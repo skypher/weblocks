@@ -1,0 +1,4 @@
+
+- Pick model persistance library (elephant!)
+- Pick unit testing framework
+- 
