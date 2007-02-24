@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "GPL"
   :description "A Common Lisp web framework."
-  :depends-on ("closer-mop" "cl-utilities")
+  :depends-on ("closer-mop" "metatilities")
   :components ((:file "weblocks")
 	       (:file "renderer-output-utils"
 		      :depends-on ("weblocks"))

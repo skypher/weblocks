@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :cl-utilities)
+  (:use :cl :c2mop :metabang.utilities)
   (:export #:humanize-name #:object-slot-names #:render-data-header #:render-data-slot
 	   #:render-data-footer #:render-data))
 

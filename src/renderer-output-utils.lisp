@@ -4,11 +4,15 @@
 ;;; Convert "some-name" or 'SOME-NAME to "Some Name"
 (defun humanize-name (name)
   "Takes a string or a symbol and converts it to a human readable format.
-   Dashes are replaced by spaces and words are capitalized."
-  (let ((namestr (if (symbolp name)
-		     (string-downcase (symbol-name name))
-		     name)))
-    (string-capitalize (substitute #\Space #\- namestr))))
+   Dashes are replaced by spaces and words are capitalized. If a string
+   ends with '-ref', it is removed."
+  (let* ((namestr (if (symbolp name)
+		      (string-downcase (symbol-name name))
+		      name))
+	 (namestrpost (if (string-ends-with namestr "-ref")
+			  (substring namestr 0 (- (length namestr) 4))
+			  namestr)))
+    (string-capitalize (substitute #\Space #\- namestrpost))))
 
 ;;; Convert 'SOME-NAME to  "some-name"
 (defun attributize-name (name)
@@ -38,6 +42,30 @@
 (defmethod object-class-name (obj)
   "Returns an object's class name."
   (class-name (class-of obj)))
+
+;;; Takes some-object and tries to figure out its name
+(defmethod object-name (obj)
+  "Takes an object and tries to guess its name. Looks for reader class-name (project-name)
+   and checks that the value is of type string."
+  (let* ((cls-symbol (class-name (class-of obj)))
+	 (cls-package (symbol-package cls-symbol))
+	 (expected-name (concatenate 'string (symbol-name cls-symbol) "-NAME"))
+	 (expected-symbol (find-symbol expected-name cls-package)))
+    (if (and (not (null expected-symbol))
+	     (fboundp expected-symbol))
+	(let ((obj-name (funcall expected-symbol obj)))
+	  (if (stringp obj-name)
+	      (return-from object-name obj-name)))))
+  nil)
+
+;;; A basic implementation of a generic function to figure out if an object should be
+;;; rendered inline. Currently an object is always rendered inline unless the slot name
+;;; end with "-ref".
+(defmethod render-slot-inline-p (obj slot-name)
+  (let ((name (if (symbolp slot-name)
+		  (symbol-name slot-name)
+		  slot-name)))
+    (not (string-ends-with name "-ref" :ignore-case-p t))))
 
 ;;; If a reader accessor for the slot exists, get its value via the accessor
 ;;; otherwise, use slot-value to access the slot
