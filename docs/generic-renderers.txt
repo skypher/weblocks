@@ -22,7 +22,12 @@ The renderer for classes will behave in the following manner:
 
 TODO:
 2. Figure out how to deal with
-   - slots that aren't simple values
-     - render object directly (without headers/footers)
+   - slots that are compound values
+     - render object directly (with or without headers/footers)
      - render the other object as text/link (how to render link/how to differentiate?)
+       - create a generic function with reasonable default implementation that returns text
+   - slots that are collections
+     - don't render at all
+     - render as links to data grids
+     - if small collection, render member names inline
 3. Make sure common customizations can be done with keyword arguments
