@@ -23,10 +23,32 @@
     (string-downcase namestr)))
 
 ;;; Returns a list of direct slot objects for a class and its subclasses
-(defmethod object-visible-slots (obj)
+(defmethod object-visible-slots (obj &key slot-names hidep observe-order-p)
   "Returns a list of direct slot objects for an object and its parents
    iff they have reader accessors."
-  (class-visible-slots (class-of obj)))
+  (let ((all-slots (class-visible-slots (class-of obj))))
+    (if hidep
+	(list->assoc (remove-if (curry-after #'member slot-names
+					     :test (lambda (a b)
+						     (string-equal (slot-definition-name a) b)))
+				all-slots)
+		     :map #'slot-definition-name)
+	(let ((slot-assoc (list->assoc slot-names)))
+	  (if observe-order-p
+	      ()
+	      (mapcar (lambda (i)
+			(cons i (let* ((slot-name (slot-definition-name i))
+				       (alt-name (assoc slot-name slot-assoc)))
+				  (if (null alt-name)
+				      slot-name
+				      (cdr alt-name)))))
+		      all-slots))))))
+
+;;; '((a . b) c (d . e)) -> ((a . b) (c . c) (d . e))
+(defun list->assoc (lst &key (map #'identity))
+  (mapcar (lambda (i)
+	    (if (consp i) i (cons i (funcall map i))))
+	  lst))
 
 ;;; Returns a list of direct slot objects for a class and its subclasses
 (defun class-visible-slots (cls)

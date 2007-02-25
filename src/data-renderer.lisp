@@ -37,19 +37,30 @@
 (defmethod render-data-footer (obj)
   (format *weblocks-output-stream* "</div>"))
 
+; slot-names is a list of slots. If hidep is t, only the slots in
+; slot-names will be displayed, otherwise the slots in slot-names will
+; be hidden and all other slots will be displayed. If observe-order-p
+; is true, slots will be displayed in the order they appear in the
+; list. This option has effect only with hidep is true. If
+; slot-names are an association list, slots will be renamed according
+; to the values in the list. This option takes effect only if hidep
+; is true.
 (defmethod render-data ((obj standard-object) &key
-			inlinep)
+			inlinep slot-names hidep observe-order-p)
   (if (not inlinep) (render-data-header obj))
   (if (not inlinep) (render-data-pre-slots obj))
   (mapc (lambda (slot)
-	  (render-data-slot obj (slot-definition-name slot) (get-slot-value obj slot)))
-	(object-visible-slots obj))
+	  (render-data-slot obj (cdr slot) (get-slot-value obj (car slot))))
+	(object-visible-slots obj
+			      :slot-names slot-names
+			      :hidep hidep
+			      :observe-order-p observe-order-p))
   (if (not inlinep) (render-data-post-slots obj))
   (if (not inlinep) (render-data-footer obj))
   *weblocks-output-stream*)
 
 (defmethod render-data (obj &key
-			inlinep)
+			inlinep slot-names hidep observe-order-p)
   (format *weblocks-output-stream* "<span>~A</span>" obj)
   *weblocks-output-stream*)
 

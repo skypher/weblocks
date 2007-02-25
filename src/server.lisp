@@ -12,7 +12,7 @@
       (stop-server *weblocks-server*)))
 
 (defun hala ()
-  (get-output-stream-string (render-data *joe-employee*)))
+  (get-output-stream-string (render-data *joe-employee* :slot-names '((first-name . blah)))))
 
 (setf *dispatch-table*
       (cons (create-prefix-dispatcher "/test" 'hala) *dispatch-table*))
