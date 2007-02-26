@@ -26,7 +26,15 @@ TODO:
      - don't render at all
      - render as links to data grids
      - if small collection, render member names inline
-3. Make sure common customizations can be done with keyword arguments
-   - show/hide/order slots
-   - rename slots
-   
+4. Make sure generic renderers look good out of the box (reference css)
+5. Make sure slots without readers are rendered if their names are passed in slot-names.
+6. Reorganize, document, and unittest the hell out of everything
+7. Create renderers for forms, tables, and lists
+7.5. Release the library?
+8. Create generic form readers (or scanners or derenderers, whatever)
+9. Create a data-form widget along with appropriate machinery
+10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
+11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.
+12. Release the library?
+13. Create a reference application.
+
