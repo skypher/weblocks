@@ -28,14 +28,18 @@
    iff they have reader accessors."
   (let ((all-slots (class-visible-slots (class-of obj))))
     (if hidep
-	(list->assoc (remove-if (curry-after #'member slot-names
-					     :test (lambda (a b)
-						     (string-equal (slot-definition-name a) b)))
-				all-slots)
+	(list->assoc (remove-if (curry-after #'member slot-names :test #'string-equal)
+				all-slots :key #'slot-definition-name)
 		     :map #'slot-definition-name)
 	(let ((slot-assoc (list->assoc slot-names)))
 	  (if observe-order-p
-	      ()
+	      (mapcar (lambda (i)
+			(let ((slot (car (member (car i) all-slots
+					    :test #'string-equal
+					    :key #'slot-definition-name))))
+			  (if (not (null slot))
+			      (cons slot (cdr i)))))
+		      slot-assoc)
 	      (mapcar (lambda (i)
 			(cons i (let* ((slot-name (slot-definition-name i))
 				       (alt-name (assoc slot-name slot-assoc)))
