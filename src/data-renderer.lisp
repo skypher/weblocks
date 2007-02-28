@@ -2,9 +2,13 @@
 (in-package :weblocks)
 
 (defmethod render-data-header (obj)
-  (format *weblocks-output-stream* "<div class=\"~A\">~%"
+  (format *weblocks-output-stream* "<div class=\"data ~A\">~%"
 	  (attributize-name (object-class-name obj)))
-  (format *weblocks-output-stream* "<p><h1>Viewing ~A</h1></p>~%"
+  (format *weblocks-output-stream*
+	  "<div class=\"extra-top-1\">&nbsp;</div>
+<div class=\"extra-top-2\">&nbsp;</div>
+<div class=\"extra-top-3\">&nbsp;</div>~%")
+  (format *weblocks-output-stream* "<h1>Viewing:&nbsp;<span>~A</span></h1>~%"
 	  (humanize-name (object-class-name obj))))
 
 (defmethod render-data-slot-object-inline (obj slot-name (slot-value standard-object))
@@ -35,6 +39,10 @@
   (format *weblocks-output-stream* "</ul>~%"))
 
 (defmethod render-data-footer (obj)
+  (format *weblocks-output-stream*
+	  "<div class=\"extra-bottom-1\">&nbsp;</div>
+<div class=\"extra-bottom-2\">&nbsp;</div>
+<div class=\"extra-bottom-3\">&nbsp;</div>~%")
   (format *weblocks-output-stream* "</div>"))
 
 ; slot-names is a list of slots. If hidep is t, only the slots in

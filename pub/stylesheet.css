@@ -1,0 +1,89 @@
+
+.data
+{
+  background: #ecf8d7 url(/pub/top_background.png) repeat-x;
+}
+
+.data > .extra-top-1
+{
+  height: 7px;
+  background: url(/pub/top_left.png) no-repeat top left;
+}
+
+.data > .extra-top-2
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/pub/top_right.png) no-repeat top right;
+  border-bottom: 1px solid #dbeac1;
+}
+
+.data > .extra-top-3
+{
+  display: none;
+}
+
+.data > h1
+{
+  margin: 0;
+  padding: 0;
+  padding-left: 0.5em;
+  border-top: 1px solid #fcfef6;
+  border-bottom: 1px solid #dbeac1;
+  border-left: 2px solid #dbeac1;
+  border-right: 2px solid #dbeac1;
+}
+
+.data > ul
+{
+  border-left: 2px solid #dbeac1;
+  border-right: 2px solid #dbeac1;
+  padding-top: 1px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.data > ul > li
+{
+  list-style: none;
+  border-top: 1px solid #fcfef6;
+  border-bottom: 1px solid #dbeac1;
+  padding-left: 2em;
+}
+
+.data > ul > li > h2
+{
+  display: inline;
+}
+
+.data > ul > li > span
+{
+  position: absolute;
+  left: 15em;
+  padding-top: 0.3em;
+}
+
+.data > .extra-bottom-1
+{
+  height: 6px;
+  background: url(/pub/bottom_background.png) repeat-x bottom;
+  border-top: 1px solid #fcfef6;
+}
+
+.data > .extra-bottom-2
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/pub/bottom_left.png) no-repeat bottom left;
+}
+
+.data > .extra-bottom-3
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/pub/bottom_right.png) no-repeat bottom right;
+}
+
+
+
