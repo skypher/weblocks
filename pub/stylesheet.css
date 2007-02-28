@@ -2,6 +2,7 @@
 .data
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
+  width: 25em;
 }
 
 .data > .extra-top-1
@@ -27,11 +28,20 @@
 {
   margin: 0;
   padding: 0;
-  padding-left: 0.5em;
+  padding-left: 0.4em;
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
+  font-size: 1.2em;
+  font-weight: bolder;
+  color: #29364F;
+  background-color: #dbeac1;
+}
+
+.data > h1 > span
+{
+  color: darkred;
 }
 
 .data > ul
@@ -49,19 +59,23 @@
   list-style: none;
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
-  padding-left: 2em;
+  padding-left: 1.5em;
 }
 
 .data > ul > li > h2
 {
   display: inline;
+  font-size: 0.95em;
+  font-weight: bolder;
+  color: grey;
 }
 
 .data > ul > li > span
 {
   position: absolute;
   left: 15em;
-  padding-top: 0.3em;
+  padding-top: 0.12em;
+  font-size: 0.9em;
 }
 
 .data > .extra-bottom-1
