@@ -8,7 +8,8 @@
 	  "<div class=\"extra-top-1\">&nbsp;</div>
 <div class=\"extra-top-2\">&nbsp;</div>
 <div class=\"extra-top-3\">&nbsp;</div>~%")
-  (format *weblocks-output-stream* "<h1>Viewing:&nbsp;<span>~A</span></h1>~%"
+  (format *weblocks-output-stream* "<h1><span class=\"action\">Viewing:&nbsp;</span>")
+  (format *weblocks-output-stream* "<span class=\"object\">~A</span></h1>~%"
 	  (humanize-name (object-class-name obj))))
 
 (defmethod render-data-slot-object-inline (obj slot-name (slot-value standard-object))

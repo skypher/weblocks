@@ -2,7 +2,7 @@
 .data
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
-  width: 25em;
+  width: 20em;
 }
 
 .data > .extra-top-1
@@ -36,12 +36,11 @@
   font-size: 1.2em;
   font-weight: bolder;
   color: #29364F;
-  background-color: #dbeac1;
 }
 
-.data > h1 > span
+.data > h1 > .action
 {
-  color: darkred;
+  display: none;
 }
 
 .data > ul
@@ -73,9 +72,10 @@
 .data > ul > li > span
 {
   position: absolute;
-  left: 15em;
+  left: 13em;
   padding-top: 0.12em;
   font-size: 0.9em;
+  font-family: "sans-serif";
 }
 
 .data > .extra-bottom-1
