@@ -8,7 +8,7 @@
 
 (defclass person ()
   ((first-name :reader first-name)
-   (last-name :reader last-name)
+   (last-name)
    (age :reader age)
 ;  (address-ref :reader address)
    (address :reader address)

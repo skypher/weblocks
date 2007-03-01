@@ -26,8 +26,6 @@ TODO:
      - don't render at all
      - render as links to data grids
      - if small collection, render member names inline
-4. Make sure generic renderers look good out of the box (reference css)
-5. Make sure slots without readers are rendered if their names are passed in slot-names.
 5.5. Make sure config flags are passed to inner objects rendered through slots.
 5.6. Reorganize the code to use s-expr library.
 6. Reorganize, document, and unittest the hell out of everything

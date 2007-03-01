@@ -26,27 +26,28 @@
 (defmethod object-visible-slots (obj &key slot-names hidep observe-order-p)
   "Returns a list of direct slot objects for an object and its parents
    iff they have reader accessors."
-  (let ((all-slots (class-visible-slots (class-of obj))))
-    (if hidep
+  (if hidep
+      (let ((all-slots (class-visible-slots (class-of obj))))
 	(list->assoc (remove-if (curry-after #'member slot-names :test #'string-equal)
 				all-slots :key #'slot-definition-name)
-		     :map #'slot-definition-name)
-	(let ((slot-assoc (list->assoc slot-names)))
-	  (if observe-order-p
-	      (mapcar (lambda (i)
-			(let ((slot (car (member (car i) all-slots
-					    :test #'string-equal
-					    :key #'slot-definition-name))))
-			  (if (not (null slot))
-			      (cons slot (cdr i)))))
-		      slot-assoc)
-	      (mapcar (lambda (i)
-			(cons i (let* ((slot-name (slot-definition-name i))
-				       (alt-name (assoc slot-name slot-assoc)))
-				  (if (null alt-name)
-				      slot-name
-				      (cdr alt-name)))))
-		      all-slots))))))
+		     :map #'slot-definition-name))
+      (let* ((slot-assoc (list->assoc slot-names))
+	     (all-slots (class-visible-slots (class-of obj) :visible-slots slot-assoc)))
+	(if observe-order-p
+	    (mapcar (lambda (i)
+		      (let ((slot (car (member (car i) all-slots
+					       :test #'string-equal
+					       :key #'slot-definition-name))))
+			(if (not (null slot))
+			    (cons slot (cdr i)))))
+		    slot-assoc)
+	    (mapcar (lambda (i)
+		      (cons i (let* ((slot-name (slot-definition-name i))
+				     (alt-name (assoc slot-name slot-assoc)))
+				(if (null alt-name)
+				    slot-name
+				    (cdr alt-name)))))
+		    all-slots)))))
 
 ;;; '((a . b) c (d . e)) -> ((a . b) (c . c) (d . e))
 (defun list->assoc (lst &key (map #'identity))
@@ -55,13 +56,16 @@
 	  lst))
 
 ;;; Returns a list of direct slot objects for a class and its subclasses
-(defun class-visible-slots (cls)
+(defun class-visible-slots (cls &key visible-slots)
   "Returns a list of direct slot objects for a class and its subclasses
-   iff they have reader accessors."
+   if they have reader accessors or they're specified in visible-slots."
   (if (eql (class-name cls) 'standard-object)
       nil
-      (apply #'append (append (mapcar #'class-visible-slots (class-direct-superclasses cls))
-			      (list (remove-if (compose #'null #'slot-definition-readers)
+      (apply #'append (append (mapcar (curry-after #'class-visible-slots :visible-slots visible-slots)
+				      (class-direct-superclasses cls))
+			      (list (remove-if (lambda (x)
+						 (and (null (slot-definition-readers x))
+						      (not (assoc (slot-definition-name x) visible-slots))))
 					       (class-direct-slots cls)))))))
 
 ;;; Takes some-object and returns its class name

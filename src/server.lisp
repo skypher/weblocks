@@ -17,7 +17,7 @@
 <head>
 <link rel=\"stylesheet\" type=\"text/css\" href=\"pub/stylesheet.css\" />
 </head>~%~%<body>~%")
-  (render-data *joe-employee* :slot-names '((first-name . fn)))
+  (render-data *joe-employee* :slot-names '(last-name))
   (format *weblocks-output-stream* "</body></html>")
 
   (get-output-stream-string *weblocks-output-stream*))
