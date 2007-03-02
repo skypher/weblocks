@@ -26,28 +26,30 @@
 (defmethod object-visible-slots (obj &key slot-names hidep observe-order-p)
   "Returns a list of direct slot objects for an object and its parents
    iff they have reader accessors."
-  (if hidep
-      (let ((all-slots (class-visible-slots (class-of obj))))
-	(list->assoc (remove-if (curry-after #'member slot-names :test #'string-equal)
-				all-slots :key #'slot-definition-name)
-		     :map #'slot-definition-name))
-      (let* ((slot-assoc (list->assoc slot-names))
-	     (all-slots (class-visible-slots (class-of obj) :visible-slots slot-assoc)))
-	(if observe-order-p
-	    (mapcar (lambda (i)
-		      (let ((slot (car (member (car i) all-slots
-					       :test #'string-equal
-					       :key #'slot-definition-name))))
-			(if (not (null slot))
-			    (cons slot (cdr i)))))
-		    slot-assoc)
-	    (mapcar (lambda (i)
-		      (cons i (let* ((slot-name (slot-definition-name i))
-				     (alt-name (assoc slot-name slot-assoc)))
-				(if (null alt-name)
-				    slot-name
-				    (cdr alt-name)))))
-		    all-slots)))))
+  (remove-if
+   (curry #'eq nil)
+   (if hidep
+       (let ((all-slots (class-visible-slots (class-of obj))))
+	 (list->assoc (remove-if (curry-after #'member slot-names :test #'string-equal)
+				 all-slots :key #'slot-definition-name)
+		      :map #'slot-definition-name))
+       (let* ((slot-assoc (list->assoc slot-names))
+	      (all-slots (class-visible-slots (class-of obj) :visible-slots slot-assoc)))
+	 (if observe-order-p
+	     (mapcar (lambda (i)
+		       (let ((slot (car (member (car i) all-slots
+						:test #'string-equal
+						:key #'slot-definition-name))))
+			 (if (not (null slot))
+			     (cons slot (cdr i)))))
+		     slot-assoc)
+	     (mapcar (lambda (i)
+		       (cons i (let* ((slot-name (slot-definition-name i))
+				      (alt-name (assoc slot-name slot-assoc)))
+				 (if (null alt-name)
+				     slot-name
+				     (cdr alt-name)))))
+		     all-slots))))))
 
 ;;; '((a . b) c (d . e)) -> ((a . b) (c . c) (d . e))
 (defun list->assoc (lst &key (map #'identity))

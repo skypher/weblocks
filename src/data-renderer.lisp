@@ -12,25 +12,25 @@
   (format *weblocks-output-stream* "<span class=\"object\">~A</span></h1>~%"
 	  (humanize-name (object-class-name obj))))
 
-(defmethod render-data-slot-object-inline (obj slot-name (slot-value standard-object))
+(defmethod render-data-slot-object-inline (obj slot-name (slot-value standard-object) &rest args)
   (format *weblocks-output-stream* "~%<!-- Rendering ~A -->~%" (attributize-name slot-name))
-  (render-data slot-value :inlinep t)
+  (apply #'render-data slot-value :inlinep t args)
   (format *weblocks-output-stream* "~%"))
 
-(defmethod render-data-slot-object-reference (obj slot-name (slot-value standard-object))
+(defmethod render-data-slot-object-reference (obj slot-name (slot-value standard-object) &rest args)
   (let ((obj-name (object-name slot-value)))
     (if (not (null obj-name))
-	(render-data-slot obj slot-name obj-name))))
+	(apply #'render-data-slot obj slot-name obj-name args))))
 
-(defmethod render-data-slot (obj slot-name (slot-value standard-object))
+(defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest args)
   (if (render-slot-inline-p obj slot-name)
-      (render-data-slot-object-inline obj slot-name slot-value)
-      (render-data-slot-object-reference obj slot-name slot-value)))
+      (apply #'render-data-slot-object-inline obj slot-name slot-value args)
+      (apply #'render-data-slot-object-reference obj slot-name slot-value args)))
 
-(defmethod render-data-slot (obj slot-name slot-value)
+(defmethod render-data-slot (obj slot-name slot-value &rest args)
   (format *weblocks-output-stream* "<li><h2>~A:</h2>"
 	  (humanize-name slot-name))
-  (render-data slot-value)
+  (apply #'render-data slot-value args)
   (format *weblocks-output-stream* "</li>~%"))
 
 (defmethod render-data-pre-slots (obj)
@@ -59,7 +59,8 @@
   (if (not inlinep) (render-data-header obj))
   (if (not inlinep) (render-data-pre-slots obj))
   (mapc (lambda (slot)
-	  (render-data-slot obj (cdr slot) (get-slot-value obj (car slot))))
+	  (apply #'render-data-slot obj (cdr slot) (get-slot-value obj (car slot))
+		 `(:slot-names ,slot-names :hidep ,hidep :observe-order-p ,observe-order-p)))
 	(object-visible-slots obj
 			      :slot-names slot-names
 			      :hidep hidep

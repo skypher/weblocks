@@ -26,7 +26,6 @@ TODO:
      - don't render at all
      - render as links to data grids
      - if small collection, render member names inline
-5.5. Make sure config flags are passed to inner objects rendered through slots.
 5.6. Reorganize the code to use s-expr library.
 6. Reorganize, document, and unittest the hell out of everything
 7. Create renderers for forms, tables, and lists

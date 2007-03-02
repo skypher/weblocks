@@ -3,12 +3,12 @@
 
 (defclass address ()
   ((street :reader street)
-   (city :reader city)
+   (city)
    (state :reader state)))
 
 (defclass person ()
   ((first-name :reader first-name)
-   (last-name)
+   (last-name :reader last-name)
    (age :reader age)
 ;  (address-ref :reader address)
    (address :reader address)
