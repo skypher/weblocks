@@ -1,5 +1,5 @@
 
 (defpackage #:weblocks-scripts
-  (:use :cl :weblocks :tinaa)
+  (:use :cl :tinaa)
   (:export #:document-weblocks))
 
