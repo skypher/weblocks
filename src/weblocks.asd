@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "GPL"
   :description "A Common Lisp web framework."
-  :depends-on ("closer-mop" "metatilities" "hunchentoot" "tinaa")
+  :depends-on ("closer-mop" "metatilities" "hunchentoot")
   :components ((:file "weblocks")
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
@@ -19,8 +19,6 @@
 			      :components ((:file "data-renderer"))))
 		:depends-on ("weblocks"))
 	       (:file "server"
-		      :depends-on (renderers))
-	       (:file "scripts"
-		      :depends-on ("weblocks"))))
+		      :depends-on (renderers))))
 
 

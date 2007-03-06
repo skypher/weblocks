@@ -1,8 +1,4 @@
 
-(defpackage #:weblocks-scripts
-  (:use :cl :weblocks :tinaa :rt)
-  (:export #:document-weblocks))
-
 (in-package :weblocks-scripts)
 
 (defun document-weblocks ()
