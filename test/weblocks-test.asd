@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "GPL"
   :description "A test harness for weblocks framework."
-  :depends-on ("weblocks" "rt")
+  :depends-on ("weblocks" "rt" "closer-mop")
   :components ((:file "weblocks-test")
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
