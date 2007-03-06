@@ -1,5 +1,11 @@
 
-(in-package :weblocks)
+(defpackage #:weblocks-scripts
+  (:use :cl :weblocks :tinaa :rt)
+  (:export #:document-weblocks #:test-weblocks))
+
+(in-package :weblocks-scripts)
 
 (defun document-weblocks ()
-  (tinaa:document-system 'package :weblocks "../docs/gen/" :show-parts-without-documentation? t))
+  (document-system 'package :weblocks "../docs/gen/" :show-parts-without-documentation? t))
+
+
