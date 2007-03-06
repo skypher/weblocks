@@ -1,7 +1,7 @@
 
 (defpackage #:weblocks-scripts
   (:use :cl :weblocks :tinaa :rt)
-  (:export #:document-weblocks #:test-weblocks))
+  (:export #:document-weblocks))
 
 (in-package :weblocks-scripts)
 
