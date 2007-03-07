@@ -46,20 +46,64 @@ Ex:
 	    (if (consp i) i (cons i (funcall map i))))
 	  lst))
 
-;;; Returns a list of direct slot objects for a class and its subclasses
-(defmethod object-visible-slots (obj &key slot-names hidep observe-order-p)
-  "Returns a list of direct slot objects for an object and its parents
-   iff they have reader accessors."
+(defgeneric object-visible-slots (obj &key slots mode)
+  (:documentation
+   "Returns a list of cons cells where 'car' of each member is
+the 'direct-slot-object' and a 'cdr' of each member is a symbol
+or a string representing the name of the slot. The rules for
+determining visible slots are the same as for
+'class-visible-slots'. This method is used by renderers to
+determine which slots should be displayed. Specialize this method
+for your objects to customize this behavior. (Note, look for
+documentation of 'class-visible-slots' for relevant definitions
+used in the examples.)
+
+Ex:
+\(object-visible-slots *joe*) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . NAME)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION MANAGER> . MANAGER))
+
+If 'mode' keyword parameter is set to nil (the default), 'slots'
+keyword parameter is expected to contain a list of cons cells
+that modify the names of the slots as well as slot names that
+should be displayed even though they have no accessors. This is
+used by the renderers to easily change rendered field names.
+
+Ex:
+\(object-visible-slots *joe* :slots (age (name . first-name))) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . FIRST-NAME)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION AGE> . AGE)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION MANAGER> . MANAGER))
+
+If 'mode' is set to ':hide', 'slots' is expected to contain a
+list of slot names that should not be displayed (and hence will
+not be returned by 'object-visible-slots'.)
+
+Ex:
+\(object-visible-slots *joe* :slots (name) :mode :hide) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION MANAGER> . MANAGER))
+
+If 'mode' is set to ':strict', 'slots' has similar semantics to
+when 'mode' is set to nil, except that only the slots listed will
+be displayed and the order will be maintained:
+
+Ex:
+\(object-visible-slots *joe* :slots (age (name . first-name)) :mode :strict) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION AGE> . AGE)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . FIRST-NAME))
+"))
+
+(defmethod object-visible-slots (obj &key slots mode)
   (remove-if
    (curry #'eq nil)
-   (if hidep
+   (if (eql mode :hide)
        (let ((all-slots (class-visible-slots (class-of obj))))
-	 (list->assoc (remove-if (curry-after #'member slot-names :test #'string-equal)
+	 (list->assoc (remove-if (curry-after #'member slots :test #'string-equal)
 				 all-slots :key #'slot-definition-name)
 		      :map #'slot-definition-name))
-       (let* ((slot-assoc (list->assoc slot-names))
+       (let* ((slot-assoc (list->assoc slots))
 	      (all-slots (class-visible-slots (class-of obj) :visible-slots (mapcar #'car slot-assoc))))
-	 (if observe-order-p
+	 (if (eql mode :strict)
 	     (mapcar (lambda (i)
 		       (let ((slot (car (member (car i) all-slots
 						:test #'string-equal
@@ -76,10 +120,15 @@ Ex:
 		     all-slots))))))
 
 (defun class-visible-slots (cls &key visible-slots)
-  "Returns a list of 'standard-direct-slot' objects for a class and its subclasses. Slots objects for slots that do not have reader accessors are filtered out and not returned. This behavior can be modified by providing a list of symbols indicating slot names via 'visible-slots' keyword argument. Slot objects whose names show up in 'visible-slots' list are returned regardless of whether an accessor is defined for them.
+  "Returns a list of 'standard-direct-slot' objects for a class
+and its subclasses. Slots objects for slots that do not have
+reader accessors are filtered out and not returned. This behavior
+can be modified by providing a list of symbols indicating slot
+names via 'visible-slots' keyword argument. Slot objects whose
+names show up in 'visible-slots' list are returned regardless of
+whether an accessor is defined for them.
 
-Ex:
-\(defclass person ()
+Ex: \(defclass person ()
   ((name :reader first-name :initform \"Joe\")
    (age :initform 30)))
 
@@ -91,7 +140,7 @@ Ex:
 \(class-visible-slots *joe*) =>
     (#<STANDARD-DIRECT-SLOT-DEFINITION NAME>
      #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>)
-\(class-visible-slots *joe*) =>
+\(class-visible-slots *joe* :visible-slots '(age)) =>
     (#<STANDARD-DIRECT-SLOT-DEFINITION NAME>
      #<STANDARD-DIRECT-SLOT-DEFINITION AGE>
      #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>)"
