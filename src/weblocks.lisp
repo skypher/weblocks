@@ -5,7 +5,18 @@
 	   #:class-visible-slots #:object-visible-slots #:object-class-name
 	   #:object-name #:render-slot-inline-p #:get-slot-value
 	   #:render-data-header #:render-data-slot #:render-data-footer
-	   #:render-data))
+	   #:render-data)
+  (:documentation
+   "Weblocks is a Common Lisp framework that eases the pain of
+web application development. It achieves its goals by
+standardizing on various libraries, providing flexible and
+extensible generic renderers, and exposing a unique widget-based
+approach to maintaining UI state.
+
+You can use the following starting points to dive into the
+documentation:
+
+Generic function 'render-data'."))
 
 (in-package :weblocks)
 
