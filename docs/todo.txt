@@ -2,4 +2,4 @@
 - Pick model persistance library (elephant!)
 - Pick unit testing framework (rt)
 - Pick documentation framework (tinaa)
-- Pick sexpr->html lib
+- Pick sexpr->html lib (cl-who)

@@ -2,15 +2,14 @@
 (in-package :weblocks)
 
 (defmethod render-data-header (obj)
-  (format *weblocks-output-stream* "<div class=\"data ~A\">~%"
-	  (attributize-name (object-class-name obj)))
-  (format *weblocks-output-stream*
-	  "<div class=\"extra-top-1\">&nbsp;</div>
-<div class=\"extra-top-2\">&nbsp;</div>
-<div class=\"extra-top-3\">&nbsp;</div>~%")
-  (format *weblocks-output-stream* "<h1><span class=\"action\">Viewing:&nbsp;</span>")
-  (format *weblocks-output-stream* "<span class=\"object\">~A</span></h1>~%"
-	  (humanize-name (object-class-name obj))))
+  (with-html-output (*weblocks-output-stream*)
+    (fmt "<div class=\"data ~A\">~%"
+	 (attributize-name (object-class-name obj)))
+    (loop for i from 1 to 3
+          for attr = (format nil "extra-top-~A" i)
+       do (htm (:div :class attr "&nbsp;")))
+    (:h1 (:span :class "action" "Viewing:&nbsp;")
+	 (:span :class "object" (str (humanize-name (object-class-name obj)))))))
 
 (defmethod render-data-slot-object-inline (obj slot-name (slot-value standard-object) &rest args)
   (format *weblocks-output-stream* "~%<!-- Rendering ~A -->~%" (attributize-name slot-name))
@@ -26,10 +25,9 @@
       (apply #'render-data-slot-object-reference obj slot-name slot-value args)))
 
 (defmethod render-data-slot (obj slot-name slot-value &rest args)
-  (format *weblocks-output-stream* "<li><h2>~A:</h2>"
-	  (humanize-name slot-name))
-  (apply #'render-data slot-value args)
-  (format *weblocks-output-stream* "</li>~%"))
+  (with-html-output (*weblocks-output-stream*)
+    (:li (:h2 (str (humanize-name slot-name)) ":")
+	 (apply #'render-data slot-value args))))
 
 (defmethod render-data-pre-slots (obj)
   (format *weblocks-output-stream* "<ul>~%"))
@@ -38,11 +36,11 @@
   (format *weblocks-output-stream* "</ul>~%"))
 
 (defmethod render-data-footer (obj)
-  (format *weblocks-output-stream*
-	  "<div class=\"extra-bottom-1\">&nbsp;</div>
-<div class=\"extra-bottom-2\">&nbsp;</div>
-<div class=\"extra-bottom-3\">&nbsp;</div>~%")
-  (format *weblocks-output-stream* "</div>"))
+  (with-html-output (*weblocks-output-stream*)
+    (loop for i from 1 to 3
+          for attr = (format nil "extra-bottom-~A" i)
+       do (htm (:div :class attr "&nbsp;")))
+  (format *weblocks-output-stream* "</div>")))
 
 ; slot-names is a list of slots. If hidep is t, only the slots in
 ; slot-names will be displayed, otherwise the slots in slot-names will
@@ -65,6 +63,7 @@
   *weblocks-output-stream*)
 
 (defmethod render-data (obj &rest keys &key inlinep &allow-other-keys)
-  (format *weblocks-output-stream* "<span>~A</span>" obj)
+  (with-html-output (*weblocks-output-stream*)
+    (:span (str obj)))
   *weblocks-output-stream*)
 

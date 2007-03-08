@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :hunchentoot)
+  (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who)
   (:export #:humanize-name #:attributize-name #:list->assoc
 	   #:class-visible-slots #:object-visible-slots #:object-class-name
 	   #:object-name #:render-slot-inline-p #:get-slot-value
