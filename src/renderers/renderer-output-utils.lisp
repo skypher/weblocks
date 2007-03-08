@@ -153,15 +153,35 @@ Ex: \(defclass person ()
 						      (not (member (slot-definition-name x) visible-slots))))
 					       (class-direct-slots cls)))))))
 
-;;; Takes some-object and returns its class name
+(defgeneric object-class-name (obj)
+  (:documentation
+   "Returns an object's class name (i.e. \"Employee\"). This
+method is used by renderers to present the name of an entity to
+the user. Override this method to change the name for particular
+objects."))
+
 (defmethod object-class-name (obj)
-  "Returns an object's class name."
   (class-name (class-of obj)))
 
-;;; Takes some-object and tries to figure out its name
+(defgeneric object-name (obj)
+  (:documentation
+   "Takes an object and returns its name (as opposed to class
+name, the name of an object is specific to its instance,
+i.e. \"Joe Average\", instead of \"Employee\"). The renderers use
+this method to present objects that aren't rendered inline by
+name.
+
+By default this method looks for a symbol of a form
+[class-name]-NAME (e.g. EMPLOYEE-NAME) in the same package where
+the class of 'obj' was defined. If this symbol is bound to a
+function the function is then callsed with the object as the only
+argument. If it returns a string, the value is returned as the
+name of the object. Otherwise, the value of 'object-class-name'
+is returned.
+
+Override this method to provide object names."))
+
 (defmethod object-name (obj)
-  "Takes an object and tries to guess its name. Looks for reader class-name (project-name)
-   and checks that the value is of type string."
   (let* ((cls-symbol (class-name (class-of obj)))
 	 (cls-package (symbol-package cls-symbol))
 	 (expected-name (concatenate 'string (symbol-name cls-symbol) "-NAME"))
@@ -171,20 +191,31 @@ Ex: \(defclass person ()
 	(let ((obj-name (funcall expected-symbol obj)))
 	  (if (stringp obj-name)
 	      (return-from object-name obj-name)))))
-  nil)
+  (object-class-name obj))
 
-;;; A basic implementation of a generic function to figure out if an object should be
-;;; rendered inline. Currently an object is always rendered inline unless the slot name
-;;; end with "-ref".
+(defgeneric render-slot-inline-p (obj slot-name)
+  (:documentation
+   "Returns a boolean value that indicates whether an object
+should be rendered inline. The renderers use this method to
+determine whether the fields of a complex slot should be rendered
+as part of the object, or the name of the object the slot
+represents should be rendered instead.
+
+The default implementation returns true if the slot name ends
+with \"-ref\" and nil otherwise.
+
+Override this method to specify whether objects should be
+rendered inline."))
+
 (defmethod render-slot-inline-p (obj slot-name)
   (let ((name (if (symbolp slot-name)
 		  (symbol-name slot-name)
 		  slot-name)))
     (not (string-ends-with name "-ref" :ignore-case-p t))))
 
-;;; If a reader accessor for the slot exists, get its value via the accessor
-;;; otherwise, use slot-value to access the slot
 (defun get-slot-value (obj slot)
+  "If a reader accessor for the slot exists, gets the value of
+'slot' via the accessor. Otherwise, uses slot-value."
   (let ((slot-reader (car (slot-definition-readers slot))))
     (if (null slot-reader)
 	(slot-value obj (slot-definition-name slot))

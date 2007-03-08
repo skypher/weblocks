@@ -18,9 +18,7 @@
   (format *weblocks-output-stream* "~%"))
 
 (defmethod render-data-slot-object-reference (obj slot-name (slot-value standard-object) &rest args)
-  (let ((obj-name (object-name slot-value)))
-    (if (not (null obj-name))
-	(apply #'render-data-slot obj slot-name obj-name args))))
+  (apply #'render-data-slot obj slot-name (object-name slot-value) args))
 
 (defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest args)
   (if (render-slot-inline-p obj slot-name)

@@ -29,9 +29,16 @@
   ((name . name) (age . age) (city . location)))
 
 ;;; Define classes for introspection testing
+(defclass address ()
+  ((street :reader address-street :initform "100 Broadway")
+   (city :reader address-city :initform "New York")))
+
+(defparameter *home-address* (make-instance 'address))
+
 (defclass person ()
   ((name :reader first-name :initform "Joe")
-   (age :initform 30)))
+   (age :initform 30)
+   (address-ref :initform *home-address*)))
 
 (defclass employee (person)
   ((manager :reader manager :initform "Jim")))
@@ -100,3 +107,50 @@
 (deftest object-visible-slots-9
     (object-visible-slot-names *joe* :slots '(manager) :mode :strict)
   ((manager . manager)))
+
+;;; Test object-class-name
+(deftest object-class-name-1
+    (object-class-name *joe*)
+  employee)
+
+;;; Test object-name
+(deftest object-name-1
+    (object-name *joe*)
+  employee)
+
+(deftest object-name-2
+    (let (employee-name)
+      (defun employee-name (empl)
+	(first-name empl))
+      (setf employee-name (object-name *joe*))
+      (fmakunbound 'employee-name)
+      employee-name)
+  "Joe")
+
+(deftest object-name-3
+    (let (employee-name)
+      (defun employee-name (empl)
+	123)
+      (setf employee-name (object-name *joe*))
+      (fmakunbound 'employee-name)
+      employee-name)
+  employee)
+
+;;; Test render-slot-inline-p
+(deftest render-slot-inline-p-1
+    (render-slot-inline-p *joe* 'name)
+  t)
+
+(deftest render-slot-inline-p-2
+    (render-slot-inline-p *joe* 'address-ref)
+  nil)
+
+;;; Test get-slot-value
+(deftest get-slot-value-1
+    (get-slot-value *joe* (car (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
+  30)
+
+(deftest get-slot-value-2
+    (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
+  "Joe")
+
