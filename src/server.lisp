@@ -12,7 +12,7 @@
   ((first-name :reader first-name)
    (last-name :reader last-name)
    (age :reader age)
-;  (address-ref :reader address)
+;   (address-ref :reader address)
    (address :reader address)
    (id :initform 1)))
 
@@ -31,6 +31,7 @@
   (setf (slot-value addr 'state) "NY")
 ;  (setf (slot-value *joe-employee* 'address-ref) addr))
   (setf (slot-value *joe-employee* 'address) addr))
+
 
 (setf (slot-value *joe-employee* 'department) "Technology")
 
