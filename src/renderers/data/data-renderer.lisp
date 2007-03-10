@@ -2,6 +2,12 @@
 (in-package :weblocks)
 
 (defun render-extra-tags (tag-class count)
+  "Renders extra tags to get around CSS limitations. 'tag-class'
+is a string that specifies the class name and 'count' is the
+number of extra tags to render.
+Ex:
+\(render-extra-tags \"extra-\" 2) =>
+\"<div class=\"extra-1\">&nbsp;</div><div class=\"extra-1\">&nbsp;</div>\""
   (with-html-output (*weblocks-output-stream*)
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
@@ -27,6 +33,40 @@
   (with-html-output (*weblocks-output-stream*)
     (:li (:h2 (str (humanize-name slot-name)) ":")
 	 (apply #'render-data slot-value args))))
+
+(defgeneric render-data (obj &rest keys &key inlinep &allow-other-keys)
+  (:documentation
+   "A generic data presentation renderer. The default
+implementation of 'render-data' for CLOS objects dynamically
+introspects object instances and serializes them to HTML
+according to the following protocol:
+
+1. If 'inlinep' is false a generic function 'with-data-header' is
+called to render headers and footers. To avoid rendering headers
+and footers set 'inlinep' to nil. Specialize 'with-data-header'
+to customize header and footer HTML.
+
+2. 'object-visible-slots' is called to determine which slots in
+the object instance should be rendered. Any additional keys
+passed to 'render-data' are forwarded to
+'object-visible-slots'. To customize the order of the slots,
+their names, visibility, etc. look at 'object-visible-slots'
+documentation for necessary arguments, or specialize
+'object-visible-slots'.
+
+3. On each slot returned by the previous step, 'get-slot-value'
+is called to determine its value and 'render-data-slot' is called
+to render the slot. Specialize 'render-data-slot' to get
+customized behavior.
+
+If specializing above steps isn't sufficient to produce required
+HTML, 'render-data' should be specialized for particular objects.
+
+Ex:
+\(render-data address)
+\(render-data address :slots (city) :mode :hide
+\(render-data address :slots ((city . town))
+\(render-data address :slots ((city . town)) :mode :strict"))
 
 (defmethod render-data ((obj standard-object) &rest keys &key inlinep &allow-other-keys)
   (let ((render-body

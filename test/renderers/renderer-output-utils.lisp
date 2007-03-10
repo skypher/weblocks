@@ -28,24 +28,6 @@
     (list->assoc '(name age (city . location)))
   ((name . name) (age . age) (city . location)))
 
-;;; Define classes for introspection testing
-(defclass address ()
-  ((street :reader address-street :initform "100 Broadway")
-   (city :reader address-city :initform "New York")))
-
-(defparameter *home-address* (make-instance 'address))
-
-(defclass person ()
-  ((name :reader first-name :initform "Joe")
-   (age :initform 30)
-   (address-ref :initform *home-address*)))
-
-(defclass employee (person)
-  ((manager :reader manager :initform "Jim")))
-
-;;; Create an instance for introspection testing
-(defparameter *joe* (make-instance 'employee))
-
 ;;; Introspection helper
 (defun class-visible-slot-names (obj &rest args)
   (mapcar #'slot-definition-name

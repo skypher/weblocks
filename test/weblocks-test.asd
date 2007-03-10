@@ -13,10 +13,13 @@
   :description "A test harness for weblocks framework."
   :depends-on ("weblocks" "rt" "closer-mop")
   :components ((:file "weblocks-test")
+	       (:module fixtures
+		:components ((:file "shared"))
+		:depends-on ("weblocks-test"))
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
 			     (:module data
 			      :components ((:file "data-renderer"))))
-		:depends-on ("weblocks-test"))))
+		:depends-on ("weblocks-test" fixtures))))
 
 
