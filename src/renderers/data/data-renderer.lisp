@@ -13,6 +13,20 @@ Ex:
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "&nbsp;")))))
 
+(defgeneric with-data-header (obj body-fn)
+  (:documentation
+   "Responsible for rendering headers of a data presentation. The
+default method renders a humanized name of the object along with
+appropriate CSS classes and extra tags for styling. The default
+implementation also sets up an unordered list. After the header
+is set up, 'with-data-header' calls a function of zero arguments
+'body-fn' which renders the body of the object (slots, etc.)
+'with-data-header' renders a footer after that.
+
+'with-data-header' is normally called by 'render-data' and should
+not be called by the programmer. Override 'with-data-header' to
+provide customized header rendering."))
+
 (defmethod with-data-header (obj body-fn)
   (let ((header-class (format nil "data ~A"
 			      (attributize-name (object-class-name obj)))))

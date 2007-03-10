@@ -4,7 +4,8 @@
   (:export #:humanize-name #:attributize-name #:list->assoc
 	   #:class-visible-slots #:object-visible-slots #:object-class-name
 	   #:object-name #:render-slot-inline-p #:get-slot-value
-	   #:*weblocks-output-stream* #:render-data)
+	   #:*weblocks-output-stream* #:render-extra-tags
+	   #:with-data-header #:render-data-slot #:render-data)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of
 web application development. It achieves its goals by
