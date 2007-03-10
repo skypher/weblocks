@@ -21,6 +21,21 @@
 	(:div :class "extra-bottom-2" "&nbsp;")
 	(:div :class "extra-bottom-3" "&nbsp;")))
 
+;;; test render-data-slot
+(deftest-html render-data-slot-1
+    (render-data-slot *joe* 'first-name "Joe")
+  (:li (:h2 "First Name:") (:span "Joe")))
+
+(deftest-html render-data-slot-2
+    (render-data-slot *joe* 'address-ref *home-address*)
+  (:li (:h2 "Address:") (:span "ADDRESS")))
+
+(deftest-html render-data-slot-3
+    (render-data-slot *joe* 'education *some-college*)
+  (htm
+   (:li (:h2 "University:") (:span "Bene Gesserit University"))
+   (:li (:h2 "Graduation Year:") (:span "2000"))))
+
 ;;; test render-data
 (deftest-html render-data-1
     (render-data "test")

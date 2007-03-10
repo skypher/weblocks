@@ -38,6 +38,26 @@ provide customized header rendering."))
 		 (:ul (funcall body-fn)))
 	    (render-extra-tags "extra-bottom-" 3)))))
 
+(defgeneric render-data-slot (obj slot-name slot-value &rest args)
+  (:documentation
+   "Renders a given slot of a particular object.
+
+'obj' - The object whose slot is being rendered.
+'slot-name' - The name of a slot (a symbol) being rendered.
+'slot-value' - The value of a slot determined with 'get-slot-value'.
+'args' - A list of arguments to pass to 'render-data'.
+
+The default implementation renders a list item. If the slot's
+value is a CLOS object, 'render-data-slot' determines whether the
+slot should be rendered iline via 'render-slot-inline-p' and then
+calls 'render-data' with 'inlinep' value being set
+appropriately.
+
+Override this function to render a slot in a customized
+manner. Note that you can override based on the object as well as
+slot name, which gives significant freedom in selecting the
+proper slot to override."))
+
 (defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest args)
   (if (render-slot-inline-p obj slot-name)
       (apply #'render-data slot-value :inlinep t args)
