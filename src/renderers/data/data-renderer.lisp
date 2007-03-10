@@ -100,7 +100,7 @@ Ex:
 \(render-data address)
 \(render-data address :slots (city) :mode :hide
 \(render-data address :slots ((city . town))
-\(render-data address :slots ((city . town)) :mode :strict"))
+\(render-data address :slots ((city . town) :mode :strict)"))
 
 (defmethod render-data ((obj standard-object) &rest keys &key inlinep &allow-other-keys)
   (let ((render-body
