@@ -1,18 +1,6 @@
 ;;;; Generic data renderer
 (in-package :weblocks)
 
-(defun render-extra-tags (tag-class count)
-  "Renders extra tags to get around CSS limitations. 'tag-class'
-is a string that specifies the class name and 'count' is the
-number of extra tags to render.
-Ex:
-\(render-extra-tags \"extra-\" 2) =>
-\"<div class=\"extra-1\">&nbsp;</div><div class=\"extra-1\">&nbsp;</div>\""
-  (with-html-output (*weblocks-output-stream*)
-    (loop for i from 1 to count
-          for attr = (format nil "~A~A" tag-class i)
-       do (htm (:div :class attr "&nbsp;")))))
-
 (defgeneric with-data-header (obj body-fn)
   (:documentation
    "Responsible for rendering headers of a data presentation. The
