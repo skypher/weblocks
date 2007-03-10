@@ -1,12 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test render-extra-tags
-(deftest-html render-extra-tags-1
-    (render-extra-tags "test-" 2)
-  (htm (:div :class "test-1" "&nbsp;")
-       (:div :class "test-2" "&nbsp;")))
-
 ;;; test with-data-header
 (deftest-html with-data-header-1
     (with-data-header *joe* (lambda () nil))

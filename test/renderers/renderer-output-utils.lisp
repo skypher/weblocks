@@ -136,3 +136,8 @@
     (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
   "Joe")
 
+;;; test render-extra-tags
+(deftest-html render-extra-tags-1
+    (render-extra-tags "test-" 2)
+  (htm (:div :class "test-1" "&nbsp;")
+       (:div :class "test-2" "&nbsp;")))
