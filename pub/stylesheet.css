@@ -72,9 +72,8 @@
 
 .data > ul > li > span
 {
-  position: absolute;
-  left: 13em;
-  padding-top: 0.12em;
+  float: right;
+  width: 12em;
   font-size: 0.9em;
   font-family: "sans-serif";
 }
