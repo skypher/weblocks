@@ -15,8 +15,10 @@
   :components ((:file "weblocks")
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
-			     (:module data
-			      :components ((:file "data-renderer"))))
+			     (:file "data-renderer"
+				    :depends-on ("renderer-output-utils"))
+			     (:file "form-renderer"
+			            :depends-on ("renderer-output-utils")))
 		:depends-on ("weblocks"))
 	       (:file "server"
 		      :depends-on (renderers))))

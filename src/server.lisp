@@ -44,14 +44,17 @@
       (stop-server *weblocks-server*)))
 
 (defun hala ()
-  (format *weblocks-output-stream* "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.0//EN\" \"http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd\">
-<html>
-<head>
-<link rel=\"stylesheet\" type=\"text/css\" href=\"pub/stylesheet.css\" />
-</head>~%~%<body>~%")
-  (render-data *joe-employee*)
-  (format *weblocks-output-stream* "</body></html>")
-
+  (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
+  (with-html-output (*weblocks-output-stream* nil :prologue t)
+    (:html
+     (:head
+      (:title "Hello!")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/form-stylesheet.css")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/stylesheet.css"))
+     (:body
+      (render-form *joe-employee*)
+      (htm :br)
+      (render-data *joe-employee*))))
   (get-output-stream-string *weblocks-output-stream*))
 
 (setf *dispatch-table*

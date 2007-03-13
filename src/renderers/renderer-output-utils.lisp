@@ -46,7 +46,7 @@ Ex:
 	    (if (consp i) i (cons i (funcall map i))))
 	  lst))
 
-(defgeneric object-visible-slots (obj &key slots mode)
+(defgeneric object-visible-slots (obj &key slots mode &allow-other-keys)
   (:documentation
    "Returns a list of cons cells where 'car' of each member is
 the 'direct-slot-object' and a 'cdr' of each member is a symbol
@@ -93,7 +93,7 @@ Ex:
      (#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . FIRST-NAME))
 "))
 
-(defmethod object-visible-slots (obj &key slots mode)
+(defmethod object-visible-slots (obj &key slots mode &allow-other-keys)
   (remove-if
    (curry #'eq nil)
    (if (eql mode :hide)

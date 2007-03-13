@@ -1,17 +1,17 @@
 
-.data
+.form
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
   width: 25em;
 }
 
-.data > .extra-top-1
+.form > .extra-top-1
 {
   height: 7px;
   background: url(/pub/top_left.png) no-repeat top left;
 }
 
-.data > .extra-top-2
+.form > .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
@@ -19,12 +19,19 @@
   border-bottom: 1px solid #dbeac1;
 }
 
-.data > .extra-top-3
+.form > .extra-top-3
 {
   display: none;
 }
 
-.data > h1
+.form > fieldset
+{
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form > fieldset > h1
 {
   margin: 0;
   padding: 0;
@@ -38,23 +45,21 @@
   color: #29364F;
 }
 
-.data > h1 > .action
+.form > fieldset > h1 > .action
 {
   display: none;
 }
 
-.data > ul
+.form > fieldset > ul
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
   padding-top: 1px;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: 0;
   padding-left: 0;
+  margin: 0;
 }
 
-.data > ul > li
+.form > fieldset > ul > li
 {
   list-style: none;
   border-top: 1px solid #fcfef6;
@@ -64,38 +69,66 @@
   height: 1.5em;
 }
 
-.data > ul > li > h2
+.form > fieldset > ul > li > label
 {
   font-size: 0.95em;
   font-weight: bolder;
   color: grey;
+  display: block;
+}
+
+.form > fieldset > ul > li > span
+{
+  font-size: 0.9em;
+  font-family: "sans-serif";
+  position: absolute;
+  left: 12em;
+  margin-top: -1.5em;
+}
+
+.form > fieldset > ul > li > span > input
+{
+  width: 17em;
+  border: solid 1px black;
+  font-size: 0.9em;
+}
+
+.form > fieldset > ul > li.submit
+{
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.form > fieldset > ul > li.submit > span
+{
+  position: absolute;;
+  left: 12em;
   margin-top: 0;
 }
 
-.data > ul > li > span
+.form > fieldset > ul > li.submit > span > button
 {
-  position: absolute;
-  left: 12em;
-  margin-top: -1.3em;
+  margin-right: 0.5em;
   font-size: 0.9em;
-  font-family: "sans-serif";
+  border: solid 1px black;
 }
 
-.data > .extra-bottom-1
+
+.form > .extra-bottom-1
 {
   height: 6px;
   background: url(/pub/bottom_background.png) repeat-x bottom;
   border-top: 1px solid #fcfef6;
 }
 
-.data > .extra-bottom-2
+.form > .extra-bottom-2
 {
   height: 7px;
   margin-top: -7px;
   background: url(/pub/bottom_left.png) no-repeat bottom left;
 }
 
-.data > .extra-bottom-3
+.form > .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
