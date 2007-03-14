@@ -69,7 +69,7 @@ body
 
 .renderer > .fields > ul > li > .label
 {
-  color: grey;
+  color: #808080;
   display: -moz-inline-box;
   display: inline-block;
   width: 10em;

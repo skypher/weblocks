@@ -8,11 +8,22 @@
 
 .form > .fields > ul > li > input
 {
-  border: solid 1px black;
+  border: solid 1px #29364F;
+  background-color: #F6FBFD;
   margin-top: 2px;
   margin-bottom: 2px;
   padding: 0;
   width: 12em;
+}
+
+.form > .fields > ul > li > input:hover
+{
+  background-color: #D8EAF8;
+}
+
+.form > .fields > ul > li > input:focus
+{
+  background-color: #D8EAF8;
 }
 
 .form > .fields > ul > li.submit
