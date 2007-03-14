@@ -49,8 +49,9 @@
     (:html
      (:head
       (:title "Hello!")
-      (:link :rel "stylesheet" :type "text/css" :href "pub/form-stylesheet.css")
-      (:link :rel "stylesheet" :type "text/css" :href "pub/stylesheet.css"))
+      (:link :rel "stylesheet" :type "text/css" :href "pub/main.css")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/form.css")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/data.css"))
      (:body
       (render-form *joe-employee*)
       (htm (:div (:br)))

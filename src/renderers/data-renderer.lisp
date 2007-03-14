@@ -16,14 +16,15 @@ not be called by the programmer. Override 'with-data-header' to
 provide customized header rendering."))
 
 (defmethod with-data-header (obj body-fn)
-  (let ((header-class (format nil "data ~A"
+  (let ((header-class (format nil "renderer data ~A"
 			      (attributize-name (object-class-name obj)))))
-    (with-html-output (*weblocks-output-stream*)
+    (with-html
       (:div :class header-class
 	    (render-extra-tags "extra-top-" 3)
-	    (htm (:h1 (:span :class "action" "Viewing:&nbsp;")
-		      (:span :class "object" (str (humanize-name (object-class-name obj)))))
-		 (:ul (funcall body-fn)))
+	    (htm (:div :class "fields"
+		  (:h1 (:span :class "action" "Viewing:&nbsp;")
+		       (:span :class "object" (str (humanize-name (object-class-name obj)))))
+		  (:ul (funcall body-fn))))
 	    (render-extra-tags "extra-bottom-" 3)))))
 
 (defgeneric render-data-slot (obj slot-name slot-value &rest args)
@@ -52,7 +53,7 @@ proper slot to override."))
       (apply #'render-data-slot obj slot-name (object-name slot-value) args)))
 
 (defmethod render-data-slot (obj slot-name slot-value &rest args)
-  (with-html-output (*weblocks-output-stream*)
+  (with-html
     (:li (:span :class "label"
 		(str (humanize-name slot-name)) ":&nbsp")
 	 (apply #'render-data slot-value args))))
@@ -106,7 +107,7 @@ Ex:
     *weblocks-output-stream*))
 
 (defmethod render-data (obj &rest keys &key inlinep &allow-other-keys)
-  (with-html-output (*weblocks-output-stream*)
+  (with-html
     (:span :class "value"
      (str obj)))
   *weblocks-output-stream*)

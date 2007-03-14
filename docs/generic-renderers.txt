@@ -29,12 +29,10 @@ TODO:
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
 3. Move unit tests to weblocks package but keep separate asd system (this way we won't have to export everything, yet they can be loaded at will)
 4. Unify rendering functions where possible.
-5. Unify data/form css where possible.
 6. Style forms better (input boxes, buttons).
 6.1. Make sure labels correspond to form ids.
 6.5. Unit test and document the hell out of forms.
-6.6. Create our own with-html macro that defaults to our stream and uses our indent param.
-7. Create renderers for forms, tables, and lists
+7. Create renderers for tables and lists
 7.5. Release the library?
 8. Create generic form readers (or scanners or derenderers, whatever)
 9. Create a data-form widget along with appropriate machinery

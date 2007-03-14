@@ -16,21 +16,21 @@ not be called by the programmer. Override 'with-form-header' to
 provide customized header rendering."))
 
 (defmethod with-form-header (obj body-fn &key name)
-  (let ((header-class (format nil "form ~A"
+  (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj))))
 	(object-name (if (null name)
 			 (humanize-name (object-class-name obj))
 			 name)))
-    (with-html-output (*weblocks-output-stream*)
+    (with-html
       (:form :class header-class :action "#" :method "post"
 	     (render-extra-tags "extra-top-" 3)
-	     (htm (:fieldset
+	     (htm (:fieldset :class "fields"
 		   (:h1 (:span :class "action" "Viewing:&nbsp;")
 			(:span :class "object" (str object-name)))
 		   (:ul (funcall body-fn)
 			(htm (:li :class "submit"
-				  (:button :type "submit" "Submit")
-				  (:button "Cancel"))))))
+				  (:input :name "ok" :type "submit" :value "Submit")
+				  (:input :name "cancel" :type "submit" :value "Cancel"))))))
 	     (render-extra-tags "extra-bottom-" 3)))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest args)
@@ -60,8 +60,8 @@ proper slot to override."))
 
 (defmethod render-form-slot (obj slot-name slot-value &rest args)
   (let ((attribute-slot-name (attributize-name slot-name)))
-    (with-html-output (*weblocks-output-stream*)
-      (:li (:label :for attribute-slot-name (str (humanize-name slot-name)) ":&nbsp")
+    (with-html
+      (:li (:label :class "label" :for attribute-slot-name (str (humanize-name slot-name)) ":&nbsp")
 	   (apply #'render-form slot-value :name attribute-slot-name args)))))
 
 (defgeneric render-form (obj &rest keys &key inlinep name &allow-other-keys)
@@ -111,7 +111,7 @@ Ex:
     *weblocks-output-stream*))
 
 (defmethod render-form (obj &rest keys &key inlinep name &allow-other-keys)
-  (with-html-output (*weblocks-output-stream*)
+  (with-html
     (:input :type "text" :name name :value obj))
   *weblocks-output-stream*)
 

@@ -1,0 +1,32 @@
+
+.form > fieldset
+{
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form > .fields > ul > li > input
+{
+  border: solid 1px black;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 0;
+  width: 12em;
+}
+
+.form > .fields > ul > li.submit
+{
+  margin-left: 10em;
+}
+
+.form > .fields > ul > li.submit > input
+{
+  display: inline;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-right: 0.5em;
+  border: solid 1px black;
+  width: 5em;
+}
+

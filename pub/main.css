@@ -1,17 +1,22 @@
 
-.data
+body
+{
+  font-size: small;
+}
+
+.renderer
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
   width: 25em;
 }
 
-.data > .extra-top-1
+.renderer > .extra-top-1
 {
   height: 7px;
   background: url(/pub/top_left.png) no-repeat top left;
 }
 
-.data > .extra-top-2
+.renderer > .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
@@ -19,12 +24,12 @@
   border-bottom: 1px solid #dbeac1;
 }
 
-.data > .extra-top-3
+.renderer > .extra-top-3
 {
   display: none;
 }
 
-.data > h1
+.renderer > .fields > h1
 {
   margin: 0;
   padding: 0;
@@ -33,28 +38,24 @@
   border-bottom: 1px solid #dbeac1;
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
-  font-size: 1.2em;
-  font-weight: bolder;
   color: #29364F;
 }
 
-.data > h1 > .action
+.renderer > .fields > h1 > .action
 {
   display: none;
 }
 
-.data > ul
+.renderer > .fields > ul
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
   padding-top: 1px;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: 0;
   padding-left: 0;
+  margin: 0;
 }
 
-.data > ul > li
+.renderer > .fields > ul > li
 {
   list-style: none;
   border-top: 1px solid #fcfef6;
@@ -62,43 +63,31 @@
   padding-left: 1.5em;
 }
 
-.data > ul > li > span.label
+.renderer > .fields > ul > li > .label
 {
-  font-size: 0.95em;
-  font-weight: bolder;
   color: grey;
   display: -moz-inline-box;
   display: inline-block;
   width: 10em;
-  vertical-align: middle;
 }
 
-.data > ul > li > span.value
-{
-  font-size: 0.9em;
-  font-family: "sans-serif";
-}
-
-.data > .extra-bottom-1
+.renderer > .extra-bottom-1
 {
   height: 6px;
   background: url(/pub/bottom_background.png) repeat-x bottom;
   border-top: 1px solid #fcfef6;
 }
 
-.data > .extra-bottom-2
+.renderer > .extra-bottom-2
 {
   height: 7px;
   margin-top: -7px;
   background: url(/pub/bottom_left.png) no-repeat bottom left;
 }
 
-.data > .extra-bottom-3
+.renderer > .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
   background: url(/pub/bottom_right.png) no-repeat bottom right;
 }
-
-
-
