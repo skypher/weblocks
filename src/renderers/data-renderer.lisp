@@ -55,7 +55,7 @@ proper slot to override."))
 (defmethod render-data-slot (obj slot-name slot-value &rest args)
   (with-html
     (:li (:span :class "label"
-		(str (humanize-name slot-name)) ":&nbsp")
+		(str (humanize-name slot-name)) ":&nbsp;")
 	 (apply #'render-data slot-value args))))
 
 (defgeneric render-data (obj &rest keys &key inlinep &allow-other-keys)

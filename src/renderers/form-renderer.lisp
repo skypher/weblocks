@@ -61,7 +61,7 @@ proper slot to override."))
 (defmethod render-form-slot (obj slot-name slot-value &rest args)
   (let ((attribute-slot-name (attributize-name slot-name)))
     (with-html
-      (:li (:label :class "label" :for attribute-slot-name (str (humanize-name slot-name)) ":&nbsp")
+      (:li (:label :class "label" :for attribute-slot-name (str (humanize-name slot-name)) ":&nbsp;")
 	   (apply #'render-form slot-value :name attribute-slot-name args)))))
 
 (defgeneric render-form (obj &rest keys &key inlinep name &allow-other-keys)

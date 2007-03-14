@@ -2,6 +2,8 @@
 body
 {
   font-size: small;
+  font-family: arial, helvetica, sans-serif;
+  
 }
 
 .renderer
@@ -39,6 +41,8 @@ body
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
   color: #29364F;
+  font-size: large;
+  font-family: Garamond, New York, serif;
 }
 
 .renderer > .fields > h1 > .action
@@ -69,6 +73,7 @@ body
   display: -moz-inline-box;
   display: inline-block;
   width: 10em;
+  font-weight: bold;
 }
 
 .renderer > .extra-bottom-1
