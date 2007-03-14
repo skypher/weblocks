@@ -60,23 +60,21 @@
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
   padding-left: 1.5em;
-  padding-top: 0.25em;
-  height: 1.5em;
 }
 
-.data > ul > li > h2
+.data > ul > li > span.label
 {
   font-size: 0.95em;
   font-weight: bolder;
   color: grey;
-  margin-top: 0;
+  display: -moz-inline-box;
+  display: inline-block;
+  width: 10em;
+  vertical-align: middle;
 }
 
-.data > ul > li > span
+.data > ul > li > span.value
 {
-  position: absolute;
-  left: 12em;
-  margin-top: -1.3em;
   font-size: 0.9em;
   font-family: "sans-serif";
 }

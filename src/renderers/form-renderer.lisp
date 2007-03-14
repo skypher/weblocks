@@ -1,4 +1,4 @@
-;;;; Generic data renderer
+;;;; Generic form renderer
 (in-package :weblocks)
 
 (defgeneric with-form-header (obj body-fn &key name)
@@ -29,9 +29,8 @@ provide customized header rendering."))
 			(:span :class "object" (str object-name)))
 		   (:ul (funcall body-fn)
 			(htm (:li :class "submit"
-				  (:span
-				   (:button :type "submit" "Submit")
-				   (:button "Cancel")))))))
+				  (:button :type "submit" "Submit")
+				  (:button "Cancel"))))))
 	     (render-extra-tags "extra-bottom-" 3)))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest args)
@@ -62,7 +61,7 @@ proper slot to override."))
 (defmethod render-form-slot (obj slot-name slot-value &rest args)
   (let ((attribute-slot-name (attributize-name slot-name)))
     (with-html-output (*weblocks-output-stream*)
-      (:li (:label :for attribute-slot-name (str (humanize-name slot-name)) ":")
+      (:li (:label :for attribute-slot-name (str (humanize-name slot-name)) ":&nbsp")
 	   (apply #'render-form slot-value :name attribute-slot-name args)))))
 
 (defgeneric render-form (obj &rest keys &key inlinep name &allow-other-keys)
@@ -113,6 +112,6 @@ Ex:
 
 (defmethod render-form (obj &rest keys &key inlinep name &allow-other-keys)
   (with-html-output (*weblocks-output-stream*)
-    (:span (:input :type "text" :name name :value obj)))
+    (:input :type "text" :name name :value obj))
   *weblocks-output-stream*)
 

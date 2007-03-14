@@ -53,7 +53,7 @@
       (:link :rel "stylesheet" :type "text/css" :href "pub/stylesheet.css"))
      (:body
       (render-form *joe-employee*)
-      (htm :br)
+      (htm (:div (:br)))
       (render-data *joe-employee*))))
   (get-output-stream-string *weblocks-output-stream*))
 
