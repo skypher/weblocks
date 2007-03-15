@@ -6,7 +6,7 @@
   margin: 0;
 }
 
-.form > fieldset > ul > li > input
+.form > fieldset > ul > li > label > input
 {
   border: solid 1px #29364F;
   background-color: #F6FBFD;
@@ -16,12 +16,12 @@
   width: 12em;
 }
 
-.form > fieldset > ul > li > input:hover
+.form > fieldset > ul > li > label > input:hover
 {
   background-color: #D8EAF8;
 }
 
-.form > fieldset > ul > li > input:focus
+.form > fieldset > ul > li > label > input:focus
 {
   background-color: #D8EAF8;
 }
@@ -41,3 +41,7 @@
   width: 5em;
 }
 
+.form > fieldset > ul > li.submit > input:hover
+{
+  background-color: #D8EAF8;
+}
