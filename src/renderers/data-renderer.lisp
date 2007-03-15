@@ -21,10 +21,9 @@ provide customized header rendering."))
     (with-html
       (:div :class header-class
 	    (render-extra-tags "extra-top-" 3)
-	    (htm (:div :class "fields"
-		  (:h1 (:span :class "action" "Viewing:&nbsp;")
-		       (:span :class "object" (str (humanize-name (object-class-name obj)))))
-		  (:ul (funcall body-fn))))
+	    (htm (:h1 (:span :class "action" "Viewing:&nbsp;")
+		      (:span :class "object" (str (humanize-name (object-class-name obj)))))
+		 (:ul (funcall body-fn)))
 	    (render-extra-tags "extra-bottom-" 3)))))
 
 (defgeneric render-data-slot (obj slot-name slot-value &rest args)

@@ -24,7 +24,7 @@ provide customized header rendering."))
     (with-html
       (:form :class header-class :action "#" :method "post"
 	     (render-extra-tags "extra-top-" 3)
-	     (htm (:fieldset :class "fields"
+	     (htm (:fieldset
 		   (:h1 (:span :class "action" "Viewing:&nbsp;")
 			(:span :class "object" (str object-name)))
 		   (:ul (funcall body-fn)

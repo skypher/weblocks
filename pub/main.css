@@ -31,7 +31,7 @@ body
   display: none;
 }
 
-.renderer > .fields > h1
+.renderer > h1, .renderer > fieldset > h1
 {
   margin: 0;
   padding: 0;
@@ -45,12 +45,12 @@ body
   font-family: Garamond, New York, serif;
 }
 
-.renderer > .fields > h1 > .action
+.renderer > h1 > .action, .renderer > fieldset > h1 > .action
 {
   display: none;
 }
 
-.renderer > .fields > ul
+.renderer > ul, .renderer > fieldset > ul
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
@@ -59,7 +59,7 @@ body
   margin: 0;
 }
 
-.renderer > .fields > ul > li
+.renderer > ul > li, .renderer > fieldset > ul > li
 {
   list-style: none;
   border-top: 1px solid #fcfef6;
@@ -67,7 +67,7 @@ body
   padding-left: 1.5em;
 }
 
-.renderer > .fields > ul > li > .label
+.renderer > ul > li > .label, .renderer > fieldset > ul > li > .label
 {
   color: #808080;
   display: -moz-inline-box;
