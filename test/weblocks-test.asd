@@ -18,8 +18,7 @@
 		:depends-on ("weblocks-test"))
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
-			     (:module data
-			      :components ((:file "data-renderer"))))
+			     (:file "data-renderer"))
 		:depends-on ("weblocks-test" fixtures))))
 
 
