@@ -16,11 +16,13 @@
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
 			     (:file "data-renderer"
-				    :depends-on ("renderer-output-utils"))
+			      :depends-on ("renderer-output-utils"))
 			     (:file "form-renderer"
-			            :depends-on ("renderer-output-utils")))
+			      :depends-on ("renderer-output-utils"))
+			     (:file "table-renderer"
+			      :depends-on ("renderer-output-utils")))
 		:depends-on ("weblocks"))
 	       (:file "server"
-		      :depends-on (renderers))))
+		:depends-on (renderers))))
 
 
