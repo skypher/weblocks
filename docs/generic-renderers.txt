@@ -1,25 +1,4 @@
 
-We must provide an extensible set of renderers that generically render objects into commonly used UI elements. The renderers must be easily customizable (allow for changing field names, order, visibility, render function, etc.) as well as extensible (all overriding renderers for a particular class).
-
-(demethod render-data (some-object &key (render-slot-data #'render-data-slot) human-assoc )
-    ...)
-(render-form some-object)
-
-(render-table-row-data some-object)
-(render-table-row-form some-object)
-(render-table-header some-object)
-
-(reder-table some-objects)
-
-
-The renderer for classes will behave in the following manner:
-1. All slots will be extracted from the class.
-2. Only the ones that have reader accessor will be renderered
-   - Unless slot names are provided explicitly, in which
-     case reader accessor will be tried and if it doesn't exist
-     slot-value will be used
-
-
 TODO:
 2. Figure out how to deal with
    - slots that are collections
@@ -28,7 +7,7 @@ TODO:
      - if small collection, render member names inline
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
 4. Unify rendering functions where possible.
-6.1. Make sure labels correspond to form ids.
+5. Standardize renderers return values.
 6.5. Unit test and document the hell out of forms.
 7. Create renderers for tables and lists
 7.5. Release the library?

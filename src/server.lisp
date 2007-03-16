@@ -54,7 +54,7 @@
       (:link :rel "stylesheet" :type "text/css" :href "pub/data.css"))
      (:body
       (render-form *joe-employee*)
-      (htm (:div (:br)))
+      (htm (:br))
       (render-data *joe-employee*))))
   (get-output-stream-string *weblocks-output-stream*))
 
