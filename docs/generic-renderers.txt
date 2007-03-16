@@ -6,6 +6,7 @@ TODO:
      - render as links to data grids
      - if small collection, render member names inline
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
+   - non-inline CLOS objects in forms
 4. Unify rendering functions where possible.
 5. Standardize renderers return values.
 6.5. Unit test and document the hell out of forms.
