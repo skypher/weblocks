@@ -12,8 +12,8 @@
   ((first-name :reader first-name)
    (last-name :reader last-name)
    (age :reader age)
-   (address-ref :reader address)
-;   (address :reader address)
+;   (address-ref :reader address)
+   (address :reader address)
    (id :initform 1)))
 
 (defclass employee (person)
@@ -29,9 +29,8 @@
   (setf (slot-value addr 'street) "1877 Ocean Ave.")
   (setf (slot-value addr 'city) "Brooklyn")
   (setf (slot-value addr 'state) "NY")
-  (setf (slot-value *joe-employee* 'address-ref) addr))
-;  (setf (slot-value *joe-employee* 'address) addr))
-
+;  (setf (slot-value *joe-employee* 'address-ref) addr))
+  (setf (slot-value *joe-employee* 'address) addr))
 
 (setf (slot-value *joe-employee* 'department) "Technology")
 
@@ -54,9 +53,9 @@
       (:link :rel "stylesheet" :type "text/css" :href "pub/data.css"))
      (:body
       (render-table (list *joe-employee* *joe-employee* *joe-employee*) :slots '() :mode :hide)
-      (htm (:br))
+      (htm (:div (:p)))
       (render-form *joe-employee*)
-      (htm (:br))
+      (htm (:div (:p)))
       (render-data *joe-employee*))))
   (get-output-stream-string *weblocks-output-stream*))
 

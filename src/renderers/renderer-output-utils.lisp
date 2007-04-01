@@ -205,7 +205,11 @@ The default implementation returns true if the slot name ends
 with \"-ref\" and nil otherwise.
 
 Override this method to specify whether objects should be
-rendered inline."))
+rendered inline.
+
+'obj' - The object whose slot is being rendered.
+'slot-name' - The name of a slot (a symbol) being rendered.
+"))
 
 (defmethod render-slot-inline-p (obj slot-name)
   (let ((name (if (symbolp slot-name)

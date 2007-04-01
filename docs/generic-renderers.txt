@@ -11,10 +11,11 @@ TODO:
    - Make sure cells honor inlining fields like the headers
    - Consider refactoring inlining functionality from data, form, and table into utils
    - Style table renderer
+   - Render the case of rendering an empty sequence
 4. Unify rendering functions for all renderers where possible.
 5. Standardize renderers return values.
 6.5. Unit test and document the hell out of forms and tables.
-7. Create renderers for tables and lists
+7. Create renderers for and lists
 7.5. Release the library?
 8. Create generic form readers (or scanners or derenderers, whatever)
 9. Create a data-form widget along with appropriate machinery
