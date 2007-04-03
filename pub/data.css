@@ -1,6 +1,7 @@
 
-.data > ul > li > span.value
+.data
 {
+  width: 25em;
 }
 
 

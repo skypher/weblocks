@@ -1,4 +1,9 @@
 
+.form
+{
+  width: 25em;
+}
+
 .form > fieldset
 {
   border: none;

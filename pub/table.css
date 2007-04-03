@@ -1,0 +1,11 @@
+
+.table
+{
+  width: 38em;
+}
+
+.table > table
+{
+  border-spacing: 0;
+}
+

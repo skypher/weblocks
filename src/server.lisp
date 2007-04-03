@@ -50,9 +50,10 @@
       (:title "Hello!")
       (:link :rel "stylesheet" :type "text/css" :href "pub/main.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/form.css")
-      (:link :rel "stylesheet" :type "text/css" :href "pub/data.css"))
+      (:link :rel "stylesheet" :type "text/css" :href "pub/data.css")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/table.css"))
      (:body
-      (render-table (list *joe-employee* *joe-employee* *joe-employee*) :slots '() :mode :hide)
+      (render-table (list *joe-employee* *joe-employee* *joe-employee*))
       (htm (:div (:p)))
       (render-form *joe-employee*)
       (htm (:div (:p)))
