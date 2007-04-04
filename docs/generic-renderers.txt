@@ -8,15 +8,15 @@ TODO:
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
    - non-inline CLOS objects in forms
 3. Table renderer
+   - Support table captions (for empty tables as well)
    - Consider refactoring inlining functionality from data, form, and table into utils
-   - Style table renderer
-   - Render the case of rendering an empty sequence
 4. Unify rendering functions for all renderers where possible.
 5. Standardize renderers return values.
 6.5. Unit test and document the hell out of forms and tables.
 6.6. Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 7. Create renderers for and lists
 7.5. Release the library?
+7.6. Render functions/closures into buttons and links.
 8. Create generic form readers (or scanners or derenderers, whatever)
 9. Create a data-form widget along with appropriate machinery
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)

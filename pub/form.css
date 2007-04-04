@@ -33,7 +33,7 @@
 
 .form > fieldset > ul > li.submit
 {
-  margin-left: 10em;
+  padding-left: 11.5em;
 }
 
 .form > fieldset > ul > li.submit > input

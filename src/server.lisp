@@ -53,7 +53,9 @@
       (:link :rel "stylesheet" :type "text/css" :href "pub/data.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/table.css"))
      (:body
-      (render-table (list *joe-employee* *joe-employee* *joe-employee*))
+      (render-table (list *joe-employee* *joe-employee* *joe-employee*) :caption "test")
+      (htm (:div (:p)))
+      (render-table '() :caption "test")
       (htm (:div (:p)))
       (render-form *joe-employee*)
       (htm (:div (:p)))

@@ -49,7 +49,7 @@ body
   display: none;
 }
 
-.renderer > ul, .renderer > fieldset > ul, .table > table
+.renderer > ul, .renderer > fieldset > ul, .table > table, .table > p.empty
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
@@ -64,7 +64,7 @@ body
 }
 
 .renderer > ul > li, .renderer > fieldset > ul > li, .renderer > table > tbody > tr > td,
-.renderer > table > thead > tr > th
+.renderer > table > thead > tr > th, .table > p.empty
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;

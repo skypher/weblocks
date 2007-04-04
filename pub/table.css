@@ -1,11 +1,26 @@
 
 .table
 {
-  width: 38em;
+  width: 42em;
 }
 
 .table > table
 {
+  width: 100%;
   border-spacing: 0;
 }
 
+.table > table > thead > tr > th
+{
+  text-align: left;
+}
+
+.table > table > thead > tr > th, .table > table > tbody > tr > td
+{
+  padding-left: 0.5em;
+}
+
+.table > p.empty
+{
+  padding-left: 0.5em;
+}
