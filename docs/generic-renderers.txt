@@ -8,7 +8,6 @@ TODO:
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
    - non-inline CLOS objects in forms
 3. Table renderer
-   - Support table captions (for empty tables as well)
    - Consider refactoring inlining functionality from data, form, and table into utils
 4. Unify rendering functions for all renderers where possible.
 5. Standardize renderers return values.

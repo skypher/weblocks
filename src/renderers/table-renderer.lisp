@@ -6,8 +6,11 @@
 there is no information available.")
 
 (defmethod with-table-header (obj body-fn)
-  (let ((header-class (format nil "renderer table ~A"
-			      (attributize-name (object-class-name obj)))))
+  (let* ((object-name (object-class-name obj))
+	 (header-class (format nil "renderer table ~A"
+			       (if (eql object-name 'null)
+				   "empty-table"
+				   (attributize-name object-name)))))
     (with-html
       (:div :class header-class
 	    (render-extra-tags "extra-top-" 3)
@@ -67,7 +70,7 @@ there is no information available.")
 			 &allow-other-keys)
   (if (empty-p objs)
       (progn
-	(render-empty-table on-empty-string)
+	(render-empty-table :on-empty-string on-empty-string :caption caption)
 	(return-from render-table)))
   (let* ((row-num -1)
 	 (render-body (lambda ()
@@ -87,8 +90,11 @@ there is no information available.")
 				     objs))))))))
     (with-table-header (car objs) render-body)))
      
-(defmethod render-empty-table (&optional on-empty-string)
+(defmethod render-empty-table (&key on-empty-string caption)
   (let ((render-empty (lambda ()
 			(with-html
-			  (:p :class "empty" (str on-empty-string))))))
+			  (:p
+			   (if caption
+			       (htm (:span (str caption) ":&nbsp;")))
+			   (:span (str on-empty-string)))))))
       (with-table-header nil render-empty)))
