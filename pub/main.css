@@ -39,12 +39,16 @@ body
 
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption
 {
+  font-size: large;
+}
+
+.renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p
+{
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
   color: #29364F;
-  font-size: large;
   font-weight: bold;
   font-family: Garamond, New York, serif;
 }
@@ -54,7 +58,7 @@ body
   display: none;
 }
 
-.renderer > ul, .renderer > fieldset > ul, .table > table, .empty-table > p
+.renderer > ul, .renderer > fieldset > ul, .table > table
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
@@ -69,7 +73,7 @@ body
 }
 
 .renderer > ul > li, .renderer > fieldset > ul > li, .renderer > table > tbody > tr > td,
-.renderer > table > thead > tr > th, .empty-table > p
+.renderer > table > thead > tr > th
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;

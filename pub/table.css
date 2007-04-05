@@ -23,4 +23,12 @@
 .empty-table > p
 {
   padding-left: 0.5em;
+  margin: 0;
+}
+
+.empty-table > p > span.caption
+{
+  color: #29364F;
+  font-weight: bold;
+  font-family: Garamond, New York, serif;
 }

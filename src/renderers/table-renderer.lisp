@@ -91,10 +91,10 @@ there is no information available.")
     (with-table-header (car objs) render-body)))
      
 (defmethod render-empty-table (&key on-empty-string caption)
-  (let ((render-empty (lambda ()
-			(with-html
-			  (:p
-			   (if caption
-			       (htm (:span (str caption) ":&nbsp;")))
-			   (:span (str on-empty-string)))))))
-      (with-table-header nil render-empty)))
+  (with-table-header nil
+    (lambda ()
+      (with-html
+	(:p
+	 (if caption
+	     (htm (:span :class "caption" (str caption) ":&nbsp;")))
+	 (:span :class "message" (str on-empty-string))))))))
