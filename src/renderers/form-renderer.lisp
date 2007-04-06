@@ -23,15 +23,14 @@ provide customized header rendering."))
 			 name)))
     (with-html
       (:form :class header-class :action "#" :method "post"
-	     (render-extra-tags "extra-top-" 3)
-	     (htm (:fieldset
-		   (:h1 (:span :class "action" "Viewing:&nbsp;")
-			(:span :class "object" (str object-name)))
-		   (:ul (funcall body-fn)
-			(htm (:li :class "submit"
-				  (:input :name "ok" :type "submit" :value "Submit")
-				  (:input :name "cancel" :type "submit" :value "Cancel"))))))
-	     (render-extra-tags "extra-bottom-" 3)))))
+	     (with-extra-tags
+	       (htm (:fieldset
+		     (:h1 (:span :class "action" "Viewing:&nbsp;")
+			  (:span :class "object" (str object-name)))
+		     (:ul (funcall body-fn)
+			  (htm (:li :class "submit"
+				    (:input :name "ok" :type "submit" :value "Submit")
+				    (:input :name "cancel" :type "submit" :value "Cancel")))))))))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest args)
   (:documentation
@@ -54,9 +53,7 @@ slot name, which gives significant freedom in selecting the
 proper slot to override."))
 
 (defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest args)
-  (if (render-slot-inline-p obj slot-name)
-      (apply #'render-form slot-value :inlinep t :name slot-name args)
-      (apply #'render-form-slot obj slot-name (object-name slot-value) args)))
+  (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value args))
 
 (defmethod render-form-slot (obj slot-name slot-value &rest args)
   (let ((attribute-slot-name (attributize-name slot-name)))
@@ -100,16 +97,7 @@ Ex:
 \(render-form address :slots ((city . town) :mode :strict)"))
 
 (defmethod render-form ((obj standard-object) &rest keys &key inlinep name &allow-other-keys)
-  (let ((render-body
-	 (lambda ()
-	   (mapc (lambda (slot)
-		   (apply #'render-form-slot obj (cdr slot)
-			  (get-slot-value obj (car slot)) keys))
-		 (apply #'object-visible-slots obj keys)))))
-    (if inlinep
-	(funcall render-body)
-	(with-form-header obj render-body :name name))
-    *weblocks-output-stream*))
+  (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
 
 (defmethod render-form (obj &rest keys &key inlinep name &allow-other-keys)
   (with-html

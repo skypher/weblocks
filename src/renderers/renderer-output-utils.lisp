@@ -236,3 +236,26 @@ Ex:
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "&nbsp;")))))
+
+(defun render-object-slots (obj render-slot-fn keys)
+  (mapc (lambda (slot)
+	  (apply render-slot-fn obj (cdr slot)
+		 (get-slot-value obj (car slot)) keys))
+	(apply #'object-visible-slots obj keys)))
+
+(defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
+  (if inlinep
+      (render-object-slots obj render-slot-fn keys)
+      (funcall header-fn obj (curry #'render-object-slots obj render-slot-fn keys))))
+
+(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
+  (if (render-slot-inline-p obj slot-name)
+      (apply render-object-fn slot-value :inlinep t :name slot-name args)
+      (apply render-slot-fn obj slot-name (object-name slot-value) args)))
+
+(defmacro with-extra-tags (&body body)
+  `(progn
+     (render-extra-tags "extra-top-" 3)
+     ,@body
+     (render-extra-tags "extra-bottom-" 3)))
+
