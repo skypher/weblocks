@@ -1,7 +1,7 @@
 ;;;; Generic data renderer
 (in-package :weblocks)
 
-(defgeneric with-data-header (obj body-fn)
+(defgeneric with-data-header (obj body-fn &rest keys)
   (:documentation
    "Responsible for rendering headers of a data presentation. The
 default method renders a humanized name of the object along with
@@ -15,7 +15,7 @@ is set up, 'with-data-header' calls a function of zero arguments
 not be called by the programmer. Override 'with-data-header' to
 provide customized header rendering."))
 
-(defmethod with-data-header (obj body-fn)
+(defmethod with-data-header (obj body-fn &rest keys)
   (let ((header-class (format nil "renderer data ~A"
 			      (attributize-name (object-class-name obj)))))
     (with-html

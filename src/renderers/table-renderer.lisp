@@ -18,19 +18,10 @@ there is no information available.")
 	      (funcall body-fn))))))
 
 ;; Auxilary functions
-(defun render-table-row-aux (obj slots render-cell-fn keys)
-  (mapcar (lambda (slot)
-	    (apply render-cell-fn obj (cdr slot) (get-slot-value obj (car slot))
-		   keys))
-	  slots))
-
-(defun render-table-row (obj render-cell-fn &rest keys &key inlinep alternp &allow-other-keys)
-  (let ((slots (apply #'object-visible-slots obj keys)))
-    (if (not inlinep)
-	(with-html
-	  (:tr :class (if alternp "altern" nil)
-	       (render-table-row-aux obj slots render-cell-fn keys)))
-	(render-table-row-aux obj slots render-cell-fn keys))))
+(defun with-table-row (obj body-fn &key alternp &allow-other-keys)
+  (with-html
+    (:tr :class (if alternp "altern" nil)
+	 (funcall body-fn))))
 
 ;; Table header
 (defmethod render-table-header-cell (obj slot-name slot-value
@@ -43,7 +34,7 @@ there is no information available.")
   (render-object-slot #'render-table-header-row #'render-table-header-cell obj slot-name slot-value keys))
 
 (defmethod render-table-header-row (obj &rest keys &key inlinep &allow-other-keys)
-  (apply #'render-table-row obj #'render-table-header-cell :alternp nil keys))
+  (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj :alternp nil keys))
 
 ;; Table body
 (defmethod render-table-body-cell (obj slot-name slot-value
@@ -56,7 +47,7 @@ there is no information available.")
   (render-object-slot #'render-table-body-row #'render-table-body-cell obj slot-name slot-value keys))
 
 (defmethod render-table-body-row (obj &rest keys &key inlinep alternp &allow-other-keys)
-  (apply #'render-table-row obj #'render-table-body-cell keys))
+  (apply #'render-standard-object #'with-table-row #'render-table-body-cell obj keys))
 
 ;; The table itself
 (defmethod render-table ((objs sequence) &rest keys

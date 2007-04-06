@@ -237,23 +237,54 @@ Ex:
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "&nbsp;")))))
 
-(defun render-object-slots (obj render-slot-fn keys)
+(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
+  "Renders a given slot of a CLOS object (usually if the slot
+itself is a standard CLOS object). This function encapsulates
+rendering behavior common to multiple generic renderers.
+
+If the members of the slot object are meant to be rendered
+inline (tested with 'render-slot-inline-p', checks for '-ref' in
+the name of the slot by default), calls 'render-object-fn'
+with :inlinep set to true. Otherwise, grabs the name of the
+object using 'object-name' and simply renders the name using
+'render-slot-fn'."
+  (if (render-slot-inline-p obj slot-name)
+      (apply render-object-fn slot-value :inlinep t :name slot-name args)
+      (apply render-slot-fn obj slot-name (object-name slot-value) args)))
+
+(defun visit-object-slots (obj render-slot-fn keys)
+  "Used by 'render-standard-object' to visit visible slots of an
+object and apply a render function to them."
   (mapc (lambda (slot)
 	  (apply render-slot-fn obj (cdr slot)
 		 (get-slot-value obj (car slot)) keys))
 	(apply #'object-visible-slots obj keys)))
 
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
-  (if inlinep
-      (render-object-slots obj render-slot-fn keys)
-      (funcall header-fn obj (curry #'render-object-slots obj render-slot-fn keys))))
+  "Renders the slots of a CLOS object into HTML. This function
+encapsulates rendering behavior common to multiple generic
+renderers.
 
-(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
-  (if (render-slot-inline-p obj slot-name)
-      (apply render-object-fn slot-value :inlinep t :name slot-name args)
-      (apply render-slot-fn obj slot-name (object-name slot-value) args)))
+If the object needs to be rendered inline within another
+object ('inlinep' is true), 'render-standard-object' walks
+through the visible slots of the object (obtained via
+'object-visible-slots') and applies 'render-slot-fn' to each of
+those.
+
+If the object is not rendered inline ('inlinep' is nil, which is
+the default), 'render-standard-object' applies the same logic as
+above, except it wraps it with a call to 'header-fn' in order to
+render a header."
+  (if inlinep
+      (visit-object-slots obj render-slot-fn keys)
+      (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn keys) keys)))
 
 (defmacro with-extra-tags (&body body)
+  "A macro used to wrap html into extra tags necessary for
+hacking CSS formatting. The macro wraps the body with three
+headers on top and three on the bottom. It uses
+'render-extra-tags' function along with 'extra-top-' and
+'extra-bottom-' arguments."
   `(progn
      (render-extra-tags "extra-top-" 3)
      ,@body
