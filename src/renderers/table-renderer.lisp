@@ -1,6 +1,11 @@
 ;;;; Generic table renderer
 (in-package :weblocks)
 
+(export '(*render-empty-sequence-string* with-table-header
+	  render-table-header-row render-table-header-cell
+	  render-table-body-row render-table-body-cell
+	  render-table render-empty-table))
+
 (defparameter *render-empty-sequence-string* "No information available."
   "The default string used by the table renderer to signify that
 there is no information available.")

@@ -1,6 +1,8 @@
 ;;;; Generic data renderer
 (in-package :weblocks)
 
+(export '(with-data-header render-data-slot render-data))
+
 (defgeneric with-data-header (obj body-fn &rest keys)
   (:documentation
    "Responsible for rendering headers of a data presentation. The

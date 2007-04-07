@@ -12,6 +12,9 @@ weblocks-test package."
 
 ;;; a helper macro to define html tests
 (defmacro deftest-html (name form value)
+  "A helper macro for creating html test cases. The macro writes
+code that temporarily binds the output stream to a string stream
+and then compares the string to the expected result."
   (let ((expected-result (eval
 			  `(with-html-output-to-string (s)
 			     ,value))))

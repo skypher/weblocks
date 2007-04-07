@@ -1,6 +1,11 @@
 ;;;; Utility functions for generic renderers
 (in-package :weblocks)
 
+(export '(humanize-name attributize-name object-visible-slots
+	  object-class-name object-name render-slot-inline-p
+	  get-slot-value render-extra-tags with-extra-tags
+	  render-object-slot render-standard-object))
+
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
 suitable for presentation. If the arguments ends with a '-ref'
@@ -237,6 +242,17 @@ Ex:
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "&nbsp;")))))
 
+(defmacro with-extra-tags (&body body)
+  "A macro used to wrap html into extra tags necessary for
+hacking CSS formatting. The macro wraps the body with three
+headers on top and three on the bottom. It uses
+'render-extra-tags' function along with 'extra-top-' and
+'extra-bottom-' arguments."
+  `(progn
+     (render-extra-tags "extra-top-" 3)
+     ,@body
+     (render-extra-tags "extra-bottom-" 3)))
+
 (defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
   "Renders a given slot of a CLOS object (usually if the slot
 itself is a standard CLOS object). This function encapsulates
@@ -278,15 +294,4 @@ render a header."
   (if inlinep
       (visit-object-slots obj render-slot-fn keys)
       (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn keys) keys)))
-
-(defmacro with-extra-tags (&body body)
-  "A macro used to wrap html into extra tags necessary for
-hacking CSS formatting. The macro wraps the body with three
-headers on top and three on the bottom. It uses
-'render-extra-tags' function along with 'extra-top-' and
-'extra-bottom-' arguments."
-  `(progn
-     (render-extra-tags "extra-top-" 3)
-     ,@body
-     (render-extra-tags "extra-bottom-" 3)))
 

@@ -1,6 +1,8 @@
 ;;;; Generic form renderer
 (in-package :weblocks)
 
+(export '(with-form-header render-form-slot render-form))
+
 (defgeneric with-form-header (obj body-fn &key name &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a form
@@ -16,7 +18,7 @@ presentation. Similar to 'with-data-header'."))
       (:form :class header-class :action "#" :method "post"
 	     (with-extra-tags
 	       (htm (:fieldset
-		     (:h1 (:span :class "action" "Viewing:&nbsp;")
+		     (:h1 (:span :class "action" "Modifying:&nbsp;")
 			  (:span :class "object" (str object-name)))
 		     (:ul (funcall body-fn)
 			  (htm (:li :class "submit"
@@ -34,7 +36,7 @@ presentation. Similar to 'with-data-header'."))
 (defmethod render-form-slot (obj slot-name slot-value &rest args)
   (let ((attribute-slot-name (attributize-name slot-name)))
     (with-html
-      (:li (:label :class "label"
+      (:li (:label
 		   (:span (str (humanize-name slot-name)) ":&nbsp;")
 		   (apply #'render-form slot-value :name attribute-slot-name args))))))
 
