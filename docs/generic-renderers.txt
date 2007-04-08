@@ -1,15 +1,15 @@
 
 TODO:
-6.6. Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
+6.5. Render functions/closures into buttons and links.
 6.7. Figure out the whole start/stop/server/framework logistics
-7. Create renderers for and lists
-7.5. Release the library?
-7.6. Render functions/closures into buttons and links.
+7.1. Port to OSX
 8. Create generic form readers (or scanners or derenderers, whatever)
 9. Create a data-form widget along with appropriate machinery
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
 11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.
 11.1. Standardize renderers return values (deferring until more is known about what's useful)
+11.2. Create renderers for lists
+11.3. Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 11.5. Figure out how to deal with
    - slots that are collections
      - don't render at all
@@ -17,6 +17,7 @@ TODO:
      - if small collection, render member names inline
      - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
    - non-inline CLOS objects in forms
-12. Release the library?
+12. Create menu and other widgets
+12.5. Rewrite defmacro
 13. Create a reference application.
-
+14. Release the library/write articles.
