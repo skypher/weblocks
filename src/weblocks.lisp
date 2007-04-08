@@ -12,7 +12,7 @@ approach to maintaining UI state.
 You can use the following starting points to dive into the
 documentation:
 
-Generic function 'render-data'."))
+Generic functions 'render-data', 'render-form', 'render-table'."))
 
 (in-package :weblocks)
 
