@@ -96,6 +96,5 @@ Ex:
 (defmethod render-data (obj &rest keys &key inlinep &allow-other-keys)
   (with-html
     (:span :class "value"
-     (str obj)))
-  *weblocks-output-stream*)
+     (str obj))))
 

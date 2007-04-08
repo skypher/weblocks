@@ -50,6 +50,5 @@ presentation. Similar to 'with-data-header'."))
 
 (defmethod render-form (obj &rest keys &key inlinep name &allow-other-keys)
   (with-html
-    (:input :type "text" :name name :value obj))
-  *weblocks-output-stream*)
+    (:input :type "text" :name name :value obj)))
 
