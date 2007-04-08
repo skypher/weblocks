@@ -1,14 +1,6 @@
 
 TODO:
-2. Figure out how to deal with
-   - slots that are collections
-     - don't render at all
-     - render as links to data grids
-     - if small collection, render member names inline
-     - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
-   - non-inline CLOS objects in forms
 5. Standardize renderers return values.
-6.5. Unit test the hell out of forms and tables.
 6.6. Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 6.7. Figure out the whole start/stop/server/framework logistics
 7. Create renderers for and lists
@@ -18,6 +10,14 @@ TODO:
 9. Create a data-form widget along with appropriate machinery
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
 11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.
+11.5. Figure out how to deal with
+   - slots that are collections
+     - don't render at all
+     - render as links to data grids
+     - if small collection, render member names inline
+     - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
+   - non-inline CLOS objects in forms
+
 12. Release the library?
 13. Create a reference application.
 
