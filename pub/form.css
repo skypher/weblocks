@@ -31,12 +31,7 @@
   background-color: #D8EAF8;
 }
 
-.form > fieldset > ul > li.submit
-{
-  padding-left: 11.5em;
-}
-
-.form > fieldset > ul > li.submit > input
+.form > fieldset > .submit > input
 {
   display: inline;
   margin-top: 2px;
@@ -46,7 +41,7 @@
   width: 5em;
 }
 
-.form > fieldset > ul > li.submit > input:hover
+.form > fieldset > .submit > input:hover
 {
   background-color: #D8EAF8;
 }

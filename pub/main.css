@@ -6,6 +6,11 @@ body
   
 }
 
+a
+{
+	color: #A61E2E;
+}
+
 .renderer
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
@@ -62,7 +67,8 @@ body
   display: none;
 }
 
-.renderer > ul, .renderer > fieldset > ul, .table > table
+.renderer > ul, .renderer > fieldset > ul, .table > table, .renderer > fieldset > .submit,
+.renderer > .submit
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
@@ -76,8 +82,13 @@ body
   padding-left: 1.5em;
 }
 
+.renderer > .submit, .form > fieldset > .submit
+{
+  padding-left: 11.5em;
+}
+
 .renderer > ul > li, .renderer > fieldset > ul > li, .renderer > table > tbody > tr > td,
-.renderer > table > thead > tr > th
+.renderer > table > thead > tr > th, .renderer > fieldset > .submit, .renderer > .submit
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;

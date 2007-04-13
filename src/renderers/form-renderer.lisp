@@ -8,22 +8,32 @@
    "Responsible for rendering headers of a form
 presentation. Similar to 'with-data-header'."))
 
-(defmethod with-form-header (obj body-fn &key name &allow-other-keys)
+(defmethod with-form-header (obj body-fn
+			     &rest keys &key name preslots-fn
+			     (postslots-fn #'render-form-controls)
+			     (method :get)
+			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj))))
 	(object-name (if (null name)
 			 (humanize-name (object-class-name obj))
 			 name)))
     (with-html
-      (:form :class header-class :action "#" :method "post"
+      (:form :class header-class :action "" :method (attributize-name method)
 	     (with-extra-tags
 	       (htm (:fieldset
 		     (:h1 (:span :class "action" "Modifying:&nbsp;")
 			  (:span :class "object" (str object-name)))
-		     (:ul (funcall body-fn)
-			  (htm (:li :class "submit"
-				    (:input :name "ok" :type "submit" :value "Submit")
-				    (:input :name "cancel" :type "submit" :value "Cancel")))))))))))
+		     (safe-apply preslots-fn obj keys)
+		     (:ul (funcall body-fn))
+		     (safe-apply postslots-fn obj keys))))))))
+
+(defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
+  (with-html
+    (:div :class "submit"
+	  (:input :name "action" :type "hidden" :value action)
+	  (:input :name "submit" :type "submit" :value "Submit")
+	  (:input :name "cancel" :type "submit" :value "Cancel"))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest args)
   (:documentation

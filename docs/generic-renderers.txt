@@ -1,10 +1,19 @@
 
 TODO:
+1. document unit test, and determine symbols export status:
+   - safe-apply
+   - change made to with-data-header (pre/post slots)
+   - change made to with-form-header (pre/post slots) (don't forget new method here)
+   - actions
+   - dataform widget
+   - form with-data-header action/method args
 6.5. Render functions/closures into buttons and links.
 6.7. Figure out the whole start/stop/server/framework logistics
 7.1. Port to OSX
 8. Create generic form readers (or scanners or derenderers, whatever)
 9. Create a data-form widget along with appropriate machinery
+-----
+9.5. Allow specifying standard as well as custom validations on fields and objects
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
 11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.
 11.1. Standardize renderers return values (deferring until more is known about what's useful)

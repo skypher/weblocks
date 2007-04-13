@@ -9,7 +9,7 @@
    (state :reader state)))
 
 (defclass person ()
-  ((first-name :reader first-name)
+  ((first-name :accessor first-name)
    (last-name :reader last-name)
    (age :reader age)
 ;   (address-ref :reader address)
@@ -34,13 +34,23 @@
 
 (setf (slot-value *joe-employee* 'department) "Technology")
 
+(defparameter *dataform-widget* (make-instance 'dataform :data *joe-employee*))
+
 (defun start-weblocks ()
   (if (null *weblocks-server*)
       (setf *weblocks-server* (start-server :port 8080))))
 
 (defun stop-weblocks ()
   (if (not (null *weblocks-server*))
-      (stop-server *weblocks-server*)))
+      (progn
+	(stop-server *weblocks-server*)
+	(setf *weblocks-server* nil))))
+
+(defun hala1 ()
+  (let ((name (first-name *joe-employee*)))
+    (if (eql name "Slava")
+	(setf (first-name *joe-employee*) "Dima")
+	(setf (first-name *joe-employee*) "Slava"))))
 
 (defun hala ()
   (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
@@ -57,12 +67,10 @@
       (htm (:div (:p)))
       (render-table '() :caption "Employees")
       (htm (:div (:p)))
-      (render-form *joe-employee*)
-      (htm (:div (:p)))
-      (render-data *joe-employee*))))
+      (render *dataform-widget*))))
   (get-output-stream-string *weblocks-output-stream*))
 
 (setf *dispatch-table*
-      (append (list (create-prefix-dispatcher "/test" 'hala)
-		    (create-folder-dispatcher-and-handler "/pub/" "/home/coffeemug/projects/weblocks2/pub/"))
+      (append (list (create-folder-dispatcher-and-handler "/pub/" "/home/coffeemug/projects/weblocks2/pub/")
+		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))

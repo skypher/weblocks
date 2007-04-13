@@ -17,7 +17,7 @@ is set up, 'with-data-header' calls a function of zero arguments
 not be called by the programmer. Override 'with-data-header' to
 provide customized header rendering."))
 
-(defmethod with-data-header (obj body-fn &rest keys)
+(defmethod with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
   (let ((header-class (format nil "renderer data ~A"
 			      (attributize-name (object-class-name obj)))))
     (with-html
@@ -25,7 +25,9 @@ provide customized header rendering."))
 	    (with-extra-tags
 	      (htm (:h1 (:span :class "action" "Viewing:&nbsp;")
 			(:span :class "object" (str (humanize-name (object-class-name obj)))))
-		   (:ul (funcall body-fn))))))))
+		   (safe-apply preslots-fn obj keys)
+		   (:ul (funcall body-fn))
+		   (safe-apply postslots-fn obj keys)))))))
 
 (defgeneric render-data-slot (obj slot-name slot-value &rest args)
   (:documentation
