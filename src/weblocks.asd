@@ -13,7 +13,7 @@
   :description "A Common Lisp web framework."
   :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who")
   :components ((:file "weblocks")
-	       (:file "action"
+	       (:file "actions"
 		      :depends-on ("weblocks"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")

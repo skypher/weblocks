@@ -14,7 +14,18 @@
 ;; if action exists, call that fn
 ;; then recurse over all widgets and render
 (defun handle-client-request ()
-  (let ((action-fn (session-value (get-parameter "action"))))
-    (if action-fn
-	(funcall action-fn))
+  (let ((action-fn (get-request-action)))
+    (when action-fn
+      (funcall action-fn))
     (hala)))
+
+(defun get-request-action ()
+  (let ((action-name (ecase (request-method)
+		       (:get (get-parameter "action"))
+		       (:post (post-parameter "action"))))
+	request-action)
+    (when action-name
+      (setf request-action (session-value action-name))
+      (assert request-action (request-action) "Cannot find action.")
+      request-action)))
+
