@@ -8,7 +8,10 @@
    (ui-state :initform :data)))
 
 (defmethod render ((obj dataform) &rest args)
-  (with-slots (data ui-state) obj
+  (apply #'render-dataform obj (dataform-data obj) args))
+
+(defmethod render-dataform ((obj dataform) data &rest args)
+  (with-slots (ui-state) obj
     (case ui-state
       (:data (apply #'render-data
 		    data
@@ -24,5 +27,6 @@
 		    data
 		    :method :post
 		    :action (make-action (lambda ()
+					   (update-object-from-request data)
 					   (setf ui-state :data)))
 		    args)))))

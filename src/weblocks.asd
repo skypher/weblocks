@@ -24,9 +24,11 @@
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
 			:depends-on ("weblocks"))
+	       (:file "request-object-mapping"
+		      :depends-on (renderers))
 	       (:module widgets
 			:components ((:file "dataform"))
-			:depends-on (renderers))
+			:depends-on (renderers "request-object-mapping"))
 	       (:file "server"
 		      :depends-on (widgets))))
 

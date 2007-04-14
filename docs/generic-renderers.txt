@@ -7,11 +7,14 @@ TODO:
    - actions
    - dataform widget
    - form with-data-header action/method args
+   - input scanner
+2. Create generic form readers (or scanners or derenderers, whatever)
+3. Create a data-form widget along with appropriate machinery
 6.5. Render functions/closures into buttons and links.
 6.7. Figure out the whole start/stop/server/framework logistics
 7.1. Port to OSX
-8. Create generic form readers (or scanners or derenderers, whatever)
-9. Create a data-form widget along with appropriate machinery
+9.1. Make sure data and form renderer labels show attributized slot name class for styling
+9.2. Make sure attributized slot names in form and data renderers refer to original slot name (in case modified by :slots, this is necessary to read back input properly)
 -----
 9.5. Allow specifying standard as well as custom validations on fields and objects
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
