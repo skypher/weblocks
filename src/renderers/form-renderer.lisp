@@ -1,14 +1,24 @@
 ;;;; Generic form renderer
 (in-package :weblocks)
 
-(export '(with-form-header render-form-slot render-form))
+(export '(*submit-control-name* with-form-header
+	  render-form-controls render-form-slot render-form))
 
-(defparameter *submit-control-name* "submit")
+(defparameter *submit-control-name* "submit"
+  "The name of the control responsible for form submission.")
 
-(defgeneric with-form-header (obj body-fn &key name &allow-other-keys)
+(defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
+				  postslots-fn method &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a form
-presentation. Similar to 'with-data-header'."))
+presentation. Similar to 'with-data-header'.
+
+'method' - a submission method for the form. Normally :get
+or :post.
+
+Other keys are also accepted and supplied to functions called
+internally (e.g. 'action'). See 'render-form-controls' for more
+details."))
 
 (defmethod with-form-header (obj body-fn
 			     &rest keys &key name preslots-fn
@@ -29,6 +39,17 @@ presentation. Similar to 'with-data-header'."))
 		     (safe-apply preslots-fn obj keys)
 		     (:ul (funcall body-fn))
 		     (safe-apply postslots-fn obj keys))))))))
+
+(defgeneric render-form-controls (obj &rest keys &key action &allow-other-keys)
+  (:documentation
+   "By default, this method renders 'Submit' and 'Cancel' buttons
+for the form renderer. It is normally passed as 'postslots-fn' to
+'with-form-header'. Override this method to render form controls
+differently.
+
+'obj' - the object being rendered.
+'action' - an action created by 'make-action' to be called in
+case the user clicks submit."))
 
 (defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
   (with-html

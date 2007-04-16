@@ -3,7 +3,7 @@
 
 (export '(with-data-header render-data-slot render-data))
 
-(defgeneric with-data-header (obj body-fn &rest keys)
+(defgeneric with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a data presentation. The
 default method renders a humanized name of the object along with
@@ -12,6 +12,13 @@ implementation also sets up an unordered list. After the header
 is set up, 'with-data-header' calls a function of zero arguments
 'body-fn' which renders the body of the object (slots, etc.)
 'with-data-header' renders a footer after that.
+
+'preslots-fn' and 'postslots-fn' can be used to add specialized
+rendering before and after the list of slots is rendered,
+respectively. When supplied, these keys should be bound to a
+function that takes the object being rendered ('obj') and a list
+of keys and render appropriate html. See 'render-form-controls'
+for an example.
 
 'with-data-header' is normally called by 'render-data' and should
 not be called by the programmer. Override 'with-data-header' to

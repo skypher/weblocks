@@ -15,6 +15,8 @@
   :components ((:file "weblocks-test")
 	       (:file "utils-test"
 		      :depends-on ("weblocks-test"))
+	       (:file "actions"
+		      :depends-on ("weblocks-test"))
 	       (:module fixtures
 		:components ((:file "shared"))
 		:depends-on ("weblocks-test"))

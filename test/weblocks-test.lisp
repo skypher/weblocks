@@ -58,7 +58,8 @@ and then compares the string to the expected result."
 
 (defmacro with-request (method parameters &body body)
   "A helper macro for test cases across web requests. The macro
-sets up a request and executes code within its context.
+sets up a request and a session, and executes code within their
+context.
 
 'method' - A method with which the request was initiated (:get
 or :post)
@@ -67,8 +68,12 @@ the request."
   (let ((parameters-slot (ecase method
 			   (:get 'get-parameters)
 			   (:post 'post-parameters))))
-    `(let ((*server* (make-instance 'unittest-server))
-	   (*request* (make-instance 'unittest-request)))
+    `(let* ((*request* (make-instance 'unittest-request))
+	    (*server* (make-instance 'unittest-server))
+	    (hunchentoot::*remote-host* "localhost")
+	    (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
+	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+	    (*session* (start-session)))
        (setf (slot-value *request* 'method) ,method)
        (setf (slot-value *request* ',parameters-slot) ,parameters)
        ,@body)))

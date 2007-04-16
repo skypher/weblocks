@@ -44,16 +44,23 @@
   (:span :class "value" "test"))
 
 (deftest-html render-data-2
-    (render-data *joe*)
+    (render-data *joe* :preslots-fn (lambda (obj &rest keys)
+							  (with-html
+							    (:div "test1")))
+		       :postslots-fn (lambda (obj &rest keys)
+				       (with-html
+					 (:div "test2"))))
   (:div :class "renderer data employee"
 	(:div :class "extra-top-1" "&nbsp;")
 	(:div :class "extra-top-2" "&nbsp;")
 	(:div :class "extra-top-3" "&nbsp;")
 	(:h1 (:span :class "action" "Viewing:&nbsp;")
 	     (:span :class "object" "Employee"))
+	(:div "test1")
 	(:ul
 	 (:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	 (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+	(:div "test2")
 	(:div :class "extra-bottom-1" "&nbsp;")
 	(:div :class "extra-bottom-2" "&nbsp;")
 	(:div :class "extra-bottom-3" "&nbsp;")))
