@@ -7,7 +7,7 @@
 ;;; to the slot
 (defmethod update-object-from-request ((obj standard-object) &key slots &allow-other-keys)
   (mapc (lambda (slot)
-	  (let ((request-slot-value (post-parameter (attributize-name (cdr slot)))))
+	  (let ((request-slot-value (request-parameter (attributize-name (cdr slot)))))
 	    (when request-slot-value
 	      (setf (slot-value obj (cdr slot)) request-slot-value))))
 	(object-visible-slots obj :slots slots)))

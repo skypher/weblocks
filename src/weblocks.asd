@@ -13,8 +13,10 @@
   :description "A Common Lisp web framework."
   :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who")
   :components ((:file "weblocks")
-	       (:file "actions"
+	       (:file "utils"
 		      :depends-on ("weblocks"))
+	       (:file "actions"
+		      :depends-on ("weblocks" "utils"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
@@ -23,12 +25,12 @@
 				      :depends-on ("renderer-output-utils"))
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
-			:depends-on ("weblocks"))
+			:depends-on ("weblocks" "utils"))
 	       (:file "request-object-mapping"
-		      :depends-on (renderers))
+		      :depends-on (renderers "utils"))
 	       (:module widgets
 			:components ((:file "dataform"))
-			:depends-on (renderers "request-object-mapping"))
+			:depends-on (renderers "request-object-mapping" "utils" "actions"))
 	       (:file "server"
 		      :depends-on (widgets))))
 

@@ -36,9 +36,12 @@
 
 (defparameter *dataform-widget* (make-instance 'dataform :data *joe-employee*))
 
-(defun start-weblocks ()
-  (if (null *weblocks-server*)
-      (setf *weblocks-server* (start-server :port 8080))))
+(defun start-weblocks (&key debug)
+  (when debug
+    (setf *show-lisp-errors-p* t)
+    (setf *show-lisp-backtraces-p* t))
+  (when (null *weblocks-server*)
+    (setf *weblocks-server* (start-server :port 8080))))
 
 (defun stop-weblocks ()
   (if (not (null *weblocks-server*))

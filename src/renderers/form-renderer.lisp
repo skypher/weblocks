@@ -3,6 +3,8 @@
 
 (export '(with-form-header render-form-slot render-form))
 
+(defparameter *submit-control-name* "submit")
+
 (defgeneric with-form-header (obj body-fn &key name &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a form
@@ -32,7 +34,7 @@ presentation. Similar to 'with-data-header'."))
   (with-html
     (:div :class "submit"
 	  (:input :name "action" :type "hidden" :value action)
-	  (:input :name "submit" :type "submit" :value "Submit")
+	  (:input :name *submit-control-name* :type "submit" :value "Submit")
 	  (:input :name "cancel" :type "submit" :value "Cancel"))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest args)

@@ -11,22 +11,31 @@
   (apply #'render-dataform obj (dataform-data obj) args))
 
 (defmethod render-dataform ((obj dataform) data &rest args)
-  (with-slots (ui-state) obj
-    (case ui-state
-      (:data (apply #'render-data
-		    data
-		    :postslots-fn
-		    (lambda (obj &rest keys)
-		      (with-html
-			(:div :class "submit"
-			      (render-link (make-action (lambda ()
-							  (setf ui-state :form)))
-					   "Modify"))))
-		    args))
-      (:form (apply #'render-form
-		    data
-		    :method :post
-		    :action (make-action (lambda ()
-					   (update-object-from-request data)
-					   (setf ui-state :data)))
-		    args)))))
+  (ecase (slot-value obj 'ui-state)
+    (:data (apply #'render-dataform-data obj data args))
+    (:form (apply #'render-dataform-form obj data args))))
+
+(defmethod render-dataform-data ((obj dataform) data &rest args)
+  (apply #'render-data
+	 data
+	 :postslots-fn
+	 (lambda (data-value &rest keys)
+	   (with-html
+	     (:div :class "submit"
+		   (render-link (make-action (lambda ()
+					       (setf (slot-value obj 'ui-state) :form)))
+				"Modify"))))
+	 args))
+
+(defmethod render-dataform-form ((obj dataform) data &rest args)
+  (apply #'render-form
+	 data
+	 :method :post
+	 :action (make-action (lambda ()
+				(when (request-parameter *submit-control-name*)
+				  (apply #'dataform-submit-action obj data args))
+				(setf (slot-value obj 'ui-state) :data)))
+	 args))
+
+(defmethod dataform-submit-action ((obj dataform) data &rest args)
+  (update-object-from-request data))

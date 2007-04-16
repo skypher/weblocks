@@ -1,13 +1,15 @@
 
 (in-package :weblocks)
 
+(defparameter *action-string* "action")
+
 (defun make-action (action-fn)
   (let ((action-code (gensym)))
     (setf (session-value action-code) action-fn)
     action-code))
 
 (defun render-link (action-code name)
-  (let ((url (concatenate 'string "?action=" (princ-to-string action-code))))
+  (let ((url (concatenate 'string "?" *action-string* "=" (princ-to-string action-code))))
     (with-html
       (:a :href url (str name)))))
 
@@ -20,9 +22,7 @@
     (hala)))
 
 (defun get-request-action ()
-  (let ((action-name (ecase (request-method)
-		       (:get (get-parameter "action"))
-		       (:post (post-parameter "action"))))
+  (let ((action-name (request-parameter *action-string*))
 	request-action)
     (when action-name
       (setf request-action (session-value action-name))

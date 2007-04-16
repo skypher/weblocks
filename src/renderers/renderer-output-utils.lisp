@@ -294,9 +294,3 @@ render a header."
   (if inlinep
       (visit-object-slots obj render-slot-fn keys)
       (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn keys) keys)))
-
-
-(defmacro safe-apply (fn &rest args)
-  `(if ,fn
-       (apply ,fn ,@args)
-       nil))
