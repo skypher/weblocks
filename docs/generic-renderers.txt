@@ -1,8 +1,8 @@
 
 TODO:
 1. document unit test, and determine symbols export status:
-   - input scanner
    - dataform widget
+   - input scanner
 2. Create generic form readers (ensure slot type info is honored when parsing data)
 6.7. Figure out the whole start/stop/server/framework logistics (test handle-client-request)
 7.1. Port to OSX
