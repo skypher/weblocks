@@ -5,7 +5,7 @@
 
 ;;; test dataform render
 (deftest-html render-dataform-1
-    (with-request :get '()
+    (with-request :get nil
       (render *edit-joe*))
   1)
 

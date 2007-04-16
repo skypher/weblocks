@@ -7,7 +7,7 @@
   "A string used to pass actions from a client to the server. See
   'get-request-action'.")
 
-(defun make-action (action-fn)
+(defun make-action (action-fn &optional (action-code (gensym)))
   "Coverts a function into an action that can be rendered into
 HTML. A unique string is generated for the function, and a
 function is added to the session hashtable under this string. The
@@ -17,10 +17,12 @@ that came with the request is stored in the hashtable, and if so,
 invokes the stored function.
 
 'action-fn' - A function of zero arguments that will be called if
-the user initiates appropriate control (link, form, etc.)"
-  (let ((action-code (gensym)))
-    (setf (session-value action-code) action-fn)
-    action-code))
+the user initiates appropriate control (link, form, etc.)
+
+'action-code' - The code to use for an action (if not specified
+make-action generates a unique value for each action)"
+  (setf (session-value action-code) action-fn)
+  action-code)
 
 (defun render-link (action-code name)
   "Renders an action into an href link. When the user clicks on

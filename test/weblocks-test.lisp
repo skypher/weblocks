@@ -1,6 +1,6 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot)
+  (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities)
   (:export #:test-weblocks))
 
 (in-package :weblocks-test)
@@ -73,7 +73,12 @@ the request."
 	    (hunchentoot::*remote-host* "localhost")
 	    (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
 	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-	    (*session* (start-session)))
-       (setf (slot-value *request* 'method) ,method)
-       (setf (slot-value *request* ',parameters-slot) ,parameters)
-       ,@body)))
+	    (*session* (start-session))
+	    (make-action-orig #'weblocks::make-action))
+       (unwind-protect (progn
+			 (setf (symbol-function 'weblocks::make-action)
+			       (curry-after #'make-action "abc123"))
+			 (setf (slot-value *request* 'method) ,method)
+			 (setf (slot-value *request* ',parameters-slot) ,parameters)
+			 ,@body)
+	 (setf (symbol-function 'weblocks::make-action) make-action-orig)))))
