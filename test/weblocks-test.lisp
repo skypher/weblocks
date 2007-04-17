@@ -56,6 +56,9 @@ and then compares the string to the expected result."
 (defmethod hunchentoot::server-mod-lisp-p ((obj unittest-server))
   (slot-value obj 'mod-lisp-p))
 
+(defparameter *dummy-action* "abc123"
+  "A dummy action code for unit tests.")
+
 (defmacro with-request (method parameters &body body)
   "A helper macro for test cases across web requests. The macro
 sets up a request and a session, and executes code within their
@@ -77,8 +80,15 @@ the request."
 	    (make-action-orig #'weblocks::make-action))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
-			       (curry-after #'make-action "abc123"))
+			       (curry-after #'make-action *dummy-action*))
 			 (setf (slot-value *request* 'method) ,method)
 			 (setf (slot-value *request* ',parameters-slot) ,parameters)
 			 ,@body)
 	 (setf (symbol-function 'weblocks::make-action) make-action-orig)))))
+
+(defun do-request (parameters)
+  "Mocks up a submitted request for unit tests."
+  (setf (slot-value *request* (ecase (request-method)
+				(:get 'get-parameters)
+				(:post 'post-parameters))) parameters)
+  (safe-funcall (weblocks::get-request-action)))

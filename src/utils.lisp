@@ -1,13 +1,17 @@
 
 (in-package :weblocks)
 
-(export '(safe-apply request-parameter))
+(export '(safe-apply safe-funcall request-parameter))
 
 (defmacro safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
-  `(if ,fn
-       (apply ,fn ,@args)
-       nil))
+  `(when ,fn
+       (apply ,fn ,@args)))
+
+(defmacro safe-funcall (fn &rest args)
+  "Funcall 'fn' if it isn't nil. Otherwise return nil."
+  `(when ,fn
+       (funcall ,fn ,@args)))
 
 (defun request-parameter (name)
   "Get parameter 'name' from the request. If the request was

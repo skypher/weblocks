@@ -53,7 +53,6 @@ session (somehow invalid), raises an assertion."
 invoked an action and calls it. Then proceeds to render the
 controls."
   (let ((action-fn (get-request-action)))
-    (when action-fn
-      (funcall action-fn))
+    (safe-funcall action-fn)
     (hala)))
 
