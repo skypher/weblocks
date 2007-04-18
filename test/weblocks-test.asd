@@ -17,9 +17,13 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test"))
+	       (:file "server"
+		      :depends-on ("weblocks-test"))
 	       (:module fixtures
 		:components ((:file "shared"))
 		:depends-on ("weblocks-test"))
+	       (:file "request-object-mapping"
+		      :depends-on ("weblocks-test" fixtures))
 	       (:module renderers
 		:components ((:file "renderer-output-utils")
 			     (:file "data-renderer")
@@ -27,7 +31,7 @@
 			     (:file "table-renderer"))
 		:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
-		:components ((:file "dataform"))
+		:components ((:file "dataform" "composite"))
 		:depends-on ("weblocks-test" fixtures))))
 
 
