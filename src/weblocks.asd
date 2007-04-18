@@ -15,8 +15,8 @@
   :components ((:file "weblocks")
 	       (:file "utils"
 		      :depends-on ("weblocks"))
-	       (:defile "page-template"
-		   :depends-on ("weblocks"))
+	       (:file "page-template"
+		      :depends-on ("weblocks"))
 	       (:file "actions"
 		      :depends-on ("weblocks" "utils" "page-template"))
 	       (:module renderers
