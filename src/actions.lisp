@@ -72,7 +72,7 @@ action and calls it. Then proceeds to render the controls."
 
   (let ((action-fn (get-request-action)))
     (safe-funcall action-fn)
-    (render (session-value 'root-composite)))
+    (with-page (curry #'render (session-value 'root-composite))))
   
   (get-output-stream-string *weblocks-output-stream*))
 

@@ -1,9 +1,7 @@
 
 TODO:
 1. document unit test, and determine symbols export status:
-   - input scanner, server (break up?), composite, request handler
-2. Break up server.lisp into a new demo project
-2.5. Deal with stylesheets, page template
+   - input scanner, server, composite, request handler, page template
 2.6. Deal with global variables shared accross threads (*weblocks-output-stream*)
 3. Improve generic form readers (ensure slot type info is honored when parsing data and inner slots are updated.)
 7.1. Port to OSX
