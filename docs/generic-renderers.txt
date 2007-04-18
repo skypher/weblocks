@@ -1,10 +1,11 @@
 
 TODO:
 1. document unit test, and determine symbols export status:
-   - dataform widget
-   - input scanner
-2. Create generic form readers (ensure slot type info is honored when parsing data)
-6.7. Figure out the whole start/stop/server/framework logistics (test handle-client-request)
+   - input scanner, server (break up?), composite, request handler
+2. Break up server.lisp into a new demo project
+2.5. Deal with stylesheets, page template
+2.6. Deal with global variables shared accross threads (*weblocks-output-stream*)
+3. Improve generic form readers (ensure slot type info is honored when parsing data and inner slots are updated.)
 7.1. Port to OSX
 9.1. Make sure data and form renderer labels show attributized slot name class for styling
 9.2. Make sure attributized slot names in form and data renderers refer to original slot name (in case modified by :slots, this is necessary to read back input properly)

@@ -29,7 +29,11 @@
 	       (:file "request-object-mapping"
 		      :depends-on (renderers "utils"))
 	       (:module widgets
-			:components ((:file "dataform"))
+			:components ((:file "widget")
+				     (:file "dataform"
+				      :depends-on ("widget"))
+				     (:file "composite"
+				      :depends-on ("widget")))
 			:depends-on (renderers "request-object-mapping" "utils" "actions"))
 	       (:file "server"
 		      :depends-on (widgets))))

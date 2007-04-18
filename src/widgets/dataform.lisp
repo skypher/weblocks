@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(dataform dataform-data render render-dataform
+(export '(dataform dataform-data render-dataform
 	  render-dataform-data render-dataform-form
 	  dataform-submit-action))
 
@@ -24,13 +24,6 @@ widget's state is updated and it renders into a form via
 'render-form' generic renderer. If a user then submits the form,
 the data object is updated from the form (see
 dataform-submit-action)."))
-
-(defgeneric render (obj &rest args)
-  (:documentation
-   "A generic function that renders a widget in its current
-state.
-
-'obj' - widget object to render."))
 
 (defmethod render ((obj dataform) &rest args)
   (apply #'render-dataform obj (dataform-data obj) args))

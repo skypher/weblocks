@@ -41,6 +41,7 @@
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
   (when (null *weblocks-server*)
+    (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server* (start-server :port 8080))))
 
 (defun stop-weblocks ()
@@ -48,12 +49,6 @@
       (progn
 	(stop-server *weblocks-server*)
 	(setf *weblocks-server* nil))))
-
-(defun hala1 ()
-  (let ((name (first-name *joe-employee*)))
-    (if (eql name "Slava")
-	(setf (first-name *joe-employee*) "Dima")
-	(setf (first-name *joe-employee*) "Slava"))))
 
 (defun hala ()
   (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
@@ -66,10 +61,6 @@
       (:link :rel "stylesheet" :type "text/css" :href "pub/data.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/table.css"))
      (:body
-      (render-table (list *joe-employee* *joe-employee* *joe-employee*) :caption "Employees")
-      (htm (:div (:p)))
-      (render-table '() :caption "Employees")
-      (htm (:div (:p)))
       (render *dataform-widget*))))
   (get-output-stream-string *weblocks-output-stream*))
 
@@ -77,3 +68,27 @@
       (append (list (create-folder-dispatcher-and-handler "/pub/" "/home/coffeemug/projects/weblocks2/pub/")
 		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))
+
+(defvar *webapp-name* nil
+  "The name of the currently running web application. See
+  'defwebapp' for more details.")
+
+(defun defwebapp (name)
+  "Sets the application name (the *webapp-name* variable). 'name'
+must be a symbol. This symbol will later be used to find a
+package that defined 'init-user-session' - a function responsible
+for the web application setup.
+
+'init-user-session' must be defined by weblocks client in the
+same package as 'name'. This function will accept a single
+parameter - a composite widget at the root of the
+application. 'init-user-session' is responsible for adding
+initial widgets to this composite."
+  (check-type name symbol)
+  (setf *webapp-name* name))
+
+(defwebapp 'weblocks-demo)
+
+(defun init-user-session (comp)
+  (push-end `("test" . ,(make-instance 'dataform :data *joe-employee*))
+	    (composite-widgets comp)))
