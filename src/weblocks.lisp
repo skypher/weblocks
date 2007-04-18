@@ -1,7 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
   (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who)
-  (:export #:*weblocks-output-stream* #:with-html)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of
 web application development. It achieves its goals by
@@ -16,9 +15,12 @@ Generic functions 'render-data', 'render-form', 'render-table'."))
 
 (in-package :weblocks)
 
-(defparameter *weblocks-output-stream* (make-string-output-stream)
-  "Output stream for Weblocks framework. All html should be
-  rendered to this stream.")
+(export '(*weblocks-output-stream* with-html))
+
+(defparameter *weblocks-output-stream* nil
+  "Output stream for Weblocks framework created for each request
+and available to code executed within a request as a special
+variable. All html should be rendered to this stream.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."

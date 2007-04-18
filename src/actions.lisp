@@ -70,9 +70,10 @@ action and calls it. Then proceeds to render the controls."
 	       root-composite)
       (setf (session-value 'root-composite) root-composite)))
 
-  (let ((action-fn (get-request-action)))
+  (let ((action-fn (get-request-action))
+	(*weblocks-output-stream* (make-string-output-stream)))
+    (declare (special *weblocks-output-stream*))
     (safe-funcall action-fn)
-    (with-page (curry #'render (session-value 'root-composite))))
-  
-  (get-output-stream-string *weblocks-output-stream*))
+    (with-page (curry #'render (session-value 'root-composite)))
+    (get-output-stream-string *weblocks-output-stream*)))
 
