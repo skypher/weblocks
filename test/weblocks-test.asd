@@ -31,7 +31,8 @@
 			     (:file "table-renderer"))
 		:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
-		:components ((:file "dataform" "composite"))
+		:components ((:file "dataform")
+			     (:file "composite"))
 		:depends-on ("weblocks-test" fixtures))))
 
 
