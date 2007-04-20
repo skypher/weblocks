@@ -45,7 +45,8 @@ session (somehow invalid), raises an assertion."
 	request-action)
     (when action-name
       (setf request-action (session-value action-name))
-      (assert request-action (request-action) "Cannot find action.")
+      (assert request-action (request-action)
+	      (concatenate 'string "Cannot find action: " action-name))
       request-action)))
 
 (defgeneric handle-client-request ()
