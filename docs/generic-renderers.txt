@@ -1,7 +1,5 @@
 
 TODO:
-1. document unit test, and determine symbols export status:
-   - request handler
 3. Improve generic form readers (ensure slot type info is honored when parsing data and inner slots are updated.)
 7.1. Port to OSX
 9.1. Make sure data and form renderer labels show attributized slot name class for styling

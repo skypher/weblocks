@@ -55,16 +55,12 @@ session (somehow invalid), raises an assertion."
    server. It is a hunchentoot handler and has access to all
    hunchentoot dynamic variables. The default implementation
    executes a user action (if any), and renders the main
-   composite. It also invokes user supplied 'init-user-session'
-   on the first request that has no session setup.  Override this
-   method (along with :before and :after specifiers to customize
-   behavior)."))
+   composite wrapped in HTML provided by 'with-page'. It also
+   invokes user supplied 'init-user-session' on the first request
+   that has no session setup.  Override this method (along
+   with :before and :after specifiers to customize behavior)."))
 
 (defmethod handle-client-request ()
-  "Handles requests coming in from the client. If this is the
-first request from a client (a session isn't set up yet),
-'init-user-session' is called. Verifies if a user invoked an
-action and calls it. Then proceeds to render the controls."
   (when (null (session-value 'root-composite))
     (let ((root-composite (make-instance 'composite)))
       (funcall (symbol-function (find-symbol "INIT-USER-SESSION" (symbol-package *webapp-name*)))
