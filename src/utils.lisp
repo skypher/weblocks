@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(safe-apply safe-funcall request-parameter))
+(export '(safe-apply safe-funcall request-parameter
+	  string-whitespace-p))
 
 (defmacro safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
@@ -23,3 +24,8 @@ error is signalled."
     (:get (get-parameter name))
     (:post (post-parameter name))))
 
+(defun string-whitespace-p (str)
+  "Returns true if every character in a string is a whitespace
+character, nil otherwise."
+  (loop for c across str
+     always (whitespacep c)))

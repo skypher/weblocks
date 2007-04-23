@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of
 web application development. It achieves its goals by

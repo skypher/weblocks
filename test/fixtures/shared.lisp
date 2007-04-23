@@ -16,7 +16,7 @@
 
 (defclass person ()
   ((name :reader first-name :initform "Joe")
-   (age :initform 30)
+   (age :initform 30 :type integer)
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))
 

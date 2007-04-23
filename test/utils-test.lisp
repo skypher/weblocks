@@ -29,3 +29,16 @@
     (with-request :post '(("a" . 1) ("b" . 2))
       (request-parameter "b"))
   2)
+
+;;; test string-whitespace-p
+(deftest string-whitespace-p-1
+    (string-whitespace-p "")
+  t)
+
+(deftest string-whitespace-p-2
+    (string-whitespace-p "   	")
+  t)
+
+(deftest string-whitespace-p-3
+    (string-whitespace-p " a  	")
+  nil)
