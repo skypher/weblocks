@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(*submit-control-name* *cancel-control-name* with-form-header
-	  render-form-controls render-form-slot render-form))
+	  render-validation-summary render-form-controls
+	  render-form-slot render-form))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -24,8 +25,8 @@ Other keys are also accepted and supplied to functions called
 internally (e.g. 'action'). See 'render-form-controls' for more
 details."))
 
-(defmethod with-form-header (obj body-fn
-			     &rest keys &key name preslots-fn
+(defmethod with-form-header (obj body-fn &rest keys &key name
+			     validation-errors preslots-fn
 			     (postslots-fn #'render-form-controls)
 			     (method :get)
 			     &allow-other-keys)
@@ -40,9 +41,28 @@ details."))
 	       (htm (:fieldset
 		     (:h1 (:span :class "action" "Modifying:&nbsp;")
 			  (:span :class "object" (str object-name)))
+		     (render-validation-summary validation-errors)
 		     (safe-apply preslots-fn obj keys)
+		     (:h2 :class "form-fields-title" "Form fields:")
 		     (:ul (funcall body-fn))
 		     (safe-apply postslots-fn obj keys))))))))
+
+(defun render-validation-summary (errors)
+  "Renders a summary of validation errors on top of the form."
+  (when errors
+    (with-html
+      (:div :class "validation-errors-summary"
+	    (:h2 :class "error-count"
+		 (let ((error-count (length errors)))
+		   (if (eql error-count 1)
+		       (str (format nil "There is 1 validation error:"))
+		       (str (format nil "There are ~S validation errors:" error-count)))))
+	    (:ul
+	     (mapc (lambda (err)
+		     (with-html
+		       (:li
+			(str (format nil "~A" (cdr err))))))
+		   errors))))))
 
 (defgeneric render-form-controls (obj &rest keys &key action &allow-other-keys)
   (:documentation
@@ -74,14 +94,18 @@ case the user clicks submit."))
 (defmethod render-form-slot (obj slot-name slot-value &rest keys
 			     &key validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
-	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal)))
+	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal))
+	 (field-class (when validation-error "item-not-validated")))
     (with-html
-      (:li (:label
-	    (:span (str (humanize-name slot-name)) ":&nbsp;")
-	    (apply #'render-form slot-value :name attribute-slot-name keys)
-	    (when validation-error
-	      (htm (:p :class "validation-error"
-		       (str (format nil "~A" (cdr validation-error)))))))))))
+      (:li :class field-class
+       (:label
+	(:span (str (humanize-name slot-name)) ":&nbsp;")
+	(apply #'render-form slot-value :name attribute-slot-name keys)
+	(when validation-error
+	  (htm (:p :class "validation-error"
+		   (:em
+		    (:span :class "validation-error-heading" "Error:&nbsp;")
+		    (str (format nil "~A" (cdr validation-error))))))))))))
 
 (defgeneric render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)
   (:documentation
