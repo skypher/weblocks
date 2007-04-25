@@ -3,7 +3,7 @@
 
 (export '(*submit-control-name* *cancel-control-name* with-form-header
 	  render-validation-summary render-form-controls
-	  render-form-slot render-form))
+	  render-form-slot render-form required-validation-error))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")

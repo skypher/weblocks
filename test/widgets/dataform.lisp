@@ -25,81 +25,28 @@
 	(render edit-joe)))
   (htm
    ;; initial state
-   (:div :class "renderer data employee"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
-	 (:h1 (:span :class "action" "Viewing:&nbsp;")
-	      (:span :class "object" "Employee"))
-	 (:ul
-	  (:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	  (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	 (:div :class "submit" (:a :href "?action=abc123" "Modify"))
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))
+   #.(data-header-template
+      '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+      :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))
    ;; click modify
-   (:form :class "renderer form employee" :action "" :method "post"
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
-	  (:fieldset
-	   (:h1 (:span :class "action" "Modifying:&nbsp;")
-		(:span :class "object" "Employee"))
-	   (:ul
-	    (:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-	    (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
-	   (:div :class "submit"
-		 (:input :name "action" :type "hidden" :value "abc123")
-		 (:input :name "submit" :type "submit" :value "Submit")
-		 (:input :name "cancel" :type "submit" :value "Cancel")))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;"))
+   #.(form-header-template
+	 '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	   (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	 :method "post")
    ;; change name to Bob and click cancel
-   (:div :class "renderer data employee"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
-	 (:h1 (:span :class "action" "Viewing:&nbsp;")
-	      (:span :class "object" "Employee"))
-	 (:ul
-	  (:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	  (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	 (:div :class "submit" (:a :href "?action=abc123" "Modify"))
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))
+   #.(data-header-template
+      '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+      :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))
    ;; click modify
-   (:form :class "renderer form employee" :action "" :method "post"
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
-	  (:fieldset
-	   (:h1 (:span :class "action" "Modifying:&nbsp;")
-		(:span :class "object" "Employee"))
-	   (:ul
-	    (:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-	    (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
-	   (:div :class "submit"
-		 (:input :name "action" :type "hidden" :value "abc123")
-		 (:input :name "submit" :type "submit" :value "Submit")
-		 (:input :name "cancel" :type "submit" :value "Cancel")))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;"))
+   #.(form-header-template
+	 '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	   (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	 :method "post")
    ;; change name to Bob and click submit
-   (:div :class "renderer data employee"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
-	 (:h1 (:span :class "action" "Viewing:&nbsp;")
-	      (:span :class "object" "Employee"))
-	 (:ul
-	  (:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Bob"))
-	  (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	 (:div :class "submit" (:a :href "?action=abc123" "Modify"))
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))))
+   #.(data-header-template
+      '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Bob"))
+	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+      :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))))
 
