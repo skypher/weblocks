@@ -49,7 +49,7 @@ details.
 object should be rendered inline or should have its own
 header."))
 
-(defmethod render-table-header-row (obj &rest keys &key inlinep &allow-other-keys)
+(defmethod render-table-header-row (obj &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj :alternp nil keys))
 
 (defgeneric render-table-header-cell (obj slot-name slot-value &rest keys)
@@ -82,7 +82,7 @@ default implementation uses 'render-table-body-cell' to render
 particular cells. See 'render-table-header-row' for more
 details."))
 
-(defmethod render-table-body-row (obj &rest keys &key inlinep alternp &allow-other-keys)
+(defmethod render-table-body-row (obj &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-body-cell obj keys))
 
 (defgeneric render-table-body-cell (obj slot-name slot-value
@@ -91,13 +91,11 @@ details."))
    "Renders the 'td' elements of the table. See
 'render-table-header-cell' for more details."))
 
-(defmethod render-table-body-cell (obj slot-name slot-value
-				   &rest keys &key inlinep &allow-other-keys)
+(defmethod render-table-body-cell (obj slot-name slot-value &rest keys)
   (with-html
     (:td :class (attributize-name slot-name) (str slot-value))))
 
-(defmethod render-table-body-cell (obj slot-name (slot-value standard-object)
-				   &rest keys &key inlinep &allow-other-keys)
+(defmethod render-table-body-cell (obj slot-name (slot-value standard-object) &rest keys)
   (render-object-slot #'render-table-body-row #'render-table-body-cell obj slot-name slot-value keys))
 
 ;; The table itself

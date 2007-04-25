@@ -19,7 +19,11 @@
 presentation. Similar to 'with-data-header'.
 
 'method' - a submission method for the form. Normally :get
-or :post.
+or :post (defaults to :get).
+
+'validation-errors' - if there were any errors during form validation,
+they should be passed via this keyword parameter. The header will
+present a summary via 'render-validation-summary'.
 
 Other keys are also accepted and supplied to functions called
 internally (e.g. 'action'). See 'render-form-controls' for more
@@ -48,7 +52,8 @@ details."))
 		     (safe-apply postslots-fn obj keys))))))))
 
 (defun render-validation-summary (errors)
-  "Renders a summary of validation errors on top of the form."
+  "Renders a summary of validation errors on top of the form. Redefine
+this function to render validation summary differently."
   (when errors
     (with-html
       (:div :class "validation-errors-summary"
@@ -87,8 +92,7 @@ case the user clicks submit."))
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
 
-(defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest keys
-			     &key validation-errors &allow-other-keys)
+(defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest keys)
   (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value keys))
 
 (defmethod render-form-slot (obj slot-name slot-value &rest keys
@@ -107,17 +111,24 @@ case the user clicks submit."))
 		    (:span :class "validation-error-heading" "Error:&nbsp;")
 		    (str (format nil "~A" (cdr validation-error))))))))))))
 
-(defgeneric render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)
+(defgeneric render-form (obj &rest keys &key inlinep name validation-errors
+			     intermediate-fields &allow-other-keys)
   (:documentation
    "A generic form presentation renderer. Similar to
 'render-data'.
 
-In addition to other keys accepts a key 'validation-errors' which
-optionally contains an association list of slot names and associated
-errors that may have happened during a previous for submission."))
+'validation-errors' - an association list of slot names and associated
+errors that may have happened during a previous for submission. These
+are rendered in a summary within a header, as well as in particular
+fields.
 
-(defmethod render-form ((obj standard-object) &rest keys
-			&key inlinep name intermediate-fields &allow-other-keys)
+'intermediate-fields' - If there are any validation errors, it's bad
+form to lose values the user has already
+entered. 'intermediate-fields' should be a copy of the request, in
+which case form renderer chooses values entered as part of the request
+over values obtained from the object."))
+
+(defmethod render-form ((obj standard-object) &rest keys)
   (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
 
 (defmethod render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)

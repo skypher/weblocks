@@ -99,10 +99,10 @@ Ex:
 \(render-data address :slots ((city . town))
 \(render-data address :slots ((city . town) :mode :strict)"))
 
-(defmethod render-data ((obj standard-object) &rest keys &key inlinep &allow-other-keys)
+(defmethod render-data ((obj standard-object) &rest keys)
   (apply #'render-standard-object #'with-data-header #'render-data-slot obj keys))
 
-(defmethod render-data (obj &rest keys &key inlinep &allow-other-keys)
+(defmethod render-data (obj &rest keys)
   (with-html
     (:span :class "value"
      (str obj))))

@@ -3,7 +3,9 @@
 
 (export '(start-weblocks stop-weblocks defwebapp))
 
-(defvar *weblocks-server* nil)
+(defvar *weblocks-server* nil
+  "If the server is started, bound to hunchentoot server
+  object. Otherwise, nil.")
 
 (defun start-weblocks (&key debug)
   "Starts weblocks framework hooked into Hunchentoot server. Set
