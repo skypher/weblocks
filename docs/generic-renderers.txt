@@ -1,7 +1,7 @@
 
 TODO:
 4. Improve generic form reader
-   - document and unit test the hell out of generic rendering and validators, clean up form renderer
+   - document and unit test the hell out of generic rendering and validators
    - ensure inner slots are updated
    - ensure slots that don't have readers but were specified during rendering are updated
    - ensure renamed slots (in different modes) are updated
@@ -10,6 +10,7 @@ TODO:
 9.2. Make sure attributized slot names in form and data renderers refer to original slot name (in case modified by :slots, this is necessary to read back input properly)
 -----
 9.3. Mark required fields
+9.4. Don't remove validation error summary for long forms.
 9.5. Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
 11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.

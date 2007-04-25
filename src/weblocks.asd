@@ -30,8 +30,10 @@
 			:depends-on ("weblocks" "utils"))
 	       (:module form-management
 			:components ((:file "validation")
+				     (:file "form-parsers"
+				      :depends-on ("validation"))
 				     (:file "request-object-mapping"
-				      :depends-on ("validation")))
+				      :depends-on ("validation" "form-parsers")))
 			:depends-on ("utils"))
 	       (:module widgets
 			:components ((:file "widget")
