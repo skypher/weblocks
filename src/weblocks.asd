@@ -28,17 +28,18 @@
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
 			:depends-on ("weblocks" "utils"))
-	       (:file "validation"
-		      :depends-on ("utils"))
-	       (:file "request-object-mapping"
-		      :depends-on (renderers "utils" "validation"))
+	       (:module form-management
+			:components ((:file "validation")
+				     (:file "request-object-mapping"
+				      :depends-on ("validation")))
+			:depends-on ("utils"))
 	       (:module widgets
 			:components ((:file "widget")
 				     (:file "dataform"
 				      :depends-on ("widget"))
 				     (:file "composite"
 				      :depends-on ("widget")))
-			:depends-on (renderers "request-object-mapping" "utils" "actions"))
+			:depends-on (renderers form-management "utils" "actions"))
 	       (:file "server"
 		      :depends-on (widgets))))
 
