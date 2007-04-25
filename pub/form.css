@@ -45,3 +45,11 @@
 {
   background-color: #D8EAF8;
 }
+
+.form > fieldset > ul > li > label > p.validation-error
+{
+  color: red;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 0;
+}

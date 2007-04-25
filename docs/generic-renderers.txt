@@ -1,7 +1,10 @@
 
 TODO:
-3. Allow specifying standard as well as custom validations on fields and objects
-4. Improve generic form readers (ensure inner slots are updated.)
+4. Improve generic form reader
+   - document and unit test the hell out of generic rendering and validators
+   - ensure inner slots are updated
+   - ensure slots that don't have readers but were specified during rendering are updated
+   - ensure renamed slots (in different modes) are updated
 5. Make sure controls have spaces between them.
 7.1. Port to OSX
 9.1. Make sure data and form renderer labels show attributized slot name class for styling

@@ -24,6 +24,15 @@ error is signalled."
     (:get (get-parameter name))
     (:post (post-parameter name))))
 
+(defun request-parameters ()
+  "Get parameters alist from the request. If the request was submitted
+via GET method, the parameters are obtained from the query string. If
+the request was submitted via POST, the parameters are obtained from
+the body of the request. Otherwise, an error is signalled."
+  (ecase (request-method)
+    (:get (get-parameters))
+    (:post (post-parameters))))
+
 (defun string-whitespace-p (str)
   "Returns true if every character in a string is a whitespace
 character, nil otherwise."

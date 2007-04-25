@@ -1,11 +1,15 @@
 ;;;; Generic form renderer
 (in-package :weblocks)
 
-(export '(*submit-control-name* with-form-header
+(export '(*submit-control-name* *cancel-control-name* with-form-header
 	  render-form-controls render-form-slot render-form))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
+
+(defparameter *cancel-control-name* "cancel"
+  "The name of the control responsible for cancellation of form
+  submission.")
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
 				  postslots-fn method &allow-other-keys)
@@ -56,32 +60,46 @@ case the user clicks submit."))
     (:div :class "submit"
 	  (:input :name "action" :type "hidden" :value action)
 	  (:input :name *submit-control-name* :type "submit" :value "Submit")
-	  (:input :name "cancel" :type "submit" :value "Cancel"))))
+	  (:input :name *cancel-control-name* :type "submit" :value "Cancel"))))
 
-(defgeneric render-form-slot (obj slot-name slot-value &rest args)
+(defgeneric render-form-slot (obj slot-name slot-value &rest keys &key validation-errors &allow-other-keys)
   (:documentation
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
 
-(defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest args)
-  (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value args))
+(defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest keys
+			     &key validation-errors &allow-other-keys)
+  (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value keys))
 
-(defmethod render-form-slot (obj slot-name slot-value &rest args)
-  (let ((attribute-slot-name (attributize-name slot-name)))
+(defmethod render-form-slot (obj slot-name slot-value &rest keys
+			     &key validation-errors &allow-other-keys)
+  (let* ((attribute-slot-name (attributize-name slot-name))
+	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal)))
     (with-html
       (:li (:label
-		   (:span (str (humanize-name slot-name)) ":&nbsp;")
-		   (apply #'render-form slot-value :name attribute-slot-name args))))))
+	    (:span (str (humanize-name slot-name)) ":&nbsp;")
+	    (apply #'render-form slot-value :name attribute-slot-name keys)
+	    (when validation-error
+	      (htm (:p :class "validation-error"
+		       (str (format nil "~A" (cdr validation-error)))))))))))
 
-(defgeneric render-form (obj &rest keys &key inlinep name &allow-other-keys)
+(defgeneric render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)
   (:documentation
    "A generic form presentation renderer. Similar to
-'render-data'."))
+'render-data'.
 
-(defmethod render-form ((obj standard-object) &rest keys &key inlinep name &allow-other-keys)
+In addition to other keys accepts a key 'validation-errors' which
+optionally contains an association list of slot names and associated
+errors that may have happened during a previous for submission."))
+
+(defmethod render-form ((obj standard-object) &rest keys
+			&key inlinep name intermediate-fields &allow-other-keys)
   (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
 
-(defmethod render-form (obj &rest keys &key inlinep name &allow-other-keys)
-  (with-html
-    (:input :type "text" :name name :value obj)))
+(defmethod render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)
+  (let ((intermediate-value (assoc name intermediate-fields :test #'string-equal)))
+    (with-html
+      (:input :type "text" :name name :value (if intermediate-value
+						 (cdr intermediate-value)
+						 obj)))))
 

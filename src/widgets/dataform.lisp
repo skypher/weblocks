@@ -13,9 +13,18 @@
 	 this widget.")
    (ui-state :initform :data
 	     :documentation "Current internal state of the
-	     widget. Normally :data when rendering via
-	     'render-data' and :form when rendering via
-	     'render-form'."))
+	     widget. Normally :data when rendering via 'render-data'
+	     and :form when rendering via 'render-form'.")
+   (validation-errors :initform nil
+		      :documentation "An association list of slot
+		      names and validation errors that occurred during
+		      the previous form submission.")
+   (intermediate-form-values :initform nil
+			     :documentation "If user enters form
+			     values and validation fails, these values
+			     are stored in this variable so the form
+			     isn't lost while the user fixes
+			     errors."))
   (:documentation
    "A class that represents a dataform widget. By default this
 widget renders the data object via 'render-data' generic renderer
@@ -73,9 +82,24 @@ customize form behavior."))
 	 data
 	 :method :post
 	 :action (make-action (lambda ()
-				(when (request-parameter *submit-control-name*)
-				  (apply #'dataform-submit-action obj data args))
-				(setf (slot-value obj 'ui-state) :data)))
+				(let (break-out)
+				  (when (request-parameter *submit-control-name*)
+				    (multiple-value-bind (success errors)
+					(apply #'dataform-submit-action obj data args)
+				      (if success
+					  (setf break-out t)
+					  (progn
+					    (setf (slot-value obj 'validation-errors) errors)
+					    (setf (slot-value obj 'intermediate-form-values)
+						  (copy-alist (request-parameters)))))))
+				  (when (request-parameter *cancel-control-name*)
+				    (setf break-out t))
+				  (when break-out
+				    (setf (slot-value obj 'validation-errors) nil)
+				    (setf (slot-value obj 'intermediate-form-values) nil)
+				    (setf (slot-value obj 'ui-state) :data)))))
+	 :validation-errors (slot-value obj 'validation-errors)
+	 :intermediate-fields (slot-value obj 'intermediate-form-values)
 	 args))
 
 (defgeneric dataform-submit-action (obj data &rest args)
