@@ -85,7 +85,9 @@
 <div class='extra-top-3'>&nbsp;</div>~
 <fieldset><h1><span class='action'>Modifying:&nbsp;</span>~
 <span class='object'>Employee</span>~
-</h1><ul><li><label><span>Name:&nbsp;</span>~
+</h1>~
+<h2 class='form-fields-title'>Form fields:</h2>~
+<ul><li><label><span>Name:&nbsp;</span>~
 <input type='text' name='name' value='Joe' />~
 </label>~
 </li>~
