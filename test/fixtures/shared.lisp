@@ -10,7 +10,7 @@
 
 (defclass education-history ()
   ((university :reader university :initform "Bene Gesserit University")
-   (graduation-year :reader graduation-year :initform 2000)))
+   (graduation-year :reader graduation-year :initform 2000 :type integer)))
 
 (defparameter *some-college* (make-instance 'education-history))
 
@@ -22,6 +22,10 @@
 
 (defclass employee (person)
   ((manager :reader manager :initform "Jim")))
+
+(decl-validate employee
+	       name (:required)
+	       age (:required))
 
 ;;; Create an instance for introspection testing
 (defparameter *joe* (make-instance 'employee))

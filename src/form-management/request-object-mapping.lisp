@@ -6,7 +6,7 @@
 (defgeneric update-object-from-request (obj &key slots &allow-other-keys)
   (:documentation
    "Tries to deserialize an object from a request via
-'update-object-from-request' (used to easily process forms), and in
+'object-from-request-valid-p' (used to easily process forms), and in
 case of success sets object slots to appropriate values.
 
 If succeeded returns true. Otherwise returns nil as the first value,

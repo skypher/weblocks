@@ -98,3 +98,25 @@
        (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
+
+(deftest-html render-form-5
+    (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill")))
+  #.(form-header-template
+     '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Bill")))
+       (:li (:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "ADDRESS")))
+       (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+     :action nil))
+
+(deftest-html render-form-6
+    (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error.")))
+  #.(form-header-template
+     '((:li :class "item-not-validated"
+	(:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")
+	 (:p :class "validation-error"
+	     (:em (:span :class "validation-error-heading" "Error:&nbsp;") "Some error."))))
+       (:li (:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "ADDRESS")))
+       (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+     :action nil
+     :preslots '((:div :class "validation-errors-summary"
+		  (:h2 :class "error-count" "There is 1 validation error:")
+		  (:ul (:li "Some error."))))))

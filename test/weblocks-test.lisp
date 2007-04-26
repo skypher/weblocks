@@ -1,6 +1,6 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities)
+  (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities :moptilities)
   (:export #:test-weblocks))
 
 (in-package :weblocks-test)

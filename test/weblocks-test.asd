@@ -35,7 +35,9 @@
 				     (:file "table-renderer"))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module form-management
-			:components ((:file "request-object-mapping"))
+			:components ((:file "validation")
+				     (:file "form-parsers")
+				     (:file "request-object-mapping"))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
 			:components ((:file "dataform")

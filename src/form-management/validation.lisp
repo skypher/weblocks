@@ -19,7 +19,8 @@ any of the validators fails, the appropriate condition is propagated
 up the call stack."
   (mapc (lambda (validator)
 	  (apply-validator validator obj (cdr slot) parsed-request-slot-value))
-	(get (slot-definition-name (car slot)) *slot-validators-indicator*)))
+	(get (slot-definition-name (car slot)) *slot-validators-indicator*))
+  t)
 
 (define-condition form-validation-error (error)
   ((slot-name :accessor validation-error-slot :initarg :slot-name))
@@ -47,15 +48,6 @@ custom validators."))
 			   :slot-name slot-name))))
 
 ;;; Declaring validators
-(defmacro decl-validate (class-name &rest args)
-  "Provides a more comfortable interface to 'declare-validators'.
-
-Ex:
-\(decl-validate employee
-   ssn (:unique :required)
-   first-name (:required))"
-  `(declare-validators ',class-name ',args))
-
 (defun declare-validators (class-name args)
   "Specifies validators for slots of a particular class.
 
@@ -79,3 +71,13 @@ See macro 'decl-validate' for a more comfortable syntax."
 	    (when validators
 	      (setf (get slot-name *slot-validators-indicator*) validators))))
     (slot-names class-name)))
+
+(defmacro decl-validate (class-name &rest args)
+  "Provides a more comfortable interface to 'declare-validators'.
+
+Ex:
+\(decl-validate employee
+   ssn (:unique :required)
+   first-name (:required))"
+  `(declare-validators ',class-name ',args))
+
