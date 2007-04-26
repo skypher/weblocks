@@ -1,7 +1,6 @@
 
 TODO:
 4. Improve generic form reader
-   - unit test the hell out of generic rendering and validators
    - ensure inner slots are updated
    - ensure slots that don't have readers but were specified during rendering are updated
    - ensure renamed slots (in different modes) are updated
