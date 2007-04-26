@@ -99,3 +99,55 @@
       '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Ivan"))
 	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Bill")))
       :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))))
+
+;;; a dataform test flow: make sure slots without readers that were specified are updated
+;;; render data (with custom slot), modify with error, modify, submit.
+(deftest-html render-dataform-3
+    (with-request :get nil
+      (let ((edit-joe (make-instance 'dataform :data (copy-template *joe*))))
+	;; initial state
+	(render edit-joe :slots '(age))
+	;; click modify
+	(do-request `((,weblocks::*action-string* . ,*dummy-action*)))
+	(render edit-joe :slots '(age))
+	;; change age to an error
+	(do-request `(("age" . "bad")
+		      ("submit" . "Submit")
+		      (,weblocks::*action-string* . ,*dummy-action*)))
+	(render edit-joe :slots '(age))
+	;; change age
+	(do-request `(("age" . "18")
+		      ("submit" . "Submit")
+		      (,weblocks::*action-string* . ,*dummy-action*)))
+	(render edit-joe :slots '(age))))
+  (htm
+   ;; initial state
+   #.(data-header-template
+      '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	(:li (:span :class "label" "Age:&nbsp;") (:span :class "value" "30"))
+	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+      :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))
+   ;; modify clicked
+   #.(form-header-template
+	 '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	   (:li (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "30")))
+	   (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	 :method "post")
+   #.(form-header-template
+	 '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	   (:li :class "item-not-validated"
+	    (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "bad")
+	     (:p :class "validation-error"
+		 (:em (:span :class "validation-error-heading" "Error:&nbsp;")
+		      "\"Age\" must be of type Integer."))))
+	   (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	 :method "post"
+	 :preslots '((:div :class "validation-errors-summary"
+		  (:h2 :class "error-count" "There is 1 validation error:")
+		  (:ul (:li "\"Age\" must be of type Integer.")))))
+   ;; age changed
+   #.(data-header-template
+      '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	(:li (:span :class "label" "Age:&nbsp;") (:span :class "value" "18"))
+	(:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+      :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))))

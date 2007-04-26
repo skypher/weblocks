@@ -110,4 +110,4 @@ widget via 'update-object-from-request'. Override to customize
 submission behavior."))
 
 (defmethod dataform-submit-action ((obj dataform) data &rest args)
-  (update-object-from-request data))
+  (apply #'update-object-from-request data args))
