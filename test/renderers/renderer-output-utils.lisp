@@ -29,24 +29,6 @@
       employee-name)
   employee)
 
-;;; Test render-slot-inline-p
-(deftest render-slot-inline-p-1
-    (render-slot-inline-p *joe* 'name)
-  t)
-
-(deftest render-slot-inline-p-2
-    (render-slot-inline-p *joe* 'address-ref)
-  nil)
-
-;;; Test get-slot-value
-(deftest get-slot-value-1
-    (get-slot-value *joe* (car (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
-  30)
-
-(deftest get-slot-value-2
-    (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
-  "Joe")
-
 ;;; test render-extra-tags
 (deftest-html render-extra-tags-1
     (render-extra-tags "test-" 2)

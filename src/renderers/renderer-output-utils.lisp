@@ -1,9 +1,8 @@
 ;;;; Utility functions for generic renderers
 (in-package :weblocks)
 
-(export '(object-class-name object-name render-slot-inline-p
-	  get-slot-value render-extra-tags with-extra-tags
-	  render-object-slot render-standard-object))
+(export '(object-class-name object-name render-extra-tags
+	  with-extra-tags render-object-slot render-standard-object))
 
 (defgeneric object-class-name (obj)
   (:documentation
@@ -44,38 +43,6 @@ Override this method to provide object names."))
 	  (if (stringp obj-name)
 	      (return-from object-name obj-name)))))
   (object-class-name obj))
-
-(defgeneric render-slot-inline-p (obj slot-name)
-  (:documentation
-   "Returns a boolean value that indicates whether an object
-should be rendered inline. The renderers use this method to
-determine whether the fields of a complex slot should be rendered
-as part of the object, or the name of the object the slot
-represents should be rendered instead.
-
-The default implementation returns true if the slot name ends
-with \"-ref\" and nil otherwise.
-
-Override this method to specify whether objects should be
-rendered inline.
-
-'obj' - The object whose slot is being rendered.
-'slot-name' - The name of a slot (a symbol) being rendered.
-"))
-
-(defmethod render-slot-inline-p (obj slot-name)
-  (let ((name (if (symbolp slot-name)
-		  (symbol-name slot-name)
-		  slot-name)))
-    (not (string-ends-with name "-ref" :ignore-case-p t))))
-
-(defun get-slot-value (obj slot)
-  "If a reader accessor for the slot exists, gets the value of
-'slot' via the accessor. Otherwise, uses slot-value."
-  (let ((slot-reader (car (slot-definition-readers slot))))
-    (if (null slot-reader)
-	(slot-value obj (slot-definition-name slot))
-	(funcall slot-reader obj))))
 
 (defun render-extra-tags (tag-class count)
   "Renders extra tags to get around CSS limitations. 'tag-class'

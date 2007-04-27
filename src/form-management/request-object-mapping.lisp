@@ -18,18 +18,26 @@ rendered/updated normally (see 'object-visible-slots' for more
 details)."))
 
 (defmethod update-object-from-request ((obj standard-object) &key slots &allow-other-keys)
-  (let ((visible-slots (object-visible-slots obj :slots slots)))
-    (multiple-value-bind (success results) (object-from-request-valid-p obj visible-slots)
-      (if success
-	  (mapc (lambda (slot)
-		  (let ((parsed-value (assoc (attributize-name (cdr slot)) results :test #'string-equal)))
-		    (when parsed-value
-		      (setf (slot-value obj (cdr slot))
-			    (cdr parsed-value)))))
-		visible-slots)
-	  (values nil results)))))
+  (multiple-value-bind (success results) (object-from-request-valid-p obj slots)
+    (if success
+	(update-object-from-request-aux obj results slots)
+	(values nil results))))
 
-(defun object-from-request-valid-p (obj visible-slots)
+(defun update-object-from-request-aux (obj parsed-request slots)
+  "An auxillary function used to implement update-object-from-request
+method."
+  (mapc (lambda (slot)
+	  (let ((parsed-value (assoc (attributize-name (cdr slot)) parsed-request :test #'string-equal))
+		(slot-value (get-slot-value obj (car slot))))
+	    (if (and (typep slot-value 'standard-object)
+		     (render-slot-inline-p obj (cdr slot)))
+		(update-object-from-request-aux slot-value parsed-request slots)
+		(when parsed-value
+		  (setf (slot-value obj (cdr slot))
+			(cdr parsed-value))))))
+	(object-visible-slots obj :slots slots)))
+
+(defun object-from-request-valid-p (obj slots)
   "Verifies whether form data that came in with the request can be
 successfully deserialized into an object. In the process,
 'parse-slot-from-request' is called to convert request strings into
@@ -56,22 +64,31 @@ done by 'update-object-from-request'."
     (mapc (lambda (slot)
 	    (let* ((slot-key (attributize-name (cdr slot)))
 		   (request-slot-value (request-parameter slot-key))
-		   (slot-type (slot-definition-type (car slot))))
-	      (when request-slot-value
-		(if (slot-in-request-empty-p slot-type request-slot-value)
-		    (if (slot-value-required-p (car slot))
-			(push `(,slot-key . ,(make-condition 'required-validation-error
-							     :slot-name (cdr slot))) errors)
-			(push `(,slot-key . nil) results))
-		    (let (parsed-value)
-		      (handler-case (progn
-				      (setf parsed-value
-					    (parse-slot-from-request slot-type (cdr slot)
-								     request-slot-value))
-				      (validate-slot-from-request obj slot parsed-value)
-				      (push `(,slot-key . ,parsed-value) results))
-			(form-validation-error (condition) (push `(,slot-key . ,condition) errors))))))))
-	  visible-slots)
+		   (slot-type (slot-definition-type (car slot)))
+		   (slot-value (get-slot-value obj (car slot))))
+	      (if (and (typep slot-value 'standard-object)
+		       (render-slot-inline-p obj (cdr slot)))
+		  (multiple-value-bind (success res)
+		      (object-from-request-valid-p slot-value slots)
+		    (if success
+			(setf results (append results res))
+			(setf errors (append errors res))))
+		  (when request-slot-value
+		    (if (slot-in-request-empty-p slot-type request-slot-value)
+			(if (slot-value-required-p (car slot))
+			    (push `(,slot-key . ,(make-condition 'required-validation-error
+								 :slot-name (cdr slot))) errors)
+			    (push `(,slot-key . nil) results))
+			(let (parsed-value)
+			  (handler-case (progn
+					  (setf parsed-value
+						(parse-slot-from-request slot-type (cdr slot)
+									 request-slot-value))
+					  (validate-slot-from-request obj slot parsed-value)
+					  (push `(,slot-key . ,parsed-value) results))
+			    (form-validation-error (condition)
+			      (push `(,slot-key . ,condition) errors)))))))))
+	  (object-visible-slots obj :slots slots))
     (if errors
 	(values nil errors)
 	(values t results))))

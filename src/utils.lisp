@@ -2,8 +2,8 @@
 (in-package :weblocks)
 
 (export '(humanize-name attributize-name object-visible-slots
-	  safe-apply safe-funcall request-parameter
-	  string-whitespace-p))
+	  get-slot-value render-slot-inline-p safe-apply safe-funcall
+	  request-parameter string-whitespace-p))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -156,6 +156,40 @@ Ex: \(defclass person ()
 						 (and (null (slot-definition-readers x))
 						      (not (member (slot-definition-name x) visible-slots))))
 					       (class-direct-slots cls)))))))
+
+(defun get-slot-value (obj slot)
+  "If a reader accessor for the slot exists, gets the value of
+'slot' via the accessor. Otherwise, uses slot-value.
+
+'slot' - slot-definition object."
+  (let ((slot-reader (car (slot-definition-readers slot))))
+    (if (null slot-reader)
+	(slot-value obj (slot-definition-name slot))
+	(funcall slot-reader obj))))
+
+(defgeneric render-slot-inline-p (obj slot-name)
+  (:documentation
+   "Returns a boolean value that indicates whether an object
+should be rendered inline. The renderers use this method to
+determine whether the fields of a complex slot should be rendered
+as part of the object, or the name of the object the slot
+represents should be rendered instead.
+
+The default implementation returns true if the slot name ends
+with \"-ref\" and nil otherwise.
+
+Override this method to specify whether objects should be
+rendered inline.
+
+'obj' - The object whose slot is being rendered.
+'slot-name' - The name of a slot (a symbol) being rendered.
+"))
+
+(defmethod render-slot-inline-p (obj slot-name)
+  (let ((name (if (symbolp slot-name)
+		  (symbol-name slot-name)
+		  slot-name)))
+    (not (string-ends-with name "-ref" :ignore-case-p t))))
 
 (defmacro safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."

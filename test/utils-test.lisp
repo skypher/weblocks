@@ -46,11 +46,29 @@
     (class-visible-slot-names *joe* :visible-slots '(age blah))
   (name age manager))
 
+;;; Test get-slot-value
+(deftest get-slot-value-1
+    (get-slot-value *joe* (car (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
+  30)
+
+(deftest get-slot-value-2
+    (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
+  "Joe")
+
 ;;; Introspection helper
 (defun object-visible-slot-names (obj &rest args)
   (mapcar (lambda (x)
 	    (cons (slot-definition-name (car x)) (cdr x)))
 	  (apply #'object-visible-slots obj args)))
+
+;;; Test render-slot-inline-p
+(deftest render-slot-inline-p-1
+    (render-slot-inline-p *joe* 'name)
+  t)
+
+(deftest render-slot-inline-p-2
+    (render-slot-inline-p *joe* 'address-ref)
+  nil)
 
 ;;; Test object-visible-slots function
 (deftest object-visible-slots-1
