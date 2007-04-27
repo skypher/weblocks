@@ -27,3 +27,4 @@ TODO:
 12.5. Rewrite defmacro
 13. Create a reference application.
 14. Release the library/write articles.
+15. If two classes have the same slot name, validation declared on one will apply to the other.
