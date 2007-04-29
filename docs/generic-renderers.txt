@@ -1,7 +1,6 @@
 
 TODO:
 4. Improve generic form reader
-   - ensure inner slots are updated (unit test aux and -p funcs separately, unit test validation of inner slots, etc.)
    - ensure renamed slots (in different modes) are updated
 7.1. Port to OSX
 9.1. Make sure data and form renderer labels show attributized slot name class for styling

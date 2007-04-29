@@ -27,6 +27,15 @@
   "Joe" 30)
 
 (deftest request-object-mapping-4
+    (with-request :post '(("name" . "Pink") ("age" . "30"))
+      (let ((new-joe (copy-template *joe*)))
+	(multiple-value-bind (success results) (weblocks::object-from-request-valid-p new-joe '(age))
+	  (weblocks::update-object-from-request-aux new-joe results '(age)))
+	(values (slot-value new-joe 'name)
+		(slot-value new-joe 'age))))
+  "Pink" 30)
+
+(deftest request-object-mapping-5
     (with-request :post '(("name" . "") ("age" . "2t5"))
       (let ((new-joe (copy-template *joe*)))
 	(multiple-value-bind (result errors) (update-object-from-request new-joe :slots '(age))
@@ -40,9 +49,16 @@
 (deftest object-from-request-valid-p-1
     (with-request :get '(("name" . "Pink") ("age" . "25"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe (object-visible-slots *joe* :slots '(age)))))
+	(weblocks::object-from-request-valid-p new-joe '(age))))
   t
   (("age" . 25) ("name" . "Pink")))
+
+(deftest object-from-request-valid-p-2
+    (with-request :get '(("university" . "Stony Brook"))
+      (let ((new-joe (copy-template *joe*)))
+	(weblocks::object-from-request-valid-p new-joe '(education))))
+  t
+  (("university" . "Stony Brook")))
 
 ;;; test slot-in-request-empty-p
 (deftest slot-in-request-empty-p-1
