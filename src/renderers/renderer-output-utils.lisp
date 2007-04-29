@@ -86,8 +86,8 @@ object using 'object-name' and simply renders the name using
   "Used by 'render-standard-object' to visit visible slots of an
 object and apply a render function to them."
   (mapc (lambda (slot)
-	  (apply render-slot-fn obj (cdr slot)
-		 (get-slot-value obj (car slot)) keys))
+	  (apply render-slot-fn obj (slot-definition-name (car slot))
+		 (get-slot-value obj (car slot)) :human-name (cdr slot) keys))
 	(apply #'object-visible-slots obj keys)))
 
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)

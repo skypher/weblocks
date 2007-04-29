@@ -57,7 +57,7 @@
 
 (deftest-html render-table-header-row-3
     (render-table-header-row *joe* :inlinep t :slots '((name . blah)) :mode :strict)
-  (:th :class "blah" "Blah"))
+  (:th :class "name" "Blah"))
 
 (deftest-html render-table-header-row-4
     (render-table-header-row *joe* :slots '(education))
@@ -101,7 +101,7 @@
 
 (deftest-html render-table-body-row-3
     (render-table-body-row *joe* :inlinep t :slots '((name . blah)) :mode :strict)
-  (:td :class "blah" "Joe"))
+  (:td :class "name" "Joe"))
 
 (deftest-html render-table-body-row-4
     (render-table-body-row *joe* :slots '(education))

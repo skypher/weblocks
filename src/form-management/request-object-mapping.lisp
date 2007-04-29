@@ -27,13 +27,14 @@ details)."))
   "An auxillary function used to implement update-object-from-request
 method."
   (mapc (lambda (slot)
-	  (let ((parsed-value (assoc (attributize-name (cdr slot)) parsed-request :test #'string-equal))
-		(slot-value (get-slot-value obj (car slot))))
+	  (let* ((slot-name (slot-definition-name (car slot)))
+		 (parsed-value (assoc (attributize-name slot-name) parsed-request :test #'string-equal))
+		 (slot-value (get-slot-value obj (car slot))))
 	    (if (and (typep slot-value 'standard-object)
-		     (render-slot-inline-p obj (cdr slot)))
+		     (render-slot-inline-p obj slot-name))
 		(update-object-from-request-aux slot-value parsed-request slots)
 		(when parsed-value
-		  (setf (slot-value obj (cdr slot))
+		  (setf (slot-value obj slot-name)
 			(cdr parsed-value))))))
 	(object-visible-slots obj :slots slots)))
 
@@ -62,12 +63,13 @@ Note, this function does not actually set the slot values, this is
 done by 'update-object-from-request'."
   (let (errors results)
     (mapc (lambda (slot)
-	    (let* ((slot-key (attributize-name (cdr slot)))
+	    (let* ((slot-name (slot-definition-name (car slot)))
+		   (slot-key (attributize-name slot-name))
 		   (request-slot-value (request-parameter slot-key))
 		   (slot-type (slot-definition-type (car slot)))
 		   (slot-value (get-slot-value obj (car slot))))
 	      (if (and (typep slot-value 'standard-object)
-		       (render-slot-inline-p obj (cdr slot)))
+		       (render-slot-inline-p obj slot-name))
 		  (multiple-value-bind (success res)
 		      (object-from-request-valid-p slot-value slots)
 		    (if success
@@ -82,7 +84,7 @@ done by 'update-object-from-request'."
 			(let (parsed-value)
 			  (handler-case (progn
 					  (setf parsed-value
-						(parse-slot-from-request slot-type (cdr slot)
+						(parse-slot-from-request slot-type slot-name
 									 request-slot-value))
 					  (validate-slot-from-request obj slot parsed-value)
 					  (push `(,slot-key . ,parsed-value) results))

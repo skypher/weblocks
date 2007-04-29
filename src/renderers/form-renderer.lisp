@@ -87,7 +87,8 @@ case the user clicks submit."))
 	  (:input :name *submit-control-name* :type "submit" :value "Submit")
 	  (:input :name *cancel-control-name* :type "submit" :value "Cancel"))))
 
-(defgeneric render-form-slot (obj slot-name slot-value &rest keys &key validation-errors &allow-other-keys)
+(defgeneric render-form-slot (obj slot-name slot-value &rest keys
+				  &key human-name validation-errors &allow-other-keys)
   (:documentation
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
@@ -96,14 +97,14 @@ case the user clicks submit."))
   (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value keys))
 
 (defmethod render-form-slot (obj slot-name slot-value &rest keys
-			     &key validation-errors &allow-other-keys)
+			     &key (human-name slot-name) validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
 	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal))
 	 (field-class (when validation-error "item-not-validated")))
     (with-html
       (:li :class field-class
        (:label
-	(:span (str (humanize-name slot-name)) ":&nbsp;")
+	(:span (str (humanize-name human-name)) ":&nbsp;")
 	(apply #'render-form slot-value :name attribute-slot-name keys)
 	(when validation-error
 	  (htm (:p :class "validation-error"

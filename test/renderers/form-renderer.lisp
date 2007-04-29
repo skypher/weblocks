@@ -108,6 +108,13 @@
      :action nil))
 
 (deftest-html render-form-6
+    (render-form *joe* :slots '((name . nickname)))
+  #.(form-header-template
+     '((:li (:label (:span "Nickname:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+       (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+     :action nil))
+
+(deftest-html render-form-7
     (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error.")))
   #.(form-header-template
      '((:li :class "item-not-validated"

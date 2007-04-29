@@ -36,7 +36,7 @@ provide customized header rendering."))
 		   (:ul (funcall body-fn))
 		   (safe-apply postslots-fn obj keys)))))))
 
-(defgeneric render-data-slot (obj slot-name slot-value &rest args)
+(defgeneric render-data-slot (obj slot-name slot-value &rest keys &key human-name &allow-other-keys)
   (:documentation
    "Renders a given slot of a particular object.
 
@@ -56,14 +56,15 @@ manner. Note that you can override based on the object as well as
 slot name, which gives significant freedom in selecting the
 proper slot to override."))
 
-(defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest args)
-  (render-object-slot #'render-data #'render-data-slot obj slot-name slot-value args))
+(defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest keys)
+  (render-object-slot #'render-data #'render-data-slot obj slot-name slot-value keys))
 
-(defmethod render-data-slot (obj slot-name slot-value &rest args)
+(defmethod render-data-slot (obj slot-name slot-value &rest keys
+			     &key (human-name slot-name) &allow-other-keys)
   (with-html
     (:li (:span :class "label"
-		(str (humanize-name slot-name)) ":&nbsp;")
-	 (apply #'render-data slot-value args))))
+		(str (humanize-name human-name)) ":&nbsp;")
+	 (apply #'render-data slot-value keys))))
 
 (defgeneric render-data (obj &rest keys &key inlinep &allow-other-keys)
   (:documentation

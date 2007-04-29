@@ -63,3 +63,8 @@
        (:li (:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000"))
        (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
+(deftest-html render-data-5
+    (render-data *joe* :slots '((name . nickname)))
+  #.(data-header-template
+     '((:li (:span :class "label" "Nickname:&nbsp;") (:span :class "value" "Joe"))
+       (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))

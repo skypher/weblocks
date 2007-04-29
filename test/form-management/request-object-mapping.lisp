@@ -45,6 +45,14 @@
   (("age" . "\"Age\" must be of type Integer.")
    ("name" . "\"Name\" is a required field.")))
 
+(deftest request-object-mapping-6
+    (with-request :post '(("name" . "Pink") ("age" . "25"))
+      (let ((new-joe (copy-template *joe*)))
+	(update-object-from-request new-joe :slots '((name . nick) (age . how-old)))
+	(values (slot-value new-joe 'name)
+		(slot-value new-joe 'age))))
+  "Pink" 25)
+
 ;;; test object-from-request-valid-p (also tested through request-object-mapping)
 (deftest object-from-request-valid-p-1
     (with-request :get '(("name" . "Pink") ("age" . "25"))
@@ -57,6 +65,20 @@
     (with-request :get '(("university" . "Stony Brook"))
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '(education))))
+  t
+  (("university" . "Stony Brook")))
+
+(deftest object-from-request-valid-p-3
+    (with-request :get '(("name" . "Pink") ("age" . "25"))
+      (let ((new-joe (copy-template *joe*)))
+	(weblocks::object-from-request-valid-p new-joe '((name . nick) (age . how-old)))))
+  t
+  (("age" . 25) ("name" . "Pink")))
+
+(deftest object-from-request-valid-p-4
+    (with-request :get '(("university" . "Stony Brook"))
+      (let ((new-joe (copy-template *joe*)))
+	(weblocks::object-from-request-valid-p new-joe '(education (university . college)))))
   t
   (("university" . "Stony Brook")))
 

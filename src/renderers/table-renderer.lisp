@@ -52,7 +52,8 @@ header."))
 (defmethod render-table-header-row (obj &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj :alternp nil keys))
 
-(defgeneric render-table-header-cell (obj slot-name slot-value &rest keys)
+(defgeneric render-table-header-cell (obj slot-name slot-value &rest keys
+					  &key human-name &allow-other-keys)
   (:documentation
    "Renders the 'th' elements of the table. The default
 implementation adds a class for CSS styling and renders a
@@ -67,9 +68,10 @@ the current header. See 'render-object-slot' function.
 'slot-name' - Name of the slot.
 'slot-value' - Value of the slot."))
 
-(defmethod render-table-header-cell (obj slot-name slot-value &rest keys)
+(defmethod render-table-header-cell (obj slot-name slot-value &rest keys
+				     &key (human-name slot-name) &allow-other-keys)
   (with-html
-    (:th :class (attributize-name slot-name) (str (humanize-name slot-name)))))
+    (:th :class (attributize-name slot-name) (str (humanize-name human-name)))))
 
 (defmethod render-table-header-cell (obj slot-name (slot-value standard-object) &rest keys)
   (render-object-slot #'render-table-header-row #'render-table-header-cell obj slot-name slot-value keys))
