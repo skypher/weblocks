@@ -127,3 +127,9 @@ a
   margin-top: -7px;
   background: url(/pub/bottom_right.png) no-repeat bottom right;
 }
+
+.missing
+{
+  font-style: italic;
+  color: #808080;
+}

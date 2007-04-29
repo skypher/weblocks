@@ -107,3 +107,7 @@ Ex:
     (:span :class "value"
      (str obj))))
 
+(defmethod render-data ((obj (eql nil)) &rest keys)
+  (with-html
+    (:span :class "value missing" "Not Specified")))
+
