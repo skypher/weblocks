@@ -7,11 +7,17 @@
 (defparameter *slot-validators-indicator* 'validators
   "An indicator that stores validators in a slot's plist.")
 
-(defun slot-value-required-p (slot)
+(defmacro slot-validators (class-name slot-name)
+  "Expands to a place where validators for a slot are stored."
+  `(get ,class-name (intern (concatenate 'string (symbol-name *slot-validators-indicator*) "-"
+					 (symbol-name ,slot-name))
+			    (symbol-package ,class-name))))
+
+(defun slot-value-required-p (class-name slot)
   "Returns true if 'slot' is declared to have an existance validator,
 nil otherwise. See 'decl-validate' for more detauls."
   (find :required
-	(get (slot-definition-name slot) *slot-validators-indicator*)))
+	(slot-validators class-name (slot-definition-name slot))))
 
 (defun validate-slot-from-request (obj slot parsed-request-slot-value)
   "Call all validators recorded on the symbol that names the slot. If
@@ -19,7 +25,7 @@ any of the validators fails, the appropriate condition is propagated
 up the call stack."
   (mapc (lambda (validator)
 	  (apply-validator validator obj (cdr slot) parsed-request-slot-value))
-	(get (slot-definition-name (car slot)) *slot-validators-indicator*))
+	(slot-validators (class-name (class-of obj)) (slot-definition-name (car slot))))
   t)
 
 (define-condition form-validation-error (error)
@@ -69,7 +75,7 @@ See macro 'decl-validate' for a more comfortable syntax."
 		 (validators (when validation-slot
 			       (cadr validation-slot))))
 	    (when validators
-	      (setf (get slot-name *slot-validators-indicator*) validators))))
+	      (setf (slot-validators class-name slot-name) validators))))
     (slot-names class-name)))
 
 (defmacro decl-validate (class-name &rest args)

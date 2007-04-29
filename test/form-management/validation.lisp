@@ -3,15 +3,16 @@
 
 ;;; test slot-value-required-p
 (deftest slot-value-required-p-1
-    (weblocks::slot-value-required-p (get-slot-definition 'employee 'age))
+    (weblocks::slot-value-required-p 'employee (get-slot-definition 'employee 'age))
   :required)
 
 (deftest slot-value-required-p-2
-    (weblocks::slot-value-required-p (get-slot-definition 'education-history 'graduation-year))
+    (weblocks::slot-value-required-p 'education-history
+				     (get-slot-definition 'education-history 'graduation-year))
   nil)
 
 (deftest slot-value-required-p-3
-    (weblocks::slot-value-required-p (get-slot-definition 'employee 'name))
+    (weblocks::slot-value-required-p 'employee (get-slot-definition 'employee 'name))
   :required)
 
 ;;; validate-slot-from-request

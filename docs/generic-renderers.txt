@@ -1,6 +1,5 @@
 
 TODO:
-6. If two classes have the same slot name, validation declared on one will apply to the other.
 7. Port to OSX
 -----
 9.25. Add "linguistic code" and convert form validations (types, etc.) to use it.

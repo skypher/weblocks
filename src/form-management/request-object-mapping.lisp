@@ -77,7 +77,7 @@ done by 'update-object-from-request'."
 			(setf errors (append errors res))))
 		  (when request-slot-value
 		    (if (slot-in-request-empty-p slot-type request-slot-value)
-			(if (slot-value-required-p (car slot))
+			(if (slot-value-required-p (class-name-of obj) (car slot))
 			    (push `(,slot-key . ,(make-condition 'required-validation-error
 								 :slot-name (cdr slot))) errors)
 			    (push `(,slot-key . nil) results))
