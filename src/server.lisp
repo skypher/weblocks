@@ -25,8 +25,13 @@ the client."
 	(stop-server *weblocks-server*)
 	(setf *weblocks-server* nil))))
 
+(defparameter *stylesheet-directory*
+  (if (equal (machine-type) "PowerPC")
+	     "/Users/coffeemug/projects/cl-weblocks/pub/"
+	     "/home/coffeemug/projects/weblocks2/pub/"))
+
 (setf *dispatch-table*
-      (append (list (create-folder-dispatcher-and-handler "/pub/" "/home/coffeemug/projects/weblocks2/pub/")
+      (append (list (create-folder-dispatcher-and-handler "/pub/" *stylesheet-directory*)
 		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))
 
