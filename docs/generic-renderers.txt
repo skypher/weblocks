@@ -1,6 +1,5 @@
 
 TODO:
-7. Port to OSX
 -----
 9.25. Add "linguistic code" and convert form validations (types, etc.) to use it.
 9.26. Make sure data and form renderer labels show attributized slot name class for styling

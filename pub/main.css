@@ -14,6 +14,7 @@ a
 .renderer
 {
   background: #ecf8d7 url(/pub/top_background.png) repeat-x;
+  margin-bottom: 1em;
 }
 
 .renderer > .extra-top-1

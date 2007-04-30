@@ -95,7 +95,7 @@ details."))
 
 (defmethod render-table-body-cell (obj slot-name slot-value &rest keys)
   (with-html
-    (:td :class (attributize-name slot-name) (str slot-value))))
+    (:td (apply #'render-data slot-value keys))))
 
 (defmethod render-table-body-cell (obj slot-name (slot-value standard-object) &rest keys)
   (render-object-slot #'render-table-body-row #'render-table-body-cell obj slot-name slot-value keys))
