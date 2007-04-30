@@ -1,24 +1,28 @@
 
 TODO:
 -----
-9.25. Add "linguistic code" and convert form validations (types, etc.) to use it.
-9.26. Make sure data and form renderer labels show attributized slot name class for styling
-9.3. Mark required fields
-9.4. Don't remove validation error summary for long forms.
-9.5. Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
-10. Create a data-grid widget (pageable, sortable, along with ajaxy view and edit functionality that automagically scales back)
-11. Create an ajaxy modal "dialog" widget along with appropriate machinery, as well as modal request in general.
-11.1. Standardize renderers return values (deferring until more is known about what's useful)
-11.2. Create renderers for lists
-11.3. Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
-11.5. Figure out how to deal with
-   - slots that are collections
-     - don't render at all
-     - render as links to data grids
-     - if small collection, render member names inline
-     - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
-   - non-inline CLOS objects in forms
-12. Create menu and other widgets
-12.5. Rewrite defmacro
-13. Create a reference application.
-14. Release the library/write articles.
+- Create menu and other widgets
+- Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
+- Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
+- Create renderers for lists
+- Figure out how to deal with
+  - slots that are collections
+    - don't render at all
+    - render as links to data grids
+    - if small collection, render member names inline
+    - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
+  - non-inline CLOS objects in forms
+
+----
+- Add "linguistic code" and convert form validations (types, etc.) to use it.
+- Make sure data and form renderer labels show attributized slot name class for styling
+- Mark required fields
+- Don't remove validation error summary for long forms.
+- Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
+- Standardize renderers return values (deferring until more is known about what's useful)
+- Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
+
+----
+- Release the library/write articles.
+- Create a reference application.
+- Rewrite defmacro
