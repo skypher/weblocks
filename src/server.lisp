@@ -26,7 +26,7 @@ the client."
 	(setf *weblocks-server* nil))))
 
 (defparameter *stylesheet-directory*
-  (if (equal (machine-type) "PowerPC")
+  (if (equal (machine-type) "Power Macintosh")
 	     "/Users/coffeemug/projects/cl-weblocks/pub/"
 	     "/home/coffeemug/projects/weblocks2/pub/"))
 
