@@ -90,45 +90,45 @@
 (deftest-html render-table-body-row-1
     (render-table-body-row *joe*)
   (:tr
-   (:td :class "name" "Joe")
-   (:td :class "manager" "Jim")))
+   (:td (:span :class "value" "Joe"))
+   (:td (:span :class "value" "Jim"))))
 
 (deftest-html render-table-body-row-2
     (render-table-body-row *joe* :inlinep t)
   (htm
-   (:td :class "name" "Joe")
-   (:td :class "manager" "Jim")))
+   (:td (:span :class "value" "Joe"))
+   (:td (:span :class "value" "Jim"))))
 
 (deftest-html render-table-body-row-3
     (render-table-body-row *joe* :inlinep t :slots '((name . blah)) :mode :strict)
-  (:td :class "name" "Joe"))
+  (:td (:span :class "value" "Joe")))
 
 (deftest-html render-table-body-row-4
     (render-table-body-row *joe* :slots '(education))
   (:tr
-   (:td :class "name" "Joe")
-   (:td :class "university" "Bene Gesserit University")
-   (:td :class "graduation-year" "2000")
-   (:td :class "manager" "Jim")))
+   (:td (:span :class "value" "Joe"))
+   (:td (:span :class "value" "Bene Gesserit University"))
+   (:td (:span :class "value" "2000"))
+   (:td (:span :class "value" "Jim"))))
 
 ;; render-table-body-cell
 (deftest-html render-table-body-cell-1
     (render-table-body-cell *joe* 'name "Joe")
-  (:td :class "name" "Joe"))
+  (:td (:span :class "value" "Joe")))
 
 (deftest-html render-table-body-cell-2
     (render-table-body-cell *joe* 'address-ref *home-address*)
-  (:td :class "address-ref" "ADDRESS"))
+  (:td (:span :class "value" "ADDRESS")))
 
 (deftest-html render-table-body-cell-3
     (render-table-body-cell *joe* 'address *home-address*)
   (htm
-   (:td :class "street" "100 Broadway")
-   (:td :class "city" "New York")))
+   (:td (:span :class "value" "100 Broadway"))
+   (:td (:span :class "value" "New York"))))
 
 (deftest-html render-table-body-cell-4
     (render-table-body-cell *joe* 'address *home-address* :slots '(city) :mode :strict)
-  (:td :class "city" "New York"))
+  (:td (:span :class "value" "New York")))
 
 ;; render-table
 (deftest-html render-table-1
@@ -144,11 +144,11 @@
 	   (:th :class "manager" "Manager")))
 	 (:tbody
 	  (:tr
-	   (:td :class "name" "Joe")
-	   (:td :class "manager" "Jim"))
+	   (:td (:span :class "value" "Joe"))
+	   (:td (:span :class "value" "Jim")))
 	  (:tr :class "altern"
-	   (:td :class "name" "Joe")
-	   (:td :class "manager" "Jim"))))
+	   (:td (:span :class "value" "Joe"))
+	   (:td (:span :class "value" "Jim")))))
 	(:div :class "extra-bottom-1" "&nbsp;")
 	(:div :class "extra-bottom-2" "&nbsp;")
 	(:div :class "extra-bottom-3" "&nbsp;")))
