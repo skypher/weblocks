@@ -44,7 +44,9 @@
 				     (:file "dataform"
 				      :depends-on ("widget"))
 				     (:file "composite"
-				      :depends-on ("widget")))
+				      :depends-on ("widget"))
+				     (:file "navigation"
+				      :depends-on ("composite" "widget")))
 			:depends-on (renderers form-management "utils" "actions"))
 	       (:file "server"
 		      :depends-on (widgets))))

@@ -9,6 +9,7 @@
      (:head
       (:title "Hello!")
       (:link :rel "stylesheet" :type "text/css" :href "pub/main.css")
+      (:link :rel "stylesheet" :type "text/css" :href "pub/navigation.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/form.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/data.css")
       (:link :rel "stylesheet" :type "text/css" :href "pub/table.css")
