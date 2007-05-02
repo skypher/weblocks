@@ -10,7 +10,7 @@
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
 	(defun init-user-session (comp)
-	  (push `("test" . ,(make-instance 'dataform :data *joe*)) (composite-widgets comp)))
+	  (push (make-instance 'dataform :data *joe*) (composite-widgets comp)))
 	;; handle the first request (make sure data is drawn)
 	(setf result1 (handle-client-request))
 	;; unbind init-user-session to make sure root-composite persists
@@ -36,6 +36,8 @@
 <link rel='stylesheet' type='text/css' href='pub/table.css' />~
 </head>~
 <body>~
+<div class='widget composite'>~
+<div class='widget dataform'>~
 <div class='renderer data employee'>~
 <div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
@@ -49,6 +51,8 @@
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
+</div>~
+</div>~
 </div>~
 </body>~
 </html>")
@@ -66,7 +70,10 @@
 <link rel='stylesheet' type='text/css' href='pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='pub/table.css' />~
 </head>~
-<body><form class='renderer form employee' action='' method='post'><div class='extra-top-1'>&nbsp;</div>~
+<body>~
+<div class='widget composite'>~
+<div class='widget dataform'>~
+<form class='renderer form employee' action='' method='post'><div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
 <div class='extra-top-3'>&nbsp;</div>~
 <fieldset><h1><span class='action'>Modifying:&nbsp;</span>~
@@ -91,6 +98,8 @@
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </form>~
+</div>~
+</div>~
 </body>~
 </html>"))
 
@@ -103,8 +112,7 @@
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
 	(defun init-user-session (comp)
-	  (init-composite comp
-			  "test" (lambda () nil)))
+	  (setf (composite-widgets comp) (list (lambda () nil))))
 	;; handle the first request (make sure data is drawn)
 	(setf result1 (handle-client-request))
 	(fmakunbound 'init-user-session)
@@ -125,6 +133,10 @@
 <link rel='stylesheet' type='text/css' href='pub/debug-mode.css' />~
 </head>~
 <body>~
+<div class='widget composite'>~
+<div class='widget function'>~
+</div>~
+</div>~
 <div class='debug-toolbar'>~
 <a href='?action=debug-reset-sessions' title='Reset Sessions'><img src='pub/reset.png' /></a>~
 </div>~

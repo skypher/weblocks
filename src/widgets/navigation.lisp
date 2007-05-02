@@ -3,7 +3,7 @@
 
 (export '(navigation init-navigation make-navigation))
 
-(defclass navigation ()
+(defclass navigation (widget)
   ((panes :accessor navigation-panes
 	  :initform nil
 	  :initarg :panes
@@ -21,11 +21,11 @@
     (when (null current-pane)
       (setf current-pane (caar panes)))))
 
-(defmethod render ((obj navigation) &rest args)
+(defmethod render-widget-body ((obj navigation) &rest args)
   (with-slots (panes current-pane) obj
     (with-html
       (when (current-pane-widget obj)
-	(render (current-pane-widget obj)))
+	(render-widget (current-pane-widget obj)))
       (:div :class "renderer menu"
 	    (with-extra-tags
 	      (if (null panes)

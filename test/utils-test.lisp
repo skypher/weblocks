@@ -23,6 +23,10 @@
     (attributize-name "hello World-REF")
   "hello-world-ref")
 
+(deftest attributize-name-3
+    (attributize-name nil)
+  "")
+
 ;;; Test list->assoc function
 (deftest list->assoc-1
     (weblocks::list->assoc '(name age (city . location)))

@@ -26,7 +26,7 @@
     (declare (special *weblocks-output-stream*))
     (safe-funcall action-fn)
     (with-page (lambda ()
-		 (render (session-value 'root-composite))
+		 (render-widget (session-value 'root-composite))
 		 (when *render-debug-toolbar*
 		   (render-debug-toolbar))))
     (get-output-stream-string *weblocks-output-stream*)))

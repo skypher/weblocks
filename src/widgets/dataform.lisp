@@ -5,7 +5,7 @@
 	  render-dataform-data render-dataform-form
 	  dataform-submit-action))
 
-(defclass dataform ()
+(defclass dataform (widget)
   ((data :accessor dataform-data
 	 :initform nil
 	 :initarg :data
@@ -34,13 +34,13 @@ widget's state is updated and it renders into a form via
 the data object is updated from the form (see
 dataform-submit-action)."))
 
-(defmethod render ((obj dataform) &rest args)
+(defmethod render-widget-body ((obj dataform) &rest args)
   (apply #'render-dataform obj (dataform-data obj) args))
 
 (defgeneric render-dataform (obj data &rest args)
   (:documentation
-   "Renders the dataform widget in its current state. Normally
-called by 'render'. Override to customize rendering for
+   "Renders the dataform widget in its current state. Normally called
+by 'render-widget-body'. Override to customize rendering for
 particular types of data.
 
 'obj' - widget object to render.

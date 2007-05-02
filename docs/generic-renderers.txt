@@ -3,8 +3,6 @@ TODO:
 -----
 - Improve navigation (titles, etc.)
 - Make sure menu and its items are wrapped in appropriate divs (including menus like in "articles")
-- Make sure widgets, composites, etc. are wrapped in appropriate divs with proper class names
-- Unit Test and document init-composite and make-composite
 - Make navigation use friendly URLs
 - Unit Test and document navigation (including empty)
 - Rethink the way styles are applied to renderers

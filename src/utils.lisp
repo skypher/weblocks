@@ -31,6 +31,8 @@ serialization (in particular for markup languages like HTML).
 Ex:
 \(attributize-name 'hello-world) => \"hello-world\"
 \(attributize-name \"Hello world-ref\") => \"hello-world-ref\""
+  (when (null name)
+    (return-from attributize-name ""))
   (let ((namestr (if (symbolp name)
 		     (symbol-name name)
 		     name)))
