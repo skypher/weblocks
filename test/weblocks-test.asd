@@ -17,6 +17,10 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test"))
+	       (:file "request-handler"
+		      :depends-on ("weblocks-test"))
+	       (:file "debug-mode"
+		      :depends-on ("weblocks-test"))
 	       (:file "server"
 		      :depends-on ("weblocks-test"))
 	       (:file "page-template"

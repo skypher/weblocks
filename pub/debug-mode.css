@@ -1,0 +1,19 @@
+
+.debug-toolbar
+{
+  background-color: #D0D0D0;
+
+  filter:alpha(opacity=90);   /* Internet Explorer       */
+  moz-opacity:0.9;            /* Mozilla 1.6 and below   */
+  opacity: 0.9;               /* newer Mozilla and CSS-3 */
+  
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.debug-toolbar img
+{
+  border: none;
+}

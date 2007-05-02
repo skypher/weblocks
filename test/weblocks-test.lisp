@@ -80,7 +80,10 @@ the request."
 	    (make-action-orig #'weblocks::make-action))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
-			       (curry-after #'make-action *dummy-action*))
+			       (lambda (action-fn &optional action-code)
+				 (if action-code
+				   (funcall make-action-orig action-fn action-code)
+				   (funcall make-action-orig action-fn *dummy-action*))))
 			 (setf (slot-value *request* 'method) ,method)
 			 (setf (slot-value *request* ',parameters-slot) ,parameters)
 			 ,@body)

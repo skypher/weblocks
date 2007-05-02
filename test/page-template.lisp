@@ -3,9 +3,10 @@
 
 ;;; test with-page
 (deftest-html with-page-1
-    (weblocks::with-page (lambda ()
-			   (with-html
-			     (:div "test"))))
+    (let ((weblocks::*render-debug-toolbar* nil))
+      (weblocks::with-page (lambda ()
+			     (with-html
+			       (:div "test")))))
   (htm
    (str "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
    (str "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")

@@ -15,7 +15,7 @@ Generic functions 'render-data', 'render-form', 'render-table'."))
 
 (in-package :weblocks)
 
-(export '(*weblocks-output-stream* with-html))
+(export '(*weblocks-output-stream* with-html reset-sessions))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request

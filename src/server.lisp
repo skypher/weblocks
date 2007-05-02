@@ -7,10 +7,18 @@
   "If the server is started, bound to hunchentoot server
   object. Otherwise, nil.")
 
+(defparameter *render-debug-toolbar* nil
+  "A global flag that defines whether the debug toolbar should be
+  rendered. Normally set to true when weblocks is started in debug
+  mode.")
+
 (defun start-weblocks (&key debug)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to
 the client."
+  (if debug
+      (setf *render-debug-toolbar* t)
+      (setf *render-debug-toolbar* nil))
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
@@ -22,6 +30,7 @@ the client."
   "Stops weblocks."
   (if (not (null *weblocks-server*))
       (progn
+	(reset-sessions)
 	(stop-server *weblocks-server*)
 	(setf *weblocks-server* nil))))
 

@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(make-action render-link handle-client-request))
+(export '(make-action-url make-action render-link handle-client-request))
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
@@ -24,6 +24,15 @@ make-action generates a unique value for each action)"
   (setf (session-value action-code) action-fn)
   action-code)
 
+(defun make-action-url (action-code)
+  "Accepts action code and returns a URL that can be used to render
+the action. Used, among others, by 'render-link'.
+
+Ex:
+
+\(make-action-url \"test-action\") => \"?action=test-action\""
+  (concatenate 'string "?" *action-string* "=" (princ-to-string action-code)))
+
 (defun render-link (action-code name)
   "Renders an action into an href link. When the user clicks on
 the link, the action will be called on the server.
@@ -31,7 +40,7 @@ the link, the action will be called on the server.
 'action-code' - The action created with 'make-action'.
 'name' - A string that will be presented to the user in the
 link."
-  (let ((url (concatenate 'string "?" *action-string* "=" (princ-to-string action-code))))
+  (let ((url (make-action-url action-code)))
     (with-html
       (:a :href url (str name)))))
 
@@ -48,29 +57,4 @@ session (somehow invalid), raises an assertion."
       (assert request-action (request-action)
 	      (concatenate 'string "Cannot find action: " action-name))
       request-action)))
-
-(defgeneric handle-client-request ()
-  (:documentation
-   "This method handles each request as it comes in from the
-   server. It is a hunchentoot handler and has access to all
-   hunchentoot dynamic variables. The default implementation
-   executes a user action (if any), and renders the main
-   composite wrapped in HTML provided by 'with-page'. It also
-   invokes user supplied 'init-user-session' on the first request
-   that has no session setup.  Override this method (along
-   with :before and :after specifiers to customize behavior)."))
-
-(defmethod handle-client-request ()
-  (when (null (session-value 'root-composite))
-    (let ((root-composite (make-instance 'composite)))
-      (funcall (symbol-function (find-symbol "INIT-USER-SESSION" (symbol-package *webapp-name*)))
-	       root-composite)
-      (setf (session-value 'root-composite) root-composite)))
-
-  (let ((action-fn (get-request-action))
-	(*weblocks-output-stream* (make-string-output-stream)))
-    (declare (special *weblocks-output-stream*))
-    (safe-funcall action-fn)
-    (with-page (curry #'render (session-value 'root-composite)))
-    (get-output-stream-string *weblocks-output-stream*)))
 

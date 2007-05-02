@@ -18,7 +18,11 @@
 	       (:file "page-template"
 		      :depends-on ("weblocks"))
 	       (:file "actions"
-		      :depends-on ("weblocks" "utils" "page-template"))
+		      :depends-on ("weblocks" "utils"))
+	       (:file "debug-mode"
+		      :depends-on ("weblocks" "actions"))
+	       (:file "request-handler"
+		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
