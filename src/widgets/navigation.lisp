@@ -22,7 +22,7 @@
       (setf current-pane (caar panes)))))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (with-slots (panes current-pane) obj
+  (with-slots (name panes current-pane) obj
     (with-html
       (when (current-pane-widget obj)
 	(render-widget (current-pane-widget obj)))
@@ -32,6 +32,9 @@
 		  (htm
 		   (:div :class "empty-menu" "No menu entries"))
 		  (htm
+		   (:h1 (if name
+			  (str (humanize-name name))
+			  (str "Navigation")))
 		   (:ul
 		    (mapc (lambda (item)
 			    (htm
@@ -62,10 +65,10 @@ ex:
     (when (null current-pane)
       (setf current-pane (caar (navigation-panes nav))))))
 
-(defun make-navigation (&rest args)
+(defun make-navigation (name &rest args)
   "Instantiates 'navigation' widget via 'make-instance' and forwards it
 along with 'args' to 'init-navigation'."
-  (let ((nav (make-instance 'navigation)))
+  (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
 
