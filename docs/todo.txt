@@ -1,13 +1,12 @@
 
 TODO:
--- CURRENT --
+-- CURRENT (navigation) --
 - Improve navigation (visual indication of selected item, refactoring, documentation, unit testing)
 - Make sure menu and its items are wrapped in appropriate divs (including menus like in "articles")
 - Properly layout the menu and widgets in the demo app (possibly color blue?)
 - Make navigation use friendly URLs
 
 -- LARGE FEATURES --
-- Create menu
 - Layout and style the demo app
 - Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
 - Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
