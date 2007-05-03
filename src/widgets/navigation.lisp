@@ -37,11 +37,17 @@
 			  (str "Navigation")))
 		   (:ul
 		    (mapc (lambda (item)
-			    (htm
-			     (:li (render-link
-				   (make-action (lambda ()
-						  (setf current-pane (car item))))
-				   (car item)))))
+			    (let* ((item-selected-p (equalp (car item) current-pane))
+				   (item-class (when item-selected-p
+						 "selected-item")))
+			      (htm
+			       (:li :class item-class
+				    (if item-selected-p
+					(htm (:span (str (car item))))
+					(render-link
+					 (make-action (lambda ()
+							(setf current-pane (car item))))
+					 (car item)))))))
 			  panes)))))))))
 
 (defun current-pane-widget (obj)

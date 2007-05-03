@@ -1,7 +1,7 @@
 
 TODO:
 -- CURRENT (navigation) --
-- Improve navigation (visual indication of selected item, refactoring, documentation, unit testing)
+- Improve navigation (refactoring, documentation, unit testing)
 - Make sure menu and its items are wrapped in appropriate divs (including menus like in "articles")
 - Properly layout the menu and widgets in the demo app (possibly color blue?)
 - Make navigation use friendly URLs
