@@ -1,5 +1,39 @@
 
-- Pick model persistance library (elephant!)
-- Pick unit testing framework (rt)
-- Pick documentation framework (tinaa)
-- Pick sexpr->html lib (cl-who)
+TODO:
+-----
+- Improve navigation (titles, etc.)
+- Make sure menu and its items are wrapped in appropriate divs (including menus like in "articles")
+- Make navigation use friendly URLs
+- Unit Test and document navigation (including empty)
+- Rethink the way styles are applied to renderers
+
+----
+- Create menu
+- Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
+- Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
+- Create renderers for lists
+- Figure out how to deal with
+  - slots that are collections
+    - don't render at all
+    - render as links to data grids
+    - if small collection, render member names inline
+    - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
+  - non-inline CLOS objects in forms
+- Authentication (permission to access menu items, actions, widgets in general)
+- Think of navigation widgets with dynamic items (to list articles, products, etc.)
+- Consider "action parameters" - map http parameters to action function argument symbols
+- Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
+
+----
+- Add "linguistic code" and convert form validations (types, etc.) to use it.
+- Make sure data and form renderer labels show attributized slot name class for styling
+- Mark required fields
+- Don't remove validation error summary for long forms.
+- Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
+- Standardize renderers return values (deferring until more is known about what's useful)
+- Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
+
+----
+- Release the library/write articles.
+- Create a reference application.
+- Rewrite defmacro
