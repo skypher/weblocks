@@ -1,17 +1,21 @@
 
 TODO:
------
-- Improve navigation (titles, etc.)
+-- CURRENT --
+- Improve navigation (visual indication of selected item, refactoring, documentation, unit testing)
 - Make sure menu and its items are wrapped in appropriate divs (including menus like in "articles")
+- Properly layout the menu and widgets in the demo app (possibly color blue?)
 - Make navigation use friendly URLs
-- Unit Test and document navigation (including empty)
-- Rethink the way styles are applied to renderers
 
-----
+-- LARGE FEATURES --
 - Create menu
+- Layout and style the demo app
 - Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
 - Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
+- Add a widget similar to google suggest
+- Register stylesheet requirements, deal with paths to stylesheets and images
 - Create renderers for lists
+
+-- RESEARCH --
 - Figure out how to deal with
   - slots that are collections
     - don't render at all
@@ -23,8 +27,9 @@ TODO:
 - Think of navigation widgets with dynamic items (to list articles, products, etc.)
 - Consider "action parameters" - map http parameters to action function argument symbols
 - Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
+- Rethink the way styles are applied to renderers
 
-----
+-- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
 - Make sure data and form renderer labels show attributized slot name class for styling
 - Mark required fields
@@ -32,8 +37,9 @@ TODO:
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Standardize renderers return values (deferring until more is known about what's useful)
 - Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
+- Add hierarchial support to navigation item
 
-----
+-- BIGGER PICTURE --
 - Release the library/write articles.
 - Create a reference application.
 - Rewrite defmacro
