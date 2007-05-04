@@ -49,7 +49,7 @@ a
 }
 
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
-.renderer > .empty-menu
+.renderer > .empty-navigation
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;

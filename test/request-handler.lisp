@@ -16,7 +16,7 @@
 	;; unbind init-user-session to make sure root-composite persists
 	(fmakunbound 'init-user-session)
 	;; fake user clicking on "modify"
-	(setf (slot-value *request* 'get-parameters) `((,weblocks::*action-string* . ,*dummy-action*)))
+	(setf (slot-value *request* 'get-parameters) `((,weblocks::*action-string* . "abc123")))
 	;; handle another request (make sure form is drawn)
 	(setf result2 (handle-client-request))
 	(values (null (session-value "debug-reset-sessions")) result1 result2)))
@@ -89,7 +89,7 @@
 </label>~
 </li>~
 </ul>~
-<div class='submit'><input name='action' type='hidden' value='abc123' />~
+<div class='submit'><input name='action' type='hidden' value='abc124' />~
 <input name='submit' type='submit' value='Submit' />~
 <input name='cancel' type='submit' value='Cancel' />~
 </div>~
@@ -138,7 +138,8 @@
 </div>~
 </div>~
 <div class='debug-toolbar'>~
-<a href='?action=debug-reset-sessions' title='Reset Sessions'><img src='pub/reset.png' /></a>~
+<a href='?action=debug-reset-sessions' title='Reset Sessions'>~
+<img src='pub/reset.png' alt='Reset Sessions' /></a>~
 </div>~
 </body>~
 </html>")

@@ -2,7 +2,7 @@
 (in-package :weblocks-test)
 
 ;;; utilities for easier testing
-(defun form-header-template (body &key (action "abc123") (method "get") preslots
+(defun form-header-template (action body &key (method "get") preslots
 			     (postslots `((:div :class "submit"
 						(:input :name "action" :type "hidden" :value ,action)
 						(:input :name "submit" :type "submit" :value "Submit")

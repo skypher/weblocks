@@ -56,7 +56,7 @@ and then compares the string to the expected result."
 (defmethod hunchentoot::server-mod-lisp-p ((obj unittest-server))
   (slot-value obj 'mod-lisp-p))
 
-(defparameter *dummy-action* "abc123"
+(defparameter *dummy-action* "abc"
   "A dummy action code for unit tests.")
 
 (defmacro with-request (method parameters &body body)
@@ -77,13 +77,19 @@ the request."
 	    (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
 	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
 	    (*session* (start-session))
-	    (make-action-orig #'weblocks::make-action))
+	    (make-action-orig #'weblocks::make-action)
+	    (dummy-action-count 123))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)
 				 (if action-code
 				   (funcall make-action-orig action-fn action-code)
-				   (funcall make-action-orig action-fn *dummy-action*))))
+				   (let ((result (funcall make-action-orig action-fn
+							  (format nil "~A~D"
+								  *dummy-action*
+								  dummy-action-count))))
+				     (incf dummy-action-count)
+				     result))))
 			 (setf (slot-value *request* 'method) ,method)
 			 (setf (slot-value *request* ',parameters-slot) ,parameters)
 			 ,@body)

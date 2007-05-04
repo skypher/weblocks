@@ -1,10 +1,10 @@
 
-.menu
+.navigation
 {
   width: 15em;
 }
 
-.empty-menu
+.empty-navigation
 {
   padding-left: 0.5em;
 }
@@ -15,7 +15,7 @@
   font-weight: bold;  
 }
 
-.menu > ul > li.selected-item > span
+.navigation > ul > li.selected-item > span
 {
   background: url(/pub/arrow.png) no-repeat center left;
   padding-left: 11px;

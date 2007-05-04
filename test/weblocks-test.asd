@@ -45,6 +45,7 @@
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
 			:components ((:file "dataform")
+				     (:file "navigation")
 				     (:file "composite")
 				     (:file "widget"))
 			:depends-on ("weblocks-test" fixtures renderers))))

@@ -8,20 +8,20 @@
 	;; initial state
 	(render-widget edit-joe)
 	;; click modify
-	(do-request `((,weblocks::*action-string* . ,*dummy-action*)))
+	(do-request `((,weblocks::*action-string* . "abc123")))
 	(render-widget edit-joe)
 	;; change name to Bob and click cancel
 	(do-request `(("name" . "Bob")
 		      ("cancel" . "Cancel")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc124")))
 	(render-widget edit-joe)
 	;; click modify
-	(do-request `((,weblocks::*action-string* . ,*dummy-action*)))
+	(do-request `((,weblocks::*action-string* . "abc125")))
 	(render-widget edit-joe)
 	;; change to bob and click submit
 	(do-request `(("name" . "Bob")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc126")))
 	(render-widget edit-joe)))
   (htm
    ;; initial state
@@ -32,7 +32,7 @@
 	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
    ;; click modify
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc124"
 	    '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
@@ -41,10 +41,10 @@
 	 #.(data-header-template
 	    '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
+	    :postslots '((:div :class "submit" (:a :href "?action=abc125" "Modify")))))
    ;; click modify
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc126"
 	    '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
@@ -53,7 +53,7 @@
 	 #.(data-header-template
 	    '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Bob"))
 	      (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))))
+	    :postslots '((:div :class "submit" (:a :href "?action=abc127" "Modify")))))))
 
 ;;; a dataform test flow: render data, modify with errors, fix errors, submit
 (deftest-html render-dataform-2
@@ -62,19 +62,19 @@
 	;; initial state
 	(render-widget edit-joe)
 	;; click modify
-	(do-request `((,weblocks::*action-string* . ,*dummy-action*)))
+	(do-request `((,weblocks::*action-string* . "abc123")))
 	(render-widget edit-joe)
 	;; change manager to Bill and name to error, and click submit
 	(do-request `(("manager" . "Bill")
 		      ("name" . "")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc124")))
 	(render-widget edit-joe)
 	;; fix error and click submit
 	(do-request `(("manager" . "Bill")
 		      ("name" . "Ivan")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc125")))
 	(render-widget edit-joe)))
   (htm
    ;; initial state
@@ -85,13 +85,13 @@
 	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
    ;; modify clicked
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc124"
 	    '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; manager changed to Bill and name to changed error, submit clicked
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc125"
 	    '((:li :class "item-not-validated"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "")
 		(:p :class "validation-error"
@@ -107,7 +107,7 @@
 	 #.(data-header-template
 	    '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Ivan"))
 	      (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Bill")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))))
+	    :postslots '((:div :class "submit" (:a :href "?action=abc126" "Modify")))))))
 
 ;;; a dataform test flow: make sure slots without readers that were specified are updated
 ;;; render data (with custom slot), modify with error, modify, submit.
@@ -117,17 +117,17 @@
 	;; initial state
 	(render-widget edit-joe :slots '(age))
 	;; click modify
-	(do-request `((,weblocks::*action-string* . ,*dummy-action*)))
+	(do-request `((,weblocks::*action-string* . "abc123")))
 	(render-widget edit-joe :slots '(age))
 	;; change age to an error
 	(do-request `(("age" . "bad")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc124")))
 	(render-widget edit-joe :slots '(age))
 	;; change age
 	(do-request `(("age" . "18")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . ,*dummy-action*)))
+		      (,weblocks::*action-string* . "abc125")))
 	(render-widget edit-joe :slots '(age))))
   (htm
    ;; initial state
@@ -139,13 +139,13 @@
 	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
    ;; modify clicked
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc124"
 	    '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
 	      (:li (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "30")))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    (:div :class "widget dataform"
-	 #.(form-header-template
+	 #.(form-header-template "abc125"
 	    '((:li (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
 	      (:li :class "item-not-validated"
 	       (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "bad")
@@ -163,4 +163,4 @@
 	    '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li (:span :class "label" "Age:&nbsp;") (:span :class "value" "18"))
 	      (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))))
+	    :postslots '((:div :class "submit" (:a :href "?action=abc126" "Modify")))))))

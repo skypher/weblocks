@@ -1,7 +1,9 @@
 
 (in-package :weblocks)
 
-(export '(navigation init-navigation make-navigation))
+(export '(navigation navigation-panes current-pane
+	  with-navigation-header render-navigation-body
+	  current-pane-widget init-navigation make-navigation))
 
 (defclass navigation (widget)
   ((panes :accessor navigation-panes
@@ -14,48 +16,79 @@
    (current-pane :initform nil
 		 :initarg :current-pane
 		 :documentation "A name that identifies currently
-                  selected entry.")))
+                  selected entry."))
+  (:documentation "The navigation widget can act as a menu controls, a
+  tabbed control, etc. It contains a list of section names and widgets
+  associated with those sections, and allows the user to select a
+  particular section which it then renders."))
 
+;;; During initialization, current pane will automatically be set to
+;;; the first available pane in the list, unless specified otherwise.
 (defmethod initialize-instance :after ((obj navigation) &rest initargs &key &allow-other-keys)
   (with-slots (panes current-pane) obj
     (when (null current-pane)
       (setf current-pane (caar panes)))))
 
-(defmethod render-widget-body ((obj navigation) &rest args)
-  (with-slots (name panes current-pane) obj
+(defgeneric with-navigation-header (obj body-fn &rest args)
+  (:documentation
+   "Renders the header of the navigation widget. Unlike
+'with-widget-header', which in case of the navigation widget wraps the
+current pane as well as the navigation html, 'with-navigation-header'
+only wraps navigation html."))
+
+(defmethod with-navigation-header ((obj navigation) body-fn &rest args)
+  (with-slots (name panes) obj
     (with-html
-      (when (current-pane-widget obj)
-	(render-widget (current-pane-widget obj)))
-      (:div :class "renderer menu"
+      (:div :class "renderer navigation"
 	    (with-extra-tags
 	      (if (null panes)
 		  (htm
-		   (:div :class "empty-menu" "No menu entries"))
+		   (:div :class "empty-navigation" "No navigation entries"))
 		  (htm
 		   (:h1 (if name
-			  (str (humanize-name name))
-			  (str "Navigation")))
+			    (str (humanize-name name))
+			    (str "Navigation")))
 		   (:ul
-		    (mapc (lambda (item)
-			    (let* ((item-selected-p (equalp (car item) current-pane))
-				   (item-class (when item-selected-p
-						 "selected-item")))
-			      (htm
-			       (:li :class item-class
-				    (if item-selected-p
-					(htm (:span (str (car item))))
-					(render-link
-					 (make-action (lambda ()
-							(setf current-pane (car item))))
-					 (car item)))))))
-			  panes)))))))))
+		    (apply body-fn obj args)))))))))
+
+(defgeneric render-navigation-body (obj &rest args)
+  (:documentation
+   "Renders the body of the navigation widget. Unlike
+'render-widget-body', which in case of navigation renders the current
+pane, as well as navigation html, 'render-navigation-body' only
+renders navigation HTML."))
+
+(defmethod render-navigation-body ((obj navigation) &rest args)
+  (with-slots (panes current-pane) obj
+    (with-html
+      (mapc (lambda (item)
+	      (let* ((item-selected-p (equalp (car item) current-pane))
+		     (item-class (when item-selected-p
+				   "selected-item")))
+		(htm
+		 (:li :class item-class
+		      (if item-selected-p
+			  (htm (:span (str (humanize-name (car item)))))
+			  (render-link
+			   (make-action (lambda ()
+					  (setf current-pane (car item))))
+			   (humanize-name (car item))))))))
+	    panes))))
+
+(defmethod render-widget-body ((obj navigation) &rest args)
+  (with-html
+    (when (current-pane-widget obj)
+      (render-widget (current-pane-widget obj)))
+    (apply #'with-navigation-header obj #'render-navigation-body args)))
 
 (defun current-pane-widget (obj)
+  "Accepts a widget object and returns the widget that represents its
+currently selected pane."
   (with-slots (panes current-pane) obj
     (cdar (member current-pane panes :key #'car :test #'string-equal))))
 
 (defun init-navigation (nav &rest args)
-  "A helper function to make a navigation widget
+  "A helper function to create a navigation widget
 
 ex:
 
@@ -69,11 +102,12 @@ ex:
      do (push-end `(,x . ,y) (navigation-panes nav)))
   (with-slots (current-pane) nav
     (when (null current-pane)
-      (setf current-pane (caar (navigation-panes nav))))))
+      (setf current-pane (caar (navigation-panes nav)))))
+  nav)
 
 (defun make-navigation (name &rest args)
-  "Instantiates 'navigation' widget via 'make-instance' and forwards it
-along with 'args' to 'init-navigation'."
+  "Instantiates 'navigation' widget via 'make-instance' and forwards
+it along with 'args' to 'init-navigation'."
   (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
