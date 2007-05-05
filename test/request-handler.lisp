@@ -144,3 +144,8 @@
 </body>~
 </html>")
   t)
+
+;;; test tokenize-uri
+(deftest tokenize-uri-1
+    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5;blah=7")
+  ("hello" "world" "blah" "test" "world"))

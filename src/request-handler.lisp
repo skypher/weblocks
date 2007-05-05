@@ -30,3 +30,12 @@
 		 (when *render-debug-toolbar*
 		   (render-debug-toolbar))))
     (get-output-stream-string *weblocks-output-stream*)))
+
+(defun tokenize-uri (uri)
+  "Tokenizes a URI into a list of elements.
+
+ex:
+\(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
+=> (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
+  (remove-if (curry #'string-equal "")
+	     (cl-ppcre:split "[/\\\\]" (cl-ppcre:regex-replace "\\?.*" uri ""))))
