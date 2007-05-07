@@ -186,3 +186,12 @@
 		   'test1)
   t)
 
+;;; test reset-current-pane
+(deftest reset-current-pane-1
+    (let ((nav (make-navigation "test navigation"
+				'test1 "w1"
+				'test2 "w2")))
+      (setf (slot-value nav 'current-pane) "test2")
+      (reset-current-pane nav)
+      (slot-value nav 'current-pane))
+  "test1")

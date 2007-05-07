@@ -4,7 +4,7 @@
 (export '(navigation navigation-panes current-pane
 	  with-navigation-header render-navigation-body
 	  current-pane-widget init-navigation make-navigation
-	  pane-exists-p))
+	  pane-exists-p reset-current-pane))
 
 (defclass navigation (widget)
   ((panes :accessor navigation-panes
@@ -124,3 +124,8 @@ it along with 'args' to 'init-navigation'."
 with the specified name."
   (not (null (find (attributize-name name)
 		   (navigation-panes navigation-object) :key #'car :test #'equalp))))
+
+(defun reset-current-pane (navigation-object)
+  "Sets the current pane to the first available pane in the list."
+  (setf (slot-value navigation-object 'current-pane)
+	(caar (navigation-panes navigation-object))))

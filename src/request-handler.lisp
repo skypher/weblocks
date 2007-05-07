@@ -38,6 +38,7 @@
   "Takes URI tokens and applies them one by one to navigation widgets
 in order to allow for friendly URLs."
   (when (null tokens)
+    (reset-navigation-widgets navigation-widget)
     (return-from apply-uri-to-navigation))
   (if (and navigation-widget (pane-exists-p navigation-widget (car tokens)))
       (progn
@@ -58,6 +59,13 @@ contained in 'comp' or its children."
 		    (composite (find-navigation-widget w))
 		    (otherwise nil)))
 		(composite-widgets comp)))))
+
+(defun reset-navigation-widgets (nav)
+  "Resets all navigation widgets from 'nav' down, using
+'reset-current-pane'."
+  (unless (null nav)
+    (reset-current-pane nav)
+    (reset-navigation-widgets (find-navigation-widget (current-pane-widget nav)))))
 
 (defun tokenize-uri (uri)
   "Tokenizes a URI into a list of elements.
