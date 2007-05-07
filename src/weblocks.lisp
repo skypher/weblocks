@@ -15,12 +15,19 @@ Generic functions 'render-data', 'render-form', 'render-table'."))
 
 (in-package :weblocks)
 
-(export '(*weblocks-output-stream* with-html reset-sessions))
+(export '(*weblocks-output-stream* *current-navigation-url* with-html
+	  reset-sessions))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
 and available to code executed within a request as a special
 variable. All html should be rendered to this stream.")
+
+(defparameter *current-navigation-url* nil
+  "Always contains a navigation URL at the given point in rendering
+  cycle. This is a special variable modified by the navigation
+  controls during rendering so that inner controls can determine their
+  location in the application hierarchy.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."

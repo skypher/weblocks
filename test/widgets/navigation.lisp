@@ -144,14 +144,45 @@
 (deftest init-navigation-1
     (navigation-panes
      (init-navigation (make-instance 'navigation)
-		      "test1" "w1"
-		      "test2" "w2"))
-  (("test1" . "w1") ("test2" . "w2")))
+		      'test1 "w1"
+		      "Test-Two" "w2"))
+  (("test1" . "w1") ("test-two" . "w2")))
 
 ;;; test make-navigation
 (deftest make-navigation-1
     (navigation-panes
      (make-navigation "test navigation"
-		      "test1" "w1"
-		      "test2" "w2"))
-  (("test1" . "w1") ("test2" . "w2")))
+		      'test1 "w1"
+		      "Test-Two" "w2"))
+  (("test1" . "w1") ("test-two" . "w2")))
+
+
+;;; test pane-exists-p
+(deftest pane-exists-p-1
+    (pane-exists-p (make-navigation "test navigation"
+				    "test1" "w1"
+				    "test2" "w2")
+		   "helloworld")
+  nil)
+
+(deftest pane-exists-p-2
+    (pane-exists-p (make-navigation "test navigation"
+				    "test1" "w1"
+				    "Test-Two" "w2")
+		   "test-two")
+  t)
+
+(deftest pane-exists-p-3
+    (pane-exists-p (make-navigation "test navigation"
+				    'test1 "w1"
+				    'test2 "w2")
+		   "test1")
+  t)
+
+(deftest pane-exists-p-4
+    (pane-exists-p (make-navigation "test navigation"
+				    'test1 "w1"
+				    'test2 "w2")
+		   'test1)
+  t)
+

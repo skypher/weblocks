@@ -3,7 +3,8 @@
 
 (export '(navigation navigation-panes current-pane
 	  with-navigation-header render-navigation-body
-	  current-pane-widget init-navigation make-navigation))
+	  current-pane-widget init-navigation make-navigation
+	  pane-exists-p))
 
 (defclass navigation (widget)
   ((panes :accessor navigation-panes
@@ -56,7 +57,10 @@ only wraps navigation html."))
    "Renders the body of the navigation widget. Unlike
 'render-widget-body', which in case of navigation renders the current
 pane, as well as navigation html, 'render-navigation-body' only
-renders navigation HTML."))
+renders navigation HTML.
+
+This method uses '*current-navigation-url*' special variable to
+determine its location in order to properly render paths in links."))
 
 (defmethod render-navigation-body ((obj navigation) &rest args)
   (with-slots (panes current-pane) obj
@@ -69,20 +73,23 @@ renders navigation HTML."))
 		 (:li :class item-class
 		      (if item-selected-p
 			  (htm (:span (str (humanize-name (car item)))))
-			  (render-link
-			   (make-action (lambda ()
-					  (setf current-pane (car item))))
-			   (humanize-name (car item))))))))
+			  (htm (:a :href (concatenate 'string *current-navigation-url*
+						      (attributize-name (car item)))
+				   (str (humanize-name (car item))))))))))
 	    panes))))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (with-html
-    (when (current-pane-widget obj)
-      (render-widget (current-pane-widget obj)))
-    (apply #'with-navigation-header obj #'render-navigation-body args)))
+  (when (current-pane-widget obj)
+    (let ((*current-navigation-url* (concatenate 'string
+						 *current-navigation-url*
+						 (slot-value obj 'current-pane)
+						 "/")))
+      (declare (special *current-navigation-url*))
+      (render-widget (current-pane-widget obj))))
+  (apply #'with-navigation-header obj #'render-navigation-body args))
 
 (defun current-pane-widget (obj)
-  "Accepts a widget object and returns the widget that represents its
+  "Accepts a navigation object and returns the widget that represents its
 currently selected pane."
   (with-slots (panes current-pane) obj
     (cdar (member current-pane panes :key #'car :test #'string-equal))))
@@ -99,7 +106,7 @@ ex:
         for x in args
         for y in (cdr args)
      when (oddp count)
-     do (push-end `(,x . ,y) (navigation-panes nav)))
+     do (push-end `(,(attributize-name x) . ,y) (navigation-panes nav)))
   (with-slots (current-pane) nav
     (when (null current-pane)
       (setf current-pane (caar (navigation-panes nav)))))
@@ -112,3 +119,8 @@ it along with 'args' to 'init-navigation'."
     (apply #'init-navigation nav args)
     nav))
 
+(defun pane-exists-p (navigation-object name)
+  "Given a navigation object and a name determines if there is a pane
+with the specified name."
+  (not (null (find (attributize-name name)
+		   (navigation-panes navigation-object) :key #'car :test #'equalp))))

@@ -8,7 +8,7 @@ present the user with a toolbar that aids development."
     (:div :class "debug-toolbar"
 	  (:a :href (make-action-url "debug-reset-sessions")
 	      :title "Reset Sessions"
-	      (:img :src "pub/reset.png"
+	      (:img :src "/pub/reset.png"
 		    :alt "Reset Sessions")))))
 
 (defun initialize-debug-actions ()

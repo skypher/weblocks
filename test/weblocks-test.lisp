@@ -30,7 +30,8 @@ and then compares the string to the expected result."
 ;;; faking hunchentoot's requests
 (defclass unittest-request ()
   ((headers-in :initform nil)
-   method uri server-protocol
+   method server-protocol
+   (hunchentoot::uri :initform nil)
    (content-stream :reader content-stream)
    (cookies-in :initform nil)
    (get-parameters :initform nil)
