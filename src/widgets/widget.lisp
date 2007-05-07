@@ -52,3 +52,10 @@ can do custom rendering without much boilerplate."))
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header')."
   (apply #'with-widget-header obj #'render-widget-body args))
+
+;;; Make all widgets act as composites to simplify development
+(defmethod composite-widgets ((obj widget))
+  nil)
+
+(defmethod composite-widgets ((obj function))
+  nil)

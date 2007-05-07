@@ -1,12 +1,10 @@
 
 TODO:
 -- CURRENT (navigation) --
-- Make navigation use friendly URLs
-  - Make sure a slah (/) address works (and sets navigation state to default?)
-  - Document and unit test (complicated composite structure, multiple menu levels, / works and resets)
-- Layout and style the demo app (color menu blue?)
+- Customize widget printing to include their names (to ease debugging)
 
 -- LARGE FEATURES --
+- Layout and style the demo app (color menu blue?)
 - Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
 - Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
 - Add a widget similar to google suggest

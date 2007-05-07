@@ -7,7 +7,7 @@
   (:div :class "debug-toolbar"
 	(:a :href "?action=debug-reset-sessions"
 	    :title "Reset Sessions"
-	    (:img :src "pub/reset.png"
+	    (:img :src "/pub/reset.png"
 		  :alt "Reset Sessions"))))
 
 ;;; test initialize-debug-actions

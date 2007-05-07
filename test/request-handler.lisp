@@ -29,11 +29,11 @@
 <html>~
 <head>~
 <title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
 </head>~
 <body>~
 <div class='widget composite'>~
@@ -64,11 +64,11 @@
 <html>~
 <head>~
 <title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
 </head>~
 <body>~
 <div class='widget composite'>~
@@ -125,12 +125,12 @@
 <html>~
 <head>~
 <title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='pub/table.css' />~
-<link rel='stylesheet' type='text/css' href='pub/debug-mode.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/debug-mode.css' />~
 </head>~
 <body>~
 <div class='widget composite'>~
@@ -139,13 +139,139 @@
 </div>~
 <div class='debug-toolbar'>~
 <a href='?action=debug-reset-sessions' title='Reset Sessions'>~
-<img src='pub/reset.png' alt='Reset Sessions' /></a>~
+<img src='/pub/reset.png' alt='Reset Sessions' /></a>~
 </div>~
 </body>~
 </html>")
   t)
 
+;;; make sure navigation controls are modified by request uri
+(deftest handle-client-request-3
+    (with-request :get nil
+      (let (weblocks::*webapp-name* result
+				    (weblocks::*render-debug-toolbar* nil))
+	;; set up our mini-application with one navigation widget
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(defun init-user-session (comp)
+	  (setf (composite-widgets comp) (list (make-navigation "test-nav"
+								"test1" (lambda (&rest args)
+									  (with-html (:div "hi1")))
+								"test2" (lambda (&rest args)
+									  (with-html (:div "hi2")))))))
+	;; set the URI
+	(setf (slot-value *request* 'hunchentoot::uri) "/test2?action=blah")
+	;; handle the request
+	(setf result (handle-client-request))
+	(fmakunbound 'init-user-session)
+	result))
+  #.(format nil
+	    "~
+<?xml version=\"1.0\" encoding=\"utf-8\" ?>~
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~
+<html>~
+<head>~
+<title>Hello!</title>~
+<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+</head>~
+<body>~
+<div class='widget composite'>~
+<div class='widget navigation test-nav'>~
+<div class='widget function'><div>hi2</div></div>~
+<div class='renderer navigation'>~
+<div class='extra-top-1'>&nbsp;</div>~
+<div class='extra-top-2'>&nbsp;</div>~
+<div class='extra-top-3'>&nbsp;</div>~
+<h1>Test Nav</h1>~
+<ul>~
+<li><a href='/test1'>Test1</a></li>~
+<li class='selected-item'><span>Test2</span></li>~
+</ul>~
+<div class='extra-bottom-1'>&nbsp;</div>~
+<div class='extra-bottom-2'>&nbsp;</div>~
+<div class='extra-bottom-3'>&nbsp;</div>~
+</div>~
+</div>~
+</div>~
+</body>~
+</html>"))
+
+;;; helper to create complex site layout
+(defun create-site-layout ()
+  (make-instance 'composite :widgets
+		 (list
+		  (make-instance
+		   'composite
+		   :widgets
+		   (list
+		    (make-instance 'composite)
+		    (make-navigation "test-nav-1"
+				     "test1" (make-instance
+					      'composite
+					      :widgets
+					      (list
+					       (make-instance 'composite)
+					       (make-navigation "test-nav-2"
+								"test3" (lambda (&rest args) nil)
+								"test4" (lambda (&rest args) nil))))
+				     "test2" (make-instance
+					      'composite
+					      :widgets
+					      (list
+					       (make-instance 'composite)
+					       (make-navigation "test-nav-3"
+								"test5" (lambda (&rest args) nil)
+								"test6" (lambda (&rest args) nil))))))))))
+
+;;; test apply-uri-to-navigation
+(deftest apply-uri-to-navigation-1
+    (let ((site (create-site-layout)) nav1 nav2)
+      (setf nav1 (weblocks::find-navigation-widget site))
+      (weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
+      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+      (values (slot-value nav1 'current-pane)
+	      (slot-value nav2 'current-pane)))
+  "test2"
+  "test6")
+
+(deftest apply-uri-to-navigation-2
+    (let ((site (create-site-layout)) nav1)
+      (with-request :get nil
+	(setf nav1 (weblocks::find-navigation-widget site))
+	(weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
+	(return-code)))
+  404)
+
+;;; test find-navigation-widget
+(deftest find-navigation-widget-1
+    (let ((site (create-site-layout))
+	  nav1 nav2)
+      (setf nav1 (weblocks::find-navigation-widget site))
+      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+      (values (widget-name nav1) (widget-name nav2)))
+  "test-nav-1"
+  "test-nav-2")
+
+;;; test reset-navigation-widgets
+(deftest reset-navigation-widgets-1
+    (let ((site (create-site-layout))
+	  nav1 nav2)
+      (setf nav1 (weblocks::find-navigation-widget site))
+      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+      (setf (slot-value nav1 'current-pane) "test2")
+      (setf (slot-value nav2 'current-pane) "test4")
+      (weblocks::reset-navigation-widgets nav1)
+      (values (slot-value nav1 'current-pane)
+	      (slot-value nav2 'current-pane)))
+  "test1"
+  "test3")
+
 ;;; test tokenize-uri
 (deftest tokenize-uri-1
-    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5;blah=7")
+    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7")
   ("hello" "world" "blah" "test" "world"))

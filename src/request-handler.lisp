@@ -34,9 +34,15 @@
 		   (render-debug-toolbar))))
     (get-output-stream-string *weblocks-output-stream*)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Below is code that implements friendly URLs ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun apply-uri-to-navigation (tokens navigation-widget)
   "Takes URI tokens and applies them one by one to navigation widgets
-in order to allow for friendly URLs."
+in order to allow for friendly URLs. The URLs are basically intimately
+linked to navigation controls to simulate document resources on the
+server."
   (when (null tokens)
     (reset-navigation-widgets navigation-widget)
     (return-from apply-uri-to-navigation))
@@ -52,13 +58,13 @@ in order to allow for friendly URLs."
 contained in 'comp' or its children."
   (when (typep comp 'navigation)
     (return-from find-navigation-widget comp))
-  (car (flatten
-	(mapcar (lambda (w)
-		  (typecase w
-		    (navigation w)
-		    (composite (find-navigation-widget w))
-		    (otherwise nil)))
-		(composite-widgets comp)))))
+  (car (flatten (remove-if #'null
+			   (mapcar (lambda (w)
+				     (typecase w
+				       (navigation w)
+				       (composite (find-navigation-widget w))
+				       (otherwise nil)))
+				   (composite-widgets comp))))))
 
 (defun reset-navigation-widgets (nav)
   "Resets all navigation widgets from 'nav' down, using
@@ -76,3 +82,6 @@ ex:
   (remove-if (curry #'string-equal "")
 	     (cl-ppcre:split "[/\\\\]" (cl-ppcre:regex-replace "\\?.*" uri ""))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; End of friendly URL code ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

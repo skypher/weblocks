@@ -67,18 +67,20 @@
 			"test2" nil)))
   (htm
    (:li :class "selected-item" (:span "Test1"))
-   (:li (:a :href "?action=abc123" "Test2"))))
+   (:li (:a :href "test2" "Test2"))))
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
     (with-request :get nil
       (let ((nav (make-navigation "Test Navigation"
 				  "Test1" (make-instance 'dataform :data *joe*)
-				  "Test2" (make-instance 'dataform :data *some-college*))))
+				  "Test2" (make-instance 'dataform :data *some-college*)))
+	    (*current-navigation-url* "/"))
+	(declare (special *current-navigation-url*))
 	;; render widget
 	(render-widget nav)
 	;; switch to test2 and render
-	(do-request `((,weblocks::*action-string* . ,"abc124")))
+	(weblocks::apply-uri-to-navigation '("test2") nav)
 	(render-widget nav)))
   (htm
    (:div :class "widget navigation test-navigation"
@@ -93,7 +95,7 @@
 	       (:div :class "extra-top-3" "&nbsp;")
 	       (:h1 "Test Navigation")
 	       (:ul (:li :class "selected-item" (:span "Test1"))
-		    (:li (:a :href "?action=abc124" "Test2")))
+		    (:li (:a :href "/test2" "Test2")))
 	       (:div :class "extra-bottom-1" "&nbsp;")
 	       (:div :class "extra-bottom-2" "&nbsp;")
 	       (:div :class "extra-bottom-3" "&nbsp;")))
@@ -109,7 +111,7 @@
 		      (:li (:span :class "label" "University:&nbsp;") (:span :class "value"
 									     "Bene Gesserit University"))
 		      (:li (:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000")))
-		     (:div :class "submit" (:a :href "?action=abc125" "Modify"))
+		     (:div :class "submit" (:a :href "?action=abc124" "Modify"))
 		     (:div :class "extra-bottom-1" "&nbsp;")
 		     (:div :class "extra-bottom-2" "&nbsp;")
 		     (:div :class "extra-bottom-3" "&nbsp;")))
@@ -118,7 +120,7 @@
 	       (:div :class "extra-top-2" "&nbsp;")
 	       (:div :class "extra-top-3" "&nbsp;")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "?action=abc126" "Test1"))
+	       (:ul (:li (:a :href "/test1" "Test1"))
 		    (:li :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "&nbsp;")
 	       (:div :class "extra-bottom-2" "&nbsp;")
