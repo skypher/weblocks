@@ -14,7 +14,7 @@
    customize behavior)."))
 (defmethod handle-client-request ()
   (when (null (session-value 'root-composite))
-    (let ((root-composite (make-instance 'composite)))
+    (let ((root-composite (make-instance 'composite :name "root")))
       (when *render-debug-toolbar*
 	(initialize-debug-actions))
       (funcall (symbol-function (find-symbol "INIT-USER-SESSION" (symbol-package *webapp-name*)))

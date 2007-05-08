@@ -1,4 +1,15 @@
 
+body
+{
+  background: url(/pub/images/page_background.png);
+}
+
+div.root
+{
+  background-color: white;
+  padding: 1em;
+}
+
 div.main-menu
 {
   position: relative;
