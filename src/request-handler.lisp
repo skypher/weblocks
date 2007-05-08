@@ -56,6 +56,8 @@ server."
 (defun find-navigation-widget (comp)
   "Given a composite 'comp', returns the first navigation widget
 contained in 'comp' or its children."
+  (when (null comp)
+    (return-from find-navigation-widget))
   (when (typep comp 'navigation)
     (return-from find-navigation-widget comp))
   (car (flatten (remove-if #'null
