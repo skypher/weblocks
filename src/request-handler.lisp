@@ -29,9 +29,7 @@
     (apply-uri-to-navigation (tokenize-uri (request-uri))
 			     (find-navigation-widget (session-value 'root-composite)))
     (with-page (lambda ()
-		 (render-widget (session-value 'root-composite))
-		 (when *render-debug-toolbar*
-		   (render-debug-toolbar))))
+		 (render-widget (session-value 'root-composite))))
     (get-output-stream-string *weblocks-output-stream*)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -44,7 +44,7 @@ custom validators."))
 ;;; Required validator
 (define-condition required-validation-error (form-validation-error) ()
   (:report (lambda (condition stream)
-	     (format stream "~S is a required field." (humanize-name (validation-error-slot condition)))))
+	     (format stream "~A is a required field." (humanize-name (validation-error-slot condition)))))
   (:documentation "A condition signalled if a required field is
   missing."))
 

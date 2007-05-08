@@ -2,13 +2,14 @@
 TODO:
 -- CURRENT --
 - Layout and style the demo app
+- Fix broken tests
 
 -- LARGE FEATURES --
-- Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
-- Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
+- Create a pageable, sortable data-grid widget
+- Rethink the application keeping AJAX in mind
+- Create a modal dialog widget, as well as modal request in general
 - Add a widget similar to google suggest
 - Register stylesheet requirements, deal with paths to stylesheets and images
-- Create renderers for lists
 
 -- RESEARCH --
 - Figure out how to deal with
@@ -21,12 +22,12 @@ TODO:
 - Authentication (permission to access menu items, actions, widgets in general)
 - Consider "action parameters" - map http parameters to action function argument symbols
 - Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
-- Rethink the way styles are applied to renderers
 - Consider lazy evaluation of session initialization
 - Create default title page if the user didn't define the application (possibly tutorial style)
 - Think of navigation widgets with dynamic items (to list articles, products, etc.)
 - Consider multiple navigation controls in one composite and hidden navigation controls
 - Reset state of regular widgets when moving accross navigation controls?
+- Create renderers for lists (redo existing renderers that use lists with these?)
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
@@ -39,6 +40,7 @@ TODO:
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
 - Highlight rows while hoovering over table (and data/forms?)
+- Port stylesheets to IE
 
 -- BIGGER PICTURE --
 - Release the library/write articles.

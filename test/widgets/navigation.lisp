@@ -134,7 +134,7 @@
 		      "test2" "w2"))
   "w1")
 
-(deftest current-pane-widget-1
+(deftest current-pane-widget-2
     (let ((nav (make-navigation "Test Navigation"
 				"test1" "w1"
 				"test2" "w2")))

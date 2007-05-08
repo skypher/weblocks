@@ -17,5 +17,9 @@
       (when *render-debug-toolbar*
 	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css"))))
      (:body
-      (funcall body-fn)))))
+      (:div :class "page-wrapper"
+	    (with-extra-tags
+	      (funcall body-fn)))
+      (when *render-debug-toolbar*
+	(render-debug-toolbar))))))
 

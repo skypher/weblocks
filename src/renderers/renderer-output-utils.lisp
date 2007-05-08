@@ -1,8 +1,8 @@
 ;;;; Utility functions for generic renderers
 (in-package :weblocks)
 
-(export '(object-class-name object-name render-extra-tags
-	  with-extra-tags render-object-slot render-standard-object))
+(export '(object-class-name object-name render-object-slot
+	  render-standard-object))
 
 (defgeneric object-class-name (obj)
   (:documentation
@@ -43,29 +43,6 @@ Override this method to provide object names."))
 	  (if (stringp obj-name)
 	      (return-from object-name obj-name)))))
   (object-class-name obj))
-
-(defun render-extra-tags (tag-class count)
-  "Renders extra tags to get around CSS limitations. 'tag-class'
-is a string that specifies the class name and 'count' is the
-number of extra tags to render.
-Ex:
-\(render-extra-tags \"extra-\" 2) =>
-\"<div class=\"extra-1\">&nbsp;</div><div class=\"extra-1\">&nbsp;</div>\""
-  (with-html-output (*weblocks-output-stream*)
-    (loop for i from 1 to count
-          for attr = (format nil "~A~A" tag-class i)
-       do (htm (:div :class attr "&nbsp;")))))
-
-(defmacro with-extra-tags (&body body)
-  "A macro used to wrap html into extra tags necessary for
-hacking CSS formatting. The macro wraps the body with three
-headers on top and three on the bottom. It uses
-'render-extra-tags' function along with 'extra-top-' and
-'extra-bottom-' arguments."
-  `(progn
-     (render-extra-tags "extra-top-" 3)
-     ,@body
-     (render-extra-tags "extra-bottom-" 3)))
 
 (defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
   "Renders a given slot of a CLOS object (usually if the slot

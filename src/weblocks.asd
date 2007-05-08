@@ -16,7 +16,7 @@
 	       (:file "utils"
 		      :depends-on ("weblocks"))
 	       (:file "page-template"
-		      :depends-on ("weblocks"))
+		      :depends-on ("weblocks" "utils"))
 	       (:file "actions"
 		      :depends-on ("weblocks" "utils"))
 	       (:file "debug-mode"

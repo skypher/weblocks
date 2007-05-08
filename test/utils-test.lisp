@@ -153,3 +153,22 @@
 (deftest string-whitespace-p-3
     (string-whitespace-p " a  	")
   nil)
+
+;;; test render-extra-tags
+(deftest-html render-extra-tags-1
+    (render-extra-tags "test-" 2)
+  (htm (:div :class "test-1" "&nbsp;")
+       (:div :class "test-2" "&nbsp;")))
+
+;;; test with-extra-tags
+(deftest-html with-extra-tags-1
+    (with-extra-tags
+      (with-html (:div "hi")))
+  (htm (:div :class "extra-top-1" "&nbsp;")
+       (:div :class "extra-top-2" "&nbsp;")
+       (:div :class "extra-top-3" "&nbsp;")
+       (:div "hi")
+       (:div :class "extra-bottom-1" "&nbsp;")
+       (:div :class "extra-bottom-2" "&nbsp;")
+       (:div :class "extra-bottom-3" "&nbsp;")))
+

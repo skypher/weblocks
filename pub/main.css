@@ -12,21 +12,21 @@ a
 
 .renderer
 {
-  background: #ecf8d7 url(/pub/images/top_background.png) repeat-x;
+  background: #ecf8d7 url(/pub/images/widget/top_background.png) repeat-x;
   margin-bottom: 1em;
 }
 
 .renderer > .extra-top-1
 {
   height: 7px;
-  background: url(/pub/images/top_left.png) no-repeat top left;
+  background: url(/pub/images/widget/top_left.png) no-repeat top left;
 }
 
 .renderer > .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/images/top_right.png) no-repeat top right;
+  background: url(/pub/images/widget/top_right.png) no-repeat top right;
   border-bottom: 1px solid #dbeac1;
 }
 
@@ -113,7 +113,7 @@ a
 .renderer > .extra-bottom-1
 {
   height: 6px;
-  background: url(/pub/images/bottom_background.png) repeat-x bottom;
+  background: url(/pub/images/widget/bottom_background.png) repeat-x bottom;
   border-top: 1px solid #fcfef6;
 }
 
@@ -121,14 +121,14 @@ a
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/images/bottom_left.png) no-repeat bottom left;
+  background: url(/pub/images/widget/bottom_left.png) no-repeat bottom left;
 }
 
 .renderer > .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/images/bottom_right.png) no-repeat bottom right;
+  background: url(/pub/images/widget/bottom_right.png) no-repeat bottom right;
 }
 
 .missing

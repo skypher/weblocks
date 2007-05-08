@@ -6,9 +6,9 @@
 (define-condition parse-validation-error (form-validation-error)
   ((expected-type :accessor validation-expected-type :initarg :expected-type))
   (:report (lambda (condition stream)
-	     (format stream "~S must be of type ~A."
+	     (format stream "~A must be of type ~A."
 		     (humanize-name (validation-error-slot condition))
-		     (humanize-name (validation-expected-type condition)))))
+		     (string-downcase (humanize-name (validation-expected-type condition))))))
   (:documentation "A condition signalled by form parsers when the
   string received as part of a form submission cannot be parsed into a
   type specified on an object slot. See 'parse-slot-from-request' for

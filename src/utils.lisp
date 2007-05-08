@@ -3,7 +3,8 @@
 
 (export '(humanize-name attributize-name object-visible-slots
 	  get-slot-value render-slot-inline-p safe-apply safe-funcall
-	  request-parameter string-whitespace-p))
+	  request-parameter string-whitespace-p render-extra-tags
+	  with-extra-tags))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -227,3 +228,26 @@ the body of the request. Otherwise, an error is signalled."
 character, nil otherwise."
   (loop for c across str
      always (whitespacep c)))
+
+(defun render-extra-tags (tag-class count)
+  "Renders extra tags to get around CSS limitations. 'tag-class'
+is a string that specifies the class name and 'count' is the
+number of extra tags to render.
+Ex:
+\(render-extra-tags \"extra-\" 2) =>
+\"<div class=\"extra-1\">&nbsp;</div><div class=\"extra-1\">&nbsp;</div>\""
+  (with-html-output (*weblocks-output-stream*)
+    (loop for i from 1 to count
+          for attr = (format nil "~A~A" tag-class i)
+       do (htm (:div :class attr "&nbsp;")))))
+
+(defmacro with-extra-tags (&body body)
+  "A macro used to wrap html into extra tags necessary for
+hacking CSS formatting. The macro wraps the body with three
+headers on top and three on the bottom. It uses
+'render-extra-tags' function along with 'extra-top-' and
+'extra-bottom-' arguments."
+  `(progn
+     (render-extra-tags "extra-top-" 3)
+     ,@body
+     (render-extra-tags "extra-bottom-" 3)))
