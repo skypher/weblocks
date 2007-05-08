@@ -1,7 +1,7 @@
 
 TODO:
 -- CURRENT --
-- Layout and style the demo app (color menu blue?)
+- Layout and style the demo app
 
 -- LARGE FEATURES --
 - Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
@@ -38,6 +38,7 @@ TODO:
 - Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
+- Highlight rows while hoovering over table (and data/forms?)
 
 -- BIGGER PICTURE --
 - Release the library/write articles.
