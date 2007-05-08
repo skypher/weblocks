@@ -3,7 +3,6 @@ body
 {
   font-size: small;
   font-family: arial, helvetica, sans-serif;
-  
 }
 
 a
@@ -13,21 +12,21 @@ a
 
 .renderer
 {
-  background: #ecf8d7 url(/pub/top_background.png) repeat-x;
+  background: #ecf8d7 url(/pub/images/top_background.png) repeat-x;
   margin-bottom: 1em;
 }
 
 .renderer > .extra-top-1
 {
   height: 7px;
-  background: url(/pub/top_left.png) no-repeat top left;
+  background: url(/pub/images/top_left.png) no-repeat top left;
 }
 
 .renderer > .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/top_right.png) no-repeat top right;
+  background: url(/pub/images/top_right.png) no-repeat top right;
   border-bottom: 1px solid #dbeac1;
 }
 
@@ -49,15 +48,25 @@ a
 }
 
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
-.renderer > .empty-navigation
+.renderer > .empty-navigation, .renderer > ul > li, .renderer > fieldset > ul > li,
+.renderer > table > tbody > tr > td, .renderer > table > thead > tr > th,
+.renderer > fieldset > .submit, .renderer > .submit
+
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
+}
+
+.renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
+.renderer > .empty-navigation, .renderer > ul, .renderer > fieldset > ul, .table > table,
+.renderer > fieldset > .submit, .renderer > .submit
+{
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
 }
 
-.renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p > span.caption
+.renderer > h1, .renderer > fieldset > h1, .table > table > caption,
+.empty-table > p > span.caption
 {
   color: #29364F;
   font-weight: bold;
@@ -72,8 +81,6 @@ a
 .renderer > ul, .renderer > fieldset > ul, .table > table, .renderer > fieldset > .submit,
 .renderer > .submit
 {
-  border-left: 2px solid #dbeac1;
-  border-right: 2px solid #dbeac1;
   padding-left: 0;
   margin: 0;
 }
@@ -89,14 +96,8 @@ a
   padding-left: 11.5em;
 }
 
-.renderer > ul > li, .renderer > fieldset > ul > li, .renderer > table > tbody > tr > td,
-.renderer > table > thead > tr > th, .renderer > fieldset > .submit, .renderer > .submit
-{
-  border-top: 1px solid #fcfef6;
-  border-bottom: 1px solid #dbeac1;
-}
-
-.renderer > ul > li > .label, .renderer > fieldset > ul > li > label > span, .table > table > thead
+.renderer > ul > li > .label, .renderer > fieldset > ul > li > label > span,
+.table > table > thead
 {
   color: #808080;
   font-weight: bold;
@@ -112,7 +113,7 @@ a
 .renderer > .extra-bottom-1
 {
   height: 6px;
-  background: url(/pub/bottom_background.png) repeat-x bottom;
+  background: url(/pub/images/bottom_background.png) repeat-x bottom;
   border-top: 1px solid #fcfef6;
 }
 
@@ -120,18 +121,23 @@ a
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/bottom_left.png) no-repeat bottom left;
+  background: url(/pub/images/bottom_left.png) no-repeat bottom left;
 }
 
 .renderer > .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/bottom_right.png) no-repeat bottom right;
+  background: url(/pub/images/bottom_right.png) no-repeat bottom right;
 }
 
 .missing
 {
   font-style: italic;
   color: #808080;
+}
+
+input[type=hidden]
+{
+  visibility: hidden;
 }

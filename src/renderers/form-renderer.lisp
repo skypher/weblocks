@@ -83,9 +83,9 @@ case the user clicks submit."))
 (defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
   (with-html
     (:div :class "submit"
-	  (:input :name "action" :type "hidden" :value action)
 	  (:input :name *submit-control-name* :type "submit" :value "Submit")
-	  (:input :name *cancel-control-name* :type "submit" :value "Cancel"))))
+	  (:input :name *cancel-control-name* :type "submit" :value "Cancel")
+	  (:input :name "action" :type "hidden" :value action))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest keys
 				  &key human-name validation-errors &allow-other-keys)

@@ -56,12 +56,12 @@
   background-color: #D8EAF8;
 }
 
-.form > fieldset > ul > li > label > p.validation-error > em > span.validation-error-heading
+.form > fieldset > ul > li > p.validation-error > em > span.validation-error-heading
 {
   display: none;
 }
 
-.form > fieldset > ul > li > label > p.validation-error
+.form > fieldset > ul > li > p.validation-error
 {
   color: red;
   font-weight: normal;

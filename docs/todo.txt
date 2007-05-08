@@ -1,10 +1,9 @@
 
 TODO:
--- CURRENT (navigation) --
-- Customize widget printing to include their names (to ease debugging)
+-- CURRENT --
+- Layout and style the demo app (color menu blue?)
 
 -- LARGE FEATURES --
-- Layout and style the demo app (color menu blue?)
 - Create a data-grid widget (pageable, sortable, along with ajaxy functionality that scales back)
 - Create an ajaxy modal "dialog" widget with relevant machinery, as well as modal request in general.
 - Add a widget similar to google suggest
@@ -38,6 +37,7 @@ TODO:
 - Standardize renderers return values (deferring until more is known about what's useful)
 - Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 - Handle error pages nicely
+- Customize widget printing to include their names (to ease debugging)
 
 -- BIGGER PICTURE --
 - Release the library/write articles.
