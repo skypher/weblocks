@@ -38,7 +38,7 @@ div.page-wrapper
   background: url(/pub/images/page/hor_border.png) repeat-x top;
 }
 
-div.root
+div#root
 {
   padding: 1em;
   border-left: black 1px solid;
@@ -46,17 +46,17 @@ div.root
   min-height: 60em;
 }
 
-div.main-menu
+div#main-menu
 {
   position: relative;
 }
 
-div.main-menu > div.composite
+div#main-menu > div.composite
 {
   margin-left: 16em;
 }
 
-div.main-menu > div.menu
+div#main-menu > div.menu
 {
   position: absolute;
   top: 0;

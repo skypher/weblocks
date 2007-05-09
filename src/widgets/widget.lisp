@@ -20,14 +20,13 @@ different widgets."))
 
 (defmethod with-widget-header (obj body-fn &rest args)
   (let* ((obj-name (attributize-name (widget-name obj)))
-	 (widget-class (concatenate 'string
-				    "widget "
-				    (attributize-name (class-name (class-of obj)))
-				    (when (and obj-name (not (string-equal obj-name "")))
-				      " ")
-				    obj-name)))
+	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
+		      obj-name)))
     (with-html
-      (:div :class widget-class
+      (:div :class (concatenate 'string
+				"widget "
+				(attributize-name (class-name (class-of obj))))
+	    :id widget-id
 	    (apply body-fn obj args)))))
 
 (defgeneric render-widget-body (obj &rest args)
