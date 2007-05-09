@@ -1,6 +1,8 @@
 
 (in-package :weblocks)
 
+(export '(render-page-body))
+
 (defun with-page (body-fn)
   "Renders boilerplate XHTML (title, stylesheets, etc.)"
   (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
@@ -17,9 +19,18 @@
       (when *render-debug-toolbar*
 	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css"))))
      (:body
-      (:div :class "page-wrapper"
-	    (with-extra-tags
-	      (funcall body-fn)))
+      (render-page-body body-fn)
       (when *render-debug-toolbar*
 	(render-debug-toolbar))))))
 
+(defgeneric render-page-body (body-fn)
+  (:documentation "Renders the body of the page (exluding the <body>
+tag). The default implementation renders root composite in a wrapper
+div along with extra tags. Specialize :before and :after methods to
+render extra html prior and post the page wrapper."))
+
+(defmethod render-page-body (body-fn)
+  (with-html
+    (:div :class "page-wrapper"
+	  (with-extra-tags
+	    (funcall body-fn)))))

@@ -1,7 +1,7 @@
 
 .table
 {
-  width: 42em;
+  min-width: 42em;
 }
 
 .table > table

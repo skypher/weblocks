@@ -16,7 +16,7 @@ Generic functions 'render-data', 'render-form', 'render-table'."))
 (in-package :weblocks)
 
 (export '(*weblocks-output-stream* *current-navigation-url* with-html
-	  reset-sessions))
+	  reset-sessions str server-type server-version))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -33,3 +33,9 @@ variable. All html should be rendered to this stream.")
   "A wrapper around cl-who with-html-output macro."
   `(with-html-output (*weblocks-output-stream* nil :indent nil)
      ,@body))
+
+(defun server-type ()
+  "Hunchentoot")
+
+(defun server-version ()
+  hunchentoot::*hunchentoot-version*)

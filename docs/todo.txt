@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT --
-- Layout and style the demo app
 - Fix broken tests
 
 -- LARGE FEATURES --
@@ -28,6 +27,7 @@ TODO:
 - Consider multiple navigation controls in one composite and hidden navigation controls
 - Reset state of regular widgets when moving accross navigation controls?
 - Create renderers for lists (redo existing renderers that use lists with these?)
+- (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.

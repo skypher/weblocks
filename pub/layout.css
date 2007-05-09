@@ -7,7 +7,7 @@ body
 
 div.page-wrapper
 {
-  max-width: 80em;
+  max-width: 70em;
   min-width: 60em;
 
   margin:0 auto;
@@ -43,6 +43,7 @@ div.root
   padding: 1em;
   border-left: black 1px solid;
   border-right: black 1px solid;
+  min-height: 60em;
 }
 
 div.main-menu
@@ -81,4 +82,65 @@ div.main-menu > div.menu
   margin-left: 5px;
   margin-right: 5px;
   background: url(/pub/images/page/hor_border.png) repeat-x bottom;
+}
+
+.header
+{
+  height: 52px;
+  background: url(/pub/images/header/background.png) repeat-x;
+  margin-top: -5px;
+  margin-bottom: 1em;
+}
+
+.header > .extra-top-1
+{
+  height: 5px;
+  background: url(/pub/images/header/top_left.png) no-repeat top left;
+}
+
+.header > .extra-top-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/pub/images/header/top_right.png) no-repeat top right;
+}
+
+.header > .extra-top-3
+{
+  height: 42px;
+  margin-left: 5px;
+  background: url(/pub/images/header/logo.png) no-repeat center left;
+}
+
+.header > .extra-bottom-1
+{
+  height: 5px;
+  background: url(/pub/images/header/bottom_left.png) no-repeat bottom left;
+}
+
+.header > .extra-bottom-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/pub/images/header/bottom_right.png) no-repeat bottom right;
+}
+
+.header > .extra-bottom-3
+{
+  display: none;
+}
+
+.footer
+{
+  margin-top: 1em;
+}
+
+.footer > p#system-info
+{
+  margin-bottom: 0;
+}
+
+.footer > p#contact-info
+{
+  margin-top: 0;
 }
