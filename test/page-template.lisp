@@ -18,6 +18,14 @@
      (:link :rel "stylesheet" :type "text/css" :href "/pub/navigation.css")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/form.css")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/data.css")
-     (:link :rel "stylesheet" :type "text/css" :href "/pub/table.css"))
+     (:link :rel "stylesheet" :type "text/css" :href "/pub/table.css")
+     (:link :rel "stylesheet" :type "text/css" :href "/pub/layout.css"))
     (:body
-     (:div "test")))))
+     (:div :class "page-wrapper"
+	   (:div :class "extra-top-1" "&nbsp;")
+	   (:div :class "extra-top-2" "&nbsp;")
+	   (:div :class "extra-top-3" "&nbsp;")
+	   (:div "test")
+	   (:div :class "extra-bottom-1" "&nbsp;")
+	   (:div :class "extra-bottom-2" "&nbsp;")
+	   (:div :class "extra-bottom-3" "&nbsp;"))))))

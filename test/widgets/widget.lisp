@@ -41,7 +41,7 @@
 (deftest-html render-widget-2
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
-  (:div :class "widget dataform test-widget"
+  (:div :class "widget dataform" :id "test-widget"
 	#.(data-header-template
 	   '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	     (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))

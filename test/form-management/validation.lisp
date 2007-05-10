@@ -23,7 +23,7 @@
       (values success (format nil "~A" error)))
     
   nil
-  "\"Age\" is a required field.")
+  "Age is a required field.")
 
 (deftest validate-slot-from-request-2
     (weblocks::validate-slot-from-request *joe* `(,(get-slot-definition 'employee 'age) . age) 20)
@@ -44,7 +44,7 @@
 	  (apply-validator :required *joe* 'age nil))
       (values success (format nil "~A" error)))
   nil
-  "\"Age\" is a required field.")
+  "Age is a required field.")
 
 ;;; Note, declare-validators and decl-validate get tested as a
 ;;; consequence of the previous tests since we use decl-validate in

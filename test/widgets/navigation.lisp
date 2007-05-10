@@ -20,7 +20,7 @@
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
-  (:div :class "renderer navigation"
+  (:div :class "renderer menu"
 	(:div :class "extra-top-1" "&nbsp;")
 	(:div :class "extra-top-2" "&nbsp;")
 	(:div :class "extra-top-3" "&nbsp;")
@@ -33,7 +33,7 @@
     (with-navigation-header (make-instance 'navigation :panes `(("Test One" . nil)))
       (lambda (x &rest args)
 	(with-html (:div "test"))))
-  (:div :class "renderer navigation"
+  (:div :class "renderer menu"
 	(:div :class "extra-top-1" "&nbsp;")
 	(:div :class "extra-top-2" "&nbsp;")
 	(:div :class "extra-top-3" "&nbsp;")
@@ -47,7 +47,7 @@
     (with-navigation-header (make-instance 'navigation :name "hello!" :panes `(("Test One" . nil)))
       (lambda (x &rest args)
 	(with-html (:div "test"))))
-  (:div :class "renderer navigation"
+  (:div :class "renderer menu"
 	(:div :class "extra-top-1" "&nbsp;")
 	(:div :class "extra-top-2" "&nbsp;")
 	(:div :class "extra-top-3" "&nbsp;")
@@ -83,13 +83,13 @@
 	(weblocks::apply-uri-to-navigation '("test2") nav)
 	(render-widget nav)))
   (htm
-   (:div :class "widget navigation test-navigation"
+   (:div :class "widget navigation" :id "test-navigation"
 	 (:div :class "widget dataform"
 	       #.(data-header-template
 		  '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 		    (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
 		  :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
-	 (:div :class "renderer navigation"
+	 (:div :class "renderer menu"
 	       (:div :class "extra-top-1" "&nbsp;")
 	       (:div :class "extra-top-2" "&nbsp;")
 	       (:div :class "extra-top-3" "&nbsp;")
@@ -99,7 +99,7 @@
 	       (:div :class "extra-bottom-1" "&nbsp;")
 	       (:div :class "extra-bottom-2" "&nbsp;")
 	       (:div :class "extra-bottom-3" "&nbsp;")))
-   (:div :class "widget navigation test-navigation"
+   (:div :class "widget navigation" :id "test-navigation"
 	 (:div :class "widget dataform"
 	       (:div :class "renderer data education-history"
 		     (:div :class "extra-top-1" "&nbsp;")
@@ -115,7 +115,7 @@
 		     (:div :class "extra-bottom-1" "&nbsp;")
 		     (:div :class "extra-bottom-2" "&nbsp;")
 		     (:div :class "extra-bottom-3" "&nbsp;")))
-	 (:div :class "renderer navigation"
+	 (:div :class "renderer menu"
 	       (:div :class "extra-top-1" "&nbsp;")
 	       (:div :class "extra-top-2" "&nbsp;")
 	       (:div :class "extra-top-3" "&nbsp;")

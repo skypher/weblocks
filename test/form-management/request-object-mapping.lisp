@@ -42,8 +42,8 @@
 	  (mapcar (lambda (res)
 		    `(,(car res) . ,(format nil "~A" (cdr res))))
 		  errors))))
-  (("age" . "\"Age\" must be of type Integer.")
-   ("name" . "\"Name\" is a required field.")))
+  (("age" . "Age must be of type integer.")
+   ("name" . "Name is a required field.")))
 
 (deftest request-object-mapping-6
     (with-request :post '(("name" . "Pink") ("age" . "25"))

@@ -4,9 +4,9 @@
 ;;; utilities for easier testing
 (defun form-header-template (action body &key (method "get") preslots
 			     (postslots `((:div :class "submit"
-						(:input :name "action" :type "hidden" :value ,action)
 						(:input :name "submit" :type "submit" :value "Submit")
-						(:input :name "cancel" :type "submit" :value "Cancel")))))
+						(:input :name "cancel" :type "submit" :value "Cancel")
+						(:input :name "action" :type "hidden" :value ,action)))))
   `(:form :class "renderer form employee" :action "" :method ,method
 	  (:div :class "extra-top-1" "&nbsp;")
 	  (:div :class "extra-top-2" "&nbsp;")

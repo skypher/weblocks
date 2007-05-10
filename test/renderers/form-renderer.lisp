@@ -14,7 +14,7 @@
 	    (:h2 :class "error-count"
 		 "There is 1 validation error:")
 	    (:ul
-	     (:li "\"Hello\" is a required field."))))
+	     (:li "Hello is a required field."))))
 
 (deftest-html render-validation-summary-2
     (render-validation-summary `(("Hello" . ,(make-condition 'required-validation-error
@@ -25,8 +25,8 @@
 	    (:h2 :class "error-count"
 		 "There are 2 validation errors:")
 	    (:ul
-	     (:li "\"Hello\" is a required field.")
-	     (:li "\"World\" is a required field."))))
+	     (:li "Hello is a required field.")
+	     (:li "World is a required field."))))
 
 (deftest-html render-validation-summary-3
     (render-validation-summary nil)
@@ -36,9 +36,9 @@
 (deftest-html render-form-controls-1
     (render-form-controls *joe* :action "abc123")
   (:div :class "submit"
-	(:input :name "action" :type "hidden" :value "abc123")
 	(:input :name "submit" :type "submit" :value "Submit")
-	(:input :name "cancel" :type "submit" :value "Cancel")))
+	(:input :name "cancel" :type "submit" :value "Cancel")
+	(:input :name "action" :type "hidden" :value "abc123")))
 
 ;;; test render-form-slot
 (deftest-html render-form-slot-1

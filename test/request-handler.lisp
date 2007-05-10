@@ -34,9 +34,14 @@
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 </head>~
 <body>~
-<div class='widget composite'>~
+<div class='page-wrapper'>~
+<div class='extra-top-1'>&nbsp;</div>~
+<div class='extra-top-2'>&nbsp;</div>~
+<div class='extra-top-3'>&nbsp;</div>~
+<div class='widget composite' id='root'>~
 <div class='widget dataform'>~
 <div class='renderer data employee'>~
 <div class='extra-top-1'>&nbsp;</div>~
@@ -54,6 +59,10 @@
 </div>~
 </div>~
 </div>~
+<div class='extra-bottom-1'>&nbsp;</div>~
+<div class='extra-bottom-2'>&nbsp;</div>~
+<div class='extra-bottom-3'>&nbsp;</div>~
+</div>~
 </body>~
 </html>")
   #.(format nil
@@ -69,9 +78,14 @@
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 </head>~
 <body>~
-<div class='widget composite'>~
+<div class='page-wrapper'>~
+<div class='extra-top-1'>&nbsp;</div>~
+<div class='extra-top-2'>&nbsp;</div>~
+<div class='extra-top-3'>&nbsp;</div>~
+<div class='widget composite' id='root'>~
 <div class='widget dataform'>~
 <form class='renderer form employee' action='' method='post'><div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
@@ -89,9 +103,10 @@
 </label>~
 </li>~
 </ul>~
-<div class='submit'><input name='action' type='hidden' value='abc124' />~
+<div class='submit'>~
 <input name='submit' type='submit' value='Submit' />~
 <input name='cancel' type='submit' value='Cancel' />~
+<input name='action' type='hidden' value='abc124' />~
 </div>~
 </fieldset>~
 <div class='extra-bottom-1'>&nbsp;</div>~
@@ -99,6 +114,10 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </form>~
 </div>~
+</div>~
+<div class='extra-bottom-1'>&nbsp;</div>~
+<div class='extra-bottom-2'>&nbsp;</div>~
+<div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </body>~
 </html>"))
@@ -130,16 +149,25 @@
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/debug-mode.css' />~
 </head>~
 <body>~
-<div class='widget composite'>~
+<div class='page-wrapper'>~
+<div class='extra-top-1'>&nbsp;</div>~
+<div class='extra-top-2'>&nbsp;</div>~
+<div class='extra-top-3'>&nbsp;</div>~
+<div class='widget composite' id='root'>~
 <div class='widget function'>~
 </div>~
 </div>~
+<div class='extra-bottom-1'>&nbsp;</div>~
+<div class='extra-bottom-2'>&nbsp;</div>~
+<div class='extra-bottom-3'>&nbsp;</div>~
+</div>~
 <div class='debug-toolbar'>~
 <a href='?action=debug-reset-sessions' title='Reset Sessions'>~
-<img src='/pub/reset.png' alt='Reset Sessions' /></a>~
+<img src='/pub/images/reset.png' alt='Reset Sessions' /></a>~
 </div>~
 </body>~
 </html>")
@@ -178,12 +206,17 @@
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 </head>~
 <body>~
-<div class='widget composite'>~
-<div class='widget navigation test-nav'>~
+<div class='page-wrapper'>~
+<div class='extra-top-1'>&nbsp;</div>~
+<div class='extra-top-2'>&nbsp;</div>~
+<div class='extra-top-3'>&nbsp;</div>~
+<div class='widget composite' id='root'>~
+<div class='widget navigation' id='test-nav'>~
 <div class='widget function'><div>hi2</div></div>~
-<div class='renderer navigation'>~
+<div class='renderer menu'>~
 <div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
 <div class='extra-top-3'>&nbsp;</div>~
@@ -197,6 +230,10 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>~
+</div>~
+<div class='extra-bottom-1'>&nbsp;</div>~
+<div class='extra-bottom-2'>&nbsp;</div>~
+<div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </body>~
 </html>"))

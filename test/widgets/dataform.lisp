@@ -96,12 +96,12 @@
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
-			 "\"Name\" is a required field."))))
+			 "Name is a required field."))))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Bill"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "\"Name\" is a required field."))))))
+			 (:ul (:li "Name is a required field."))))))
    ;; error fixed, submit clicked
    (:div :class "widget dataform"
 	 #.(data-header-template
@@ -151,12 +151,12 @@
 	       (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "bad")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
-			 "\"Age\" must be of type Integer."))))
+			 "Age must be of type integer."))))
 	      (:li (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "\"Age\" must be of type Integer."))))))
+			 (:ul (:li "Age must be of type integer."))))))
    ;; age changed
    (:div :class "widget dataform"
 	 #.(data-header-template
