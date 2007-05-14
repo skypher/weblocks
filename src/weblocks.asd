@@ -43,6 +43,10 @@
 			:components ((:file "widget")
 				     (:file "dataform"
 				      :depends-on ("widget"))
+				     (:file "datagrid"
+				      :depends-on ("widget"))
+				     (:file "paging"
+				      :depends-on ("widget"))
 				     (:file "composite"
 				      :depends-on ("widget"))
 				     (:file "navigation"

@@ -1,40 +1,40 @@
 
 TODO:
--- CURRENT --
-- Fix broken tests
+-- CURRENT (data-grid) --
+- Consider "navigateable grids" that keep sorting/paging information on the URL
+- Sorting
+  - Allow turning sorting on and off
+  - Allow sorting only certain columns
+  - Don't allow sorting when sort operators aren't available
+  - Sort the first available column by default when sorting is on
+  - Style the sorted column
+  - Implement sorting on slots of objects rendered inline
+  - Ensure data as function works properly and is efficient (called only when necessary)
+  - Refreshing the page after a sorting action resorts the grid, is that what we want?
+- Paging
+  - Design paging control
+- Allow adding actions to each row
 
 -- LARGE FEATURES --
-- Create a pageable, sortable data-grid widget
-- Rethink the application keeping AJAX in mind
+- Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
+- Rethink the application keeping AJAX in mind
 - Add a widget similar to google suggest
-- Register stylesheet requirements, deal with paths to stylesheets and images
 
 -- RESEARCH --
-- Figure out how to deal with
-  - slots that are collections
-    - don't render at all
-    - render as links to data grids
-    - if small collection, render member names inline
-    - for forms, open grids to select, show dropdown, radio buttons, checkboxes, etc.
-  - non-inline CLOS objects in forms
-- Authentication (permission to access menu items, actions, widgets in general)
+- slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
+- non-inline CLOS objects in forms
 - Consider "action parameters" - map http parameters to action function argument symbols
 - Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
-- Consider lazy evaluation of session initialization
-- Create default title page if the user didn't define the application (possibly tutorial style)
-- Think of navigation widgets with dynamic items (to list articles, products, etc.)
-- Consider multiple navigation controls in one composite and hidden navigation controls
-- Reset state of regular widgets when moving accross navigation controls?
-- Create renderers for lists (redo existing renderers that use lists with these?)
 - (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
+- Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
+- Register stylesheet requirements, deal with paths to stylesheets and images
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
 - Make sure data and form renderer labels show attributized slot name class for styling
 - Mark required fields
 - Don't remove validation error summary for long forms.
-- Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Standardize renderers return values (deferring until more is known about what's useful)
 - Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 - Handle error pages nicely
@@ -46,3 +46,11 @@ TODO:
 - Release the library/write articles.
 - Create a reference application.
 - Rewrite defmacro
+
+-- WISHLIST --
+- Authentication (permission to access menu items, actions, widgets in general)
+- Consider lazy evaluation of session initialization
+- Create default title page if the user didn't define the application (possibly tutorial style)
+- Consider multiple navigation controls in one composite, hidden navigation controls, dynamic menus
+- Reset state of regular widgets when moving accross navigation controls?
+- Create renderers for lists (redo existing renderers that use lists with these?)
