@@ -17,7 +17,8 @@
     (let ((root-composite (make-instance 'composite :name "root")))
       (when *render-debug-toolbar*
 	(initialize-debug-actions))
-      (funcall (symbol-function (find-symbol "INIT-USER-SESSION" (symbol-package *webapp-name*)))
+      (funcall (symbol-function (find-symbol (symbol-name '#:init-user-session)
+					     (symbol-package *webapp-name*)))
 	       root-composite)
       (setf (session-value 'root-composite) root-composite)))
 
