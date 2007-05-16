@@ -41,3 +41,13 @@ span.paging
 .current
 {
 }
+
+.sort-ascending
+{
+  background: url(/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
+}
+
+.sort-descending
+{
+  background: url(/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
+}

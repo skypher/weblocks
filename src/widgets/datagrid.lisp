@@ -30,20 +30,27 @@
 
 (defmethod render-datagrid-header-cell (obj slot-name slot-value &rest keys
 					&key (human-name slot-name) grid-obj &allow-other-keys)
-  (with-html
-    (:th :class (attributize-name slot-name)
-	 (render-link (make-action (lambda ()
+  (let ((href-class (when (equalp slot-name (car (datagrid-sort grid-obj)))
+		      (concatenate 'string "sort-" (string (cdr (datagrid-sort grid-obj)))))))
+    (with-html
+      (:th :class (concatenate 'string (attributize-name href-class)
+			       " " (attributize-name slot-name))
+	   (:a :href (make-action-url
+		      (make-action (lambda ()
 				     (let (slot dir (new-dir :ascending))
 				       (unless (null (datagrid-sort grid-obj))
 					 (setf slot (car (datagrid-sort grid-obj)))
 					 (setf dir (cdr (datagrid-sort grid-obj))))
 				       (when (equalp slot slot-name)
 					 (setf new-dir (negate-sort-direction dir)))
-				       (setf (datagrid-sort grid-obj) `(,slot-name . ,new-dir)))))
-		      (humanize-name human-name)))))
+				       (setf (datagrid-sort grid-obj) `(,slot-name . ,new-dir))))))
+	       (str (humanize-name human-name)))))))
 
 (defmethod render-widget-body ((obj datagrid) &rest args)
-  (render-table (datagrid-sort-data obj) :grid-obj obj))
+  (render-table (datagrid-sort-data obj) :grid-obj obj
+		:summary (format nil "Ordered by ~A ~A."
+				 (humanize-name (car (datagrid-sort obj)))
+				 (humanize-name (cdr (datagrid-sort obj))))))
 
 (defun datagrid-sort-data (grid-obj)
   (with-slots (data sort) grid-obj

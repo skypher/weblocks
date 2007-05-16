@@ -103,7 +103,7 @@ details."))
 ;; The table itself
 (defun render-table (objs &rest keys
 		     &key (on-empty-string *render-empty-sequence-string*)
-		     caption &allow-other-keys)
+		     caption summary &allow-other-keys)
   "A generic table presentation renderer. This implementation
 renders a sequence of objects into a table by calling
 'render-table-body-row' for each object in the sequence. Table
@@ -140,6 +140,7 @@ typed objects at your own risk.
       (lambda ()
 	(with-html
 	  (:table
+	   :summary summary
 	   (if caption
 	       (htm (:caption (str caption))))
 	   (htm
