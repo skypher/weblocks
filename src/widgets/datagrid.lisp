@@ -19,11 +19,30 @@
 	 :initarg :sort
 	 :documentation "Holds a dotted pair of a name of the sorted
          column and the direction of the sort (:ascending
-         or :descending).")))
+         or :descending).")
+   (allow-sorting :accessor datagrid-allow-sorting
+		  :initform t
+		  :initarg :allow-sorting
+		  :documentation "This slot controls whether the
+		  datagrid object should support sorting. If set to
+		  t (default), sorting is allowed; if set to nil
+		  sorting is disallowed. If set to a list of slot
+		  names, only these slots will be available for the
+		  user to sort on. Note, if generic functions
+		  'strictly-less' and 'equivalent' aren't defined on
+		  the datatype of the column, sorting for that column
+		  will be turned off regardless of the value of this
+		  slot.")))
 
 (defmethod render-table-header-cell :around (obj slot-name slot-value &rest keys
 						 &key grid-obj &allow-other-keys)
-  (when (or (null grid-obj) (typep slot-value 'standard-object))
+  (when (or (null grid-obj)
+	    (typep slot-value 'standard-object)
+	    (not (datagrid-allow-sorting grid-obj))
+	    (when (listp (datagrid-allow-sorting grid-obj))
+	      (not (member slot-name
+			   (datagrid-allow-sorting grid-obj)
+			   :test #'equalp))))
     (apply #'call-next-method obj slot-name slot-value keys)
     (return-from render-table-header-cell))
   (apply #'render-datagrid-header-cell obj slot-name slot-value keys))

@@ -3,10 +3,8 @@ TODO:
 -- CURRENT (data-grid) --
 - Consider "navigateable grids" that keep sorting/paging information on the URL
 - Sorting
-  - Allow turning sorting on and off
-  - Allow sorting only certain columns
-  - Don't allow sorting when sort operators aren't available
   - Sort the first available column by default when sorting is on
+  - Don't allow sorting when sort operators aren't available
   - Implement sorting on slots of objects rendered inline
   - Ensure data as function works properly and is efficient (called only when necessary)
   - Refreshing the page after a sorting action resorts the grid, is that what we want?

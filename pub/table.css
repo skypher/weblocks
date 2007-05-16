@@ -13,6 +13,7 @@
 .table > table > thead > tr > th
 {
   text-align: left;
+  padding-right: 7px;
 }
 
 .table > table > thead > tr > th, .table > table > tbody > tr > td
@@ -47,7 +48,22 @@ span.paging
   background: url(/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
 }
 
+.sort-ascending > a
+{
+  background: url(/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
+}
+
 .sort-descending
 {
   background: url(/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
+}
+
+.sort-descending > a
+{
+  background: url(/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
+}
+
+.sort-ascending > a, .sort-descending > a
+{
+  display: block;
 }
