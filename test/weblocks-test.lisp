@@ -1,6 +1,8 @@
 
 (defpackage #:weblocks-test
   (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities :moptilities)
+  (:shadowing-import-from :c2mop #:defclass #:ensure-generic-function
+			  #:standard-generic-function #:defgeneric #:standard-class)
   (:export #:test-weblocks))
 
 (in-package :weblocks-test)
