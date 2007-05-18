@@ -38,7 +38,7 @@
 						 &key grid-obj &allow-other-keys)
   (when (or (null grid-obj)
 	    (typep slot-value 'standard-object)
-	    (not (datagrid-column-sortable-p grid-obj slot-name)))
+	    (not (datagrid-column-sortable-p grid-obj slot-name slot-value)))
     (apply #'call-next-method obj slot-name slot-value keys)
     (return-from render-table-header-cell))
   (apply #'render-datagrid-header-cell obj slot-name slot-value keys))
@@ -65,18 +65,21 @@
   (mapc (lambda (column)
 	  (let ((column-name (cdr column)))
 	    (when (and (null (datagrid-sort grid))
-		       (datagrid-column-sortable-p grid column-name))
+		       (datagrid-column-sortable-p grid column-name
+						   (get-slot-value (car (datagrid-data grid)) (car column))))
 	      (setf (datagrid-sort grid) (cons column-name :ascending)))))
 	(apply #'object-visible-slots (car (datagrid-data grid)) args)))
 
-(defun datagrid-column-sortable-p (grid-obj column-name)
+(defun datagrid-column-sortable-p (grid-obj column-name column-value)
   (and
    (datagrid-allow-sorting grid-obj)
    (if (listp (datagrid-allow-sorting grid-obj))
        (member column-name
 	       (datagrid-allow-sorting grid-obj)
 	       :test #'equalp)
-       t)))
+       t)
+   (compute-applicable-methods #'strictly-less (list column-value column-value))
+   (compute-applicable-methods #'equivalent (list column-value column-value))))
 
 (defmethod render-widget-body ((obj datagrid) &rest args)
   (apply #'datagrid-update-sort-column obj args)
