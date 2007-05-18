@@ -38,11 +38,7 @@
 						 &key grid-obj &allow-other-keys)
   (when (or (null grid-obj)
 	    (typep slot-value 'standard-object)
-	    (not (datagrid-allow-sorting grid-obj))
-	    (when (listp (datagrid-allow-sorting grid-obj))
-	      (not (member slot-name
-			   (datagrid-allow-sorting grid-obj)
-			   :test #'equalp))))
+	    (not (datagrid-column-sortable-p grid-obj slot-name)))
     (apply #'call-next-method obj slot-name slot-value keys)
     (return-from render-table-header-cell))
   (apply #'render-datagrid-header-cell obj slot-name slot-value keys))
@@ -65,7 +61,25 @@
 				       (setf (datagrid-sort grid-obj) `(,slot-name . ,new-dir))))))
 	       (str (humanize-name human-name)))))))
 
+(defun datagrid-update-sort-column (grid &rest args)
+  (mapc (lambda (column)
+	  (let ((column-name (cdr column)))
+	    (when (and (null (datagrid-sort grid))
+		       (datagrid-column-sortable-p grid column-name))
+	      (setf (datagrid-sort grid) (cons column-name :ascending)))))
+	(apply #'object-visible-slots (car (datagrid-data grid)) args)))
+
+(defun datagrid-column-sortable-p (grid-obj column-name)
+  (and
+   (datagrid-allow-sorting grid-obj)
+   (if (listp (datagrid-allow-sorting grid-obj))
+       (member column-name
+	       (datagrid-allow-sorting grid-obj)
+	       :test #'equalp)
+       t)))
+
 (defmethod render-widget-body ((obj datagrid) &rest args)
+  (apply #'datagrid-update-sort-column obj args)
   (render-table (datagrid-sort-data obj) :grid-obj obj
 		:summary (format nil "Ordered by ~A ~A."
 				 (humanize-name (car (datagrid-sort obj)))
