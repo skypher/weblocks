@@ -12,10 +12,11 @@ TODO:
 - Allow adding actions to each row
 
 -- LARGE FEATURES --
+- Add a widget similar to google suggest
+- Create a gridsearch control
 - Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
 - Rethink the application keeping AJAX in mind
-- Add a widget similar to google suggest
 
 -- RESEARCH --
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
