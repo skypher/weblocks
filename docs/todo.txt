@@ -25,6 +25,7 @@ TODO:
 - (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Register stylesheet requirements, deal with paths to stylesheets and images
+- Move datagrid specific stylesheets from table.css to datagrid.css
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
