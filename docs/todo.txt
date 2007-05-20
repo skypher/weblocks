@@ -4,7 +4,7 @@ TODO:
 - Sorting
   - Implement sorting on slots of objects rendered inline
   - Ensure data as function works properly and is efficient (called only when necessary)
-  - Refreshing the page after a sorting action resorts the grid, is that what we want?
+  - Refactor, unit test (idepotency of page refreshes with respect to sorting), document
 - Paging
   - Design paging control
 - Consider "navigateable grids" that keep sorting/paging information on the URL

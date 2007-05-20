@@ -46,19 +46,19 @@
 (defmethod render-datagrid-header-cell (obj slot-name slot-value &rest keys
 					&key (human-name slot-name) grid-obj &allow-other-keys)
   (let ((href-class (when (equalp slot-name (car (datagrid-sort grid-obj)))
-		      (concatenate 'string "sort-" (string (cdr (datagrid-sort grid-obj)))))))
+		      (concatenate 'string "sort-" (string (cdr (datagrid-sort grid-obj))))))
+	slot dir (new-dir :ascending))
+    (unless (null (datagrid-sort grid-obj))
+      (setf slot (car (datagrid-sort grid-obj)))
+      (setf dir (cdr (datagrid-sort grid-obj))))
     (with-html
       (:th :class (concatenate 'string (attributize-name href-class)
 			       " " (attributize-name slot-name))
 	   (:a :href (make-action-url
 		      (make-action (lambda ()
-				     (let (slot dir (new-dir :ascending))
-				       (unless (null (datagrid-sort grid-obj))
-					 (setf slot (car (datagrid-sort grid-obj)))
-					 (setf dir (cdr (datagrid-sort grid-obj))))
-				       (when (equalp slot slot-name)
-					 (setf new-dir (negate-sort-direction dir)))
-				       (setf (datagrid-sort grid-obj) `(,slot-name . ,new-dir))))))
+				     (when (equalp slot slot-name)
+				       (setf new-dir (negate-sort-direction dir)))
+				     (setf (datagrid-sort grid-obj) (cons slot-name new-dir)))))
 	       (str (humanize-name human-name)))))))
 
 (defun datagrid-update-sort-column (grid &rest args)
