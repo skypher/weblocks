@@ -10,7 +10,10 @@
 (defun test-weblocks ()
   "Call this function to run all unit tests defined in
 weblocks-test package."
-  (do-tests))
+  (do-tests)
+  (when weblocks::*webapp-name*
+    (warn "A web application has been loaded. Some tests may
+    fail. Ideally tests should be run on a clean image.")))
 
 (defmacro deftest-html (name form value)
   "A helper macro for creating html test cases. The macro writes
