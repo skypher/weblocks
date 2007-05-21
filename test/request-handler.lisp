@@ -49,8 +49,8 @@
 <div class='extra-top-3'>&nbsp;</div>~
 <h1><span class='action'>Viewing:&nbsp;</span><span class='object'>Employee</span></h1>~
 <ul>~
-<li><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
-<li><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
+<li class='name'><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
+<li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
 <div class='submit'><a href='?action=abc123'>Modify</a></div>~
 <div class='extra-bottom-1'>&nbsp;</div>~
@@ -94,11 +94,11 @@
 <span class='object'>Employee</span>~
 </h1>~
 <h2 class='form-fields-title'>Form fields:</h2>~
-<ul><li><label><span>Name:&nbsp;</span>~
+<ul><li class='name'><label><span>Name:&nbsp;</span>~
 <input type='text' name='name' value='Joe' />~
 </label>~
 </li>~
-<li><label><span>Manager:&nbsp;</span>~
+<li class='manager'><label><span>Manager:&nbsp;</span>~
 <input type='text' name='manager' value='Jim' />~
 </label>~
 </li>~

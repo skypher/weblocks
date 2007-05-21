@@ -33,8 +33,8 @@
       (render-widget (make-instance 'dataform :data *joe*)))
   (:div :class "widget dataform"
 	#.(data-header-template
-	   '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
 	   :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))))
 
 ;;; render some widget with a name
@@ -43,7 +43,7 @@
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
   (:div :class "widget dataform" :id "test-widget"
 	#.(data-header-template
-	   '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
 	   :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify"))))))
 

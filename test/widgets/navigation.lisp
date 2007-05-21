@@ -86,8 +86,9 @@
    (:div :class "widget navigation" :id "test-navigation"
 	 (:div :class "widget dataform"
 	       #.(data-header-template
-		  '((:li (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-		    (:li (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+		  '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+		    (:li :class "manager"
+		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
 		  :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
 	 (:div :class "renderer menu"
 	       (:div :class "extra-top-1" "&nbsp;")
@@ -108,9 +109,11 @@
 		     (:h1 (:span :class "action" "Viewing:&nbsp;")
 			  (:span :class "object" "Education History"))
 		     (:ul
-		      (:li (:span :class "label" "University:&nbsp;") (:span :class "value"
+		      (:li :class "university"
+			   (:span :class "label" "University:&nbsp;") (:span :class "value"
 									     "Bene Gesserit University"))
-		      (:li (:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000")))
+		      (:li :class "graduation-year"
+			   (:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000")))
 		     (:div :class "submit" (:a :href "?action=abc124" "Modify"))
 		     (:div :class "extra-bottom-1" "&nbsp;")
 		     (:div :class "extra-bottom-2" "&nbsp;")
