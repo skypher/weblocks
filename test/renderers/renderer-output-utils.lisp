@@ -31,17 +31,17 @@
 
 ;;; test render-object-slot
 (deftest render-object-slot-1
-    (let ((render-object-tmp (lambda (obj &key inlinep slot-path testkey)
-			       (list obj inlinep slot-path testkey))))
+    (let ((render-object-tmp (lambda (obj &key inlinep testkey)
+			       (list obj inlinep testkey))))
       (render-object-slot render-object-tmp nil "some-object" "some-slot" "some-value"
-			  :testkey "some-key"))
-  ("some-value" t ("some-slot") "some-key"))
+			  '(:testkey "some-key")))
+  ("some-value" t "some-key"))
 
 (deftest render-object-slot-2
     (let ((render-slot-tmp (lambda (obj slot-name obj-name &key testkey)
 			       (list obj slot-name obj-name testkey))))
       (render-object-slot nil render-slot-tmp "some-object" "some-slot-ref" 1
-			  :testkey "some-key"))
+			  '(:testkey "some-key")))
   ("some-object" "some-slot-ref" fixnum "some-key"))
 
 ;; Slot rendering helper
@@ -55,7 +55,7 @@
     (weblocks::visit-object-slots
      *joe*
      #'render-slot-simple
-     '(:slots (name) :mode :strict))
+     :slots '(name) :mode :strict)
   (htm
    (:p "NAME")
    (:p "Joe")))
