@@ -100,7 +100,8 @@ case the user clicks submit."))
 			     &key (human-name slot-name) validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
 	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal))
-	 (field-class (when validation-error "item-not-validated")))
+	 (field-class (concatenate 'string attribute-slot-name
+				   (when validation-error " item-not-validated"))))
     (with-html
       (:li :class field-class
        (:label

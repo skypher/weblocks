@@ -29,7 +29,6 @@ TODO:
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
-- Make sure data and form renderer labels show attributized slot name class for styling
 - Mark required fields
 - Don't remove validation error summary for long forms.
 - Standardize renderers return values (deferring until more is known about what's useful)
