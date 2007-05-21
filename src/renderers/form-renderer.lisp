@@ -29,22 +29,19 @@ Other keys are also accepted and supplied to functions called
 internally (e.g. 'action'). See 'render-form-controls' for more
 details."))
 
-(defmethod with-form-header (obj body-fn &rest keys &key name
+(defmethod with-form-header (obj body-fn &rest keys &key
 			     validation-errors preslots-fn
 			     (postslots-fn #'render-form-controls)
 			     (method :get)
 			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
-			      (attributize-name (object-class-name obj))))
-	(object-name (if (null name)
-			 (humanize-name (object-class-name obj))
-			 name)))
+			      (attributize-name (object-class-name obj)))))
     (with-html
       (:form :class header-class :action "" :method (attributize-name method)
 	     (with-extra-tags
 	       (htm (:fieldset
 		     (:h1 (:span :class "action" "Modifying:&nbsp;")
-			  (:span :class "object" (str object-name)))
+			  (:span :class "object" (str (humanize-name (object-class-name obj)))))
 		     (render-validation-summary validation-errors)
 		     (safe-apply preslots-fn obj keys)
 		     (:h2 :class "form-fields-title" "Form fields:")
@@ -106,7 +103,7 @@ case the user clicks submit."))
       (:li :class field-class
        (:label
 	(:span (str (humanize-name human-name)) ":&nbsp;")
-	(apply #'render-form slot-value :name attribute-slot-name keys)
+	(apply #'render-form slot-value keys)
 	(when validation-error
 	  (htm (:p :class "validation-error"
 		   (:em
@@ -133,10 +130,11 @@ over values obtained from the object."))
 (defmethod render-form ((obj standard-object) &rest keys)
   (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
 
-(defmethod render-form (obj &rest keys &key inlinep name intermediate-fields &allow-other-keys)
-  (let ((intermediate-value (assoc name intermediate-fields :test #'string-equal)))
+(defmethod render-form (obj &rest keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+  (let* ((slot-name (attributize-name (last-item slot-path)))
+	 (intermediate-value (assoc slot-name intermediate-fields :test #'string-equal)))
     (with-html
-      (:input :type "text" :name name :value (if intermediate-value
-						 (cdr intermediate-value)
-						 obj)))))
+      (:input :type "text" :name slot-name :value (if intermediate-value
+								  (cdr intermediate-value)
+								  obj)))))
 

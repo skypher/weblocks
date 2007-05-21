@@ -44,12 +44,12 @@
   (apply #'render-datagrid-header-cell obj slot-name slot-value keys))
 
 (defmethod render-datagrid-header-cell (obj slot-name slot-value &rest keys
-					&key (human-name slot-name) grid-obj &allow-other-keys)
-  (let ((href-class (when (equalp slot-name (car (datagrid-sort grid-obj)))
+					&key (human-name slot-name) slot-path grid-obj &allow-other-keys)
+  (let ((href-class (when (equalp slot-name (sorted-slot-name grid-obj))
 		      (concatenate 'string "sort-" (string (cdr (datagrid-sort grid-obj))))))
 	slot dir (new-dir :ascending))
     (unless (null (datagrid-sort grid-obj))
-      (setf slot (car (datagrid-sort grid-obj)))
+      (setf slot (sorted-slot-name grid-obj))
       (setf dir (cdr (datagrid-sort grid-obj))))
     (with-html
       (:th :class (concatenate 'string (attributize-name href-class)
@@ -58,7 +58,7 @@
 		      (make-action (lambda ()
 				     (when (equalp slot slot-name)
 				       (setf new-dir (negate-sort-direction dir)))
-				     (setf (datagrid-sort grid-obj) (cons slot-name new-dir)))))
+				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir)))))
 	       (str (humanize-name human-name)))))))
 
 (defun datagrid-update-sort-column (grid &rest args)
@@ -85,18 +85,21 @@
   (apply #'datagrid-update-sort-column obj args)
   (render-table (datagrid-sort-data obj) :grid-obj obj
 		:summary (format nil "Ordered by ~A ~A."
-				 (humanize-name (car (datagrid-sort obj)))
+				 (humanize-name (sorted-slot-name obj))
 				 (humanize-name (cdr (datagrid-sort obj))))))
+
+(defun sorted-slot-name (grid-obj)
+  (car (last (ensure-list (car (datagrid-sort grid-obj))))))
 
 (defun datagrid-sort-data (grid-obj)
   (with-slots (data sort) grid-obj
     (if (and (typep data 'sequence) sort)
-	(setf data (sort data (if (equalp (cdr sort) :ascending)
-				  #'strictly-less
-				  (lambda (a b)
-				    (and (not (strictly-less a b))
-					 (not (equivalent a b)))))
-			 :key (curry-after #'slot-value (car sort))))
+	(setf data (stable-sort data (if (equalp (cdr sort) :ascending)
+					 #'strictly-less
+					 (lambda (a b)
+					   (and (not (strictly-less a b))
+						(not (equivalent a b)))))
+				:key (curry-after #'slot-value-by-path (car sort))))
 	data)))
 
 (defmethod strictly-less ((a number) (b number))

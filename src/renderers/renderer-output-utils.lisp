@@ -44,7 +44,7 @@ Override this method to provide object names."))
 	      (return-from object-name obj-name)))))
   (object-class-name obj))
 
-(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value args)
+(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value keys)
   "Renders a given slot of a CLOS object (usually if the slot
 itself is a standard CLOS object). This function encapsulates
 rendering behavior common to multiple generic renderers.
@@ -56,15 +56,19 @@ with :inlinep set to true. Otherwise, grabs the name of the
 object using 'object-name' and simply renders the name using
 'render-slot-fn'."
   (if (render-slot-inline-p obj slot-name)
-      (apply render-object-fn slot-value :inlinep t :name slot-name args)
-      (apply render-slot-fn obj slot-name (object-name slot-value) args)))
+      (apply render-object-fn slot-value :inlinep t keys)
+      (apply render-slot-fn obj slot-name (object-name slot-value) keys)))
 
-(defun visit-object-slots (obj render-slot-fn keys)
+(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
 object and apply a render function to them."
   (mapc (lambda (slot)
-	  (apply render-slot-fn obj (slot-definition-name (car slot))
-		 (get-slot-value obj (car slot)) :human-name (cdr slot) keys))
+	  (let ((slot-name (slot-definition-name (car slot))))
+	    (apply render-slot-fn obj slot-name
+		   (get-slot-value obj (car slot))
+		   :human-name (cdr slot)
+		   :slot-path (append slot-path (list slot-name))
+		   keys)))
 	(apply #'object-visible-slots obj keys)))
 
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
@@ -83,5 +87,5 @@ the default), 'render-standard-object' applies the same logic as
 above, except it wraps it with a call to 'header-fn' in order to
 render a header."
   (if inlinep
-      (visit-object-slots obj render-slot-fn keys)
-      (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn keys) keys)))
+      (apply #'visit-object-slots obj render-slot-fn keys)
+      (apply header-fn obj (curry #'apply #'visit-object-slots obj render-slot-fn keys) keys)))

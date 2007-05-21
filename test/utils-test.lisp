@@ -59,6 +59,19 @@
     (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
   "Joe")
 
+;;; Test slot-value-by-path
+(deftest slot-value-by-path-1
+    (slot-value-by-path *joe* '(address-ref street))
+  "100 Broadway")
+
+(deftest slot-value-by-path-2
+    (slot-value-by-path *joe* 'name)
+  "Joe")
+
+(deftest slot-value-by-path-3
+    (slot-value-by-path *joe* '(nil name))
+  "Joe")
+
 ;;; Introspection helper
 (defun object-visible-slot-names (obj &rest args)
   (mapcar (lambda (x)
