@@ -10,10 +10,10 @@
 	 :documentation "Either a sequence of data objects that will
 	 be rendered and modified by this widget, or a function that
 	 accepts sorting and paging parameters. If this slot is bound
-	 to a sequence, datagrid will do the paging and sourting
-	 itself in memory. If the slot is bound to a function, the
-	 function is expected to return a properly sorted and paged
-	 sequence.")
+	 to a sequence, datagrid will do the paging and sorting itself
+	 in memory destructively. If the slot is bound to a function,
+	 the function is expected to return a properly sorted and
+	 paged sequence.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
@@ -58,7 +58,8 @@
 		      (make-action (lambda ()
 				     (when (equalp slot slot-name)
 				       (setf new-dir (negate-sort-direction dir)))
-				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir)))))
+				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir))
+				     (datagrid-sort-data grid-obj))))
 	       (str (humanize-name human-name)))))))
 
 (defun datagrid-update-sort-column (grid &rest args)
@@ -67,7 +68,8 @@
 	    (when (and (null (datagrid-sort grid))
 		       (datagrid-column-sortable-p grid column-name
 						   (get-slot-value (car (datagrid-data grid)) (car column))))
-	      (setf (datagrid-sort grid) (cons column-name :ascending)))))
+	      (setf (datagrid-sort grid) (cons column-name :ascending))
+	      (datagrid-sort-data grid))))
 	(apply #'object-visible-slots (car (datagrid-data grid)) args)))
 
 (defun datagrid-column-sortable-p (grid-obj column-name column-value)
@@ -83,7 +85,7 @@
 
 (defmethod render-widget-body ((obj datagrid) &rest args)
   (apply #'datagrid-update-sort-column obj args)
-  (render-table (datagrid-sort-data obj) :grid-obj obj
+  (render-table (datagrid-data obj) :grid-obj obj
 		:summary (format nil "Ordered by ~A ~A."
 				 (humanize-name (sorted-slot-name obj))
 				 (humanize-name (cdr (datagrid-sort obj))))))
@@ -93,14 +95,13 @@
 
 (defun datagrid-sort-data (grid-obj)
   (with-slots (data sort) grid-obj
-    (if (and (typep data 'sequence) sort)
-	(setf data (stable-sort data (if (equalp (cdr sort) :ascending)
-					 #'strictly-less
-					 (lambda (a b)
-					   (and (not (strictly-less a b))
-						(not (equivalent a b)))))
-				:key (curry-after #'slot-value-by-path (car sort))))
-	data)))
+    (when (and (typep data 'sequence) sort)
+      (setf data (stable-sort data (if (equalp (cdr sort) :ascending)
+				       #'strictly-less
+				       (lambda (a b)
+					 (and (not (strictly-less a b))
+					      (not (equivalent a b)))))
+			      :key (curry-after #'slot-value-by-path (car sort)))))))
 
 (defmethod strictly-less ((a number) (b number))
   (< a b))
@@ -114,7 +115,7 @@
 (defmethod datagrid-data ((grid-obj datagrid))
   (with-slots (data) grid-obj
     (etypecase data
-      (function (funcall data))
+      (function (funcall data (datagrid-sort grid-obj)))
       (sequence data))))
 
 (defun negate-sort-direction (dir)

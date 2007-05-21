@@ -2,7 +2,6 @@
 TODO:
 -- CURRENT (data-grid) --
 - Sorting
-  - Ensure data as function works properly and is efficient (called only when necessary)
   - Refactor, unit test (idempotency of page refreshes with respect to sorting), document
 - Paging
   - Design paging control
