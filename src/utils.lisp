@@ -4,7 +4,8 @@
 (export '(humanize-name attributize-name object-visible-slots
 	  get-slot-value slot-value-by-path render-slot-inline-p
 	  safe-apply safe-funcall request-parameter
-	  string-whitespace-p render-extra-tags with-extra-tags))
+	  string-whitespace-p render-extra-tags with-extra-tags
+	  strictly-less-p equivalentp))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -271,3 +272,23 @@ headers on top and three on the bottom. It uses
      (render-extra-tags "extra-top-" 3)
      ,@body
      (render-extra-tags "extra-bottom-" 3)))
+
+(defgeneric strictly-less-p (a b)
+  (:documentation
+   "Returns true if 'a' is strictly less than 'b'. This function is
+used by the framework for sorting data."))
+
+(defmethod strictly-less-p ((a number) (b number))
+  (< a b))
+
+(defmethod strictly-less-p ((a string) (b string))
+  (string-lessp a b))
+
+(defgeneric equivalentp (a b)
+  (:documentation
+   "Returns true if 'a' is in some sense equivalent to 'b'. This
+function is used by the framework for sorting data."))
+
+(defmethod equivalentp (a b)
+  (equalp a b))
+

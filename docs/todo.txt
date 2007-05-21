@@ -2,11 +2,11 @@
 TODO:
 -- CURRENT (data-grid) --
 - Sorting
-  - Refactor, unit test (idempotency of page refreshes with respect to sorting), document
+  - Unit test (idempotency of page refreshes with respect to sorting)
+- Allow adding actions to each row
 - Paging
   - Design paging control
 - Consider "navigateable grids" that keep sorting/paging information on the URL
-- Allow adding actions to each row
 
 -- LARGE FEATURES --
 - Add a widget similar to google suggest

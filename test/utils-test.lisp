@@ -185,3 +185,16 @@
        (:div :class "extra-bottom-2" "&nbsp;")
        (:div :class "extra-bottom-3" "&nbsp;")))
 
+;;; test strictly-less-p
+(deftest strictly-less-p-1
+    (strictly-less-p 1 2)
+  t)
+
+(deftest strictly-less-p-2
+    (not (null (strictly-less-p "a" "b")))
+  t)
+
+;;; test equivalentp
+(deftest equivalentp-1
+    (equivalentp "a" "a")
+  t)
