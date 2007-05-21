@@ -37,7 +37,7 @@ the client."
 (defparameter *stylesheet-directory*
   (if (equal (machine-type) "Power Macintosh")
 	     "/Users/coffeemug/projects/cl-weblocks/pub/"
-	     "/home/coffeemug/projects/weblocks2/pub/"))
+	     "/home/coffeemug/projects/cl-weblocks/pub/"))
 
 (setf *dispatch-table*
       (append (list (create-folder-dispatcher-and-handler "/pub/" *stylesheet-directory*)
