@@ -56,15 +56,15 @@ customize the way datagrid headers are rendered."))
 
 (defmethod render-datagrid-header-cell (obj slot-name slot-value &rest keys
 					&key (human-name slot-name) slot-path grid-obj &allow-other-keys)
-  (let ((href-class (when (equalp slot-name (datagrid-sorted-slot-name grid-obj))
-		      (concatenate 'string "sort-" (string (cdr (datagrid-sort grid-obj))))))
+  (let ((th-class (when (equalp slot-name (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
+		    (concatenate 'string " sort-"
+				 (attributize-name (string (cdr (datagrid-sort grid-obj)))))))
 	slot dir (new-dir :ascending))
     (unless (null (datagrid-sort grid-obj))
-      (setf slot (datagrid-sorted-slot-name grid-obj))
+      (setf slot (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
       (setf dir (cdr (datagrid-sort grid-obj))))
     (with-html
-      (:th :class (concatenate 'string (attributize-name href-class)
-			       " " (attributize-name slot-name))
+      (:th :class (concatenate 'string (attributize-name slot-name) th-class)
 	   (:a :href (make-action-url
 		      (make-action (lambda ()
 				     (when (equalp slot slot-name)
@@ -73,48 +73,42 @@ customize the way datagrid headers are rendered."))
 				     (datagrid-sort-data grid-obj))))
 	       (str (humanize-name human-name)))))))
 
-(defun datagrid-update-sort-column (grid &rest args)
+(defun datagrid-update-sort-column (grid data-obj &rest args)
   "This function is called to ensure that a datagrid is sorted on
 sortable column (if one is available). If the datagrid is not sorted,
 this function finds the first sortable column and sorts the datagrid
 on that column. If this isn't done the datagrid UI is confusing when
 it's sorted on nothing."
-  (mapc (lambda (column)
-	  (let ((column-name (cdr column)))
-	    (when (and (null (datagrid-sort grid))
-		       (datagrid-column-sortable-p grid column-name
-						   (get-slot-value (car (datagrid-data grid)) (car column))))
-	      (setf (datagrid-sort grid) (cons column-name :ascending))
-	      (datagrid-sort-data grid))))
-	(apply #'object-visible-slots (car (datagrid-data grid)) args)))
+  (apply #'visit-object-slots
+	 data-obj
+	 (lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
+	   (if (typep slot-value 'standard-object)
+	       (datagrid-update-sort-column grid slot-value :slot-path slot-path)
+	       (when (and (null (datagrid-sort grid))
+			  (datagrid-column-sortable-p grid slot-path slot-value))
+		 (setf (datagrid-sort grid) (cons slot-path :ascending))
+		 (datagrid-sort-data grid))))
+	 args))
 
-(defun datagrid-column-sortable-p (grid-obj column-name column-value)
+(defun datagrid-column-sortable-p (grid-obj column-path column-value)
   "Determines if a column is sortable based on the 'allow-sorting'
 slot and availability of 'strictly-less-p' and 'equivalentp' generic
 functions."
   (and
    (datagrid-allow-sorting grid-obj)
    (if (listp (datagrid-allow-sorting grid-obj))
-       (member column-name
+       (member (datagrid-sorted-slot-name column-path)
 	       (datagrid-allow-sorting grid-obj)
 	       :test #'equalp)
        t)
    (compute-applicable-methods #'strictly-less-p (list column-value column-value))
    (compute-applicable-methods #'equivalentp (list column-value column-value))))
 
-;;; Renders the body of the data grid.
-(defmethod render-widget-body ((obj datagrid) &rest args)
-  (apply #'datagrid-update-sort-column obj args)
-  (apply #'render-table (datagrid-data obj)
-	 :grid-obj obj
-	 :summary (format nil "Ordered by ~A ~A."
-			  (humanize-name (datagrid-sorted-slot-name obj))
-			  (humanize-name (cdr (datagrid-sort obj))))
-	 args))
-
-(defun datagrid-sorted-slot-name (grid-obj)
+(defun datagrid-sorted-slot-name (sort-info)
   "Returns the name of the current slot from the slot path."
-  (car (last (ensure-list (car (datagrid-sort grid-obj))))))
+  (car (last (ensure-list (if (dotted-pair-p sort-info)
+			      (car sort-info)
+			      sort-info)))))
 
 (defun datagrid-sort-data (grid-obj)
   "Destructively sorts the 'data' slot of the datagrid if and only if
@@ -144,3 +138,18 @@ for :descending and vica versa)."
   (ecase dir
     (:ascending :descending)
     (:descending :ascending)))
+
+;;; Renders the body of the data grid.
+(defmethod render-widget-body ((obj datagrid) &rest args)
+  (apply #'datagrid-update-sort-column obj (car (datagrid-data obj)) args)
+  (apply #'render-table (datagrid-data obj)
+	 :grid-obj obj
+	 :summary (if (datagrid-sort obj)
+		      (format nil "Ordered by ~A, ~A."
+			      (string-downcase (humanize-name
+						(datagrid-sorted-slot-name (datagrid-sort obj))))
+			      (string-downcase (humanize-name
+						(cdr (datagrid-sort obj)))))
+		      nil)
+	 args))
+

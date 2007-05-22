@@ -1,11 +1,8 @@
 
 TODO:
 -- CURRENT (data-grid) --
-- Sorting
-  - Unit test (idempotency of page refreshes with respect to sorting)
 - Allow adding actions to each row
-- Paging
-  - Design paging control
+- Design paging control
 - Consider "navigateable grids" that keep sorting/paging information on the URL
 
 -- LARGE FEATURES --

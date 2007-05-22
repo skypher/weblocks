@@ -15,8 +15,8 @@
 (defparameter *some-college* (make-instance 'education-history))
 
 (defclass person ()
-  ((name :reader first-name :initform "Joe")
-   (age :initform 30 :type integer)
+  ((name :reader first-name :initform "Joe" :initarg :name)
+   (age :initform 30 :type integer :initarg :age)
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))
 
@@ -27,6 +27,7 @@
 	       name (:required)
 	       age (:required))
 
-;;; Create an instance for introspection testing
+;;; Create instances for introspection testing
 (defparameter *joe* (make-instance 'employee))
+(defparameter *bob* (make-instance 'employee :name "Bob" :age 50))
 

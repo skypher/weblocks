@@ -50,16 +50,6 @@
       (:p (str slot-name))
       (:p (str slot-value))))
 
-;; test visit-object-slots
-(deftest-html visit-object-slots-1
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots '(name) :mode :strict)
-  (htm
-   (:p "NAME")
-   (:p "Joe")))
-
 ;; test render-standard-object
 (deftest-html render-standard-object-1
     (render-standard-object nil #'render-slot-simple *joe* :inlinep t)

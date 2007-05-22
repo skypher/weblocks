@@ -292,3 +292,15 @@ function is used by the framework for sorting data."))
 (defmethod equivalentp (a b)
   (equalp a b))
 
+(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path &allow-other-keys)
+  "Used by 'render-standard-object' to visit visible slots of an
+object and apply a render function to them."
+  (mapc (lambda (slot)
+	  (let ((slot-name (slot-definition-name (car slot))))
+	    (apply render-slot-fn obj slot-name
+		   (get-slot-value obj (car slot))
+		   :human-name (cdr slot)
+		   :slot-path (append slot-path (list slot-name))
+		   keys)))
+	(apply #'object-visible-slots obj keys)))
+

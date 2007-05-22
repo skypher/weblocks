@@ -133,25 +133,15 @@
 ;; render-table
 (deftest-html render-table-1
     (render-table (list *joe* *joe*))
-  (:div :class "renderer table employee"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
-	(:table
-	 (:thead
-	  (:tr
-	   (:th :class "name" "Name")
-	   (:th :class "manager" "Manager")))
-	 (:tbody
-	  (:tr
-	   (:td :class "name" (:span :class "value" "Joe"))
-	   (:td :class "manager" (:span :class "value" "Jim")))
-	  (:tr :class "altern"
-	   (:td :class "name" (:span :class "value" "Joe"))
-	   (:td :class "manager" (:span :class "value" "Jim")))))
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;")))
+  #.(table-header-template
+     '((:th :class "name" "Name")
+       (:th :class "manager" "Manager"))
+     '((:tr
+	(:td :class "name" (:span :class "value" "Joe"))
+	(:td :class "manager" (:span :class "value" "Jim")))
+       (:tr :class "altern"
+	(:td :class "name" (:span :class "value" "Joe"))
+	(:td :class "manager" (:span :class "value" "Jim"))))))
 
 ;; render-empty-table
 (deftest-html render-empty-table-1

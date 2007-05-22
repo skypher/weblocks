@@ -59,18 +59,6 @@ object using 'object-name' and simply renders the name using
       (apply render-object-fn slot-value :inlinep t keys)
       (apply render-slot-fn obj slot-name (object-name slot-value) keys)))
 
-(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path &allow-other-keys)
-  "Used by 'render-standard-object' to visit visible slots of an
-object and apply a render function to them."
-  (mapc (lambda (slot)
-	  (let ((slot-name (slot-definition-name (car slot))))
-	    (apply render-slot-fn obj slot-name
-		   (get-slot-value obj (car slot))
-		   :human-name (cdr slot)
-		   :slot-path (append slot-path (list slot-name))
-		   keys)))
-	(apply #'object-visible-slots obj keys)))
-
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
   "Renders the slots of a CLOS object into HTML. This function
 encapsulates rendering behavior common to multiple generic

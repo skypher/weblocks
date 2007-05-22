@@ -31,12 +31,14 @@
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer-utils")
+				     (:file "table-renderer-utils")
 				     (:file "data-renderer"
 				      :depends-on ("data-renderer-utils"))
 				     (:file "form-renderer-utils")
 				     (:file "form-renderer"
 				      :depends-on ("form-renderer-utils"))
-				     (:file "table-renderer"))
+				     (:file "table-renderer"
+					    :depends-on ("table-renderer-utils")))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module form-management
 			:components ((:file "validation")
@@ -45,6 +47,7 @@
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
 			:components ((:file "dataform")
+				     (:file "datagrid")
 				     (:file "navigation")
 				     (:file "composite")
 				     (:file "widget"))

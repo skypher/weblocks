@@ -198,3 +198,14 @@
 (deftest equivalentp-1
     (equivalentp "a" "a")
   t)
+
+;; test visit-object-slots
+(deftest-html visit-object-slots-1
+    (weblocks::visit-object-slots
+     *joe*
+     #'render-slot-simple
+     :slots '(name) :mode :strict)
+  (htm
+   (:p "NAME")
+   (:p "Joe")))
+
