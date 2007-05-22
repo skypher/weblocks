@@ -120,22 +120,23 @@
 ;;; render data (with custom slot), modify with error, modify, submit.
 (deftest-html render-dataform-3
     (with-request :get nil
-      (let ((edit-joe (make-instance 'dataform :data (copy-template *joe*))))
+      (let ((edit-joe (make-instance 'dataform :data (copy-template *joe*)
+				     :widget-args '(:slots (age)))))
 	;; initial state
-	(render-widget edit-joe :slots '(age))
+	(render-widget edit-joe)
 	;; click modify
 	(do-request `((,weblocks::*action-string* . "abc123")))
-	(render-widget edit-joe :slots '(age))
+	(render-widget edit-joe)
 	;; change age to an error
 	(do-request `(("age" . "bad")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc124")))
-	(render-widget edit-joe :slots '(age))
+	(render-widget edit-joe)
 	;; change age
 	(do-request `(("age" . "18")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc125")))
-	(render-widget edit-joe :slots '(age))))
+	(render-widget edit-joe)))
   (htm
    ;; initial state
    (:div :class "widget dataform"

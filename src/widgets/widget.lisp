@@ -9,7 +9,13 @@
 	 :initform nil
 	 :initarg :name
 	 :documentation "A name of the widget used in rendering CSS
-	 classes."))
+	 classes.")
+   (widget-args :accessor widget-args
+		:initform nil
+		:initarg :widget-args
+		:documentation "A list of arguments that will be
+		passed by 'render-widget' to all functions involved in
+		rendering the widget."))
   (:documentation "Base class for all widget objects."))
 
 (defgeneric with-widget-header (obj body-fn &rest args)
@@ -47,10 +53,13 @@ can do custom rendering without much boilerplate."))
 (defmethod widget-name ((obj function))
   nil)
 
-(defun render-widget (obj &rest args)
+(defmethod widget-args ((obj function))
+  nil)
+
+(defun render-widget (obj)
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header')."
-  (apply #'with-widget-header obj #'render-widget-body args))
+  (apply #'with-widget-header obj #'render-widget-body (widget-args obj)))
 
 ;;; Make all widgets act as composites to simplify development
 (defmethod composite-widgets ((obj widget))
