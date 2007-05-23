@@ -69,8 +69,7 @@ customize the way datagrid headers are rendered."))
 		      (make-action (lambda ()
 				     (when (equalp slot slot-name)
 				       (setf new-dir (negate-sort-direction dir)))
-				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir))
-				     (datagrid-sort-data grid-obj))))
+				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir)))))
 	       (str (humanize-name human-name)))))))
 
 (defun datagrid-update-sort-column (grid data-obj &rest args)
@@ -86,8 +85,7 @@ it's sorted on nothing."
 	       (datagrid-update-sort-column grid slot-value :slot-path slot-path)
 	       (when (and (null (datagrid-sort grid))
 			  (datagrid-column-sortable-p grid slot-path slot-value))
-		 (setf (datagrid-sort grid) (cons slot-path :ascending))
-		 (datagrid-sort-data grid))))
+		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
 	 args))
 
 (defun datagrid-column-sortable-p (grid-obj column-path column-value)
@@ -142,6 +140,7 @@ for :descending and vica versa)."
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
   (apply #'datagrid-update-sort-column obj (car (datagrid-data obj)) args)
+  (datagrid-sort-data obj)
   (apply #'render-table (datagrid-data obj)
 	 :grid-obj obj
 	 :summary (if (datagrid-sort obj)
