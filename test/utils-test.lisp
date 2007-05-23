@@ -1,6 +1,12 @@
 
 (in-package :weblocks-test)
 
+;; Slot rendering helper
+(defun render-slot-simple (obj slot-name slot-value &rest keys)
+  (with-html
+    (:p (str slot-name))
+    (:p (str slot-value))))
+
 ;;; Test humanize-name function
 (deftest humanize-name-1
     (humanize-name 'hello-world)
@@ -75,7 +81,9 @@
 ;;; Introspection helper
 (defun object-visible-slot-names (obj &rest args)
   (mapcar (lambda (x)
-	    (cons (slot-definition-name (car x)) (cdr x)))
+	    (if (typep (car x) 'standard-direct-slot-definition)
+		(cons (slot-definition-name (car x)) (cdr x))
+		x))
 	  (apply #'object-visible-slots obj args)))
 
 ;;; Test render-slot-inline-p
@@ -124,6 +132,31 @@
 (deftest object-visible-slots-9
     (object-visible-slot-names *joe* :slots '(manager) :mode :strict)
   ((manager . manager)))
+
+(deftest object-visible-slots-10
+    (mapcar
+     (lambda (x)
+       (if (functionp x)
+	   (funcall x)
+	   x))
+     (flatten (object-visible-slot-names *joe* :slots `((manager . ,(lambda () 1))))))
+  (name name manager 1))
+
+(deftest object-visible-slots-11
+    (mapcar
+     (lambda (x)
+       (if (functionp x)
+	   (funcall x)
+	   x))
+     (flatten (object-visible-slot-names *joe* :slots `((manager . ,(lambda () 1))) :mode :strict)))
+  (manager 1))
+
+(deftest object-visible-slots-12
+    (values
+     (object-visible-slot-names *joe* :slots '(name test) :mode :strict)
+     (object-visible-slot-names *joe* :slots '(name (test . blah)) :mode :strict))
+  ((name . name) (test . test))
+  ((name . name) (test . blah)))
 
 ;;; test safe-apply
 (deftest safe-apply-1
@@ -209,3 +242,42 @@
    (:p "NAME")
    (:p "Joe")))
 
+(deftest-html visit-object-slots-2
+    (weblocks::visit-object-slots
+     *joe*
+     #'render-slot-simple
+     :slots `((name . ,(lambda (obj slot-name slot-value &rest args)
+			       (with-html (:p "TEST"))))))
+  (htm
+   (:p "TEST")
+   (:p "MANAGER")
+   (:p "Jim")))
+
+(deftest-html visit-object-slots-3
+    (weblocks::visit-object-slots
+     *joe*
+     #'render-slot-simple
+     :slots `(name
+	      (blah . ,(lambda (obj slot-name slot-value &rest args)
+			       (with-html (:p "TEST"))))
+	      hello)
+     :mode :strict)
+  (htm
+   (:p "NAME")
+   (:p "Joe")
+   (:p "TEST")
+   (:p "HELLO")
+   (:p "NIL")))
+
+(deftest-html visit-object-slots-4
+    (weblocks::visit-object-slots
+     *joe*
+     #'render-slot-simple
+     :slots `((name . ,(lambda (obj slot-name slot-value &rest args)
+			       (with-html (:p "TEST")))))
+     :call-around-fn-p nil)
+  (htm
+   (:p "NAME")
+   (:p "Joe")
+   (:p "MANAGER")
+   (:p "Jim")))

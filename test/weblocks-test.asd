@@ -39,7 +39,7 @@
 				      :depends-on ("form-renderer-utils"))
 				     (:file "table-renderer"
 					    :depends-on ("table-renderer-utils")))
-			:depends-on ("weblocks-test" fixtures))
+			:depends-on ("weblocks-test" "utils-test" fixtures))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers")

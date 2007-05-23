@@ -99,6 +99,23 @@ Ex:
 \(object-visible-slots *joe* :slots (age (name . first-name)) :mode :strict) =>
     ((#<STANDARD-DIRECT-SLOT-DEFINITION AGE> . AGE)
      (#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . FIRST-NAME))
+
+A function is a legidimate 'cdr' of a cons pair when passed via :slots
+argument. In this case the argument will be treated by various pieces
+of the framework as an 'override' that will be used to render the slot
+instead of the usual mechanism. 'object-visible-slots' simply returns
+the function in such cases:
+
+\(object-visible-slots *joe* :slots (list
+                                     (cons name
+                                           (lambda ()
+                                              nil)))
+                             :mode :strict) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . #<FUNCTION # {C239E45}>)
+
+In strict mode slot names that do not exist in the object's class can
+be specified. They will be returned as is, and the renderers can later
+use them to render custom slots.
 "))
 
 (defmethod object-visible-slots (obj &key slots mode &allow-other-keys)
@@ -117,7 +134,8 @@ Ex:
 						:test #'string-equal
 						:key #'slot-definition-name))))
 			 (if (not (null slot))
-			     (cons slot (cdr i)))))
+			     (cons slot (cdr i))
+			     i)))
 		     slot-assoc)
 	     (mapcar (lambda (i)
 		       (cons i (let* ((slot-name (slot-definition-name i))
@@ -292,14 +310,32 @@ function is used by the framework for sorting data."))
 (defmethod equivalentp (a b)
   (equalp a b))
 
-(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path &allow-other-keys)
+(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
+			   &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
-object and apply a render function to them."
+object and apply a render function to them.
+
+If 'object-visible-slots' returns a function as a 'cdr' of a
+particular slot cons pair due to appropriate arguments,
+'visit-object-slots' calls this function instead of
+'render-slot-fn' (unless 'call-around-fn-p' argument is set to
+nil). This can be used to quickly render slots in a custom way without
+specializing CLOS functions."
   (mapc (lambda (slot)
-	  (let ((slot-name (slot-definition-name (car slot))))
-	    (apply render-slot-fn obj slot-name
-		   (get-slot-value obj (car slot))
-		   :human-name (cdr slot)
+	  (let ((render-fn (if (and call-around-fn-p
+				    (functionp (cdr slot)))
+			       (cdr slot)
+			       render-slot-fn))
+		slot-name slot-value)
+	    (if (typep (car slot) 'standard-direct-slot-definition)
+		(setf slot-name (slot-definition-name (car slot))
+		      slot-value (get-slot-value obj (car slot)))
+		(setf slot-name (car slot)))
+	    (apply render-fn obj slot-name
+		   slot-value
+		   :human-name (if (not (functionp (cdr slot)))
+				   (cdr slot)
+				   slot-name)
 		   :slot-path (append slot-path (list slot-name))
 		   keys)))
 	(apply #'object-visible-slots obj keys)))

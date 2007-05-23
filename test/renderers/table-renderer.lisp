@@ -67,6 +67,12 @@
    (:th :class "graduation-year" "Graduation Year")
    (:th :class "manager" "Manager")))
 
+(deftest-html render-table-header-row-5
+    (render-table-header-row *joe* :slots `((name . ,(lambda () nil))))
+  (:tr
+   (:th :class "name" "Name")
+   (:th :class "manager" "Manager")))
+
 ;; render-table-header-cell
 (deftest-html render-table-header-cell-1
     (render-table-header-cell *joe* 'name "Joe")

@@ -44,12 +44,6 @@
 			  '(:testkey "some-key")))
   ("some-object" "some-slot-ref" fixnum "some-key"))
 
-;; Slot rendering helper
-(defun render-slot-simple (obj slot-name slot-value &rest keys)
-    (with-html
-      (:p (str slot-name))
-      (:p (str slot-value))))
-
 ;; test render-standard-object
 (deftest-html render-standard-object-1
     (render-standard-object nil #'render-slot-simple *joe* :inlinep t)

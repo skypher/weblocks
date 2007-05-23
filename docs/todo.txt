@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (data-grid) --
-- Allow adding actions to each row
 - Design paging control
 - Consider "navigateable grids" that keep sorting/paging information on the URL
 

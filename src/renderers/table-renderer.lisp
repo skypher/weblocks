@@ -50,7 +50,10 @@ object should be rendered inline or should have its own
 header."))
 
 (defmethod render-table-header-row (obj &rest keys)
-  (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj :alternp nil keys))
+  (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj
+	 :alternp nil
+	 :call-around-fn-p nil
+	 keys))
 
 (defgeneric render-table-header-cell (obj slot-name slot-value &rest keys
 					  &key human-name &allow-other-keys)

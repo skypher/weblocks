@@ -86,6 +86,7 @@ it's sorted on nothing."
 	       (when (and (null (datagrid-sort grid))
 			  (datagrid-column-sortable-p grid slot-path slot-value))
 		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
+	 :call-around-fn-p nil
 	 args))
 
 (defun datagrid-column-sortable-p (grid-obj column-path column-value)
