@@ -10,12 +10,7 @@
 web application development. It achieves its goals by
 standardizing on various libraries, providing flexible and
 extensible generic renderers, and exposing a unique widget-based
-approach to maintaining UI state.
-
-You can use the following starting points to dive into the
-documentation:
-
-Generic functions 'render-data', 'render-form', 'render-table'."))
+approach to maintaining UI state."))
 
 (in-package :weblocks)
 
