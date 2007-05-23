@@ -15,7 +15,7 @@
 (defparameter *some-college* (make-instance 'education-history))
 
 (defclass person ()
-  ((name :reader first-name :initform "Joe" :initarg :name)
+  ((name :accessor first-name :initform "Joe" :initarg :name)
    (age :initform 30 :type integer :initarg :age)
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))

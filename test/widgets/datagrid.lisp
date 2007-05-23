@@ -256,3 +256,34 @@
        (:tr :class "altern"
 	(:td :class "name" (:span :class "value" "Bob"))
 	(:td :class "manager" (:span :class "value" "Jim"))))))
+
+(deftest-html render-widget-body-datagrid-4
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*))))
+	(render-widget-body grid)
+	(setf (first-name *bob*) "Zed")
+	(render-widget-body grid)
+	(setf (first-name *bob*) "Bob")))
+  (htm
+   #.(table-header-template
+      '((:th :class "name sort-ascending" (:a :href "?action=abc123" "Name"))
+	(:th :class "manager" (:a :href "?action=abc124" "Manager")))
+      '((:tr
+	 (:td :class "name" (:span :class "value" "Bob"))
+	 (:td :class "manager" (:span :class "value" "Jim")))
+	(:tr :class "altern"
+	 (:td :class "name" (:span :class "value" "Joe"))
+	 (:td :class "manager" (:span :class "value" "Jim"))))
+      :summary "Ordered by name, ascending.")
+   #.(table-header-template
+      '((:th :class "name sort-ascending" (:a :href "?action=abc125" "Name"))
+	(:th :class "manager" (:a :href "?action=abc126" "Manager")))
+      '((:tr
+	 (:td :class "name" (:span :class "value" "Joe"))
+	 (:td :class "manager" (:span :class "value" "Jim")))
+	(:tr :class "altern"
+	 (:td :class "name" (:span :class "value" "Zed"))
+	 (:td :class "manager" (:span :class "value" "Jim"))))
+      :summary "Ordered by name, ascending.")))
+
