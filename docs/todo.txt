@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Show a UI indication that a request has started
 - Cookies/URL rewriting in JS
 - Back button/history research
 - Unit test (existing, render-dirty-widgets, handle-client-request,

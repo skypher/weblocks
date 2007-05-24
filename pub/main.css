@@ -141,3 +141,10 @@ input[type=hidden]
 {
   visibility: hidden;
 }
+
+#ajax-progress
+{
+  position: fixed;
+  right: 0;
+  top: 0;
+}

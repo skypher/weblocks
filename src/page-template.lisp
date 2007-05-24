@@ -23,7 +23,8 @@
      (:body
       (render-page-body body-fn)
       (when *render-debug-toolbar*
-	(render-debug-toolbar)))))
+	(render-debug-toolbar))
+      (:div :id "ajax-progress" "&nbsp;"))))
 
 (defgeneric render-page-body (body-fn)
   (:documentation "Renders the body of the page (exluding the <body>
