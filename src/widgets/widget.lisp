@@ -1,12 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(widget widget-name with-widget-header render-widget-body
-	  render-widget))
+(export '(widget widget-name widget-args with-widget-header
+	  render-widget-body render-widget))
 
 (defclass widget ()
   ((name :accessor widget-name
-	 :initform nil
+	 :initform (gensym)
 	 :initarg :name
 	 :documentation "A name of the widget used in rendering CSS
 	 classes.")
@@ -16,6 +16,7 @@
 		:documentation "A list of arguments that will be
 		passed by 'render-widget' to all functions involved in
 		rendering the widget."))
+  #+lispworks (:optimize-slot-access nil)
   (:documentation "Base class for all widget objects."))
 
 (defgeneric with-widget-header (obj body-fn &rest args)
@@ -56,10 +57,13 @@ can do custom rendering without much boilerplate."))
 (defmethod widget-args ((obj function))
   nil)
 
-(defun render-widget (obj)
+(defun render-widget (obj &key inlinep)
   "Renders a widget ('render-widget-body') wrapped in a
-header ('with-widget-header')."
-  (apply #'with-widget-header obj #'render-widget-body (widget-args obj)))
+header ('with-widget-header'). If 'inlinep' is true, renders the
+widget without a header."
+  (if inlinep
+      (apply #'render-widget-body obj (widget-args obj))
+      (apply #'with-widget-header obj #'render-widget-body (widget-args obj))))
 
 ;;; Make all widgets act as composites to simplify development
 (defmethod composite-widgets ((obj widget))
@@ -67,3 +71,15 @@ header ('with-widget-header')."
 
 (defmethod composite-widgets ((obj function))
   nil)
+
+(defun make-dirty (w)
+  "Adds a widget to a list of dirty widgets. Normally used during an
+AJAX request."
+  (declare (special *dirty-widgets*))
+  (setf *dirty-widgets* (cons w *dirty-widgets*)))
+
+;;; When slots of a widget are modified, the widget should be marked
+;;; as dirty to service AJAX calls.
+(defmethod (setf slot-value-using-class) :around (new-value class (object widget) slot-name)
+  (make-dirty object)
+  (call-next-method new-value class object slot-name))

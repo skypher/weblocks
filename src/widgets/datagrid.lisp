@@ -65,12 +65,11 @@ customize the way datagrid headers are rendered."))
       (setf dir (cdr (datagrid-sort grid-obj))))
     (with-html
       (:th :class (concatenate 'string (attributize-name slot-name) th-class)
-	   (:a :href (make-action-url
-		      (make-action (lambda ()
-				     (when (equalp slot slot-name)
-				       (setf new-dir (negate-sort-direction dir)))
-				     (setf (datagrid-sort grid-obj) (cons slot-path new-dir)))))
-	       (str (humanize-name human-name)))))))
+	   (render-link (make-action (lambda ()
+				       (when (equalp slot slot-name)
+					 (setf new-dir (negate-sort-direction dir)))
+				       (setf (datagrid-sort grid-obj) (cons slot-path new-dir))))
+			(humanize-name human-name))))))
 
 (defun datagrid-update-sort-column (grid data-obj &rest args)
   "This function is called to ensure that a datagrid is sorted on

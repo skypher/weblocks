@@ -1,15 +1,22 @@
 
 TODO:
--- CURRENT (data-grid) --
-- Design paging control
-- Consider "navigateable grids" that keep sorting/paging information on the URL
+-- CURRENT (AJAX) --
+- Form buttons should be AJAX as well
+- Show a UI indication that a request has started
+- Cookies/URL rewriting in JS
+- Back button/history research
+- Unit test (existing, render-dirty-widgets, handle-client-request,
+  render-link, make-dirty, slot-value-using-class)
+- Update multiple components/declare dirty components
+- Test in w3m
 
 -- LARGE FEATURES --
 - Add a widget similar to google suggest
 - Create a gridsearch control
+- Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
+- Consider "navigateable grids" that keep sorting/paging information on the URL
 - Create a modal dialog widget, as well as modal request in general
-- Rethink the application keeping AJAX in mind
 
 -- RESEARCH --
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)

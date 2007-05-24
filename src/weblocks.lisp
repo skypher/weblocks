@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json)
   (:shadowing-import-from :c2mop #:defgeneric
 			  #:standard-generic-function #:defclass #:ensure-generic-function
 			  #:standard-class #:defgeneric #:standard-generic-function #:defclass
@@ -27,6 +27,11 @@ variable. All html should be rendered to this stream.")
   cycle. This is a special variable modified by the navigation
   controls during rendering so that inner controls can determine their
   location in the application hierarchy.")
+
+(defparameter *dirty-widgets* nil
+  "Contains a list of dirty widgets at the current point in rendering
+  cycle. This is a special variable modified by the actions that
+  change state of widgets.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."

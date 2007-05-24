@@ -12,6 +12,7 @@
    'init-user-session' on the first request that has no session setup.
    Override this method (along with :before and :after specifiers to
    customize behavior)."))
+
 (defmethod handle-client-request ()
   (when (null (session-value 'root-composite))
     (let ((root-composite (make-instance 'composite :name "root")))
@@ -22,15 +23,18 @@
 	       root-composite)
       (setf (session-value 'root-composite) root-composite)))
 
-  (let ((action-fn (get-request-action))
-	(*weblocks-output-stream* (make-string-output-stream))
-	(*current-navigation-url* "/"))
-    (declare (special *weblocks-output-stream* *current-navigation-url*))
-    (safe-funcall action-fn)
-    (apply-uri-to-navigation (tokenize-uri (request-uri))
-			     (find-navigation-widget (session-value 'root-composite)))
-    (with-page (lambda ()
-		 (render-widget (session-value 'root-composite))))
+  (let ((*weblocks-output-stream* (make-string-output-stream))
+	(*current-navigation-url* "/")
+	*dirty-widgets*)
+    (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*))
+    (safe-funcall (get-request-action))
+    (if (ajax-request-p)
+	(render-dirty-widgets)
+	(progn
+	  (apply-uri-to-navigation (tokenize-uri (request-uri))
+				   (find-navigation-widget (session-value 'root-composite)))
+	  (with-page (lambda ()
+		       (render-widget (session-value 'root-composite))))))
     (get-output-stream-string *weblocks-output-stream*)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -86,3 +90,19 @@ ex:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; End of friendly URL code ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun render-dirty-widgets ()
+  "Renders widgets that have been marked as dirty into a JSON
+association list. This function is normally called by
+'handle-client-request' to service AJAX requests."
+  (declare (special *dirty-widgets* *weblocks-output-stream*))
+  (setf (header-out "X-JSON")
+	(encode-json-to-string
+	 (mapcar (lambda (w)
+		   (cons
+		    (widget-name w)
+		    (progn
+		      (render-widget w :inlinep t)
+		      (get-output-stream-string *weblocks-output-stream*))))
+		 *dirty-widgets*))))
+

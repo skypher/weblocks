@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(start-weblocks stop-weblocks defwebapp))
+(export '(start-weblocks stop-weblocks defwebapp ajax-request-p))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -61,3 +61,9 @@ application. 'init-user-session' is responsible for adding
 initial widgets to this composite."
   (check-type name symbol)
   (setf *webapp-name* name))
+
+(defun ajax-request-p ()
+  "Detects if the current request was initiated via AJAX by looking
+for 'X-Requested-With' http header. This function expects to be called
+in a dynamic hunchentoot environment."
+  (header-in "X-Requested-With"))

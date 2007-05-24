@@ -8,3 +8,15 @@
       (defwebapp 'hello)
       weblocks::*webapp-name*)
   hello)
+
+;;; test ajax-request-p
+(deftest ajax-request-p-1
+    (with-request :get nil
+      (ajax-request-p))
+  nil)
+
+(deftest ajax-request-p-2
+    (with-request :get nil
+      (setf (slot-value *request* 'headers-in) '(("X-Requested-With" . "test")))
+      (ajax-request-p))
+  "test")

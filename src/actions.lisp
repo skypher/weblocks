@@ -34,15 +34,19 @@ Ex:
   (concatenate 'string "?" *action-string* "=" (princ-to-string action-code)))
 
 (defun render-link (action-code name)
-  "Renders an action into an href link. When the user clicks on
-the link, the action will be called on the server.
+  "Renders an action into an href link. The link will be rendered in
+such a way that the action will be invoked via AJAX, or will fall back
+to regular request if JavaScript is not available. When the user
+clicks on the link, the action will be called on the server.
 
 'action-code' - The action created with 'make-action'.
 'name' - A string that will be presented to the user in the
 link."
   (let ((url (make-action-url action-code)))
     (with-html
-      (:a :href url (str name)))))
+      (:a :href "#" :onclick (format nil "initiateAction(\"~A\"); return false;"
+				     action-code)
+	  (str name)))))
 
 (defun get-request-action ()
   "Gets an action from the request. If the request contains

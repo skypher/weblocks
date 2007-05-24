@@ -17,7 +17,9 @@
       (:link :rel "stylesheet" :type "text/css" :href "/pub/table.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/layout.css")
       (when *render-debug-toolbar*
-	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css"))))
+	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css")))
+      (:script :src "/pub/scripts/prototype.js" :type "text/javascript"))
+      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript"))
      (:body
       (render-page-body body-fn)
       (when *render-debug-toolbar*
