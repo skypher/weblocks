@@ -1,13 +1,12 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Form buttons should be AJAX as well
 - Show a UI indication that a request has started
 - Cookies/URL rewriting in JS
 - Back button/history research
 - Unit test (existing, render-dirty-widgets, handle-client-request,
   render-link, make-dirty, slot-value-using-class)
-- Update multiple components/declare dirty components
+- Update multiple components/declare dirty components/POST/GET requests (ajax on/off by default, etc.)
 - Test in w3m
 
 -- LARGE FEATURES --

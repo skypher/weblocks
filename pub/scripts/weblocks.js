@@ -5,11 +5,31 @@ function onActionSuccess(transport, json) {
     }
 }
 
+function getActionUrl(actionCode) {
+    return '/?action=' + actionCode;
+}
+
 function initiateAction(actionCode) {
-    new Ajax.Request('/?action=' + actionCode,
+    new Ajax.Request(getActionUrl(actionCode),
 		     {
 			 method: 'get',
 			 onSuccess: onActionSuccess
 		     });
 }
 
+function initiateFormAction(actionCode, form) {
+    new Ajax.Request(getActionUrl(actionCode),
+		     {
+			 method: form.method,
+			 onSuccess: onActionSuccess,
+			 parameters: form.serialize(true)    
+		     });
+}
+
+function disableIrrelevantButtons(currentButton) {
+    $(currentButton.form).getInputs('submit').each(function(obj)
+						   {
+						       obj.disable();
+						       currentButton.enable();
+						   });
+}

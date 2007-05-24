@@ -23,7 +23,7 @@
      (:body
       (render-page-body body-fn)
       (when *render-debug-toolbar*
-	(render-debug-toolbar))))))
+	(render-debug-toolbar)))))
 
 (defgeneric render-page-body (body-fn)
   (:documentation "Renders the body of the page (exluding the <body>

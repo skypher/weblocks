@@ -13,7 +13,7 @@
   submission.")
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
-				  postslots-fn method &allow-other-keys)
+				  postslots-fn method action &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a form
 presentation. Similar to 'with-data-header'.
@@ -32,12 +32,13 @@ details."))
 (defmethod with-form-header (obj body-fn &rest keys &key
 			     validation-errors preslots-fn
 			     (postslots-fn #'render-form-controls)
-			     (method :get)
+			     (method :get) action
 			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj)))))
     (with-html
       (:form :class header-class :action "" :method (attributize-name method)
+	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this)); return false;" action)
 	     (with-extra-tags
 	       (htm (:fieldset
 		     (:h1 (:span :class "action" "Modifying:&nbsp;")
@@ -80,8 +81,10 @@ case the user clicks submit."))
 (defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
   (with-html
     (:div :class "submit"
-	  (:input :name *submit-control-name* :type "submit" :value "Submit")
-	  (:input :name *cancel-control-name* :type "submit" :value "Cancel")
+	  (:input :name *submit-control-name* :type "submit" :value "Submit"
+		  :onclick "disableIrrelevantButtons(this);")
+	  (:input :name *cancel-control-name* :type "submit" :value "Cancel"
+		  :onclick "disableIrrelevantButtons(this);")
 	  (:input :name "action" :type "hidden" :value action))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest keys
