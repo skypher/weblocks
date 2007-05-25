@@ -67,3 +67,15 @@ initial widgets to this composite."
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
   (header-in "X-Requested-With"))
+
+(defun session-name-string-pair ()
+  "Returns a session name and string suitable for URL rewriting. This
+pair is passed to JavaScript because web servers don't normally do URL
+rewriting in JavaScript code."
+  (if (and *rewrite-for-session-urls*
+	   (null (cookie-in *session-cookie-name*))
+	   (hunchentoot::session-cookie-value))
+      (format nil "~A=~A"
+	      (url-encode *session-cookie-name*)
+	      (url-encode (hunchentoot::session-cookie-value)))
+      ""))

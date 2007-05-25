@@ -44,8 +44,8 @@ clicks on the link, the action will be called on the server.
 link."
   (let ((url (make-action-url action-code)))
     (with-html
-      (:a :href url :onclick (format nil "initiateAction(\"~A\"); return false;"
-				     action-code)
+      (:a :href url :onclick (format nil "initiateAction(\"~A\", \"~A\"); return false;"
+				     action-code (session-name-string-pair))
 	  (str name)))))
 
 (defun get-request-action ()

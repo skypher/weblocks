@@ -38,7 +38,9 @@ details."))
 			      (attributize-name (object-class-name obj)))))
     (with-html
       (:form :class header-class :action "" :method (attributize-name method)
-	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this)); return false;" action)
+	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
+			       action
+			       (session-name-string-pair))
 	     (with-extra-tags
 	       (htm (:fieldset
 		     (:h1 (:span :class "action" "Modifying:&nbsp;")

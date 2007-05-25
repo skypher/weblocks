@@ -4,16 +4,29 @@
 (defgeneric handle-client-request ()
   (:documentation
    "This method handles each request as it comes in from the
-   server. It is a hunchentoot handler and has access to all
-   hunchentoot dynamic variables. The default implementation executes
-   a user action (if any), prepares the navigation controls using
-   'apply-uri-to-navigation', and renders the main composite wrapped
-   in HTML provided by 'with-page'. It also invokes user supplied
-   'init-user-session' on the first request that has no session setup.
-   Override this method (along with :before and :after specifiers to
-   customize behavior)."))
+server. It is a hunchentoot handler and has access to all hunchentoot
+dynamic variables. The default implementation executes a user
+action (if any), prepares the navigation controls using
+'apply-uri-to-navigation', and renders the main composite wrapped in
+HTML provided by 'with-page'. If the request is an AJAX request, only
+the dirty widgets are rendered into a JSON data structure. It also
+invokes user supplied 'init-user-session' on the first request that
+has no session setup.
+
+Additionally, on the first request a session is created and a client
+is forced to redirect. At this point if the cookie is sent, session
+information is removed from the URL, otherwise the URL is left in
+tact. This is done so that session information appears on the URL for
+clients that don't support cookies (this way AJAX requests followed by
+a refresh will work).
+
+Override this method (along with :before
+and :after specifiers to customize behavior)."))
 
 (defmethod handle-client-request ()
+  (when (null *session*)
+    (start-session)
+    (redirect (request-uri)))
   (when (null (session-value 'root-composite))
     (let ((root-composite (make-instance 'composite :name "root")))
       (when *render-debug-toolbar*
@@ -21,7 +34,9 @@
       (funcall (symbol-function (find-symbol (symbol-name '#:init-user-session)
 					     (symbol-package *webapp-name*)))
 	       root-composite)
-      (setf (session-value 'root-composite) root-composite)))
+      (setf (session-value 'root-composite) root-composite))
+    (when (cookie-in *session-cookie-name*)
+      (redirect (remove-session-from-uri (request-uri)))))
 
   (let ((*weblocks-output-stream* (make-string-output-stream))
 	(*current-navigation-url* "/")
@@ -36,6 +51,12 @@
 	  (with-page (lambda ()
 		       (render-widget (session-value 'root-composite))))))
     (get-output-stream-string *weblocks-output-stream*)))
+
+(defun remove-session-from-uri (uri)
+  "Removes the session info from a URI."
+  (cl-ppcre:regex-replace (format nil "(~A=.*&)|(~A=.*$)"
+				  *session-cookie-name*
+				  *session-cookie-name*) uri ""))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Below is code that implements friendly URLs ;;;

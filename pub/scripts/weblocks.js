@@ -15,20 +15,20 @@ function onActionSuccess(transport, json) {
     }
 }
 
-function getActionUrl(actionCode) {
-    return '/?action=' + actionCode;
+function getActionUrl(actionCode, sessionString) {
+    return '/?' + sessionString + '&action=' + actionCode;
 }
 
-function initiateAction(actionCode) {
-    new Ajax.Request(getActionUrl(actionCode),
+function initiateAction(actionCode, sessionString) {
+    new Ajax.Request(getActionUrl(actionCode, sessionString),
 		     {
 			 method: 'get',
 			 onSuccess: onActionSuccess
 		     });
 }
 
-function initiateFormAction(actionCode, form) {
-    new Ajax.Request(getActionUrl(actionCode),
+function initiateFormAction(actionCode, form, sessionString) {
+    new Ajax.Request(getActionUrl(actionCode, sessionString),
 		     {
 			 method: form.method,
 			 onSuccess: onActionSuccess,
