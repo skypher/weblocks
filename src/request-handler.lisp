@@ -54,9 +54,11 @@ and :after specifiers to customize behavior)."))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
-  (cl-ppcre:regex-replace (format nil "(~A=.*&)|(~A=.*$)"
-				  *session-cookie-name*
-				  *session-cookie-name*) uri ""))
+  (let ((path (puri:uri-path (puri:parse-uri uri))))
+    (loop for x in (get-parameters)
+       when (not (string-equal (car x) *session-cookie-name*))
+       do (setf path (url-rewrite:add-get-param-to-url path (car x) (cdr x))))
+    path))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Below is code that implements friendly URLs ;;;
