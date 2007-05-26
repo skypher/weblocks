@@ -84,7 +84,9 @@ the request."
 	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
 	    (*session* (start-session))
 	    (make-action-orig #'weblocks::make-action)
-	    (dummy-action-count 123))
+	    (generate-widget-id-orig #'weblocks::generate-widget-id)
+	    (dummy-action-count 123)
+	    (*session-cookie-name* "weblocks-session"))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)
@@ -96,10 +98,16 @@ the request."
 								  dummy-action-count))))
 				     (incf dummy-action-count)
 				     result))))
+			 (setf (symbol-function 'weblocks::generate-widget-id)
+			       (lambda ()
+				 "widget-123"))
 			 (setf (slot-value *request* 'method) ,method)
 			 (setf (slot-value *request* ',parameters-slot) ,parameters)
+			 (setf (slot-value *session* 'hunchentoot::session-id) 1)
+			 (setf (slot-value *session* 'hunchentoot::session-string) "test")
 			 ,@body)
-	 (setf (symbol-function 'weblocks::make-action) make-action-orig)))))
+	 (setf (symbol-function 'weblocks::make-action) make-action-orig)
+	 (setf (symbol-function 'weblocks::generate-widget-id) generate-widget-id-orig)))))
 
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."

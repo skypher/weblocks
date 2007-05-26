@@ -15,10 +15,14 @@
   :components ((:file "weblocks-test")
 	       (:file "utils-test"
 		      :depends-on ("weblocks-test"))
+	       (:file "action-utils"
+		      :depends-on ("weblocks-test"))
 	       (:file "actions"
+		      :depends-on ("weblocks-test" "action-utils"))
+	       (:file "request-handler-utils"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-handler"
-		      :depends-on ("weblocks-test"))
+		      :depends-on ("weblocks-test" "request-handler-utils"))
 	       (:file "debug-mode"
 		      :depends-on ("weblocks-test"))
 	       (:file "server"
@@ -38,8 +42,8 @@
 				     (:file "form-renderer"
 				      :depends-on ("form-renderer-utils"))
 				     (:file "table-renderer"
-					    :depends-on ("table-renderer-utils")))
-			:depends-on ("weblocks-test" "utils-test" fixtures))
+				      :depends-on ("table-renderer-utils")))
+			:depends-on ("weblocks-test" "utils-test" "action-utils" fixtures))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers")

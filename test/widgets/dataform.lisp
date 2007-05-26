@@ -25,13 +25,12 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc123"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
    ;; click modify
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc124"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
@@ -39,13 +38,12 @@
 	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; change name to Bob and click cancel
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc125"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc125" "Modify")))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
    ;; click modify
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc126"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
@@ -53,11 +51,10 @@
 	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; change name to Bob and click submit
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc127"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Bob"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc127" "Modify")))))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))))
 
 ;;; a dataform test flow: render data, modify with errors, fix errors, submit
 (deftest-html render-dataform-2
@@ -82,13 +79,12 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc123"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
    ;; modify clicked
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc124"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
@@ -96,7 +92,7 @@
 	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; manager changed to Bill and name to changed error, submit clicked
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc125"
 	    '((:li :class "name item-not-validated"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "")
@@ -110,11 +106,12 @@
 			 (:h2 :class "error-count" "There is 1 validation error:")
 			 (:ul (:li "Name is a required field."))))))
    ;; error fixed, submit clicked
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc126"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Ivan"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Bill")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc126" "Modify")))))))
+	      (:li :class "manager"
+	       (:span :class "label" "Manager:&nbsp;")
+	       (:span :class "value" "Bill")))))))
 
 ;;; a dataform test flow: make sure slots without readers that were specified are updated
 ;;; render data (with custom slot), modify with error, modify, submit.
@@ -139,14 +136,13 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc123"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "age" (:span :class "label" "Age:&nbsp;") (:span :class "value" "30"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
    ;; modify clicked
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc124"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
@@ -154,7 +150,7 @@
 	      (:li :class "manager"
 	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
-   (:div :class "widget dataform"
+   (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template "abc125"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
@@ -170,9 +166,8 @@
 			 (:h2 :class "error-count" "There is 1 validation error:")
 			 (:ul (:li "Age must be of type integer."))))))
    ;; age changed
-   (:div :class "widget dataform"
-	 #.(data-header-template
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template "abc126"
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "age" (:span :class "label" "Age:&nbsp;") (:span :class "value" "18"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-	    :postslots '((:div :class "submit" (:a :href "?action=abc126" "Modify")))))))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))))

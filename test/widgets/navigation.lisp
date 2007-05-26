@@ -84,12 +84,11 @@
 	(render-widget nav)))
   (htm
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform"
-	       #.(data-header-template
+	 (:div :class "widget dataform" :id "widget-123"
+	       #.(data-header-template "abc123"
 		  '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 		    (:li :class "manager"
-		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-		  :postslots '((:div :class "submit" (:a :href "?action=abc123" "Modify")))))
+		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 	 (:div :class "renderer menu"
 	       (:div :class "extra-top-1" "&nbsp;")
 	       (:div :class "extra-top-2" "&nbsp;")
@@ -101,7 +100,7 @@
 	       (:div :class "extra-bottom-2" "&nbsp;")
 	       (:div :class "extra-bottom-3" "&nbsp;")))
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform"
+	 (:div :class "widget dataform" :id "widget-123"
 	       (:div :class "renderer data education-history"
 		     (:div :class "extra-top-1" "&nbsp;")
 		     (:div :class "extra-top-2" "&nbsp;")
@@ -114,7 +113,7 @@
 									     "Bene Gesserit University"))
 		      (:li :class "graduation-year"
 			   (:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000")))
-		     (:div :class "submit" (:a :href "?action=abc124" "Modify"))
+		     (:div :class "submit" #.(link-action-template "abc124" "Modify"))
 		     (:div :class "extra-bottom-1" "&nbsp;")
 		     (:div :class "extra-bottom-2" "&nbsp;")
 		     (:div :class "extra-bottom-3" "&nbsp;")))

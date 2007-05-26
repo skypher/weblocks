@@ -4,7 +4,8 @@
 ;;; test with-data-header
 (deftest-html with-data-header-1
     (with-data-header *joe* (lambda () nil))
-  #.(data-header-template '(nil)))
+  #.(data-header-template nil '(nil)
+			  :postslots nil))
 
 ;;; test render-data-slot
 (deftest-html render-data-slot-1
@@ -45,7 +46,7 @@
 		       :postslots-fn (lambda (obj &rest keys)
 				       (with-html
 					 (:div "test2"))))
-  #.(data-header-template
+  #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :preslots '((:div "test1"))
@@ -53,23 +54,26 @@
 
 (deftest-html render-data-3
     (render-data *joe* :slots '(address-ref))
-  #.(data-header-template
+  #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "address-ref" (:span :class "label" "Address:&nbsp;") (:span :class "value" "ADDRESS"))
-       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+     :postslots nil))
 
 (deftest-html render-data-4
     (render-data *joe* :slots '(education))
-  #.(data-header-template
+  #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "university" (:span :class "label" "University:&nbsp;")
 	(:span :class "value" "Bene Gesserit University"))
        (:li :class "graduation-year"
 	(:span :class "label" "Graduation Year:&nbsp;") (:span :class "value" "2000"))
-       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+     :postslots nil))
 
 (deftest-html render-data-5
     (render-data *joe* :slots '((name . nickname)))
-  #.(data-header-template
+  #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Nickname:&nbsp;") (:span :class "value" "Joe"))
-       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
+     :postslots nil))

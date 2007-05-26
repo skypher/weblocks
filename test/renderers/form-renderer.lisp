@@ -3,7 +3,8 @@
 
 ;;; test with-form-header
 (deftest-html with-form-header-1
-    (with-form-header *joe* (lambda () nil) :action "test-action" :method :post)
+    (with-request :get nil
+      (with-form-header *joe* (lambda () nil) :action "test-action" :method :post))
   #.(form-header-template "test-action" '(nil) :method "post"))
 
 ;;; test render-validation-summary
@@ -36,8 +37,10 @@
 (deftest-html render-form-controls-1
     (render-form-controls *joe* :action "abc123")
   (:div :class "submit"
-	(:input :name "submit" :type "submit" :value "Submit")
-	(:input :name "cancel" :type "submit" :value "Cancel")
+	(:input :name "submit" :type "submit" :value "Submit"
+		:onclick "disableIrrelevantButtons(this);")
+	(:input :name "cancel" :type "submit" :value "Cancel"
+		:onclick "disableIrrelevantButtons(this);")
 	(:input :name "action" :type "hidden" :value "abc123")))
 
 ;;; test render-form-slot
@@ -69,14 +72,16 @@
   (:input :type "text" :name "test" :value "test"))
 
 (deftest-html render-form-2
-    (render-form *joe* :action "abc123")
+    (with-request :get nil
+      (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
        (:li :class "manager"
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-3
-    (render-form *joe* :slots '(address-ref))
+    (with-request :post nil
+      (render-form *joe* :slots '(address-ref)))
   #.(form-header-template nil
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
        (:li :class "address-ref"
@@ -85,12 +90,15 @@
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-4
-    (render-form *joe* :slots '(education) :preslots-fn (lambda (obj &rest keys)
-							  (with-html
-							    (:div "test1")))
-					   :postslots-fn (lambda (obj &rest keys)
-							   (with-html
-							     (:div "test2"))))
+    (with-request :post nil
+      (render-form *joe* :slots '(education)
+		   :preslots-fn (lambda (obj &rest keys)
+				  (with-html
+				    (:div "test1")))
+		   :postslots-fn (lambda (obj &rest keys)
+				   (with-html
+				     (:div "test2")))
+		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
        (:li :class "university" (:label (:span "University:&nbsp;")
@@ -103,7 +111,8 @@
      :postslots '((:div "test2"))))
 
 (deftest-html render-form-5
-    (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill")))
+    (with-request :get nil
+      (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
   #.(form-header-template nil
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Bill")))
        (:li :class "address-ref"
@@ -112,14 +121,16 @@
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-6
-    (render-form *joe* :slots '((name . nickname)))
+    (with-request :post nil
+      (render-form *joe* :slots '((name . nickname))))
   #.(form-header-template nil
      '((:li :class "name" (:label (:span "Nickname:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
        (:li :class "manager"
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-7
-    (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error.")))
+    (with-request :get nil
+      (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
   #.(form-header-template nil
      '((:li :class "name item-not-validated"
 	(:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")

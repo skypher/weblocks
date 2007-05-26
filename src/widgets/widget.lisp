@@ -4,12 +4,17 @@
 (export '(widget widget-name widget-args with-widget-header
 	  render-widget-body render-widget))
 
+(defun generate-widget-id ()
+  "Generates a unique ID that can be used to identify a widget."
+  (gensym))
+
 (defclass widget ()
   ((name :accessor widget-name
-	 :initform (gensym)
+	 :initform (generate-widget-id)
 	 :initarg :name
 	 :documentation "A name of the widget used in rendering CSS
-	 classes.")
+	 classes. If the name is not provided it will be generated
+	 automatically with 'generate-widget-id'.")
    (widget-args :accessor widget-args
 		:initform nil
 		:initarg :widget-args
@@ -28,7 +33,7 @@ different widgets."))
 (defmethod with-widget-header (obj body-fn &rest args)
   (let* ((obj-name (attributize-name (widget-name obj)))
 	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
-		      obj-name)))
+		      (attributize-name obj-name))))
     (with-html
       (:div :class (concatenate 'string
 				"widget "

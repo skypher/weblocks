@@ -21,28 +21,8 @@
 	(setf result2 (handle-client-request))
 	(values (null (session-value "debug-reset-sessions")) result1 result2)))
   t
-  #.(format nil
-	    "~
-<?xml version=\"1.0\" encoding=\"utf-8\" ?>~
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~
-<html>~
-<head>~
-<title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
-</head>~
-<body>~
-<div class='page-wrapper'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
-<div class='widget composite' id='root'>~
-<div class='widget dataform'>~
+  #.(with-request-template "~
+<div class='widget dataform' id='widget-123'>~
 <div class='renderer data employee'>~
 <div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
@@ -52,42 +32,19 @@
 <li class='name'><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
 <li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
-<div class='submit'><a href='?action=abc123'>Modify</a></div>~
+<div class='submit'><a href='?action=abc123' ~
+                       onclick='initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); ~
+                       return false;'>Modify</a></div>~
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
-</div>~
-</div>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
-</body>~
-</html>")
-  #.(format nil
-	    "~
-<?xml version=\"1.0\" encoding=\"utf-8\" ?>~
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~
-<html>~
-<head>~
-<title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
-</head>~
-<body>~
-<div class='page-wrapper'>~
+</div>")
+  #.(with-request-template "~
+<div class='widget dataform' id='widget-123'>~
+<form class='renderer form employee' action='' method='post' ~
+      onsubmit='initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;'>~
 <div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
-<div class='widget composite' id='root'>~
-<div class='widget dataform'>~
-<form class='renderer form employee' action='' method='post'><div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
 <div class='extra-top-3'>&nbsp;</div>~
 <fieldset><h1><span class='action'>Modifying:&nbsp;</span>~
@@ -104,8 +61,8 @@
 </li>~
 </ul>~
 <div class='submit'>~
-<input name='submit' type='submit' value='Submit' />~
-<input name='cancel' type='submit' value='Cancel' />~
+<input name='submit' type='submit' value='Submit' onclick='disableIrrelevantButtons(this);' />~
+<input name='cancel' type='submit' value='Cancel' onclick='disableIrrelevantButtons(this);' />~
 <input name='action' type='hidden' value='abc124' />~
 </div>~
 </fieldset>~
@@ -113,14 +70,7 @@
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </form>~
-</div>~
-</div>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
-</body>~
-</html>"))
+</div>"))
 
 ;;; make sure debug toolbar is rendered when appropriate
 (deftest handle-client-request-2
@@ -136,41 +86,10 @@
 	(setf result1 (handle-client-request))
 	(fmakunbound 'init-user-session)
 	(values result1 (not (null (session-value "debug-reset-sessions"))))))
-  #.(format nil
+  #.(with-request-template
 	    "~
-<?xml version=\"1.0\" encoding=\"utf-8\" ?>~
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~
-<html>~
-<head>~
-<title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/debug-mode.css' />~
-</head>~
-<body>~
-<div class='page-wrapper'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
-<div class='widget composite' id='root'>~
 <div class='widget function'>~
-</div>~
-</div>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
-<div class='debug-toolbar'>~
-<a href='?action=debug-reset-sessions' title='Reset Sessions'>~
-<img src='/pub/images/reset.png' alt='Reset Sessions' /></a>~
-</div>~
-</body>~
-</html>")
+</div>" :render-debug-toolbar-p t)
   t)
 
 ;;; make sure navigation controls are modified by request uri
@@ -193,27 +112,8 @@
 	(setf result (handle-client-request))
 	(fmakunbound 'init-user-session)
 	result))
-  #.(format nil
+  #.(with-request-template
 	    "~
-<?xml version=\"1.0\" encoding=\"utf-8\" ?>~
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~
-<html>~
-<head>~
-<title>Hello!</title>~
-<link rel='stylesheet' type='text/css' href='/pub/main.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/form.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/data.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/table.css' />~
-<link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
-</head>~
-<body>~
-<div class='page-wrapper'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
-<div class='widget composite' id='root'>~
 <div class='widget navigation' id='test-nav'>~
 <div class='widget function'><div>hi2</div></div>~
 <div class='renderer menu'>~
@@ -229,14 +129,7 @@
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
-</div>~
-</div>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
-</body>~
-</html>"))
+</div>"))
 
 ;;; helper to create complex site layout
 (defun create-site-layout ()

@@ -14,7 +14,7 @@
 				   :slot-path '(name)
 				   :grid-obj (make-instance 'datagrid :sort '((name) . :ascending))))
   (:th :class "name sort-ascending"
-       (:a :href "?action=abc123" "Name")))
+       #.(link-action-template "abc123" "Name")))
 
 (deftest-html render-datagrid-header-cell-2
     (with-request :get nil
@@ -22,7 +22,7 @@
 				   :slot-path '(name)
 				   :grid-obj (make-instance 'datagrid :sort '((manager) . :ascending))))
   (:th :class "name"
-       (:a :href "?action=abc123" "Name")))
+       #.(link-action-template "abc123" "Name")))
 
 ;;; test datagrid-update-sort-column
 (deftest datagrid-update-sort-column-1
@@ -194,8 +194,8 @@
 	(render-widget-body grid)))
   (htm
    #.(table-header-template
-      '((:th :class "name sort-ascending" (:a :href "?action=abc123" "Name"))
-	(:th :class "manager" (:a :href "?action=abc124" "Manager")))
+      '((:th :class "name sort-ascending" #.(link-action-template "abc123" "Name"))
+	(:th :class "manager" #.(link-action-template "abc124" "Manager")))
       '((:tr
 	 (:td :class "name" (:span :class "value" "Bob"))
 	 (:td :class "manager" (:span :class "value" "Jim")))
@@ -204,8 +204,8 @@
 	 (:td :class "manager" (:span :class "value" "Jim"))))
       :summary "Ordered by name, ascending.")
    #.(table-header-template
-     '((:th :class "name sort-descending" (:a :href "?action=abc125" "Name"))
-       (:th :class "manager" (:a :href "?action=abc126" "Manager")))
+     '((:th :class "name sort-descending" #.(link-action-template "abc125" "Name"))
+       (:th :class "manager" #.(link-action-template "abc126" "Manager")))
      '((:tr
 	(:td :class "name" (:span :class "value" "Joe"))
 	(:td :class "manager" (:span :class "value" "Jim")))
@@ -214,8 +214,8 @@
 	(:td :class "manager" (:span :class "value" "Jim"))))
      :summary "Ordered by name, descending.")
    #.(table-header-template
-     '((:th :class "name sort-descending" (:a :href "?action=abc127" "Name"))
-       (:th :class "manager" (:a :href "?action=abc128" "Manager")))
+     '((:th :class "name sort-descending" #.(link-action-template "abc127" "Name"))
+       (:th :class "manager" #.(link-action-template "abc128" "Manager")))
      '((:tr
 	(:td :class "name" (:span :class "value" "Joe"))
 	(:td :class "manager" (:span :class "value" "Jim")))
@@ -232,7 +232,7 @@
 	(render-widget-body grid)))
   #.(table-header-template
      '((:th :class "name" "Name")
-       (:th :class "manager sort-ascending" (:a :href "?action=abc123" "Manager")))
+       (:th :class "manager sort-ascending" #.(link-action-template "abc123" "Manager")))
      '((:tr
 	(:td :class "name" (:span :class "value" "Joe"))
 	(:td :class "manager" (:span :class "value" "Jim")))
@@ -267,8 +267,8 @@
 	(setf (first-name *bob*) "Bob")))
   (htm
    #.(table-header-template
-      '((:th :class "name sort-ascending" (:a :href "?action=abc123" "Name"))
-	(:th :class "manager" (:a :href "?action=abc124" "Manager")))
+      '((:th :class "name sort-ascending" #.(link-action-template "abc123" "Name"))
+	(:th :class "manager" #.(link-action-template "abc124" "Manager")))
       '((:tr
 	 (:td :class "name" (:span :class "value" "Bob"))
 	 (:td :class "manager" (:span :class "value" "Jim")))
@@ -277,8 +277,8 @@
 	 (:td :class "manager" (:span :class "value" "Jim"))))
       :summary "Ordered by name, ascending.")
    #.(table-header-template
-      '((:th :class "name sort-ascending" (:a :href "?action=abc125" "Name"))
-	(:th :class "manager" (:a :href "?action=abc126" "Manager")))
+      '((:th :class "name sort-ascending" #.(link-action-template "abc125" "Name"))
+	(:th :class "manager" #.(link-action-template "abc126" "Manager")))
       '((:tr
 	 (:td :class "name" (:span :class "value" "Joe"))
 	 (:td :class "manager" (:span :class "value" "Jim")))

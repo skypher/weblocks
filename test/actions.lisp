@@ -21,6 +21,7 @@
 
 ;;; testing render-link
 (deftest-html render-link-1
-    (render-link "abc123" "some link")
-  (:a :href "?action=abc123" "some link"))
+    (with-request :get nil
+      (render-link "abc123" "some link"))
+  #.(link-action-template "abc123" "some link"))
 

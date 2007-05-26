@@ -11,35 +11,17 @@
 		  (composite-widgets comp))
 	(render-widget comp)))
   (htm
-   (:div :class "widget composite"
-	 (:div :class "widget dataform"
-	       (:div :class "renderer data employee"
-		     (:div :class "extra-top-1" "&nbsp;")
-		     (:div :class "extra-top-2" "&nbsp;")
-		     (:div :class "extra-top-3" "&nbsp;")
-		     (:h1 (:span :class "action" "Viewing:&nbsp;")
-			  (:span :class "object" "Employee"))
-		     (:ul
-		      (:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-		      (:li :class "manager"
-			   (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
-		     (:div :class "submit" (:a :href "?action=abc123" "Modify"))
-		     (:div :class "extra-bottom-1" "&nbsp;")
-		     (:div :class "extra-bottom-2" "&nbsp;")
-		     (:div :class "extra-bottom-3" "&nbsp;")))
-	 (:div :class "widget dataform"
-	       (:div :class "renderer data address"
-		     (:div :class "extra-top-1" "&nbsp;")
-		     (:div :class "extra-top-2" "&nbsp;")
-		     (:div :class "extra-top-3" "&nbsp;")
-		     (:h1 (:span :class "action" "Viewing:&nbsp;")
-			  (:span :class "object" "Address"))
-		     (:ul
-		      (:li :class "street"
+   (:div :class "widget composite" :id "widget-123"
+	 (:div :class "widget dataform" :id "widget-123"
+	       #.(data-header-template "abc123"
+		  '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+		    (:li :class "manager"
+			   (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+	 (:div :class "widget dataform" :id "widget-123"
+	       #.(data-header-template "abc124"
+		  '((:li :class "street"
 			   (:span :class "label" "Street:&nbsp;") (:span :class "value" "100 Broadway"))
-		      (:li :class "city"
+		    (:li :class "city"
 			   (:span :class "label" "City:&nbsp;") (:span :class "value" "New York")))
-		     (:div :class "submit" (:a :href "?action=abc124" "Modify"))
-		     (:div :class "extra-bottom-1" "&nbsp;")
-		     (:div :class "extra-bottom-2" "&nbsp;")
-		     (:div :class "extra-bottom-3" "&nbsp;"))))))
+		  :data-class-name "address")))))
+

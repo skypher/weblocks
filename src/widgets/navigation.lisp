@@ -7,7 +7,10 @@
 	  pane-exists-p reset-current-pane))
 
 (defclass navigation (widget)
-  ((panes :accessor navigation-panes
+  ((name :initform nil
+	 :documentation "A navigation widget doesn't have a name
+	 assigned to automatically.")
+   (panes :accessor navigation-panes
 	  :initform nil
 	  :initarg :panes
 	  :documentation "An association list of names and
