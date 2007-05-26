@@ -158,6 +158,22 @@
 								"test5" (lambda (&rest args) nil)
 								"test6" (lambda (&rest args) nil))))))))))
 
+;;; test remove-session-from-uri
+(deftest remove-session-from-uri-1
+    (with-request :get nil
+      (weblocks::remove-session-from-uri "/pub/test/blah"))
+  "/pub/test/blah")
+
+(deftest remove-session-from-uri-2
+    (with-request :get '(("action" . "test"))
+      (weblocks::remove-session-from-uri "/pub/test/blah"))
+  "/pub/test/blah?action=test")
+
+(deftest remove-session-from-uri-3
+    (with-request :get '(("action" . "test") ("weblocks-session" "123"))
+      (weblocks::remove-session-from-uri "/pub/test/blah"))
+  "/pub/test/blah?action=test")
+
 ;;; test apply-uri-to-navigation
 (deftest apply-uri-to-navigation-1
     (let ((site (create-site-layout)) nav1 nav2)
@@ -209,3 +225,19 @@
 (deftest tokenize-uri-1
     (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7")
   ("hello" "world" "blah" "test" "world"))
+
+;;; test render-dirty-widgets
+(deftest render-dirty-widgets-1
+    (with-request :get nil
+      (let ((weblocks::*dirty-widgets* (list (make-instance 'composite)
+					     (lambda (&rest args)
+					       (with-html (:p "test")))))
+	    (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special weblocks::*dirty-widgets* *weblocks-output-stream*))
+	(weblocks::render-dirty-widgets)
+	(header-out "X-JSON")))
+  #.(format nil "~
+{~
+\"widget-123\":\"\",~
+\null:\"<p>test</p>\"~
+}"))

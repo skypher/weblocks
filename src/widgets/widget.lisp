@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(widget widget-name widget-args with-widget-header
-	  render-widget-body render-widget))
+	  render-widget-body render-widget make-dirty))
 
 (defun generate-widget-id ()
   "Generates a unique ID that can be used to identify a widget."
@@ -81,6 +81,9 @@ widget without a header."
   "Adds a widget to a list of dirty widgets. Normally used during an
 AJAX request."
   (declare (special *dirty-widgets*))
+  (when (functionp w)
+    (error "AJAX is not supported for functions. Convert the function
+    into a CLOS object derived from 'widget'."))
   (setf *dirty-widgets* (cons w *dirty-widgets*)))
 
 ;;; When slots of a widget are modified, the widget should be marked

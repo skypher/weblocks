@@ -52,3 +52,28 @@
   #.(data-header-template "abc123"
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+
+;;; test make-dirty
+(deftest make-dirty-1
+    (multiple-value-bind (res errors)
+	(ignore-errors (make-dirty (lambda () nil)))
+      (values res (null errors)))
+  nil nil)
+
+(deftest make-dirty-2
+    (let ((weblocks::*dirty-widgets* nil))
+      (declare (special weblocks::*dirty-widgets*))
+      (make-dirty (make-instance 'composite :name "test"))
+      (widget-name (car weblocks::*dirty-widgets*)))
+  "test")
+
+;;; test that (setf slot-value-using-class) method is modified for
+;;; widgets to automatically mark them as dirty
+(deftest setf-slot-value-using-class-1
+    (with-request :get nil
+      (let ((weblocks::*dirty-widgets* nil)
+	    (w (make-instance 'dataform)))
+	(declare (special weblocks::*dirty-widgets*))
+	(setf (slot-value w 'weblocks::ui-state) :form)
+	(widget-name (car weblocks::*dirty-widgets*))))
+  "widget-123")

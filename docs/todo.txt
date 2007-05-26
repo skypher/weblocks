@@ -1,9 +1,7 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Unit test (render-dirty-widgets, handle-client-request,
-  render-link, make-dirty, slot-value-using-class,
-  session-name-string-pair, remove-session-from-uri), cookieless ajax
+- Unit test (handle-client-request), cookieless ajax
 - Update multiple components/declare dirty components/POST/GET requests (ajax on/off by default, etc.)
 - Handling failure
 - Back button/history research
