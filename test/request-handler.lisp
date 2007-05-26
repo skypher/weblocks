@@ -4,7 +4,7 @@
 ;;; testing handle-client-request
 (deftest handle-client-request-1
     (with-request :get nil
-      (let (weblocks::*webapp-name* result1 result2
+      (let (weblocks::*webapp-name* result1 result2 result3
 				    (weblocks::*render-debug-toolbar* nil))
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
@@ -17,9 +17,12 @@
 	(fmakunbound 'init-user-session)
 	;; fake user clicking on "modify"
 	(setf (slot-value *request* 'get-parameters) `((,weblocks::*action-string* . "abc123")))
-	;; handle another request (make sure form is drawn)
+	;; handle another request, this time AJAX (make sure form is drawn)
+	(setf (slot-value *request* 'hunchentoot::headers-in)
+	    (cons '("X-Requested-With" . "blah") (slot-value *request* 'hunchentoot::headers-in)))
 	(setf result2 (handle-client-request))
-	(values (null (session-value "debug-reset-sessions")) result1 result2)))
+	(setf result3 (header-out "X-JSON"))
+	(values (null (session-value "debug-reset-sessions")) result1 result2 result3)))
   t
   #.(with-request-template "~
 <div class='widget dataform' id='widget-123'>~
@@ -40,10 +43,11 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>")
-  #.(with-request-template "~
-<div class='widget dataform' id='widget-123'>~
-<form class='renderer form employee' action='' method='post' ~
-      onsubmit='initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;'>~
+  ""
+  #.(format nil "{\"widget-123\":~
+\"<form class='renderer form employee' action='' method='post' ~
+      onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3Atest\\\"); ~
+                return false;'>~
 <div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
 <div class='extra-top-3'>&nbsp;</div>~
@@ -69,8 +73,7 @@
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
-</form>~
-</div>"))
+</form>\"}"))
 
 ;;; make sure debug toolbar is rendered when appropriate
 (deftest handle-client-request-2
@@ -130,6 +133,17 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>"))
+
+(deftest handle-client-request-4
+    (with-request :get nil
+      (let (weblocks::*webapp-name* result1 result2 result3
+				    (weblocks::*render-debug-toolbar* nil))
+	;; make sure we handle cookies
+	(setf *session* nil)
+	(catch 'hunchentoot::handler-done
+	  (handle-client-request))
+	(header-out "Location")))
+  "http://NILNIL?weblocks-session=1%3Atest")
 
 ;;; helper to create complex site layout
 (defun create-site-layout ()

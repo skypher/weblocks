@@ -55,7 +55,10 @@ and then compares the string to the expected result."
 (defclass unittest-server ()
   ((mod-lisp-p :initform nil
                :initarg :mod-lisp-p
-               :reader server-mod-lisp-p))
+               :reader hunchentoot::server-mod-lisp-p)
+   (ssl-certificate-file :initarg :ssl-certificate-file
+			 :initform nil
+                         :reader hunchentoot::server-ssl-certificate-file))
   (:documentation "A class used to mock hunchentoot server in
   order to be able to unit test across requests."))
 

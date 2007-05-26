@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Unit test (handle-client-request), cookieless ajax
 - Update multiple components/declare dirty components/POST/GET requests (ajax on/off by default, etc.)
 - Handling failure
 - Back button/history research
