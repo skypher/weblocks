@@ -132,3 +132,10 @@ with the specified name."
   "Sets the current pane to the first available pane in the list."
   (setf (slot-value navigation-object 'current-pane)
 	(caar (navigation-panes navigation-object))))
+
+(defmethod find-widget-by-path* (path (root navigation))
+  (find-widget-by-path* (cdr path)
+			(cdar (member (car path)
+				      (navigation-panes root)
+				      :key #'car
+				      :test #'string-equal))))

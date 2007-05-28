@@ -77,3 +77,26 @@
 	(setf (slot-value w 'weblocks::ui-state) :form)
 	(widget-name (car weblocks::*dirty-widgets*))))
   "widget-123")
+
+;;; test find-widget-by-path
+(deftest find-widget-by-path-1
+    (find-widget-by-path '(hello) nil)
+  nil)
+
+(deftest find-widget-by-path-2
+    (find-widget-by-path nil 'hello)
+  hello)
+
+(deftest find-widget-by-path-3
+    (with-request :get nil
+      (setf (session-value 'weblocks::root-composite) (create-site-layout))
+      (let ((res (find-widget-by-path '(root-inner test-nav-1 test2 test2-leaf))))
+	(values (widget-name res)
+		(type-of res))))
+  test2-leaf composite)
+
+(deftest find-widget-by-path-4
+    (with-request :get nil
+      (setf (session-value 'weblocks::root-composite) (create-site-layout))
+      (find-widget-by-path '(doesnt exist)))
+  nil)

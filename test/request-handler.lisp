@@ -145,33 +145,6 @@
 	(header-out "Location")))
   "http://NILNIL?weblocks-session=1%3Atest")
 
-;;; helper to create complex site layout
-(defun create-site-layout ()
-  (make-instance 'composite :widgets
-		 (list
-		  (make-instance
-		   'composite
-		   :widgets
-		   (list
-		    (make-instance 'composite)
-		    (make-navigation "test-nav-1"
-				     "test1" (make-instance
-					      'composite
-					      :widgets
-					      (list
-					       (make-instance 'composite)
-					       (make-navigation "test-nav-2"
-								"test3" (lambda (&rest args) nil)
-								"test4" (lambda (&rest args) nil))))
-				     "test2" (make-instance
-					      'composite
-					      :widgets
-					      (list
-					       (make-instance 'composite)
-					       (make-navigation "test-nav-3"
-								"test5" (lambda (&rest args) nil)
-								"test6" (lambda (&rest args) nil))))))))))
-
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil

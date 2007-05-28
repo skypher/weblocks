@@ -22,7 +22,7 @@
 	       (:file "request-handler-utils"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-handler"
-		      :depends-on ("weblocks-test" "request-handler-utils"))
+		      :depends-on ("weblocks-test" "request-handler-utils" fixtures))
 	       (:file "debug-mode"
 		      :depends-on ("weblocks-test"))
 	       (:file "server"

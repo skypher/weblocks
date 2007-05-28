@@ -87,7 +87,9 @@ customize form behavior."))
 				    (multiple-value-bind (success errors)
 					(apply #'dataform-submit-action obj data args)
 				      (if success
-					  (setf break-out t)
+					  (progn
+					    (make-dirty obj :putp t)
+					    (setf break-out t))
 					  (progn
 					    (setf (slot-value obj 'validation-errors) errors)
 					    (setf (slot-value obj 'intermediate-form-values)
