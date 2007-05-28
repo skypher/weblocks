@@ -1,9 +1,7 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Update multiple components/declare dirty components/POST/GET requests (ajax on/off by default, etc.)
-- Handling failure
-- Back button/history research
+- Update multiple components/declare dirty components
 - Test in w3m
 
 -- LARGE FEATURES --
@@ -11,8 +9,9 @@ TODO:
 - Create a gridsearch control
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
-- Consider "navigateable grids" that keep sorting/paging information on the URL
 - Create a modal dialog widget, as well as modal request in general
+- Handling AJAX failure
+- Controls that expose state on the URL, AJAX and POST/GET, back button/history research
 
 -- RESEARCH --
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
@@ -34,6 +33,7 @@ TODO:
 - Highlight rows while hoovering over table (and data/forms?)
 - Port stylesheets to IE
 - Move datagrid specific stylesheets from table.css to datagrid.css
+- Give every session separate instances of data
 
 -- BIGGER PICTURE --
 - Release the library/write articles.
