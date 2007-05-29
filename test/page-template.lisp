@@ -8,7 +8,7 @@
 			     (with-html
 			       (:div "test")))))
   (htm
-   (str "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
+   (str "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
    (str "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")
    (str "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">")
    (:html
