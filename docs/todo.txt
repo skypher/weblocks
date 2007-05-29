@@ -2,7 +2,6 @@
 TODO:
 -- CURRENT (flash) --
 - Improve CSS and markup
-- Add icon (info, warning, etc)
 - Disappear on AJAX (via hook into request handler)
 - Do animation on AJAX appearance and disappearance
 - Consider an (X) to close
