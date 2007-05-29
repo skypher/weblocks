@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (AJAX) --
-- Unit test declaring dirty components, and updating multiple components
 - Test in w3m
 
 -- LARGE FEATURES --

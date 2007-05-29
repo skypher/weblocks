@@ -67,6 +67,17 @@
       (widget-name (car weblocks::*dirty-widgets*)))
   "test")
 
+(deftest make-dirty-3
+    (with-request :get nil
+      (setf (session-value 'weblocks::root-composite) (create-site-layout))	
+      (let ((weblocks::*dirty-widgets* nil))
+	(declare (special weblocks::*dirty-widgets*))
+	(make-dirty (make-instance 'composite :name "test"
+				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
+		    :putp t)
+	(mapcar #'widget-name weblocks::*dirty-widgets*)))
+  (test2-leaf "test"))
+
 ;;; test that (setf slot-value-using-class) method is modified for
 ;;; widgets to automatically mark them as dirty
 (deftest setf-slot-value-using-class-1
