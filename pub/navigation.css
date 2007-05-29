@@ -2,17 +2,17 @@
 .menu
 {
   width: 15em;
-  background: #d8eaf8 url(/pub/images/menu/top_background.png) repeat-x;
+  background: #d8eaf8 url(/pub/images/widget/menu/top_background.png) repeat-x;
 }
 
 .menu > .extra-top-1
 {
-  background: url(/pub/images/menu/top_left.png) no-repeat top left;
+  background: url(/pub/images/widget/menu/top_left.png) no-repeat top left;
 }
 
 .menu > .extra-top-2
 {
-  background: url(/pub/images/menu/top_right.png) no-repeat top right;
+  background: url(/pub/images/widget/menu/top_right.png) no-repeat top right;
   border-bottom-color: #bfd9ec;
 }
 
@@ -29,7 +29,7 @@
 
 .menu > ul > li.selected-item > span
 {
-  background: url(/pub/images/menu/arrow.png) no-repeat center left;
+  background: url(/pub/images/widget/menu/arrow.png) no-repeat center left;
   padding-left: 11px;
   margin-left: -11px;
 }
@@ -48,18 +48,18 @@
 
 .menu > .extra-bottom-1
 {
-  background: url(/pub/images/menu/bottom_background.png) repeat-x bottom;
+  background: url(/pub/images/widget/menu/bottom_background.png) repeat-x bottom;
   border-top-color: #f6fbfd;
 }
 
 .menu > .extra-bottom-2
 {
-  background: url(/pub/images/menu/bottom_left.png) no-repeat bottom left;
+  background: url(/pub/images/widget/menu/bottom_left.png) no-repeat bottom left;
 }
 
 .menu > .extra-bottom-3
 {
-  background: url(/pub/images/menu/bottom_right.png) no-repeat bottom right;
+  background: url(/pub/images/widget/menu/bottom_right.png) no-repeat bottom right;
 }
 
 .menu li:hover
@@ -69,7 +69,7 @@
 
 .menu > ul > li.selected-item:hover > span
 {
-  background: url(/pub/images/menu/selected_arrow.png) no-repeat center left;
+  background: url(/pub/images/widget/menu/selected_arrow.png) no-repeat center left;
 }
 
 .menu a
