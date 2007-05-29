@@ -145,6 +145,19 @@
 	(header-out "Location")))
   "http://NILNIL?weblocks-session=1%3Atest")
 
+(deftest handle-client-request-5
+    (with-request :get nil
+      (let ((res 0)
+	    *on-pre-request* *on-post-request*)
+	(start-session)
+	(setf *on-pre-request* (cons (lambda ()
+				       (incf res)) *on-pre-request*))
+	(setf *on-post-request* (cons (lambda ()
+					(incf res)) *on-post-request*))
+	(handle-client-request)
+	res))
+  2)
+
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil

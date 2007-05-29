@@ -1,6 +1,16 @@
 
 (in-package :weblocks)
 
+(export '(*on-pre-request* *on-post-request*))
+
+(defparameter *on-pre-request* nil
+  "A list of functions that take no arguments. Each function will be
+called before request handling begins.")
+
+(defparameter *on-post-request* nil
+  "A list of functions that take no arguments. Each function will be
+called after request handling ends.")
+
 (defgeneric handle-client-request ()
   (:documentation
    "This method handles each request as it comes in from the
@@ -42,6 +52,7 @@ and :after specifiers to customize behavior)."))
 	(*current-navigation-url* "/")
 	*dirty-widgets*)
     (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*))
+    (mapc #'funcall *on-pre-request*)
     (safe-funcall (get-request-action))
     (if (ajax-request-p)
 	(render-dirty-widgets)
@@ -50,6 +61,7 @@ and :after specifiers to customize behavior)."))
 				   (find-navigation-widget (session-value 'root-composite)))
 	  (with-page (lambda ()
 		       (render-widget (session-value 'root-composite))))))
+    (mapc #'funcall *on-post-request*)
     (get-output-stream-string *weblocks-output-stream*)))
 
 (defun remove-session-from-uri (uri)
