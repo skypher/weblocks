@@ -1,7 +1,12 @@
 
 TODO:
--- CURRENT (AJAX) --
-- Test in w3m
+-- CURRENT (flash) --
+- Improve CSS and markup
+- Add icon (info, warning, etc)
+- Disappear on AJAX (via hook into request handler)
+- Do animation on AJAX appearance and disappearance
+- Consider an (X) to close
+- Consider a message on nth action
 
 -- LARGE FEATURES --
 - Add a widget similar to google suggest

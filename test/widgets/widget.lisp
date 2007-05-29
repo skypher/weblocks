@@ -7,6 +7,14 @@
 			  (with-html (:p "blah"))))
   (:p "blah"))
 
+(deftest-html render-widget-body-2
+    (render-widget-body "test")
+  (:p "test"))
+
+(deftest-html render-widget-body-3
+    (render-widget-body "test" :id "foo" :class "bar")
+  (:p :id "foo" :class "bar" "test"))
+
 ;;; test with-widget-header
 (deftest-html with-widget-header-1
     (with-request :get nil

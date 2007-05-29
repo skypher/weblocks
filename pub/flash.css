@@ -1,0 +1,47 @@
+
+.flash > .renderer
+{
+  background: #f8e9d8 url(/pub/images/widget/flash/top_background.png) repeat-x;
+  /*border-top-color: #ead8c2;
+  border-bottom-color: #fef9f6;
+  padding-left: 0.5em;*/
+}
+
+.flash > .renderer > .extra-top-1
+{
+  background: url(/pub/images/widget/flash/top_left.png) no-repeat top left;
+}
+
+.flash > .renderer >  .extra-top-2
+{
+  background: url(/pub/images/widget/flash/top_right.png) no-repeat top right;
+  border-bottom-color: #ead8c2;
+}
+
+.flash > .renderer > .message p
+{ 
+  padding: 0;
+  margin: 0;
+  padding-left: 0.5em;
+  border-left: solid 2px #ead8c2;
+  border-right: solid 2px #ead8c2;
+  border-top: solid 1px #fef9f6;
+  border-bottom: solid 1px #ead8c2;
+}
+
+.flash > .renderer > .extra-bottom-1
+{
+  background: url(/pub/images/widget/flash/bottom_background.png) repeat-x bottom;
+  border-top-color: #fef9f6; 
+}
+
+.flash > .renderer > .extra-bottom-2
+{
+  background: url(/pub/images/widget/flash/bottom_left.png) no-repeat bottom left;
+}
+
+.flash > .renderer > .extra-bottom-3
+{
+  background: url(/pub/images/widget/flash/bottom_right.png) no-repeat bottom right;
+}
+

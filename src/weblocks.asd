@@ -41,6 +41,8 @@
 			:depends-on ("utils"))
 	       (:module widgets
 			:components ((:file "widget")
+				     (:file "flash"
+				      :depends-on ("widget"))
 				     (:file "dataform"
 				      :depends-on ("widget"))
 				     (:file "datagrid"

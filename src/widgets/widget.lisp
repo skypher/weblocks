@@ -62,15 +62,27 @@ order to actually render the widget, call 'render-widget' instead.
 One of the implementations allows \"rendering\" functions. When
 'render-widget' is called on a function, the function is simply
 called. This allows to easily add functions to composite widgets that
-can do custom rendering without much boilerplate."))
+can do custom rendering without much boilerplate.
+
+Another implementation allows rendering strings."))
 
 (defmethod render-widget-body ((obj function) &rest args)
   (apply obj args))
+
+(defmethod render-widget-body ((obj string) &rest args &key id class &allow-other-keys)
+  (with-html
+    (:p :id id :class class (str obj))))
 
 (defmethod widget-name ((obj function))
   nil)
 
 (defmethod widget-args ((obj function))
+  nil)
+
+(defmethod widget-name ((obj string))
+  nil)
+
+(defmethod widget-args ((obj string))
   nil)
 
 (defun render-widget (obj &key inlinep)
