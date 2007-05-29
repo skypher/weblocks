@@ -16,8 +16,8 @@
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 ~A~
-<script src='/pub/scripts/prototype.js' type='text/javascript' />~
-<script src='/pub/scripts/weblocks.js' type='text/javascript' />~
+<script src='/pub/scripts/prototype.js' type='text/javascript'></script>~
+<script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
 </head>~
 <body>~
 <div class='page-wrapper'>~
