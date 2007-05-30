@@ -1,10 +1,12 @@
 
 TODO:
--- CURRENT (flash) --
-- Unit test
+-- CURRENT (ajax suggest) --
+- Add a degradeable ajax suggest widget (local -> dropdown)
+- Incorporate it into selecting state
+- Keep in mind gridsearch useage
 
 -- LARGE FEATURES --
-- Add a widget similar to google suggest
+- Create a degradable isearch control
 - Create a gridsearch control
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
