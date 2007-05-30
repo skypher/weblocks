@@ -161,7 +161,7 @@ association list. This function is normally called by
 	 (list (cons "widgets"
 		     (mapcar (lambda (w)
 			       (cons
-				(widget-name w)
+				(attributize-name (widget-name w))
 				(progn
 				  (render-widget w :inlinep t)
 				  (get-output-stream-string *weblocks-output-stream*))))

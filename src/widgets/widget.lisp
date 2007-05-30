@@ -54,7 +54,7 @@ within it. Specialize this function to provide customized headers for
 different widgets."))
 
 (defmethod with-widget-header (obj body-fn &rest args)
-  (let* ((obj-name (attributize-name (widget-name obj)))
+  (let* ((obj-name (attributize-name (widget-name obj))) ; obj-name may be null in functions
 	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
 		      (attributize-name obj-name))))
     (with-html
