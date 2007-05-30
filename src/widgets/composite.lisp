@@ -9,6 +9,7 @@
 	    :initarg :widgets
 	    :documentation "A list of widgets that are contained in
 	      this composite widget."))
+  (:metaclass widget-class)
   (:documentation "A composite widget is simply a container for other
   widgets. The 'widgets' slot accessible with 'composite-widgets'
   accessor contains a list of widgets. When 'render-widget' is invoked

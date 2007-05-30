@@ -25,6 +25,7 @@
 			     are stored in this variable so the form
 			     isn't lost while the user fixes
 			     errors."))
+  (:metaclass widget-class)
   (:documentation
    "A class that represents a dataform widget. By default this
 widget renders the data object via 'render-data' generic renderer

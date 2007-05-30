@@ -33,7 +33,10 @@
 		  'strictly-less-p' and 'equivalentp' aren't defined
 		  on the datatype of the column, sorting for that
 		  column will be turned off regardless of the value of
-		  this slot.")))
+		  this slot."))
+  (:metaclass widget-class)
+  (:documentation "Represents a sortable, pagable table. This
+  widget is inspired by ASP.NET's datagrid control."))
 
 ;;; Hooks into table renderer's header rendering mechanism and
 ;;; forwards the calls to 'render-datagrid-header-cell' whenever

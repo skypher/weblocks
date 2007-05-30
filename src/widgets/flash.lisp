@@ -14,6 +14,7 @@
 	      :initform nil
 	      :documentation "True if the newly set message has been
 	      rendered."))
+  (:metaclass widget-class)
   (:documentation "A widget that allows displaying a message that
   disappears on the following request. It is useful for one time
   messages (welcome, etc.)"))

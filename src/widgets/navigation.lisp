@@ -21,6 +21,7 @@
 		 :initarg :current-pane
 		 :documentation "A name that identifies currently
                   selected entry."))
+  (:metaclass widget-class)
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It contains a list of section names and widgets
   associated with those sections, and allows the user to select a

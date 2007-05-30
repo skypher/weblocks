@@ -1,9 +1,20 @@
 
 (in-package :weblocks)
 
-(export '(widget widget-name widget-args with-widget-header
-	  render-widget-body render-widget make-dirty
-	  find-widget-by-path* find-widget-by-path))
+(export '(widget-class widget widget-name widget-args
+	  with-widget-header render-widget-body render-widget
+	  make-dirty find-widget-by-path* find-widget-by-path))
+
+(defclass widget-class (standard-class)
+  ()
+  (:documentation "A metaclass used for all widget classes. A
+  custom metaclass is necessary to specialize
+  'slot-value-using-class'."))
+
+;;; Necessary to allow deriving
+(defmethod validate-superclass ((class widget-class)
+				(superclass standard-class))
+  t)
 
 (defun generate-widget-id ()
   "Generates a unique ID that can be used to identify a widget."
@@ -31,8 +42,9 @@
                     via a POST request. This slot allows setting up
                     dependencies between widgets that will make
                     multiple widgets update automatically during AJAX
-                    requests."))  #+lispworks (:optimize-slot-access
-                    nil)
+                    requests."))
+  #+lispworks (:optimize-slot-access nil)
+  (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
 (defgeneric with-widget-header (obj body-fn &rest args)
@@ -119,7 +131,7 @@ as well."
 
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
-(defmethod (setf slot-value-using-class) :around (new-value class (object widget) slot-name)
+(defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget) slot-name)
   (make-dirty object)
   (call-next-method new-value class object slot-name))
 

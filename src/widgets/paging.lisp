@@ -17,7 +17,8 @@
 		:initarg :total-items)
    (current-page :accessor paging-current-page
 		 :initform 1
-		 :initarg :current-page)))
+		 :initarg :current-page))
+  (:metaclass widget-class))
 
 (defun page-count (p)
   (check-type p paging)
