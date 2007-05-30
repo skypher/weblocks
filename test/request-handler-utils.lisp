@@ -10,6 +10,7 @@
 <head>~
 <title>Hello!</title>~
 <link rel='stylesheet' type='text/css' href='/pub/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/flash.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
@@ -18,6 +19,7 @@
 ~A~
 <script src='/pub/scripts/prototype.js' type='text/javascript'></script>~
 <script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
+<script src='/pub/scripts/scriptaculous.js?load=effects' type='text/javascript'></script>~
 </head>~
 <body>~
 <div class='page-wrapper'>~

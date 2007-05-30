@@ -10,9 +10,18 @@ Ajax.Responders.register({
 });
 
 function onActionSuccess(transport, json) {
-    for(var i in json) {
-	$(i).update(json[i]);
+    // Update dirty widgets
+    var dirtyWidgets = json['widgets'];
+    for(var i in dirtyWidgets) {
+	$(i).update(dirtyWidgets[i]);
     }
+
+    // Perform a series of specialized operations
+    var onLoadCalls = json['on-load'];
+    onLoadCalls.each(function(item)
+		     {
+			 item.evalJSON().call();
+		     });
 }
 
 function getActionUrl(actionCode, sessionString) {

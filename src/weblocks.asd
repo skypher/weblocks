@@ -53,7 +53,7 @@
 				      :depends-on ("widget"))
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
-			:depends-on (renderers form-management "utils" "actions"))
+			:depends-on (renderers form-management "request-handler" "utils" "actions"))
 	       (:file "server"
 		      :depends-on (widgets))))
 

@@ -21,7 +21,8 @@
 	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css")))
       ; empty quote in script tags are a fix for w3m
       (:script :src "/pub/scripts/prototype.js" :type "text/javascript" "")
-      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" ""))
+      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" "")
+      (:script :src "/pub/scripts/scriptaculous.js?load=effects" :type "text/javascript" ""))
      (:body
       (render-page-body body-fn)
       (when *render-debug-toolbar*

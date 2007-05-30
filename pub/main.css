@@ -50,7 +50,7 @@ a
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
 .renderer > .empty-navigation, .renderer > ul > li, .renderer > fieldset > ul > li,
 .renderer > table > tbody > tr > td, .renderer > table > thead > tr > th,
-.renderer > fieldset > .submit, .renderer > .submit
+.renderer > fieldset > .submit, .renderer > .submit, .flash > .renderer > .message p
 
 {
   border-top: 1px solid #fcfef6;
@@ -59,7 +59,7 @@ a
 
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
 .renderer > .empty-navigation, .renderer > ul, .renderer > fieldset > ul, .table > table,
-.renderer > fieldset > .submit, .renderer > .submit
+.renderer > fieldset > .submit, .renderer > .submit, .flash > .renderer > .message p
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;

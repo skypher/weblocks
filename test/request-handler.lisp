@@ -44,7 +44,8 @@
 </div>~
 </div>")
   ""
-  #.(format nil "{\"widget-123\":~
+  #.(format nil "{\"widgets\":~
+{\"widget-123\":~
 \"<form class='renderer form employee' action='' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3Atest\\\"); ~
                 return false;'>~
@@ -73,7 +74,8 @@
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
-</form>\"}"))
+</form>\"},~
+\"on-load\":null}"))
 
 ;;; make sure debug toolbar is rendered when appropriate
 (deftest handle-client-request-2
@@ -148,13 +150,64 @@
 (deftest handle-client-request-5
     (with-request :get nil
       (let ((res 0)
-	    *on-pre-request* *on-post-request*)
+	    *on-pre-request* *on-post-request* weblocks::*webapp-name*)
+	;; set up our mini-application
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(defun init-user-session (comp) nil)
+	;; start the session
 	(start-session)
+	;; do the test
 	(setf *on-pre-request* (cons (lambda ()
 				       (incf res)) *on-pre-request*))
 	(setf *on-post-request* (cons (lambda ()
 					(incf res)) *on-post-request*))
 	(handle-client-request)
+	;; tear down the application
+	(fmakunbound 'init-user-session)
+	res))
+  2)
+
+(deftest handle-client-request-6
+    (with-request :get nil
+      (let ((res 0) weblocks::*webapp-name*)
+	;; set up our mini-application
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(defun init-user-session (comp) nil)
+	;; start the session
+	(start-session)
+	;; do the test
+	(setf (on-session-pre-request) (cons (lambda ()
+					       (incf res)) (on-session-pre-request)))
+	(setf (on-session-post-request) (cons (lambda ()
+						(incf res)) (on-session-post-request)))
+	(handle-client-request)
+	;; tear down the application
+	(fmakunbound 'init-user-session)
+	res))
+  2)
+
+(deftest handle-client-request-7
+    (with-request :get nil
+      (let ((res 0) weblocks::*webapp-name*)
+	(declare (special weblocks::*webapp-name*))
+	;; start the session
+	(start-session)
+	;; set up our mini-application
+	(defwebapp 'hello)
+	(defun init-user-session (comp)
+	  (declare (special *on-pre-request-onetime*
+			    *on-post-request-onetime*))
+	  (setf *on-pre-request-onetime* (cons (lambda ()
+						 (incf res))
+					       *on-pre-request-onetime*))
+	  (setf *on-post-request-onetime* (cons (lambda ()
+						 (incf res))
+						*on-post-request-onetime*)))
+	;; do the test
+	(handle-client-request)
+	;; tear down the application
 	res))
   2)
 
@@ -232,12 +285,18 @@
       (let ((weblocks::*dirty-widgets* (list (make-instance 'composite)
 					     (lambda (&rest args)
 					       (with-html (:p "test")))))
-	    (*weblocks-output-stream* (make-string-output-stream)))
-	(declare (special weblocks::*dirty-widgets* *weblocks-output-stream*))
+	    (*weblocks-output-stream* (make-string-output-stream))
+	    (*on-ajax-complete-scripts* (list "testjs")))
+	(declare (special weblocks::*dirty-widgets*
+			  *weblocks-output-stream* *on-ajax-complete-scripts*))
 	(weblocks::render-dirty-widgets)
 	(header-out "X-JSON")))
   #.(format nil "~
 {~
+\"widgets\":~
+{~
 \"widget-123\":\"\",~
 \null:\"<p>test</p>\"~
+},~
+\"on-load\":[\"testjs\"]~
 }"))

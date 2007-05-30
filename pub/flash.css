@@ -2,9 +2,6 @@
 .flash > .renderer
 {
   background: #f8e9d8 url(/pub/images/widget/flash/top_background.png) repeat-x;
-  /*border-top-color: #ead8c2;
-  border-bottom-color: #fef9f6;
-  padding-left: 0.5em;*/
 }
 
 .flash > .renderer > .extra-top-1
@@ -30,10 +27,10 @@
   padding: 0;
   margin: 0;
   padding-left: 32px;
-  border-left: solid 2px #ead8c2;
-  border-right: solid 2px #ead8c2;
-  border-top: solid 1px #fef9f6;
-  border-bottom: solid 1px #ead8c2;
+  border-color: #ead8c2;
+  border-right-color: #ead8c2;
+  border-top-color: #fef9f6;
+  border-bottom-color: #ead8c2;
   background: url(/pub/images/widget/flash/flag.png) no-repeat center left;
 }
 

@@ -1,11 +1,7 @@
 
 TODO:
 -- CURRENT (flash) --
-- Improve CSS and markup
-- Disappear on AJAX (via hook into request handler)
-- Do animation on AJAX appearance and disappearance
-- Consider an (X) to close
-- Consider a message on nth action
+- Unit test
 
 -- LARGE FEATURES --
 - Add a widget similar to google suggest
@@ -13,7 +9,7 @@ TODO:
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
-- Handling AJAX failure
+- Handling failure (AJAX and regular)
 - Controls that expose state on the URL, AJAX and POST/GET, back button/history research
 
 -- RESEARCH --
@@ -24,6 +20,7 @@ TODO:
 - (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Register stylesheet requirements, deal with paths to stylesheets and images
+- Preload ajax image and navigation arrow
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
@@ -37,6 +34,7 @@ TODO:
 - Port stylesheets to IE
 - Move datagrid specific stylesheets from table.css to datagrid.css
 - Give every session separate instances of data
+- Consider using Yahoo fonts CSS
 
 -- BIGGER PICTURE --
 - Release the library/write articles.

@@ -1,15 +1,30 @@
 
 (in-package :weblocks)
 
-(export '(*on-pre-request* *on-post-request*))
+(export '(*on-pre-request* *on-post-request*
+	  *on-ajax-complete-scripts* on-session-pre-request
+	  on-session-post-request *on-pre-request-onetime*
+	  *on-post-request-onetime*))
 
 (defparameter *on-pre-request* nil
   "A list of functions that take no arguments. Each function will be
-called before request handling begins.")
+called before request handling begins. This is an application wide
+property.")
 
 (defparameter *on-post-request* nil
   "A list of functions that take no arguments. Each function will be
-called after request handling ends.")
+called after request handling ends. This is an application wide
+property.")
+
+(defmacro on-session-pre-request ()
+  "Similar to *on-pre-request*, only returns a list of functions
+registered per session."
+  '(session-value 'on-pre-request))
+
+(defmacro on-session-post-request ()
+  "Similar to *on-post-request*, only returns a list of functions
+registered per session."
+  '(session-value 'on-post-request))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -37,32 +52,41 @@ and :after specifiers to customize behavior)."))
   (when (null *session*)
     (start-session)
     (redirect (request-uri)))
-  (when (null (session-value 'root-composite))
-    (let ((root-composite (make-instance 'composite :name "root")))
-      (when *render-debug-toolbar*
-	(initialize-debug-actions))
-      (funcall (symbol-function (find-symbol (symbol-name '#:init-user-session)
-					     (symbol-package *webapp-name*)))
-	       root-composite)
-      (setf (session-value 'root-composite) root-composite))
-    (when (cookie-in *session-cookie-name*)
-      (redirect (remove-session-from-uri (request-uri)))))
+  (let (*on-pre-request-onetime* *on-post-request-onetime*)
+    (declare (special *on-pre-request-onetime*
+		      *on-post-request-onetime*))
+    (when (null (session-value 'root-composite))
+      (let ((root-composite (make-instance 'composite :name "root")))
+	(when *render-debug-toolbar*
+	  (initialize-debug-actions))
+	(funcall (symbol-function (find-symbol (symbol-name '#:init-user-session)
+					       (symbol-package *webapp-name*)))
+		 root-composite)
+	(setf (session-value 'root-composite) root-composite))
+      (when (cookie-in *session-cookie-name*)
+	(redirect (remove-session-from-uri (request-uri)))))
 
-  (let ((*weblocks-output-stream* (make-string-output-stream))
-	(*current-navigation-url* "/")
-	*dirty-widgets*)
-    (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*))
-    (mapc #'funcall *on-pre-request*)
-    (safe-funcall (get-request-action))
-    (if (ajax-request-p)
-	(render-dirty-widgets)
-	(progn
-	  (apply-uri-to-navigation (tokenize-uri (request-uri))
-				   (find-navigation-widget (session-value 'root-composite)))
-	  (with-page (lambda ()
-		       (render-widget (session-value 'root-composite))))))
-    (mapc #'funcall *on-post-request*)
-    (get-output-stream-string *weblocks-output-stream*)))
+    (let ((*weblocks-output-stream* (make-string-output-stream))
+	  (*current-navigation-url* "/") *dirty-widgets*
+	  *on-ajax-complete-scripts*)
+      (declare (special *weblocks-output-stream*
+			*current-navigation-url* *dirty-widgets*
+			*on-ajax-complete-scripts*))
+      (mapc #'funcall *on-pre-request*)
+      (mapc #'funcall (on-session-pre-request))
+      (mapc #'funcall *on-pre-request-onetime*)
+      (safe-funcall (get-request-action))
+      (if (ajax-request-p)
+	  (render-dirty-widgets)
+	  (progn
+	    (apply-uri-to-navigation (tokenize-uri (request-uri))
+				     (find-navigation-widget (session-value 'root-composite)))
+	    (with-page (lambda ()
+			 (render-widget (session-value 'root-composite))))))
+      (mapc #'funcall *on-post-request-onetime*)
+      (mapc #'funcall (on-session-post-request))
+      (mapc #'funcall *on-post-request*)
+      (get-output-stream-string *weblocks-output-stream*))))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
@@ -130,14 +154,18 @@ ex:
   "Renders widgets that have been marked as dirty into a JSON
 association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
-  (declare (special *dirty-widgets* *weblocks-output-stream*))
+  (declare (special *dirty-widgets* *weblocks-output-stream*
+		    *on-ajax-complete-scripts*))
   (setf (header-out "X-JSON")
 	(encode-json-to-string
-	 (mapcar (lambda (w)
-		   (cons
-		    (widget-name w)
-		    (progn
-		      (render-widget w :inlinep t)
-		      (get-output-stream-string *weblocks-output-stream*))))
-		 *dirty-widgets*))))
+	 (list (cons "widgets"
+		     (mapcar (lambda (w)
+			       (cons
+				(widget-name w)
+				(progn
+				  (render-widget w :inlinep t)
+				  (get-output-stream-string *weblocks-output-stream*))))
+			     *dirty-widgets*))
+	       (cons "on-load"
+		     *on-ajax-complete-scripts*)))))
 
