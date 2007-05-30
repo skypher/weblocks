@@ -1,11 +1,19 @@
 
+-- TEMPORARY --
+- json issue on openmcl
+- metaclass inheritance
+- safari issue
+- getting opera 8 fix into Element.update
+- opera 8 margin issue
+
 TODO:
 -- CURRENT (ajax suggest) --
 - Add a degradeable ajax suggest widget (local -> dropdown)
-- Incorporate it into selecting state
-- Keep in mind gridsearch useage
+- Unit test
+- Incorporate it into selecting state in forms
 
 -- LARGE FEATURES --
+- Multiple messages in single flash control
 - Create a degradable isearch control
 - Create a gridsearch control
 - Design paging control for datagrid
@@ -33,10 +41,11 @@ TODO:
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
 - Highlight rows while hoovering over table (and data/forms?)
-- Port stylesheets to IE
+- Port stylesheets to IE, browser compatibility, offer simpe HTML version for older browsers
 - Move datagrid specific stylesheets from table.css to datagrid.css
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
+- Reset sessions should respect friendly URL
 
 -- BIGGER PICTURE --
 - Release the library/write articles.
