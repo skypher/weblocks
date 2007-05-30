@@ -66,4 +66,5 @@ span.paging
 .sort-ascending > a, .sort-descending > a
 {
   display: block;
+  text-decoration: underline;
 }
