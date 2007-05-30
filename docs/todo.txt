@@ -13,13 +13,12 @@ TODO:
 - Incorporate it into selecting state in forms
 
 -- LARGE FEATURES --
-- Multiple messages in single flash control
 - Create a degradable isearch control
 - Create a gridsearch control
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
-- Handling failure (AJAX and regular)
+- Handling failure (AJAX and regular, add message types to flash widget)
 - Controls that expose state on the URL, AJAX and POST/GET, back button/history research
 
 -- RESEARCH --

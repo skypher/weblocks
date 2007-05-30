@@ -4,15 +4,21 @@
 ;;; test render-widget-body for flash
 (deftest-html render-widget-body-flash-1
     (with-request :get nil
-      (render-widget-body (make-instance 'flash :message "Hello World!")))
+      (let ((w (make-instance 'flash :messages '("Hello World!"))))
+	(flash-message w "Foo")
+	(render-widget-body w)))
   (htm
    (:div :class "renderer"
 	 (:div :class "extra-top-1" "&nbsp;")
 	 (:div :class "extra-top-2" "&nbsp;")
 	 (:div :class "extra-top-3" "&nbsp;")
-	 (:div :class "message"
+	 (:ul :class "messages"
+	      (:li
 	       (:div :class "widget simple-character-string"
 		     (:p "Hello World!")))
+	      (:li
+	       (:div :class "widget simple-character-string"
+		     (:p "Foo"))))
 	 (:div :class "extra-bottom-1" "&nbsp;")
 	 (:div :class "extra-bottom-2" "&nbsp;")
 	 (:div :class "extra-bottom-3" "&nbsp;"))))
@@ -20,7 +26,7 @@
 (deftest render-widget-body-flash-2
     (with-request :get nil
       (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (w (make-instance 'flash :message "Hello World!")))
+	    (w (make-instance 'flash :messages '("Hello World!" "Something Else"))))
 	(declare (special *weblocks-output-stream*))
 	(render-widget-body w)
 	(values (weblocks::flash-rendered-p w)
@@ -33,10 +39,11 @@
 	    (w (make-instance 'flash)))
 	(declare (special *weblocks-output-stream*))
 	(flash-message w "Test")
+	(flash-message w "Test2")
 	(render-widget-body w)
 	(funcall (car (on-session-pre-request)))
 	(values (weblocks::flash-rendered-p w)
-		(flash-message* w))))
+		(flash-messages w))))
   nil nil)
 
 (deftest render-widget-body-flash-4
@@ -61,5 +68,6 @@
     (with-request :post nil
       (let ((w (make-instance 'flash)))
 	(flash-message w "test")
-	(flash-message* w)))
-  "test")
+	(flash-message w "bar")
+	(flash-messages w)))
+  ("test" "bar"))

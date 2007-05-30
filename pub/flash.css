@@ -15,22 +15,31 @@
   border-bottom-color: #ead8c2;
 }
 
-.flash .renderer .message p
+.flash > .renderer > ul.messages p
+{
+  padding: 0;
+  margin: 0;
+}
+
+.flash > .renderer > ul.messages
+{ 
+  border-left-color: #ead8c2;
+  border-right-color: #ead8c2;
+}
+
+.flash > .renderer > ul.messages > li
 {
   height: 16px;
 }
 
-.flash > .renderer > .message p
-{ 
-  height: auto;
-  min-height: 16px;
-  padding: 0;
-  margin: 0;
+.flash > .renderer > ul.messages > li
+{
   padding-left: 32px;
-  border-color: #ead8c2;
-  border-right-color: #ead8c2;
+  min-height: 16px;
+  height: auto;
   border-top-color: #fef9f6;
   border-bottom-color: #ead8c2;
+  list-style-image: none;
   background: url(/pub/images/widget/flash/flag.png) no-repeat top left;
 }
 
