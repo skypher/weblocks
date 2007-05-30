@@ -118,3 +118,8 @@ the request."
 				(:get 'get-parameters)
 				(:post 'post-parameters))) parameters)
   (safe-funcall (weblocks::get-request-action)))
+
+(defun make-request-ajax ()
+  "Adds appropriate headers to a request so it is considered to be an
+AJAX request."
+  (push '("X-Requested-With" . "test") (slot-value *request* 'headers-in)))

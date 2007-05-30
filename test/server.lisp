@@ -17,7 +17,7 @@
 
 (deftest ajax-request-p-2
     (with-request :get nil
-      (setf (slot-value *request* 'headers-in) '(("X-Requested-With" . "test")))
+      (make-request-ajax)
       (ajax-request-p))
   "test")
 
