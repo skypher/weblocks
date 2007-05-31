@@ -8,7 +8,7 @@
 (defparameter *page-around-current-page-count* 1)
 (defparameter *triangulation-page-count* 4)
 
-(defclass paging (widget)
+(defwidget paging (widget)
   ((items-per-page :accessor paging-items-per-page
 		   :initform *items-per-page*
 		   :initarg :items-per-page)
@@ -17,8 +17,7 @@
 		:initarg :total-items)
    (current-page :accessor paging-current-page
 		 :initform 1
-		 :initarg :current-page))
-  (:metaclass widget-class))
+		 :initarg :current-page)))
 
 (defun page-count (p)
   (check-type p paging)

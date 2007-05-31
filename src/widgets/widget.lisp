@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(widget-class widget widget-name widget-args
+(export '(widget-class defwidget widget widget-name widget-args
 	  with-widget-header render-widget-body render-widget
 	  make-dirty find-widget-by-path* find-widget-by-path))
 
@@ -20,7 +20,13 @@
   "Generates a unique ID that can be used to identify a widget."
   (gensym))
 
-(defclass widget ()
+(defmacro defwidget (&body body)
+  "A macro used to define new widget classes. Behaves exactly as
+defclass, except adds 'widget-class' metaclass specification."
+  `(defclass ,@body
+       (:metaclass widget-class)))
+
+(defwidget widget ()
   ((name :accessor widget-name
 	 :initform (generate-widget-id)
 	 :initarg :name
@@ -44,7 +50,6 @@
                     multiple widgets update automatically during AJAX
                     requests."))
   #+lispworks (:optimize-slot-access nil)
-  (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
 (defgeneric with-widget-header (obj body-fn &rest args)

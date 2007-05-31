@@ -4,7 +4,7 @@
 (export '(datagrid datagrid-data datagrid-sort datagrid-allow-sorting
 	  render-datagrid-header-cell datagrid-sorted-slot-name))
 
-(defclass datagrid (widget)
+(defwidget datagrid (widget)
   ((data :accessor datagrid-data
 	 :initform nil
 	 :initarg :data
@@ -34,7 +34,6 @@
 		  on the datatype of the column, sorting for that
 		  column will be turned off regardless of the value of
 		  this slot."))
-  (:metaclass widget-class)
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
 

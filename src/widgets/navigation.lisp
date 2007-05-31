@@ -6,7 +6,7 @@
 	  current-pane-widget init-navigation make-navigation
 	  pane-exists-p reset-current-pane))
 
-(defclass navigation (widget)
+(defwidget navigation (widget)
   ((name :initform nil
 	 :documentation "A navigation widget doesn't have a name
 	 assigned to automatically.")
@@ -21,7 +21,6 @@
 		 :initarg :current-pane
 		 :documentation "A name that identifies currently
                   selected entry."))
-  (:metaclass widget-class)
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It contains a list of section names and widgets
   associated with those sections, and allows the user to select a
