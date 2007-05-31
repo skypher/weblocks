@@ -167,5 +167,7 @@ association list. This function is normally called by
 				  (get-output-stream-string *weblocks-output-stream*))))
 			     *dirty-widgets*))
 	       (cons "on-load"
-		     *on-ajax-complete-scripts*)))))
+		     *on-ajax-complete-scripts*))))
+  ;; We need something in the response for Safari to evaluate JSON
+  (format *weblocks-output-stream* " "))
 

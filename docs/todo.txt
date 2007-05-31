@@ -1,10 +1,8 @@
 
 -- TEMPORARY --
-- json issue on openmcl
-- metaclass inheritance
-- safari issue
-- getting opera 8 fix into Element.update
 - opera 8 margin issue
+- json issue on openmcl
+- getting opera 8 fix into Element.update
 
 TODO:
 -- CURRENT (ajax suggest) --
@@ -30,6 +28,7 @@ TODO:
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Register stylesheet requirements, deal with paths to stylesheets and images
 - Preload ajax image and navigation arrow
+- Consider redoing flash widget with modal style in mind
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.

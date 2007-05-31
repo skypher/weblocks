@@ -25,7 +25,8 @@
   (push (lambda ()
 	  (declare (special *on-ajax-complete-scripts* *on-post-request-onetime*))
 	  (when (and (flash-messages obj)
-		     (flash-rendered-p obj))
+		     (flash-rendered-p obj)
+		     (get-request-action))
 	    (if (ajax-request-p)
 		(progn
 		  (push (format nil "function () { new Effect.BlindUp('~A'); }"

@@ -4,7 +4,8 @@
 ;;; test render-widget-body for flash
 (deftest-html render-widget-body-flash-1
     (with-request :get nil
-      (let ((w (make-instance 'flash :messages '("Hello World!"))))
+      (let ((w (make-instance 'flash)))
+	(flash-message w "Hello World!")
 	(flash-message w "Foo")
 	(render-widget-body w)))
   (htm
@@ -34,7 +35,8 @@
   t 1)
 
 (deftest render-widget-body-flash-3
-    (with-request :get nil
+    (with-request :get `((,weblocks::*action-string* . "abc123"))
+      (make-action (lambda () nil))
       (let ((*weblocks-output-stream* (make-string-output-stream))
 	    (w (make-instance 'flash)))
 	(declare (special *weblocks-output-stream*))
@@ -47,7 +49,8 @@
   nil nil)
 
 (deftest render-widget-body-flash-4
-    (with-request :get nil
+    (with-request :get `((,weblocks::*action-string* . "abc123"))
+      (make-action (lambda () nil))
       (let ((*weblocks-output-stream* (make-string-output-stream))
 	    (w (make-instance 'flash))
 	    *on-ajax-complete-scripts* *on-post-request-onetime*)
@@ -63,6 +66,18 @@
 		(weblocks::flash-rendered-p w))))
   ("function () { new Effect.BlindUp('widget-123'); }")
   nil)
+
+(deftest render-widget-body-flash-5
+    (with-request :get nil
+      (let ((*weblocks-output-stream* (make-string-output-stream))
+	    (w (make-instance 'flash)))
+	(declare (special *weblocks-output-stream*))
+	(flash-message w "Test")
+	(flash-message w "Test2")
+	(render-widget-body w)
+	(funcall (car (on-session-pre-request)))
+	(weblocks::flash-rendered-p w)))
+  t)
 
 (deftest flash-message-1
     (with-request :post nil

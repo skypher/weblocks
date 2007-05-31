@@ -43,7 +43,7 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>")
-  ""
+  " "
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
 \"<form class='renderer form employee' action='' method='post' ~
@@ -290,7 +290,9 @@
 	(declare (special weblocks::*dirty-widgets*
 			  *weblocks-output-stream* *on-ajax-complete-scripts*))
 	(weblocks::render-dirty-widgets)
-	(header-out "X-JSON")))
+	(values
+	 (header-out "X-JSON")
+	 (get-output-stream-string *weblocks-output-stream*))))
   #.(format nil "~
 {~
 \"widgets\":~
@@ -299,4 +301,7 @@
 \"\":\"<p>test</p>\"~
 },~
 \"on-load\":[\"testjs\"]~
-}"))
+}")
+  ; this is necessary for Safari
+  " ")
+
