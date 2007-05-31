@@ -38,12 +38,22 @@ the dirty widgets are rendered into a JSON data structure. It also
 invokes user supplied 'init-user-session' on the first request that
 has no session setup.
 
+'handle-client-request' immediately returns '+http-not-found+' if it
+seems a mime type on the script name (it doesn't handle what could be
+files because these mess with callback functions and break some
+widgets that depend on them).
+
 Additionally, on the first request a session is created and a client
 is forced to redirect. At this point if the cookie is sent, session
 information is removed from the URL, otherwise the URL is left in
 tact. This is done so that session information appears on the URL for
 clients that don't support cookies (this way AJAX requests followed by
 a refresh will work).
+
+This function also manages lists of callback functions and calls them
+at different points before and after request. See *on-pre-request*,
+'on-session-pre-request', and *on-pre-request-onetime* (as well as
+their 'post' alternative).
 
 Override this method (along with :before
 and :after specifiers to customize behavior)."))
