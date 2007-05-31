@@ -4,7 +4,7 @@
 (export '(*on-pre-request* *on-post-request*
 	  *on-ajax-complete-scripts* on-session-pre-request
 	  on-session-post-request *on-pre-request-onetime*
-	  *on-post-request-onetime*))
+	  *on-post-request-onetime* *uri-tokens* refresh-request-p))
 
 (defparameter *on-pre-request* nil
   "A list of functions that take no arguments. Each function will be
@@ -49,6 +49,9 @@ Override this method (along with :before
 and :after specifiers to customize behavior)."))
 
 (defmethod handle-client-request ()
+  (when (hunchentoot::mime-type (script-name))
+    (setf (return-code) +http-not-found+)
+    (throw 'handler-done nil))
   (when (null *session*)
     (start-session)
     (redirect (request-uri)))
@@ -67,11 +70,12 @@ and :after specifiers to customize behavior)."))
 	(redirect (remove-session-from-uri (request-uri)))))
 
     (let ((*weblocks-output-stream* (make-string-output-stream))
+	  (*uri-tokens* (tokenize-uri (request-uri)))
 	  (*current-navigation-url* "/") *dirty-widgets*
 	  *on-ajax-complete-scripts*)
       (declare (special *weblocks-output-stream*
 			*current-navigation-url* *dirty-widgets*
-			*on-ajax-complete-scripts*))
+			*on-ajax-complete-scripts* *uri-tokens*))
       (mapc #'funcall *on-pre-request*)
       (mapc #'funcall (on-session-pre-request))
       (mapc #'funcall *on-pre-request-onetime*)
@@ -79,13 +83,14 @@ and :after specifiers to customize behavior)."))
       (if (ajax-request-p)
 	  (render-dirty-widgets)
 	  (progn
-	    (apply-uri-to-navigation (tokenize-uri (request-uri))
+	    (apply-uri-to-navigation *uri-tokens*
 				     (find-navigation-widget (session-value 'root-composite)))
 	    (with-page (lambda ()
 			 (render-widget (session-value 'root-composite))))))
       (mapc #'funcall *on-post-request-onetime*)
       (mapc #'funcall (on-session-post-request))
       (mapc #'funcall *on-post-request*)
+      (setf (session-value 'last-request-uri) *uri-tokens*)
       (get-output-stream-string *weblocks-output-stream*))))
 
 (defun remove-session-from-uri (uri)
@@ -171,3 +176,11 @@ association list. This function is normally called by
   ;; We need something in the response for Safari to evaluate JSON
   (format *weblocks-output-stream* " "))
 
+(defun refresh-request-p ()
+  "Determines if a request is a result of the user invoking a browser
+refresh function. Note that a request will not be considered a refresh
+if there is an action involved (even if the user hits refresh)."
+  (declare (special *uri-tokens*))
+  (and
+   (null (get-request-action))
+   (equalp *uri-tokens* (session-value 'last-request-uri))))

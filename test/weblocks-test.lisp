@@ -89,7 +89,9 @@ the request."
 	    (make-action-orig #'weblocks::make-action)
 	    (generate-widget-id-orig #'weblocks::generate-widget-id)
 	    (dummy-action-count 123)
-	    (*session-cookie-name* "weblocks-session"))
+	    (*session-cookie-name* "weblocks-session")
+	    (*uri-tokens* '("foo" "bar")))
+       (declare (special *uri-tokens*))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)
@@ -106,6 +108,7 @@ the request."
 				 "widget-123"))
 			 (setf (slot-value *request* 'method) ,method)
 			 (setf (slot-value *request* ',parameters-slot) ,parameters)
+			 (setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
 			 (setf (slot-value *session* 'hunchentoot::session-id) 1)
 			 (setf (slot-value *session* 'hunchentoot::session-string) "test")
 			 ,@body)

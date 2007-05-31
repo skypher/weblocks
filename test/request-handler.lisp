@@ -1,7 +1,17 @@
 
 (in-package :weblocks-test)
 
+
 ;;; testing handle-client-request
+(deftest handle-client-request-0
+    (with-request :get nil
+      (setf (slot-value *request* 'hunchentoot::script-name) "/hello/world/bar.txt")
+      (multiple-value-bind (res err)
+	  (ignore-errors
+	    (handle-client-request))
+	res))
+  nil)
+
 (deftest handle-client-request-1
     (with-request :get nil
       (let (weblocks::*webapp-name* result1 result2 result3
@@ -305,3 +315,22 @@
   ; this is necessary for Safari
   " ")
 
+;;; test refresh-request-p
+(deftest refresh-request-p-1
+    (with-request :get nil
+      (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
+      (refresh-request-p))
+  t)
+
+(deftest refresh-request-p-2
+    (with-request :get nil
+      (setf (session-value 'weblocks::last-request-uri) '("foo"))
+      (refresh-request-p))
+  nil)
+
+(deftest refresh-request-p-2
+    (with-request :get `((,weblocks::*action-string* . "abc123"))
+      (make-action (lambda () nil))
+      (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
+      (refresh-request-p))
+  nil)

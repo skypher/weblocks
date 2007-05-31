@@ -67,11 +67,13 @@
   ("function () { new Effect.BlindUp('widget-123'); }")
   nil)
 
+;; After refresh, state shouldn't be reset
 (deftest render-widget-body-flash-5
     (with-request :get nil
       (let ((*weblocks-output-stream* (make-string-output-stream))
+	    (*uri-tokens* nil) ; refresh
 	    (w (make-instance 'flash)))
-	(declare (special *weblocks-output-stream*))
+	(declare (special *weblocks-output-stream* *uri-tokens*))
 	(flash-message w "Test")
 	(flash-message w "Test2")
 	(render-widget-body w)
