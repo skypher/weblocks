@@ -2,6 +2,7 @@
 .form
 {
   width: 25em;
+  margin-top: 0;
 }
 
 .form > fieldset

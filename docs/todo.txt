@@ -1,6 +1,5 @@
 
 -- TEMPORARY --
-- opera 8 margin issue
 - json issue on openmcl
 - getting opera 8 fix into Element.update
 
