@@ -128,11 +128,11 @@ as well."
     into a CLOS object derived from 'widget'."))
   (setf *dirty-widgets* (adjoin w *dirty-widgets*))
   (when putp
-     (mapc
-      (lambda (i)
-	(setf *dirty-widgets* (adjoin i *dirty-widgets*)))
-      (remove nil (loop for i in (widget-propagate-dirty w)
-		     collect (find-widget-by-path i))))))
+    (mapc
+     (lambda (i)
+       (setf *dirty-widgets* (adjoin i *dirty-widgets*)))
+     (remove nil (loop for i in (widget-propagate-dirty w)
+		    collect (find-widget-by-path i))))))
 
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
