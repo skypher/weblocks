@@ -120,7 +120,7 @@ the request."
   (setf (slot-value *request* (ecase (request-method)
 				(:get 'get-parameters)
 				(:post 'post-parameters))) parameters)
-  (safe-funcall (weblocks::get-request-action)))
+  (weblocks::eval-action))
 
 (defun make-request-ajax ()
   "Adds appropriate headers to a request so it is considered to be an

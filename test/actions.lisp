@@ -4,13 +4,13 @@
 ;;; testing make-action
 (deftest make-action/get-request-action-1
     (with-request :get nil
-      (let ((action-name (make-action (lambda () 123))))
+      (let ((action-name (make-action (lambda (&rest keys) 123))))
 	(do-request `(("action" . ,action-name)))))
   123)
 
 (deftest make-action/get-request-action-2
     (with-request :post nil
-      (let ((action-name (make-action (lambda () 123))))
+      (let ((action-name (make-action (lambda (&rest keys) 123))))
 	(do-request `(("action" . ,action-name)))))
   123)
 

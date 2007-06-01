@@ -89,7 +89,7 @@ and :after specifiers to customize behavior)."))
       (mapc #'funcall *on-pre-request*)
       (mapc #'funcall (on-session-pre-request))
       (mapc #'funcall *on-pre-request-onetime*)
-      (safe-funcall (get-request-action))
+      (eval-action)
       (if (ajax-request-p)
 	  (render-dirty-widgets)
 	  (progn
@@ -102,6 +102,10 @@ and :after specifiers to customize behavior)."))
       (mapc #'funcall *on-post-request*)
       (setf (session-value 'last-request-uri) *uri-tokens*)
       (get-output-stream-string *weblocks-output-stream*))))
+
+(defun eval-action ()
+  "Evaluates the action that came with the request."
+  (safe-apply (get-request-action) (alist->plist (request-parameters))))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."

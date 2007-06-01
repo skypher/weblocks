@@ -3,9 +3,9 @@
 
 (export '(humanize-name attributize-name object-visible-slots
 	  get-slot-value slot-value-by-path render-slot-inline-p
-	  safe-apply safe-funcall request-parameter
+	  safe-apply safe-funcall request-parameter request-parameters
 	  string-whitespace-p render-extra-tags with-extra-tags
-	  strictly-less-p equivalentp))
+	  strictly-less-p equivalentp alist->plist))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -340,3 +340,11 @@ specializing CLOS functions."
 		   keys)))
 	(apply #'object-visible-slots obj keys)))
 
+(defun alist->plist (alist)
+  "Converts an alist to plist."
+  (let ((keyword-package (find-package :keyword)))
+    (loop for i in alist
+       collect (if (symbolp (car i))
+		   (intern (symbol-name (car i)) keyword-package)
+		   (intern (string-upcase (car i)) keyword-package))
+       collect (cdr i))))

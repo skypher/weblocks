@@ -187,6 +187,17 @@
       (request-parameter "b"))
   2)
 
+;;; test request-parameters
+(deftest request-parameters-1
+    (with-request :get '(("a" . 1) ("b" . 2))
+      (request-parameters))
+  (("a" . 1) ("b" . 2)))
+
+(deftest request-parameters-2
+    (with-request :post '(("a" . 1) ("b" . 2))
+      (request-parameters))
+  (("a" . 1) ("b" . 2)))
+
 ;;; test string-whitespace-p
 (deftest string-whitespace-p-1
     (string-whitespace-p "")
@@ -281,3 +292,16 @@
    (:p "Joe")
    (:p "MANAGER")
    (:p "Jim")))
+
+;;; test alist->plist
+(deftest alist->plist-1
+    (alist->plist '((hello . world) (blah . test)))
+  (:hello world :blah test))
+
+(deftest alist->plist-2
+    (alist->plist '(("hello" . world) ("blah" . test)))
+  (:hello world :blah test))
+
+(deftest alist->plist-3
+    (alist->plist nil)
+  nil)

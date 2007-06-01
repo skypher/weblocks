@@ -25,7 +25,6 @@ TODO:
 -- RESEARCH --
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
 - non-inline CLOS objects in forms
-- Consider "action parameters" - map http parameters to action function argument symbols
 - Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
 - (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).

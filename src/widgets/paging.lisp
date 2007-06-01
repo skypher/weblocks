@@ -80,7 +80,7 @@
 
 (defun make-paging-link (obj page)
   (render-link (make-action
-		(lambda ()
+		(lambda (&rest args)
 		  (setf (paging-current-page obj) page)))
 	       (princ page)))
 

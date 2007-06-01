@@ -66,7 +66,7 @@ customize data behavior."))
 	 (lambda (data-value &rest keys)
 	   (with-html
 	     (:div :class "submit"
-		   (render-link (make-action (lambda ()
+		   (render-link (make-action (lambda (&rest args)
 					       (setf (slot-value obj 'ui-state) :form)))
 				"Modify"))))
 	 args))
@@ -81,9 +81,9 @@ customize form behavior."))
   (apply #'render-form
 	 data
 	 :method :post
-	 :action (make-action (lambda ()
+	 :action (make-action (lambda (&key submit cancel &allow-other-keys)
 				(let (break-out)
-				  (when (request-parameter *submit-control-name*)
+				  (when submit
 				    (multiple-value-bind (success errors)
 					(apply #'dataform-submit-action obj data args)
 				      (if success
@@ -94,7 +94,7 @@ customize form behavior."))
 					    (setf (slot-value obj 'validation-errors) errors)
 					    (setf (slot-value obj 'intermediate-form-values)
 						  (copy-alist (request-parameters)))))))
-				  (when (request-parameter *cancel-control-name*)
+				  (when cancel
 				    (setf break-out t))
 				  (when break-out
 				    (setf (slot-value obj 'validation-errors) nil)

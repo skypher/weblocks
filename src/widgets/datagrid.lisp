@@ -67,7 +67,7 @@ customize the way datagrid headers are rendered."))
       (setf dir (cdr (datagrid-sort grid-obj))))
     (with-html
       (:th :class (concatenate 'string (attributize-name slot-name) th-class)
-	   (:span (render-link (make-action (lambda ()
+	   (:span (render-link (make-action (lambda (&rest args)
 					      (when (equalp slot slot-name)
 						(setf new-dir (negate-sort-direction dir)))
 					      (setf (datagrid-sort grid-obj) (cons slot-path new-dir))))

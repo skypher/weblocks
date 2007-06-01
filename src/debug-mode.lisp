@@ -15,7 +15,7 @@ present the user with a toolbar that aids development."
   "When weblocks is started in debug mode, called on session
 initalization so that appropriate actions that aid development can be
 created."
-  (make-action (lambda ()
+  (make-action (lambda (&rest args)
 		 (reset-sessions)
 		 (redirect "/"))
 	       "debug-reset-sessions"))
