@@ -23,6 +23,9 @@
 		      :depends-on ("weblocks" "actions"))
 	       (:file "request-handler"
 		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions"))
+	       (:module blocks
+			:components ((:file "suggest"))
+			:depends-on ("weblocks"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
@@ -42,8 +45,6 @@
 	       (:module widgets
 			:components ((:file "widget")
 				     (:file "flash"
-				      :depends-on ("widget"))
-				     (:file "suggest"
 				      :depends-on ("widget"))
 				     (:file "dataform"
 				      :depends-on ("widget"))

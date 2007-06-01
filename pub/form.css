@@ -22,7 +22,7 @@
   display: none;
 }
 
-input
+input, select
 {
   border: solid 1px #29364F;
   background-color: #F6FBFD;

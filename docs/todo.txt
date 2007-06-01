@@ -5,11 +5,7 @@
 
 TODO:
 -- CURRENT (ajax suggest) --
-- Improve styling
-- Degrade local to dropdown
 - Allows server backed
-- Improve id and class names
-- Consider 'blocks' concept
 - Unit test
 - Incorporate it into selecting state in forms
 

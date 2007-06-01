@@ -52,3 +52,21 @@ function disableIrrelevantButtons(currentButton) {
 						       currentButton.enable();
 						   });
 }
+
+// Support suggest control
+function replaceDropdownWithSuggest(inputId, inputName, choicesId) {
+    var dropdownOptions = $(inputId).childElements();
+    var suggestOptions = [];
+    dropdownOptions.each(function(i)
+			 {
+			     suggestOptions.push(i.innerHTML);
+			 });
+
+    var suggestHTML = ('\
+<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest" />\
+<div id="' + choicesId + '" class="suggest"></div>\
+');
+    $(inputId).replace(suggestHTML);
+    
+    new Autocompleter.Local(inputId, choicesId, suggestOptions, {});
+}

@@ -32,6 +32,9 @@
 	       (:module fixtures
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
+	       (:module blocks
+			:components ((:file "suggest"))
+			:depends-on ("weblocks-test" fixtures))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer-utils")
