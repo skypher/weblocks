@@ -14,6 +14,7 @@
       (:link :rel "stylesheet" :type "text/css" :href "/pub/flash.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/navigation.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/form.css")
+      (:link :rel "stylesheet" :type "text/css" :href "/pub/suggest.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/data.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/table.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/layout.css")
@@ -22,7 +23,7 @@
       ; empty quote in script tags are a fix for w3m
       (:script :src "/pub/scripts/prototype.js" :type "text/javascript" "")
       (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" "")
-      (:script :src "/pub/scripts/scriptaculous.js?load=effects" :type "text/javascript" ""))
+      (:script :src "/pub/scripts/scriptaculous.js?load=effects,controls" :type "text/javascript" ""))
      (:body
       (render-page-body body-fn)
       (when *render-debug-toolbar*

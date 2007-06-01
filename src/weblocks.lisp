@@ -15,7 +15,7 @@ approach to maintaining UI state."))
 (in-package :weblocks)
 
 (export '(*weblocks-output-stream* *current-navigation-url* with-html
-	  reset-sessions str server-type server-version))
+	  reset-sessions str server-type server-version with-javascript))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -37,6 +37,15 @@ variable. All html should be rendered to this stream.")
   "A wrapper around cl-who with-html-output macro."
   `(with-html-output (*weblocks-output-stream* nil :indent nil)
      ,@body))
+
+(defmacro with-javascript (source &rest args)
+  "Places 'source' between script and CDATA elements. Used to avoid
+having to worry about special characters in JavaScript code."
+  `(with-html
+     (:script :type "text/javascript" :language "javascript"
+	      (fmt "~%// <![CDATA[~%")
+	      (fmt ,source ,@args)
+	      (fmt "~%// ]]~%"))))
 
 (defun server-type ()
   "Hunchentoot")

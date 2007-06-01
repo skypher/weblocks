@@ -5,7 +5,11 @@
 
 TODO:
 -- CURRENT (ajax suggest) --
-- Add a degradeable ajax suggest widget (local -> dropdown)
+- Improve styling
+- Degrade local to dropdown
+- Allows server backed
+- Improve id and class names
+- Consider 'blocks' concept
 - Unit test
 - Incorporate it into selecting state in forms
 

@@ -43,6 +43,8 @@
 			:components ((:file "widget")
 				     (:file "flash"
 				      :depends-on ("widget"))
+				     (:file "suggest"
+				      :depends-on ("widget"))
 				     (:file "dataform"
 				      :depends-on ("widget"))
 				     (:file "datagrid"
