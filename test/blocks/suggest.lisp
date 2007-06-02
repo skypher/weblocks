@@ -27,7 +27,9 @@
 
 (deftest render-suggest-3
     (with-request :get nil
-      (render-suggest 'some-name nil :fetch-fn (lambda (a) '("a" "b" "c")) :input-id 'i1 :choices-id 'c1)
+      (let ((*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *weblocks-output-stream*))
+	(render-suggest 'some-name nil :fetch-fn (lambda (a) '("a" "b" "c")) :input-id 'i1 :choices-id 'c1))
       (do-request `(("pure" . "true") (,weblocks::*action-string* . "abc123"))))
   "<ul><li>a</li><li>b</li><li>c</li></ul>")
 
