@@ -1,4 +1,12 @@
 
+// Utilities
+function updateElementBody(element, newBody) {
+    // this is an Opera 8 fix
+    // should be removed if it ever makes it into Prototype
+    element.update('<form><input /></form>');
+    element.update(newBody);
+}
+
 // Register global AJAX handlers to show progress
 Ajax.Responders.register({
   onCreate: function() {
@@ -13,7 +21,7 @@ function onActionSuccess(transport, json) {
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {
-	$(i).update(dirtyWidgets[i]);
+	updateElementBody($(i), dirtyWidgets[i]);
     }
 
     // Perform a series of specialized operations
