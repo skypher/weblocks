@@ -5,8 +5,6 @@
 
 TODO:
 -- CURRENT (ajax suggest) --
-- Allows server backed
-- Unit test
 - Incorporate it into selecting state in forms
 
 -- LARGE FEATURES --

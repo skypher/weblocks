@@ -24,8 +24,12 @@ function onActionSuccess(transport, json) {
 		     });
 }
 
-function getActionUrl(actionCode, sessionString) {
-    return '/?' + sessionString + '&action=' + actionCode;
+function getActionUrl(actionCode, sessionString, isPure) {
+    var url = '/?' + sessionString + '&action=' + actionCode;
+    if(isPure) {
+	url += '&pure=true';
+    }
+    return url;
 }
 
 function initiateAction(actionCode, sessionString) {
@@ -69,4 +73,8 @@ function replaceDropdownWithSuggest(inputId, inputName, choicesId) {
     $(inputId).replace(suggestHTML);
     
     new Autocompleter.Local(inputId, choicesId, suggestOptions, {});
+}
+
+function declareSuggest(inputId, choicesId, actionCode, sessionString) {
+    new Ajax.Autocompleter(inputId, choicesId, getActionUrl(actionCode, sessionString, true), {});
 }
