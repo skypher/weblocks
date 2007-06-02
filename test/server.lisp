@@ -34,6 +34,22 @@
       (not (null (ajax-request-p))))
   nil)
 
+;;; test pure-request-p
+(deftest pure-request-p-1
+    (with-request :get nil
+      (not (null (pure-request-p))))
+  nil)
+
+(deftest pure-request-p-2
+    (with-request :get '(("pure" . blah))
+      (not (null (pure-request-p))))
+  nil)
+
+(deftest pure-request-p-3
+    (with-request :get '(("pure" . true))
+      (not (null (pure-request-p))))
+  t)
+
 ;;; test session-name-string-pair
 (deftest session-name-string-pair-1
     (let ((*rewrite-for-session-urls* nil))

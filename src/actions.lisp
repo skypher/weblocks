@@ -54,7 +54,7 @@ link."
 session. And appropriate function is returned. If no action is in
 the parameter, returns nil. If the action isn't in the
 session (somehow invalid), raises an assertion."
-  (let ((action-name (request-parameter *action-string*))
+  (let ((action-name (parameter *action-string*))
 	request-action)
     (when action-name
       (setf request-action (session-value action-name))

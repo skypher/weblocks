@@ -86,6 +86,8 @@ and :after specifiers to customize behavior)."))
       (declare (special *weblocks-output-stream*
 			*current-navigation-url* *dirty-widgets*
 			*on-ajax-complete-scripts* *uri-tokens*))
+      (when (pure-request-p)
+	(throw 'handler-done (eval-action)))
       (mapc #'funcall *on-pre-request*)
       (mapc #'funcall (on-session-pre-request))
       (mapc #'funcall *on-pre-request-onetime*)

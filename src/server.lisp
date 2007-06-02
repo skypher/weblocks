@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(start-weblocks stop-weblocks defwebapp ajax-request-p))
+(export '(start-weblocks stop-weblocks defwebapp ajax-request-p
+	  pure-request-p))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -67,6 +68,18 @@ initial widgets to this composite."
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
   (header-in "X-Requested-With"))
+
+(defun pure-request-p ()
+  "Detects if the current request is declared as 'pure', i.e. affects
+no widgets or internal application state, but merely is a request for
+information. Such requests simply return the result of the function
+that represents the action and are used by some AJAX operations to
+retreive information (suggest block, etc). When such requests are
+satisfied, the actions have access to the session, the widgets, and
+all other parameters. However, none of the callbacks (see
+*on-pre-request*) are executed, no widgets are sent to the client,
+etc."
+  (string-equal (get-parameter "pure") "true"))
 
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This

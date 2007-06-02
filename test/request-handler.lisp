@@ -221,6 +221,33 @@
 	res))
   2)
 
+(deftest handle-client-request-8
+    (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
+      (let ((res 0) weblocks::*webapp-name*)
+	(declare (special weblocks::*webapp-name*))
+	;; start the session
+	(start-session)
+	;; action
+	(make-action (lambda (&rest args)
+		       (incf res)))
+	;; set up our mini-application
+	(defwebapp 'hello)
+	(defun init-user-session (comp)
+	  (declare (special *on-pre-request-onetime*
+			    *on-post-request-onetime*))
+	  (setf *on-pre-request-onetime* (cons (lambda ()
+						 (incf res))
+					       *on-pre-request-onetime*))
+	  (setf *on-post-request-onetime* (cons (lambda ()
+						 (incf res))
+						*on-post-request-onetime*)))
+	;; do the test
+	(ignore-errors
+	  (handle-client-request))
+	;; tear down the application
+	res))
+  1)
+
 ;;; test eval-action
 (deftest eval-action-1
     (with-request :get `(("name" . "Bob")
