@@ -178,17 +178,16 @@ association list. This function is normally called by
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *on-ajax-complete-scripts*))
   (setf (header-out "X-JSON")
-	(encode-json-to-string
-	 (list (cons "widgets"
-		     (mapcar (lambda (w)
-			       (cons
-				(attributize-name (widget-name w))
-				(progn
-				  (render-widget w :inlinep t)
-				  (get-output-stream-string *weblocks-output-stream*))))
-			     *dirty-widgets*))
-	       (cons "on-load"
-		     *on-ajax-complete-scripts*))))
+	(format nil "{\"widgets\":~A,\"on-load\":~A}"
+		(encode-json-alist-to-string
+		 (mapcar (lambda (w)
+			   (cons
+			    (widget-name w)
+			    (progn
+			      (render-widget w :inlinep t)
+			      (get-output-stream-string *weblocks-output-stream*))))
+			 *dirty-widgets*))
+		(encode-json-to-string *on-ajax-complete-scripts*)))
   ;; We need something in the response for Safari to evaluate JSON
   (format *weblocks-output-stream* " "))
 

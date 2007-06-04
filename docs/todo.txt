@@ -1,7 +1,4 @@
 
--- TEMPORARY --
-- json issue on openmcl
-
 TODO:
 -- CURRENT (ajax suggest) --
 - Incorporate it into selecting state in forms
