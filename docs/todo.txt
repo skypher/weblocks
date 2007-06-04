@@ -1,7 +1,6 @@
 
 -- TEMPORARY --
 - json issue on openmcl
-- getting opera 8 fix into Element.update
 
 TODO:
 -- CURRENT (ajax suggest) --
