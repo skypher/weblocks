@@ -66,7 +66,7 @@ function disableIrrelevantButtons(currentButton) {
 }
 
 // Support suggest control
-function replaceDropdownWithSuggest(inputId, inputName, choicesId) {
+function replaceDropdownWithSuggest(inputId, inputName, choicesId, value) {
     var dropdownOptions = $(inputId).childElements();
     var suggestOptions = [];
     dropdownOptions.each(function(i)
@@ -74,10 +74,13 @@ function replaceDropdownWithSuggest(inputId, inputName, choicesId) {
 			     suggestOptions.push(i.innerHTML);
 			 });
 
-    var suggestHTML = ('\
-<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest" />\
-<div id="' + choicesId + '" class="suggest"></div>\
-');
+    var inputBox = '<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest"';
+    if(value) {
+	inputBox += 'value="' + value +'"';
+    }
+    inputBox += '/>';
+    
+    var suggestHTML = inputBox + '<div id="' + choicesId + '" class="suggest"></div>';
     $(inputId).replace(suggestHTML);
     
     new Autocompleter.Local(inputId, choicesId, suggestOptions, {});

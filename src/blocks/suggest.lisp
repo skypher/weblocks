@@ -3,7 +3,7 @@
 
 (export '(render-suggest))
 
-(defun render-suggest (input-name localp &key fetch-fn
+(defun render-suggest (input-name localp &key value fetch-fn
 		       (input-id (gensym))
 		       (choices-id (gensym))
 		       (format-fn #'format-suggest-list))
@@ -16,6 +16,8 @@ to the server. Otherwise, must be set to a list of items which will be
 sent to the client for local autocompletion. In this case, the value
 of 'fetch-action' is ignored. Note, if JavaScript is turned off local
 autocompletion will degrade to a simple drowdown.
+
+value - can be used to set the value of the input box and/or dropdown.
 
 fetch-fn - when 'localp' is false, a function that accepts a single
 argument (the string entered by the user) and returns a list of items
@@ -33,13 +35,16 @@ the client. Accepts a list of results."
 	(with-html
 	  (:select :id a-input-id :name a-input-name
 		   (mapc (lambda (i)
-			   (htm
-			    (:option (str i))))
+			   (if (string-equal i value)
+			       (htm (:option :selected "true" (str i)))
+			       (htm (:option (str i)))))
 			 localp))
-	  (with-javascript "replaceDropdownWithSuggest('~A', '~A', '~A');"
-	    a-input-id a-input-name a-choices-id))
+	  (with-javascript (if value
+			       "replaceDropdownWithSuggest('~A', '~A', '~A', '~A');"
+			       "replaceDropdownWithSuggest('~A', '~A', '~A');")
+	    a-input-id a-input-name a-choices-id value))
 	(with-html
-	  (:input :type "text" :id a-input-id :name a-input-name :class "suggest")
+	  (:input :type "text" :id a-input-id :name a-input-name :class "suggest" :value value)
 	  (:div :id a-choices-id :class "suggest" "")
 	  (with-javascript "declareSuggest('~A', '~A', '~A', '~A');"
 	    a-input-id a-choices-id
