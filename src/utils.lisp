@@ -5,7 +5,7 @@
 	  get-slot-value slot-value-by-path render-slot-inline-p
 	  safe-apply safe-funcall request-parameter request-parameters
 	  string-whitespace-p render-extra-tags with-extra-tags
-	  strictly-less-p equivalentp alist->plist))
+	  strictly-less-p equivalentp alist->plist intersperse))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -348,3 +348,15 @@ specializing CLOS functions."
 		   (intern (symbol-name (car i)) keyword-package)
 		   (intern (string-upcase (car i)) keyword-package))
        collect (cdr i))))
+
+(defun intersperse (list delimeter)
+  "Intersperses a list with a delimeter.
+
+\(intersperse '(1 2 3 4 5) 0)
+=> (1 0 2 0 3 0 4 0 5)"
+  (if (null list)
+      list
+      (flatten
+       (cons (car list)
+	     (loop for i in (cdr list)
+		collect (list delimeter i))))))

@@ -305,3 +305,16 @@
 (deftest alist->plist-3
     (alist->plist nil)
   nil)
+
+;;; test intersperse
+(deftest intersperse-1
+    (intersperse '(1 2 3 4 5) 0)
+  (1 0 2 0 3 0 4 0 5))
+
+(deftest intersperse-2
+    (intersperse '(1) 0)
+  (1))
+
+(deftest intersperse-3
+    (intersperse nil 0)
+  nil))
