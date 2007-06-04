@@ -1,16 +1,19 @@
 
 TODO:
--- CURRENT (ajax suggest) --
-- Incorporate it into selecting state in forms
+-- CURRENT (degradable isearch) --
+- Fix issue with two 'action' parameters being sent in form AJAX requests
+- Unify isearch and form renderer button styling
+- Style isearch input
+- Document, export, unit test
 
 -- LARGE FEATURES --
-- Create a degradable isearch control
 - Create a gridsearch control
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
 - Handling failure (AJAX and regular, add message types to flash widget)
 - Controls that expose state on the URL, AJAX and POST/GET, back button/history research
+- Convert states to render using suggest block (specialize on nil, validate, proper display of data)
 
 -- RESEARCH --
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
@@ -26,8 +29,6 @@ TODO:
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
 - Mark required fields
 - Don't remove validation error summary for long forms.
-- Standardize renderers return values (deferring until more is known about what's useful)
-- Fix the bug where in strict mode one must do (address first-name) instead of just (first-name)
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
 - Highlight rows while hoovering over table (and data/forms?)
@@ -36,11 +37,6 @@ TODO:
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
-
--- BIGGER PICTURE --
-- Release the library/write articles.
-- Create a reference application.
-- Rewrite defmacro
 
 -- WISHLIST --
 - Authentication (permission to access menu items, actions, widgets in general)
