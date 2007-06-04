@@ -57,6 +57,9 @@
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
 			:depends-on (renderers form-management "request-handler" "utils" "actions"))
+	       (:module data-types
+			:components ((:file "us-states"))
+			:depends-on (renderers blocks))
 	       (:file "server"
 		      :depends-on (widgets))))
 
