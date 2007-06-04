@@ -50,12 +50,16 @@ link."
 
 (defun get-request-action ()
   "Gets an action from the request. If the request contains
-*action-string* parameter, the action is looked up in the
-session. And appropriate function is returned. If no action is in
-the parameter, returns nil. If the action isn't in the
-session (somehow invalid), raises an assertion."
-  (let ((action-name (parameter *action-string*))
-	request-action)
+*action-string* parameter, the action is looked up in the session and
+appropriate function is returned. If no action is in the parameter,
+returns nil. If the action isn't in the session (somehow invalid),
+raises an assertion."
+  (let* ((request-action-name (request-parameter *action-string*))
+	 (get/post-action-name (parameter *action-string*))
+	 (action-name (if request-action-name
+			  request-action-name
+			  get/post-action-name))
+	 request-action)
     (when action-name
       (setf request-action (session-value action-name))
       (assert request-action (request-action)
