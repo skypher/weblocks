@@ -49,6 +49,8 @@ function initiateAction(actionCode, sessionString) {
 }
 
 function initiateFormAction(actionCode, form, sessionString) {
+    // Hidden "action" field should be turned off with AJAX
+    // todo: ...
     new Ajax.Request(getActionUrl(actionCode, sessionString),
 		     {
 			 method: form.method,

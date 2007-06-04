@@ -24,7 +24,8 @@
 	       (:file "request-handler"
 		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions"))
 	       (:module blocks
-			:components ((:file "suggest"))
+			:components ((:file "suggest")
+				     (:file "isearch"))
 			:depends-on ("weblocks"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
