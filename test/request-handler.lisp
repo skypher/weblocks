@@ -345,7 +345,7 @@
 \"widgets\":~
 {~
 \"widget-123\":\"\",~
-\"\":\"<p>test</p>\"~
+null:\"<p>test</p>\"~
 },~
 \"on-load\":[\"testjs\"]~
 }")
