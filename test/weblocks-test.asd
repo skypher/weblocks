@@ -33,7 +33,8 @@
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
 	       (:module blocks
-			:components ((:file "suggest"))
+			:components ((:file "suggest")
+				     (:file "isearch"))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")

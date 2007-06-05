@@ -43,7 +43,7 @@ input:focus
 }
 
 
-.form > fieldset > .submit > input
+input.submit
 {
   display: inline;
   margin-top: 2px;
@@ -53,7 +53,7 @@ input:focus
   width: 5em;
 }
 
-.form > fieldset > .submit > input:hover
+input.submit:hover
 {
   background-color: #D8EAF8;
 }

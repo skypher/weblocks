@@ -83,9 +83,9 @@ case the user clicks submit."))
 (defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
   (with-html
     (:div :class "submit"
-	  (:input :name *submit-control-name* :type "submit" :value "Submit"
+	  (:input :name *submit-control-name* :type "submit" :class "submit" :value "Submit"
 		  :onclick "disableIrrelevantButtons(this);")
-	  (:input :name *cancel-control-name* :type "submit" :value "Cancel"
+	  (:input :name *cancel-control-name* :type "submit" :class "submit cancel" :value "Cancel"
 		  :onclick "disableIrrelevantButtons(this);")
 	  (:input :name "action" :type "hidden" :value action))))
 

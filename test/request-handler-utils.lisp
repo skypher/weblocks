@@ -14,6 +14,7 @@
 <link rel='stylesheet' type='text/css' href='/pub/navigation.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/form.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/suggest.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/isearch.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/layout.css' />~

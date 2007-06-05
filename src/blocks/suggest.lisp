@@ -28,12 +28,10 @@ respectively. If an ID isn't provided, it will be generated.
 
 format-fn - a function used to format the results into html sent to
 the client. Accepts a list of results."
-  (let ((a-input-name (attributize-name input-name))
-	(a-input-id (attributize-name input-id))
-	(a-choices-id (attributize-name choices-id)))
+  (let ((a-input-name (attributize-name input-name)))
     (if localp
 	(with-html
-	  (:select :id a-input-id :name a-input-name
+	  (:select :id input-id :name a-input-name
 		   (mapc (lambda (i)
 			   (if (string-equal i value)
 			       (htm (:option :selected "true" (str i)))
@@ -42,12 +40,12 @@ the client. Accepts a list of results."
 	  (with-javascript (if value
 			       "replaceDropdownWithSuggest('~A', '~A', '~A', '~A');"
 			       "replaceDropdownWithSuggest('~A', '~A', '~A');")
-	    a-input-id a-input-name a-choices-id value))
+	    input-id a-input-name choices-id value))
 	(with-html
-	  (:input :type "text" :id a-input-id :name a-input-name :class "suggest" :value value)
-	  (:div :id a-choices-id :class "suggest" "")
+	  (:input :type "text" :id input-id :name a-input-name :class "suggest" :value value)
+	  (:div :id choices-id :class "suggest" "")
 	  (with-javascript "declareSuggest('~A', '~A', '~A', '~A');"
-	    a-input-id a-choices-id
+	    input-id choices-id
 	    (make-action
 	     (lambda (&rest keys)
 	       (funcall format-fn (funcall fetch-fn (request-parameter a-input-name)))))

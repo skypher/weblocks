@@ -76,8 +76,9 @@
 </li>~
 </ul>~
 <div class='submit'>~
-<input name='submit' type='submit' value='Submit' onclick='disableIrrelevantButtons(this);' />~
-<input name='cancel' type='submit' value='Cancel' onclick='disableIrrelevantButtons(this);' />~
+<input name='submit' type='submit' class='submit' value='Submit' onclick='disableIrrelevantButtons(this);' />~
+<input name='cancel' type='submit' class='submit cancel' value='Cancel' ~
+onclick='disableIrrelevantButtons(this);' />~
 <input name='action' type='hidden' value='abc124' />~
 </div>~
 </fieldset>~

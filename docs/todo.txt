@@ -1,12 +1,8 @@
 
 TODO:
--- CURRENT (degradable isearch) --
-- Unify isearch and form renderer button styling
-- Style isearch input
-- Document, export, unit test
+-- CURRENT (gridsearch) --
 
 -- LARGE FEATURES --
-- Create a gridsearch control
 - Design paging control for datagrid
 - Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
