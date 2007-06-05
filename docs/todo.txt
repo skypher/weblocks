@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (degradable isearch) --
-- Fix issue with two 'action' parameters being sent in form AJAX requests
 - Unify isearch and form renderer button styling
 - Style isearch input
 - Document, export, unit test
