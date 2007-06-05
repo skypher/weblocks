@@ -20,6 +20,11 @@
   padding-left: 0.5em;
 }
 
+.table > table > tbody > tr:hover
+{
+  background: #dbeac1;
+}
+
 .empty-table > p
 {
   padding-left: 0.5em;
@@ -33,35 +38,3 @@
   font-family: Garamond, New York, serif;
 }
 
-span.paging
-{
-  margin-right: 0.5em;
-}
-
-.sort-ascending > span
-{
-  background: url(/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
-}
-
-.sort-ascending > span > a
-{
-  background: url(/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
-}
-
-.sort-descending > span
-{
-  background: url(/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
-}
-
-.sort-descending > span > a
-{
-  background: url(/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
-}
-
-
-.sort-ascending > span > a, .sort-descending > span > a,
-.sort-ascending > span, .sort-descending > span
-{
-  display: block;
-  text-decoration: underline;
-}

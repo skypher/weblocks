@@ -17,6 +17,7 @@
 <link rel='stylesheet' type='text/css' href='/pub/isearch.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/data.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/table.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/datagrid.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/layout.css' />~
 ~A~
 <script src='/pub/scripts/prototype.js' type='text/javascript'></script>~

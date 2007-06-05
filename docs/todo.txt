@@ -26,9 +26,7 @@ TODO:
 - Don't remove validation error summary for long forms.
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
-- Highlight rows while hoovering over table (and data/forms?)
 - Port stylesheets to IE, browser compatibility, offer simpe HTML version for older browsers
-- Move datagrid specific stylesheets from table.css to datagrid.css
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
