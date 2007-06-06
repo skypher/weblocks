@@ -1,38 +1,38 @@
 
-.flash > .renderer
+.flash > div.widget-body > .renderer
 {
   background: #f8e9d8 url(/pub/images/widget/flash/top_background.png) repeat-x;
 }
 
-.flash > .renderer > .extra-top-1
+.flash > div.widget-body > .renderer > .extra-top-1
 {
   background: url(/pub/images/widget/flash/top_left.png) no-repeat top left;
 }
 
-.flash > .renderer >  .extra-top-2
+.flash > div.widget-body > .renderer >  .extra-top-2
 {
   background: url(/pub/images/widget/flash/top_right.png) no-repeat top right;
   border-bottom-color: #ead8c2;
 }
 
-.flash > .renderer > ul.messages p
+.flash > div.widget-body > .renderer > ul.messages p
 {
   padding: 0;
   margin: 0;
 }
 
-.flash > .renderer > ul.messages
+.flash > div.widget-body > .renderer > ul.messages
 { 
   border-left-color: #ead8c2;
   border-right-color: #ead8c2;
 }
 
-.flash > .renderer > ul.messages > li
+.flash > div.widget-body > .renderer > ul.messages > li
 {
   height: 16px;
 }
 
-.flash > .renderer > ul.messages > li
+.flash > div.widget-body > .renderer > ul.messages > li
 {
   padding-left: 32px;
   min-height: 16px;
@@ -43,18 +43,18 @@
   background: url(/pub/images/widget/flash/flag.png) no-repeat top left;
 }
 
-.flash > .renderer > .extra-bottom-1
+.flash > div.widget-body > .renderer > .extra-bottom-1
 {
   background: url(/pub/images/widget/flash/bottom_background.png) repeat-x bottom;
   border-top-color: #fef9f6; 
 }
 
-.flash > .renderer > .extra-bottom-2
+.flash > div.widget-body > .renderer > .extra-bottom-2
 {
   background: url(/pub/images/widget/flash/bottom_left.png) no-repeat bottom left;
 }
 
-.flash > .renderer > .extra-bottom-3
+.flash > div.widget-body > .renderer > .extra-bottom-3
 {
   background: url(/pub/images/widget/flash/bottom_right.png) no-repeat bottom right;
 }

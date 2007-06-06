@@ -67,7 +67,7 @@ proper slot to override."))
 		(str (humanize-name human-name)) ":&nbsp;")
 	 (apply #'render-data slot-value keys))))
 
-(defgeneric render-data (obj &rest keys &key inlinep &allow-other-keys)
+(defgeneric render-data (obj &rest keys &key inlinep highlight &allow-other-keys)
   (:documentation
    "A generic data presentation renderer. The default
 implementation of 'render-data' for CLOS objects dynamically
@@ -99,15 +99,23 @@ Ex:
 \(render-data address)
 \(render-data address :slots (city) :mode :hide
 \(render-data address :slots ((city . town))
-\(render-data address :slots ((city . town) :mode :strict)"))
+\(render-data address :slots ((city . town) :mode :strict)
+
+When 'highlight' is set to a string, render-data searches for the
+string and renders it as a strong element. This is done to support
+incremental searching in some controls."))
 
 (defmethod render-data ((obj standard-object) &rest keys)
   (apply #'render-standard-object #'with-data-header #'render-data-slot obj keys))
 
-(defmethod render-data (obj &rest keys)
-  (with-html
-    (:span :class "value"
-     (str obj))))
+(defmethod render-data (obj &rest keys &key highlight &allow-other-keys)
+  (let* ((item (format nil "~A" obj)))
+    (with-html
+      (:span :class "value"
+	     (str (if highlight
+		      (ppcre:regex-replace-all
+		       highlight item (concatenate 'string "<strong>" "\\&" "</strong>"))
+		      item))))))
 
 (defmethod render-data ((obj (eql nil)) &rest keys)
   (with-html

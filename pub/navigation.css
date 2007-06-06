@@ -40,7 +40,7 @@
   border-bottom-color: #bfd9ec;
 }
 
-.menu > h1, .menu > .empty-navigation, .menu > ul
+.menu > h1, .menu > .empty-navigation, .menu > ul, .datagrid-search-bar > form
 {
   border-left-color: #bfd9ec;
   border-right-color: #bfd9ec;

@@ -25,6 +25,13 @@
   background: #dbeac1;
 }
 
+.table > table > tbody > tr > td strong
+{
+  background: #fe4631;
+  color: white;
+  font-weight: normal;
+}
+
 .empty-table > p
 {
   padding-left: 0.5em;

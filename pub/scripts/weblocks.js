@@ -1,9 +1,6 @@
 
 // Utilities
 function updateElementBody(element, newBody) {
-    // this is an Opera 8 fix
-    // should be removed if it ever makes it into Prototype
-    element.update('<form><input /></form>');
     element.update(newBody);
 }
 
@@ -21,7 +18,7 @@ function onActionSuccess(transport, json) {
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {
-	updateElementBody($(i), dirtyWidgets[i]);
+	updateElementBody($(i).getElementsByClassName('widget-body')[0], dirtyWidgets[i]);
     }
 
     // Perform a series of specialized operations
@@ -49,14 +46,15 @@ function initiateAction(actionCode, sessionString) {
 }
 
 function initiateFormAction(actionCode, form, sessionString) {
-    // Hidden "action" field should be turned off with AJAX
-    $(form).getInputs('hidden', 'action').first().disable();
+    // Hidden "action" field should not be serialized on AJAX
+    var serializedForm = form.serialize(true);
+    delete(serializedForm['action']);
     
     new Ajax.Request(getActionUrl(actionCode, sessionString),
 		     {
 			 method: form.method,
 			 onSuccess: onActionSuccess,
-			 parameters: form.serialize(true)    
+			 parameters: serializedForm
 		     });
 }
 

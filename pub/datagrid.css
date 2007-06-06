@@ -1,9 +1,11 @@
 
+/* Paging */
 span.paging
 {
   margin-right: 0.5em;
 }
 
+/* Sorting */
 .sort-ascending > span
 {
   background: url(/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
@@ -30,4 +32,58 @@ span.paging
 {
   display: block;
   text-decoration: underline;
+}
+
+/* Searching */
+.datagrid-search-bar
+{
+  background: #d8eaf8 url(/pub/images/widget/menu/top_background.png) repeat-x;
+  display: -moz-inline-box;
+  display: inline-block;
+  margin-left: 1em;
+}
+
+.datagrid-search-bar > .extra-top-3,
+.datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
+.datagrid-search-bar > .extra-bottom-3
+{
+  display: none;
+}
+
+.datagrid-search-bar > .extra-top-1
+{
+  height: 7px;
+  background: url(/pub/images/widget/menu/top_left.png) no-repeat top left;
+}
+
+.datagrid-search-bar > .extra-top-2
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/pub/images/widget/menu/top_right.png) no-repeat top right;
+}
+
+.datagrid-search-bar > form
+{
+  padding: 0;
+  margin: 0;
+}
+
+.datagrid-search-bar > form > fieldset
+{
+  border: none;
+  padding: 0;
+  margin: 0;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.datagrid-search-bar > form, .datagrid-search-bar > form > fieldset > input.search-bar
+{
+}
+
+.datagrid-search-bar > form > fieldset > input.search-bar
+{
+  margin-top: -2px;
+  margin-bottom: 4px;
 }

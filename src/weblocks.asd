@@ -57,7 +57,7 @@
 				      :depends-on ("widget"))
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
-			:depends-on (renderers form-management "request-handler" "utils" "actions"))
+			:depends-on (blocks renderers form-management "request-handler" "utils" "actions"))
 	       (:module data-types
 			:components ((:file "us-states"))
 			:depends-on (renderers blocks))

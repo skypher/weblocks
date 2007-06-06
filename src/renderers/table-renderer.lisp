@@ -11,14 +11,14 @@
 there is no information available.")
 
 ;; The usual div wrapper
-(defgeneric with-table-header (obj body-fn)
+(defgeneric with-table-header (obj body-fn &rest keys &key pretable-fn posttable-fn &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a table
 presentation. The default implementation renders appropriate
 div's along with classes necessary for CSS styling. Look at
 'with-data-header' for more details."))
 
-(defmethod with-table-header (obj body-fn)
+(defmethod with-table-header (obj body-fn &rest keys &key pretable-fn posttable-fn &allow-other-keys)
   (let* ((object-name (object-class-name obj))
 	 (header-class (format nil "renderer table ~A"
 			       (if (eql object-name 'null)
@@ -27,7 +27,9 @@ div's along with classes necessary for CSS styling. Look at
     (with-html
       (:div :class header-class
 	    (with-extra-tags
-	      (funcall body-fn))))))
+	      (safe-apply pretable-fn obj keys)
+	      (funcall body-fn)
+	      (safe-apply posttable-fn obj keys))))))
 
 ;; Auxilary functions
 (defun with-table-row (obj body-fn &key alternp &allow-other-keys)
@@ -45,9 +47,10 @@ particular cells. Specialize this method to achieve customized
 header row rendering. See 'render-standard-object' for more
 details.
 
-'obj' - the object being rendered.  'inlinep' - whether the
-object should be rendered inline or should have its own
-header."))
+'obj' - the object being rendered.
+
+'inlinep' - whether the object should be rendered inline or should
+have its own header."))
 
 (defmethod render-table-header-row (obj &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj
@@ -136,34 +139,36 @@ typed objects at your own risk.
 \(render-table (list address1 address2) :slots (city) :mode :hide"
   (if (empty-p objs)
       (progn
-	(render-empty-table :on-empty-string on-empty-string :caption caption)
+	(apply #'render-empty-table :on-empty-string on-empty-string :caption caption keys)
 	(return-from render-table)))
   (let ((row-num -1)
 	(first-obj (first-element objs)))
-    (with-table-header first-obj
-      (lambda ()
-	(with-html
-	  (:table
-	   :summary summary
-	   (if caption
-	       (htm (:caption (str caption))))
-	   (htm
-	    (:thead (apply #'render-table-header-row first-obj keys)))
-	    (:tbody
-	     (map 'list (lambda (obj)
-			  (apply #'render-table-body-row obj
-			   :alternp (oddp (incf row-num))
-			   keys))
-		  objs))))))))
+    (apply #'with-table-header first-obj
+	   (lambda ()
+	     (with-html
+	       (:table
+		:summary summary
+		(if caption
+		    (htm (:caption (str caption))))
+		(htm
+		 (:thead (apply #'render-table-header-row first-obj keys)))
+		(:tbody
+		 (map 'list (lambda (obj)
+			      (apply #'render-table-body-row obj
+				     :alternp (oddp (incf row-num))
+				     keys))
+		      objs)))))
+	   keys)))
      
-(defun render-empty-table (&key on-empty-string caption)
+(defun render-empty-table (&rest keys &key on-empty-string caption &allow-other-keys)
   "A function used by 'render-table' to render an empty table.
 'on-empty-string' - an informational string rendered to the
 client.
 'caption' - a caption for the block of information."
-  (with-table-header nil
-    (lambda ()
-      (with-html
-	(:p (if caption
-		(htm (:span :class "caption" (str caption) ":&nbsp;")))
-	    (:span :class "message" (str on-empty-string)))))))
+  (apply #'with-table-header nil
+	 (lambda ()
+	   (with-html
+	     (:p (if caption
+		     (htm (:span :class "caption" (str caption) ":&nbsp;")))
+		 (:span :class "message" (str on-empty-string)))))
+	 keys))

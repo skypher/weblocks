@@ -42,10 +42,10 @@ variable. All html should be rendered to this stream.")
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
   `(with-html
-     (:script :type "text/javascript" :language "javascript"
+     (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt ,source ,@args)
-	      (fmt "~%// ]]~%"))))
+	      (fmt "~%// ]]>~%"))))
 
 (defun server-type ()
   "Hunchentoot")

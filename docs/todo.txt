@@ -1,6 +1,12 @@
 
 TODO:
 -- CURRENT (gridsearch) --
+- Style the search bar (color, slide out, icon?) and add accessible text hidden by CSS
+- Test sorting and searching on non-inline items
+- Unit test (render-data highlighting, pretable/posttable, isearch
+  existing value, visit-object-slots combines values,
+  pre/postwidget-body-fn, datagrid-update-sort-column-aux,
+  datagrid-update-sort-column, make-isearch-regex, datagrid-data non-destructive)
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -26,15 +32,18 @@ TODO:
 - Don't remove validation error summary for long forms.
 - Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
-- Port stylesheets to IE, browser compatibility, offer simpe HTML version for older browsers
+- Port stylesheets to IE, fix the form bug for Opera 8, browser
+  compatibility, offer simpe HTML version for older browsers
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
 
 -- WISHLIST --
+- Allow multiple search tokens in grid searchbar
 - Authentication (permission to access menu items, actions, widgets in general)
 - Consider lazy evaluation of session initialization
 - Create default title page if the user didn't define the application (possibly tutorial style)
 - Consider multiple navigation controls in one composite, hidden navigation controls, dynamic menus
 - Reset state of regular widgets when moving accross navigation controls?
 - Create renderers for lists (redo existing renderers that use lists with these?)
+- Tooltips/balloon widget/block

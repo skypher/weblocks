@@ -2,6 +2,7 @@
 (in-package :weblocks)
 
 (export '(datagrid datagrid-data datagrid-sort datagrid-allow-sorting
+	  datagrid-search datagrid-allow-searching-p
 	  render-datagrid-header-cell datagrid-sorted-slot-name))
 
 (defwidget datagrid (widget)
@@ -10,11 +11,11 @@
 	 :initarg :data
 	 :documentation "Either a sequence of data objects that will
 	 be rendered and modified by this widget, or a function that
-	 accepts sorting and paging parameters. If this slot is bound
-	 to a sequence, datagrid will do the paging and sorting itself
-	 in memory destructively. If the slot is bound to a function,
-	 the function is expected to return a properly sorted and
-	 paged sequence.")
+	 accepts searching, sorting, and paging parameters. If this
+	 slot is bound to a sequence, datagrid will do the paging and
+	 sorting itself in memory destructively. If the slot is bound
+	 to a function, the function is expected to return a properly
+	 sorted and paged sequence.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
@@ -33,9 +34,143 @@
 		  'strictly-less-p' and 'equivalentp' aren't defined
 		  on the datatype of the column, sorting for that
 		  column will be turned off regardless of the value of
-		  this slot."))
+		  this slot.")
+   (search :accessor datagrid-search
+	   :initform nil
+	   :initarg :search
+	   :documentation "Contains a search string that will filter
+	   results. Initially set to nil, which means all results will
+	   be visible.")
+   (allow-searching-p :accessor datagrid-allow-searching-p
+		      :initform t
+		      :initarg :allow-searching
+		      :documentation "Set to true to enable searching,
+		      or to nil to disable it."))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Filtering and searching ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun datagrid-filter-data (grid-obj data)
+  "Returns filtered datagrid data. Applies 'object-satisfies-search-p'
+repeatedly to each item in the sequence."
+  (with-slots (search) grid-obj
+    (if search
+	(remove nil
+		(mapcar (lambda (item)
+			  (when (object-satisfies-search-p (make-isearch-regex search) item)
+			    item))
+			data))
+	data)))
+
+(defun object-satisfies-search-p (search-regex object &rest args)
+  "Determines if an object satisfies a search regex. Applies regex to
+string representations of each slot value, and if one matches returns
+true."
+  (some (compose #'not #'null)
+	(flatten
+	 (apply #'visit-object-slots object
+		(lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
+		  (if (typep slot-value 'standard-object)
+		      (object-satisfies-search-p search-regex slot-value :slot-path slot-path)
+		      (ppcre:scan search-regex (format nil "~A" slot-value))))
+		:call-around-fn-p nil
+		args))))
+
+(defun make-isearch-regex (search)
+  "Create a regular expression from the user's input that tries to be
+faithful to Emacs' isearch."
+  (if (some #'upper-case-p search)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
+
+(defun datagrid-render-search-bar (grid &rest keys)
+  "Renders a search bar for the datagrid."
+  (with-html
+    (:div :class "datagrid-search-bar"
+	  (with-extra-tags
+	    (render-isearch "search"
+			    (make-action
+			     (lambda (&key search &allow-other-keys)
+			       (setf (datagrid-search grid) (when (not (empty-p search))
+							      search))))
+			    :value (datagrid-search grid))))))
+
+;;; Render the searchbar in the header
+(defmethod with-widget-header ((obj datagrid) body-fn &rest args)
+  (apply #'call-next-method
+	 obj body-fn
+	 :prewidget-body-fn (when (datagrid-allow-searching-p obj)
+			      (curry #'datagrid-render-search-bar obj))
+	 args))
+
+;;;;;;;;;;;;;;;
+;;; Sorting ;;;
+;;;;;;;;;;;;;;;
+(defun datagrid-update-sort-column (grid &rest args)
+  "An interface for 'datagrid-update-sort-column-aux'. Gets the data
+and tries to update the sort column only when necessary."
+  (when (null (datagrid-sort grid))
+    (apply #'datagrid-update-sort-column-aux grid (car (datagrid-data grid)) args)))
+
+(defun datagrid-update-sort-column-aux (grid data-obj &rest args)
+  "This function is called to ensure that a datagrid is sorted on
+sortable column (if one is available). If the datagrid is not sorted,
+this function finds the first sortable column and sorts the datagrid
+on that column. If this isn't done the datagrid UI is confusing when
+it's sorted on nothing."
+  (apply #'visit-object-slots
+	 data-obj
+	 (lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
+	   (if (typep slot-value 'standard-object)
+	       (datagrid-update-sort-column-aux grid slot-value :slot-path slot-path)
+	       (when (and (null (datagrid-sort grid))
+			  (datagrid-column-sortable-p grid slot-path slot-value))
+		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
+	 :call-around-fn-p nil
+	 args))
+
+(defun datagrid-column-sortable-p (grid-obj column-path column-value)
+  "Determines if a column is sortable based on the 'allow-sorting'
+slot and availability of 'strictly-less-p' and 'equivalentp' generic
+functions."
+  (and
+   (datagrid-allow-sorting grid-obj)
+   (if (listp (datagrid-allow-sorting grid-obj))
+       (member (datagrid-sorted-slot-name column-path)
+	       (datagrid-allow-sorting grid-obj)
+	       :test #'equalp)
+       t)
+   (compute-applicable-methods #'strictly-less-p (list column-value column-value))
+   (compute-applicable-methods #'equivalentp (list column-value column-value))))
+
+(defun datagrid-sorted-slot-name (sort-info)
+  "Returns the name of the current slot from the slot path."
+  (car (last (ensure-list (if (dotted-pair-p sort-info)
+			      (car sort-info)
+			      sort-info)))))
+
+(defun datagrid-sort-data (grid-obj data)
+  "Sorts the data of the datagrid."
+  (with-slots (sort) grid-obj
+    (if sort
+	(stable-sort (copy-list data)
+		     (if (equalp (cdr sort) :ascending)
+			 #'strictly-less-p
+			 (lambda (a b)
+			   (and (not (strictly-less-p a b))
+				(not (equivalentp a b)))))
+		     :key (curry-after #'slot-value-by-path (car sort)))
+	data)))
+
+(defun negate-sort-direction (dir)
+  "Returns a negated direction of a sort (returns :ascending
+for :descending and vica versa)."
+  (ecase dir
+    (:ascending :descending)
+    (:descending :ascending)))
 
 ;;; Hooks into table renderer's header rendering mechanism and
 ;;; forwards the calls to 'render-datagrid-header-cell' whenever
@@ -73,76 +208,20 @@ customize the way datagrid headers are rendered."))
 					      (setf (datagrid-sort grid-obj) (cons slot-path new-dir))))
 			       (humanize-name human-name)))))))
 
-(defun datagrid-update-sort-column (grid data-obj &rest args)
-  "This function is called to ensure that a datagrid is sorted on
-sortable column (if one is available). If the datagrid is not sorted,
-this function finds the first sortable column and sorts the datagrid
-on that column. If this isn't done the datagrid UI is confusing when
-it's sorted on nothing."
-  (apply #'visit-object-slots
-	 data-obj
-	 (lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
-	   (if (typep slot-value 'standard-object)
-	       (datagrid-update-sort-column grid slot-value :slot-path slot-path)
-	       (when (and (null (datagrid-sort grid))
-			  (datagrid-column-sortable-p grid slot-path slot-value))
-		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
-	 :call-around-fn-p nil
-	 args))
-
-(defun datagrid-column-sortable-p (grid-obj column-path column-value)
-  "Determines if a column is sortable based on the 'allow-sorting'
-slot and availability of 'strictly-less-p' and 'equivalentp' generic
-functions."
-  (and
-   (datagrid-allow-sorting grid-obj)
-   (if (listp (datagrid-allow-sorting grid-obj))
-       (member (datagrid-sorted-slot-name column-path)
-	       (datagrid-allow-sorting grid-obj)
-	       :test #'equalp)
-       t)
-   (compute-applicable-methods #'strictly-less-p (list column-value column-value))
-   (compute-applicable-methods #'equivalentp (list column-value column-value))))
-
-(defun datagrid-sorted-slot-name (sort-info)
-  "Returns the name of the current slot from the slot path."
-  (car (last (ensure-list (if (dotted-pair-p sort-info)
-			      (car sort-info)
-			      sort-info)))))
-
-(defun datagrid-sort-data (grid-obj)
-  "Destructively sorts the 'data' slot of the datagrid if and only if
-it is a sequence of values. If the 'data' slot is a function,
-'datagrid-sort-data' does nothing."
-  (with-slots (data sort) grid-obj
-    (when (and (typep data 'sequence) sort)
-      (setf data (stable-sort data (if (equalp (cdr sort) :ascending)
-				       #'strictly-less-p
-				       (lambda (a b)
-					 (and (not (strictly-less-p a b))
-					      (not (equivalentp a b)))))
-			      :key (curry-after #'slot-value-by-path (car sort)))))))
-
 ;;; If the 'data' slot is a sequence, simply returns it. If it is a
 ;;; function, calls it with appropriate parameters. Signals an error
 ;;; otherwise.
 (defmethod datagrid-data ((grid-obj datagrid))
   (with-slots (data) grid-obj
     (etypecase data
-      (function (funcall data (datagrid-sort grid-obj)))
-      (sequence data))))
-
-(defun negate-sort-direction (dir)
-  "Returns a negated direction of a sort (returns :ascending
-for :descending and vica versa)."
-  (ecase dir
-    (:ascending :descending)
-    (:descending :ascending)))
+      (function (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj)))
+      (sequence 
+       (datagrid-sort-data grid-obj
+			   (datagrid-filter-data grid-obj data))))))
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
-  (apply #'datagrid-update-sort-column obj (car (datagrid-data obj)) args)
-  (datagrid-sort-data obj)
+  (apply #'datagrid-update-sort-column obj args)
   (apply #'render-table (datagrid-data obj)
 	 :grid-obj obj
 	 :summary (if (datagrid-sort obj)
@@ -152,5 +231,7 @@ for :descending and vica versa)."
 			      (string-downcase (humanize-name
 						(cdr (datagrid-sort obj)))))
 		      nil)
+	 :highlight (when (datagrid-search obj)
+		      (make-isearch-regex (datagrid-search obj)))
 	 args))
 

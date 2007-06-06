@@ -58,7 +58,8 @@ defclass, except adds 'widget-class' metaclass specification."
 within it. Specialize this function to provide customized headers for
 different widgets."))
 
-(defmethod with-widget-header (obj body-fn &rest args)
+(defmethod with-widget-header (obj body-fn &rest args &key
+			       prewidget-body-fn postwidget-body-fn &allow-other-keys)
   (let* ((obj-name (attributize-name (widget-name obj))) ; obj-name may be null in functions
 	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
 		      (attributize-name obj-name))))
@@ -67,7 +68,10 @@ different widgets."))
 				"widget "
 				(attributize-name (class-name (class-of obj))))
 	    :id widget-id
-	    (apply body-fn obj args)))))
+	    (safe-apply prewidget-body-fn args)
+	    (:div :class "widget-body"
+		  (apply body-fn obj args))
+	    (safe-apply postwidget-body-fn args)))))
 
 (defgeneric render-widget-body (obj &rest args)
   (:documentation

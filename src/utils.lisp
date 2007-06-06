@@ -321,24 +321,24 @@ particular slot cons pair due to appropriate arguments,
 'render-slot-fn' (unless 'call-around-fn-p' argument is set to
 nil). This can be used to quickly render slots in a custom way without
 specializing CLOS functions."
-  (mapc (lambda (slot)
-	  (let ((render-fn (if (and call-around-fn-p
-				    (functionp (cdr slot)))
-			       (cdr slot)
-			       render-slot-fn))
-		slot-name slot-value)
-	    (if (typep (car slot) 'standard-direct-slot-definition)
-		(setf slot-name (slot-definition-name (car slot))
-		      slot-value (get-slot-value obj (car slot)))
-		(setf slot-name (car slot)))
-	    (apply render-fn obj slot-name
-		   slot-value
-		   :human-name (if (not (functionp (cdr slot)))
-				   (cdr slot)
-				   slot-name)
-		   :slot-path (append slot-path (list slot-name))
-		   keys)))
-	(apply #'object-visible-slots obj keys)))
+  (mapcar (lambda (slot)
+	    (let ((render-fn (if (and call-around-fn-p
+				      (functionp (cdr slot)))
+				 (cdr slot)
+				 render-slot-fn))
+		  slot-name slot-value)
+	      (if (typep (car slot) 'standard-direct-slot-definition)
+		  (setf slot-name (slot-definition-name (car slot))
+			slot-value (get-slot-value obj (car slot)))
+		  (setf slot-name (car slot)))
+	      (apply render-fn obj slot-name
+		     slot-value
+		     :human-name (if (not (functionp (cdr slot)))
+				     (cdr slot)
+				     slot-name)
+		     :slot-path (append slot-path (list slot-name))
+		     keys)))
+	  (apply #'object-visible-slots obj keys)))
 
 (defun alist->plist (alist)
   "Converts an alist to plist."
