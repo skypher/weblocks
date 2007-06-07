@@ -101,9 +101,10 @@ Ex:
 \(render-data address :slots ((city . town))
 \(render-data address :slots ((city . town) :mode :strict)
 
-When 'highlight' is set to a string, render-data searches for the
-string and renders it as a strong element. This is done to support
-incremental searching in some controls."))
+When 'highlight' is set not null, render-data searches for the ppcre
+regular expression it represents and renders it as a strong
+element. This is done to support incremental searching in some
+controls."))
 
 (defmethod render-data ((obj standard-object) &rest keys)
   (apply #'render-standard-object #'with-data-header #'render-data-slot obj keys))

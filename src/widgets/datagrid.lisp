@@ -91,6 +91,7 @@ faithful to Emacs' isearch."
   (with-html
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
+	    (htm (:span "Search table"))
 	    (render-isearch "search"
 			    (make-action
 			     (lambda (&key search &allow-other-keys)

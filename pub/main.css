@@ -59,7 +59,7 @@ a
 
 .renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
 .renderer > .empty-navigation, .renderer > ul, .renderer > fieldset > ul, .table > table,
-.renderer > fieldset > .submit, .renderer > .submit, .datagrid-search-bar > form
+.renderer > fieldset > .submit, .renderer > .submit
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;

@@ -1,12 +1,11 @@
 
 TODO:
 -- CURRENT (gridsearch) --
-- Style the search bar (color, slide out, icon?) and add accessible text hidden by CSS
-- Test sorting and searching on non-inline items
 - Unit test (render-data highlighting, pretable/posttable, isearch
   existing value, visit-object-slots combines values,
   pre/postwidget-body-fn, datagrid-update-sort-column-aux,
   datagrid-update-sort-column, make-isearch-regex, datagrid-data non-destructive)
+- Test sorting and searching on non-inline items
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -37,6 +36,7 @@ TODO:
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
+- Allow adding titles to navigation items and set them as page title, add application title
 
 -- WISHLIST --
 - Allow multiple search tokens in grid searchbar

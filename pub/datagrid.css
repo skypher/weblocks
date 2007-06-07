@@ -35,14 +35,7 @@ span.paging
 }
 
 /* Searching */
-.datagrid-search-bar
-{
-  background: #d8eaf8 url(/pub/images/widget/menu/top_background.png) repeat-x;
-  display: -moz-inline-box;
-  display: inline-block;
-  margin-left: 1em;
-}
-
+.datagrid-search-bar > .extra-top-1, .datagrid-search-bar > .extra-top-2,
 .datagrid-search-bar > .extra-top-3,
 .datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
 .datagrid-search-bar > .extra-bottom-3
@@ -50,40 +43,26 @@ span.paging
   display: none;
 }
 
-.datagrid-search-bar > .extra-top-1
+.datagrid-search-bar
 {
-  height: 7px;
-  background: url(/pub/images/widget/menu/top_left.png) no-repeat top left;
+  background: url(/pub/images/widget/datagrid/isearch.png) no-repeat left center;
+  padding-left: 17px;
 }
 
-.datagrid-search-bar > .extra-top-2
+.datagrid-search-bar > span
 {
-  height: 7px;
-  margin-top: -7px;
-  background: url(/pub/images/widget/menu/top_right.png) no-repeat top right;
+  display: none;
 }
 
-.datagrid-search-bar > form
+.datagrid-search-bar > form, .datagrid-search-bar > form > fieldset
 {
-  padding: 0;
-  margin: 0;
-}
-
-.datagrid-search-bar > form > fieldset
-{
+  display: inline;
   border: none;
   padding: 0;
   margin: 0;
-  padding-left: 3px;
-  padding-right: 3px;
 }
 
-.datagrid-search-bar > form, .datagrid-search-bar > form > fieldset > input.search-bar
+.datagrid-search-bar > form > fieldset > input.submit
 {
-}
-
-.datagrid-search-bar > form > fieldset > input.search-bar
-{
-  margin-top: -2px;
-  margin-bottom: 4px;
+  margin-left: 0.5em;
 }
