@@ -38,7 +38,7 @@ span.paging
 .datagrid-search-bar > .extra-top-1, .datagrid-search-bar > .extra-top-2,
 .datagrid-search-bar > .extra-top-3,
 .datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
-.datagrid-search-bar > .extra-bottom-3
+.datagrid-search-bar > .extra-bottom-3, .datagrid-search-bar > span
 {
   display: none;
 }
@@ -46,12 +46,9 @@ span.paging
 .datagrid-search-bar
 {
   background: url(/pub/images/widget/datagrid/isearch.png) no-repeat left center;
-  padding-left: 17px;
-}
-
-.datagrid-search-bar > span
-{
-  display: none;
+  padding-left: 18px;
+  min-height: 16px;
+  margin-bottom: 2px;
 }
 
 .datagrid-search-bar > form, .datagrid-search-bar > form > fieldset
@@ -62,7 +59,14 @@ span.paging
   margin: 0;
 }
 
+.datagrid-search-bar > form > fieldset > input.search-bar
+{
+  margin: 0;
+}
+
 .datagrid-search-bar > form > fieldset > input.submit
 {
+  margin: 0;
   margin-left: 0.5em;
 }
+
