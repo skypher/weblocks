@@ -16,10 +16,12 @@
 	 (:ul :class "messages"
 	      (:li
 	       (:div :class "widget simple-character-string"
-		     (:p "Hello World!")))
+		     (:div :class "widget-body"
+			   (:p "Hello World!"))))
 	      (:li
 	       (:div :class "widget simple-character-string"
-		     (:p "Foo"))))
+		     (:div :class "widget-body"
+			   (:p "Foo")))))
 	 (:div :class "extra-bottom-1" "&nbsp;")
 	 (:div :class "extra-bottom-2" "&nbsp;")
 	 (:div :class "extra-bottom-3" "&nbsp;"))))

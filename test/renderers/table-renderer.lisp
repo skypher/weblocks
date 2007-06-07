@@ -138,7 +138,11 @@
 
 ;; render-table
 (deftest-html render-table-1
-    (render-table (list *joe* *joe*))
+    (render-table (list *joe* *joe*)
+		  :pretable-fn (lambda (&rest args)
+				 (with-html (:p "hello")))
+		  :posttable-fn (lambda (&rest args)
+				  (with-html (:p "world"))))
   #.(table-header-template
      '((:th :class "name" "Name")
        (:th :class "manager" "Manager"))

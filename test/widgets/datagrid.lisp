@@ -29,7 +29,7 @@
     (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)))
 	  sort1 sort2)
       (setf sort1 (datagrid-sort grid))
-      (weblocks::datagrid-update-sort-column grid (car (datagrid-data grid)))
+      (weblocks::datagrid-update-sort-column grid)
       (setf sort2 (datagrid-sort grid))
       (values sort1 sort2))
   nil
@@ -39,7 +39,7 @@
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *joe*)
 			       :allow-sorting '(manager))))
-      (weblocks::datagrid-update-sort-column grid (car (datagrid-data grid)))
+      (weblocks::datagrid-update-sort-column grid)
       (datagrid-sort grid))
   ((manager) . :ascending))
 
@@ -47,7 +47,7 @@
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *joe*)
 			       :allow-sorting '(university))))
-      (weblocks::datagrid-update-sort-column grid (car (datagrid-data grid)) :slots '(education university))
+      (weblocks::datagrid-update-sort-column grid :slots '(education university))
       (datagrid-sort grid))
   ((education university) . :ascending))
 
@@ -121,42 +121,38 @@
 (deftest datagrid-sort-data-1
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((name) . :ascending))))
-      (weblocks::datagrid-sort-data grid)
+			       :sort '((name) . :ascending)))
+	  res)
+      (setf res (weblocks::datagrid-sort-data grid
+					      (slot-value grid 'weblocks::data)))
       (values
-       (first-name (car (datagrid-data grid)))
-       (first-name (cadr (datagrid-data grid)))))
+       (first-name (car res))
+       (first-name (cadr res))))
   "Bob" "Joe")
 
 (deftest datagrid-sort-data-2
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((name) . :descending))))
-      (weblocks::datagrid-sort-data grid)
+			       :sort '((name) . :descending)))
+	  res)
+      (setf res (weblocks::datagrid-sort-data grid
+					      (slot-value grid 'weblocks::data)))
       (values
-       (first-name (car (datagrid-data grid)))
-       (first-name (cadr (datagrid-data grid)))))
+       (first-name (car res))
+       (first-name (cadr res))))
   "Joe" "Bob")
 
 (deftest datagrid-sort-data-3
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((age) . :descending))))
-      (weblocks::datagrid-sort-data grid)
+			       :sort '((age) . :descending)))
+	  res)
+      (setf res (weblocks::datagrid-sort-data grid
+					      (slot-value grid 'weblocks::data)))
       (values
-       (first-name (car (datagrid-data grid)))
-       (first-name (cadr (datagrid-data grid)))))
+       (first-name (car res))
+       (first-name (cadr res))))
   "Bob" "Joe")
-
-(deftest datagrid-sort-data-4
-    (let ((grid (make-instance 'datagrid
-			       :data (lambda (sort) (list *joe* *bob*))
-			       :sort '((age) . :descending))))
-      (weblocks::datagrid-sort-data grid)
-      (values
-       (first-name (car (datagrid-data grid)))
-       (first-name (cadr (datagrid-data grid)))))
-  "Joe" "Bob")
 
 ;;; test datagrid-data
 (deftest datagrid-data-1
@@ -166,7 +162,7 @@
 
 (deftest datagrid-data-2
     (datagrid-data (make-instance 'datagrid
-				  :data (lambda (sort)
+				  :data (lambda (search sort)
 					  (list 1 2))))
   (1 2))
 

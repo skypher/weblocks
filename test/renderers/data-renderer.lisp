@@ -77,3 +77,7 @@
      '((:li :class "name" (:span :class "label" "Nickname:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
+
+(deftest-html render-data-6
+    (render-data "test" :highlight ".s")
+  (:span :class "value" "t<strong>es</strong>t"))

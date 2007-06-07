@@ -1,10 +1,12 @@
 
 TODO:
 -- CURRENT (gridsearch) --
-- Unit test (render-data highlighting, pretable/posttable, isearch
+- Unit test (pretable/posttable, isearch
   existing value, visit-object-slots combines values,
   pre/postwidget-body-fn, datagrid-update-sort-column-aux,
-  datagrid-update-sort-column, make-isearch-regex, datagrid-data non-destructive)
+  datagrid-update-sort-column, make-isearch-regex,
+  datagrid-filter-data, datagrid-render-search-bar, with-widget-header
+  search bar, highlighting)
 - Test sorting and searching on non-inline items
 
 -- LARGE FEATURES --
