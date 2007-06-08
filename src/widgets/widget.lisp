@@ -52,11 +52,16 @@ defclass, except adds 'widget-class' metaclass specification."
   #+lispworks (:optimize-slot-access nil)
   (:documentation "Base class for all widget objects."))
 
-(defgeneric with-widget-header (obj body-fn &rest args)
+(defgeneric with-widget-header (obj body-fn &rest args &key
+				    prewidget-body-fn postwidget-body-fn &allow-other-keys)
   (:documentation
    "Renders a header and footer for the widget and calls 'body-fn'
 within it. Specialize this function to provide customized headers for
-different widgets."))
+different widgets.
+
+'prewidget-body-fn' and 'postwidget-body-fn' allow specifying
+functions that will be applied before and after the body is
+rendered."))
 
 (defmethod with-widget-header (obj body-fn &rest args &key
 			       prewidget-body-fn postwidget-body-fn &allow-other-keys)

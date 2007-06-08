@@ -124,7 +124,7 @@
 
 (deftest-html render-table-body-cell-2
     (render-table-body-cell *joe* 'address-ref *home-address*)
-  (:td :class "address-ref" (:span :class "value" "ADDRESS")))
+  (:td :class "address-ref" (:span :class "value" "Address")))
 
 (deftest-html render-table-body-cell-3
     (render-table-body-cell *joe* 'address *home-address*)
@@ -151,7 +151,9 @@
 	(:td :class "manager" (:span :class "value" "Jim")))
        (:tr :class "altern"
 	(:td :class "name" (:span :class "value" "Joe"))
-	(:td :class "manager" (:span :class "value" "Jim"))))))
+	(:td :class "manager" (:span :class "value" "Jim"))))
+     :pretable '((:p "hello"))
+     :posttable '((:p "world"))))
 
 ;; render-empty-table
 (deftest-html render-empty-table-1

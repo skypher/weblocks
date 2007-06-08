@@ -20,10 +20,14 @@
     (with-request :get nil
       (with-widget-header (make-instance 'dataform :data *joe*)
 	(lambda (obj &rest args)
-	  (with-html (:p "test")))))
+	  (with-html (:p "test")))
+	:prewidget-body-fn (lambda (&rest args) (with-html (:p "hello")))
+	:postwidget-body-fn (lambda (&rest args) (with-html (:p "world")))))
   (:div :class "widget dataform" :id "widget-123"
+	(:p "hello")
 	(:div :class "widget-body"
-	      (:p "test"))))
+	      (:p "test"))
+	(:p "world")))
 
 ;;; test widget-name specialization for functions
 (deftest widget-name-1

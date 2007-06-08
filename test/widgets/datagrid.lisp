@@ -1,6 +1,101 @@
 
 (in-package :weblocks-test)
 
+;;; test with-widget-header for datagrid
+(deftest-html with-widget-header-data-grid-1
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid)))
+	(with-widget-header grid (lambda (&rest args)
+				   nil)
+			    :form-id "I1"
+			    :input-id "I2"
+			    :search-id "I3")))
+  (:div :class "widget datagrid" :id "widget-123"
+	(:div :class "datagrid-search-bar"
+	      (:div :class "extra-top-1" "&nbsp;")
+	      (:div :class "extra-top-2" "&nbsp;")
+	      (:div :class "extra-top-3" "&nbsp;")
+	      (:span "Search table")
+	      (:form :id "I1" :class "isearch" :action "" :method "get"
+		     (:fieldset
+		      (:input :type "text" :id "I2" :name "search" :class "search-bar")
+		      (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
+		      (:input :name "action" :type "hidden" :value "abc123")))
+	      (:script :type "text/javascript"
+		       (fmt "~%// <![CDATA[~%")
+		       (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
+});$('I3').remove();")
+		       (fmt "~%// ]]>~%"))
+	      (:div :class "extra-bottom-1" "&nbsp;")
+	      (:div :class "extra-bottom-2" "&nbsp;")
+	      (:div :class "extra-bottom-3" "&nbsp;"))
+	(:div :class "widget-body" "")))
+
+;;; test datagrid-filter-data
+(deftest datagrid-filter-data-1
+    (length (weblocks::datagrid-filter-data
+	     (make-instance 'datagrid :search "Joe")
+	     (list *joe* *bob*)))
+  1)
+
+(deftest datagrid-filter-data-2
+    (length (weblocks::datagrid-filter-data
+	     (make-instance 'datagrid :search "o")
+	     (list *joe* *bob*)))
+  2)
+
+;;; test object-satisfies-search-p
+(deftest object-satisfies-search-p-1
+    (weblocks::object-satisfies-search-p "hi" *joe*)
+  nil)
+
+(deftest object-satisfies-search-p-2
+    (weblocks::object-satisfies-search-p "Joe" *joe*)
+  t)
+
+(deftest object-satisfies-search-p-3
+    (weblocks::object-satisfies-search-p "30" *joe*)
+  nil)
+
+(deftest object-satisfies-search-p-4
+    (weblocks::object-satisfies-search-p "30" *joe* :slots '(age))
+  t)
+
+(deftest object-satisfies-search-p-5
+    (weblocks::object-satisfies-search-p "Broadway" *joe*)
+  nil)
+
+(deftest object-satisfies-search-p-6
+    (weblocks::object-satisfies-search-p "address" *joe*)
+  nil)
+
+;;; test make-isearch-regex
+(deftest make-isearch-regex-1
+    (let ((regex (weblocks::make-isearch-regex "hello")))
+      (values (ppcre:scan regex "hello")
+	      (ppcre:scan regex "HeLlO")
+	      (ppcre:scan regex "test")))
+  0 0 nil)
+
+(deftest make-isearch-regex-2
+    (let ((regex (weblocks::make-isearch-regex "Hello")))
+      (values (ppcre:scan regex "Hello")
+	      (ppcre:scan regex "hello")
+	      (ppcre:scan regex "test")))
+  0 nil nil)
+
+;;; test datagrid-render-search-bar
+(deftest datagrid-render-search-bar-1
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid :search "test"))
+	    (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *weblocks-output-stream*))
+	(weblocks::datagrid-render-search-bar grid)
+	(do-request `((,weblocks::*action-string* . "abc123")
+				   ("search" . "hello")))
+	(datagrid-search grid)))
+  "hello")
+
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
     (render-table-header-cell *joe* 'name "Joe"
@@ -24,7 +119,7 @@
   (:th :class "name"
        (:span #.(link-action-template "abc123" "Name"))))
 
-;;; test datagrid-update-sort-column
+;;; test datagrid-update-sort-column/aux-datagrid-update-sort-column
 (deftest datagrid-update-sort-column-1
     (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)))
 	  sort1 sort2)
@@ -50,6 +145,14 @@
       (weblocks::datagrid-update-sort-column grid :slots '(education university))
       (datagrid-sort grid))
   ((education university) . :ascending))
+
+(deftest datagrid-update-sort-column-4
+    (let ((grid (make-instance 'datagrid
+			       :data (list *joe* *joe*)
+			       :allow-sorting '(address-ref))))
+      (weblocks::datagrid-update-sort-column grid :slots '(address-ref))
+      (datagrid-sort grid))
+  ((address-ref) . :ascending))
 
 ;;; test datagrid-column-sortable-p
 (deftest datagrid-column-sortable-p-1
@@ -283,3 +386,59 @@
 	 (:td :class "manager" (:span :class "value" "Jim"))))
       :summary "Ordered by name, ascending.")))
 
+(deftest-html render-widget-body-datagrid-5
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :search "J")))
+	;; render datagrid
+	(render-widget-body grid)))
+  (htm
+   #.(table-header-template
+      '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	(:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
+      '((:tr
+	 (:td :class "name" (:span :class "value" "Bob"))
+	 (:td :class "manager" (:span :class "value" "<strong>J</strong>im")))
+	(:tr :class "altern"
+	 (:td :class "name" (:span :class "value" "<strong>J</strong>oe"))
+	 (:td :class "manager" (:span :class "value" "<strong>J</strong>im"))))
+      :summary "Ordered by name, ascending.")))
+
+(deftest-html render-widget-body-datagrid-6
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :sort '(address-ref . :ascending))))
+	;; render datagrid
+	(render-widget-body grid :slots '(address-ref))
+	;; sort by name (should be descending)
+	(do-request `((,weblocks::*action-string* . "abc124")))
+	(render-widget-body grid :slots '(address-ref))))
+  (htm
+   #.(table-header-template
+      '((:th :class "name" (:span #.(link-action-template "abc123" "Name")))
+	(:th :class "address-ref sort-ascending" (:span #.(link-action-template "abc124" "Address")))
+	(:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+      '((:tr
+	 (:td :class "name" (:span :class "value" "Joe"))
+	 (:td :class "address-ref" (:span :class "value" "Address"))
+	 (:td :class "manager" (:span :class "value" "Jim")))
+	(:tr :class "altern"
+	 (:td :class "name" (:span :class "value" "Bob"))
+	 (:td :class "address-ref" (:span :class "value" "Address"))
+	 (:td :class "manager" (:span :class "value" "Jim"))))
+      :summary "Ordered by address, ascending.")
+   #.(table-header-template
+     '((:th :class "name" (:span #.(link-action-template "abc126" "Name")))
+       (:th :class "address-ref sort-descending" (:span #.(link-action-template "abc127" "Address")))
+       (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
+     '((:tr
+	(:td :class "name" (:span :class "value" "Joe"))
+	(:td :class "address-ref" (:span :class "value" "Address"))
+	(:td :class "manager" (:span :class "value" "Jim")))
+       (:tr :class "altern"
+	(:td :class "name" (:span :class "value" "Bob"))
+	(:td :class "address-ref" (:span :class "value" "Address"))
+	(:td :class "manager" (:span :class "value" "Jim"))))
+     :summary "Ordered by address, descending.")))

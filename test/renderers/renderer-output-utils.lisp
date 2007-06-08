@@ -9,7 +9,7 @@
 ;;; Test object-name
 (deftest object-name-1
     (object-name *joe*)
-  employee)
+  "Employee")
 
 (deftest object-name-2
     (let (employee-name)
@@ -27,7 +27,7 @@
       (setf employee-name (object-name *joe*))
       (fmakunbound 'employee-name)
       employee-name)
-  employee)
+  "Employee")
 
 ;;; test render-object-slot
 (deftest render-object-slot-1
@@ -42,7 +42,7 @@
 			       (list obj slot-name obj-name testkey))))
       (render-object-slot nil render-slot-tmp "some-object" "some-slot-ref" 1
 			  '(:testkey "some-key")))
-  ("some-object" "some-slot-ref" fixnum "some-key"))
+  ("some-object" "some-slot-ref" "Fixnum" "some-key"))
 
 ;; test render-standard-object
 (deftest-html render-standard-object-1

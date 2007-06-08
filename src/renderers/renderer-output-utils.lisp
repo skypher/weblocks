@@ -42,7 +42,7 @@ Override this method to provide object names."))
 	(let ((obj-name (funcall expected-symbol obj)))
 	  (if (stringp obj-name)
 	      (return-from object-name obj-name)))))
-  (object-class-name obj))
+  (humanize-name (object-class-name obj)))
 
 (defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value keys)
   "Renders a given slot of a CLOS object (usually if the slot

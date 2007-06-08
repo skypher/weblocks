@@ -9,10 +9,10 @@
 	    (:option "a")
 	    (:option "b")
 	    (:option "c"))
-   (:script :type "text/javascript" :language "javascript"
+   (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt "replaceDropdownWithSuggest('I1', 'some-name', 'C1');")
-	      (fmt "~%// ]]~%"))))
+	      (fmt "~%// ]]>~%"))))
 
 (deftest-html render-suggest-2
     (with-request :get nil
@@ -20,10 +20,10 @@
   (htm
    (:input :type "text" :id "I1" :name "some-name" :class "suggest")
    (:div :id "C1" :class "suggest" "")
-   (:script :type "text/javascript" :language "javascript"
+   (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3Atest');")
-	      (fmt "~%// ]]~%"))))
+	      (fmt "~%// ]]>~%"))))
 
 (deftest render-suggest-3
     (with-request :get nil
@@ -40,10 +40,10 @@
 	    (:option "a")
 	    (:option :selected "true" "b")
 	    (:option "c"))
-   (:script :type "text/javascript" :language "javascript"
+   (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt "replaceDropdownWithSuggest('I1', 'some-name', 'C1', 'b');")
-	      (fmt "~%// ]]~%"))))
+	      (fmt "~%// ]]>~%"))))
 
 (deftest-html render-suggest-5
     (with-request :get nil
@@ -52,10 +52,10 @@
   (htm
    (:input :type "text" :id "I1" :name "some-name" :class "suggest" :value "test")
    (:div :id "C1" :class "suggest" "")
-   (:script :type "text/javascript" :language "javascript"
+   (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3Atest');")
-	      (fmt "~%// ]]~%"))))
+	      (fmt "~%// ]]>~%"))))
 
 ;;; test format-suggest-list
 (deftest format-suggest-list-1

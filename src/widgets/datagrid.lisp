@@ -74,7 +74,9 @@ true."
 	 (apply #'visit-object-slots object
 		(lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
 		  (if (typep slot-value 'standard-object)
-		      (object-satisfies-search-p search-regex slot-value :slot-path slot-path)
+		      (if (render-slot-inline-p obj slot-name)
+			  (object-satisfies-search-p search-regex slot-value :slot-path slot-path)
+			  (ppcre:scan search-regex (format nil "~A" (object-name slot-value))))
 		      (ppcre:scan search-regex (format nil "~A" slot-value))))
 		:call-around-fn-p nil
 		args))))
@@ -92,12 +94,13 @@ faithful to Emacs' isearch."
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
 	    (htm (:span "Search table"))
-	    (render-isearch "search"
-			    (make-action
-			     (lambda (&key search &allow-other-keys)
-			       (setf (datagrid-search grid) (when (not (empty-p search))
-							      search))))
-			    :value (datagrid-search grid))))))
+	    (apply #'render-isearch "search"
+		   (make-action
+		    (lambda (&key search &allow-other-keys)
+		      (setf (datagrid-search grid) (when (not (empty-p search))
+						     search))))
+		   :value (datagrid-search grid)
+		   keys)))))
 
 ;;; Render the searchbar in the header
 (defmethod with-widget-header ((obj datagrid) body-fn &rest args)
@@ -126,7 +129,11 @@ it's sorted on nothing."
 	 data-obj
 	 (lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
 	   (if (typep slot-value 'standard-object)
-	       (datagrid-update-sort-column-aux grid slot-value :slot-path slot-path)
+	       (if (render-slot-inline-p obj slot-name)
+		   (datagrid-update-sort-column-aux grid slot-value :slot-path slot-path)
+		   (when (and (null (datagrid-sort grid))
+			      (datagrid-column-sortable-p grid slot-path (object-name slot-value)))
+		     (setf (datagrid-sort grid) (cons slot-path :ascending))))
 	       (when (and (null (datagrid-sort grid))
 			  (datagrid-column-sortable-p grid slot-path slot-value))
 		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
@@ -163,7 +170,7 @@ functions."
 			 (lambda (a b)
 			   (and (not (strictly-less-p a b))
 				(not (equivalentp a b)))))
-		     :key (curry-after #'slot-value-by-path (car sort)))
+		     :key (curry-after #'slot-value-by-path (car sort) :observe-inline-p t))
 	data)))
 
 (defun negate-sort-direction (dir)

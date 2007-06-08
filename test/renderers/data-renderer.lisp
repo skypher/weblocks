@@ -22,7 +22,7 @@
        (:span :class "label"
 	      "Address:&nbsp;")
        (:span :class "value"
-	      "ADDRESS")))
+	      "Address")))
 
 (deftest-html render-data-slot-3
     (render-data-slot *joe* 'education *some-college*)
@@ -56,7 +56,7 @@
     (render-data *joe* :slots '(address-ref))
   #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-       (:li :class "address-ref" (:span :class "label" "Address:&nbsp;") (:span :class "value" "ADDRESS"))
+       (:li :class "address-ref" (:span :class "label" "Address:&nbsp;") (:span :class "value" "Address"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 

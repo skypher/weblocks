@@ -1,13 +1,6 @@
 
 TODO:
--- CURRENT (gridsearch) --
-- Unit test (pretable/posttable, isearch
-  existing value, visit-object-slots combines values,
-  pre/postwidget-body-fn, datagrid-update-sort-column-aux,
-  datagrid-update-sort-column, make-isearch-regex,
-  datagrid-filter-data, datagrid-render-search-bar, with-widget-header
-  search bar, highlighting)
-- Test sorting and searching on non-inline items
+-- CURRENT () --
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -39,6 +32,7 @@ TODO:
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
 - Allow adding titles to navigation items and set them as page title, add application title
+- Consider refactoring parts of regex filtering and sorting into utils
 
 -- WISHLIST --
 - Allow multiple search tokens in grid searchbar

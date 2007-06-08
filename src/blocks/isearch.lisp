@@ -7,7 +7,7 @@
 		       (form-id (gensym))
 		       (input-id (gensym))
 		       (search-id (gensym))
-		       (method :get))
+		       (method :get) &allow-other-keys)
   "Renders an input bar with 'input-name' that calls back
 'isearch-action' in delayed manner. This is useful for realtime
 searching capabilities. Currently the delay is set to 0.4, similar to

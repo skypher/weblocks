@@ -189,25 +189,35 @@ Ex: \(defclass person ()
 	(slot-value obj (slot-definition-name slot))
 	(funcall slot-reader obj))))
 
-(defun slot-value-by-path (obj path)
-  "Retrieves a value of a slot from a hierarchy of objects. Nil is
-ignored.
+(defun slot-value-by-path (obj path &key observe-inline-p)
+  "Retrieves a value of a slot from a hierarchy of objects. A nil on
+the path is ignored. 
+
+If 'observe-inline-p' is set to true, 'slot-value-by-path' will return
+the result of 'object-name' for objects that should not be rendered
+inline according to 'render-slot-inline-p'
 
 ex:
 \(slot-value-by-path employee '(address street)) => \"17 Sunvalley St.\"
+\(slot-value-by-path employee '(address-ref)) => \"Address\"
+\(slot-value-by-path employee 'address-ref) => \"Address\"
 \(slot-value-by-path address '(street)) => \"17 Sunvalley St.\"
 \(slot-value-by-path address '(nil street)) => \"17 Sunvalley St.\"
 
 obj - a CLOS object
 path - a list of slot names"
   (when (symbolp path)
-    (return-from slot-value-by-path (slot-value obj path)))
+    (return-from slot-value-by-path
+      (slot-value-by-path obj (list path) :observe-inline-p observe-inline-p)))
   (let* ((clean-path (remove nil path))
 	 (value (slot-value obj (car clean-path)))
 	 (path-rest (cdr clean-path)))
     (if path-rest
-	(slot-value-by-path value path-rest)
-	value)))
+	(slot-value-by-path value path-rest :observe-inline-p observe-inline-p)
+	(if (and (not (render-slot-inline-p obj (car clean-path)))
+		 observe-inline-p)
+	    (object-name value)
+	    value))))
 
 (defgeneric render-slot-inline-p (obj slot-name)
   (:documentation

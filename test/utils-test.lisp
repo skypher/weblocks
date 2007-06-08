@@ -78,6 +78,14 @@
     (slot-value-by-path *joe* '(nil name))
   "Joe")
 
+(deftest slot-value-by-path-4
+    (address-city (slot-value-by-path *joe* '(address-ref)))
+  "New York")
+
+(deftest slot-value-by-path-5
+    (slot-value-by-path *joe* '(address-ref) :observe-inline-p t)
+  "Address")
+
 ;;; Introspection helper
 (defun object-visible-slot-names (obj &rest args)
   (mapcar (lambda (x)
@@ -292,6 +300,13 @@
    (:p "Joe")
    (:p "MANAGER")
    (:p "Jim")))
+
+(deftest visit-object-slots-5
+    (weblocks::visit-object-slots
+     *joe*
+     (lambda (obj slot-name slot-value &rest keys)
+       1))
+  (1 1))
 
 ;;; test alist->plist
 (deftest alist->plist-1

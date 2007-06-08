@@ -3,11 +3,12 @@
 
 (deftest-html render-isearch-1
     (with-request :get nil
-      (render-isearch "some-search" "some-action" :form-id 'i1 :input-id 'i2 :search-id 'i3))
+      (render-isearch "some-search" "some-action" :form-id 'i1 :input-id 'i2 :search-id 'i3
+		      :value "test"))
   (htm
    (:form :id "I1" :class "isearch" :action "" :method "get"
 	  (:fieldset
-	   (:input :type "text" :id "I2" :name "some-search" :class "search-bar")
+	   (:input :type "text" :id "I2" :name "some-search" :class "search-bar" :value "test")
 	   (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
 	   (:input :name "action" :type "hidden" :value "some-action")))
    (:script :type "text/javascript"

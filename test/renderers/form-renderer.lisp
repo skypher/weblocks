@@ -54,7 +54,7 @@
     (render-form-slot *joe* 'address-ref *home-address* :slot-path '(address-ref))
   (:li :class "address-ref" (:label
 	(:span "Address:&nbsp;")
-	(:input :type "text" :name "address-ref" :value "ADDRESS"))))
+	(:input :type "text" :name "address-ref" :value "Address"))))
 
 (deftest-html render-form-slot-3
     (render-form-slot *joe* 'education *some-college*)
@@ -85,7 +85,7 @@
   #.(form-header-template nil
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "ADDRESS")))
+	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
@@ -116,7 +116,7 @@
   #.(form-header-template nil
      '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Bill")))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "ADDRESS")))
+	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
 
@@ -137,7 +137,7 @@
 	 (:p :class "validation-error"
 	     (:em (:span :class "validation-error-heading" "Error:&nbsp;") "Some error."))))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "ADDRESS")))
+	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
 	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
      :preslots '((:div :class "validation-errors-summary"
