@@ -3,9 +3,11 @@
 
 ;; Slot rendering helper
 (defun render-slot-simple (obj slot-name slot-value &rest keys)
-  (with-html
-    (:p (str slot-name))
-    (:p (str slot-value))))
+  (if (typep slot-value 'standard-object)
+      (apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
+      (with-html
+	(:p (str slot-name))
+	(:p (str slot-value)))))
 
 ;;; Test humanize-name function
 (deftest humanize-name-1
@@ -160,11 +162,20 @@
   (manager 1))
 
 (deftest object-visible-slots-12
+    ;; Make sure we can't add new fields in strict mode - since the
+    ;; arguments propagate recursively, new slots appear more than
+    ;; once for complex objects. Additionally, slots specified for
+    ;; inner objects appear as new slots in the outer objects and vica
+    ;; versa.
     (values
      (object-visible-slot-names *joe* :slots '(name test) :mode :strict)
      (object-visible-slot-names *joe* :slots '(name (test . blah)) :mode :strict))
-  ((name . name) (test . test))
-  ((name . name) (test . blah)))
+  ((name . name))
+  ((name . name)))
+
+(deftest object-visible-slots-13
+    (object-visible-slot-names *joe* :custom-slots '((1 . (foo . hello)) (bar . world)))
+  ((name . name) (foo . hello) (manager . manager) (bar . world)))
 
 ;;; test safe-apply
 (deftest safe-apply-1
@@ -276,11 +287,11 @@
     (weblocks::visit-object-slots
      *joe*
      #'render-slot-simple
-     :slots `(name
-	      (blah . ,(lambda (obj slot-name slot-value &rest args)
-			       (with-html (:p "TEST"))))
-	      hello)
-     :mode :strict)
+     :slots `(name)
+     :mode :strict
+     :custom-slots `((blah . ,(lambda (obj slot-name slot-value &rest args)
+				      (with-html (:p "TEST"))))
+		     hello))
   (htm
    (:p "NAME")
    (:p "Joe")
@@ -308,6 +319,18 @@
        1))
   (1 1))
 
+(deftest-html visit-object-slots-6
+    (weblocks::visit-object-slots
+     *joe*
+     #'render-slot-simple
+     :slots '(name education) :custom-slots '(test))
+  (htm
+   (:p "NAME") (:p "Joe")
+   (:p "UNIVERSITY") (:p "Bene Gesserit University")
+   (:p "GRADUATION-YEAR") (:p "2000")
+   (:p "MANAGER") (:p "Jim")
+   (:p "TEST") (:p "NIL")))
+
 ;;; test alist->plist
 (deftest alist->plist-1
     (alist->plist '((hello . world) (blah . test)))
@@ -333,3 +356,34 @@
 (deftest intersperse-3
     (intersperse nil 0)
   nil)
+
+;;; test insert-after
+(deftest insert-after-1
+    (let ((a (list 1 3 4 5)))
+      (insert-after 2 a 0)
+      a)
+  (1 2 3 4 5))
+
+;;; test insert-at
+(deftest insert-at-1
+    (let ((a (list 1 2 3 4)))
+      (insert-at 0 a 0)
+      a)
+  (0 1 2 3 4))
+
+(deftest insert-at-2
+    (let ((a (list 1 2 3 4)))
+      (insert-at 1.5 a 1)
+      a)
+  (1 1.5 2 3 4))
+
+(deftest insert-at-3
+    (let ((a (list 1 2 3 4)))
+      (insert-at 5 a 4)
+      a)
+  (1 2 3 4 5))
+
+;;; test remove-keyword-parameter
+(deftest remove-keyword-parameter-1
+    (remove-keyword-parameter '(0 :a 1 :b 2 :c 3) :b)
+  (0 :a 1 :c 3))

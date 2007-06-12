@@ -8,8 +8,12 @@
 		:initform t
 		:initarg :allow-add-p
 		:documentation "If true, gridedit provides the UI to
-		add entries to the collection. Otherwise, such UI is
-		not provided.")
+		add entries to the collection.")
+   (allow-delete-p :accessor gridedit-allow-delete-p
+		   :initform t
+		   :initarg :allow-delete-p
+		   :documentation "If true, gridedit provides the UI
+		   to delete entries in the collection.")
    (ui-state :accessor gridedit-ui-state
 	     :initform nil
 	     :initarg :ui-state
@@ -68,7 +72,8 @@ actual place to push 'item' is obtained from the grid."))
   (push item (datagrid-data grid)))
 
 (defmethod render-widget-body ((obj gridedit) &rest args)
-  (call-next-method)
+  (apply #'call-next-method obj :custom-slots `((test . ,(lambda (&rest args)
+						 (with-html (:td "hala"))))) args)
   (with-slots (allow-add-p ui-state) obj
     (cond ((and (null ui-state)
 		allow-add-p) (gridedit-render-add-button obj))

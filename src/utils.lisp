@@ -1,11 +1,13 @@
 
 (in-package :weblocks)
 
-(export '(humanize-name attributize-name object-visible-slots
-	  get-slot-value slot-value-by-path render-slot-inline-p
-	  safe-apply safe-funcall request-parameter request-parameters
-	  string-whitespace-p render-extra-tags with-extra-tags
-	  strictly-less-p equivalentp alist->plist intersperse))
+(export '(humanize-name attributize-name insert-after insert-at
+	  object-visible-slots get-slot-value slot-value-by-path
+	  render-slot-inline-p safe-apply safe-funcall
+	  request-parameter request-parameters string-whitespace-p
+	  render-extra-tags with-extra-tags strictly-less-p
+	  equivalentp alist->plist intersperse
+	  remove-keyword-parameter))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -53,6 +55,17 @@ Ex:
   (mapcar (lambda (i)
 	    (if (consp i) i (cons i (funcall map i))))
 	  lst))
+
+(defun insert-after (newelt list index) 
+  "Destructively inserts 'newelt' into 'list' after 'index'."
+  (push newelt (cdr (nthcdr index list))) 
+  list)
+
+(defmacro insert-at (newelt list index) 
+  "Destructively inserts 'newelt' into 'list' before 'index'."
+  `(if (zerop ,index)
+       (push ,newelt ,list)
+       (insert-after ,newelt ,list (1- ,index))))
 
 (defgeneric object-visible-slots (obj &key slots mode &allow-other-keys)
   (:documentation
@@ -113,37 +126,59 @@ the function in such cases:
                              :mode :strict) =>
     ((#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . #<FUNCTION # {C239E45}>)
 
-In strict mode slot names that do not exist in the object's class can
-be specified. They will be returned as is, and the renderers can later
-use them to render custom slots.
+Custom slots that do not exist can also be added in any mode using
+the :custom-slots keyword. The keyword should be bound to an
+association list where the car of each cons cell is an index and the
+cdr is the slot. The slot will be added and returned as is at the
+specified index. If car of the cons pair is not a number or the
+element isn't a cons pair, it is treated as a slot which will be
+appended at the end.
+
+\(object-visible-slots *joe* :custom-slots '((0 . test))) =>
+    (test
+     (#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . NAME)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION MANAGER> . MANAGER))
+
+\(object-visible-slots *joe* :custom-slots '(test)) =>
+    ((#<STANDARD-DIRECT-SLOT-DEFINITION NAME> . NAME)
+     (#<STANDARD-DIRECT-SLOT-DEFINITION MANAGER> . MANAGER)
+     test)
 "))
 
-(defmethod object-visible-slots (obj &key slots mode &allow-other-keys)
-  (remove-if
-   (curry #'eq nil)
-   (if (eql mode :hide)
-       (let ((all-slots (class-visible-slots (class-of obj))))
-	 (list->assoc (remove-if (curry-after #'member slots :test #'string-equal)
-				 all-slots :key #'slot-definition-name)
-		      :map #'slot-definition-name))
-       (let* ((slot-assoc (list->assoc slots))
-	      (all-slots (class-visible-slots (class-of obj) :visible-slots (mapcar #'car slot-assoc))))
-	 (if (eql mode :strict)
-	     (mapcar (lambda (i)
-		       (let ((slot (car (member (car i) all-slots
-						:test #'string-equal
-						:key #'slot-definition-name))))
-			 (if (not (null slot))
-			     (cons slot (cdr i))
-			     i)))
-		     slot-assoc)
-	     (mapcar (lambda (i)
-		       (cons i (let* ((slot-name (slot-definition-name i))
-				      (alt-name (assoc slot-name slot-assoc)))
-				 (if (null alt-name)
-				     slot-name
-				     (cdr alt-name)))))
-		     all-slots))))))
+(defmethod object-visible-slots (obj &key slots mode custom-slots &allow-other-keys)
+  (let ((visible-slots (remove
+			nil
+			(if (eql mode :hide)
+			    (let ((all-slots (class-visible-slots (class-of obj))))
+			      (list->assoc (remove-if (curry-after #'member slots :test #'string-equal)
+						      all-slots :key #'slot-definition-name)
+					   :map #'slot-definition-name))
+			    (let* ((slot-assoc (list->assoc slots))
+				   (all-slots (class-visible-slots (class-of obj)
+								   :visible-slots
+								   (mapcar #'car slot-assoc))))
+			      (if (eql mode :strict)
+				  (mapcar (lambda (i)
+					    (let ((slot (car (member (car i) all-slots
+								     :test #'string-equal
+								     :key #'slot-definition-name))))
+					      (when (not (null slot))
+						  (cons slot (cdr i)))))
+					  slot-assoc)
+				  (mapcar (lambda (i)
+					    (cons i (let* ((slot-name (slot-definition-name i))
+							   (alt-name (assoc slot-name slot-assoc)))
+						      (if (null alt-name)
+							  slot-name
+							  (cdr alt-name)))))
+					  all-slots)))))))
+    (mapc (lambda (obj)
+	    (if (and (consp obj)
+		     (integerp (car obj)))
+		(insert-at (cdr obj) visible-slots (car obj))
+		(push-end obj visible-slots)))
+	  custom-slots)
+    (list->assoc visible-slots)))
 
 (defun class-visible-slots (cls &key visible-slots)
   "Returns a list of 'standard-direct-slot' objects for a class
@@ -347,7 +382,7 @@ specializing CLOS functions."
 				     (cdr slot)
 				     slot-name)
 		     :slot-path (append slot-path (list slot-name))
-		     keys)))
+		     (remove-keyword-parameter keys :custom-slots))))
 	  (apply #'object-visible-slots obj keys)))
 
 (defun alist->plist (alist)
@@ -370,3 +405,17 @@ specializing CLOS functions."
        (cons (car list)
 	     (loop for i in (cdr list)
 		collect (list delimeter i))))))
+
+
+(defun remove-keyword-parameter (parameter-list keyword)
+  "Removes a keyword parameter from a parameter-list.
+\(remove-keyword-parameter '(1 2 3 :a 1 :b 2 :c 3) :b)
+=> (1 2 3 :a 1 :c 3)"
+  (let (remove)
+    (loop for i in parameter-list
+          when (eql i keyword)
+            do (setf remove t)
+          else when remove
+            do (setf remove nil)
+          else collect i)))
+
