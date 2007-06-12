@@ -203,3 +203,32 @@
 		    (:li :class "age" (:span :class "label" "Age:&nbsp;") (:span :class "value" "18"))
 		    (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 		     (:span :class "value" "Jim"))))))))
+
+(deftest render-dataform-4
+    (with-request :get nil
+      (let* ((*weblocks-output-stream* (make-string-output-stream))
+	     on-cancel-called-p
+	     on-success-called-p
+	     (edit-joe (make-instance 'dataform
+				      :data (copy-template *joe*)
+				      :ui-state :form
+				      :on-cancel (lambda (grid)
+						   (setf on-cancel-called-p t))
+				      :on-success (lambda (grid)
+						    (setf on-success-called-p t)))))
+	(declare (special *weblocks-output-stream*))
+	;; initial state
+	(render-widget edit-joe)
+	(do-request `(("cancel" . "Cancel")
+		      (,weblocks::*action-string* . "abc123")))
+	(render-widget edit-joe)
+	;; click modify
+	(do-request `((,weblocks::*action-string* . "abc124")))
+	(render-widget edit-joe)
+	;; change to bob and click submit
+	(do-request `(("submit" . "Submit")
+		      (,weblocks::*action-string* . "abc125")))
+	(render-widget edit-joe)
+	(values on-cancel-called-p on-success-called-p)))
+  t t)
+

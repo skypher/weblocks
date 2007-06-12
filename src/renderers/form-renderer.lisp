@@ -33,6 +33,7 @@ details."))
 			     validation-errors preslots-fn
 			     (postslots-fn #'render-form-controls)
 			     (method :get) action
+			     (title-action "Modifying")
 			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj)))))
@@ -43,7 +44,7 @@ details."))
 			       (session-name-string-pair))
 	     (with-extra-tags
 	       (htm (:fieldset
-		     (:h1 (:span :class "action" "Modifying:&nbsp;")
+		     (:h1 (:span :class "action" (str (concatenate 'string title-action ":&nbsp;")))
 			  (:span :class "object" (str (humanize-name (object-class-name obj)))))
 		     (render-validation-summary validation-errors)
 		     (safe-apply preslots-fn obj keys)

@@ -1,9 +1,9 @@
 
 (in-package :weblocks)
 
-(export '(dataform dataform-data render-dataform
-	  render-dataform-data render-dataform-form
-	  dataform-submit-action))
+(export '(dataform dataform-data dataform-on-cancel
+	  dataform-on-success render-dataform render-dataform-data
+	  render-dataform-form dataform-submit-action))
 
 (defwidget dataform (widget)
   ((data :accessor dataform-data
@@ -12,6 +12,7 @@
 	 :documentation "Data object rendered and modified by
 	 this widget.")
    (ui-state :initform :data
+	     :initarg :ui-state
 	     :documentation "Current internal state of the
 	     widget. Normally :data when rendering via 'render-data'
 	     and :form when rendering via 'render-form'.")
@@ -24,7 +25,20 @@
 			     values and validation fails, these values
 			     are stored in this variable so the form
 			     isn't lost while the user fixes
-			     errors."))
+			     errors.")
+   (on-cancel :accessor dataform-on-cancel
+	      :initform nil
+	      :initarg :on-cancel
+	      :documentation "An optional callback function with one
+	      argument (the dataform widget). Called when the user
+	      presses a cancel button.")
+   (on-success :accessor dataform-on-success
+	       :initform nil
+	       :initarg :on-success
+	       :documentation "An optional callback function with one
+	       argument (the dataform widget). Called when the user
+	       successfully submitted data that passed through the
+	       validation stage."))
   (:documentation
    "A class that represents a dataform widget. By default this
 widget renders the data object via 'render-data' generic renderer
@@ -89,12 +103,14 @@ customize form behavior."))
 				      (if success
 					  (progn
 					    (make-dirty obj :putp t)
+					    (safe-funcall (dataform-on-success obj) obj)
 					    (setf break-out t))
 					  (progn
 					    (setf (slot-value obj 'validation-errors) errors)
 					    (setf (slot-value obj 'intermediate-form-values)
 						  (copy-alist (request-parameters)))))))
 				  (when cancel
+				    (safe-funcall (dataform-on-cancel obj) obj)
 				    (setf break-out t))
 				  (when break-out
 				    (setf (slot-value obj 'validation-errors) nil)

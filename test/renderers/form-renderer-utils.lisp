@@ -2,7 +2,7 @@
 (in-package :weblocks-test)
 
 ;;; utilities for easier testing
-(defun form-header-template (action body &key (method "get") preslots
+(defun form-header-template (action body &key (method "get") (title-action "Modifying:&nbsp;") preslots
 			     (postslots `((:div :class "submit"
 						(:input :name "submit" :type "submit" :class "submit"
 										      :value "Submit"
@@ -21,7 +21,7 @@
 	  (:div :class "extra-top-2" "&nbsp;")
 	  (:div :class "extra-top-3" "&nbsp;")
 	  (:fieldset 
-	   (:h1 (:span :class "action" "Modifying:&nbsp;")
+	   (:h1 (:span :class "action" (str ,title-action))
 		(:span :class "object" "Employee"))
 	   ,@preslots
 	   (:h2 :class "form-fields-title" "Form fields:")

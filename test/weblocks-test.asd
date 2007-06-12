@@ -57,6 +57,7 @@
 			:components ((:file "dataform")
 				     (:file "flash")
 				     (:file "datagrid")
+				     (:file "gridedit")
 				     (:file "navigation")
 				     (:file "composite")
 				     (:file "widget"))

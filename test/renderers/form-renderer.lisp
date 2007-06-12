@@ -7,6 +7,16 @@
       (with-form-header *joe* (lambda () nil) :action "test-action" :method :post))
   #.(form-header-template "test-action" '(nil) :method "post"))
 
+(deftest-html with-form-header-2
+    (with-request :get nil
+      (with-form-header *joe* (lambda () nil)
+			:action "test-action"
+			:method :post
+			:title-action "Changing"))
+  #.(form-header-template "test-action" '(nil)
+			  :method "post"
+			  :title-action "Changing:&nbsp;"))
+
 ;;; test render-validation-summary
 (deftest-html render-validation-summary-1
     (render-validation-summary `(("Hello" . ,(make-condition 'required-validation-error

@@ -51,6 +51,8 @@
 				      :depends-on ("widget"))
 				     (:file "datagrid"
 				      :depends-on ("widget"))
+				     (:file "gridedit"
+				      :depends-on ("datagrid" "dataform"))
 				     (:file "paging"
 				      :depends-on ("widget"))
 				     (:file "composite"

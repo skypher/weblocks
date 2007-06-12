@@ -1,10 +1,14 @@
 
 TODO:
--- CURRENT () --
+-- CURRENT (gridedit) --
+- Simply output class for all derived widgets
+- Refactor out forms
+- Only show isearch bar when there's more than one data entry
+- Optimize/refactor getting data from grid
+- Fix friendly URLs not being respected in w3m
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
-- Create a gridedit control based on datagrid and dataform
 - Create a modal dialog widget, as well as modal request in general
 - Handling failure (AJAX and regular, add message types to flash widget)
 - Controls that expose state on the URL, AJAX and POST/GET, back button/history research
