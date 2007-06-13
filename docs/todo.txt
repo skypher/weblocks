@@ -1,9 +1,10 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Only show isearch bar when there's more than one data entry
-- Optimize/refactor getting data from grid
 - Fix "add null" when search hides all information
+- Adding employee during search/sort is a bad idea
+- Add employee should refresh the entire widget, not just the body
+- Only show isearch bar when there's more than one data entry
 - Add ability to select items
 - Add ability to select all items, not just the ones on current page (integrate with search)
 - Add delete functionality based on select
@@ -27,6 +28,7 @@ TODO:
 - Consider redoing flash widget with modal style in mind (widget specific modality?)
 - Refactor out forms
 - Consider refactoring parts of regex filtering and sorting into utils
+- Optimize/cache getting data from grid
 
 -- MINOR FEATURES --
 - Mark required fields

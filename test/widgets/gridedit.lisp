@@ -4,7 +4,8 @@
 ;;; testing gridedit-render-add-button
 (deftest-html gridedit-render-add-button-1
     (with-request :get nil
-      (weblocks::gridedit-render-add-button (make-instance 'gridedit)))
+      (weblocks::gridedit-render-add-button (make-instance 'gridedit
+							   :data-class 'employee)))
   (:form :class "add-entry"
 	 :action ""
 	 :method "get"
@@ -16,7 +17,8 @@
 ;;; testing gridedit-render-add-form
 (deftest-html gridedit-render-add-form-1
     (with-request :get nil
-      (weblocks::gridedit-render-add-form (make-instance 'gridedit :data (list *joe*))))
+      (weblocks::gridedit-render-add-form (make-instance 'gridedit :data (list *joe*)
+							 :data-class 'employee)))
   (:div :class "widget dataform" :id "widget-123"
 	 (:div :class "widget-body"
 	       #.(form-header-template
@@ -30,7 +32,8 @@
 
 ;;; testing gridedit-add-item
 (deftest gridedit-add-item-1
-    (let ((grid (make-instance 'gridedit :data (list *joe*))))
+    (let ((grid (make-instance 'gridedit :data (list *joe*)
+			       :data-class 'employee)))
       (weblocks::gridedit-add-item grid *joe* nil)
       (length (datagrid-data grid)))
   2)
@@ -38,7 +41,9 @@
 ;;; testing render-widget-body for gridedit
 (deftest-html render-widget-body-gridedit-1
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*))))
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+				 :data-class 'employee
+				 :forbid-sorting-on '(test))))
 	;; render datagrid
 	(render-widget-body grid :custom-slots '(test))
 	;; click "Add Employee"
@@ -109,6 +114,17 @@
 	 (:fieldset
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
 	  (:input :name "action" :type "hidden" :value "abc131")))))
+
+(deftest render-widget-body-gridedit-2
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+				 :data-class 'employee))
+	    (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *weblocks-output-stream*))
+	;; render datagrid
+	(render-widget-body grid)
+	(datagrid-forbid-sorting-on grid)))
+  (delete))
 
 ;;; test append-custom-slots
 (deftest append-custom-slots-1

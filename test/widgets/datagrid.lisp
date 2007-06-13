@@ -4,7 +4,8 @@
 ;;; test with-widget-header for datagrid
 (deftest-html with-widget-header-data-grid-1
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid)))
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee)))
 	(with-widget-header grid (lambda (&rest args)
 				   nil)
 			    :form-id "I1"
@@ -35,13 +36,15 @@
 ;;; test datagrid-filter-data
 (deftest datagrid-filter-data-1
     (length (weblocks::datagrid-filter-data
-	     (make-instance 'datagrid :search "Joe")
+	     (make-instance 'datagrid :search "Joe"
+			    :data-class 'employee)
 	     (list *joe* *bob*)))
   1)
 
 (deftest datagrid-filter-data-2
     (length (weblocks::datagrid-filter-data
-	     (make-instance 'datagrid :search "o")
+	     (make-instance 'datagrid :search "o"
+			    :data-class 'employee)
 	     (list *joe* *bob*)))
   2)
 
@@ -87,18 +90,21 @@
 
 ;;; test hidden-items-message
 (deftest hidden-items-message-1
-    (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)))
+    (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+						   :data-class 'employee))
   "&nbsp;")
 
 (deftest hidden-items-message-2
     (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)
-						   :search "Test"))
+						   :search "Test"
+						   :data-class 'employee))
   "(<span class=\"item-count\">2</span> items are hidden by the search)")
 
 ;;; test datagrid-render-search-bar
 (deftest datagrid-render-search-bar-1
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :search "test"))
+      (let ((grid (make-instance 'datagrid :search "test"
+				 :data-class 'employee))
 	    (*weblocks-output-stream* (make-string-output-stream))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
@@ -110,7 +116,8 @@
 
 (deftest datagrid-render-search-bar-2
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)))
+      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)
+				 :data-class 'employee))
 	    (*weblocks-output-stream* (make-string-output-stream))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
@@ -125,7 +132,8 @@
 
 (deftest-html datagrid-render-search-bar-3
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)))
+      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)
+				 :data-class 'employee))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
 	(weblocks::datagrid-render-search-bar grid
@@ -182,7 +190,8 @@
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
     (render-table-header-cell *joe* 'name "Joe"
-			      :grid-obj (make-instance 'datagrid :allow-sorting nil))
+			      :grid-obj (make-instance 'datagrid :allow-sorting nil
+						       :data-class 'employee))
   (:th :class "name" "Name"))
 
 ;;; test render-datagrid-header-cell
@@ -190,7 +199,8 @@
     (with-request :get nil
       (render-datagrid-header-cell *joe* 'name "Joe"
 				   :slot-path '(name)
-				   :grid-obj (make-instance 'datagrid :sort '((name) . :ascending))))
+				   :grid-obj (make-instance 'datagrid :sort '((name) . :ascending)
+							    :data-class 'employee)))
   (:th :class "name sort-ascending"
        (:span #.(link-action-template "abc123" "Name"))))
 
@@ -198,13 +208,15 @@
     (with-request :get nil
       (render-datagrid-header-cell *joe* 'name "Joe"
 				   :slot-path '(name)
-				   :grid-obj (make-instance 'datagrid :sort '((manager) . :ascending))))
+				   :grid-obj (make-instance 'datagrid :sort '((manager) . :ascending)
+							    :data-class 'employee)))
   (:th :class "name"
        (:span #.(link-action-template "abc123" "Name"))))
 
 ;;; test datagrid-update-sort-column/aux-datagrid-update-sort-column
 (deftest datagrid-update-sort-column-1
-    (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)))
+    (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)
+			       :data-class 'employee))
 	  sort1 sort2)
       (setf sort1 (datagrid-sort grid))
       (weblocks::datagrid-update-sort-column grid)
@@ -216,7 +228,8 @@
 (deftest datagrid-update-sort-column-2
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *joe*)
-			       :allow-sorting '(manager))))
+			       :allow-sorting '(manager)
+			       :data-class 'employee)))
       (weblocks::datagrid-update-sort-column grid)
       (datagrid-sort grid))
   ((manager) . :ascending))
@@ -224,7 +237,8 @@
 (deftest datagrid-update-sort-column-3
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *joe*)
-			       :allow-sorting '(university))))
+			       :allow-sorting '(university)
+			       :data-class 'employee)))
       (weblocks::datagrid-update-sort-column grid :slots '(education university))
       (datagrid-sort grid))
   ((education university) . :ascending))
@@ -232,7 +246,8 @@
 (deftest datagrid-update-sort-column-4
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *joe*)
-			       :allow-sorting '(address-ref))))
+			       :allow-sorting '(address-ref)
+			       :data-class 'employee)))
       (weblocks::datagrid-update-sort-column grid :slots '(address-ref))
       (datagrid-sort grid))
   ((address-ref) . :ascending))
@@ -242,7 +257,8 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting nil)
+							       :allow-sorting nil
+							       :data-class 'employee)
 						'(name) "Joe")))
   nil)
 
@@ -250,7 +266,8 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting t)
+							       :allow-sorting t
+							       :data-class 'employee)
 						'(name) "Joe")))
   t)
 
@@ -258,7 +275,8 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting '(manager))
+							       :allow-sorting '(manager)
+							       :data-class 'employee)
 						'(name) "Joe")))
   nil)
 
@@ -266,7 +284,8 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting '(manager))
+							       :allow-sorting '(manager)
+							       :data-class 'employee)
 						'(manager) "Jim")))
   t)
 
@@ -274,7 +293,8 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting '(education graduation-year))
+							       :allow-sorting '(education graduation-year)
+							       :data-class 'employee)
 						'(education university) "Jim")))
   nil)
 
@@ -282,9 +302,19 @@
     (not (null
 	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
 							       :data (list *joe*)
-							       :allow-sorting '(education graduation-year))
+							       :allow-sorting '(education graduation-year)
+							       :data-class 'employee)
 						'(education graduation-year) "Jim")))
   t)
+
+(deftest datagrid-column-sortable-p-7
+    (not (null
+	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+							       :data (list *joe*)
+							       :forbid-sorting-on '(name)
+							       :data-class 'employee)
+						'(name) "Joe")))
+  nil)
 
 ;;; test datagrid-sorted-slot-name
 (deftest datagrid-sorted-slot-name-1
@@ -307,7 +337,8 @@
 (deftest datagrid-sort-data-1
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((name) . :ascending)))
+			       :sort '((name) . :ascending)
+			       :data-class 'employee))
 	  res)
       (setf res (weblocks::datagrid-sort-data grid
 					      (slot-value grid 'weblocks::data)))
@@ -319,7 +350,8 @@
 (deftest datagrid-sort-data-2
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((name) . :descending)))
+			       :sort '((name) . :descending)
+			       :data-class 'employee))
 	  res)
       (setf res (weblocks::datagrid-sort-data grid
 					      (slot-value grid 'weblocks::data)))
@@ -331,7 +363,8 @@
 (deftest datagrid-sort-data-3
     (let ((grid (make-instance 'datagrid
 			       :data (list *joe* *bob*)
-			       :sort '((age) . :descending)))
+			       :sort '((age) . :descending)
+			       :data-class 'employee))
 	  res)
       (setf res (weblocks::datagrid-sort-data grid
 					      (slot-value grid 'weblocks::data)))
@@ -343,33 +376,38 @@
 ;;; test datagrid-data
 (deftest datagrid-data-1
     (datagrid-data (make-instance 'datagrid
-				  :data (list 1 2)))
+				  :data (list 1 2)
+				  :data-class 'employee))
   (1 2))
 
 (deftest datagrid-data-2
     (datagrid-data (make-instance 'datagrid
 				  :data (lambda (search sort)
-					  (list 1 2))))
+					  (list 1 2))
+				  :data-class 'employee))
   (1 2))
 
 ;;; test datagrid-data-count
 (deftest datagrid-data-count-1
     (datagrid-data-count (make-instance 'datagrid
-				  :data (list 1 2)))
+				  :data (list 1 2)
+				  :data-class 'employee))
   2)
 
 (deftest datagrid-data-count-2
     (datagrid-data-count (make-instance 'datagrid
 				  :data (lambda (search sort &key countp)
 					  (list search sort countp))
-				  :search "foo"))
+				  :search "foo"
+				  :data-class 'employee))
   ("foo" nil t))
 
 (deftest datagrid-data-count-3
     (datagrid-data-count (make-instance 'datagrid
 				  :data (lambda (search sort &key countp)
 					  (list search sort countp))
-				  :search "foo")
+				  :search "foo"
+				  :data-class 'employee)
 			 :totalp t)
   (nil nil t))
 
@@ -386,7 +424,8 @@
 (deftest-html render-widget-body-datagrid-1
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*))))
+				 :data (list *joe* *bob*)
+				 :data-class 'employee)))
 	;; render datagrid
 	(render-widget-body grid)
 	;; sort by name (should be descending)
@@ -431,7 +470,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :allow-sorting '(manager))))
+				 :allow-sorting '(manager)
+				 :data-class 'employee)))
 	(render-widget-body grid)))
   #.(table-header-template
      '((:th :class "name" "Name")
@@ -448,7 +488,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :allow-sorting nil)))
+				 :allow-sorting nil
+				 :data-class 'employee)))
 	(render-widget-body grid)))
   #.(table-header-template
      '((:th :class "name" "Name")
@@ -463,7 +504,8 @@
 (deftest-html render-widget-body-datagrid-4
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*))))
+				 :data (list *joe* *bob*)
+				 :data-class 'employee)))
 	(render-widget-body grid)
 	(setf (first-name *bob*) "Zed")
 	(render-widget-body grid)
@@ -494,7 +536,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :search "J")))
+				 :search "J"
+				 :data-class 'employee)))
 	;; render datagrid
 	(render-widget-body grid)))
   (htm
@@ -513,7 +556,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :sort '(address-ref . :ascending))))
+				 :sort '(address-ref . :ascending)
+				 :data-class 'employee)))
 	;; render datagrid
 	(render-widget-body grid :slots '(address-ref))
 	;; sort by name (should be descending)

@@ -21,19 +21,6 @@
       (ajax-request-p))
   "test")
 
-;;; test ajax-request-p
-(deftest ajax-request-p-1
-    (with-request :get nil
-      (setf (slot-value *request* 'hunchentoot::headers-in)
-	    (cons '("X-Requested-With" . "blah") (slot-value *request* 'hunchentoot::headers-in)))
-      (not (null (ajax-request-p))))
-  t)
-
-(deftest ajax-request-p-2
-    (with-request :get nil
-      (not (null (ajax-request-p))))
-  nil)
-
 ;;; test pure-request-p
 (deftest pure-request-p-1
     (with-request :get nil

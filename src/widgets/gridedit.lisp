@@ -72,6 +72,7 @@ actual place to push 'item' is obtained from the grid."))
   (push item (datagrid-data grid)))
 
 (defmethod render-widget-body ((obj gridedit) &rest args)
+  (pushnew 'delete (datagrid-forbid-sorting-on obj))
   (apply #'call-next-method obj
 	 :custom-slots (append-custom-slots
 			(when (gridedit-allow-delete-p obj)

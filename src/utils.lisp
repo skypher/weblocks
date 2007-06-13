@@ -347,6 +347,9 @@ used by the framework for sorting data."))
 (defmethod strictly-less-p ((a string) (b string))
   (string-lessp a b))
 
+(defmethod strictly-less-p ((a (eql nil)) (b (eql nil)))
+  nil)
+
 (defgeneric equivalentp (a b)
   (:documentation
    "Returns true if 'a' is in some sense equivalent to 'b'. This
@@ -354,6 +357,9 @@ function is used by the framework for sorting data."))
 
 (defmethod equivalentp (a b)
   (equalp a b))
+
+(defmethod equivalent ((a (eql nil)) (b (eql nil)))
+  t)
 
 (defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
 			   &allow-other-keys)

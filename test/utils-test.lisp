@@ -257,9 +257,17 @@
     (not (null (strictly-less-p "a" "b")))
   t)
 
+(deftest strictly-less-p-3
+    (not (null (strictly-less-p nil nil)))
+  nil)
+
 ;;; test equivalentp
 (deftest equivalentp-1
     (equivalentp "a" "a")
+  t)
+
+(deftest equivalentp-2
+    (equivalentp nil nil)
   t)
 
 ;; test visit-object-slots

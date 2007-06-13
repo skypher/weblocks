@@ -37,7 +37,8 @@
   "widget string")
 
 (deftest widget-css-classes-4
-    (widget-css-classes (make-instance 'gridedit))
+    (widget-css-classes (make-instance 'gridedit
+				       :data-class 'employee))
   "widget datagrid gridedit")
 
 ;;; test with-widget-header

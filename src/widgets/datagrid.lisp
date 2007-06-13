@@ -2,13 +2,23 @@
 (in-package :weblocks)
 
 (export '(datagrid datagrid-data datagrid-data-count datagrid-sort
-	  datagrid-allow-sorting datagrid-search
-	  datagrid-allow-searching-p
+	  datagrid-allow-sorting datagrid-forbid-sorting-on
+	  datagrid-search datagrid-allow-searching-p
 	  datagrid-show-hidden-entries-count-p
 	  render-datagrid-header-cell datagrid-sorted-slot-name))
 
 (defwidget datagrid (widget)
-  ((data :accessor datagrid-data
+  ((data-class :accessor datagrid-data-class
+	       :initform nil
+	       :initarg :data-class
+	       :documentation "The class of the objects rendered by
+	       this datagrid. While the class can potentially be
+	       obtained from the data directly, it is not always
+	       possible. Additionally, specifying the class makes
+	       datagrid more efficient. For these reasons it is
+	       required to specify this slot at the instantiation
+	       time.")
+   (data :accessor datagrid-data
 	 :initform nil
 	 :initarg :data
 	 :documentation "Either a sequence of data objects that will
@@ -35,11 +45,13 @@
 		  t (default), sorting is allowed; if set to nil
 		  sorting is disallowed. If set to a list of slot
 		  names, only these slots will be available for the
-		  user to sort on. Note, if generic functions
-		  'strictly-less-p' and 'equivalentp' aren't defined
-		  on the datatype of the column, sorting for that
-		  column will be turned off regardless of the value of
-		  this slot.")
+		  user to sort on.")
+   (forbid-sorting-on :accessor datagrid-forbid-sorting-on
+		      :initform nil
+		      :initarg :forbid-sorting-on
+		      :documentation "A list of slot names on which
+		      datagrid will not do sorting. Note, this slot
+		      takes precedence over 'allow-sorting'.")
    (search :accessor datagrid-search
 	   :initform nil
 	   :initarg :search
@@ -61,6 +73,11 @@
 				been hidden."))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
+
+;;; Ensure that data-class is specified
+(defmethod initialize-instance :after ((obj datagrid) &rest initargs &key &allow-other-keys)
+  (when (null (datagrid-data-class obj))
+    (error "data-class must be specified to initialize a datagrid.")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Filtering and searching ;;;
@@ -157,7 +174,10 @@ search."
   "An interface for 'datagrid-update-sort-column-aux'. Gets the data
 and tries to update the sort column only when necessary."
   (when (null (datagrid-sort grid))
-    (apply #'datagrid-update-sort-column-aux grid (car (datagrid-data grid)) args)))
+    (apply #'datagrid-update-sort-column-aux
+	   grid
+	   (make-instance (datagrid-data-class grid))
+	   args)))
 
 (defun datagrid-update-sort-column-aux (grid data-obj &rest args)
   "This function is called to ensure that a datagrid is sorted on
@@ -191,6 +211,9 @@ functions."
 	       (datagrid-allow-sorting grid-obj)
 	       :test #'equalp)
        t)
+   (not (member (datagrid-sorted-slot-name column-path)
+		(datagrid-forbid-sorting-on grid-obj)
+		:test #'equalp))
    (compute-applicable-methods #'strictly-less-p (list column-value column-value))
    (compute-applicable-methods #'equivalentp (list column-value column-value))))
 
