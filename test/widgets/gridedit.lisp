@@ -11,7 +11,7 @@
 	 :method "get"
 	 :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	 (:fieldset
-	  (:input :name "submit" :type "submit" :class "submit" :value "Add Null")
+	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
 	  (:input :name "action" :type "hidden" :value "abc123"))))
 
 ;;; testing gridedit-render-add-form
