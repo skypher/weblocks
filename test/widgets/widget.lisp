@@ -15,6 +15,19 @@
     (render-widget-body "test" :id "foo" :class "bar")
   (:p :id "foo" :class "bar" "test"))
 
+;;; test widget-css-classes
+(deftest widget-css-classes-1
+    (widget-css-classes #'identity)
+  "widget function")
+
+(deftest widget-css-classes-2
+    (widget-css-classes "test")
+  "widget string")
+
+(deftest widget-css-classes-3
+    (widget-css-classes (make-instance 'gridedit))
+  "widget datagrid gridedit")
+
 ;;; test with-widget-header
 (deftest-html with-widget-header-1
     (with-request :get nil

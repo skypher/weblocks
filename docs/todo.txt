@@ -1,11 +1,16 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Simply output class for all derived widgets
+- Allow an fbound symbol to be treated as widget
+- Tell user how many items are hidden by grid search using fbound symbol
+- Add ability to select items
+- Add ability to select all items, not just the ones on current page (integrate with search)
+- Add delete functionality based on select
+- Allow viewing/editing by clicking on a row/link column
+- Fix friendly URLs not being respected in w3m
+- Optimize/refactor getting data from grid
 - Refactor out forms
 - Only show isearch bar when there's more than one data entry
-- Optimize/refactor getting data from grid
-- Fix friendly URLs not being respected in w3m
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -22,13 +27,12 @@ TODO:
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Register stylesheet requirements, deal with paths to stylesheets and images
 - Preload ajax image and navigation arrow
-- Consider redoing flash widget with modal style in mind
+- Consider redoing flash widget with modal style in mind (widget specific modality?)
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
 - Mark required fields
 - Don't remove validation error summary for long forms.
-- Handle error pages nicely
 - Customize widget printing to include their names (to ease debugging)
 - Port stylesheets to IE, fix the form bug for Opera 8, browser
   compatibility, offer simpe HTML version for older browsers

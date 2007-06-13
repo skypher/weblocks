@@ -15,11 +15,11 @@
 	 (:div :class "extra-top-3" "&nbsp;")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget simple-character-string"
+	       (:div :class "widget string"
 		     (:div :class "widget-body"
 			   (:p "Hello World!"))))
 	      (:li
-	       (:div :class "widget simple-character-string"
+	       (:div :class "widget string"
 		     (:div :class "widget-body"
 			   (:p "Foo")))))
 	 (:div :class "extra-bottom-1" "&nbsp;")

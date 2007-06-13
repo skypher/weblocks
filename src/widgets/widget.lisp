@@ -2,8 +2,9 @@
 (in-package :weblocks)
 
 (export '(widget-class defwidget widget widget-name widget-args
-	  with-widget-header render-widget-body render-widget
-	  make-dirty find-widget-by-path* find-widget-by-path))
+	  with-widget-header render-widget-body widget-css-classes
+	  render-widget make-dirty find-widget-by-path*
+	  find-widget-by-path))
 
 (defclass widget-class (standard-class)
   ()
@@ -69,9 +70,7 @@ rendered."))
 	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
 		      (attributize-name obj-name))))
     (with-html
-      (:div :class (concatenate 'string
-				"widget "
-				(attributize-name (class-name (class-of obj))))
+      (:div :class (widget-css-classes obj)
 	    :id widget-id
 	    (safe-apply prewidget-body-fn args)
 	    (:div :class "widget-body"
@@ -99,13 +98,34 @@ Another implementation allows rendering strings."))
   (with-html
     (:p :id id :class class (str obj))))
 
+(defgeneric widget-css-classes (widget)
+  (:documentation "Returns a string that represents applicable CSS
+classes for 'widget'. Normally includes the class name and the names
+of its subclasses. It is safe to assume that the class 'widget' will
+be present for all widgets."))
+
+(defmethod widget-css-classes ((obj widget))
+  (apply #'concatenate 'string
+	 (intersperse
+	  (mapcar (compose #'attributize-name #'class-name)
+		  (reverse
+		   (loop for i in (superclasses obj :proper? nil)
+		      until (string-equal (class-name i) 'standard-object)
+		      collect i))) " ")))
+
+(defmethod widget-css-classes ((obj function))
+  "widget function")
+
+(defmethod widget-css-classes ((obj string))
+  "widget string")
+
 (defmethod widget-name ((obj function))
   nil)
 
-(defmethod widget-args ((obj function))
+(defmethod widget-name ((obj string))
   nil)
 
-(defmethod widget-name ((obj string))
+(defmethod widget-args ((obj function))
   nil)
 
 (defmethod widget-args ((obj string))

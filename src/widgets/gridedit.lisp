@@ -72,10 +72,21 @@ actual place to push 'item' is obtained from the grid."))
   (push item (datagrid-data grid)))
 
 (defmethod render-widget-body ((obj gridedit) &rest args)
-  (apply #'call-next-method obj :custom-slots `((test . ,(lambda (&rest args)
-						 (with-html (:td "hala"))))) args)
+  (apply #'call-next-method obj
+	 :custom-slots (append-custom-slots
+			(when (gridedit-allow-delete-p obj)
+			  `((0 . (delete . ,(lambda (&rest args)
+						    (with-html (:td "Delete")))))))
+			args)
+	 args)
   (with-slots (allow-add-p ui-state) obj
     (cond ((and (null ui-state)
 		allow-add-p) (gridedit-render-add-button obj))
 	  ((eql ui-state :add) (gridedit-render-add-form obj)))))
 
+
+(defun append-custom-slots (custom-slots args)
+  "Appends gridedit specific custom slots to the ones already defined
+in 'args'."
+  (append (cadr (member :custom-slots args))
+	  custom-slots))
