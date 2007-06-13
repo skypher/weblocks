@@ -15,7 +15,7 @@
 	      (:div :class "extra-top-1" "&nbsp;")
 	      (:div :class "extra-top-2" "&nbsp;")
 	      (:div :class "extra-top-3" "&nbsp;")
-	      (:span "Search table")
+	      (:span :class "title" "Search table")
 	      (:form :id "I1" :class "isearch" :action "" :method "get"
 		     (:fieldset
 		      (:input :type "text" :id "I2" :name "search" :class "search-bar")
@@ -26,6 +26,7 @@
 		       (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
 });$('I3').remove();")
 		       (fmt "~%// ]]>~%"))
+	      (:span :class "hidden-items" "&nbsp;")
 	      (:div :class "extra-bottom-1" "&nbsp;")
 	      (:div :class "extra-bottom-2" "&nbsp;")
 	      (:div :class "extra-bottom-3" "&nbsp;"))
@@ -84,17 +85,99 @@
 	      (ppcre:scan regex "test")))
   0 nil nil)
 
+;;; test hidden-items-message
+(deftest hidden-items-message-1
+    (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)))
+  "&nbsp;")
+
+(deftest hidden-items-message-2
+    (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+						   :search "Test"))
+  "(<span class=\"item-count\">2</span> items are hidden by the search)")
+
 ;;; test datagrid-render-search-bar
 (deftest datagrid-render-search-bar-1
     (with-request :get nil
       (let ((grid (make-instance 'datagrid :search "test"))
-	    (*weblocks-output-stream* (make-string-output-stream)))
-	(declare (special *weblocks-output-stream*))
+	    (*weblocks-output-stream* (make-string-output-stream))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
 	(weblocks::datagrid-render-search-bar grid)
 	(do-request `((,weblocks::*action-string* . "abc123")
 				   ("search" . "hello")))
-	(datagrid-search grid)))
+	(values (datagrid-search grid))))
   "hello")
+
+(deftest datagrid-render-search-bar-2
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)))
+	    (*weblocks-output-stream* (make-string-output-stream))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
+	(weblocks::datagrid-render-search-bar grid)
+	(do-request `((,weblocks::*action-string* . "abc123")
+				   ("search" . "hello")))
+	(do-request `((,weblocks::*action-string* . "abc123")
+				   ("search" . "bob")))
+	(reverse *on-ajax-complete-scripts*)))
+  ("function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">2</span> items are hidden by the search)';}"
+   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">1</span> items are hidden by the search)';}"))
+
+(deftest-html datagrid-render-search-bar-3
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
+	(weblocks::datagrid-render-search-bar grid
+					      :form-id "I1"
+					      :input-id "I2"
+					      :search-id "I3")
+	(do-request `((,weblocks::*action-string* . "abc123")
+				   ("search" . "hello")))
+	(weblocks::datagrid-render-search-bar grid
+					      :form-id "I1"
+					      :input-id "I2"
+					      :search-id "I3")))
+  (htm
+   (:div :class "datagrid-search-bar"
+	 (:div :class "extra-top-1" "&nbsp;")
+	 (:div :class "extra-top-2" "&nbsp;")
+	 (:div :class "extra-top-3" "&nbsp;")
+	 (:span :class "title" "Search table")
+	 (:form :id "I1" :class "isearch" :action "" :method "get"
+		(:fieldset
+		 (:input :type "text" :id "I2" :name "search" :class "search-bar")
+		 (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
+		 (:input :name "action" :type "hidden" :value "abc123")))
+	 (:script :type "text/javascript"
+		  (fmt "~%// <![CDATA[~%")
+		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
+});$('I3').remove();")
+		  (fmt "~%// ]]>~%"))
+	 (:span :class "hidden-items" "&nbsp;")
+	 (:div :class "extra-bottom-1" "&nbsp;")
+	 (:div :class "extra-bottom-2" "&nbsp;")
+	 (:div :class "extra-bottom-3" "&nbsp;"))
+   (:div :class "datagrid-search-bar"
+	 (:div :class "extra-top-1" "&nbsp;")
+	 (:div :class "extra-top-2" "&nbsp;")
+	 (:div :class "extra-top-3" "&nbsp;")
+	 (:span :class "title" "Search table")
+	 (:form :id "I1" :class "isearch" :action "" :method "get"
+		(:fieldset
+		 (:input :type "text" :id "I2" :name "search" :class "search-bar" :value "hello")
+		 (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
+		 (:input :name "action" :type "hidden" :value "abc124")))
+	 (:script :type "text/javascript"
+		  (fmt "~%// <![CDATA[~%")
+		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc124', $('I1'), 'weblocks-session=1%3Atest');
+});$('I3').remove();")
+		  (fmt "~%// ]]>~%"))
+	 (:span :class "hidden-items"
+		"(<span class=\"item-count\">2</span> items are hidden by the search)")
+	 (:div :class "extra-bottom-1" "&nbsp;")
+	 (:div :class "extra-bottom-2" "&nbsp;")
+	 (:div :class "extra-bottom-3" "&nbsp;"))))
 
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
@@ -268,6 +351,27 @@
 				  :data (lambda (search sort)
 					  (list 1 2))))
   (1 2))
+
+;;; test datagrid-data-count
+(deftest datagrid-data-count-1
+    (datagrid-data-count (make-instance 'datagrid
+				  :data (list 1 2)))
+  2)
+
+(deftest datagrid-data-count-2
+    (datagrid-data-count (make-instance 'datagrid
+				  :data (lambda (search sort &key countp)
+					  (list search sort countp))
+				  :search "foo"))
+  ("foo" nil t))
+
+(deftest datagrid-data-count-3
+    (datagrid-data-count (make-instance 'datagrid
+				  :data (lambda (search sort &key countp)
+					  (list search sort countp))
+				  :search "foo")
+			 :totalp t)
+  (nil nil t))
 
 ;;; test negate-sort-direction
 (deftest negate-sort-direction-1

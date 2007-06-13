@@ -14,11 +14,19 @@ Ajax.Responders.register({
 	}
 });
 
+function findWidgetBody(widget) {
+    var descendants = $(widget).immediateDescendants();
+    return descendants.find(function(i)
+			    {
+				return i.hasClassName('widget-body');
+			    });
+}
+
 function onActionSuccess(transport, json) {
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {
-	updateElementBody($(i).getElementsByClassName('widget-body')[0], dirtyWidgets[i]);
+	updateElementBody(findWidgetBody($(i)), dirtyWidgets[i]);
     }
 
     // Perform a series of specialized operations

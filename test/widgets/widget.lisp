@@ -15,16 +15,28 @@
     (render-widget-body "test" :id "foo" :class "bar")
   (:p :id "foo" :class "bar" "test"))
 
+;; helper function
+(defun dummy-symbol-function (&rest args)
+  (with-html (:p "test")))
+
+(deftest-html render-widget-body-4
+    (render-widget-body 'dummy-symbol-function)
+  (:p "test"))
+
 ;;; test widget-css-classes
 (deftest widget-css-classes-1
     (widget-css-classes #'identity)
   "widget function")
 
 (deftest widget-css-classes-2
+    (widget-css-classes 'identity)
+  "widget function identity")
+
+(deftest widget-css-classes-3
     (widget-css-classes "test")
   "widget string")
 
-(deftest widget-css-classes-3
+(deftest widget-css-classes-4
     (widget-css-classes (make-instance 'gridedit))
   "widget datagrid gridedit")
 
@@ -42,9 +54,43 @@
 	      (:p "test"))
 	(:p "world")))
 
-;;; test widget-name specialization for functions
+;;; test widget-name specialization for widgets
 (deftest widget-name-1
     (widget-name #'identity)
+  nil)
+
+(deftest widget-name-2
+    (widget-name "identity")
+  nil)
+
+(deftest widget-name-3
+    (widget-name 'identity)
+  identity)
+
+;;; test widget-args specialization for widgets
+(deftest widget-args-1
+    (widget-args #'identity)
+  nil)
+
+(deftest widget-args-2
+    (widget-args "identity")
+  nil)
+
+(deftest widget-args-3
+    (widget-args 'identity)
+  nil)
+
+;;; test composite-widgets specialization for widgets
+(deftest composite-widgets-1
+    (composite-widgets #'identity)
+  nil)
+
+(deftest composite-widgets-2
+    (composite-widgets "identity")
+  nil)
+
+(deftest composite-widgets-3
+    (composite-widgets 'identity)
   nil)
 
 ;;; render function as a widget

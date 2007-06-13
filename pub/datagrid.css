@@ -38,7 +38,7 @@ span.paging
 .datagrid-search-bar > .extra-top-1, .datagrid-search-bar > .extra-top-2,
 .datagrid-search-bar > .extra-top-3,
 .datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
-.datagrid-search-bar > .extra-bottom-3, .datagrid-search-bar > span
+.datagrid-search-bar > .extra-bottom-3, .datagrid-search-bar > span.title
 {
   display: none;
 }
@@ -70,3 +70,12 @@ span.paging
   margin-left: 0.5em;
 }
 
+.datagrid-search-bar > span.hidden-items
+{
+  margin: 0;
+  padding: 0;
+  vertical-align: bottom;
+  margin-left: 0.5em;
+  color: grey;
+  font-size: x-small;
+}

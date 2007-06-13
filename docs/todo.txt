@@ -1,16 +1,14 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Allow an fbound symbol to be treated as widget
-- Tell user how many items are hidden by grid search using fbound symbol
+- Only show isearch bar when there's more than one data entry
+- Make sure we handle singular/plural situation for items
+- Optimize/refactor getting data from grid
+- Fix "add null" when search hides all information
 - Add ability to select items
 - Add ability to select all items, not just the ones on current page (integrate with search)
 - Add delete functionality based on select
 - Allow viewing/editing by clicking on a row/link column
-- Fix friendly URLs not being respected in w3m
-- Optimize/refactor getting data from grid
-- Refactor out forms
-- Only show isearch bar when there's more than one data entry
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -28,6 +26,8 @@ TODO:
 - Register stylesheet requirements, deal with paths to stylesheets and images
 - Preload ajax image and navigation arrow
 - Consider redoing flash widget with modal style in mind (widget specific modality?)
+- Refactor out forms
+- Consider refactoring parts of regex filtering and sorting into utils
 
 -- MINOR FEATURES --
 - Add "linguistic code" and convert form validations (types, etc.) to use it.
@@ -39,8 +39,8 @@ TODO:
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Reset sessions should respect friendly URL
+- Fix friendly URLs not being respected in w3m
 - Allow adding titles to navigation items and set them as page title, add application title
-- Consider refactoring parts of regex filtering and sorting into utils
 
 -- WISHLIST --
 - Allow multiple search tokens in grid searchbar

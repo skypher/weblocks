@@ -1,8 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(datagrid datagrid-data datagrid-sort datagrid-allow-sorting
-	  datagrid-search datagrid-allow-searching-p
+(export '(datagrid datagrid-data datagrid-data-count datagrid-sort
+	  datagrid-allow-sorting datagrid-search
+	  datagrid-allow-searching-p
+	  datagrid-show-hidden-entries-count-p
 	  render-datagrid-header-cell datagrid-sorted-slot-name))
 
 (defwidget datagrid (widget)
@@ -15,7 +17,10 @@
 	 slot is bound to a sequence, datagrid will do the paging and
 	 sorting itself in memory destructively. If the slot is bound
 	 to a function, the function is expected to return a properly
-	 sorted and paged sequence.")
+	 sorted and paged sequence. The function should also accept
+	 a :countp keyword argument. If true, the function should
+	 return only the number of items with the given search
+	 parameters, not the actual items themselves.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
@@ -45,7 +50,15 @@
 		      :initform t
 		      :initarg :allow-searching
 		      :documentation "Set to true to enable searching,
-		      or to nil to disable it."))
+		      or to nil to disable it.")
+   (show-hidden-entries-count-p :accessor datagrid-show-hidden-entries-count-p
+				:initform t
+				:initarg :show-hidden-entries-count-p
+				:documentation "If set to true (the
+				default), and searching is allowed,
+				the datagrid displays a message during
+				search specifying how many items have
+				been hidden."))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
 
@@ -88,19 +101,44 @@ faithful to Emacs' isearch."
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
 
+(defun hidden-items-message (grid)
+  "Returns a text message specifying how many items are hidden by the
+search."
+  (let ((hidden-items-count (- (datagrid-data-count grid :totalp t)
+			       (datagrid-data-count grid :totalp nil))))
+    (if (> hidden-items-count 0)
+	(format nil "(<span class=\"item-count\">~A</span> ~
+items are hidden by the search)" hidden-items-count)
+	"&nbsp;")))
+
 (defun datagrid-render-search-bar (grid &rest keys)
   "Renders a search bar for the datagrid."
   (with-html
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
-	    (htm (:span "Search table"))
+	    (htm (:span :class "title" "Search table"))
 	    (apply #'render-isearch "search"
 		   (make-action
 		    (lambda (&key search &allow-other-keys)
+		      (declare (special *on-ajax-complete-scripts*))
 		      (setf (datagrid-search grid) (when (not (empty-p search))
-						     search))))
+						     search))
+		      (when (datagrid-show-hidden-entries-count-p grid)
+			(push (format nil "function () { $('~A').~
+                                           getElementsByClassName('hidden-items')[0].~
+                                             innerHTML = '~A';~
+                                         }"
+				      (attributize-name (widget-name grid))
+				      (hidden-items-message grid))
+			      *on-ajax-complete-scripts*))))
 		   :value (datagrid-search grid)
-		   keys)))))
+		   keys)
+	    (when (datagrid-show-hidden-entries-count-p grid)
+	      (let ((hidden-items-message (hidden-items-message grid)))
+		(when hidden-items-message
+		  (with-html
+		    (:span :class "hidden-items"
+			   (str hidden-items-message))))))))))
 
 ;;; Render the searchbar in the header
 (defmethod with-widget-header ((obj datagrid) body-fn &rest args)
@@ -226,6 +264,23 @@ customize the way datagrid headers are rendered."))
       (sequence 
        (datagrid-sort-data grid-obj
 			   (datagrid-filter-data grid-obj data))))))
+
+(defun datagrid-data-count (grid &key totalp)
+  "Returns the number of items in the grid. This function works
+similarly to datagrid-data in principle. Note, if totalp is set to
+true, 'datagrid-data-count' returns the the total number of items and
+ignores searching parameters."
+  (with-slots (data) grid
+    (etypecase data
+      (function (funcall data
+			 (when (not totalp)
+			   (datagrid-search grid))
+			 nil
+			 :countp t))
+      (sequence 
+       (if totalp
+	   (length data)
+	   (length (datagrid-filter-data grid data)))))))
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)

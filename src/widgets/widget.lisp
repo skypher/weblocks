@@ -87,9 +87,16 @@ order to actually render the widget, call 'render-widget' instead.
 One of the implementations allows \"rendering\" functions. When
 'render-widget' is called on a function, the function is simply
 called. This allows to easily add functions to composite widgets that
-can do custom rendering without much boilerplate.
+can do custom rendering without much boilerplate. Similarly symbols
+that are fbound to functions can be treated as widgets.
 
 Another implementation allows rendering strings."))
+
+(defmethod render-widget-body ((obj symbol) &rest args)
+  (if (fboundp obj)
+      (apply obj args)
+      (error "Cannot render ~A as widget. Symbol not bound to a
+      function." obj)))
 
 (defmethod render-widget-body ((obj function) &rest args)
   (apply obj args))
@@ -113,16 +120,25 @@ be present for all widgets."))
 		      until (string-equal (class-name i) 'standard-object)
 		      collect i))) " ")))
 
+(defmethod widget-css-classes ((obj symbol))
+  (format nil "widget function ~A" (attributize-name obj)))
+
 (defmethod widget-css-classes ((obj function))
   "widget function")
 
 (defmethod widget-css-classes ((obj string))
   "widget string")
 
+(defmethod widget-name ((obj symbol))
+  obj)
+
 (defmethod widget-name ((obj function))
   nil)
 
 (defmethod widget-name ((obj string))
+  nil)
+
+(defmethod widget-args ((obj symbol))
   nil)
 
 (defmethod widget-args ((obj function))
@@ -144,6 +160,12 @@ widget without a header."
   nil)
 
 (defmethod composite-widgets ((obj function))
+  nil)
+
+(defmethod composite-widgets ((obj symbol))
+  nil)
+
+(defmethod composite-widgets ((obj string))
   nil)
 
 (defun make-dirty (w &key putp)
