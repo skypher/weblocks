@@ -98,7 +98,7 @@
     (weblocks::hidden-items-message (make-instance 'datagrid :data (list *joe* *bob*)
 						   :search "Test"
 						   :data-class 'employee))
-  "(<span class=\"item-count\">2</span> items are hidden by the search)")
+  "(2 items are hidden by the search)")
 
 ;;; test datagrid-render-search-bar
 (deftest datagrid-render-search-bar-1
@@ -127,8 +127,8 @@
 	(do-request `((,weblocks::*action-string* . "abc123")
 				   ("search" . "bob")))
 	(reverse *on-ajax-complete-scripts*)))
-  ("function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">2</span> items are hidden by the search)';}"
-   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">1</span> item is hidden by the search)';}"))
+  ("function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(2 items are hidden by the search)';}"
+   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(1 item is hidden by the search)';}"))
 
 (deftest-html datagrid-render-search-bar-3
     (with-request :get nil
@@ -182,7 +182,7 @@
 });$('I3').remove();")
 		  (fmt "~%// ]]>~%"))
 	 (:span :class "hidden-items"
-		"(<span class=\"item-count\">2</span> items are hidden by the search)")
+		"(2 items are hidden by the search)")
 	 (:div :class "extra-bottom-1" "&nbsp;")
 	 (:div :class "extra-bottom-2" "&nbsp;")
 	 (:div :class "extra-bottom-3" "&nbsp;"))))

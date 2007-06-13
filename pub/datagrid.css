@@ -74,7 +74,10 @@ span.paging
 {
   margin: 0;
   padding: 0;
+  display: -moz-inline-box;
+  display: inline-block;
   vertical-align: bottom;
+  margin-bottom: 2px;
   margin-left: 0.5em;
   color: grey;
   font-size: x-small;

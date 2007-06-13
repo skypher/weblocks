@@ -124,7 +124,7 @@ search."
   (let ((hidden-items-count (- (datagrid-data-count grid :totalp t)
 			       (datagrid-data-count grid :totalp nil))))
     (if (> hidden-items-count 0)
-	(format nil "(<span class=\"item-count\">~A</span> ~A ~A hidden by the search)"
+	(format nil "(~A ~A ~A hidden by the search)"
 		hidden-items-count
 		(proper-number-form hidden-items-count "item")
 		(proper-number-form hidden-items-count "is"))
