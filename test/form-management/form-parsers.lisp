@@ -12,7 +12,7 @@
 	  (parse-slot-from-request 'integer "AGE" "2t5"))
       (values success (format nil "~A" error)))
   nil
-  "Age must be of type integer.")
+  "Age must be an integer.")
 
 (deftest parse-slot-from-request-3
     (parse-slot-from-request 'unknown-type "AGE" "25")

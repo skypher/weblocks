@@ -2,7 +2,6 @@
 TODO:
 -- CURRENT (gridedit) --
 - Only show isearch bar when there's more than one data entry
-- Make sure we handle singular/plural situation for items
 - Optimize/refactor getting data from grid
 - Fix "add null" when search hides all information
 - Add ability to select items
@@ -30,7 +29,6 @@ TODO:
 - Consider refactoring parts of regex filtering and sorting into utils
 
 -- MINOR FEATURES --
-- Add "linguistic code" and convert form validations (types, etc.) to use it.
 - Mark required fields
 - Don't remove validation error summary for long forms.
 - Customize widget printing to include their names (to ease debugging)

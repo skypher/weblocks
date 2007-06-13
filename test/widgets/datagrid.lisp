@@ -121,7 +121,7 @@
 				   ("search" . "bob")))
 	(reverse *on-ajax-complete-scripts*)))
   ("function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">2</span> items are hidden by the search)';}"
-   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">1</span> items are hidden by the search)';}"))
+   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(<span class=\"item-count\">1</span> item is hidden by the search)';}"))
 
 (deftest-html datagrid-render-search-bar-3
     (with-request :get nil

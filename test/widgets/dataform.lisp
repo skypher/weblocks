@@ -187,13 +187,13 @@
 		     (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "bad")
 		      (:p :class "validation-error"
 			  (:em (:span :class "validation-error-heading" "Error:&nbsp;")
-			       "Age must be of type integer."))))
+			       "Age must be an integer."))))
 		    (:li :class "manager"
 		     (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "Age must be of type integer.")))))))
+			 (:ul (:li "Age must be an integer.")))))))
    ;; age changed
    (:div :class "widget dataform" :id "widget-123"
 	 (:div :class "widget-body"

@@ -15,6 +15,8 @@
   :components ((:file "weblocks")
 	       (:file "utils"
 		      :depends-on ("weblocks"))
+	       (:file "linguistic"
+		      :depends-on ("weblocks"))
 	       (:file "page-template"
 		      :depends-on ("weblocks" "utils"))
 	       (:file "actions"
