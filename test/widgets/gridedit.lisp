@@ -115,6 +115,31 @@
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
 	  (:input :name "action" :type "hidden" :value "abc131")))))
 
+(deftest-html render-widget-body-gridedit-2
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+				 :data-class 'employee
+				 :search "doesn't exist")))
+	;; render datagrid
+	(render-widget-body grid)))
+  (htm
+   ;; datagrid
+   (:div :class "renderer table empty-table"
+	(:div :class "extra-top-1" "&nbsp;")
+	(:div :class "extra-top-2" "&nbsp;")
+	(:div :class "extra-top-3" "&nbsp;")
+	(:p (:span :class "message" "No information available."))
+	(:div :class "extra-bottom-1" "&nbsp;")
+	(:div :class "extra-bottom-2" "&nbsp;")
+	(:div :class "extra-bottom-3" "&nbsp;"))
+   (:form :class "add-entry"
+	 :action ""
+	 :method "get"
+	 :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 (:fieldset
+	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
+	  (:input :name "action" :type "hidden" :value "abc123")))))
+
 (deftest render-widget-body-gridedit-2
     (with-request :get nil
       (let ((grid (make-instance 'gridedit :data (list *joe*)

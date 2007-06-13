@@ -40,7 +40,7 @@
 		      :class "submit"
 		      :value (format nil "Add ~A" (humanize-name
 						   (object-class-name
-						    (car (datagrid-data grid))))))
+						    (make-instance (datagrid-data-class grid))))))
 	      (:input :name "action"
 		      :type "hidden"
 		      :value action))))))
@@ -49,7 +49,7 @@
   "Renders a form that allows adding a new entry utilizing
 'dataform' widget."
   (render-widget (make-instance 'dataform
-				:data (make-instance (class-of (car (datagrid-data grid))))
+				:data (make-instance (class-of (make-instance (datagrid-data-class grid))))
 				:ui-state :form
 				:on-cancel (lambda (obj)
 					     (setf (gridedit-ui-state grid) nil))
