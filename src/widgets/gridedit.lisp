@@ -1,10 +1,23 @@
 
 (in-package :weblocks)
 
-(export '(gridedit gridedit-allow-add-p gridedit-add-item))
+(export '(gridedit gridedit-allow-add-p))
 
 (defwidget gridedit (datagrid)
-  ((allow-add-p :accessor gridedit-allow-add-p
+  ((on-add-item :accessor gridedit-on-add-item
+		:initform nil
+		:initarg :on-add-item
+		:documentation "A function called by gridedit when an
+		item is added. The function should accept two
+		arguments (the gridedit object and a new item), and
+		should take appropriate action (write to the database,
+		etc.) If 'data' is set to a function and 'on-add-item'
+		is not specified, the UI to add items will not be
+		provided regardless of the value of 'allow-add-p'. If
+		'data' is a sequence, 'on-add-item' will be
+		responsible for adding the data to the sequence, if
+		specified.")
+   (allow-add-p :accessor gridedit-allow-add-p
 		:initform t
 		:initarg :allow-add-p
 		:documentation "If true, gridedit provides the UI to
@@ -55,21 +68,18 @@
 					     (setf (gridedit-ui-state grid) nil))
 				:on-success (lambda (obj)
 					      (gridedit-add-item grid
-								 (dataform-data obj)
-								 (slot-value grid 'data))
+								 (dataform-data obj))
 					      (setf (gridedit-ui-state grid) nil))
 				:widget-args '(:title-action "Adding"))))
 
-(defgeneric gridedit-add-item (grid item collection)
-  (:documentation
-   "Default implementation adds 'item' to the start of '(datagrid-data
-grid)' via 'push'. Specialize this function for different types of
-collections, storage methods, and/or grids. Note that in the default
-implementation 'collection' is used for specialization only, the
-actual place to push 'item' is obtained from the grid."))
-
-(defmethod gridedit-add-item ((grid gridedit) item collection)
-  (push item (datagrid-data grid)))
+(defun gridedit-add-item (grid item)
+  "If 'on-add-item' is specified, simply calls
+'on-add-item'. Otherwise, if 'data' is a sequence, adds the item to
+the beginning of the sequence."
+  (if (gridedit-on-add-item grid)
+      (funcall (gridedit-on-add-item grid) grid item)
+      (when (typep (slot-value grid 'data) 'sequence)
+	(push item (slot-value grid 'data)))))
 
 (defmethod render-widget-body ((obj gridedit) &rest args)
   (pushnew 'delete (datagrid-forbid-sorting-on obj))
@@ -82,7 +92,9 @@ actual place to push 'item' is obtained from the grid."))
 	 args)
   (with-slots (allow-add-p ui-state) obj
     (cond ((and (null ui-state)
-		allow-add-p) (gridedit-render-add-button obj))
+		allow-add-p
+		(or (gridedit-on-add-item obj)
+		    (typep (slot-value obj 'data) 'sequence))) (gridedit-render-add-button obj))
 	  ((eql ui-state :add) (gridedit-render-add-form obj)))))
 
 

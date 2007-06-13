@@ -34,9 +34,19 @@
 (deftest gridedit-add-item-1
     (let ((grid (make-instance 'gridedit :data (list *joe*)
 			       :data-class 'employee)))
-      (weblocks::gridedit-add-item grid *joe* nil)
+      (weblocks::gridedit-add-item grid *joe*)
       (length (datagrid-data grid)))
   2)
+
+(deftest gridedit-add-item-2
+    (let ((grid (make-instance 'gridedit :data (list *joe*)
+			       :data-class 'employee
+			       :on-add-item (lambda (grid item)
+					      (push item (slot-value grid 'weblocks::data))
+					      (push item (slot-value grid 'weblocks::data))))))
+      (weblocks::gridedit-add-item grid *joe*)
+      (length (datagrid-data grid)))
+  3)
 
 ;;; testing render-widget-body for gridedit
 (deftest-html render-widget-body-gridedit-1
@@ -139,6 +149,26 @@
 	 (:fieldset
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
 	  (:input :name "action" :type "hidden" :value "abc123")))))
+
+(deftest-html render-widget-body-gridedit-3
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (lambda (&rest args)
+						   (list *joe*))
+				 :data-class 'employee
+				 :allow-add-p t)))
+	;; render datagrid
+	(render-widget-body grid)))
+  (htm
+   ;; datagrid
+   #.(table-header-template
+      '((:th :class "delete" "Delete")
+	(:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	(:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
+      '((:tr
+	 (:td "Delete")
+	 (:td :class "name" (:span :class "value" "Joe"))
+	 (:td :class "manager" (:span :class "value" "Jim"))))
+      :summary "Ordered by name, ascending.")))
 
 (deftest render-widget-body-gridedit-2
     (with-request :get nil

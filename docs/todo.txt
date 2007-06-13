@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Adding employee during search/sort is a bad idea
 - Add employee should refresh the entire widget, not just the body
 - Only show isearch bar when there's more than one data entry
 - Add ability to select items
