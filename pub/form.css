@@ -22,41 +22,20 @@
   display: none;
 }
 
-input, select
+form.renderer > fieldset > ul > li > label > input,
+form.renderer > fieldset > ul > li > label > select
 {
-  border: solid 1px #29364F;
-  background-color: #F6FBFD;
   margin-top: 2px;
   margin-bottom: 2px;
   padding: 0;
   width: 12em;
-  min-height: 1.3em;
 }
 
-input:hover
+form.renderer > fieldset > div.submit > input.submit
 {
-  background-color: #D8EAF8;
-}
-
-input:focus
-{
-  background-color: #D8EAF8;
-}
-
-
-input.submit
-{
-  display: inline;
   margin-top: 2px;
   margin-bottom: 2px;
   margin-right: 0.5em;
-  border: solid 1px black;
-  width: 5em;
-}
-
-input.submit:hover
-{
-  background-color: #D8EAF8;
 }
 
 span.validation-error-heading

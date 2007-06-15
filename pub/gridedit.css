@@ -13,9 +13,6 @@
 
 .gridedit form.add-entry > fieldset > input.submit
 {
-  width: auto;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
   margin: 0;
   margin-bottom: 1em;
 }
