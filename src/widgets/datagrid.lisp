@@ -1,12 +1,17 @@
 
 (in-package :weblocks)
 
-(export '(datagrid datagrid-data datagrid-data-count datagrid-sort
-	  datagrid-allow-sorting datagrid-forbid-sorting-on
-	  datagrid-search datagrid-allow-searching-p
+(export '(*show-isearch-item-count-threshold* datagrid datagrid-data
+	  datagrid-data-count datagrid-sort datagrid-allow-sorting
+	  datagrid-forbid-sorting-on datagrid-search
+	  datagrid-allow-searching-p
 	  datagrid-show-hidden-entries-count-p
 	  render-datagrid-header-cell datagrid-sorted-slot-name
 	  render-datagrid-table-body))
+
+(defparameter *show-isearch-item-count-threshold* 2
+  "Isearch will not be shown if the number of items in the datagrid is
+less than this value.")
 
 (defwidget datagrid (widget)
   ((data-class :accessor datagrid-data-class
@@ -317,7 +322,8 @@ ignores searching parameters."
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
-  (when (datagrid-allow-searching-p obj)
+  (when (and (datagrid-allow-searching-p obj)
+	     (>= (datagrid-data-count obj :totalp t) *show-isearch-item-count-threshold*))
     (apply #'datagrid-render-search-bar obj args))
   (with-html
     (:div :class "datagrid-body"

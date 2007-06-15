@@ -355,6 +355,49 @@
     (weblocks::negate-sort-direction :descending)
   :ascending)
 
+;;; test render-widget-body for datagrid
+(deftest-html render-widget-body-datagrid-1
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :data-class 'employee))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *on-ajax-complete-scripts*))
+	;; render datagrid
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
+  (htm
+   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+	    '((:tr
+	       (:td :class "name" (:span :class "value" "Bob"))
+	       (:td :class "manager" (:span :class "value" "Jim")))
+	      (:tr :class "altern"
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))))
+	    :summary "Ordered by name, ascending."))))
+
+(deftest-html render-widget-body-datagrid-2
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe*)
+				 :data-class 'employee))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *on-ajax-complete-scripts*))
+	;; render datagrid
+	(render-widget-body grid)))
+  (htm
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
+	    '((:tr
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))))
+	    :summary "Ordered by name, ascending."))))
+
 ;;; test render-datagrid-table-body
 (deftest-html render-datagrid-table-body-1
     (with-request :get nil
