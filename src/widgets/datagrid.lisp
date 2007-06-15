@@ -219,8 +219,11 @@ functions."
    (not (member (datagrid-sorted-slot-name column-path)
 		(datagrid-forbid-sorting-on grid-obj)
 		:test #'equalp))
-   (compute-applicable-methods #'strictly-less-p (list column-value column-value))
-   (compute-applicable-methods #'equivalentp (list column-value column-value))))
+   ; Currently column-value is always nil so computing applicable
+   ; methods is unnecessary. It also seems to interfere with
+   ; profiling.
+   #|(compute-applicable-methods #'strictly-less-p (list column-value column-value))
+   (compute-applicable-methods #'equivalentp (list column-value column-value))|#))
 
 (defun datagrid-sorted-slot-name (sort-info)
   "Returns the name of the current slot from the slot path."
