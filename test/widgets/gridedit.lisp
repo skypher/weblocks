@@ -54,75 +54,80 @@
 				 :data-class 'employee
 				 :forbid-sorting-on '(test))))
 	;; render datagrid
-	(render-widget-body grid :custom-slots '(test))
+	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add Employee"
-	(do-request `((,weblocks::*action-string* . "abc125")))
-	(render-widget-body grid)
+	(do-request `((,weblocks::*action-string* . "abc126")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "submit"
 	(do-request `(("submit" . "Submit")
-		      (,weblocks::*action-string* . "abc128")))
-	(render-widget-body grid)))
+		      (,weblocks::*action-string* . "abc130")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
-   #.(table-header-template
-      '((:th :class "delete" "Delete")
-	(:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
-	(:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
-	(:th :class "test" "Test"))
-      '((:tr
-	 (:td "Delete")
-	 (:td :class "name" (:span :class "value" "Joe"))
-	 (:td :class "manager" (:span :class "value" "Jim"))
-	 (:td :class "test" (:span :class "value missing" "Not Specified"))))
-      :summary "Ordered by name, ascending.")
+   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "delete" "Delete")
+	      (:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager")))
+	      (:th :class "test" "Test"))
+	    '((:tr
+	       (:td "Delete")
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))
+	       (:td :class "test" (:span :class "value missing" "Not Specified"))))
+	    :summary "Ordered by name, ascending."))
    (:form :class "add-entry"
 	 :action ""
 	 :method "get"
-	 :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	 (:fieldset
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
-	  (:input :name "action" :type "hidden" :value "abc125")))
+	  (:input :name "action" :type "hidden" :value "abc126")))
    ;; "Add Employee" clicked
-   #.(table-header-template
-      '((:th :class "delete" "Delete")
-	(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
-	(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
-      '((:tr
-	 (:td "Delete")
-	 (:td :class "name" (:span :class "value" "Joe"))
-	 (:td :class "manager" (:span :class "value" "Jim"))))
-      :summary "Ordered by name, ascending.")
+   #.(searchbar-template "I1" "I2" "I3" "abc127")
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "delete" "Delete")
+	      (:th :class "name sort-ascending" (:span #.(link-action-template "abc128" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc129" "Manager"))))
+	    '((:tr
+	       (:td "Delete")
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))))
+	    :summary "Ordered by name, ascending."))
    (:div :class "widget dataform" :id "widget-123"
-	 (:div :class "widget-body"
-	       #.(form-header-template
-		  "abc128"
-		  '((:li :class "name"
-		     (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-		    (:li :class "manager"
-		     (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
-		  :method "post"
-		  :title-action "Adding:&nbsp;")))
+	 #.(form-header-template
+	    "abc130"
+	    '((:li :class "name"
+	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	      (:li :class "manager"
+	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	    :method "post"
+	    :title-action "Adding:&nbsp;"))
    ;; "Submit" clicked
-   #.(table-header-template
-      '((:th :class "delete" "Delete")
-	(:th :class "name sort-ascending" (:span #.(link-action-template "abc129" "Name")))
-	(:th :class "manager" (:span #.(link-action-template "abc130" "Manager"))))
-      '((:tr
-	 (:td "Delete")
-	 (:td :class "name" (:span :class "value" "Joe"))
-	 (:td :class "manager" (:span :class "value" "Jim")))
-	(:tr :class "altern"
-	 (:td "Delete")
-	 (:td :class "name" (:span :class "value" "Joe"))
-	 (:td :class "manager" (:span :class "value" "Jim"))))
-      :summary "Ordered by name, ascending.")
+   #.(searchbar-template "I1" "I2" "I3" "abc131")
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "delete" "Delete")
+	      (:th :class "name sort-ascending" (:span #.(link-action-template "abc132" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc133" "Manager"))))
+	    '((:tr
+	       (:td "Delete")
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim")))
+	      (:tr :class "altern"
+	       (:td "Delete")
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))))
+	    :summary "Ordered by name, ascending."))
    (:form :class "add-entry"
 	 :action ""
 	 :method "get"
-	 :onsubmit "initiateFormAction(\"abc131\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 :onsubmit "initiateFormAction(\"abc134\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	 (:fieldset
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
-	  (:input :name "action" :type "hidden" :value "abc131")))))
+	  (:input :name "action" :type "hidden" :value "abc134")))))
 
 (deftest-html render-widget-body-gridedit-2
     (with-request :get nil
@@ -130,44 +135,50 @@
 				 :data-class 'employee
 				 :search "doesn't exist")))
 	;; render datagrid
-	(render-widget-body grid)))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
-   (:div :class "renderer table empty-table"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
-	(:p (:span :class "message" "No information available."))
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;"))
+   #.(searchbar-template "I1" "I2" "I3" "abc123" :value "doesn't exist"
+			 :hidden-items-text "(1 item is hidden by the search)")
+   (:div :class "datagrid-body"
+	 (:div :class "renderer table empty-table"
+	       (:div :class "extra-top-1" "&nbsp;")
+	       (:div :class "extra-top-2" "&nbsp;")
+	       (:div :class "extra-top-3" "&nbsp;")
+	       (:p (:span :class "message" "No information available."))
+	       (:div :class "extra-bottom-1" "&nbsp;")
+	       (:div :class "extra-bottom-2" "&nbsp;")
+	       (:div :class "extra-bottom-3" "&nbsp;")))
    (:form :class "add-entry"
 	 :action ""
 	 :method "get"
-	 :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	 (:fieldset
 	  (:input :name "submit" :type "submit" :class "submit" :value "Add Employee")
-	  (:input :name "action" :type "hidden" :value "abc123")))))
+	  (:input :name "action" :type "hidden" :value "abc124")))))
 
 (deftest-html render-widget-body-gridedit-3
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (lambda (&rest args)
-						   (list *joe*))
+      (let ((grid (make-instance 'gridedit :data (lambda (&rest args &key countp &allow-other-keys)
+						   (if countp
+						       1
+						       (list *joe*)))
 				 :data-class 'employee
 				 :allow-add-p t)))
 	;; render datagrid
-	(render-widget-body grid)))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
-   ;; datagrid
-   #.(table-header-template
-      '((:th :class "delete" "Delete")
-	(:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
-	(:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
-      '((:tr
-	 (:td "Delete")
-	 (:td :class "name" (:span :class "value" "Joe"))
-	 (:td :class "manager" (:span :class "value" "Jim"))))
-      :summary "Ordered by name, ascending.")))
+   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   (:div :class "datagrid-body"
+	 #.(table-header-template
+	    '((:th :class "delete" "Delete")
+	      (:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+	    '((:tr
+	       (:td "Delete")
+	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "manager" (:span :class "value" "Jim"))))
+	    :summary "Ordered by name, ascending."))))
 
 (deftest render-widget-body-gridedit-4
     (with-request :get nil

@@ -56,7 +56,9 @@
 				     (:file "request-object-mapping"))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
-			:components ((:file "dataform")
+			:components ((:file "widget-test-utils")
+				     (:file "dataform"
+				      :depends-on ("widget-test-utils"))
 				     (:file "flash")
 				     (:file "datagrid")
 				     (:file "gridedit")

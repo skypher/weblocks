@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- render-datagrid-body
 - Only show isearch bar when there's more than one data entry
 - Add ability to select items
 - Add ability to select all items, not just the ones on current page (integrate with search)

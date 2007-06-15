@@ -117,53 +117,10 @@
 					      :input-id "I2"
 					      :search-id "I3")))
   (htm
-   (:div :class "datagrid-search-bar"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
-	 (:span :class "title" "Search table")
-	 (:form :id "I1" :class "isearch" :action "" :method "get"
-		(:fieldset
-		 (:input :type "text" :id "I2" :name "search" :class "search-bar")
-		 (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
-		 (:input :name "action" :type "hidden" :value "abc123")))
-	 (:script :type "text/javascript"
-		  (fmt "~%// <![CDATA[~%")
-		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
-});")
-		  (fmt "~%// ]]>~%"))
-	 (:script :type "text/javascript"
-		  (fmt "~%// <![CDATA[~%")
-		  (fmt "$('I3').remove();")
-		  (fmt "~%// ]]>~%"))
-	 (:span :class "hidden-items" "&nbsp;")
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))
-   (:div :class "datagrid-search-bar"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
-	 (:span :class "title" "Search table")
-	 (:form :id "I1" :class "isearch" :action "" :method "get"
-		(:fieldset
-		 (:input :type "text" :id "I2" :name "search" :class "search-bar" :value "hello")
-		 (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
-		 (:input :name "action" :type "hidden" :value "abc124")))
-	 (:script :type "text/javascript"
-		  (fmt "~%// <![CDATA[~%")
-		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc124', $('I1'), 'weblocks-session=1%3Atest');
-});")
-		  (fmt "~%// ]]>~%"))
-	 (:script :type "text/javascript"
-		  (fmt "~%// <![CDATA[~%")
-		  (fmt "$('I3').remove();")
-		  (fmt "~%// ]]>~%"))
-	 (:span :class "hidden-items"
-		"(2 items are hidden by the search)")
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))))
+   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   #.(searchbar-template "I1" "I2" "I3" "abc124"
+			 :hidden-items-text "(2 items are hidden by the search)"
+			 :value "hello")))
 
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
