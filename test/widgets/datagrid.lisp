@@ -1,38 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test with-widget-header for datagrid
-(deftest-html with-widget-header-data-grid-1
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee)))
-	(with-widget-header grid (lambda (&rest args)
-				   nil)
-			    :form-id "I1"
-			    :input-id "I2"
-			    :search-id "I3")))
-  (:div :class "widget datagrid" :id "widget-123"
-	(:div :class "datagrid-search-bar"
-	      (:div :class "extra-top-1" "&nbsp;")
-	      (:div :class "extra-top-2" "&nbsp;")
-	      (:div :class "extra-top-3" "&nbsp;")
-	      (:span :class "title" "Search table")
-	      (:form :id "I1" :class "isearch" :action "" :method "get"
-		     (:fieldset
-		      (:input :type "text" :id "I2" :name "search" :class "search-bar")
-		      (:input :id "I3" :name "submit" :type "submit" :class "submit" :value "Search")
-		      (:input :name "action" :type "hidden" :value "abc123")))
-	      (:script :type "text/javascript"
-		       (fmt "~%// <![CDATA[~%")
-		       (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
-});$('I3').remove();")
-		       (fmt "~%// ]]>~%"))
-	      (:span :class "hidden-items" "&nbsp;")
-	      (:div :class "extra-bottom-1" "&nbsp;")
-	      (:div :class "extra-bottom-2" "&nbsp;")
-	      (:div :class "extra-bottom-3" "&nbsp;"))
-	(:div :class "widget-body" "")))
-
 ;;; test datagrid-filter-data
 (deftest datagrid-filter-data-1
     (length (weblocks::datagrid-filter-data
@@ -127,8 +95,10 @@
 	(do-request `((,weblocks::*action-string* . "abc123")
 				   ("search" . "bob")))
 	(reverse *on-ajax-complete-scripts*)))
-  ("function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(2 items are hidden by the search)';}"
-   "function () { $('widget-123').getElementsByClassName('hidden-items')[0].innerHTML = '(1 item is hidden by the search)';}"))
+  ("function () { updateElementBody($('widget-123').getElementsByClassName('datagrid-body')[0], \"<div class='renderer table empty-table'><div class='extra-top-1'>&nbsp;</div><div class='extra-top-2'>&nbsp;</div><div class='extra-top-3'>&nbsp;</div><p><span class='message'>No information available.</span></p><div class='extra-bottom-1'>&nbsp;</div><div class='extra-bottom-2'>&nbsp;</div><div class='extra-bottom-3'>&nbsp;</div></div>\"); }"
+   "function () { updateElementBody($('widget-123').getElementsByClassName('hidden-items')[0], '(2 items are hidden by the search)'); }"
+   "function () { updateElementBody($('widget-123').getElementsByClassName('datagrid-body')[0], \"<div class='renderer table employee'><div class='extra-top-1'>&nbsp;</div><div class='extra-top-2'>&nbsp;</div><div class='extra-top-3'>&nbsp;</div><table summary='Ordered by name, ascending.'><thead><tr><th class='name sort-ascending'><span><a href='?action=abc124' onclick='initiateAction(\\\"abc124\\\", \\\"weblocks-session=1%3Atest\\\"); return false;'>Name</a></span></th><th class='manager'><span><a href='?action=abc125' onclick='initiateAction(\\\"abc125\\\", \\\"weblocks-session=1%3Atest\\\"); return false;'>Manager</a></span></th></tr></thead><tbody><tr><td class='name'><span class='value'><strong>Bob</strong></span></td><td class='manager'><span class='value'>Jim</span></td></tr></tbody></table><div class='extra-bottom-1'>&nbsp;</div><div class='extra-bottom-2'>&nbsp;</div><div class='extra-bottom-3'>&nbsp;</div></div>\"); }"
+   "function () { updateElementBody($('widget-123').getElementsByClassName('hidden-items')[0], '(1 item is hidden by the search)'); }"))
 
 (deftest-html datagrid-render-search-bar-3
     (with-request :get nil
@@ -160,7 +130,11 @@
 	 (:script :type "text/javascript"
 		  (fmt "~%// <![CDATA[~%")
 		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
-});$('I3').remove();")
+});")
+		  (fmt "~%// ]]>~%"))
+	 (:script :type "text/javascript"
+		  (fmt "~%// <![CDATA[~%")
+		  (fmt "$('I3').remove();")
 		  (fmt "~%// ]]>~%"))
 	 (:span :class "hidden-items" "&nbsp;")
 	 (:div :class "extra-bottom-1" "&nbsp;")
@@ -179,7 +153,11 @@
 	 (:script :type "text/javascript"
 		  (fmt "~%// <![CDATA[~%")
 		  (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc124', $('I1'), 'weblocks-session=1%3Atest');
-});$('I3').remove();")
+});")
+		  (fmt "~%// ]]>~%"))
+	 (:script :type "text/javascript"
+		  (fmt "~%// <![CDATA[~%")
+		  (fmt "$('I3').remove();")
 		  (fmt "~%// ]]>~%"))
 	 (:span :class "hidden-items"
 		"(2 items are hidden by the search)")
@@ -420,20 +398,22 @@
     (weblocks::negate-sort-direction :descending)
   :ascending)
 
-;;; test render-widget-body
-(deftest-html render-widget-body-datagrid-1
+;;; test render-datagrid-table-body
+(deftest-html render-datagrid-table-body-1
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :data-class 'employee)))
+				 :data-class 'employee))
+	    (*on-ajax-complete-scripts* nil))
+	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
-	(render-widget-body grid)
+	(render-datagrid-table-body grid)
 	;; sort by name (should be descending)
 	(do-request `((,weblocks::*action-string* . "abc123")))
-	(render-widget-body grid)
+	(render-datagrid-table-body grid)
 	;; refresh the action (should still be descending)
 	(do-request `((,weblocks::*action-string* . "abc123")))
-	(render-widget-body grid)))
+	(render-datagrid-table-body grid)))
   (htm
    #.(table-header-template
       '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
@@ -466,13 +446,13 @@
 	(:td :class "manager" (:span :class "value" "Jim"))))
      :summary "Ordered by name, descending.")))
 
-(deftest-html render-widget-body-datagrid-2
+(deftest-html render-datagrid-table-body-2
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :allow-sorting '(manager)
 				 :data-class 'employee)))
-	(render-widget-body grid)))
+	(render-datagrid-table-body grid)))
   #.(table-header-template
      '((:th :class "name" "Name")
        (:th :class "manager sort-ascending" (:span #.(link-action-template "abc123" "Manager"))))
@@ -484,13 +464,13 @@
 	(:td :class "manager" (:span :class "value" "Jim"))))
      :summary "Ordered by manager, ascending."))
 
-(deftest-html render-widget-body-datagrid-3
+(deftest-html render-datagrid-table-body-3
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :allow-sorting nil
 				 :data-class 'employee)))
-	(render-widget-body grid)))
+	(render-datagrid-table-body grid)))
   #.(table-header-template
      '((:th :class "name" "Name")
        (:th :class "manager" "Manager"))
@@ -501,14 +481,14 @@
 	(:td :class "name" (:span :class "value" "Bob"))
 	(:td :class "manager" (:span :class "value" "Jim"))))))
 
-(deftest-html render-widget-body-datagrid-4
+(deftest-html render-datagrid-table-body-4
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :data-class 'employee)))
-	(render-widget-body grid)
+	(render-datagrid-table-body grid)
 	(setf (first-name *bob*) "Zed")
-	(render-widget-body grid)
+	(render-datagrid-table-body grid)
 	(setf (first-name *bob*) "Bob")))
   (htm
    #.(table-header-template
@@ -532,14 +512,14 @@
 	 (:td :class "manager" (:span :class "value" "Jim"))))
       :summary "Ordered by name, ascending.")))
 
-(deftest-html render-widget-body-datagrid-5
+(deftest-html render-datagrid-table-body-5
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :search "J"
 				 :data-class 'employee)))
 	;; render datagrid
-	(render-widget-body grid)))
+	(render-datagrid-table-body grid)))
   (htm
    #.(table-header-template
       '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
@@ -552,17 +532,17 @@
 	 (:td :class "manager" (:span :class "value" "<strong>J</strong>im"))))
       :summary "Ordered by name, ascending.")))
 
-(deftest-html render-widget-body-datagrid-6
+(deftest-html render-datagrid-table-body-6
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :sort '(address-ref . :ascending)
 				 :data-class 'employee)))
 	;; render datagrid
-	(render-widget-body grid :slots '(address-ref))
+	(render-datagrid-table-body grid :slots '(address-ref))
 	;; sort by name (should be descending)
 	(do-request `((,weblocks::*action-string* . "abc124")))
-	(render-widget-body grid :slots '(address-ref))))
+	(render-datagrid-table-body grid :slots '(address-ref))))
   (htm
    #.(table-header-template
       '((:th :class "name" (:span #.(link-action-template "abc123" "Name")))

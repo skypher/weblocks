@@ -20,15 +20,14 @@
       (weblocks::gridedit-render-add-form (make-instance 'gridedit :data (list *joe*)
 							 :data-class 'employee)))
   (:div :class "widget dataform" :id "widget-123"
-	 (:div :class "widget-body"
-	       #.(form-header-template
-		  "abc123"
-		  '((:li :class "name"
-		     (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-		    (:li :class "manager"
-		     (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
-		  :method "post"
-		  :title-action "Adding:&nbsp;"))))
+	#.(form-header-template
+	   "abc123"
+	   '((:li :class "name"
+	      (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	     (:li :class "manager"
+	      (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	   :method "post"
+	   :title-action "Adding:&nbsp;")))
 
 ;;; testing gridedit-add-item
 (deftest gridedit-add-item-1
@@ -170,7 +169,7 @@
 	 (:td :class "manager" (:span :class "value" "Jim"))))
       :summary "Ordered by name, ascending.")))
 
-(deftest render-widget-body-gridedit-2
+(deftest render-widget-body-gridedit-4
     (with-request :get nil
       (let ((grid (make-instance 'gridedit :data (list *joe*)
 				 :data-class 'employee))

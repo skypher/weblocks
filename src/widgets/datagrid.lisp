@@ -5,7 +5,8 @@
 	  datagrid-allow-sorting datagrid-forbid-sorting-on
 	  datagrid-search datagrid-allow-searching-p
 	  datagrid-show-hidden-entries-count-p
-	  render-datagrid-header-cell datagrid-sorted-slot-name))
+	  render-datagrid-header-cell datagrid-sorted-slot-name
+	  render-datagrid-table-body))
 
 (defwidget datagrid (widget)
   ((data-class :accessor datagrid-data-class
@@ -55,6 +56,7 @@
    (search :accessor datagrid-search
 	   :initform nil
 	   :initarg :search
+	   :affects-dirty-status-p nil
 	   :documentation "Contains a search string that will filter
 	   results. Initially set to nil, which means all results will
 	   be visible.")
@@ -142,11 +144,22 @@ search."
 		      (declare (special *on-ajax-complete-scripts*))
 		      (setf (datagrid-search grid) (when (not (empty-p search))
 						     search))
+		      (push (format nil "~
+function () { ~
+  updateElementBody($('~A').getElementsByClassName('datagrid-body')[0], ~A); ~
+}"
+				      (attributize-name (widget-name grid))
+				      (encode-json-to-string
+				      (let ((*weblocks-output-stream* (make-string-output-stream)))
+					(declare (special *weblocks-output-stream*))
+					(apply #'render-datagrid-table-body grid (widget-args grid))
+					(get-output-stream-string *weblocks-output-stream*))))
+			      *on-ajax-complete-scripts*)
 		      (when (datagrid-show-hidden-entries-count-p grid)
-			(push (format nil "function () { $('~A').~
-                                           getElementsByClassName('hidden-items')[0].~
-                                             innerHTML = '~A';~
-                                         }"
+			(push (format nil "~
+function () { ~
+  updateElementBody($('~A').getElementsByClassName('hidden-items')[0], '~A'); ~
+}"
 				      (attributize-name (widget-name grid))
 				      (hidden-items-message grid))
 			      *on-ajax-complete-scripts*))))
@@ -158,14 +171,6 @@ search."
 		  (with-html
 		    (:span :class "hidden-items"
 			   (str hidden-items-message))))))))))
-
-;;; Render the searchbar in the header
-(defmethod with-widget-header ((obj datagrid) body-fn &rest args)
-  (apply #'call-next-method
-	 obj body-fn
-	 :prewidget-body-fn (when (datagrid-allow-searching-p obj)
-			      (curry #'datagrid-render-search-bar obj))
-	 args))
 
 ;;;;;;;;;;;;;;;
 ;;; Sorting ;;;
@@ -309,17 +314,29 @@ ignores searching parameters."
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
-  (apply #'datagrid-update-sort-column obj args)
-  (apply #'render-table (datagrid-data obj)
-	 :grid-obj obj
-	 :summary (if (datagrid-sort obj)
+  (when (datagrid-allow-searching-p obj)
+    (apply #'datagrid-render-search-bar obj args))
+  (with-html
+    (:div :class "datagrid-body"
+	  (apply #'render-datagrid-table-body obj args))))
+
+(defgeneric render-datagrid-table-body (grid &rest args)
+  (:documentation "Should render the actual data of the datagrid
+without any controls before or after. This function is used to update
+the body during ajax search requests."))
+  
+(defmethod render-datagrid-table-body ((grid datagrid) &rest args)
+  "Renders the body of the datagrid without the search bar."
+  (apply #'datagrid-update-sort-column grid args)
+  (apply #'render-table (datagrid-data grid)
+	 :grid-obj grid
+	 :summary (if (datagrid-sort grid)
 		      (format nil "Ordered by ~A, ~A."
 			      (string-downcase (humanize-name
-						(datagrid-sorted-slot-name (datagrid-sort obj))))
+						(datagrid-sorted-slot-name (datagrid-sort grid))))
 			      (string-downcase (humanize-name
-						(cdr (datagrid-sort obj)))))
+						(cdr (datagrid-sort grid)))))
 		      nil)
-	 :highlight (when (datagrid-search obj)
-		      (make-isearch-regex (datagrid-search obj)))
+	 :highlight (when (datagrid-search grid)
+		      (make-isearch-regex (datagrid-search grid)))
 	 args))
-

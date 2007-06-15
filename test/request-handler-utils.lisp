@@ -31,9 +31,7 @@
 <div class='extra-top-2'>&nbsp;</div>~
 <div class='extra-top-3'>&nbsp;</div>~
 <div class='widget composite' id='root'>~
-<div class='widget-body'>~
 ~A~
-</div>~
 </div>~
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~

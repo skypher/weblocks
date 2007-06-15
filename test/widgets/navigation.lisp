@@ -84,56 +84,52 @@
 	(render-widget nav)))
   (htm
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget-body"
-	       (:div :class "widget dataform" :id "widget-123"
-		     (:div :class "widget-body"
-			   #.(data-header-template
-			      "abc123"
-			      '((:li :class "name" (:span :class "label" "Name:&nbsp;")
-				 (:span :class "value" "Joe"))
-				(:li :class "manager"
-				 (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim"))))))
-	       (:div :class "renderer menu"
-		     (:div :class "extra-top-1" "&nbsp;")
-		     (:div :class "extra-top-2" "&nbsp;")
-		     (:div :class "extra-top-3" "&nbsp;")
-		     (:h1 "Test Navigation")
-		     (:ul (:li :class "selected-item" (:span "Test1"))
-			  (:li (:a :href "/test2" "Test2")))
-		     (:div :class "extra-bottom-1" "&nbsp;")
-		     (:div :class "extra-bottom-2" "&nbsp;")
-		     (:div :class "extra-bottom-3" "&nbsp;"))))
+	 (:div :class "widget dataform" :id "widget-123"
+	       #.(data-header-template
+		  "abc123"
+		  '((:li :class "name" (:span :class "label" "Name:&nbsp;")
+		     (:span :class "value" "Joe"))
+		    (:li :class "manager"
+		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+	 (:div :class "renderer menu"
+	       (:div :class "extra-top-1" "&nbsp;")
+	       (:div :class "extra-top-2" "&nbsp;")
+	       (:div :class "extra-top-3" "&nbsp;")
+	       (:h1 "Test Navigation")
+	       (:ul (:li :class "selected-item" (:span "Test1"))
+		    (:li (:a :href "/test2" "Test2")))
+	       (:div :class "extra-bottom-1" "&nbsp;")
+	       (:div :class "extra-bottom-2" "&nbsp;")
+	       (:div :class "extra-bottom-3" "&nbsp;")))
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget-body"
-	       (:div :class "widget dataform" :id "widget-123"
-		     (:div :class "widget-body"
-			   (:div :class "renderer data education-history"
-				 (:div :class "extra-top-1" "&nbsp;")
-				 (:div :class "extra-top-2" "&nbsp;")
-				 (:div :class "extra-top-3" "&nbsp;")
-				 (:h1 (:span :class "action" "Viewing:&nbsp;")
-				      (:span :class "object" "Education History"))
-				 (:ul
-				  (:li :class "university"
-				       (:span :class "label" "University:&nbsp;")
-				       (:span :class "value" "Bene Gesserit University"))
-				  (:li :class "graduation-year"
-				       (:span :class "label" "Graduation Year:&nbsp;")
-				       (:span :class "value" "2000")))
-				 (:div :class "submit" #.(link-action-template "abc124" "Modify"))
-				 (:div :class "extra-bottom-1" "&nbsp;")
-				 (:div :class "extra-bottom-2" "&nbsp;")
-				 (:div :class "extra-bottom-3" "&nbsp;"))))
-	       (:div :class "renderer menu"
+	 (:div :class "widget dataform" :id "widget-123"
+	       (:div :class "renderer data education-history"
 		     (:div :class "extra-top-1" "&nbsp;")
 		     (:div :class "extra-top-2" "&nbsp;")
 		     (:div :class "extra-top-3" "&nbsp;")
-		     (:h1 "Test Navigation")
-		     (:ul (:li (:a :href "/test1" "Test1"))
-			  (:li :class "selected-item" (:span "Test2")))
+		     (:h1 (:span :class "action" "Viewing:&nbsp;")
+			  (:span :class "object" "Education History"))
+		     (:ul
+		      (:li :class "university"
+			   (:span :class "label" "University:&nbsp;")
+			   (:span :class "value" "Bene Gesserit University"))
+		      (:li :class "graduation-year"
+			   (:span :class "label" "Graduation Year:&nbsp;")
+			   (:span :class "value" "2000")))
+		     (:div :class "submit" #.(link-action-template "abc124" "Modify"))
 		     (:div :class "extra-bottom-1" "&nbsp;")
 		     (:div :class "extra-bottom-2" "&nbsp;")
-		     (:div :class "extra-bottom-3" "&nbsp;"))))))
+		     (:div :class "extra-bottom-3" "&nbsp;")))
+	 (:div :class "renderer menu"
+	       (:div :class "extra-top-1" "&nbsp;")
+	       (:div :class "extra-top-2" "&nbsp;")
+	       (:div :class "extra-top-3" "&nbsp;")
+	       (:h1 "Test Navigation")
+	       (:ul (:li (:a :href "/test1" "Test1"))
+		    (:li :class "selected-item" (:span "Test2")))
+	       (:div :class "extra-bottom-1" "&nbsp;")
+	       (:div :class "extra-bottom-2" "&nbsp;")
+	       (:div :class "extra-bottom-3" "&nbsp;")))))
 
 ;;; test current-pane-widget
 (deftest current-pane-widget-1

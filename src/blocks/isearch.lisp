@@ -23,14 +23,16 @@ method - form request method, defaults to GET."
       (:form :id form-id :class "isearch" :action "" :method (attributize-name method)
 	     (:fieldset
 	      (:input :type "text" :id input-id :name a-input-name :class "search-bar" :value value)
-	      (:input :id search-id :name *submit-control-name* :type "submit" :class "submit"
-									       :value "Search")
+	      (unless (ajax-request-p)
+		(htm (:input :id search-id :name *submit-control-name* :type "submit" :class "submit"
+			     :value "Search")))
 	      (:input :name "action" :type "hidden" :value isearch-action)))
       (with-javascript "~
 new Form.Element.DelayedObserver('~A', 0.4, function(elem, value) {~
 initiateFormAction('~A', $('~A'), '~A');
-});~
-$('~A').remove();"
+});"
 	input-id
-	isearch-action form-id (session-name-string-pair)
-	search-id))))
+	isearch-action form-id (session-name-string-pair))
+      (unless (ajax-request-p)
+	(with-javascript "$('~A').remove();"
+	  search-id)))))

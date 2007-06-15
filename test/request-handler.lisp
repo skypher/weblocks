@@ -36,7 +36,6 @@
   t
   #.(with-request-template "~
 <div class='widget dataform' id='widget-123'>~
-<div class='widget-body'>~
 <div class='renderer data employee'>~
 <div class='extra-top-1'>&nbsp;</div>~
 <div class='extra-top-2'>&nbsp;</div>~
@@ -52,7 +51,6 @@
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
 </div>~
 </div>")
   " "
@@ -107,8 +105,6 @@ onclick='disableIrrelevantButtons(this);' />~
   #.(with-request-template
 	    "~
 <div class='widget function'>~
-<div class='widget-body'>~
-</div>~
 </div>" :render-debug-toolbar-p t)
   t)
 
@@ -135,10 +131,8 @@ onclick='disableIrrelevantButtons(this);' />~
   #.(with-request-template
 	    "~
 <div class='widget navigation' id='test-nav'>~
-<div class='widget-body'>~
 <div class='widget function'>~
-<div class='widget-body'>~
-<div>hi2</div></div>~
+<div>hi2</div>~
 </div>~
 <div class='renderer menu'>~
 <div class='extra-top-1'>&nbsp;</div>~
@@ -152,7 +146,6 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
-</div>~
 </div>~
 </div>"))
 

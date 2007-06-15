@@ -1,10 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(widget-class defwidget widget widget-name widget-args
-	  with-widget-header render-widget-body widget-css-classes
-	  render-widget make-dirty find-widget-by-path*
-	  find-widget-by-path))
+(export '(widget-class transient-slot defwidget widget
+	  widget-name widget-args with-widget-header
+	  render-widget-body widget-css-classes render-widget
+	  make-dirty find-widget-by-path* find-widget-by-path))
 
 (defclass widget-class (standard-class)
   ()
@@ -16,6 +16,44 @@
 (defmethod validate-superclass ((class widget-class)
 				(superclass standard-class))
   t)
+
+;;; Allow customization of widget slot options
+(defclass widget-slot-definition-mixin ()
+  ((affects-dirty-status-p :accessor widget-slot-affects-dirty-status-p
+			   :initform t
+			   :initarg :affects-dirty-status-p
+			   :documentation "When set to true (the
+			   default), the widget will be made dirty
+			   when this slot is modified."))
+  (:documentation "A mixin class used in
+  'widget-direct-slot-definition' and
+  'widget-effective-slot-definition' to allow specifying custom widget
+  properties."))
+
+(defclass widget-direct-slot-definition
+    (standard-direct-slot-definition widget-slot-definition-mixin) 
+  ()
+  (:documentation "Allows specifying custom widget properties."))
+
+(defmethod direct-slot-definition-class ((class widget-class) &rest initargs) 
+   (find-class 'widget-direct-slot-definition))
+
+;;; Copy slot options over to runtime definition of the slot
+(defclass widget-effective-slot-definition
+    (standard-effective-slot-definition widget-slot-definition-mixin) 
+  ()
+  (:documentation "Allows specifying custom widget properties."))
+
+(defmethod effective-slot-definition-class ((class widget-class) &rest initargs) 
+  (find-class 'widget-effective-slot-definition))
+
+(defmethod compute-effective-slot-definition ((class widget-class) slot-name dslotds)
+  (let ((result (call-next-method)))
+    (loop for dsd in dslotds
+	 when (typep dsd 'widget-direct-slot-definition)
+	 do (setf (widget-slot-affects-dirty-status-p result) (widget-slot-affects-dirty-status-p dsd))
+	 return dsd)
+    result))
 
 (defun generate-widget-id ()
   "Generates a unique ID that can be used to identify a widget."
@@ -73,8 +111,7 @@ rendered."))
       (:div :class (widget-css-classes obj)
 	    :id widget-id
 	    (safe-apply prewidget-body-fn args)
-	    (:div :class "widget-body"
-		  (apply body-fn obj args))
+	    (apply body-fn obj args)
 	    (safe-apply postwidget-body-fn args)))))
 
 (defgeneric render-widget-body (obj &rest args)
@@ -187,8 +224,10 @@ as well."
 
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
-(defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget) slot-name)
-  (make-dirty object)
+(defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget)
+					  (slot-name widget-effective-slot-definition))
+  (when (widget-slot-affects-dirty-status-p slot-name)
+    (make-dirty object))
   (call-next-method new-value class object slot-name))
 
 (defgeneric find-widget-by-path* (path root)

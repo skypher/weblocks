@@ -51,8 +51,7 @@
 	:postwidget-body-fn (lambda (&rest args) (with-html (:p "world")))))
   (:div :class "widget dataform" :id "widget-123"
 	(:p "hello")
-	(:div :class "widget-body"
-	      (:p "test"))
+	(:p "test")
 	(:p "world")))
 
 ;;; test widget-name specialization for widgets
@@ -99,32 +98,29 @@
     (render-widget (lambda (&rest args)
 		     (with-html (:p "blah"))))
   (:div :class "widget function"
-	(:div :class "widget-body"
-	      (:p "blah"))))
+	(:p "blah")))
 
 ;;; render some other widget without a name
 (deftest-html render-widget-1
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*)))
   (:div :class "widget dataform" :id "widget-123"
-	(:div :class "widget-body"
-	      #.(data-header-template
-		 "abc123"
-		 '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-		   (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
-		    (:span :class "value" "Jim")))))))
+	#.(data-header-template
+	   "abc123"
+	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	      (:span :class "value" "Jim"))))))
 
 ;;; render some widget with a name
 (deftest-html render-widget-2
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
   (:div :class "widget dataform" :id "test-widget"
-	(:div :class "widget-body"
-	      #.(data-header-template
-		 "abc123"
-		 '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-		   (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
-		    (:span :class "value" "Jim")))))))
+	#.(data-header-template
+	   "abc123"
+	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	      (:span :class "value" "Jim"))))))
 
 (deftest-html render-widget-3
     (with-request :get nil

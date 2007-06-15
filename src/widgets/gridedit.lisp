@@ -38,13 +38,18 @@
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
+;;; Ensure we never try to sort on our 'delete' slot
+(defmethod initialize-instance :after ((obj gridedit) &rest initargs &key &allow-other-keys)
+  (pushnew 'delete (datagrid-forbid-sorting-on obj)))
+
 (defun gridedit-render-add-button (grid)
   "Renders a button that allows adding a new entry."
   (let ((action (make-action (lambda (&rest args)
 			       (setf (gridedit-ui-state grid) :add)))))
     (with-html
       (:form :class "add-entry" :action "" :method "get"
-	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
+	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); ~
+                                    return false;"
 			       action
 			       (session-name-string-pair))
 	     (:fieldset
@@ -82,20 +87,22 @@ the beginning of the sequence."
 	(push item (slot-value grid 'data)))))
 
 (defmethod render-widget-body ((obj gridedit) &rest args)
-  (pushnew 'delete (datagrid-forbid-sorting-on obj))
-  (apply #'call-next-method obj
-	 :custom-slots (append-custom-slots
-			(when (gridedit-allow-delete-p obj)
-			  `((0 . (delete . ,(lambda (&rest args)
-						    (with-html (:td "Delete")))))))
-			args)
-	 args)
+  (call-next-method)
   (with-slots (allow-add-p ui-state) obj
     (cond ((and (null ui-state)
 		allow-add-p
 		(or (gridedit-on-add-item obj)
 		    (typep (slot-value obj 'data) 'sequence))) (gridedit-render-add-button obj))
 	  ((eql ui-state :add) (gridedit-render-add-form obj)))))
+
+(defmethod render-datagrid-table-body ((grid gridedit) &rest args)
+  (apply #'call-next-method grid
+	 :custom-slots (append-custom-slots
+			(when (gridedit-allow-delete-p grid)
+			  `((0 . (delete . ,(lambda (&rest args)
+						    (with-html (:td "Delete")))))))
+			args)
+	 args))
 
 
 (defun append-custom-slots (custom-slots args)

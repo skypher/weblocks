@@ -51,12 +51,12 @@ div#main-menu
   position: relative;
 }
 
-div#main-menu > div.widget-body > div.composite
+div#main-menu > div.composite
 {
   margin-left: 16em;
 }
 
-div#main-menu > div.widget-body > div.menu
+div#main-menu > div.menu
 {
   position: absolute;
   top: 0;
