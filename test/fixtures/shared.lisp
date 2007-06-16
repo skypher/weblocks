@@ -15,7 +15,8 @@
 (defparameter *some-college* (make-instance 'education-history))
 
 (defclass person ()
-  ((name :accessor first-name :initform "Joe" :initarg :name)
+  ((id :accessor id :initarg :id)
+   (name :accessor first-name :initform "Joe" :initarg :name)
    (age :initform 30 :type integer :initarg :age)
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))
@@ -28,8 +29,8 @@
 	       age (:required))
 
 ;;; Create instances for introspection testing
-(defparameter *joe* (make-instance 'employee))
-(defparameter *bob* (make-instance 'employee :name "Bob" :age 50))
+(defparameter *joe* (make-instance 'employee :id 1))
+(defparameter *bob* (make-instance 'employee :name "Bob" :age 50 :id 2))
 
 ;;; helper to create complex site layout
 (defun create-site-layout ()

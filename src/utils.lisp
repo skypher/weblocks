@@ -6,7 +6,7 @@
 	  render-slot-inline-p safe-apply safe-funcall
 	  request-parameter request-parameters string-whitespace-p
 	  render-extra-tags with-extra-tags strictly-less-p
-	  equivalentp alist->plist intersperse
+	  equivalentp object-id id alist->plist intersperse
 	  remove-keyword-parameter))
 
 (defun humanize-name (name)
@@ -37,9 +37,10 @@ Ex:
 \(attributize-name \"Hello world-ref\") => \"hello-world-ref\""
   (when (null name)
     (return-from attributize-name ""))
-  (let ((namestr (if (symbolp name)
-		     (symbol-name name)
-		     name)))
+  (let ((namestr (etypecase name
+		     (symbol (symbol-name name))
+		     (string name)
+		     (integer (format nil "~A" name)))))
     (string-downcase (substitute #\- #\Space namestr))))
 
 (defun list->assoc (lst &key (map #'identity))
@@ -360,6 +361,18 @@ function is used by the framework for sorting data."))
 
 (defmethod equivalent ((a (eql nil)) (b (eql nil)))
   t)
+
+(defgeneric object-id (obj)
+  (:documentation
+   "Returns a value that uniquely identifies an object in memory or in
+a backend store. The default implementation looks for an 'id' slot via
+'slot-value'. If such slot is not present, signals an
+error. Specialize this function for various back end stores and other
+object identification schemes."))
+
+(defmethod object-id ((obj standard-object))
+  (handler-case (slot-value obj 'id)
+    (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
 
 (defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
 			   &allow-other-keys)

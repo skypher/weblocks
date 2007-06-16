@@ -60,7 +60,8 @@
 				     (:file "dataform"
 				      :depends-on ("widget-test-utils"))
 				     (:file "flash")
-				     (:file "datagrid")
+				     (:file "datagrid"
+				      :depends-on ("widget-test-utils"))
 				     (:file "gridedit")
 				     (:file "navigation")
 				     (:file "composite")

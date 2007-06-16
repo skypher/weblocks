@@ -16,3 +16,9 @@
   margin: 0;
   margin-bottom: 1em;
 }
+
+.gridedit .select
+{
+  text-align: center;
+  width: 3em;
+}

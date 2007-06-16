@@ -35,6 +35,10 @@
     (attributize-name nil)
   "")
 
+(deftest attributize-name-4
+    (attributize-name 1)
+  "1")
+
 ;;; Test list->assoc function
 (deftest list->assoc-1
     (weblocks::list->assoc '(name age (city . location)))
@@ -270,7 +274,12 @@
     (equivalentp nil nil)
   t)
 
-;; test visit-object-slots
+;;; test object-id
+(deftest object-id-1
+    (object-id *joe*)
+  1)
+
+;;; test visit-object-slots
 (deftest-html visit-object-slots-1
     (weblocks::visit-object-slots
      *joe*
