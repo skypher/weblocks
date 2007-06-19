@@ -57,12 +57,12 @@
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
 			:components ((:file "widget-test-utils")
-				     (:file "dataform"
-				      :depends-on ("widget-test-utils"))
+				     (:file "dataform")
 				     (:file "flash")
 				     (:file "datagrid"
 				      :depends-on ("widget-test-utils"))
-				     (:file "gridedit")
+				     (:file "gridedit"
+					    :depends-on ("widget-test-utils"))
 				     (:file "navigation")
 				     (:file "composite")
 				     (:file "widget"))

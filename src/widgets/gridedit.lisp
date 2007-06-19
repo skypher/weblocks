@@ -1,7 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(gridedit gridedit-allow-add-p))
+(export '(gridedit gridedit-on-add-item gridedit-allow-add-p
+	  gridedit-on-delete-items gridedit-allow-delete-p
+	  gridedit-allow-select-p gridedit-ui-state
+	  gridedit-render-new-item-form))
 
 (defwidget gridedit (datagrid)
   ((on-add-item :accessor gridedit-on-add-item
@@ -51,11 +54,19 @@
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
-(defun gridedit-render-new-item-form (grid)
-  "Renders a form that allows adding a new entry utilizing
-'dataform' widget."
+(defgeneric gridedit-render-new-item-form (grid)
+  (:documentation
+   "The default implementation renders a form that allows adding a new
+entry utilizing 'dataform' widget. Note, in order for this
+functionality to work properly, the object in question needs to have a
+slot named 'id', with an initform that assigns an ID to the object.
+
+Specialize this method to provide different ways to add items to the
+grid."))
+
+(defmethod gridedit-render-new-item-form ((grid datagrid))
   (render-widget (make-instance 'dataform
-				:data (make-instance (class-of (make-instance (datagrid-data-class grid))))
+				:data (make-instance (datagrid-data-class grid))
 				:ui-state :form
 				:on-cancel (lambda (obj)
 					     (setf (gridedit-ui-state grid) nil)
@@ -64,7 +75,8 @@
 					      (gridedit-add-item grid (dataform-data obj))
 					      (setf (datagrid-allow-item-ops-p grid) t)
 					      (setf (gridedit-ui-state grid) nil))
-				:widget-args '(:title-action "Adding"))))
+				:widget-args '(:title-action "Adding"
+					       :ignore-unbound-slots-p t))))
 
 (defun gridedit-add-item (grid item)
   "If 'on-add-item' is specified, simply calls
@@ -96,6 +108,9 @@ datagrid's 'selection' slot."
 				  (slot-value grid 'data)
 				  :key #'object-id)))))))
 
+;;; Renders the body of the gridedit. Essentially, just calls
+;;; datagrid's render method, except that proper controls (add item,
+;;; delete item, etc.) are added or removed depending on the settings
 (defmethod render-widget-body ((obj gridedit) &rest args)
   (setf (datagrid-item-ops obj)
 	(remove-if (lambda (i)

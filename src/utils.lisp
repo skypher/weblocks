@@ -246,7 +246,7 @@ path - a list of slot names"
     (return-from slot-value-by-path
       (slot-value-by-path obj (list path) :observe-inline-p observe-inline-p)))
   (let* ((clean-path (remove nil path))
-	 (value (slot-value obj (car clean-path)))
+	 (value (ignore-errors (slot-value obj (car clean-path))))
 	 (path-rest (cdr clean-path)))
     (if path-rest
 	(slot-value-by-path value path-rest :observe-inline-p observe-inline-p)
@@ -375,7 +375,7 @@ object identification schemes."))
     (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
 
 (defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
-			   &allow-other-keys)
+			   (ignore-unbound-slots-p nil) &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
 object and apply a render function to them.
 
@@ -384,7 +384,13 @@ particular slot cons pair due to appropriate arguments,
 'visit-object-slots' calls this function instead of
 'render-slot-fn' (unless 'call-around-fn-p' argument is set to
 nil). This can be used to quickly render slots in a custom way without
-specializing CLOS functions."
+specializing CLOS functions.
+
+If 'ignore-unbound-slots-p is true, 'visit-object-slots' will
+ignore errors that result from attempting to get slot values. In case
+of errors, slot-value will simply be set to nil. Use this parameter to
+allow visiting objects whose instances aren't bound to particular
+values."
   (mapcar (lambda (slot)
 	    (let ((render-fn (if (and call-around-fn-p
 				      (functionp (cdr slot)))
@@ -392,8 +398,11 @@ specializing CLOS functions."
 				 render-slot-fn))
 		  slot-name slot-value)
 	      (if (typep (car slot) 'standard-direct-slot-definition)
-		  (setf slot-name (slot-definition-name (car slot))
-			slot-value (get-slot-value obj (car slot)))
+		  (progn
+		    (setf slot-name (slot-definition-name (car slot)))
+		    (if ignore-unbound-slots-p
+			(ignore-errors (setf slot-value (get-slot-value obj (car slot))))
+			(setf slot-value (get-slot-value obj (car slot)))))
 		  (setf slot-name (car slot)))
 	      (apply render-fn obj slot-name
 		     slot-value

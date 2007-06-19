@@ -348,6 +348,16 @@
    (:p "MANAGER") (:p "Jim")
    (:p "TEST") (:p "NIL")))
 
+(deftest-html visit-object-slots-7
+    (weblocks::visit-object-slots
+     (make-instance 'employee)
+     #'render-slot-simple
+     :slots '(name) :mode :strict
+     :ignore-unbound-slots-p t)
+  (htm
+   (:p "NAME")
+   (:p "NIL")))
+
 ;;; test alist->plist
 (deftest alist->plist-1
     (alist->plist '((hello . world) (blah . test)))

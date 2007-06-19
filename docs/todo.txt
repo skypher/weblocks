@@ -3,13 +3,13 @@ TODO:
 -- CURRENT (gridedit) --
 - Fix, document, refactor, unit test datagrid and gridedit
 - What happens when user tries to delete and nothing is selected?
-- Deleting confirmation
 - Allow viewing/editing by clicking on a row/link column
 - Test in w3m/safari/openmcl
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
 - Create a modal dialog widget, as well as modal request in general
+- Deleting confirmation in datagrid
 - Handling failure (AJAX and regular, add message types to flash widget)
 - Controls that expose state on the URL, AJAX and POST/GET, back button/history research
 - Convert states to render using suggest block (specialize on nil, validate, proper display of data)

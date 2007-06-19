@@ -67,7 +67,7 @@ less than this value.")
 	   be visible.")
    (allow-searching-p :accessor datagrid-allow-searching-p
 		      :initform t
-		      :initarg :allow-searching
+		      :initarg :allow-searching-p
 		      :documentation "Set to true to enable searching,
 		      or to nil to disable it.")
    (show-hidden-entries-count-p :accessor datagrid-show-hidden-entries-count-p
@@ -268,6 +268,7 @@ it's sorted on nothing."
 			  (datagrid-column-sortable-p grid slot-path slot-value))
 		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
 	 :call-around-fn-p nil
+	 :ignore-unbound-slots-p t
 	 args))
 
 (defun datagrid-column-sortable-p (grid-obj column-path column-value)
@@ -428,7 +429,8 @@ ignores searching parameters."
 			       (session-name-string-pair))
 	     (:fieldset
 	      (apply #'render-datagrid-table-body obj args)
-	      (when (datagrid-allow-item-ops-p obj)
+	      (when (and (datagrid-allow-item-ops-p obj)
+			 (datagrid-item-ops obj))
 		(apply #'render-item-ops-bar obj args))
 	      (:input :name "action" :type "hidden" :value action))))))
 
