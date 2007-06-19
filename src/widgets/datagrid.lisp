@@ -187,7 +187,7 @@ search."
 		      (setf (datagrid-search grid) (when (not (empty-p search))
 						     search))
 		      ; we also need to clear the selection
-		      (setf (datagrid-selection grid) (datagrid-clear-selection grid))
+		      (datagrid-clear-selection grid)
 		      (push (format nil "~
 function () { ~
   updateElementBody($('~A').getElementsByClassName('datagrid-body')[0], ~A); ~
@@ -232,7 +232,7 @@ function () { ~
 		     "All")
 	", "
 	(render-link (make-action (lambda (&rest args)
-				    (setf (datagrid-selection grid) (datagrid-clear-selection grid))
+				    (datagrid-clear-selection grid)
 				    (make-dirty grid)))
 		     "None"))))
 
@@ -355,7 +355,9 @@ customize the way datagrid headers are rendered."))
 	   (:span (render-link (make-action (lambda (&rest args)
 					      (when (equalp slot slot-name)
 						(setf new-dir (negate-sort-direction dir)))
-					      (setf (datagrid-sort grid-obj) (cons slot-path new-dir))))
+					      (setf (datagrid-sort grid-obj) (cons slot-path new-dir))
+					      ;; we also need to clear the selection
+					      (datagrid-clear-selection grid-obj)))
 			       (humanize-name human-name)))))))
 
 ;;; If the 'data' slot is a sequence, simply returns it. If it is a
@@ -402,13 +404,13 @@ ignores searching parameters."
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
-  (when (and (datagrid-allow-searching-p obj)
-	     (>= (datagrid-data-count obj :totalp t) *show-isearch-item-count-threshold*))
-    (apply #'datagrid-render-search-bar obj args))
-  (when (datagrid-allow-select-p obj)
-    (apply #'render-select-bar obj args))
+  (when (>= (datagrid-data-count obj :totalp t) *show-isearch-item-count-threshold*)
+    (when (datagrid-allow-searching-p obj)
+      (apply #'datagrid-render-search-bar obj args))
+    (when (datagrid-allow-select-p obj)
+      (apply #'render-select-bar obj args)))
   (let ((action (make-action (lambda (&rest args)
-			       (setf (datagrid-selection obj) (datagrid-clear-selection obj))
+			       (datagrid-clear-selection obj)
 			       (loop for i in (request-parameters)
 				    when (string-starts-with (car i) "item-")
 				    do (datagrid-select-item obj (substring (car i) 5)))
@@ -417,7 +419,7 @@ ignores searching parameters."
 						 :key #'car
 						 :test #'string-equal)
 				    do (funcall (cdr i) obj (datagrid-selection obj)))
-			       nil))))
+			       (datagrid-clear-selection obj)))))
     (with-html
       (:form :action "" :method "get"
 	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); ~
