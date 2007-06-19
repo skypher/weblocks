@@ -15,6 +15,16 @@ weblocks-test package."
     (warn "A web application has been loaded. Some tests may
     fail. Ideally tests should be run on a clean image.")))
 
+(defparameter *test-widget-id* 0
+  "Used to generate a unique ID for fixtures.")
+
+(defun gen-object-id ()
+  "Generates an object id that is guranteed to be unique and
+consecutive per test, as long as the instance is created within
+'deftest-html'."
+  (declare (special *test-widget-id*))
+  (incf *test-widget-id*))
+
 (defmacro deftest-html (name form value)
   "A helper macro for creating html test cases. The macro writes
 code that temporarily binds the output stream to a string stream
@@ -24,7 +34,9 @@ and then compares the string to the expected result."
 			     ,value))))
     `(deftest ,name
 	 (let ((stream-bak *weblocks-output-stream*)
+	       (*test-widget-id* 1000)
 	       result)
+	   (declare (special *test-widget-id*))
 	   (setf *weblocks-output-stream* (make-string-output-stream))
 	   ,form
 	   (setf result (get-output-stream-string *weblocks-output-stream*))

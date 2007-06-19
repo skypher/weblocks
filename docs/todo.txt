@@ -1,7 +1,8 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Fix, document, refactor, unit test datagrid and gridedit
+- Unit test item removal in gridedit
+- Fix, document, refactor, unit test datagrid
 - What happens when user tries to delete and nothing is selected?
 - Allow viewing/editing by clicking on a row/link column
 - Test in w3m/safari/openmcl

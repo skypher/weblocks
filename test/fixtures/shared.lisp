@@ -15,7 +15,7 @@
 (defparameter *some-college* (make-instance 'education-history))
 
 (defclass person ()
-  ((id :initarg :id :initform (gensym))
+  ((id :initarg :id :initform (gen-object-id))
    (name :accessor first-name :initarg :name)
    (age :type integer :initarg :age)
    (address-ref :initform *home-address*)
