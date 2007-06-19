@@ -1,11 +1,7 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Add delete functionality based on select
-- Don't show selection bar when there is one or less items
-- Should sorting and item operations reset selection?
 - Fix, document, refactor, unit test datagrid and gridedit
-- Highlight selected rows
 - What happens when user tries to delete and nothing is selected?
 - Deleting confirmation
 - Allow viewing/editing by clicking on a row/link column
@@ -42,6 +38,7 @@ TODO:
 - Reset sessions should respect friendly URL
 - Fix friendly URLs not being respected in w3m
 - Allow adding titles to navigation items and set them as page title, add application title
+- Rename blocks to snippets, datagrid to grid, gridedit to ...?
 
 -- WISHLIST --
 - Allow multiple search tokens in grid searchbar
@@ -53,3 +50,4 @@ TODO:
 - Create renderers for lists (redo existing renderers that use lists with these?)
 - Tooltips/balloon widget/block
 - Integrate selecting items with paging (allow selecting beyond current page?)
+- Highlight selected rows
