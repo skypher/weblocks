@@ -22,11 +22,24 @@
 		:initarg :allow-add-p
 		:documentation "If true, gridedit provides the UI to
 		add entries to the collection.")
+   (on-delete-items :accessor gridedit-on-delete-items
+		    :initform nil
+		    :initarg :on-delete-items
+		    :documentation "A function called by gridedit when
+		    one or more items are deleted. The function should
+		    accept two arguments (the gridedit object and a
+		    list of IDs (see object-id) of the items to be
+		    deleted). If all items are to be deleted the
+		    keyword :all is passed as a second argument
+		    instead of the list. 'on-delete-items' has the
+		    same semantics as 'on-add-item' if terms of
+		    managing items and providing deletion UI.")
    (allow-delete-p :accessor gridedit-allow-delete-p
 		   :initform t
 		   :initarg :allow-delete-p
 		   :documentation "If true, gridedit provides the UI
 		   to delete entries in the collection.")
+   (allow-select-p :initform t)
    (ui-state :accessor gridedit-ui-state
 	     :initform nil
 	     :initarg :ui-state
@@ -38,42 +51,18 @@
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
-;;; Ensure we never try to sort on our 'delete' slot
-(defmethod initialize-instance :after ((obj gridedit) &rest initargs &key &allow-other-keys)
-  (pushnew 'delete (datagrid-forbid-sorting-on obj)))
-
-(defun gridedit-render-add-button (grid)
-  "Renders a button that allows adding a new entry."
-  (let ((action (make-action (lambda (&rest args)
-			       (setf (gridedit-ui-state grid) :add)))))
-    (with-html
-      (:form :class "add-entry" :action "" :method "get"
-	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); ~
-                                    return false;"
-			       action
-			       (session-name-string-pair))
-	     (:fieldset
-	      (:input :name *submit-control-name*
-		      :type "submit"
-		      :class "submit"
-		      :value (format nil "Add ~A" (humanize-name
-						   (object-class-name
-						    (make-instance (datagrid-data-class grid))))))
-	      (:input :name "action"
-		      :type "hidden"
-		      :value action))))))
-
-(defun gridedit-render-add-form (grid)
+(defun gridedit-render-new-item-form (grid)
   "Renders a form that allows adding a new entry utilizing
 'dataform' widget."
   (render-widget (make-instance 'dataform
 				:data (make-instance (class-of (make-instance (datagrid-data-class grid))))
 				:ui-state :form
 				:on-cancel (lambda (obj)
-					     (setf (gridedit-ui-state grid) nil))
+					     (setf (gridedit-ui-state grid) nil)
+					     (setf (datagrid-allow-item-ops-p grid) t))
 				:on-success (lambda (obj)
-					      (gridedit-add-item grid
-								 (dataform-data obj))
+					      (gridedit-add-item grid (dataform-data obj))
+					      (setf (datagrid-allow-item-ops-p grid) t)
 					      (setf (gridedit-ui-state grid) nil))
 				:widget-args '(:title-action "Adding"))))
 
@@ -86,27 +75,50 @@ the beginning of the sequence."
       (when (typep (slot-value grid 'data) 'sequence)
 	(push item (slot-value grid 'data)))))
 
+(defun gridedit-delete-items (grid items)
+  "If 'on-delete-items' is specified, simply calls
+'on-delete-items'. Otherwise, if 'data' is a sequence, deletes the
+specified items from the sequence. The 'items' parameter is similar to
+datagrid's 'selection' slot."
+  (if (gridedit-on-delete-items grid)
+      (funcall (gridedit-on-delete-items grid) grid items)
+      (when (typep (slot-value grid 'data) 'sequence)
+	(setf (slot-value grid 'data)
+	      (ecase (car items)
+		(:all (delete-if (compose #'not (curry-after #'member
+							     (cdr items)
+							     :test #'string-equal))
+				 (slot-value grid 'data)
+				 :key #'object-id))
+		(:none (delete-if (curry-after #'member
+					       (cdr items)
+					       :test #'string-equal)
+				  (slot-value grid 'data)
+				  :key #'object-id)))))))
+
 (defmethod render-widget-body ((obj gridedit) &rest args)
+  (setf (datagrid-item-ops obj)
+	(remove-if (lambda (i)
+		     (or (string-equal i 'add)
+			 (string-equal i 'delete)))
+		   (datagrid-item-ops obj)
+		   :key #'car))
+  (when (and (gridedit-allow-add-p obj)
+	     (or (typep (slot-value obj 'data) 'sequence)
+		 (gridedit-on-add-item obj)))
+    (pushnew (cons 'delete #'gridedit-delete-items)
+	     (datagrid-item-ops obj)
+	     :key #'car))
+  (when (and (gridedit-allow-add-p obj)
+	     (datagrid-allow-select-p obj)
+	     (or (typep (slot-value obj 'data) 'sequence)
+		 (gridedit-on-add-item obj)))
+    (pushnew `(add . ,(lambda (&rest args)
+			      (setf (gridedit-ui-state obj) :add)
+			      (setf (datagrid-allow-item-ops-p obj) nil)))
+	     (datagrid-item-ops obj)
+	     :key #'car))
   (call-next-method)
-  (with-slots (allow-add-p ui-state) obj
-    (cond ((and (null ui-state)
-		allow-add-p
-		(or (gridedit-on-add-item obj)
-		    (typep (slot-value obj 'data) 'sequence))) (gridedit-render-add-button obj))
-	  ((eql ui-state :add) (gridedit-render-add-form obj)))))
+  (case (gridedit-ui-state obj)
+    (:add (gridedit-render-new-item-form obj))))
 
-(defmethod render-datagrid-table-body ((grid gridedit) &rest args)
-  (apply #'call-next-method grid
-	 :custom-slots (append-custom-slots
-			(when (gridedit-allow-delete-p grid)
-			  `((0 . (delete . ,(lambda (&rest args)
-						    (with-html (:td "Delete")))))))
-			args)
-	 args))
-
-
-(defun append-custom-slots (custom-slots args)
-  "Appends gridedit specific custom slots to the ones already defined
-in 'args'."
-  (append (cadr (member :custom-slots args))
-	  custom-slots))

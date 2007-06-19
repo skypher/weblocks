@@ -77,12 +77,45 @@ less than this value.")
 				default), and searching is allowed,
 				the datagrid displays a message during
 				search specifying how many items have
-				been hidden."))
+				been hidden.")
+   (selection :accessor datagrid-selection
+	      :initform (cons :none nil)
+	      :initarg :selection
+	      :affects-dirty-status-p nil
+	      :documentation "Contains a cons cell that identifies
+	      currently selected elements. That 'car' of the cell is
+	      either :all or :none. In case of :all, all items except
+	      the ones in the cdr list are selected. In case of :none,
+	      none of the elements except the ones in the cdr list are
+	      selected.")
+   (allow-select-p :accessor datagrid-allow-select-p
+		   :initform nil
+		   :initarg :allow-delete-p
+		   :documentation "If true, datagrid provides the UI
+		   to select entries in the collection.")
+   (item-ops :accessor datagrid-item-ops
+	     :initform nil
+	     :initarg :item-ops
+	     :documentation "A list of cons cells that define
+	     operations on items. A car of each cell should contain a
+	     name of the operation, while the cdr of each cell should
+	     contain a function that accepts two arguments - the grid
+	     object, and the selection cons cell passed to the
+	     function for convenience. Any given function is called by
+	     the datagrid when the appropriate operation has been
+	     invoked by the user.")
+   (allow-item-ops-p :accessor datagrid-allow-item-ops-p
+		     :initform t
+		     :initarg :allow-item-ops-p
+		     :documentation "If true, datagrid provides UI to
+		     access operations defined in 'item-ops'."))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
 
-;;; Ensure that data-class is specified
+;;; Ensure that data-class is specified and that we cannot sort on the
+;;; "select" slot
 (defmethod initialize-instance :after ((obj datagrid) &rest initargs &key &allow-other-keys)
+  (pushnew 'select (datagrid-forbid-sorting-on obj))
   (when (null (datagrid-data-class obj))
     (error "data-class must be specified to initialize a datagrid.")))
 
@@ -137,6 +170,10 @@ search."
 		(proper-number-form hidden-items-count "is"))
 	"&nbsp;")))
 
+(defun datagrid-clear-selection (grid)
+  "Clears selected items."
+  (setf (datagrid-selection grid) (cons :none nil)))
+
 (defun datagrid-render-search-bar (grid &rest keys)
   "Renders a search bar for the datagrid."
   (with-html
@@ -149,6 +186,8 @@ search."
 		      (declare (special *on-ajax-complete-scripts*))
 		      (setf (datagrid-search grid) (when (not (empty-p search))
 						     search))
+		      ; we also need to clear the selection
+		      (setf (datagrid-selection grid) (datagrid-clear-selection grid))
 		      (push (format nil "~
 function () { ~
   updateElementBody($('~A').getElementsByClassName('datagrid-body')[0], ~A); ~
@@ -177,9 +216,30 @@ function () { ~
 		    (:span :class "hidden-items"
 			   (str hidden-items-message))))))))))
 
+;;;;;;;;;;;;;;;;;;;;;;
+;;; Item Selection ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+(defun render-select-bar (grid &rest keys)
+  "Renders commands relevant to item selection."
+  (with-html
+    (:p :class "datagrid-select-bar"
+	(:strong "Select: ")
+	(render-link (make-action (lambda (&rest args)
+				    (setf (datagrid-selection grid)
+					  (cons :none (mapcar #'object-id (datagrid-data grid))))
+				    (make-dirty grid)))
+		     "All")
+	", "
+	(render-link (make-action (lambda (&rest args)
+				    (setf (datagrid-selection grid) (datagrid-clear-selection grid))
+				    (make-dirty grid)))
+		     "None"))))
+
 ;;;;;;;;;;;;;;;
 ;;; Sorting ;;;
 ;;;;;;;;;;;;;;;
+
 (defun datagrid-update-sort-column (grid &rest args)
   "An interface for 'datagrid-update-sort-column-aux'. Gets the data
 and tries to update the sort column only when necessary."
@@ -258,7 +318,9 @@ for :descending and vica versa)."
 
 ;;; Hooks into table renderer's header rendering mechanism and
 ;;; forwards the calls to 'render-datagrid-header-cell' whenever
-;;; appropriate to support sorting via clicking on headers
+;;; appropriate to support sorting via clicking on
+;;; headers. Additionally, specialize header rendering for 'select'
+;;; slot to allow for selecting all/none slot selection
 (defmethod render-table-header-cell :around (obj slot-name slot-value &rest keys
 						 &key grid-obj &allow-other-keys)
   (if (or (null grid-obj)
@@ -266,6 +328,10 @@ for :descending and vica versa)."
 	  (not (datagrid-column-sortable-p grid-obj slot-name slot-value)))
       (apply #'call-next-method obj slot-name slot-value keys)
       (apply #'render-datagrid-header-cell obj slot-name slot-value keys)))
+
+(defmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-value &rest keys
+				     &key grid-obj &allow-other-keys)
+  (with-html (:th :class "select" "")))
 
 (defgeneric render-datagrid-header-cell (obj slot-name slot-value &rest keys
 					&key human-name slot-path grid-obj &allow-other-keys)
@@ -320,14 +386,80 @@ ignores searching parameters."
 	   (length data)
 	   (length (datagrid-filter-data grid data)))))))
 
+(defun render-item-ops-bar (grid &rest args)
+  "Renders the operations define in 'item-ops' slot if
+'allow-item-ops-p' is true."
+  (with-html
+    (:div :class "item-operations"
+	  (mapc (lambda (op)
+		  (with-html
+		    (:input :name (attributize-name (car op))
+			    :type "submit"
+			    :class "submit"
+			    :value (humanize-name (car op))
+			    :onclick "disableIrrelevantButtons(this);")))
+		(datagrid-item-ops grid)))))
+
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args)
   (when (and (datagrid-allow-searching-p obj)
 	     (>= (datagrid-data-count obj :totalp t) *show-isearch-item-count-threshold*))
     (apply #'datagrid-render-search-bar obj args))
-  (with-html
-    (:div :class "datagrid-body"
-	  (apply #'render-datagrid-table-body obj args))))
+  (when (datagrid-allow-select-p obj)
+    (apply #'render-select-bar obj args))
+  (let ((action (make-action (lambda (&rest args)
+			       (setf (datagrid-selection obj) (datagrid-clear-selection obj))
+			       (loop for i in (request-parameters)
+				    when (string-starts-with (car i) "item-")
+				    do (datagrid-select-item obj (substring (car i) 5)))
+			       (loop for i in (datagrid-item-ops obj)
+				    when (member (car i) (request-parameters)
+						 :key #'car
+						 :test #'string-equal)
+				    do (funcall (cdr i) obj (datagrid-selection obj)))
+			       nil))))
+    (with-html
+      (:form :action "" :method "get"
+	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); ~
+                                    return false;"
+			       action
+			       (session-name-string-pair))
+	     (:fieldset
+	      (apply #'render-datagrid-table-body obj args)
+	      (when (datagrid-allow-item-ops-p obj)
+		(apply #'render-item-ops-bar obj args))
+	      (:input :name "action" :type "hidden" :value action))))))
+
+(defun datagrid-item-selected-p (grid item)
+  "Checks if an item in the datagrid is marked as selected."
+  (let ((state (car (datagrid-selection grid)))
+	(items (cdr (datagrid-selection grid))))
+    (ecase state
+      (:all (not (member item items :test #'string-equal)))
+      (:none (member item items :test #'string-equal)))))
+
+(defun datagrid-select-item (grid item-id)
+  "Marks an item in the datagrid as selected."
+  (let ((state (car (datagrid-selection grid))))
+    (ecase state
+      (:all (setf (cdr (datagrid-selection grid))
+		  (remove item-id (cdr (datagrid-selection grid)))))
+      (:none (setf (cdr (datagrid-selection grid))
+		   (pushnew item-id (cdr (datagrid-selection grid)))))))
+  (make-dirty grid))
+
+(defun datagrid-render-select-body-cell (grid obj slot-name slot-value &rest args)
+  "Renders a cell with a checkbox used to select items."
+  (let ((checkbox-name (concatenate 'string
+				    "item-" (attributize-name (object-id obj)))))
+    (with-html
+      (:td :class "select"
+	   (if (datagrid-item-selected-p grid (object-id obj))
+	       (htm (:input :type "checkbox"
+			    :name checkbox-name
+			    :checked "checked"))
+	       (htm (:input :type "checkbox"
+			    :name checkbox-name)))))))
 
 (defgeneric render-datagrid-table-body (grid &rest args)
   (:documentation "Should render the actual data of the datagrid
@@ -337,15 +469,29 @@ the body during ajax search requests."))
 (defmethod render-datagrid-table-body ((grid datagrid) &rest args)
   "Renders the body of the datagrid without the search bar."
   (apply #'datagrid-update-sort-column grid args)
-  (apply #'render-table (datagrid-data grid)
-	 :grid-obj grid
-	 :summary (if (datagrid-sort grid)
-		      (format nil "Ordered by ~A, ~A."
-			      (string-downcase (humanize-name
-						(datagrid-sorted-slot-name (datagrid-sort grid))))
-			      (string-downcase (humanize-name
-						(cdr (datagrid-sort grid)))))
-		      nil)
-	 :highlight (when (datagrid-search grid)
-		      (make-isearch-regex (datagrid-search grid)))
-	 args))
+  (with-html
+    (:div :class "datagrid-body"
+	  (apply #'render-table (datagrid-data grid)
+		 :grid-obj grid
+		 :summary (if (datagrid-sort grid)
+			      (format nil "Ordered by ~A, ~A."
+				      (string-downcase (humanize-name
+							(datagrid-sorted-slot-name
+							 (datagrid-sort grid))))
+				      (string-downcase (humanize-name
+							(cdr (datagrid-sort grid)))))
+			      nil)
+		 :highlight (when (datagrid-search grid)
+			      (make-isearch-regex (datagrid-search grid)))
+		 :custom-slots (append-custom-slots
+				(when (datagrid-allow-select-p grid)
+				  `((0 . (select
+					  . ,(curry #'datagrid-render-select-body-cell grid)))))
+				args)
+		 args))))
+
+(defun append-custom-slots (custom-slots args)
+  "Appends 'custom-slots' to whatever custom slots that are already
+defined in 'args'."
+  (append (cadr (member :custom-slots args))
+	  custom-slots))

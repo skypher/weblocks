@@ -1,24 +1,2 @@
 
-.gridedit form.add-entry > fieldset
-{
-  border: none;
-  margin: 0;
-  padding: 0;
-}
 
-.gridedit form.add-entry
-{
-  text-align: right;
-}
-
-.gridedit form.add-entry > fieldset > input.submit
-{
-  margin: 0;
-  margin-bottom: 1em;
-}
-
-.gridedit .select
-{
-  text-align: center;
-  width: 3em;
-}

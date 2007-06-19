@@ -1,10 +1,15 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Add ability to select items
-- Add ability to select all items, not just the ones on current page (integrate with search)
 - Add delete functionality based on select
+- Don't show selection bar when there is one or less items
+- Should sorting and item operations reset selection?
+- Fix, document, refactor, unit test datagrid and gridedit
+- Highlight selected rows
+- What happens when user tries to delete and nothing is selected?
+- Deleting confirmation
 - Allow viewing/editing by clicking on a row/link column
+- Test in w3m/safari/openmcl
 
 -- LARGE FEATURES --
 - Design paging control for datagrid
@@ -47,3 +52,4 @@ TODO:
 - Reset state of regular widgets when moving accross navigation controls?
 - Create renderers for lists (redo existing renderers that use lists with these?)
 - Tooltips/balloon widget/block
+- Integrate selecting items with paging (allow selecting beyond current page?)
