@@ -99,14 +99,14 @@ datagrid's 'selection' slot."
 	      (ecase (car items)
 		(:all (delete-if (compose #'not (curry-after #'member
 							     (cdr items)
-							     :test #'string-equal))
+							     :test #'equalp))
 				 (slot-value grid 'data)
 				 :key #'object-id))
 		(:none (delete-if (curry-after #'member
 					       (cdr items)
-					       :test #'string-equal)
+					       :test #'equalp)
 				  (slot-value grid 'data)
-				  :key #'object-id)))))))
+				  :key (compose #'princ-to-string #'object-id))))))))
 
 ;;; Renders the body of the gridedit. Essentially, just calls
 ;;; datagrid's render method, except that proper controls (add item,

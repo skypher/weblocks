@@ -34,6 +34,24 @@
       (length (datagrid-data grid)))
   3)
 
+;;; testing gridedit-delete-items
+(deftest gridedit-delete-items-1
+    (let ((grid (make-instance 'gridedit
+			       :data (list *joe* *bob*)
+			       :data-class 'employee)))
+      (weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*))))
+      (mapcar #'first-name (datagrid-data grid)))
+  ("Bob"))
+
+(deftest gridedit-delete-items-2
+    (let ((grid (make-instance 'gridedit
+			       :data (list *joe* *bob*)
+			       :data-class 'employee)))
+      (weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*)
+							      (object-id *bob*))))
+      (mapcar #'first-name (datagrid-data grid)))
+  nil)
+
 ;;; testing render-widget-body for gridedit
 (deftest-html render-widget-body-gridedit-1
     (with-request :get nil
@@ -139,3 +157,61 @@
 		   :onclick "disableIrrelevantButtons(this);"))
      (:input :name "action" :type "hidden" :value "abc132")))))
 
+(deftest-html render-widget-body-gridedit-2
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+					   :data-class 'employee
+					   :forbid-sorting-on '(test)
+					   :allow-searching-p nil)))
+	;; render datagrid
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
+	;; click "Delete"
+	(do-request `(("item-1" . "on")
+		      ("delete" . "Delete")
+		      (,weblocks::*action-string* . "abc123")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
+  (htm
+   ;; datagrid
+   (:form
+    :action ""
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+	      '((:tr
+		 (:td :class "select"
+		  (:input :type "checkbox" :name "item-1"))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))))
+	      :summary "Ordered by name, ascending."))
+     (:div :class "item-operations"
+	   (:input :name "add" :type "submit" :class "submit" :value "Add"
+		   :onclick "disableIrrelevantButtons(this);")
+	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		   :onclick "disableIrrelevantButtons(this);"))
+     (:input :name "action" :type "hidden" :value "abc123")))
+   ;; "Delete" clicked
+   (:form
+    :action ""
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    (:fieldset
+     (:div :class "datagrid-body"
+	   (:div :class "renderer table empty-table"
+	       (:div :class "extra-top-1" "&nbsp;")
+	       (:div :class "extra-top-2" "&nbsp;")
+	       (:div :class "extra-top-3" "&nbsp;")
+	       (:p (:span :class "message" "No information available."))
+	       (:div :class "extra-bottom-1" "&nbsp;")
+	       (:div :class "extra-bottom-2" "&nbsp;")
+	       (:div :class "extra-bottom-3" "&nbsp;")))
+     (:div :class "item-operations"
+	   (:input :name "add" :type "submit" :class "submit" :value "Add"
+		   :onclick "disableIrrelevantButtons(this);")
+	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		   :onclick "disableIrrelevantButtons(this);"))
+     (:input :name "action" :type "hidden" :value "abc126")))))
