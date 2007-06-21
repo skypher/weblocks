@@ -97,13 +97,14 @@ datagrid's 'selection' slot."
       (when (typep (slot-value grid 'data) 'sequence)
 	(setf (slot-value grid 'data)
 	      (ecase (car items)
-		(:all (delete-if (compose #'not (curry-after #'member
-							     (cdr items)
-							     :test #'equalp))
-				 (slot-value grid 'data)
-				 :key #'object-id))
+;; 		(:all (delete-if (compose #'not (curry-after #'member
+;; 							     (cdr items)
+;; 							     :test #'equalp))
+;; 				 (slot-value grid 'data)
+;; 				 :key #'object-id))
 		(:none (delete-if (curry-after #'member
 					       (cdr items)
+					       :key #'princ-to-string
 					       :test #'equalp)
 				  (slot-value grid 'data)
 				  :key (compose #'princ-to-string #'object-id))))))))

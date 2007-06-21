@@ -51,8 +51,13 @@
 				      :depends-on ("widget"))
 				     (:file "dataform"
 				      :depends-on ("widget"))
-				     (:file "datagrid"
-				      :depends-on ("widget"))
+				     (:module datagrid
+					      :components ((:file "datagrid"
+								  :depends-on ("filter" "sort" "select"))
+							   (:file "filter")
+							   (:file "sort")
+							   (:file "select"))
+					      :depends-on ("widget"))
 				     (:file "gridedit"
 				      :depends-on ("datagrid" "dataform"))
 				     (:file "paging"
@@ -61,11 +66,12 @@
 				      :depends-on ("widget"))
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
-			:depends-on (blocks renderers form-management "request-handler" "utils" "actions"))
+			:depends-on (blocks renderers
+					    form-management "request-handler" "utils" "actions" "server"))
 	       (:module data-types
 			:components ((:file "us-states"))
 			:depends-on (renderers blocks))
 	       (:file "server"
-		      :depends-on (widgets))))
+		      :depends-on (weblocks))))
 
 

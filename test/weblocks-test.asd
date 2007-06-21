@@ -59,7 +59,11 @@
 			:components ((:file "widget-test-utils")
 				     (:file "dataform")
 				     (:file "flash")
-				     (:file "datagrid"
+				     (:module datagrid
+				      :components ((:file "datagrid")
+						   (:file "filter")
+						   (:file "sort")
+						   (:file "select"))
 				      :depends-on ("widget-test-utils"))
 				     (:file "gridedit"
 					    :depends-on ("widget-test-utils"))

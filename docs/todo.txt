@@ -1,8 +1,7 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Fix, document, refactor, unit test datagrid
-- What happens when user tries to delete and nothing is selected?
+- Confirm how many items were deleted
 - Allow viewing/editing by clicking on a row/link column
 - Test in w3m/safari/openmcl
 
