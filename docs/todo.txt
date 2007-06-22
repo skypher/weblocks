@@ -2,6 +2,15 @@
 TODO:
 -- CURRENT (gridedit) --
 - Confirm how many items were deleted
+  - Problem of posting a new message to flash when it's about to dissappear
+  - Flash gradually appearing on AJAX requests
+  - Allow error messages in flash, consider shake effect
+  - Properly locating gridedit flash
+  - Styling gridedit flash
+  - Unit test
+    - gridedit-delete-items flashes a message
+    - datagrid-selection-empty-p
+    - widget-dirty-p
 - Allow viewing/editing by clicking on a row/link column
 - Test in w3m/safari/openmcl
 
