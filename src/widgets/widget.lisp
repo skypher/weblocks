@@ -228,6 +228,10 @@ modified, unless slots are marked with affects-dirty-status-p."))
      (remove nil (loop for i in (widget-propagate-dirty w)
 		    collect (find-widget-by-path i))))))
 
+(defun widget-dirty-p (w)
+  "Returns true if the widget 'w' has been marked dirty."
+  (member w *dirty-widgets*))
+
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
 (defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget)

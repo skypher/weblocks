@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(datagrid-item-selected-p datagrid-select-item
-	  datagrid-clear-selection))
+	  datagrid-clear-selection datagrid-selection-empty-p))
 
 (defun render-select-bar (grid &rest keys)
   "Renders commands relevant to item selection (select all, none,
@@ -42,6 +42,20 @@ etc.)"
 (defun datagrid-clear-selection (grid)
   "Clears selected items."
   (setf (datagrid-selection grid) (cons :none nil)))
+
+(defun datagrid-selection-empty-p (selection-or-grid)
+  "Returns true if no items are selected, nil otherwise.
+'selection-or-grid' should either be a datagrid widget or its
+selection slot (both are accepted for convinience)."
+  (etypecase selection-or-grid
+    (datagrid (datagrid-selection-empty-p (datagrid-selection selection-or-grid)))
+    (cons (let ((state (car selection-or-grid))
+		(items (cdr selection-or-grid)))
+	    (ecase state
+	      ;(:all ???)
+	      (:none (if (null items)
+			 t
+			 nil)))))))
 
 (defun datagrid-render-select-body-cell (grid obj slot-name slot-value &rest args)
   "Renders a cell with a checkbox used to select items."
