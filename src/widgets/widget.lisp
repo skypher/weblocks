@@ -1,10 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(widget-class transient-slot defwidget widget
-	  widget-name widget-args with-widget-header
-	  render-widget-body widget-css-classes render-widget
-	  make-dirty find-widget-by-path* find-widget-by-path))
+(export '(widget-class transient-slot defwidget widget widget-name
+	  widget-args with-widget-header render-widget-body
+	  widget-css-classes render-widget mark-dirty widget-dirty-p
+	  find-widget-by-path* find-widget-by-path))
 
 (defclass widget-class (standard-class)
   ()
@@ -205,11 +205,17 @@ widget without a header."
 (defmethod composite-widgets ((obj string))
   nil)
 
-(defun make-dirty (w &key putp)
-  "Adds a widget to a list of dirty widgets. Normally used during an
-AJAX request. If there are any widgets in the 'propagate-dirty' slot
-of 'w' and 'putp' is true, these widgets are added to the dirty list
-as well."
+(defgeneric mark-dirty (w &key putp)
+  (:documentation
+   "Default implementation adds a widget to a list of dirty
+widgets. Normally used during an AJAX request. If there are any
+widgets in the 'propagate-dirty' slot of 'w' and 'putp' is true, these
+widgets are added to the dirty list as well.
+
+Note, this function is automatically called when widget slots are
+modified, unless slots are marked with affects-dirty-status-p."))
+
+(defmethod mark-dirty ((w widget) &key putp)
   (declare (special *dirty-widgets*))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
@@ -227,7 +233,7 @@ as well."
 (defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget)
 					  (slot-name widget-effective-slot-definition))
   (when (widget-slot-affects-dirty-status-p slot-name)
-    (make-dirty object))
+    (mark-dirty object))
   (call-next-method new-value class object slot-name))
 
 (defgeneric find-widget-by-path* (path root)

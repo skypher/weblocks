@@ -129,26 +129,26 @@
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
-;;; test make-dirty
-(deftest make-dirty-1
+;;; test mark-dirty
+(deftest mark-dirty-1
     (multiple-value-bind (res errors)
-	(ignore-errors (make-dirty (lambda () nil)))
+	(ignore-errors (mark-dirty (lambda () nil)))
       (values res (null errors)))
   nil nil)
 
-(deftest make-dirty-2
+(deftest mark-dirty-2
     (let ((weblocks::*dirty-widgets* nil))
       (declare (special weblocks::*dirty-widgets*))
-      (make-dirty (make-instance 'composite :name "test"))
+      (mark-dirty (make-instance 'composite :name "test"))
       (widget-name (car weblocks::*dirty-widgets*)))
   "test")
 
-(deftest make-dirty-3
+(deftest mark-dirty-3
     (with-request :get nil
       (setf (session-value 'weblocks::root-composite) (create-site-layout))	
       (let ((weblocks::*dirty-widgets* nil))
 	(declare (special weblocks::*dirty-widgets*))
-	(make-dirty (make-instance 'composite :name "test"
+	(mark-dirty (make-instance 'composite :name "test"
 				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
 		    :putp t)
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))

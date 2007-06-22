@@ -13,12 +13,12 @@ etc.)"
 	(render-link (make-action (lambda (&rest args)
 				    (setf (datagrid-selection grid)
 					  (cons :none (mapcar #'object-id (datagrid-data grid))))
-				    (make-dirty grid)))
+				    (mark-dirty grid)))
 		     "All")
 	", "
 	(render-link (make-action (lambda (&rest args)
 				    (datagrid-clear-selection grid)
-				    (make-dirty grid)))
+				    (mark-dirty grid)))
 		     "None"))))
 
 (defun datagrid-item-selected-p (grid item-id)
@@ -37,7 +37,7 @@ etc.)"
 ;; 		  (remove item-id (cdr (datagrid-selection grid)))))
       (:none (setf (cdr (datagrid-selection grid))
 		   (pushnew item-id (cdr (datagrid-selection grid)))))))
-  (make-dirty grid))
+  (mark-dirty grid))
 
 (defun datagrid-clear-selection (grid)
   "Clears selected items."
