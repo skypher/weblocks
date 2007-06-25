@@ -37,8 +37,9 @@
   "widget string")
 
 (deftest widget-css-classes-4
-    (widget-css-classes (make-instance 'gridedit
-				       :data-class 'employee))
+    (with-request :get nil
+      (widget-css-classes (make-instance 'gridedit
+					 :data-class 'employee)))
   "widget datagrid gridedit")
 
 ;;; test with-widget-header
@@ -153,6 +154,22 @@
 		    :putp t)
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))
   (test2-leaf "test"))
+
+;;; test widget-dirty-p
+(deftest widget-dirty-p-1
+    (let ((weblocks::*dirty-widgets* nil)
+	  (w (make-instance 'composite :name "test")))
+      (declare (special weblocks::*dirty-widgets*))
+      (widget-dirty-p w))
+  nil)
+
+(deftest widget-dirty-p-2
+    (let ((weblocks::*dirty-widgets* nil)
+	  (w (make-instance 'composite :name "test")))
+      (declare (special weblocks::*dirty-widgets*))
+      (mark-dirty w)
+      (not (null (widget-dirty-p w))))
+  t)
 
 ;;; test that (setf slot-value-using-class) method is modified for
 ;;; widgets to automatically mark them as dirty

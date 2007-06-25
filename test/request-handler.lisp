@@ -1,7 +1,6 @@
 
 (in-package :weblocks-test)
 
-
 ;;; testing handle-client-request
 (deftest handle-client-request-0
     (with-request :get nil
@@ -171,10 +170,12 @@ onclick='disableIrrelevantButtons(this);' />~
 	;; start the session
 	(start-session)
 	;; do the test
-	(setf *on-pre-request* (cons (lambda ()
-				       (incf res)) *on-pre-request*))
-	(setf *on-post-request* (cons (lambda ()
-					(incf res)) *on-post-request*))
+	(push (lambda ()
+		(incf res))
+	      (request-hook :application :pre-action))
+	(push (lambda ()
+		(incf res))
+	      (request-hook :application :post-action))
 	(handle-client-request)
 	;; tear down the application
 	(fmakunbound 'init-user-session)
@@ -185,16 +186,18 @@ onclick='disableIrrelevantButtons(this);' />~
     (with-request :get nil
       (let ((res 0) weblocks::*webapp-name*)
 	;; set up our mini-application
-	(declare (special weblocks::*webapp-name*))
+	(declare (special weblocks::*webapp-name* *request-hook*))
 	(defwebapp 'hello)
 	(defun init-user-session (comp) nil)
 	;; start the session
 	(start-session)
 	;; do the test
-	(setf (on-session-pre-request) (cons (lambda ()
-					       (incf res)) (on-session-pre-request)))
-	(setf (on-session-post-request) (cons (lambda ()
-						(incf res)) (on-session-post-request)))
+	(push (lambda ()
+		(incf res))
+	      (request-hook :session :pre-render))
+	(push (lambda ()
+		(incf res))
+	      (request-hook :session :post-render))
 	(handle-client-request)
 	;; tear down the application
 	(fmakunbound 'init-user-session)
@@ -204,30 +207,30 @@ onclick='disableIrrelevantButtons(this);' />~
 (deftest handle-client-request-7
     (with-request :get nil
       (let ((res 0) weblocks::*webapp-name*)
-	(declare (special weblocks::*webapp-name*))
+	(declare (special weblocks::*webapp-name* *request-hook*))
 	;; start the session
 	(start-session)
 	;; set up our mini-application
 	(defwebapp 'hello)
 	(defun init-user-session (comp)
-	  (declare (special *on-pre-request-onetime*
-			    *on-post-request-onetime*))
-	  (setf *on-pre-request-onetime* (cons (lambda ()
-						 (incf res))
-					       *on-pre-request-onetime*))
-	  (setf *on-post-request-onetime* (cons (lambda ()
-						 (incf res))
-						*on-post-request-onetime*)))
+	  (declare (special *request-hook*))
+	  (push (lambda ()
+		  (incf res))
+		(request-hook :request :pre-action))
+	  (push (lambda ()
+		  (incf res))
+		(request-hook :request :post-render)))
 	;; do the test
 	(handle-client-request)
 	;; tear down the application
+	(fmakunbound 'init-user-session)
 	res))
   2)
 
 (deftest handle-client-request-8
     (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
       (let ((res 0) weblocks::*webapp-name*)
-	(declare (special weblocks::*webapp-name*))
+	(declare (special weblocks::*webapp-name* *request-hook*))
 	;; start the session
 	(start-session)
 	;; action
@@ -236,14 +239,13 @@ onclick='disableIrrelevantButtons(this);' />~
 	;; set up our mini-application
 	(defwebapp 'hello)
 	(defun init-user-session (comp)
-	  (declare (special *on-pre-request-onetime*
-			    *on-post-request-onetime*))
-	  (setf *on-pre-request-onetime* (cons (lambda ()
-						 (incf res))
-					       *on-pre-request-onetime*))
-	  (setf *on-post-request-onetime* (cons (lambda ()
-						 (incf res))
-						*on-post-request-onetime*)))
+	  (declare (special *request-hook))
+	  (push (lambda ()
+		  (incf res))
+		(request-hook :request :pre-action))
+	  (push (lambda ()
+		  (incf res))
+		(request-hook :request :post-render)))
 	;; do the test
 	(ignore-errors
 	  (handle-client-request))

@@ -1,30 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*on-pre-request* *on-post-request*
-	  *on-ajax-complete-scripts* on-session-pre-request
-	  on-session-post-request *on-pre-request-onetime*
-	  *on-post-request-onetime* *uri-tokens* refresh-request-p))
-
-(defparameter *on-pre-request* nil
-  "A list of functions that take no arguments. Each function will be
-called before request handling begins. This is an application wide
-property.")
-
-(defparameter *on-post-request* nil
-  "A list of functions that take no arguments. Each function will be
-called after request handling ends. This is an application wide
-property.")
-
-(defmacro on-session-pre-request ()
-  "Similar to *on-pre-request*, only returns a list of functions
-registered per session."
-  '(session-value 'on-pre-request))
-
-(defmacro on-session-post-request ()
-  "Similar to *on-post-request*, only returns a list of functions
-registered per session."
-  '(session-value 'on-post-request))
+(export '(*on-ajax-complete-scripts* *uri-tokens* refresh-request-p))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -51,9 +28,7 @@ clients that don't support cookies (this way AJAX requests followed by
 a refresh will work).
 
 This function also manages lists of callback functions and calls them
-at different points before and after request. See *on-pre-request*,
-'on-session-pre-request', and *on-pre-request-onetime* (as well as
-their 'post' alternative).
+at different points before and after request. See 'request-hook'.
 
 Override this method (along with :before
 and :after specifiers to customize behavior)."))
@@ -65,9 +40,8 @@ and :after specifiers to customize behavior)."))
   (when (null *session*)
     (start-session)
     (redirect (request-uri)))
-  (let (*on-pre-request-onetime* *on-post-request-onetime*)
-    (declare (special *on-pre-request-onetime*
-		      *on-post-request-onetime*))
+  (let ((*request-hook* (make-instance 'request-hooks)))
+    (declare (special *request-hook*))
     (when (null (session-value 'root-composite))
       (let ((root-composite (make-instance 'composite :name "root")))
 	(when *render-debug-toolbar*
@@ -88,10 +62,10 @@ and :after specifiers to customize behavior)."))
 			*on-ajax-complete-scripts* *uri-tokens*))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))
-      (mapc #'funcall *on-pre-request*)
-      (mapc #'funcall (on-session-pre-request))
-      (mapc #'funcall *on-pre-request-onetime*)
+      (eval-hook :pre-action)
       (eval-action)
+      (eval-hook :post-action)
+      (eval-hook :pre-render)
       (if (ajax-request-p)
 	  (render-dirty-widgets)
 	  (progn
@@ -99,9 +73,7 @@ and :after specifiers to customize behavior)."))
 				     (find-navigation-widget (session-value 'root-composite)))
 	    (with-page (lambda ()
 			 (render-widget (session-value 'root-composite))))))
-      (mapc #'funcall *on-post-request-onetime*)
-      (mapc #'funcall (on-session-post-request))
-      (mapc #'funcall *on-post-request*)
+      (eval-hook :post-render)
       (setf (session-value 'last-request-uri) *uri-tokens*)
       (get-output-stream-string *weblocks-output-stream*))))
 

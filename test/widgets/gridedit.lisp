@@ -18,38 +18,42 @@
 
 ;;; testing gridedit-add-item
 (deftest gridedit-add-item-1
-    (let ((grid (make-instance 'gridedit :data (list *joe*)
-			       :data-class 'employee)))
-      (weblocks::gridedit-add-item grid *joe*)
-      (length (datagrid-data grid)))
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+					   :data-class 'employee)))
+	(weblocks::gridedit-add-item grid *joe*)
+	(length (datagrid-data grid))))
   2)
 
 (deftest gridedit-add-item-2
-    (let ((grid (make-instance 'gridedit :data (list *joe*)
-			       :data-class 'employee
-			       :on-add-item (lambda (grid item)
-					      (push item (slot-value grid 'weblocks::data))
-					      (push item (slot-value grid 'weblocks::data))))))
-      (weblocks::gridedit-add-item grid *joe*)
-      (length (datagrid-data grid)))
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+					   :data-class 'employee
+					   :on-add-item (lambda (grid item)
+							  (push item (slot-value grid 'weblocks::data))
+							  (push item (slot-value grid 'weblocks::data))))))
+	(weblocks::gridedit-add-item grid *joe*)
+	(length (datagrid-data grid))))
   3)
 
 ;;; testing gridedit-delete-items
 (deftest gridedit-delete-items-1
-    (let ((grid (make-instance 'gridedit
-			       :data (list *joe* *bob*)
-			       :data-class 'employee)))
-      (weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*))))
-      (mapcar #'first-name (datagrid-data grid)))
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit
+				 :data (list *joe* *bob*)
+				 :data-class 'employee)))
+	(weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*))))
+	(mapcar #'first-name (datagrid-data grid))))
   ("Bob"))
 
 (deftest gridedit-delete-items-2
-    (let ((grid (make-instance 'gridedit
-			       :data (list *joe* *bob*)
-			       :data-class 'employee)))
-      (weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*)
-							      (object-id *bob*))))
-      (mapcar #'first-name (datagrid-data grid)))
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit
+				 :data (list *joe* *bob*)
+				 :data-class 'employee)))
+	(weblocks::gridedit-delete-items grid (cons :none (list (object-id *joe*)
+								(object-id *bob*))))
+	(mapcar #'first-name (datagrid-data grid))))
   nil)
 
 ;;; testing render-widget-body for gridedit
@@ -72,6 +76,7 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
+   (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
@@ -97,6 +102,7 @@
 		   :onclick "disableIrrelevantButtons(this);"))
      (:input :name "action" :type "hidden" :value "abc123")))
    ;; "Add Employee" clicked
+   (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
@@ -124,6 +130,7 @@
 	    :method "post"
 	    :title-action "Adding:&nbsp;"))
    ;; "Submit" clicked
+   (:div :class "widget flash" :id "widget-123" "")
    (:p :class "datagrid-select-bar"
        (:strong "Select: ")
        (:a :href "?action=abc130" :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3Atest\"); return false;" "All")
@@ -172,6 +179,7 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
+   (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
@@ -195,6 +203,18 @@
 		   :onclick "disableIrrelevantButtons(this);"))
      (:input :name "action" :type "hidden" :value "abc123")))
    ;; "Delete" clicked
+   (:div :class "widget flash" :id "widget-123"
+	 (:div :class "renderer"
+	 (:div :class "extra-top-1" "&nbsp;")
+	 (:div :class "extra-top-2" "&nbsp;")
+	 (:div :class "extra-top-3" "&nbsp;")
+	 (:ul :class "messages"
+	      (:li
+	       (:div :class "widget string"
+		     (:p "1 item deleted."))))
+	 (:div :class "extra-bottom-1" "&nbsp;")
+	 (:div :class "extra-bottom-2" "&nbsp;")
+	 (:div :class "extra-bottom-3" "&nbsp;")))
    (:form
     :action ""
     :method "get"

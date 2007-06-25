@@ -31,12 +31,10 @@
 		    :documentation "A function called by gridedit when
 		    one or more items are deleted. The function should
 		    accept two arguments (the gridedit object and a
-		    list of IDs (see object-id) of the items to be
-		    deleted). If all items are to be deleted the
-		    keyword :all is passed as a second argument
-		    instead of the list. 'on-delete-items' has the
-		    same semantics as 'on-add-item' if terms of
-		    managing items and providing deletion UI.")
+		    value that has semantics similar to datagrid's
+		    'selection' slot). 'on-delete-items' has the same
+		    semantics as 'on-add-item' if terms of managing
+		    items and providing deletion UI.")
    (allow-delete-p :accessor gridedit-allow-delete-p
 		   :initform t
 		   :initarg :allow-delete-p
@@ -50,7 +48,13 @@
 	     to nil, gridedit simply renders an 'add entry' button,
 	     assuming its permitted (see 'allow-add-p'). When set
 	     to :add, renders an empty form that allows adding a new
-	     entry."))
+	     entry.")
+   (flash :accessor gridedit-flash
+	  :initform (make-instance 'flash)
+	  :initarg :flash
+	  :documentation "A flash control used by gridedit to display
+	  relevant information to the user (how many items have been
+	  deleted, etc.)"))
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
@@ -92,22 +96,33 @@ the beginning of the sequence."
 'on-delete-items'. Otherwise, if 'data' is a sequence, deletes the
 specified items from the sequence. The 'items' parameter is similar to
 datagrid's 'selection' slot."
-  (if (gridedit-on-delete-items grid)
-      (funcall (gridedit-on-delete-items grid) grid items)
-      (when (typep (slot-value grid 'data) 'sequence)
-	(setf (slot-value grid 'data)
-	      (ecase (car items)
-;; 		(:all (delete-if (compose #'not (curry-after #'member
-;; 							     (cdr items)
-;; 							     :test #'equalp))
-;; 				 (slot-value grid 'data)
-;; 				 :key #'object-id))
-		(:none (delete-if (curry-after #'member
-					       (cdr items)
-					       :key #'princ-to-string
-					       :test #'equalp)
-				  (slot-value grid 'data)
-				  :key (compose #'princ-to-string #'object-id))))))))
+  (when (datagrid-selection-empty-p items)
+    (flash-message (gridedit-flash grid) "Please select items to delete.")
+    (mark-dirty grid)
+    (return-from gridedit-delete-items))
+  (let ((initial-items-count (datagrid-data-count grid :totalp t))
+	deleted-items-count)
+    (if (gridedit-on-delete-items grid)
+	(funcall (gridedit-on-delete-items grid) grid items)
+	(when (typep (slot-value grid 'data) 'sequence)
+	  (setf (slot-value grid 'data)
+		(ecase (car items)
+		  ;; 		(:all (delete-if (compose #'not (curry-after #'member
+		  ;; 							     (cdr items)
+		  ;; 							     :test #'equalp))
+		  ;; 				 (slot-value grid 'data)
+		  ;; 				 :key #'object-id))
+		  (:none (delete-if (curry-after #'member
+						 (cdr items)
+						 :key #'princ-to-string
+						 :test #'equalp)
+				    (slot-value grid 'data)
+				    :key (compose #'princ-to-string #'object-id)))))))
+    (setf deleted-items-count (- initial-items-count (datagrid-data-count grid :totalp t)))
+    (flash-message (gridedit-flash grid)
+		   (format nil "~A ~A deleted."
+			   deleted-items-count
+			   (proper-number-form deleted-items-count "item")))))
 
 ;;; Renders the body of the gridedit. Essentially, just calls
 ;;; datagrid's render method, except that proper controls (add item,
@@ -134,6 +149,7 @@ datagrid's 'selection' slot."
 			      (setf (datagrid-allow-item-ops-p obj) nil)))
 	     (datagrid-item-ops obj)
 	     :key #'car))
+  (render-widget (gridedit-flash obj))
   (call-next-method)
   (case (gridedit-ui-state obj)
     (:add (gridedit-render-new-item-form obj))))

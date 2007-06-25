@@ -49,6 +49,20 @@
       (not (null (datagrid-item-selected-p grid 2))))
   nil)
 
+;;; test datagrid-selection-empty-p
+(deftest datagrid-selection-empty-p-1
+    (let ((grid (make-instance 'datagrid
+			       :data-class 'employee
+			       :selection '(:none . (1 2 3)))))
+      (datagrid-selection-empty-p grid))
+  nil)
+
+(deftest datagrid-selection-empty-p-2
+    (let ((grid (make-instance 'datagrid
+			       :data-class 'employee)))
+      (datagrid-selection-empty-p grid))
+  t)
+
 ;;; test datagrid-render-select-body-cell
 (deftest-html datagrid-render-select-body-cell-1
     (let ((grid (make-instance 'datagrid

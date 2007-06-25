@@ -23,8 +23,10 @@
 		      :depends-on ("weblocks" "utils"))
 	       (:file "debug-mode"
 		      :depends-on ("weblocks" "actions"))
+	       (:file "request-hooks"
+		      :depends-on ("weblocks"))
 	       (:file "request-handler"
-		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions"))
+		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions" "request-hooks"))
 	       (:module blocks
 			:components ((:file "suggest")
 				     (:file "isearch"))

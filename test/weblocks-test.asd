@@ -21,6 +21,8 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test" "action-utils"))
+	       (:file "request-hooks"
+		      :depends-on ("weblocks-test"))
 	       (:file "request-handler-utils"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-handler"

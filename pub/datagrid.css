@@ -131,3 +131,36 @@ div.item-operations > input.submit
   margin-left: 0.5em;
 }
 
+/* Flash */
+div.datagrid .flash > .renderer > .extra-top-1, div.datagrid .flash > .renderer > .extra-top-2,
+div.datagrid .flash > .renderer > .extra-top-3, div.datagrid .flash > .renderer > .extra-bottom-1,
+div.datagrid .flash > .renderer > .extra-bottom-2, div.datagrid .flash > .renderer > .extra-bottom-3
+{
+  display: none;
+}
+
+div.datagrid .flash > .renderer
+{
+  background-image: none;
+}
+
+div.datagrid .flash > .renderer > ul.messages
+{
+  border-style: none;
+  /*border-bottom: solid 2px #ead8c2;*/
+}
+
+div.datagrid .flash > .renderer > ul.messages > li
+{
+  background-image: none;
+  border-style: none;
+  min-height: auto;
+  height: auto;
+  padding-left: 0;
+/*  text-align: center; */
+}
+
+div.datagrid .flash > .renderer > ul.messages p
+{
+  padding: 2px;
+}
