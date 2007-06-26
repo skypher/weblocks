@@ -1,8 +1,6 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Remove select bar when search returns less than X items?
-- Remove delete button when there are no items left
 - Allow viewing/editing by clicking on a row/link column
 
 -- LARGE FEATURES --

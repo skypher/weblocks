@@ -250,7 +250,5 @@
 	       (:div :class "extra-bottom-3" "&nbsp;")))
      (:div :class "item-operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
-		   :onclick "disableIrrelevantButtons(this);")
-	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		   :onclick "disableIrrelevantButtons(this);"))
      (:input :name "action" :type "hidden" :value "abc128")))))
