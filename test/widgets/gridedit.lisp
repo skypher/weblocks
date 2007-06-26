@@ -148,7 +148,18 @@
 	     (:a :href "?action=abc134" :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
 	     (:a :href "?action=abc135" :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "")
+   (:div :class "widget flash" :id "widget-123"
+	 (:div :class "renderer"
+	 (:div :class "extra-top-1" "&nbsp;")
+	 (:div :class "extra-top-2" "&nbsp;")
+	 (:div :class "extra-top-3" "&nbsp;")
+	 (:ul :class "messages"
+	      (:li
+	       (:div :class "widget string"
+		     (:p "Item added."))))
+	 (:div :class "extra-bottom-1" "&nbsp;")
+	 (:div :class "extra-bottom-2" "&nbsp;")
+	 (:div :class "extra-bottom-3" "&nbsp;")))
    (:form
     :action ""
     :method "get"

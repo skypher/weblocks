@@ -89,7 +89,8 @@ the beginning of the sequence."
   (if (gridedit-on-add-item grid)
       (funcall (gridedit-on-add-item grid) grid item)
       (when (typep (slot-value grid 'data) 'sequence)
-	(push item (slot-value grid 'data)))))
+	(push item (slot-value grid 'data))))
+  (flash-message (gridedit-flash grid) "Item added."))
 
 (defun gridedit-delete-items (grid items)
   "If 'on-delete-items' is specified, simply calls
