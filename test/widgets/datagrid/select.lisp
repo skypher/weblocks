@@ -90,7 +90,8 @@
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :data-class 'employee
-				 :allow-select-p t))
+				 :allow-select-p t
+				 :show-hidden-entries-count-p nil))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
@@ -103,7 +104,8 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; initial
-   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   (:div :class "data-mining-bar"
+	 #.(searchbar-template "I1" "I2" "I3" "abc123")
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "?action=abc124"
@@ -111,7 +113,7 @@
 	  "All")
       ", "
       (:a :href "?action=abc125"
-	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3Atest\"); return false;" "None"))
+	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
 	   (:div :class "datagrid-body"
@@ -132,7 +134,8 @@
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc126")))
    ;; select all clicked
-   #.(searchbar-template "I1" "I2" "I3" "abc129")
+   (:div :class "data-mining-bar"
+	 #.(searchbar-template "I1" "I2" "I3" "abc129")
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "?action=abc130"
@@ -140,7 +143,7 @@
 	  "All")
       ", "
       (:a :href "?action=abc131"
-	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3Atest\"); return false;" "None"))
+	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
 	   (:div :class "datagrid-body"
@@ -161,7 +164,8 @@
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc132")))
    ;; select none clicked
-   #.(searchbar-template "I1" "I2" "I3" "abc135")
+   (:div :class "data-mining-bar"
+	 #.(searchbar-template "I1" "I2" "I3" "abc135")
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "?action=abc136"
@@ -169,7 +173,7 @@
 	  "All")
       ", "
       (:a :href "?action=abc137"
-	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3Atest\"); return false;" "None"))
+	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
 	   (:div :class "datagrid-body"

@@ -149,8 +149,10 @@ datagrid's 'selection' slot."
 			      (setf (datagrid-allow-item-ops-p obj) nil)))
 	     (datagrid-item-ops obj)
 	     :key #'car))
-  (render-widget (gridedit-flash obj))
-  (call-next-method)
+  (apply #'call-next-method obj
+	 :post-data-mining-fn
+	 (compose #'render-widget #'gridedit-flash)
+	 args)
   (case (gridedit-ui-state obj)
     (:add (gridedit-render-new-item-form obj))))
 

@@ -1,2 +1,71 @@
 
+/* Flash */
+div.gridedit .flash > .renderer > .extra-top-1
+{
+  position: absolute;
+  z-index: 10;
+}
+
+div.gridedit .flash > .renderer > .extra-top-2
+{
+  border: none;
+  position: absolute;
+  right: 0;
+  margin-top: 0;
+  z-index: 10;
+}
+
+div.gridedit .flash > .renderer > .extra-top-3
+{
+  background: url(/pub/images/widget/flash/top_background.png) repeat-x;
+  margin-bottom: -14px;
+  display: block;
+}
+
+div.gridedit .flash > .renderer > .extra-bottom-1
+{
+  border: none;
+  margin-top: -11px;
+}
+
+div.gridedit .flash > .renderer > .extra-bottom-2
+{
+  background: url(/pub/images/widget/gridedit/flash/bottom_left.png) no-repeat bottom left;
+  margin-top: -7px;
+}
+
+div.gridedit .flash > .renderer > .extra-bottom-3
+{
+  background: url(/pub/images/widget/gridedit/flash/bottom_right.png) no-repeat bottom right;
+  margin-top: -7px;
+}
+
+div.gridedit .flash > .renderer
+{
+  margin-bottom: 0.25em;
+  background-image: url(/pub/images/widget/gridedit/flash/horizontal_border.png);
+  background-repeat: repeat-y;
+  background-position: left;
+}
+
+div.gridedit .flash > .renderer > ul.messages
+{
+  background: url(/pub/images/widget/gridedit/flash/horizontal_border.png) repeat-y right;
+  border: none;
+  margin-bottom: 5px;
+}
+
+div.gridedit .flash > .renderer > ul.messages > li
+{
+  background-image: none;
+  border: none;
+  padding-left: 0;
+}
+
+div.gridedit .flash > .renderer > ul.messages p
+{
+  text-align: center;
+  font-size: x-small;
+  padding-top: 1px;
+}
 

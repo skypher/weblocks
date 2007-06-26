@@ -67,26 +67,32 @@
 	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
 	(do-request `(("add" . "Add")
-		      (,weblocks::*action-string* . "abc123")))
+		      (,weblocks::*action-string* . "abc125")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "submit"
 	(do-request `(("name" . "Jill")
 		      ("submit" . "Submit")
-		      (,weblocks::*action-string* . "abc129")))
+		      (,weblocks::*action-string* . "abc133")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     ", "
+	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
-    :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc125" "Manager")))
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
@@ -100,29 +106,35 @@
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		   :onclick "disableIrrelevantButtons(this);"))
-     (:input :name "action" :type "hidden" :value "abc123")))
+     (:input :name "action" :type "hidden" :value "abc125")))
    ;; "Add Employee" clicked
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "?action=abc128" :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     ", "
+	     (:a :href "?action=abc129" :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
-    :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc127" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:input :type "checkbox" :name "item-1"))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
-     (:input :name "action" :type "hidden" :value "abc126")))
+     (:input :name "action" :type "hidden" :value "abc130")))
    (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template
-	    "abc129"
+	    "abc133"
 	    '((:li :class "name"
 	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name")))
 	      (:li :class "manager"
@@ -130,22 +142,23 @@
 	    :method "post"
 	    :title-action "Adding:&nbsp;"))
    ;; "Submit" clicked
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "?action=abc134" :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     ", "
+	     (:a :href "?action=abc135" :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "")
-   (:p :class "datagrid-select-bar"
-       (:strong "Select: ")
-       (:a :href "?action=abc130" :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3Atest\"); return false;" "All")
-       ", "
-       (:a :href "?action=abc131" :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3Atest\"); return false;" "None"))
    (:form
     :action ""
     :method "get"
-    :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc133" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc134" "Manager"))))
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc137" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:input :type "checkbox" :name "item-1002"))
@@ -162,7 +175,7 @@
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		   :onclick "disableIrrelevantButtons(this);"))
-     (:input :name "action" :type "hidden" :value "abc132")))))
+     (:input :name "action" :type "hidden" :value "abc136")))))
 
 (deftest-html render-widget-body-gridedit-2
     (with-request :get nil
@@ -175,21 +188,27 @@
 	;; click "Delete"
 	(do-request `(("item-1" . "on")
 		      ("delete" . "Delete")
-		      (,weblocks::*action-string* . "abc123")))
+		      (,weblocks::*action-string* . "abc125")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     ", "
+	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "")
    (:form
     :action ""
     :method "get"
-    :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:input :type "checkbox" :name "item-1"))
@@ -201,7 +220,7 @@
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		   :onclick "disableIrrelevantButtons(this);"))
-     (:input :name "action" :type "hidden" :value "abc123")))
+     (:input :name "action" :type "hidden" :value "abc125")))
    ;; "Delete" clicked
    (:div :class "widget flash" :id "widget-123"
 	 (:div :class "renderer"
@@ -218,7 +237,7 @@
    (:form
     :action ""
     :method "get"
-    :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :onsubmit "initiateFormAction(\"abc128\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:fieldset
      (:div :class "datagrid-body"
 	   (:div :class "renderer table empty-table"
@@ -234,4 +253,4 @@
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		   :onclick "disableIrrelevantButtons(this);"))
-     (:input :name "action" :type "hidden" :value "abc126")))))
+     (:input :name "action" :type "hidden" :value "abc128")))))

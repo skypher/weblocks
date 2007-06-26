@@ -48,7 +48,7 @@ span.paging
   text-decoration: underline;
 }
 
-/* Searching */
+/* Filter */
 .datagrid-search-bar > .extra-top-1, .datagrid-search-bar > .extra-top-2,
 .datagrid-search-bar > .extra-top-3,
 .datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
@@ -57,12 +57,11 @@ span.paging
   display: none;
 }
 
-.datagrid-search-bar
+.datagrid > .data-mining-bar
 {
-  background: url(/pub/images/widget/datagrid/isearch.png) no-repeat left center;
-  padding-left: 18px;
-  min-height: 16px;
-  margin-bottom: 2px;
+  position: relative;
+  margin-bottom: 0.25em;
+  text-align: right;
 }
 
 .datagrid-search-bar > form, .datagrid-search-bar > form > fieldset
@@ -71,6 +70,13 @@ span.paging
   border: none;
   padding: 0;
   margin: 0;
+}
+
+.datagrid-search-bar > form > fieldset
+{
+  padding-left: 18px;
+  background: url(/pub/images/widget/datagrid/isearch.png) left bottom no-repeat;
+  vertical-align: bottom;
 }
 
 .datagrid-search-bar > form > fieldset > input.search-bar
@@ -88,11 +94,10 @@ span.paging
 {
   margin: 0;
   padding: 0;
+  padding-right: 0.5em;
   display: -moz-inline-box;
   display: inline-block;
   vertical-align: bottom;
-  margin-bottom: 2px;
-  margin-left: 0.5em;
   color: grey;
   font-size: x-small;
 }
@@ -100,10 +105,12 @@ span.paging
 /* Selecting */
 p.datagrid-select-bar
 {
-  margin: 0;
-  margin-bottom: 4px;
   padding: 0;
+  margin: 0;
   font-size: x-small;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 p.datagrid-select-bar > strong
@@ -131,36 +138,3 @@ div.item-operations > input.submit
   margin-left: 0.5em;
 }
 
-/* Flash */
-div.datagrid .flash > .renderer > .extra-top-1, div.datagrid .flash > .renderer > .extra-top-2,
-div.datagrid .flash > .renderer > .extra-top-3, div.datagrid .flash > .renderer > .extra-bottom-1,
-div.datagrid .flash > .renderer > .extra-bottom-2, div.datagrid .flash > .renderer > .extra-bottom-3
-{
-  display: none;
-}
-
-div.datagrid .flash > .renderer
-{
-  background-image: none;
-}
-
-div.datagrid .flash > .renderer > ul.messages
-{
-  border-style: none;
-  /*border-bottom: solid 2px #ead8c2;*/
-}
-
-div.datagrid .flash > .renderer > ul.messages > li
-{
-  background-image: none;
-  border-style: none;
-  min-height: auto;
-  height: auto;
-  padding-left: 0;
-/*  text-align: center; */
-}
-
-div.datagrid .flash > .renderer > ul.messages p
-{
-  padding: 2px;
-}

@@ -1,18 +1,13 @@
 
 (in-package :weblocks)
 
-(export '(*show-controls-item-count-threshold* datagrid
-	  datagrid-data-class datagrid-data datagrid-sort
+(export '(datagrid datagrid-data-class datagrid-data datagrid-sort
 	  datagrid-allow-sorting datagrid-forbid-sorting-on
 	  datagrid-search datagrid-allow-searching-p
 	  datagrid-show-hidden-entries-count-p datagrid-selection
 	  datagrid-allow-select-p datagrid-item-ops
 	  datagrid-allow-item-ops-p datagrid-data
 	  datagrid-data-count))
-
-(defparameter *show-controls-item-count-threshold* 2
-  "Isearch and selection controls will not be shown if the number of
-items in the datagrid is less than this value.")
 
 (defwidget datagrid (widget)
   ((data-class :accessor datagrid-data-class
@@ -169,12 +164,17 @@ defined in 'args'."
 		(datagrid-item-ops grid)))))
 
 ;;; Renders the body of the data grid.
-(defmethod render-widget-body ((obj datagrid) &rest args)
-  (when (>= (datagrid-data-count obj :totalp t) *show-controls-item-count-threshold*)
-    (when (datagrid-allow-searching-p obj)
-      (apply #'datagrid-render-search-bar obj args))
-    (when (datagrid-allow-select-p obj)
-      (apply #'render-select-bar obj args)))
+(defmethod render-widget-body ((obj datagrid) &rest args
+			       &key pre-data-mining-fn post-data-mining-fn)
+  (safe-funcall pre-data-mining-fn obj)
+  (when (>= (datagrid-data-count obj :totalp t) 1)
+    (with-html
+      (:div :class "data-mining-bar"
+	    (when (datagrid-allow-searching-p obj)
+	      (apply #'datagrid-render-search-bar obj args))
+	    (when (datagrid-allow-select-p obj)
+	      (apply #'render-select-bar obj args)))))
+  (safe-funcall post-data-mining-fn obj)
   (let ((action (make-action (lambda (&rest args)
 			       (datagrid-clear-selection obj)
 			       (loop for i in (request-parameters)

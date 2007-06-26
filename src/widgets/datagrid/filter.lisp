@@ -53,7 +53,13 @@ search."
   (with-html
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
-	    (htm (:span :class "title" "Search table"))
+	    (htm (:span :class "title" (:strong "Search table&nbsp")))
+	    (when (datagrid-show-hidden-entries-count-p grid)
+	      (let ((hidden-items-message (hidden-items-message grid)))
+		(when hidden-items-message
+		  (with-html
+		    (:span :class "hidden-items"
+			   (str hidden-items-message))))))
 	    (apply #'render-isearch "search"
 		   (make-action
 		    (lambda (&key search &allow-other-keys)
@@ -82,10 +88,4 @@ function () { ~
 				      (hidden-items-message grid))
 			      *on-ajax-complete-scripts*))))
 		   :value (datagrid-search grid)
-		   keys)
-	    (when (datagrid-show-hidden-entries-count-p grid)
-	      (let ((hidden-items-message (hidden-items-message grid)))
-		(when hidden-items-message
-		  (with-html
-		    (:span :class "hidden-items"
-			   (str hidden-items-message))))))))))
+		   keys)))))

@@ -6,7 +6,10 @@
 	 (:div :class "extra-top-1" "&nbsp;")
 	 (:div :class "extra-top-2" "&nbsp;")
 	 (:div :class "extra-top-3" "&nbsp;")
-	 (:span :class "title" "Search table")
+	 (:span :class "title"
+		(:strong "Search table&nbsp"))
+	 ,(when hidden-items-text
+	      `(htm (:span :class "hidden-items" ,hidden-items-text)))
 	 (:form :id ,form-id :class "isearch" :action "" :method "get"
 		(:fieldset
 		 (:input :type "text" :id ,search-id :name "search" :class "search-bar" :value ,value)
@@ -21,9 +24,6 @@
 		  (fmt "~%// <![CDATA[~%")
 		  (fmt "$('~A').remove();" ,submit-id)
 		  (fmt "~%// ]]>~%"))
-	 ,(if hidden-items-text
-	      `(htm (:span :class "hidden-items" ,hidden-items-text))
-	      '(:span :class "hidden-items" "&nbsp;"))
 	 (:div :class "extra-bottom-1" "&nbsp;")
 	 (:div :class "extra-bottom-2" "&nbsp;")
 	 (:div :class "extra-bottom-3" "&nbsp;")))

@@ -68,13 +68,15 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
-				 :data-class 'employee))
+				 :data-class 'employee
+				 :show-hidden-entries-count-p nil))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
-   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   (:div :class "data-mining-bar"
+	 #.(searchbar-template "I1" "I2" "I3" "abc123"))
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
 	   (:div :class "datagrid-body"
@@ -94,12 +96,15 @@
     (with-request :get nil
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe*)
-				 :data-class 'employee))
+				 :data-class 'employee
+				 :allow-select-p nil
+				 :allow-searching-p nil))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
 	(render-widget-body grid)))
   (htm
+   (:div :class "data-mining-bar" "")
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
    (:div :class "datagrid-body"
@@ -121,8 +126,10 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
-   #.(searchbar-template "I1" "I2" "I3" "abc123" :value "doesn't exist"
-						 :hidden-items-text "(2 items are hidden by the search)")
+   (:div :class "data-mining-bar"
+	 #.(searchbar-template "I1" "I2" "I3" "abc123" :value "doesn't exist"
+						       :hidden-items-text
+						       "(2 items are hidden by the search)"))
    (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:fieldset
 	   (:div :class "datagrid-body"

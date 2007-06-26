@@ -117,7 +117,8 @@
 					      :input-id "I2"
 					      :search-id "I3")))
   (htm
-   #.(searchbar-template "I1" "I2" "I3" "abc123")
+   #.(searchbar-template "I1" "I2" "I3" "abc123"
+			 :hidden-items-text "&nbsp;")
    #.(searchbar-template "I1" "I2" "I3" "abc124"
 			 :hidden-items-text "(2 items are hidden by the search)"
 			 :value "hello")))

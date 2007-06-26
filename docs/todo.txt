@@ -1,9 +1,8 @@
 
 TODO:
 -- CURRENT (gridedit) --
-- Styling gridedit flash
-- Properly locate gridedit flash
-- Test in w3m/safari/openmcl
+- Remove select bar when search returns less than X items?
+- Remove delete button when there are no items left
 - Allow viewing/editing by clicking on a row/link column
 
 -- LARGE FEATURES --
@@ -15,39 +14,17 @@ TODO:
 - Convert states to render using suggest block (specialize on nil, validate, proper display of data)
 
 -- RESEARCH --
-- slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
-- non-inline CLOS objects in forms
 - Consider redirecting to hide all non user-friendly actions on non-ajax requests (consider debug toolbar)
-- (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 - Focus on the control being modified (#anchor), possibly change title. (More accessible/friendly).
 - Register stylesheet requirements, deal with paths to stylesheets and images
-- Preload ajax image and navigation arrow
 - Consider redoing flash widget with modal style in mind (widget specific modality?)
-- Refactor out forms
-- Consider refactoring parts of regex filtering and sorting into utils
-- Optimize/cache getting data from grid
 
 -- MINOR FEATURES --
 - Mark required fields
-- Don't remove validation error summary for long forms.
-- Customize widget printing to include their names (to ease debugging)
 - Port stylesheets to IE, fix the form bug for Opera 8, browser
   compatibility, offer simpe HTML version for older browsers
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
-- Reset sessions should respect friendly URL
-- Fix friendly URLs not being respected in w3m
+- Fix friendly URLs and form actions in w3m
 - Allow adding titles to navigation items and set them as page title, add application title
-- Rename blocks to snippets, datagrid to grid, gridedit to ...?
 
--- WISHLIST --
-- Allow multiple search tokens in grid searchbar
-- Authentication (permission to access menu items, actions, widgets in general)
-- Consider lazy evaluation of session initialization
-- Create default title page if the user didn't define the application (possibly tutorial style)
-- Consider multiple navigation controls in one composite, hidden navigation controls, dynamic menus
-- Reset state of regular widgets when moving accross navigation controls?
-- Create renderers for lists (redo existing renderers that use lists with these?)
-- Tooltips/balloon widget/block
-- Integrate selecting items with paging (allow selecting beyond current page?)
-- Highlight selected rows
