@@ -320,11 +320,11 @@ is a string that specifies the class name and 'count' is the
 number of extra tags to render.
 Ex:
 \(render-extra-tags \"extra-\" 2) =>
-\"<div class=\"extra-1\">&nbsp;</div><div class=\"extra-1\">&nbsp;</div>\""
+\"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
   (with-html-output (*weblocks-output-stream*)
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
-       do (htm (:div :class attr "&nbsp;")))))
+       do (htm (:div :class attr "")))))
 
 (defmacro with-extra-tags (&body body)
   "A macro used to wrap html into extra tags necessary for

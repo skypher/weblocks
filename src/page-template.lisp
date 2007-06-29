@@ -5,7 +5,8 @@
 
 (defun with-page (body-fn)
   "Renders boilerplate XHTML (title, stylesheets, etc.)"
-  (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
+  ; Note, anything that precedes the doctype puts IE6 in quirks mode
+  ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
   (with-html-output (*weblocks-output-stream* nil :prologue t)
     (:html
      (:head

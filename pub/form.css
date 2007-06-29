@@ -5,25 +5,25 @@
   margin-top: 0;
 }
 
-.form > fieldset
+.form fieldset
 {
   border: none;
   padding: 0;
   margin: 0;
 }
 
-.form > fieldset > .validation-errors-summary
+.form fieldset .validation-errors-summary
 {
   display: none;
 }
 
-.form > fieldset > .form-fields-title
+.form fieldset .form-fields-title
 {
   display: none;
 }
 
-form.renderer > fieldset > ul > li > label > input,
-form.renderer > fieldset > ul > li > label > select
+form.renderer fieldset ul li label input,
+form.renderer fieldset ul li label select
 {
   margin-top: 2px;
   margin-bottom: 2px;
@@ -31,7 +31,7 @@ form.renderer > fieldset > ul > li > label > select
   width: 12em;
 }
 
-form.renderer > fieldset > div.submit > input.submit
+form.renderer fieldset div.submit input.submit
 {
   margin-top: 2px;
   margin-bottom: 2px;

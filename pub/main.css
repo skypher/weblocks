@@ -16,119 +16,123 @@ a
   margin-bottom: 1em;
 }
 
-.renderer > .extra-top-1
+.renderer .extra-top-1
 {
   height: 7px;
   background: url(/pub/images/widget/top_left.png) no-repeat top left;
+  overflow: hidden;
 }
 
-.renderer > .extra-top-2
+.renderer .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
   background: url(/pub/images/widget/top_right.png) no-repeat top right;
   border-bottom: 1px solid #dbeac1;
+  overflow: hidden;
 }
 
-.renderer > .extra-top-3
+.renderer .extra-top-3
 {
   display: none;
 }
 
-.renderer > h1, .renderer > fieldset > h1
+.renderer h1, .renderer fieldset h1
 {
   margin: 0;
   padding: 0;
   padding-left: 0.4em;
 }
 
-.renderer > h1, .renderer > fieldset > h1, .table > table > caption
+.renderer h1, .renderer fieldset h1, .table table caption
 {
   font-size: large;
 }
 
-.renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
-.renderer > .empty-navigation, .renderer > ul > li, .renderer > fieldset > ul > li,
-.renderer > table > tbody > tr > td, .renderer > table > thead > tr > th,
-.renderer > fieldset > .submit, .renderer > .submit
+.renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
+.renderer .empty-navigation, .renderer ul li, .renderer fieldset ul li,
+.renderer table tbody tr td, .renderer table thead tr th,
+.renderer fieldset div.submit, .renderer div.submit
 
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;
 }
 
-.renderer > h1, .renderer > fieldset > h1, .table > table > caption, .empty-table > p,
-.renderer > .empty-navigation, .renderer > ul, .renderer > fieldset > ul, .table > table,
-.renderer > fieldset > .submit, .renderer > .submit
+.renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
+.renderer .empty-navigation, .renderer ul, .renderer fieldset ul, .table table,
+.renderer fieldset div.submit, .renderer div.submit
 {
   border-left: 2px solid #dbeac1;
   border-right: 2px solid #dbeac1;
 }
 
-.renderer > h1, .renderer > fieldset > h1, .table > table > caption,
-.empty-table > p > span.caption
+.renderer h1, .renderer fieldset h1, .table table caption,
+.empty-table p span.caption
 {
   color: #29364F;
   font-weight: bold;
   font-family: Garamond, New York, serif;
 }
 
-.renderer > h1 > .action, .renderer > fieldset > h1 > .action
+.renderer h1 .action, .renderer fieldset h1 .action
 {
   display: none;
 }
 
-.renderer > ul, .renderer > fieldset > ul, .table > table, .renderer > fieldset > .submit,
-.renderer > .submit
+.renderer ul, .renderer fieldset ul, .table table, .renderer fieldset div.submit,
+.renderer div.submit
 {
   padding-left: 0;
   margin: 0;
 }
 
-.renderer > ul > li, .renderer > fieldset > ul > li
+.renderer ul li, .renderer fieldset ul li
 {
   list-style: none;
   padding-left: 1.5em;
 }
 
-.renderer > .submit, .form > fieldset > .submit
+.renderer div.submit, .form fieldset div.submit
 {
   padding-left: 11.5em;
 }
 
-.renderer > ul > li > .label, .renderer > fieldset > ul > li > label > span,
-.table > table > thead
+.renderer ul li .label, .renderer fieldset ul li label span,
+.table table thead
 {
   color: #808080;
   font-weight: bold;
 }
 
-.renderer > ul > li > .label, .renderer > fieldset > ul > li > label > span
+.renderer ul li .label, .renderer fieldset ul li label span
 {
   display: -moz-inline-box;
   display: inline-block;
   width: 10em;
 }
 
-.renderer > .extra-bottom-1
+.renderer .extra-bottom-1
 {
-  height: 6px;
-  background: url(/pub/images/widget/bottom_background.png) repeat-x bottom;
-  border-top: 1px solid #fcfef6;
+  height: 7px;
+  background: url(/pub/images/widget/bottom_background.png) repeat-x top;
+  overflow: hidden;
 }
 
-.renderer > .extra-bottom-2
+.renderer .extra-bottom-2
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/images/widget/bottom_left.png) no-repeat bottom left;
+  background: url(/pub/images/widget/bottom_left.png) no-repeat top left;
+  overflow: hidden;
 }
 
-.renderer > .extra-bottom-3
+.renderer .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
-  background: url(/pub/images/widget/bottom_right.png) no-repeat bottom right;
+  background: url(/pub/images/widget/bottom_right.png) no-repeat top right;
+  overflow: hidden;
 }
 
 .missing
