@@ -2,20 +2,21 @@
 .table
 {
   min-width: 42em;
-}
-
-.table > table
-{
   width: 100%;
-  border-spacing: 0;
 }
 
-.table > table > thead > tr > th
+.table table
+{
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table table thead tr th
 {
   text-align: left;
 }
 
-.table > table > thead > tr > th, .table > table > tbody > tr > td
+.table table thead tr th, .table table tbody tr td
 {
   padding-left: 0.5em;
 }
@@ -25,23 +26,30 @@
   background: #dbeac1;
 }
 
-.table > table > tbody > tr > td strong
+.table table tbody tr
+{
+  hover: expression(onmouseover=new Function("this.style.backgroundColor='#dbeac1';"),
+                    onmouseout=new Function("this.style.backgroundColor='#ecf8d7';"));
+}
+
+.table table tbody tr td strong
 {
   background: #fe4631;
   color: white;
   font-weight: normal;
 }
 
-.empty-table > p
+div.empty-table p
 {
   padding-left: 0.5em;
   margin: 0;
 }
 
-.empty-table > p > span.caption
+div.empty-table p span.caption
 {
   color: #29364F;
   font-weight: bold;
   font-family: Garamond, New York, serif;
 }
+
 
