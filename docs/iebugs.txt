@@ -1,0 +1,6 @@
+
+- Quirks mode - anything before doctype/incorrect doctype
+- Incorrect overflow issue (set overflow to hidden)
+- min-width doesn't work (use dynamic properties)
+  (to do: .table min-width)
+- border-spacing doesn't work (replace with border-collapse?)
