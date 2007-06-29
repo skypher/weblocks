@@ -1,90 +1,51 @@
 
 (in-package :weblocks)
 
-(export '(*items-per-page* paging paging-items-per-page
-	  paging-total-items paging-current-page))
+(export '(*items-per-page* pager pager-items-per-page
+	  pager-total-items))
 
-(defparameter *items-per-page* 15)
-(defparameter *page-around-current-page-count* 1)
-(defparameter *triangulation-page-count* 4)
+(defparameter *items-per-page* 3)
 
-(defwidget paging (widget)
-  ((items-per-page :accessor paging-items-per-page
+(defwidget pager (widget)
+  ((items-per-page :accessor pager-items-per-page
 		   :initform *items-per-page*
 		   :initarg :items-per-page)
-   (total-items :accessor paging-total-items
-		:initform nil
+   (total-items :accessor pager-total-items
+		:initform 1
 		:initarg :total-items)
-   (current-page :accessor paging-current-page
-		 :initform 1
-		 :initarg :current-page)))
+   (slider-position :accessor pager-slider-position
+		    :initform 0
+		    :initarg :slider-position
+		    :affects-dirty-status-p nil)
+   (on-change :accessor pager-on-change
+	      :initform nil
+	      :initarg :on-change
+	      :affects-dirty-status-p nil)))
 
-(defun page-count (p)
-  (check-type p paging)
-  (ceiling (/ (paging-total-items p)
-	      (paging-items-per-page p))))
+(defun slider-width (p)
+  (floor (* (/ (pager-items-per-page p)
+	       (pager-total-items p))
+	    100)))
 
-(defmethod with-widget-header ((obj paging) body-fn &rest args)
-  (if (<= (page-count obj) 1)
-    nil
-    (apply #'call-next-method obj body-fn args)))
+(defun get-item-range (p)
+  (with-slots (items-per-page total-items slider-position) p
+    (let ((start (floor (* (- total-items items-per-page)
+			   slider-position))))
+      (cons start (+ start items-per-page)))))
 
+(defmethod render-widget-body ((obj pager) &rest args)
+  (with-html
+    (:div :id "slider-track" :class "slider-track"
+	  (:div :id "slider-handle"
+		:class "slider-handle"
+		:style (format nil "width: ~A%;" (slider-width obj))
+		"")))
+  (with-javascript (format nil "new Control.Slider('slider-handle', 'slider-track', { sliderValue: ~A, onChange: function(value) { initiateAction('~A' + '&value=' + value, '~A'); } });"
+			   (pager-slider-position obj)
+			   (make-action (lambda (&rest args &key value &allow-other-keys)
+					  (log-message* "VALUE: ~A" value)
+					  (setf (pager-slider-position obj)
+						(read (make-string-input-stream value)))
+					  (safe-funcall (pager-on-change obj) obj)))
+			   (session-name-string-pair))))
 
-(defmethod render-widget-body ((obj paging) &rest args)
-  (when (<= (page-count obj) 1)
-    (return-from render-widget-body))
-  (with-slots (current-page) obj
-    (let* ((pages-before-current (- current-page *page-around-current-page-count* 1 1))
-	   (pages-after-current (- (page-count obj) (+ current-page *page-around-current-page-count*) 1))
-	   (hidden-page-count (+ pages-before-current pages-after-current))
-	   (unavailable-ratio (/ pages-before-current hidden-page-count))
-	   (before-triang-count (clamp
-				 1
-				 (- *triangulation-page-count* 1)
-				 (round (* *triangulation-page-count* unavailable-ratio))))
-	   (after-triang-count (- *triangulation-page-count* before-triang-count)))
-      (with-html
-	(:p
-	 ; first-page
-	 (:span :class "paging"
-		(make-paging-link obj 1))
-	 (:span :class "paging" "..")
-	 ; triangulation
-	 (loop for i from 1 to before-triang-count
-	       for j = (round (* i (/ pages-before-current (+ before-triang-count 1))))
-	       do (progn
-		    (htm (:span :class "paging" 
-				(make-paging-link obj j)))))
-	 (:span :class "paging" "..")
-	 ; prior to current
-	 (loop for i from (- current-page *page-around-current-page-count*) to (- current-page 1)
-	      do (htm (:span :class "paging" (make-paging-link obj i))))
-	 ; current
-	 (:span :class "paging current"  (str current-page))
-	 ; post current
-	 (loop for i from (+ current-page 1) to (+ current-page *page-around-current-page-count*)
-	      do (htm (:span :class "paging" (make-paging-link obj i))))
-	 (:span :class "paging" "..")
-	 ; triangulation
-	 (loop for i from 1 to after-triang-count
-	       for j = (round (+ current-page (round (* i (/ pages-after-current (+ after-triang-count 1))))))
-	       do (progn
-		    (log-message* "i: ~A, pac: ~A, atc: ~A" i pages-after-current after-triang-count)
-		    (htm (:span :class "paging"
-				(make-paging-link obj j)))))
-	 ; last
-	 (:span :class "paging" "..")
-	 (:span :class "paging"  
-		(make-paging-link obj (page-count obj))))))))
-
-
-(defun make-paging-link (obj page)
-  (render-link (make-action
-		(lambda (&rest args)
-		  (setf (paging-current-page obj) page)))
-	       (princ page)))
-
-(defun clamp (a b j)
-  (cond ((< j a) a)
-	((> j b) b)
-	(t j)))
