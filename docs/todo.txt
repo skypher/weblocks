@@ -1,10 +1,11 @@
 
 TODO:
--- CURRENT (gridedit) --
-- Allow viewing/editing by clicking on a row/link column
+-- CURRENT (Port to IE) --
+
 
 -- LARGE FEATURES --
-- Design paging control for datagrid
+- Design paging control
+- Allow viewing/editing by clicking on a row/link column in gridedit
 - Create a modal dialog widget, as well as modal request in general
 - Deleting confirmation in datagrid
 - Handling failure (AJAX and regular, add message types to flash widget)
@@ -19,8 +20,8 @@ TODO:
 
 -- MINOR FEATURES --
 - Mark required fields
-- Port stylesheets to IE, fix the form bug for Opera 8, browser
-  compatibility, offer simpe HTML version for older browsers
+- Port stylesheets to IE, browser compatibility, offer simpe HTML
+  version for older browsers
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Fix friendly URLs and form actions in w3m
