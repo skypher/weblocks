@@ -20,17 +20,6 @@
   padding-left: 0.5em;
 }
 
-.table > table > tbody > tr:hover
-{
-  background: #dbeac1;
-}
-
-.table table tbody tr
-{
-  /*hover: expression(onmouseover=new Function("this.style.backgroundColor='#dbeac1';"),
-                    onmouseout=new Function("this.style.backgroundColor='#ecf8d7';"));*/
-}
-
 .table table tbody tr td strong
 {
   background: #fe4631;
@@ -58,6 +47,13 @@ div.empty-table p span.caption
   background-image: url(/pub/images/widget/table-border-top.png);
   background-repeat: repeat-x;
   background-position: top;
+}
+
+/* Note, the :hover selector works in IE 6 due to a behavior included
+   in main.css on the body tag */
+.table table tbody tr:hover
+{
+  background: #dbeac1;
 }
 
 /* IE specific border behavior (no support for border-spacing) */
