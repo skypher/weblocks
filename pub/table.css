@@ -44,7 +44,7 @@ div.empty-table p span.caption
 {
   border-bottom: 1px solid #dbeac1;
   padding-top: 1px;
-  background-image: url(/pub/images/widget/table-border-top.png);
+  background-image: url(/pub/images/widget/table_border_top.png);
   background-repeat: repeat-x;
   background-position: top;
 }
