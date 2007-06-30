@@ -8,7 +8,7 @@
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
   (with-html-output (*weblocks-output-stream* nil :prologue t)
-    (:html
+    (:html :xmlns "http://www.w3.org/1999/xhtml"
      (:head
       (:title "Hello!")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/main.css")

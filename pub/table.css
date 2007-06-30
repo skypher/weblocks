@@ -7,7 +7,6 @@
 
 .table table
 {
-  border-spacing: 0;
   width: 100%;
 }
 
@@ -28,8 +27,8 @@
 
 .table table tbody tr
 {
-  hover: expression(onmouseover=new Function("this.style.backgroundColor='#dbeac1';"),
-                    onmouseout=new Function("this.style.backgroundColor='#ecf8d7';"));
+  /*hover: expression(onmouseover=new Function("this.style.backgroundColor='#dbeac1';"),
+                    onmouseout=new Function("this.style.backgroundColor='#ecf8d7';"));*/
 }
 
 .table table tbody tr td strong
@@ -52,4 +51,40 @@ div.empty-table p span.caption
   font-family: Garamond, New York, serif;
 }
 
+.renderer table tbody tr td
+{
+  border-bottom: 1px solid #dbeac1;
+  padding-top: 1px;
+  background-image: url(/pub/images/widget/table-border-top.png);
+  background-repeat: repeat-x;
+  background-position: top;
+}
 
+/* IE specific border behavior (no support for border-spacing) */
+.table table
+{
+  border-collapse: collapse;
+}
+
+/* Border behavior for other browsers (can't use border-collapse
+   because of incosistent behavior between Opera, Mozilla, IE, and
+   Safari). Note, comment is necessary to hide from IE7. */
+.table >/**/table
+{
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+/* Safari and WebKit specific caption fix */
+html[xmlns*=""] body:last-child .table table caption
+{
+  width: 100%;
+}
+
+@media all and (min-width: 0px)
+{
+  body:not(:root:root) .table table caption
+  {
+    width: 100%;
+  }
+}

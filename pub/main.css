@@ -51,9 +51,8 @@ a
 
 .renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
 .renderer .empty-navigation, .renderer ul li, .renderer fieldset ul li,
-.renderer table tbody tr td, .renderer table thead tr th,
+.renderer table thead tr th,
 .renderer fieldset div.submit, .renderer div.submit
-
 {
   border-top: 1px solid #fcfef6;
   border-bottom: 1px solid #dbeac1;

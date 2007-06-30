@@ -2,7 +2,6 @@
 TODO:
 -- CURRENT (Port to IE) --
 
-
 -- LARGE FEATURES --
 - Design paging control
 - Allow viewing/editing by clicking on a row/link column in gridedit
