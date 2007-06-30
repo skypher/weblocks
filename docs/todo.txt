@@ -1,6 +1,11 @@
 
 TODO:
 -- CURRENT (Port to IE) --
+- Hover related behaviors stop working on ajax
+- Sort arrow styling is screwed up
+- Isearch doesn't work
+- When adding an item to gridedit, no margin under dataform (in all browsers)
+- Progress bar often doesn't show up
 
 -- LARGE FEATURES --
 - Design paging control

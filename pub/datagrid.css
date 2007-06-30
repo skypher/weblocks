@@ -1,70 +1,65 @@
 
 /* Body */
-.datagrid > form > fieldset
+.datagrid form fieldset
 {
   border: none;
   margin: 0;
   padding: 0;
 }
 
-.datagrid > form
+.datagrid form
 {
   margin: 0;
   padding: 0;
 }
 
-/* Paging */
-span.paging
-{
-  margin-right: 0.5em;
-}
-
 /* Sorting */
-.sort-ascending > span
+.sort-ascending span
 {
   background: url(/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
 }
 
-.sort-ascending > span > a
+.sort-ascending span a
 {
   background: url(/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
 }
 
-.sort-descending > span
+.sort-descending span
 {
   background: url(/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
 }
 
-.sort-descending > span > a
+.sort-descending span a
 {
   background: url(/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
 }
 
 
-.sort-ascending > span > a, .sort-descending > span > a,
-.sort-ascending > span, .sort-descending > span
+.sort-ascending span a, .sort-descending span a,
+.sort-ascending span, .sort-descending span
 {
   display: block;
   text-decoration: underline;
 }
 
 /* Filter */
-.datagrid-search-bar > .extra-top-1, .datagrid-search-bar > .extra-top-2,
-.datagrid-search-bar > .extra-top-3,
-.datagrid-search-bar > .extra-bottom-1, .datagrid-search-bar > .extra-bottom-2,
-.datagrid-search-bar > .extra-bottom-3, .datagrid-search-bar > span.title
+.datagrid-search-bar .extra-top-1, .datagrid-search-bar .extra-top-2,
+.datagrid-search-bar .extra-top-3,
+.datagrid-search-bar .extra-bottom-1, .datagrid-search-bar .extra-bottom-2,
+.datagrid-search-bar .extra-bottom-3, .datagrid-search-bar span.title
 {
   display: none;
 }
 
-.datagrid > .data-mining-bar
+.datagrid .data-mining-bar
 {
   position: relative;
   margin-bottom: 0.25em;
   text-align: right;
+  _height: 0; /* IE specific hasLayout fix */
 }
 
-.datagrid-search-bar > form, .datagrid-search-bar > form > fieldset
+.datagrid-search-bar form, .datagrid-search-bar form fieldset
 {
   display: inline;
   border: none;
@@ -72,25 +67,25 @@ span.paging
   margin: 0;
 }
 
-.datagrid-search-bar > form > fieldset
+.datagrid-search-bar form fieldset
 {
   padding-left: 18px;
   background: url(/pub/images/widget/datagrid/isearch.png) left bottom no-repeat;
   vertical-align: bottom;
 }
 
-.datagrid-search-bar > form > fieldset > input.search-bar
+.datagrid-search-bar form fieldset input.search-bar
 {
   margin: 0;
 }
 
-.datagrid-search-bar > form > fieldset > input.submit
+.datagrid-search-bar form fieldset input.submit
 {
   margin: 0;
   margin-left: 0.5em;
 }
 
-.datagrid-search-bar > span.hidden-items
+.datagrid-search-bar span.hidden-items
 {
   margin: 0;
   padding: 0;
@@ -98,7 +93,7 @@ span.paging
   display: -moz-inline-box;
   display: inline-block;
   vertical-align: bottom;
-  color: grey;
+  color: gray;
   font-size: x-small;
 }
 
@@ -113,14 +108,14 @@ p.datagrid-select-bar
   left: 0;
 }
 
-p.datagrid-select-bar > strong
+p.datagrid-select-bar strong
 {
-  color: grey;
+  color: gray;
   font-family: Garamond, New York, serif;
   font-weight: normal;
 }
 
-.datagrid > form .select
+.datagrid form .select
 {
   text-align: center;
   width: 1em;
@@ -133,7 +128,7 @@ div.item-operations
   margin-bottom: 1em;
 }
 
-div.item-operations > input.submit
+div.item-operations input.submit
 {
   margin-left: 0.5em;
 }
