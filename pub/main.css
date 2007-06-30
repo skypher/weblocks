@@ -5,13 +5,6 @@ body
   font-family: arial, helvetica, sans-serif;
 }
 
-/* IE 6 and below specific behavior to support :hover on all
-   elements. */
-* html
-{
-  behavior:url("/pub/scripts/iecsshover.htc");
-}
-
 a
 {
   color: #A61E2E;

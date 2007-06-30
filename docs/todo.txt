@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (Port to IE) --
-- Hover related behaviors stop working on ajax
 - Isearch doesn't work
 - Progress bar often doesn't show up
 
