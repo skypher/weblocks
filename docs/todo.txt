@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (Port to IE) --
-- Isearch doesn't work
 - Progress bar often doesn't show up
 
 -- LARGE FEATURES --

@@ -68,24 +68,26 @@ search."
 						     search))
 		      ; we also need to clear the selection
 		      (datagrid-clear-selection grid)
-		      (push (format nil "~
-function () { ~
-  updateElementBody($('~A').getElementsByClassName('datagrid-body')[0], ~A); ~
-}"
-				      (attributize-name (widget-name grid))
-				      (encode-json-to-string
-				      (let ((*weblocks-output-stream* (make-string-output-stream)))
-					(declare (special *weblocks-output-stream*))
-					(apply #'render-datagrid-table-body grid (widget-args grid))
-					(get-output-stream-string *weblocks-output-stream*))))
+		      (push (format nil "new Function(~A)"
+				    (encode-json-to-string
+				     (format nil "updateElementBody($('~A').~
+                                                    getElementsByClassName('datagrid-body')[0], ~A);"
+					     (attributize-name (widget-name grid))
+					     (encode-json-to-string
+					      (let ((*weblocks-output-stream* (make-string-output-stream)))
+						(declare (special *weblocks-output-stream*))
+						(apply #'render-datagrid-table-body grid (widget-args grid))
+						(get-output-stream-string *weblocks-output-stream*))))))
 			      *on-ajax-complete-scripts*)
 		      (when (datagrid-show-hidden-entries-count-p grid)
-			(push (format nil "~
-function () { ~
-  updateElementBody($('~A').getElementsByClassName('hidden-items')[0], '~A'); ~
-}"
-				      (attributize-name (widget-name grid))
-				      (hidden-items-message grid))
-			      *on-ajax-complete-scripts*))))
+			(push
+			 (format nil
+				 "new Function(~A)"
+				 (encode-json-to-string
+				  (format nil "updateElementBody($('~A').~
+                                                 getElementsByClassName('hidden-items')[0], '~A');"
+					  (attributize-name (widget-name grid))
+					  (hidden-items-message grid))))
+			 *on-ajax-complete-scripts*))))
 		   :value (datagrid-search grid)
 		   keys)))))

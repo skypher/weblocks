@@ -23,10 +23,12 @@ function onActionSuccess(transport, json) {
 
     // Perform a series of specialized operations
     var onLoadCalls = json['on-load'];
-    onLoadCalls.each(function(item)
-		     {
-			 item.evalJSON().call();
-		     });
+    if(onLoadCalls) {
+	onLoadCalls.each(function(item)
+			 {
+			     item.evalJSON().call();
+			 });
+    }
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
