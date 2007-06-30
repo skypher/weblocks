@@ -1,13 +1,13 @@
 
 /* Body */
-.datagrid form fieldset
+.datagrid form.datagrid-form fieldset
 {
   border: none;
   margin: 0;
   padding: 0;
 }
 
-.datagrid form
+.datagrid form.datagrid-form
 {
   margin: 0;
   padding: 0;

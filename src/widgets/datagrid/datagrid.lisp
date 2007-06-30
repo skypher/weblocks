@@ -192,6 +192,7 @@ defined in 'args'."
                                     return false;"
 			       action
 			       (session-name-string-pair))
+	     :class "datagrid-form"
 	     (:fieldset
 	      (apply #'render-datagrid-table-body obj args)
 	      (when (and (datagrid-allow-item-ops-p obj)
