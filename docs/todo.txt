@@ -3,7 +3,6 @@ TODO:
 -- CURRENT (Port to IE) --
 - Arrow for selected items (convert to palette as well?) broken in IE6
 - Hover broken in IE6
-- Verify isearch (no JS) IE styling
 - Progress bar often doesn't show up
 - Flash
 - Suggest
