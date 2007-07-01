@@ -35,10 +35,10 @@
 	  (when (and (ajax-request-p)
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
-		(push (format nil "function () { new Effect.Pulsate('~A', { pulses: 3, duration: 0.5 } ); }"
+		(push (format nil "new Function(\"new Effect.Pulsate('~A', { pulses: 3, duration: 0.5 } );\")"
 			      (attributize-name (widget-name obj)))
 		      *on-ajax-complete-scripts*)
-		(push (format nil "function () { new Effect.BlindUp('~A'); }"
+		(push (format nil "new Function(\"new Effect.BlindUp('~A');\")"
 			      (attributize-name (widget-name obj)))
 		      *on-ajax-complete-scripts*))))
 	(request-hook :session :post-action))

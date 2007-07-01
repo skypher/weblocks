@@ -1,61 +1,62 @@
 
-.flash > .renderer
+.flash .renderer
 {
+  width: 100%;
   background: #f8e9d8 url(/pub/images/widget/flash/top_background.png) repeat-x;
 }
 
-.flash > .renderer > .extra-top-1
+.flash .renderer .extra-top-1
 {
   background: url(/pub/images/widget/flash/top_left.png) no-repeat top left;
 }
 
-.flash > .renderer >  .extra-top-2
+.flash .renderer .extra-top-2
 {
   background: url(/pub/images/widget/flash/top_right.png) no-repeat top right;
   border-bottom-color: #ead8c2;
 }
 
-.flash > .renderer > ul.messages p
+.flash .renderer ul.messages p
 {
   padding: 0;
   margin: 0;
 }
 
-.flash > .renderer > ul.messages
+.flash .renderer ul.messages
 { 
   border-left-color: #ead8c2;
   border-right-color: #ead8c2;
 }
 
-.flash > .renderer > ul.messages > li
-{
-  height: 16px;
-}
-
-.flash > .renderer > ul.messages > li
+.flash .renderer ul.messages li
 {
   padding-left: 32px;
   min-height: 16px;
-  height: auto;
   border-top-color: #fef9f6;
   border-bottom-color: #ead8c2;
   list-style-image: none;
   background: url(/pub/images/widget/flash/flag.png) no-repeat top left;
 }
 
-.flash > .renderer > .extra-bottom-1
+/* Fake min-height for IE 6 */
+* html .flash .renderer ul.messages li
 {
-  background: url(/pub/images/widget/flash/bottom_background.png) repeat-x bottom;
+  height: 16px;
+}
+
+.flash .renderer .extra-bottom-1
+{
+  background: url(/pub/images/widget/flash/bottom_background.png) repeat-x top;
   border-top-color: #fef9f6; 
 }
 
-.flash > .renderer > .extra-bottom-2
+.flash .renderer .extra-bottom-2
 {
-  background: url(/pub/images/widget/flash/bottom_left.png) no-repeat bottom left;
+  background: url(/pub/images/widget/flash/bottom_left.png) no-repeat top left;
 }
 
-.flash > .renderer > .extra-bottom-3
+.flash .renderer .extra-bottom-3
 {
-  background: url(/pub/images/widget/flash/bottom_right.png) no-repeat bottom right;
+  background: url(/pub/images/widget/flash/bottom_right.png) no-repeat top right;
 }
 
