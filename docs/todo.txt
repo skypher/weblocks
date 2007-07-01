@@ -1,12 +1,10 @@
 
 TODO:
 -- CURRENT (Port to IE) --
-- Arrow for selected items (convert to palette as well?) broken in IE6
-- Hover broken in IE6
-- Progress bar often doesn't show up
 - Flash
-- Suggest
+- Progress bar often doesn't show up
 - Layout
+- Suggest
 
 -- LARGE FEATURES --
 - Design paging control

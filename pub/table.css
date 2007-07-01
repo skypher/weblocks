@@ -2,7 +2,6 @@
 .table
 {
   min-width: 42em;
-  _height: 0; /* IE specific hasLayout fix */
 }
 
 .table table

@@ -14,6 +14,7 @@ a
 {
   background: #ecf8d7 url(/pub/images/widget/top_background.png) repeat-x;
   margin-bottom: 1em;
+  _height: 0; /* IE specific hasLayout fix */
 }
 
 .renderer .extra-top-1
