@@ -56,7 +56,17 @@
   position: relative;
   margin-bottom: 0.25em;
   text-align: right;
-  _height: 0; /* IE specific hasLayout fix */
+}
+
+/* IE specific hasLayout fixes */
+*:first-child+html .datagrid .data-mining-bar
+{
+  height: 1%; 
+}
+
+* html .datagrid .data-mining-bar
+{
+  height: 1%; 
 }
 
 .datagrid-search-bar form, .datagrid-search-bar form fieldset

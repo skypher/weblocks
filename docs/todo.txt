@@ -1,10 +1,7 @@
 
 TODO:
 -- CURRENT (Port to IE) --
-- Flash
-- Progress bar often doesn't show up
 - Layout
-- Suggest
 
 -- LARGE FEATURES --
 - Design paging control

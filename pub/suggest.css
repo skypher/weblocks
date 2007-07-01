@@ -5,13 +5,13 @@ div.suggest
   background-color: #F6FBFD;
 }
 
-div.suggest > ul
+div.suggest ul
 {
   margin: 0;
   padding: 0;
 }
 
-div.suggest > ul > li
+div.suggest ul li
 {
   list-style-type: none;
   margin: 0;
@@ -19,7 +19,7 @@ div.suggest > ul > li
   display: block;
 }
 
-div.suggest > ul > li.selected
+div.suggest ul li.selected
 {
   background-color: #D8EAF8;
 }
