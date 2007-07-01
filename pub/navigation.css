@@ -71,9 +71,12 @@
   background-color: #bfd9ec;
 }
 
-.menu > ul > li.selected-item:hover > span
+/* Make the hover work for IE 6 */
+* html .menu li
 {
-  background: url(/pub/images/widget/menu/selected_arrow.png) no-repeat center left;
+  background-color: expression(
+    this.onmouseover = new Function("this.runtimeStyle.backgroundColor = '#bfd9ec';"),
+    this.onmouseout = new Function("this.runtimeStyle.backgroundColor = '#d8eaf8';"));
 }
 
 .menu a
