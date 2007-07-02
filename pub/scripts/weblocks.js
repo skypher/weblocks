@@ -31,6 +31,10 @@ function onActionSuccess(transport, json) {
     }
 }
 
+function onActionFailure() {
+    alert('Could not complete the request. This probably means your session has timed out. Please refresh the page and try again.');
+}
+
 function getActionUrl(actionCode, sessionString, isPure) {
     var url = '/?' + sessionString + '&action=' + actionCode;
     if(isPure) {
@@ -43,7 +47,8 @@ function initiateAction(actionCode, sessionString) {
     new Ajax.Request(getActionUrl(actionCode, sessionString),
 		     {
 			 method: 'get',
-			 onSuccess: onActionSuccess
+			 onSuccess: onActionSuccess,
+			 onFailure: onActionFailure
 		     });
 }
 
@@ -56,6 +61,7 @@ function initiateFormAction(actionCode, form, sessionString) {
 		     {
 			 method: form.method,
 			 onSuccess: onActionSuccess,
+			 onFailure: onActionFailure,
 			 parameters: serializedForm
 		     });
 }

@@ -1,6 +1,19 @@
 
 (in-package :weblocks-test)
 
+;;; testing get-request-action-name
+(deftest get-request-action-name-1
+    (with-request :get '(("action" . "blah"))
+      (setf (slot-value *request* 'post-parameters) '(("action" . "blah1")))
+      (weblocks::get-request-action-name))
+  "blah")
+
+(deftest get-request-action-name-2
+    (with-request :get nil
+      (setf (slot-value *request* 'post-parameters) '(("action" . "blah")))
+      (weblocks::get-request-action-name))
+  "blah")
+
 ;;; testing make-action
 (deftest make-action/get-request-action-1
     (with-request :get nil

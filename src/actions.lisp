@@ -48,18 +48,23 @@ link."
 				     action-code (session-name-string-pair))
 	  (str name)))))
 
+(defun get-request-action-name ()
+  "Gets the name of the action from the request."
+  (let* ((request-action-name (request-parameter *action-string*))
+	 (get/post-action-name (parameter *action-string*))
+	 (action-name (if request-action-name
+			  request-action-name
+			  get/post-action-name)))
+    action-name))
+
 (defun get-request-action ()
   "Gets an action from the request. If the request contains
 *action-string* parameter, the action is looked up in the session and
 appropriate function is returned. If no action is in the parameter,
 returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
-  (let* ((request-action-name (request-parameter *action-string*))
-	 (get/post-action-name (parameter *action-string*))
-	 (action-name (if request-action-name
-			  request-action-name
-			  get/post-action-name))
-	 request-action)
+  (let ((action-name (get-request-action-name))
+	request-action)
     (when action-name
       (setf request-action (session-value action-name))
       (assert request-action (request-action)

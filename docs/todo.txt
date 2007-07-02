@@ -1,6 +1,7 @@
 
 TODO:
 -- CURRENT () --
+- Flash bug when using friendly URLs
 
 -- LARGE FEATURES --
 - Design paging control
