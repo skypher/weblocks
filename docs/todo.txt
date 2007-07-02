@@ -1,7 +1,12 @@
 
 TODO:
--- CURRENT () --
+-- CURRENT (Release...) --
+- Structure and name (title, menus, add more grids, etc.) demo better
+- Give every session separate instances of data
 - Flash bug when using friendly URLs
+- IE 6 sliding bug when switching to two widgets and clicking on an action
+- Write article
+- Upload to grokthis when account is ready
 
 -- LARGE FEATURES --
 - Design paging control
@@ -21,7 +26,6 @@ TODO:
 -- MINOR FEATURES --
 - Browser compatibility, offer simpe HTML
   version for older browsers
-- Give every session separate instances of data
 - Consider using Yahoo fonts CSS
 - Fix friendly URLs and form actions in w3m
 - Allow adding titles to navigation items and set them as page title, add application title
