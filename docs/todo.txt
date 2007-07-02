@@ -1,10 +1,8 @@
 
 TODO:
 -- CURRENT (Release...) --
-- Structure and name (title, menus, add more grids, etc.) demo better
-- Give every session separate instances of data
 - Flash bug when using friendly URLs
-- IE 6 sliding bug when switching to two widgets and clicking on an action
+- IE 6/7/flash sliding bug when switching to two widgets and clicking on an action
 - Write article
 - Upload to grokthis when account is ready
 

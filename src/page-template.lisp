@@ -10,7 +10,7 @@
   (with-html-output (*weblocks-output-stream* nil :prologue t)
     (:html :xmlns "http://www.w3.org/1999/xhtml"
      (:head
-      (:title "Hello!")
+      (:title "Weblocks - a Common Lisp web framework")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/layout.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/main.css")
       (:link :rel "stylesheet" :type "text/css" :href "/pub/flash.css")
