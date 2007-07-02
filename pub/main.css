@@ -152,3 +152,13 @@ input[type=hidden]
   right: 0;
   top: 0;
 }
+
+/* IE 6 specific progress bar fix */
+* html #ajax-progress
+{
+  position: absolute;
+  left: expression((documentElement.scrollLeft
+                     + (documentElement.clientWidth - this.clientWidth))
+                   + 'px')
+  top: expression(documentElement.scrollTop + 'px');
+}
