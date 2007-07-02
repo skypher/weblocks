@@ -265,6 +265,14 @@
     (not (null (strictly-less-p nil nil)))
   nil)
 
+(deftest strictly-less-p-4
+    (strictly-less-p nil 'a)
+  nil)
+
+(deftest strictly-less-p-5
+    (strictly-less-p 'a nil)
+  t)
+
 ;;; test equivalentp
 (deftest equivalentp-1
     (equivalentp "a" "a")

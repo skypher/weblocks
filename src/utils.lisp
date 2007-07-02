@@ -351,6 +351,12 @@ used by the framework for sorting data."))
 (defmethod strictly-less-p ((a (eql nil)) (b (eql nil)))
   nil)
 
+(defmethod strictly-less-p (a (b (eql nil)))
+  t)
+
+(defmethod strictly-less-p ((a (eql nil)) b)
+  nil)
+
 (defgeneric equivalentp (a b)
   (:documentation
    "Returns true if 'a' is in some sense equivalent to 'b'. This
