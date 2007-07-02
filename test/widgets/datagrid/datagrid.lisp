@@ -77,7 +77,10 @@
   (htm
    (:div :class "data-mining-bar"
 	 #.(searchbar-template "I1" "I2" "I3" "abc123"))
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -105,7 +108,10 @@
 	(render-widget-body grid)))
   (htm
    (:div :class "data-mining-bar" "")
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
    (:div :class "datagrid-body"
 	 #.(table-header-template
@@ -130,7 +136,10 @@
 	 #.(searchbar-template "I1" "I2" "I3" "abc123" :value "doesn't exist"
 						       :hidden-items-text
 						       "(2 items are hidden by the search)"))
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 (:div :class "renderer table empty-table"

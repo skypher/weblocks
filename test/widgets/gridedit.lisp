@@ -87,6 +87,7 @@
     :action ""
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :class "datagrid-form"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
@@ -119,6 +120,7 @@
     :action ""
     :method "get"
     :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :class "datagrid-form"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
@@ -164,6 +166,7 @@
     :action ""
     :method "get"
     :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :class "datagrid-form"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
@@ -214,6 +217,7 @@
     :action ""
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :class "datagrid-form"
     (:fieldset
      (:div :class "datagrid-body"
 	   #.(table-header-template
@@ -249,6 +253,7 @@
     :action ""
     :method "get"
     :onsubmit "initiateFormAction(\"abc128\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+    :class "datagrid-form"
     (:fieldset
      (:div :class "datagrid-body"
 	   (:div :class "renderer table empty-table"

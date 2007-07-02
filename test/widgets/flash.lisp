@@ -75,7 +75,7 @@ widget."
 	(render-widget-body w)
 	(evaluate-flash-hooks)
 	*on-ajax-complete-scripts*))
-  ("function () { new Effect.BlindUp('widget-123'); }"))
+  ("new Function(\"new Effect.BlindUp('widget-123');\")"))
 
 ;; After refresh, state shouldn't be reset
 (deftest render-widget-body-flash-5

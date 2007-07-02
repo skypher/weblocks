@@ -114,7 +114,10 @@
       ", "
       (:a :href "?action=abc125"
 	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -144,7 +147,10 @@
       ", "
       (:a :href "?action=abc131"
 	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -174,7 +180,10 @@
       ", "
       (:a :href "?action=abc137"
 	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:form :action "" :method "get" :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+   (:form :action ""
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :class "datagrid-form"
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
