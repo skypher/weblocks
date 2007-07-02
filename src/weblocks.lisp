@@ -52,3 +52,6 @@ having to worry about special characters in JavaScript code."
 
 (defun server-version ()
   hunchentoot::*hunchentoot-version*)
+
+;;; This turns off a regex optimization that eats A LOT of memory
+(setq cl-ppcre:*use-bmh-matchers* nil)

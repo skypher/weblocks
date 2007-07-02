@@ -1,7 +1,6 @@
 
 TODO:
 -- CURRENT (Release...) --
-- Work out ppcre memory issues
 - Write article
 - Upload to grokthis when account is ready
 
