@@ -38,11 +38,6 @@ form.renderer fieldset div.submit input.submit
   margin-right: 0.5em;
 }
 
-span.validation-error-heading
-{
-  display: none;
-}
-
 p.validation-error
 {
   color: red;
@@ -50,3 +45,9 @@ p.validation-error
   margin-top: 0;
   margin-bottom: 0;
 }
+
+p.validation-error span.validation-error-heading
+{
+  display: none;
+}
+
