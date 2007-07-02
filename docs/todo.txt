@@ -1,7 +1,6 @@
 
 TODO:
--- CURRENT (Port to IE) --
-- Layout
+-- CURRENT () --
 
 -- LARGE FEATURES --
 - Design paging control
@@ -20,7 +19,7 @@ TODO:
 
 -- MINOR FEATURES --
 - Mark required fields
-- Port stylesheets to IE, browser compatibility, offer simpe HTML
+- Browser compatibility, offer simpe HTML
   version for older browsers
 - Give every session separate instances of data
 - Consider using Yahoo fonts CSS

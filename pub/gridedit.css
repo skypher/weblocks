@@ -3,6 +3,7 @@
 div.gridedit .flash
 {
   position: relative;
+  _height: 1%; /* hasLayout IE 6 fix */
 }
 
 div.gridedit .flash .renderer .extra-top-1
