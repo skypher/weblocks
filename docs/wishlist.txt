@@ -22,4 +22,5 @@
 - (Use widget names?) to show headings to improve accessibility. Concentrate on heading structure.
 - slots that are collections (links to data grid popups, inline, dropdowns, radio buttons, etc.)
 - non-inline CLOS objects in forms
+- Refactor, better document and unit test 'handle-client-request'
 

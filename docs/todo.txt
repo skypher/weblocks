@@ -1,8 +1,7 @@
 
 TODO:
 -- CURRENT (Release...) --
-- Flash bug when using friendly URLs
-- IE 6/7/flash sliding bug when switching to two widgets and clicking on an action
+- Work out ppcre memory issues
 - Write article
 - Upload to grokthis when account is ready
 

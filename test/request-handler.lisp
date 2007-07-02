@@ -379,3 +379,16 @@ null:\"<p>test</p>\"~
       (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
       (refresh-request-p))
   nil)
+
+;;; test initial-request-p
+(deftest initial-request-p-1
+    (with-request :get nil
+      (initial-request-p))
+  nil)
+
+(deftest initial-request-p-2
+    (with-request :get nil
+      (setf (session-value 'last-request-uri) :none)
+      (initial-request-p))
+  nil)
+

@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(*on-ajax-complete-scripts* *uri-tokens* refresh-request-p))
+(export '(*on-ajax-complete-scripts* *uri-tokens* refresh-request-p
+	  initial-request-p))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -41,6 +42,7 @@ and :after specifiers to customize behavior)."))
     (when (get-request-action-name)
       (error "Cannot invoke action ~A. The session has timed out." (get-request-action-name)))
     (start-session)
+    (setf (session-value 'last-request-uri) :none)
     (redirect (request-uri)))
   (let ((*request-hook* (make-instance 'request-hooks)))
     (declare (special *request-hook*))
@@ -76,7 +78,8 @@ and :after specifiers to customize behavior)."))
 	    (with-page (lambda ()
 			 (render-widget (session-value 'root-composite))))))
       (eval-hook :post-render)
-      (setf (session-value 'last-request-uri) *uri-tokens*)
+      (unless (ajax-request-p)
+	(setf (session-value 'last-request-uri) *uri-tokens*))
       (get-output-stream-string *weblocks-output-stream*))))
 
 (defun eval-action ()
@@ -173,3 +176,7 @@ if there is an action involved (even if the user hits refresh)."
   (and
    (null (get-request-action))
    (equalp *uri-tokens* (session-value 'last-request-uri))))
+
+(defun initial-request-p ()
+  "Returns true if the request is the first request for the session."
+  (equalp (session-value 'last-request-uri) :none))
