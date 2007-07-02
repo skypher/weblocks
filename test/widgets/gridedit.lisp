@@ -10,9 +10,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label (:span "Name:&nbsp;") (:input :type "text" :name "name")))
+	      (:label
+	       (:span :class "slot-name"
+		      (:span :class "extra" "Name:&nbsp;"
+			     (:em :class "required-slot" "(required)&nbsp;")))
+	       (:input :type "text" :name "name")))
 	     (:li :class "manager"
-	      (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	      (:label
+	       (:span :class "slot-name"
+		      (:span :class "extra" "Manager:&nbsp;"))
+	       (:input :type "text" :name "manager" :value "Jim"))))
 	   :method "post"
 	   :title-action "Adding:&nbsp;")))
 
@@ -138,9 +145,16 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name")))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"
 	    :title-action "Adding:&nbsp;"))
    ;; "Submit" clicked

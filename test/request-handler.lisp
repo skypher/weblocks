@@ -65,11 +65,14 @@
 <span class='object'>Employee</span>~
 </h1>~
 <h2 class='form-fields-title'>Form fields:</h2>~
-<ul><li class='name'><label><span>Name:&nbsp;</span>~
+<ul><li class='name'><label>~
+<span class='slot-name'><span class='extra'>Name:&nbsp;~
+<em class='required-slot'>(required)&nbsp;</em></span></span>~
 <input type='text' name='name' value='Joe' />~
 </label>~
 </li>~
-<li class='manager'><label><span>Manager:&nbsp;</span>~
+<li class='manager'><label>~
+<span class='slot-name'><span class='extra'>Manager:&nbsp;</span></span>~
 <input type='text' name='manager' value='Jim' />~
 </label>~
 </li>~

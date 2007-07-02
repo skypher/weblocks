@@ -95,21 +95,21 @@ a
 
 .renderer div.submit, .form fieldset div.submit
 {
-  padding-left: 11.5em;
+  padding-left: 13.5em;
 }
 
-.renderer ul li .label, .renderer fieldset ul li label span,
+.renderer ul li .label, .renderer fieldset ul li label span.slot-name,
 .table table thead
 {
   color: #808080;
   font-weight: bold;
 }
 
-.renderer ul li .label, .renderer fieldset ul li label span
+.renderer ul li .label, .renderer fieldset ul li label span.slot-name
 {
   display: -moz-inline-box;
   display: inline-block;
-  width: 10em;
+  width: 12em;
 }
 
 .renderer .extra-bottom-1

@@ -15,9 +15,15 @@
 
 (defun slot-value-required-p (class-name slot)
   "Returns true if 'slot' is declared to have an existance validator,
-nil otherwise. See 'decl-validate' for more detauls."
+nil otherwise. See 'decl-validate' for more detauls.
+
+'class-name' - the name of the class that contains the slot.
+'slot' - either a slot definition or a slot name."
   (find :required
-	(slot-validators class-name (slot-definition-name slot))))
+	(slot-validators class-name
+			 (slot-definition-name (if (symbolp slot)
+						   (get-slot-definition class-name slot)
+						   slot)))))
 
 (defun validate-slot-from-request (obj slot parsed-request-slot-value)
   "Call all validators recorded on the symbol that names the slot. If

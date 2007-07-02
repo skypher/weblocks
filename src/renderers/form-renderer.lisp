@@ -107,14 +107,18 @@ case the user clicks submit."))
 				   (when validation-error " item-not-validated"))))
     (with-html
       (:li :class field-class
-       (:label
-	(:span (str (humanize-name human-name)) ":&nbsp;")
-	(apply #'render-form slot-value keys)
-	(when validation-error
-	  (htm (:p :class "validation-error"
-		   (:em
-		    (:span :class "validation-error-heading" "Error:&nbsp;")
-		    (str (format nil "~A" (cdr validation-error))))))))))))
+	   (:label
+	     (:span :class "slot-name"
+		    (:span :class "extra"
+		     (str (humanize-name human-name)) ":&nbsp;"
+		     (when (slot-value-required-p (class-name (class-of obj)) slot-name)
+		       (htm (:em :class "required-slot" "(required)&nbsp;")))))
+	    (apply #'render-form slot-value keys)
+	    (when validation-error
+	      (htm (:p :class "validation-error"
+		       (:em
+			(:span :class "validation-error-heading" "Error:&nbsp;")
+			(str (format nil "~A" (cdr validation-error))))))))))))
 
 (defgeneric render-form (obj &rest keys &key inlinep name validation-errors
 			     intermediate-fields &allow-other-keys)

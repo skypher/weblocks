@@ -19,7 +19,6 @@ TODO:
 - Consider redoing flash widget with modal style in mind (widget specific modality?)
 
 -- MINOR FEATURES --
-- Mark required fields
 - Browser compatibility, offer simpe HTML
   version for older browsers
 - Give every session separate instances of data

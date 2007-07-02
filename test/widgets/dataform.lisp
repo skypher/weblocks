@@ -36,9 +36,16 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe")))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; change name to Bob and click cancel
    (:div :class "widget dataform" :id "widget-123"
@@ -52,9 +59,16 @@
 	 #.(form-header-template
 	    "abc126"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe")))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; change name to Bob and click submit
    (:div :class "widget dataform" :id "widget-123"
@@ -98,21 +112,34 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe")))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    ;; manager changed to Bill and name to changed error, submit clicked
    (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name item-not-validated"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "")
+	       (:label (:span :class "slot-name"
+			      (:span :class "extra" "Name:&nbsp;"
+				     (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
 			 "Name is a required field."))))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Bill"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Bill"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
@@ -160,24 +187,46 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-	      (:li :class "age" (:label (:span "Age:&nbsp;")
-				 (:input :type "text" :name "age" :value "30")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe")))
+	      (:li :class "age"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Age:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "age" :value "30")))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"))
    (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name"
-	       (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe")))
 	      (:li :class "age item-not-validated"
-	       (:label (:span "Age:&nbsp;") (:input :type "text" :name "age" :value "bad")
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Age:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "age" :value "bad")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
 			 "Age must be an integer."))))
 	      (:li :class "manager"
-	       (:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")

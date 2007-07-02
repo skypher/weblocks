@@ -55,25 +55,34 @@
 
 ;;; test render-form-slot
 (deftest-html render-form-slot-1
-    (render-form-slot *joe* 'first-name "Joe" :slot-path '(first-name))
-  (:li :class "first-name" (:label
-	(:span "First Name:&nbsp;")
-	(:input :type "text" :name "first-name" :value "Joe"))))
+    (render-form-slot *joe* 'name "Joe" :slot-path '(name))
+  (:li :class "name"
+       (:label
+	(:span :class "slot-name"
+	       (:span :class "extra" "Name:&nbsp;"
+		      (:em :class "required-slot" "(required)&nbsp;")))
+	(:input :type "text" :name "name" :value "Joe"))))
 
 (deftest-html render-form-slot-2
     (render-form-slot *joe* 'address-ref *home-address* :slot-path '(address-ref))
-  (:li :class "address-ref" (:label
-	(:span "Address:&nbsp;")
-	(:input :type "text" :name "address-ref" :value "Address"))))
+  (:li :class "address-ref"
+       (:label
+	(:span :class "slot-name"
+	       (:span :class "extra" "Address:&nbsp;"))
+	       (:input :type "text" :name "address-ref" :value "Address"))))
 
 (deftest-html render-form-slot-3
     (render-form-slot *joe* 'education *some-college*)
   (htm
-   (:li :class "university" (:label
-	 (:span "University:&nbsp;")
+   (:li :class "university"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "University:&nbsp;"))
 	 (:input :type "text" :name "university" :value "Bene Gesserit University")))
-   (:li :class "graduation-year" (:label
-	 (:span "Graduation Year:&nbsp;")
+   (:li :class "graduation-year"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Graduation Year:&nbsp;"))
 	 (:input :type "text" :name "graduation-year" :value "2000")))))
 
 ;;; test render-form
@@ -85,19 +94,38 @@
     (with-request :get nil
       (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
-     '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+     '((:li :class "name"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-3
     (with-request :post nil
       (render-form *joe* :slots '(address-ref)))
   #.(form-header-template nil
-     '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+     '((:li :class "name"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe")))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Address:&nbsp;"))
+	 (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-4
     (with-request :post nil
@@ -110,13 +138,27 @@
 				     (:div "test2")))
 		   :action "abc123"))
   #.(form-header-template "abc123"
-     '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
-       (:li :class "university" (:label (:span "University:&nbsp;")
-	     (:input :type "text" :name "university" :value "Bene Gesserit University")))
-       (:li :class "graduation-year" (:label (:span "Graduation Year:&nbsp;")
+     '((:li :class "name"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe")))
+       (:li :class "university"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "University:&nbsp;"))
+	 (:input :type "text" :name "university" :value "Bene Gesserit University")))
+       (:li :class "graduation-year"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Graduation Year:&nbsp;"))
 	     (:input :type "text" :name "graduation-year" :value "2000")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
 
@@ -124,32 +166,60 @@
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
   #.(form-header-template nil
-     '((:li :class "name" (:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Bill")))
+     '((:li :class "name"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Bill")))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Address:&nbsp;"))
+	 (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-6
     (with-request :post nil
       (render-form *joe* :slots '((name . nickname))))
   #.(form-header-template nil
-     '((:li :class "name" (:label (:span "Nickname:&nbsp;") (:input :type "text" :name "name" :value "Joe")))
+     '((:li :class "name"
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Nickname:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))))
 
 (deftest-html render-form-7
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
   #.(form-header-template nil
      '((:li :class "name item-not-validated"
-	(:label (:span "Name:&nbsp;") (:input :type "text" :name "name" :value "Joe")
+	(:label (:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe")
 	 (:p :class "validation-error"
 	     (:em (:span :class "validation-error-heading" "Error:&nbsp;") "Some error."))))
        (:li :class "address-ref"
-	(:label (:span "Address:&nbsp;") (:input :type "text" :name "address-ref" :value "Address")))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Address:&nbsp;"))
+	 (:input :type "text" :name "address-ref" :value "Address")))
        (:li :class "manager"
-	(:label (:span "Manager:&nbsp;") (:input :type "text" :name "manager" :value "Jim"))))
+	(:label
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim"))))
      :preslots '((:div :class "validation-errors-summary"
 		  (:h2 :class "error-count" "There is 1 validation error:")
 		  (:ul (:li "Some error."))))))

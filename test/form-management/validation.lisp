@@ -15,6 +15,10 @@
     (weblocks::slot-value-required-p 'employee (get-slot-definition 'employee 'name))
   :required)
 
+(deftest slot-value-required-p-4
+    (weblocks::slot-value-required-p 'employee 'age)
+  :required)
+
 ;;; validate-slot-from-request
 (deftest validate-slot-from-request-1
     (multiple-value-bind (success error)

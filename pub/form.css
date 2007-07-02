@@ -1,7 +1,7 @@
 
 .form
 {
-  width: 25em;
+  width: 27em;
   margin-top: 0;
 }
 
@@ -20,6 +20,15 @@
 .form fieldset .form-fields-title
 {
   display: none;
+}
+
+form.renderer fieldset ul li label em.required-slot
+{
+  font-weight: normal;
+  display: inline;
+  font-size: x-small;
+  font-style: normal;
+  color: red;
 }
 
 form.renderer fieldset ul li label input,
