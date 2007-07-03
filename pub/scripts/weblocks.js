@@ -18,7 +18,10 @@ function onActionSuccess(transport, json) {
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {
-	updateElementBody($(i), dirtyWidgets[i]);
+	var widget = $(i);
+	if(widget) {
+	    updateElementBody(widget, dirtyWidgets[i]);
+	}
     }
 
     // Perform a series of specialized operations
