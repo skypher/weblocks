@@ -13,7 +13,7 @@
   rendered. Normally set to true when weblocks is started in debug
   mode.")
 
-(defun start-weblocks (&key debug)
+(defun start-weblocks (&key debug (port 8080))
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to
 the client."
@@ -25,7 +25,7 @@ the client."
     (setf *show-lisp-backtraces-p* t))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
-    (setf *weblocks-server* (start-server :port 8080))))
+    (setf *weblocks-server* (start-server :port port))))
 
 (defun stop-weblocks ()
   "Stops weblocks."
