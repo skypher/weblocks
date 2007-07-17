@@ -121,7 +121,7 @@
 (defmethod datagrid-data ((grid-obj datagrid))
   (with-slots (data) grid-obj
     (etypecase data
-      (function (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj)))
+      ((or function symbol) (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj)))
       (sequence 
        (datagrid-sort-data grid-obj
 			   (datagrid-filter-data grid-obj data))))))
@@ -133,11 +133,11 @@ true, 'datagrid-data-count' returns the the total number of items and
 ignores searching parameters."
   (with-slots (data) grid
     (etypecase data
-      (function (funcall data
-			 (when (not totalp)
-			   (datagrid-search grid))
-			 nil
-			 :countp t))
+      ((or function symbol) (funcall data
+				     (when (not totalp)
+				       (datagrid-search grid))
+				     nil
+				     :countp t))
       (sequence 
        (if totalp
 	   (length data)
