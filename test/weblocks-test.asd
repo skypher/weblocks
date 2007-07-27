@@ -9,7 +9,7 @@
   :version "0.0.1"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
-  :licence "GPL"
+  :licence "LLGPL"
   :description "A test harness for weblocks framework."
   :depends-on ("weblocks" "rt" "closer-mop" "metatilities")
   :components ((:file "weblocks-test")

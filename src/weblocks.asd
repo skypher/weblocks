@@ -9,7 +9,7 @@
   :version "0.0.1"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
-  :licence "GPL"
+  :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri")
   :components ((:file "weblocks")

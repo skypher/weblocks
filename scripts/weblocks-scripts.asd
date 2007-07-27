@@ -9,7 +9,7 @@
   :version "0.0.1"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
-  :licence "GPL"
+  :licence "LLGPL"
   :description "A set of scripts for weblocks framework."
   :depends-on ("weblocks" "weblocks-test" "tinaa")
   :components ((:file "weblocks-scripts")
