@@ -89,7 +89,7 @@
 	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
 	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "")
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :action ""
     :method "get"
@@ -122,7 +122,7 @@
 	     (:a :href "?action=abc128" :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
 	     (:a :href "?action=abc129" :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "")
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :action ""
     :method "get"
@@ -226,7 +226,7 @@
 	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
 	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "")
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :action ""
     :method "get"

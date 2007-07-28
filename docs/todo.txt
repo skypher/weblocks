@@ -1,8 +1,6 @@
 
 TODO:
--- CURRENT (Release...) --
-- Write article
-- Upload to grokthis when account is ready
+-- CURRENT () --
 
 -- LARGE FEATURES --
 - Design paging control

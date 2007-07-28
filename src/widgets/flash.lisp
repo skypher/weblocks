@@ -50,6 +50,25 @@
 	    (setf (flash-old-messages obj) nil)))
 	(request-hook :session :post-render)))
 
+(defun flash-messages-to-show (flash)
+  "Returns a list of messages that need to be shown or nil if there is
+nothing to show. This functions takes into consideration any stale
+messages that need to be shown for AJAX effects."
+  (or (flash-messages flash)
+      (and (ajax-request-p)
+	   (flash-old-messages flash))))
+
+;;; Specialize with-widget-header to display a comment if there are no
+;;; messages. We need this fix for IE6.
+(defmethod with-widget-header ((obj flash) body-fn &rest args)
+  (if (flash-messages-to-show obj)
+      (call-next-method)
+      (apply #'call-next-method
+	     obj body-fn
+	     :prewidget-body-fn (lambda (&rest args)
+				  (format *weblocks-output-stream* "<!-- empty flash -->"))
+	     args)))
+
 (defun flash-message (flash msg)
   "Add a 'msg' to a list of messages to show on this request in the
 'flash' object."
@@ -58,9 +77,7 @@
 
 (defmethod render-widget-body ((obj flash) &rest args)
   (declare (special *on-ajax-complete-scripts* *dirty-widgets*))
-  (let ((messages (or (flash-messages obj)
-		      (and (ajax-request-p)
-			   (flash-old-messages obj)))))
+  (let ((messages (flash-messages-to-show obj)))
     (when messages
       (with-html
 	(:div :class "renderer"

@@ -91,6 +91,43 @@ widget."
 	(flash-messages w)))
   ("Test" "Test2"))
 
+;; test flash-messages-to-show
+(deftest flash-messages-to-show-1
+    (with-request :get nil
+      (let ((w (make-instance 'flash)))
+	(flash-message w "Hello World!")
+	(flash-message w "Foo")
+	(weblocks::flash-messages-to-show w)))
+  ("Hello World!" "Foo"))
+
+(deftest flash-messages-to-show-2
+    (with-request :get nil
+      (let ((w (make-instance 'flash)))
+	(flash-message w "Hello World!")
+	(flash-message w "Foo")
+	(evaluate-flash-hooks)
+	(weblocks::flash-messages-to-show w)))
+  nil)
+
+(deftest flash-messages-to-show-3
+    (with-request :get nil
+      (let ((w (make-instance 'flash)))
+	(flash-message w "Hello World!")
+	(flash-message w "Foo")
+	(funcall (car (request-hook :session :pre-action)))
+	(funcall (car (request-hook :session :post-action)))
+	(make-request-ajax)
+	(weblocks::flash-messages-to-show w)))
+  ("Hello World!" "Foo"))
+
+;; test with-widget-header for flash
+(deftest-html with-widget-header-empty-flash-1
+    (with-request :get nil
+      (let ((w (make-instance 'flash)))
+	(with-widget-header w (lambda (&rest args) nil))))
+  (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->"))
+
+;; test flash-message
 (deftest flash-message-1
     (with-request :post nil
       (let ((w (make-instance 'flash)))
