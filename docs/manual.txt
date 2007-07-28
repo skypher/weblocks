@@ -1,0 +1,237 @@
+
+-- Introduction --
+There is nothing special about Weblocks. It is merely one possible
+logical solution to a subset of problems faced in web application
+development. To get familiar with Weblocks and its approach let's
+start with breaking the ice.
+
+-- Breaking the Ice --
+Once Weblocks has been installed it can be loaded into the Lisp image
+like this:
+
+> (asdf:operate 'asdf:load-op 'weblocks)
+
+We can then start the webserver (Weblocks uses Hunchentoot) and the
+framework on the default port (8080) like this:
+
+> (weblocks:start-weblocks)
+
+If we point the web browser to http://localhost:8080/ we'll get Error
+500 - an Internal Server Error[1]. We now know the web server is
+running, but what's wrong?
+
+When weblocks starts up it sets up a hook that processes all client
+requests. The hook looks for two things - a web application
+definition, and a callback function named 'init-user-session' that
+initializes the application every time a new session is created
+(sessions are managed by Weblocks automatically). Let's satisfy these
+requirements:
+
+> (weblocks:defwebapp 'our-application)
+> (defun init-user-session (comp)
+    (setf (weblocks:composite-widgets comp)
+          (list "Hello!")))
+
+Refresh the browser. If all went well you should see the word
+"Hello!" printed on the screen.
+
+What did we do? We told Weblocks that our application is named
+'our-application'. Weblocks will look for 'init-user-session' in the
+same package where the symbol 'our-application' is interned. Before we
+can figure out how 'init-user-session' works we need to explain the
+concept of 'widgets' - this will be done in the next section.
+
+-- Widgets --
+Weblocks applications are not organized into pages. They're organized
+into "widgets". A widget can potentially be anything that's rendered
+to the browser. Widgets can be very simple or very complex.
+
+Weblocks defines a generic function 'render-widget-body' along with a
+number of methods that accept different objects. Any object that can
+be passed to 'render-widget-body' can be called a widget. New widgets
+can be created by adding methods to this generic function.
+
+There is a method added to 'render-widget-body' that accepts a vector
+of characters. That means the simplest possible widget is a string:
+
+> (weblocks:render-widget-body "Hello World!")
+
+When 'render-widget-body' is called on a string, the string is simply
+outputted as an HTML paragraph.
+
+Functions can also be treated as widgets. When 'render-widget-body' is
+called with a function an appropriate method is invoked that simply
+calls the function:
+
+> (weblocks:render-widget-body (lambda (&rest args)
+                                 (with-html
+			           (:p "test"))))
+
+The macro 'with-html' is a wrapper that weblocks provides for CL-WHO
+macro 'with-html-output'. For each client request Weblocks sets up a
+stream available via a special variable *weblocks-output-stream*. By
+writing to this stream the application can send HTML to the
+client. However, using 'with-html' is preferred - it automatically
+redirects output to *weblocks-output-stream* and takes full advantage
+of CL-WHO which alleviates the need to format HTML strings or to use
+template engines[2].
+
+One of the widgets that Weblocks defines is a 'composite' widget. A
+composite is a CLOS object that contains a list of other widgets. A
+composite provides a simple and convinient way to group
+widgets. Rendering a composite renders each widget in the list, one by
+one:
+
+> (setf my-composite
+        (make-instance 'weblocks:composite
+                       :widgets (list "a" "b")))
+> (weblocks:render-widget-body my-composite)
+
+In this case two paragraphs will be rendered. The first one will say
+"a" and the second one will say "b". Composites can be recursive -
+they can contain other composites.
+
+Most widgets defined by Weblocks are CLOS objects. The fact that
+strings and functions are widgets are an exception made for
+convinience, rather than the rule. The base class for widgets is
+'widget'. It contains a number of slots that are common to all
+widgets. One of these slots is 'name'. If the name of the widget isn't
+given during the instatiation, a unique name is generated
+automatically.
+
+Widgets map to HTML really well. The way widgets are normally rendered
+is via a function 'render-widget', not via 'render-widget-body'. The
+function 'render-widget' wraps the widget body in a 'div' element. The
+id of the div is set to the widget name and the classes of the div are
+set to the CLOS hierarchy class names. For example, the header for the
+composite widget will be rendered something like this:
+
+<div id="g2345" class="widget composite"> ... </div>
+
+This works very well for CSS styling too.
+
+Widgets that don't derive from CLOS class 'widget' like strings and
+functions are handled in a similar manner, except they lack the "id"
+attribute.
+
+-- The magic behind 'init-user-session' --
+We're now ready to understand how 'init-user-session' works.
+
+When weblocks sees an HTTP request that does not yet have a session
+associated with it, a session is created. A new composite widget is
+instantiated and is associated with this session. This composite
+widget is called a 'root' - all other widgets of the application will
+be stored in it.
+
+The root composite is then passed to 'init-user-session'. It's up to
+'init-user-session' to add other widgets to the root composite. When
+it's time for Weblocks to render HTML to the client it simply calls
+'render-widget' on the root composite, which ends up rendering all
+widgets that were added to the root in 'init-user-session'.
+
+Recall our 'init-user-session' code:
+
+(defun init-user-session (comp)
+  (setf (weblocks:composite-widgets comp)
+        (list "Hello!")))
+
+The argument 'comp' is the root composite that Weblocks will pass to
+'init-user-session'. The accessor 'composite-widgets' gives access to
+the slot of the root composite that contains a list of widgets. We
+simply set the slot to a new list of one element - a string
+"Hello!". We can get away with this because strings are also widgets.
+
+We can add other widgets to this list, including other strings,
+functions, composites, etc[3].
+
+-- Renderers --
+A major criticism of the above approach is that it steers away from
+the MVC model since HTML (or the CL-WHO alternative) is mixed with the
+code. This does not have to be true. In principle, nothing stops you
+from writing widgets that invoke a template engine. However, Weblocks
+does not take this path.
+
+Weblocks treats HTML as a serialization format. Weblocks' philosophy
+is that neither the programmer nor the designer should have to write
+HTML - most of the time HTML should be generated automatically. The
+programmer's job is to define the data structures, the high level UI
+components, and the business logic. The designer's job is to create
+appropriate stylesheets. The actual HTML markup generation is the job
+of the framework.
+
+In practice this isn't always possible because of CSS quirks and
+limitations, but Weblocks tries to stay true to this approach whenever
+the current state of W3C affairs permits. In order to make this
+possible Weblocks defines a set of 'renderers' - pieces of code that
+serialize data structures to different types of HTML.
+
+Let's illustrate this approach by defining a data structure for a
+person:
+
+> (defclass person ()
+    ((id :initform (gensym))
+     (first-name :accessor first-name
+   	         :initarg :first-name
+	         :initform nil)
+     (last-name :accessor last-name
+   	        :initarg :last-name
+	        :initform nil)
+     (age :accessor age
+          :initarg :age
+	  :initform nil)))
+
+> (setf joe (make-instance 'person
+                           :first-name "Joe"
+	                   :last-name "Average"
+			   :age 31))
+
+Normally, to render information about the person to the screen we'd
+create a number of templates that we'd use throughout the
+application. We would probably create a template for rendering the
+data, a template for rendering the form, and perhaps a template for
+rendering a table of people. This wouldn't be too difficult except we
+have to do this again and again for every new data structure we come
+up with. We end up generating nearly the same HTML manually - all
+that's changing is a list of fields. Weblocks automates this work:
+
+> (weblocks:render-data joe)
+> (weblocks:render-table (list joe))
+
+The first line renders our data structure into a simple list of
+fields. The second line renders a table of one row. In similar manner
+weblocks provides a renderer for serializing data structures into
+forms. Other renderers can be added if the need arises.
+
+Renderers try to respect the rules of the language. For example, if a
+slot has no accessor by default this slot will be omitted from rendering.
+
+Renderers can be controlled to easily rename, rearrange, hide/show,
+and custom render slots[4]. Most widgets that deal with rendering data
+structures (dataform widget, grid widget, etc.) use renderers to
+render data. Weblocks tries to provide renderers that satisfy commonly
+used customization cases. The programmer should resort to custom HTML
+only in rare special cases when there is no way to configure the
+renderer to generate sufficient HTML.
+
+-- Actions --
+Everything we've discussed above has been about rendering data to the
+client. So far we haven't discussed interactivity - the user's ability
+to change the state of the UI and to modify the data.
+
+
+
+-- Troubleshooting --
+
+[1] This is not very user friendly. The default application should
+provide basic information on how to get started.
+
+[2] Many people argue that template engines are a good thing since
+they enforce MVC. Weblocks takes a different approach by using
+'renderers' - pieces of code that generically serialize data
+structures into different types of HTML.
+
+[3] Be sure to reset the session or redefining 'init-user-session'
+will have no effect. You can do this by restarting the browser or by
+calling 'weblocks::reset-sessions'.
+
+[4] See reference documentation for more details.
