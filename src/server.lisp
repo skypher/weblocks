@@ -1,8 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(start-weblocks stop-weblocks defwebapp ajax-request-p
-	  pure-request-p))
+(export '(start-weblocks stop-weblocks compute-public-files-path
+	  *public-files-path* defwebapp ajax-request-p pure-request-p))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -35,13 +35,27 @@ the client."
 	(stop-server *weblocks-server*)
 	(setf *weblocks-server* nil))))
 
-(defparameter *stylesheet-directory*
-  (if (equal (machine-type) "Power Macintosh")
-	     "/Users/coffeemug/projects/cl-weblocks/pub/"
-	     "/home/coffeemug/projects/cl-weblocks/pub/"))
+(defun compute-public-files-path (asdf-system-name)
+  "Computes the directory of public files. The function uses the
+following protocol: it finds the '.asd' file of the system specified
+by 'asdf-system-name', goes up one directory, and goes into 'pub'."
+  (merge-pathnames
+   (make-pathname :directory '(:relative :up "pub"))
+   (make-pathname :directory
+		  (pathname-directory (asdf:system-definition-pathname
+				       (asdf:find-system asdf-system-name))))))
+
+(defparameter *public-files-path*
+  (compute-public-files-path :weblocks)
+  "Must be set to a directory on the filesystem that contains public
+files that should be available via the webserver (images, stylesheets,
+javascript files, etc.) Modify this directory to set the location of
+your files. Points to the weblocks' 'pub' directory by default.")
 
 (setf *dispatch-table*
-      (append (list (create-folder-dispatcher-and-handler "/pub/" *stylesheet-directory*)
+      (append (list (lambda (request)
+		      (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
+			       request))
 		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))
 
