@@ -74,6 +74,8 @@
 			:components ((:file "us-states"))
 			:depends-on (renderers blocks))
 	       (:file "server"
-		      :depends-on (weblocks))))
+		      :depends-on ("weblocks"))
+	       (:file "default-app"
+		      :depends-on ("server" "weblocks" "utils" "request-handler"))))
 
 

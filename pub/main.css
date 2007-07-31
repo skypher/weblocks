@@ -45,7 +45,7 @@ a
   padding-left: 0.4em;
 }
 
-.renderer h1, .renderer fieldset h1, .table table caption
+#root h1
 {
   font-size: large;
 }
@@ -67,8 +67,7 @@ a
   border-right: 2px solid #dbeac1;
 }
 
-.renderer h1, .renderer fieldset h1, .table table caption,
-.empty-table p span.caption
+#root h1
 {
   color: #29364F;
   font-weight: bold;
