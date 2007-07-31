@@ -75,7 +75,7 @@
 			:depends-on (renderers blocks))
 	       (:file "server"
 		      :depends-on ("weblocks"))
-	       (:file "default-app"
+	       (:file "default-application"
 		      :depends-on ("server" "weblocks" "utils" "request-handler"))))
 
 
