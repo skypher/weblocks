@@ -23,15 +23,17 @@
    (data :accessor datagrid-data
 	 :initform nil
 	 :initarg :data
-	 :documentation "Either a sequence of data objects that will
-	 be rendered and modified by this widget, or a function that
-	 accepts searching, sorting, and paging parameters. If this
-	 slot is bound to a sequence, datagrid will do the paging and
-	 sorting itself in memory destructively. If the slot is bound
-	 to a function, the function is expected to return a properly
-	 sorted and paged sequence. The function should also accept
-	 a :countp keyword argument. If true, the function should
-	 return only the number of items with the given search
+	 :documentation "Either a sequence of data objects that
+	 will be rendered and modified by this widget, or a
+	 function designator that accepts searching, sorting, and
+	 paging parameters. If this slot is bound to a sequence,
+	 datagrid will do the paging and sorting itself in memory
+	 destructively. If the slot is bound to a function (or a
+	 symbol that designates a function), the function is
+	 expected to return a properly sorted and paged
+	 sequence. The function should also accept a :countp
+	 keyword argument. If true, the function should return
+	 only the number of items with the given search
 	 parameters, not the actual items themselves.")
    (sort :accessor datagrid-sort
 	 :initform nil

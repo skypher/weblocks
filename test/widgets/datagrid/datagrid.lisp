@@ -15,6 +15,15 @@
 				  :data-class 'employee))
   (1 2))
 
+(defun datagrid-data-foo (search sort)
+  (list 1 2))
+
+(deftest datagrid-data-3
+    (datagrid-data (make-instance 'datagrid
+                                  :data 'datagrid-data-foo
+                                  :data-class 'employee))
+  (1 2))
+
 ;;; test datagrid-data-count
 (deftest datagrid-data-count-1
     (datagrid-data-count (make-instance 'datagrid
@@ -36,6 +45,24 @@
 					  (list search sort countp))
 				  :search "foo"
 				  :data-class 'employee)
+			 :totalp t)
+  (nil nil t))
+
+(defun datagrid-data-count-foo (search sort &key countp)
+  (list search sort countp))
+
+(deftest datagrid-data-count-4
+    (datagrid-data-count (make-instance 'datagrid
+                                        :data 'datagrid-data-count-foo
+                                        :search "foo"
+                                        :data-class 'employee))
+  ("foo" nil t))
+
+(deftest datagrid-data-count-5
+    (datagrid-data-count (make-instance 'datagrid
+                                        :data 'datagrid-data-count-foo
+                                        :search "foo"
+                                        :data-class 'employee)
 			 :totalp t)
   (nil nil t))
 
