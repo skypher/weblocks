@@ -9,11 +9,33 @@
 
 (defun test-weblocks ()
   "Call this function to run all unit tests defined in
-weblocks-test package."
-  (do-tests)
-  (when weblocks::*webapp-name*
-    (warn "A web application has been loaded. Some tests may
-    fail. Ideally tests should be run on a clean image.")))
+'weblocks-test' package.
+
+This function takes steps to clear the environment for the unit
+tests. For example, if an application is defined that may interfere
+with the unit tests, this function removes the application. All
+changes are rolled back after the tests are done. Note, the steps that
+this function takes may not be sufficient. If some tests fail, try to
+run the test suite without loading an application."
+  (let ((app-name weblocks::*webapp-name*)
+	interference-methods)
+    ;; hide application
+    (setf weblocks::*webapp-name* nil)
+    ;; remove before/after methods from render-page-body
+    (mapcar (lambda (m)
+	      (let ((qualifiers (method-qualifiers m)))
+		(when (or (find :before qualifiers)
+			  (find :after qualifiers))
+		  (remove-method #'render-page-body m)
+		  (push m interference-methods))))
+	    (generic-function-methods #'render-page-body))
+    ;; run the tests
+    (do-tests)
+    ;; reinstate the application
+    (setf weblocks::*webapp-name* app-name)
+    ;; reinstate render-page-body before/after methods
+    (loop for m in interference-methods
+	 do (add-method #'render-page-body m))))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
