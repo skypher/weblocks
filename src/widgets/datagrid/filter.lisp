@@ -53,7 +53,7 @@ search."
   (with-html
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
-	    (htm (:span :class "title" (:strong "Search table&nbsp")))
+	    (htm (:span :class "title" (:strong "Search table&nbsp;")))
 	    (when (datagrid-show-hidden-entries-count-p grid)
 	      (let ((hidden-items-message (hidden-items-message grid)))
 		(when hidden-items-message
