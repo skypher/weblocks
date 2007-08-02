@@ -2,9 +2,10 @@
 (in-package :weblocks)
 
 (export '(widget-class transient-slot defwidget widget widget-name
-	  widget-args with-widget-header render-widget-body
-	  widget-css-classes render-widget mark-dirty widget-dirty-p
-	  find-widget-by-path* find-widget-by-path))
+	  widget-args widget-public-dependencies with-widget-header
+	  render-widget-body widget-css-classes render-widget
+	  mark-dirty widget-dirty-p find-widget-by-path*
+	  find-widget-by-path))
 
 (defclass widget-class (standard-class)
   ()
@@ -90,6 +91,65 @@ defclass, except adds 'widget-class' metaclass specification."
                     requests."))
   #+lispworks (:optimize-slot-access nil)
   (:documentation "Base class for all widget objects."))
+
+(defgeneric widget-public-dependencies (obj)
+  (:documentation
+   "Whenever a widget is rendered by weblocks in a non-AJAX request,
+this function is called to determine which stylesheets and javascript
+files the widget depends on. These dependencies are then included into
+the header of the containing page.
+
+The function must return a list of dependencies. Each member of the
+list must be the virtual path to the file excluding \"/pub/\". The
+extension (currently only \".css\" and \".js\") will be used by
+weblocks to determine how to include the dependency into the page
+header.
+
+The default implementation uses the following protocol to determine if
+a widget has dependencies. It looks under
+*public-files-path*/scripts/[attributized-widget-class-name].js and
+*public-files-path*/stylesheets/[attributized-widget-class-name].css. If
+it finds the aforementioned files, it returns them as
+dependencies. This way the developer can simply place relevant files
+in the appropriate location and not worry about specializing this
+function most of the time.
+
+'widget-public-dependencies' also returns widgets for the superclasses
+of 'obj', because it's intuitive to assume that a widget will use the
+stylesheets of its superclasses."))
+
+(defmethod widget-public-dependencies (obj)
+  (reverse
+   (remove nil
+	   (flatten
+	    (loop for i in (superclasses obj :proper? nil)
+	       until (string-equal (class-name i) 'standard-object)
+	       collect (widget-public-dependencies-aux (class-name i)))))))
+
+(defmethod widget-public-dependencies ((obj symbol))
+  (widget-public-dependencies-aux obj))
+
+(defun widget-public-dependencies-aux (widget-class-name)
+  "A utility function used to help 'widget-public-dependencies'
+implement its functionality. Determines widget dependencies for a
+particular class name."
+  (let (dependencies)
+    (labels ((dependency-relative-path (type)
+	       (make-pathname :directory `(:relative ,(ecase type
+							     (:stylesheet "stylesheets")
+							     (:script "scripts")))
+			      :name (attributize-name widget-class-name)
+			      :type (ecase type
+				      (:stylesheet "css")
+				      (:script "js"))))
+	     (dependency-absolute-path (type)
+	       (merge-pathnames
+		(dependency-relative-path type)
+		*public-files-path*)))
+      (loop for type in '(:stylesheet :script)
+	 do (when (probe-file (dependency-absolute-path type))
+	      (push (dependency-relative-path type) dependencies)))
+      (remove nil dependencies))))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    prewidget-body-fn postwidget-body-fn &allow-other-keys)
@@ -187,7 +247,15 @@ be present for all widgets."))
 (defun render-widget (obj &key inlinep)
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header'). If 'inlinep' is true, renders the
-widget without a header."
+widget without a header.
+
+Additionally, calls 'widget-public-dependencies' and adds the returned
+items to *page-public-dependencies*. This is later used by Weblocks to
+declare stylesheets and javascript links in the page header."
+  (declare (special *page-public-dependencies*))
+  (setf *page-public-dependencies*
+	(append *page-public-dependencies*
+		(widget-public-dependencies obj)))
   (if inlinep
       (apply #'render-widget-body obj (widget-args obj))
       (apply #'with-widget-header obj #'render-widget-body (widget-args obj))))

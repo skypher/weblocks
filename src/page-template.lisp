@@ -3,46 +3,53 @@
 
 (export '(render-page-body))
 
-(defun with-page (body-fn)
-  "Renders boilerplate XHTML (title, stylesheets, etc.)"
+(defun render-page ()
+  "Takes the widget and application dependency information and wraps
+the HTML already rendered to *weblocks-output-stream* with boilerplate
+page HTML (title, stylesheets, etc.)."
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
-  (with-html-output (*weblocks-output-stream* nil :prologue t)
-    (:html :xmlns "http://www.w3.org/1999/xhtml"
-     (:head
-      (:title "Weblocks - a Common Lisp web framework")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/layout.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/main.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/flash.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/navigation.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/form.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/suggest.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/isearch.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/data.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/table.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/datagrid.css")
-      (:link :rel "stylesheet" :type "text/css" :href "/pub/gridedit.css")
-      (when *render-debug-toolbar*
-	(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/debug-mode.css")))
-      ; empty quote in script tags are a fix for w3m
-      (:script :src "/pub/scripts/prototype.js" :type "text/javascript" "")
-      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" "")
-      (:script :src "/pub/scripts/scriptaculous.js?load=effects,controls" :type "text/javascript" ""))
-     (:body
-      (render-page-body body-fn)
-      (when *render-debug-toolbar*
-	(render-debug-toolbar))
-      (:div :id "ajax-progress" "&nbsp;")))))
+  (declare (special *page-public-dependencies*))
+  (let ((rendered-html (get-output-stream-string *weblocks-output-stream*)))
+    (with-html-output (*weblocks-output-stream* nil :prologue t)
+      (:html :xmlns "http://www.w3.org/1999/xhtml"
+	     (:head
+	      (:title "Weblocks - a Common Lisp web framework")
+	      ; render stylesheets
+	      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/layout.css")
+	      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/main.css")
+	      (loop for i in (remove-duplicates *page-public-dependencies*
+						:test #'equalp :from-end t)
+		 when (equalp (pathname-type i) "css")
+		 do (htm (:link :rel "stylesheet" :type "text/css"
+				:href (merge-pathnames i (make-pathname :directory '(:absolute "pub"))))))
+	      (when *render-debug-toolbar*
+		(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/debug-mode.css")))
+	      ; render scripts
+	      ; empty quote in script tags are a fix for w3m
+	      (loop for i in *page-public-dependencies*
+		 when (equalp (pathname-type i) "js")
+		 do (htm (:script :type "text/javascript"
+				  :src (merge-pathnames i (make-pathname :directory '(:absolute "pub")))
+				  "")))
+	      (:script :src "/pub/scripts/prototype.js" :type "text/javascript" "")
+	      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" "")
+	      (:script :src "/pub/scripts/scriptaculous.js?load=effects,controls" :type "text/javascript" ""))
+	     (:body
+	      (render-page-body rendered-html)
+	      (when *render-debug-toolbar*
+		(render-debug-toolbar))
+	      (:div :id "ajax-progress" "&nbsp;"))))))
 
-(defgeneric render-page-body (body-fn)
+(defgeneric render-page-body (rendered-html)
   (:documentation "Renders the body of the page (exluding the <body>
-tag). The default implementation renders root composite in a wrapper
-div along with extra tags. Specialize :before and :after methods to
-render extra html prior and post the page wrapper."))
+tag). The default implementation wraps the already rendered HTML in a
+wrapper div along with extra tags. Specialize :before and :after
+methods to render extra html prior and post the page wrapper."))
 
 (defmethod render-page-body (body-fn)
   (with-html
     (:div :class "page-wrapper"
 	  (render-extra-tags "page-extra-top-" 3)
-	  (funcall body-fn)
+	  (htm (str body-fn))
 	  (render-extra-tags "page-extra-bottom-" 3))))

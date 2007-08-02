@@ -3,39 +3,52 @@
   (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities :moptilities)
   (:shadowing-import-from :c2mop #:defclass #:ensure-generic-function
 			  #:standard-generic-function #:defgeneric #:standard-class)
+  (:shadow #:do-test)
   (:export #:test-weblocks))
 
 (in-package :weblocks-test)
 
-(defun test-weblocks ()
-  "Call this function to run all unit tests defined in
-'weblocks-test' package.
-
-This function takes steps to clear the environment for the unit
+(defmacro with-test-environment (&body body)
+  "This macro takes steps to clear the environment for the unit
 tests. For example, if an application is defined that may interfere
 with the unit tests, this function removes the application. All
 changes are rolled back after the tests are done. Note, the steps that
-this function takes may not be sufficient. If some tests fail, try to
-run the test suite without loading an application."
-  (let ((app-name weblocks::*webapp-name*)
-	interference-methods)
-    ;; hide application
-    (setf weblocks::*webapp-name* nil)
-    ;; remove before/after methods from render-page-body
-    (mapcar (lambda (m)
-	      (let ((qualifiers (method-qualifiers m)))
-		(when (or (find :before qualifiers)
-			  (find :after qualifiers))
-		  (remove-method #'render-page-body m)
-		  (push m interference-methods))))
-	    (generic-function-methods #'render-page-body))
+this macro takes may not be sufficient. If some tests fail, try to run
+the test suite without loading an application."
+  `(let ((app-name weblocks::*webapp-name*) interference-methods
+	 result)
+     ;; hide application
+     (setf weblocks::*webapp-name* nil)
+     ;; remove before/after methods from render-page-body
+     (mapcar (lambda (m)
+	       (let ((qualifiers (method-qualifiers m)))
+		 (when (or (find :before qualifiers)
+			   (find :after qualifiers))
+		   (remove-method #'render-page-body m)
+		   (push m interference-methods))))
+	     (generic-function-methods #'render-page-body))
+     ;; insert the body
+     (setf result (progn ,@body))
+     ;; reinstate the application
+     (setf weblocks::*webapp-name* app-name)
+     ;; reinstate render-page-body before/after methods
+     (loop for m in interference-methods
+	do (add-method #'render-page-body m))
+     result))
+
+(defun test-weblocks ()
+  "Call this function to run all unit tests defined in 'weblocks-test'
+package. This function tests weblocks in a clean environment. See
+'with-test-environment' for more details."
+  (with-test-environment
     ;; run the tests
-    (do-tests)
-    ;; reinstate the application
-    (setf weblocks::*webapp-name* app-name)
-    ;; reinstate render-page-body before/after methods
-    (loop for m in interference-methods
-	 do (add-method #'render-page-body m))))
+    (do-tests)))
+
+(defun do-test ()
+  "Shadows rt's 'do-test'. This function calls rt's do test in a clean
+test environment. See 'with-test-environment'."
+  (with-test-environment
+      (rt::do-test)))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
@@ -124,8 +137,9 @@ the request."
 	    (generate-widget-id-orig #'weblocks::generate-widget-id)
 	    (dummy-action-count 123)
 	    (*session-cookie-name* "weblocks-session")
-	    (*uri-tokens* '("foo" "bar")))
-       (declare (special *uri-tokens*))
+	    (*uri-tokens* '("foo" "bar"))
+	    weblocks::*page-public-dependencies*)
+       (declare (special *uri-tokens* weblocks::*page-public-dependencies*))
        (unwind-protect (progn
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)

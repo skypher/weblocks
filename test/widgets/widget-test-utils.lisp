@@ -7,7 +7,7 @@
 	 (:div :class "extra-top-2" "&nbsp;")
 	 (:div :class "extra-top-3" "&nbsp;")
 	 (:span :class "title"
-		(:strong "Search table&nbsp"))
+		(:strong "Search table&nbsp;"))
 	 ,(when hidden-items-text
 	      `(htm (:span :class "hidden-items" ,hidden-items-text)))
 	 (:form :id ,form-id :class "isearch" :action "" :method "get"

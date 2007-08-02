@@ -1,6 +1,30 @@
 
 (in-package :weblocks-test)
 
+;;; test widget-public-dependencies-aux
+(deftest widget-public-dependencies-aux-1
+    (weblocks::widget-public-dependencies-aux 'non-existant-widget-name)
+  nil)
+
+(deftest widget-public-dependencies-aux-2
+    (format nil "~A" (weblocks::widget-public-dependencies-aux 'navigation))
+  "(stylesheets/navigation.css)")
+
+;;; test widget-public-dependencies
+(deftest widget-public-dependencies-1
+    (format nil "~A" (widget-public-dependencies (make-instance 'navigation)))
+  "(stylesheets/navigation.css)")
+
+(deftest widget-public-dependencies-2
+    (with-request :get nil
+      (format nil "~A" (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
+  "(stylesheets/datagrid.css stylesheets/gridedit.css)")
+
+(deftest widget-public-dependencies-3
+    (with-request :get nil
+      (widget-public-dependencies 'test))
+  nil)
+
 ;;; test render-widget-body
 (deftest-html render-widget-body-1
     (render-widget-body (lambda (&rest args)
@@ -96,8 +120,9 @@
 
 ;;; render function as a widget
 (deftest-html render-function-1
-    (render-widget (lambda (&rest args)
-		     (with-html (:p "blah"))))
+    (with-request :get nil
+      (render-widget (lambda (&rest args)
+		       (with-html (:p "blah")))))
   (:div :class "widget function"
 	(:p "blah")))
 
@@ -129,6 +154,14 @@
   #.(data-header-template "abc123"
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+
+(deftest render-widget-4
+    (let ((*weblocks-output-stream* (make-string-output-stream)))
+      (declare (special *weblocks-output-stream*))
+      (with-request :get nil
+	(render-widget (make-instance 'dataform :data *joe*))
+	(format nil "~A" weblocks::*page-public-dependencies*)))
+  "(stylesheets/dataform.css)")
 
 ;;; test mark-dirty
 (deftest mark-dirty-1

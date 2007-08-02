@@ -11,13 +11,13 @@ server. It is a hunchentoot handler and has access to all hunchentoot
 dynamic variables. The default implementation executes a user
 action (if any), prepares the navigation controls using
 'apply-uri-to-navigation', and renders the main composite wrapped in
-HTML provided by 'with-page'. If the request is an AJAX request, only
-the dirty widgets are rendered into a JSON data structure. It also
-invokes user supplied 'init-user-session' on the first request that
-has no session setup.
+HTML provided by 'render-page'. If the request is an AJAX request,
+only the dirty widgets are rendered into a JSON data structure. It
+also invokes user supplied 'init-user-session' on the first request
+that has no session setup.
 
 'handle-client-request' immediately returns '+http-not-found+' if it
-seems a mime type on the script name (it doesn't handle what could be
+sees a mime type on the script name (it doesn't handle what could be
 files because these mess with callback functions and break some
 widgets that depend on them).
 
@@ -31,8 +31,8 @@ a refresh will work).
 This function also manages lists of callback functions and calls them
 at different points before and after request. See 'request-hook'.
 
-Override this method (along with :before
-and :after specifiers to customize behavior)."))
+Override this method (along with :before and :after specifiers to
+customize behavior)."))
 
 (defmethod handle-client-request ()
   (when (hunchentoot::mime-type (script-name))
@@ -60,10 +60,10 @@ and :after specifiers to customize behavior)."))
     (let ((*weblocks-output-stream* (make-string-output-stream))
 	  (*uri-tokens* (tokenize-uri (request-uri)))
 	  (*current-navigation-url* "/") *dirty-widgets*
-	  *on-ajax-complete-scripts*)
-      (declare (special *weblocks-output-stream*
-			*current-navigation-url* *dirty-widgets*
-			*on-ajax-complete-scripts* *uri-tokens*))
+	  *on-ajax-complete-scripts* *page-public-dependencies*)
+      (declare (special *weblocks-output-stream* *current-navigation-url*
+			*dirty-widgets* *on-ajax-complete-scripts*
+			*uri-tokens* *page-public-dependencies*))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))
       (eval-hook :pre-action)
@@ -75,8 +75,13 @@ and :after specifiers to customize behavior)."))
 	  (progn
 	    (apply-uri-to-navigation *uri-tokens*
 				     (find-navigation-widget (session-value 'root-composite)))
-	    (with-page (lambda ()
-			 (render-widget (session-value 'root-composite))))))
+	    ; we need to render widgets in before the boilerplate HTML
+	    ; that wraps them in order to collect a list of script and
+	    ; stylesheet dependencies.
+	    (render-widget (session-value 'root-composite))
+	    ; render page will wrap the HTML already rendered to
+	    ; *weblocks-output-stream* with necessary boilerplate HTML
+	    (render-page)))
       (eval-hook :post-render)
       (unless (ajax-request-p)
 	(setf (session-value 'last-request-uri) *uri-tokens*))

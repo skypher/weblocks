@@ -51,7 +51,8 @@
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
-</div>")
+</div>"
+      :widget-stylesheets '("dataform"))
   " "
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
@@ -149,7 +150,8 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='extra-bottom-2'>&nbsp;</div>~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
-</div>"))
+</div>"
+      :widget-stylesheets '("navigation")))
 
 (deftest handle-client-request-4
     (with-request :get nil
