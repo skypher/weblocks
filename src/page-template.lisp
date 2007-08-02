@@ -16,13 +16,13 @@ page HTML (title, stylesheets, etc.)."
 	     (:head
 	      (:title "Weblocks - a Common Lisp web framework")
 	      ; render stylesheets
-	      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/layout.css")
-	      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/main.css")
-	      (loop for i in (remove-duplicates *page-public-dependencies*
+	      (loop for i in (remove-duplicates (append *application-public-dependencies*
+							*page-public-dependencies*)
 						:test #'equalp :from-end t)
 		 when (equalp (pathname-type i) "css")
 		 do (htm (:link :rel "stylesheet" :type "text/css"
-				:href (merge-pathnames i (make-pathname :directory '(:absolute "pub"))))))
+				:href (merge-pathnames i (make-pathname :directory
+									'(:absolute "pub"))))))
 	      (when *render-debug-toolbar*
 		(htm (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/debug-mode.css")))
 	      ; render scripts

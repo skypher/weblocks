@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(start-weblocks stop-weblocks compute-public-files-path
-	  *public-files-path* defwebapp ajax-request-p pure-request-p))
+	  *public-files-path* ajax-request-p pure-request-p))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -58,24 +58,6 @@ your files. Points to the weblocks' 'pub' directory by default.")
 			       request))
 		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))
-
-(defvar *webapp-name* nil
-  "The name of the currently running web application. See
-'defwebapp' for more details.")
-
-(defun defwebapp (name)
-  "Sets the application name (the *webapp-name* variable). 'name'
-must be a symbol. This symbol will later be used to find a
-package that defined 'init-user-session' - a function responsible
-for the web application setup.
-
-'init-user-session' must be defined by weblocks client in the
-same package as 'name'. This function will accept a single
-parameter - a composite widget at the root of the
-application. 'init-user-session' is responsible for adding
-initial widgets to this composite."
-  (check-type name symbol)
-  (setf *webapp-name* name))
 
 (defun ajax-request-p ()
   "Detects if the current request was initiated via AJAX by looking

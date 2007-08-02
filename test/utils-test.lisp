@@ -422,3 +422,4 @@
 (deftest remove-keyword-parameter-1
     (remove-keyword-parameter '(0 :a 1 :b 2 :c 3) :b)
   (0 :a 1 :c 3))
+

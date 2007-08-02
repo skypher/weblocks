@@ -100,7 +100,8 @@ files the widget depends on. These dependencies are then included into
 the header of the containing page.
 
 The function must return a list of dependencies. Each member of the
-list must be the virtual path to the file excluding \"/pub/\". The
+list must be the virtual path to the file (see convinience functions
+'public-file-relative-path' and 'public-files-relative-paths'). The
 extension (currently only \".css\" and \".js\") will be used by
 weblocks to determine how to include the dependency into the page
 header.
@@ -133,23 +134,14 @@ stylesheets of its superclasses."))
   "A utility function used to help 'widget-public-dependencies'
 implement its functionality. Determines widget dependencies for a
 particular class name."
-  (let (dependencies)
-    (labels ((dependency-relative-path (type)
-	       (make-pathname :directory `(:relative ,(ecase type
-							     (:stylesheet "stylesheets")
-							     (:script "scripts")))
-			      :name (attributize-name widget-class-name)
-			      :type (ecase type
-				      (:stylesheet "css")
-				      (:script "js"))))
-	     (dependency-absolute-path (type)
-	       (merge-pathnames
-		(dependency-relative-path type)
-		*public-files-path*)))
-      (loop for type in '(:stylesheet :script)
-	 do (when (probe-file (dependency-absolute-path type))
-	      (push (dependency-relative-path type) dependencies)))
-      (remove nil dependencies))))
+  (let (dependencies
+	(attributized-widget-class-name (attributize-name widget-class-name)))
+    (loop for type in '(:stylesheet :script)
+       do (when (probe-file (merge-pathnames
+			     (public-file-relative-path type attributized-widget-class-name)
+			     *public-files-path*))
+	    (push (public-file-relative-path type attributized-widget-class-name) dependencies)))
+    (remove nil dependencies)))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    prewidget-body-fn postwidget-body-fn &allow-other-keys)
