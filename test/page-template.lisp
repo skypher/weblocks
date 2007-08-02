@@ -22,7 +22,7 @@
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/bar.css")
      (:script :src "/pub/scripts/prototype.js" :type "text/javascript" "")
      (:script :src "/pub/scripts/weblocks.js" :type "text/javascript" "")
-     (:script :src "/pub/scripts/scriptaculous.js?load=effects,controls" :type "text/javascript" ""))
+     (:script :src "/pub/scripts/scriptaculous.js" :type "text/javascript" ""))
     (:body
      (:div :class "page-wrapper"
 	   (:div :class "page-extra-top-1" "&nbsp;")

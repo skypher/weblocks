@@ -5,18 +5,15 @@
 (deftest defwebapp-1
     (let (weblocks::*webapp-name* weblocks::*application-public-dependencies*)
       (declare (special weblocks::*webapp-name* weblocks::*application-public-dependencies*))
-      (defwebapp 'hello :public-dependencies '("a" "b" "c"))
-      (values weblocks::*webapp-name*
-	      weblocks::*application-public-dependencies*))
-  hello ("a" "b" "c"))
-
-(deftest defwebapp-2
-    (let (weblocks::*webapp-name* weblocks::*application-public-dependencies*)
-      (declare (special weblocks::*webapp-name* weblocks::*application-public-dependencies*))
       (defwebapp 'hello)
       (values weblocks::*webapp-name*
-	      (format nil "~A" weblocks::*application-public-dependencies*)))
-  hello "(stylesheets/layout.css stylesheets/main.css)")
+	      (mapcar (curry #'format nil "~A") weblocks::*application-public-dependencies*)))
+  hello
+  ("stylesheets/layout.css"
+   "stylesheets/main.css"
+   "scripts/prototype.js"
+   "scripts/weblocks.js"
+   "scripts/scriptaculous.js"))
 
 ;;; test public-file-relative-path
 (deftest public-file-relative-path-1

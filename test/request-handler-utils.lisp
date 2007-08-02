@@ -14,7 +14,7 @@
 ~A~
 <script src='/pub/scripts/prototype.js' type='text/javascript'></script>~
 <script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
-<script src='/pub/scripts/scriptaculous.js?load=effects,controls' type='text/javascript'></script>~
+<script src='/pub/scripts/scriptaculous.js' type='text/javascript'></script>~
 </head>~
 <body>~
 <div class='page-wrapper'>~
@@ -39,7 +39,7 @@
 			       nil
 			       "<link rel='stylesheet' type='text/css' href='/pub/stylesheets/~A.css' />" i)))
 	  (if render-debug-toolbar-p (format nil "~
-	       <link rel='stylesheet' type='text/css' href='/pub/stylesheets/debug-mode.css' />")
+	       <link rel='stylesheet' type='text/css' href='/pub/stylesheets/debug-toolbar.css' />")
 	      "")
 	  (format nil body)
 	  (if render-debug-toolbar-p (format nil "~

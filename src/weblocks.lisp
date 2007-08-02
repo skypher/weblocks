@@ -79,10 +79,7 @@ Ex:
   (loop for i in args
      collect (public-file-relative-path (car i) (cdr i))))
 
-(defun defwebapp (name &key (public-dependencies
-			     (public-files-relative-paths
-			      '(:stylesheet . "layout")
-			      '(:stylesheet . "main"))))
+(defun defwebapp (name)
   "Sets the application name (the *webapp-name* variable). 'name'
 must be a symbol. This symbol will later be used to find a
 package that defined 'init-user-session' - a function responsible
@@ -94,16 +91,20 @@ parameter - a composite widget at the root of the
 application. 'init-user-session' is responsible for adding
 initial widgets to this composite.
 
-'public-dependencies' argument can be used for convinience. If it's
-specified, 'defwebapp' will assign its value to
-*application-public-dependencies*. By default 'defwebapp' sets up the
-application to depend on the following resources:
+By default 'defwebapp' adds the following resources to
+*application-public-dependencies*:
 
-Stylesheets: layout.css, main.css"
+Stylesheets: layout.css, main.css
+Scripts: prototype.js, weblocks.js, scriptaculous.js"
   (check-type name symbol)
   (setf *webapp-name* name)
-  (when public-dependencies
-    (setf *application-public-dependencies* public-dependencies)))
+  (setf *application-public-dependencies*
+	(public-files-relative-paths
+	 '(:stylesheet . "layout")
+	 '(:stylesheet . "main")
+	 '(:script . "prototype")
+	 '(:script . "weblocks")
+	 '(:script . "scriptaculous"))))
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."
