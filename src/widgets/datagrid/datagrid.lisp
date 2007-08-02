@@ -123,10 +123,11 @@
 (defmethod datagrid-data ((grid-obj datagrid))
   (with-slots (data) grid-obj
     (etypecase data
-      ((or function symbol) (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj)))
-      (sequence 
+      (sequence ; 'sequence' also handles null values
        (datagrid-sort-data grid-obj
-			   (datagrid-filter-data grid-obj data))))))
+			   (datagrid-filter-data grid-obj data)))
+      ((or function symbol)
+       (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj))))))
 
 (defun datagrid-data-count (grid &key totalp)
   "Returns the number of items in the grid. This function works
@@ -135,15 +136,16 @@ true, 'datagrid-data-count' returns the the total number of items and
 ignores searching parameters."
   (with-slots (data) grid
     (etypecase data
-      ((or function symbol) (funcall data
-				     (when (not totalp)
-				       (datagrid-search grid))
-				     nil
-				     :countp t))
-      (sequence 
+      (sequence ; 'sequence' also handles null values
        (if totalp
 	   (length data)
-	   (length (datagrid-filter-data grid data)))))))
+	   (length (datagrid-filter-data grid data))))
+      ((or function symbol)
+       (funcall data
+                (when (not totalp)
+                  (datagrid-search grid))
+                nil
+                :countp t)))))
 
 (defun append-custom-slots (custom-slots args)
   "Appends 'custom-slots' to whatever custom slots that are already

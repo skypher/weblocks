@@ -24,6 +24,12 @@
                                   :data-class 'employee))
   (1 2))
 
+(deftest datagrid-data-4
+    (datagrid-data (make-instance 'datagrid
+                                  :data nil
+                                  :data-class 'employee))
+  nil)
+
 ;;; test datagrid-data-count
 (deftest datagrid-data-count-1
     (datagrid-data-count (make-instance 'datagrid
@@ -65,6 +71,12 @@
                                         :data-class 'employee)
 			 :totalp t)
   (nil nil t))
+
+(deftest datagrid-data-count-6
+    (datagrid-data-count (make-instance 'datagrid
+                                        :data nil
+                                        :data-class 'employee))
+  0)
 
 ;;; test append-custom-slots
 (deftest append-custom-slots-1
