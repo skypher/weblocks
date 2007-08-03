@@ -2,9 +2,9 @@
 (in-package :weblocks)
 
 (export '(navigation navigation-panes current-pane
-	  with-navigation-header render-navigation-body
-	  current-pane-widget init-navigation make-navigation
-	  pane-exists-p reset-current-pane))
+	  *current-navigation-url* with-navigation-header render-navigation-body
+	  current-pane-widget init-navigation make-navigation pane-exists-p
+	  reset-current-pane))
 
 (defwidget navigation (widget)
   ((name :initform nil
@@ -26,6 +26,12 @@
   tabbed control, etc. It contains a list of section names and widgets
   associated with those sections, and allows the user to select a
   particular section which it then renders."))
+
+(defparameter *current-navigation-url* nil
+  "Always contains a navigation URL at the given point in rendering
+cycle. This is a special variable modified by the navigation controls
+during rendering so that inner controls can determine their location
+in the application hierarchy.")
 
 ;;; During initialization, current pane will automatically be set to
 ;;; the first available pane in the list, unless specified otherwise.

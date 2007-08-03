@@ -14,8 +14,8 @@ approach to maintaining UI state."))
 
 (in-package :weblocks)
 
-(export '(*weblocks-output-stream* *current-navigation-url*
-	  with-html reset-sessions str with-javascript))
+(export '(*weblocks-output-stream* with-html reset-sessions str
+	  with-javascript))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -26,12 +26,6 @@ variable. All html should be rendered to this stream.")
   "A global flag that defines whether the debug toolbar should be
   rendered. Normally set to true when weblocks is started in debug
   mode.")
-
-(defparameter *current-navigation-url* nil
-  "Always contains a navigation URL at the given point in rendering
-cycle. This is a special variable modified by the navigation controls
-during rendering so that inner controls can determine their location
-in the application hierarchy.")
 
 (defparameter *dirty-widgets* nil
   "Contains a list of dirty widgets at the current point in rendering
