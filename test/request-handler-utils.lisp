@@ -2,7 +2,7 @@
 (in-package :weblocks-test)
 
 (defun with-request-template (body &key
-			      (title "Hello - Placeholder Application")
+			      (title "Hello")
 			      render-debug-toolbar-p widget-stylesheets)
   (format nil "~
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
