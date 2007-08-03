@@ -15,8 +15,8 @@ approach to maintaining UI state."))
 (in-package :weblocks)
 
 (export '(*weblocks-output-stream* *current-navigation-url*
-	  *application-public-dependencies* defwebapp with-html
-	  reset-sessions str server-type server-version
+	  *webapp-description* *application-public-dependencies* defwebapp
+	  with-html reset-sessions str server-type server-version
 	  with-javascript public-file-relative-path
 	  public-files-relative-paths))
 
@@ -27,9 +27,9 @@ variable. All html should be rendered to this stream.")
 
 (defparameter *current-navigation-url* nil
   "Always contains a navigation URL at the given point in rendering
-  cycle. This is a special variable modified by the navigation
-  controls during rendering so that inner controls can determine their
-  location in the application hierarchy.")
+cycle. This is a special variable modified by the navigation controls
+during rendering so that inner controls can determine their location
+in the application hierarchy.")
 
 (defparameter *dirty-widgets* nil
   "Contains a list of dirty widgets at the current point in rendering
@@ -37,8 +37,14 @@ variable. All html should be rendered to this stream.")
   change state of widgets.")
 
 (defvar *webapp-name* nil
-  "The name of the currently running web application. See
-'defwebapp' for more details.")
+  "The name of the web application (also see 'defwebapp'). Please
+note, this name will be used for the composition of the page title
+displayed to the user. See 'page-title' for details.")
+
+(defvar *webapp-description* nil
+  "The description of the web application. Please note, this
+description will be used for the composition of the page title
+displayed to the user. See 'page-title' for details.")
 
 (defvar *application-public-dependencies* nil
   "A list of dependencies on scripts and/or stylesheets that will
@@ -79,17 +85,25 @@ Ex:
   (loop for i in args
      collect (public-file-relative-path (car i) (cdr i))))
 
-(defun defwebapp (name)
+(defun defwebapp (name &key description)
   "Sets the application name (the *webapp-name* variable). 'name'
 must be a symbol. This symbol will later be used to find a
 package that defined 'init-user-session' - a function responsible
 for the web application setup.
+
+Additionally, 'name' will be used by 'page-title' to generate the
+title of each page.
 
 'init-user-session' must be defined by weblocks client in the
 same package as 'name'. This function will accept a single
 parameter - a composite widget at the root of the
 application. 'init-user-session' is responsible for adding
 initial widgets to this composite.
+
+'description' is a short description of the web application (ex: \"A
+technology demonstration\"). *webapp-description* will be set to this
+description (unless description is nil), and the value will later be
+used by 'page-title' to generate the page titles.
 
 By default 'defwebapp' adds the following resources to
 *application-public-dependencies*:
@@ -98,6 +112,8 @@ Stylesheets: layout.css, main.css
 Scripts: prototype.js, weblocks.js, scriptaculous.js"
   (check-type name symbol)
   (setf *webapp-name* name)
+  (when description
+    (setf *webapp-description* description))
   (setf *application-public-dependencies*
 	(public-files-relative-paths
 	 '(:stylesheet . "layout")

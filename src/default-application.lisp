@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(defwebapp 'weblocks)
+(defwebapp 'weblocks
+    :description "Placeholder Application")
 
 (defmethod render-page-body :after (rendered-html)
   (with-html

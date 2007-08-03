@@ -1,12 +1,46 @@
 
 (in-package :weblocks-test)
 
+;;; test page-title
+(deftest page-title-1
+    (let ((*current-page-description* "current-page-desc")
+	  (*webapp-description* "webapp-desc")
+	  (weblocks::*webapp-name* "webapp-name"))
+      (declare (special *current-page-description*
+			*webapp-description*
+			weblocks::*webapp-name*))
+      (page-title))
+  "Webapp Name - current-page-desc")
+
+(deftest page-title-2
+    (let ((*current-page-description* nil)
+	  (*webapp-description* "webapp-desc")
+	  (weblocks::*webapp-name* "webapp-name"))
+      (declare (special *current-page-description*
+			*webapp-description*
+			weblocks::*webapp-name*))
+      (page-title))
+  "Webapp Name - webapp-desc")
+
+(deftest page-title-3
+    (let ((*current-page-description* nil)
+	  (*webapp-description* nil)
+	  (weblocks::*webapp-name* "webapp-name"))
+      (declare (special *current-page-description*
+			*webapp-description*
+			weblocks::*webapp-name*))
+      (page-title))
+  "Webapp Name")
+
 ;;; test with-page
 (deftest-html with-page-1
     (let ((weblocks::*render-debug-toolbar* nil)
 	  (weblocks::*page-public-dependencies* (list "stylesheets/foo.css"
-						      "stylesheets/bar.css")))
-      (declare (special weblocks::*page-public-dependencies*))
+						      "stylesheets/bar.css"))
+	  (weblocks::*webapp-name* 'some-name)
+	  (*current-page-description* "Some Page"))
+      (declare (special weblocks::*page-public-dependencies*
+			*current-page-description* weblocks::*webapp-name*))
       (with-html
 	(:div "test"))
       (weblocks::render-page))
@@ -15,7 +49,7 @@
    (str "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">")
    (:html :xmlns "http://www.w3.org/1999/xhtml"
     (:head
-     (:title "Weblocks - a Common Lisp web framework")
+     (:title "Some Name - Some Page")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/layout.css")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/main.css")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/foo.css")

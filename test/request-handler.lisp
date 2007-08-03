@@ -151,7 +151,8 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>"
-      :widget-stylesheets '("navigation")))
+      :widget-stylesheets '("navigation")
+      :title "Hello - Test2"))
 
 (deftest handle-client-request-4
     (with-request :get nil
@@ -257,6 +258,25 @@ onclick='disableIrrelevantButtons(this);' />~
 	;; tear down the application
 	res))
   1)
+
+(deftest handle-client-request-9
+    (with-request :get nil
+      (let (weblocks::*webapp-name* result1)
+	;; set up our mini-application with one dataform widget
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(defun init-user-session (comp)
+	  (setf (composite-widgets comp)
+		(list (lambda ()
+			(declare (special *current-page-description*))
+			(setf *current-page-description* "Some Page")))))
+	;; handle the first request (make sure data is drawn)
+	(setf result1 (handle-client-request))
+	(fmakunbound 'init-user-session)
+	result1))
+  #.(with-request-template
+	"<div class='widget function'></div>"
+      :title "Hello - Some Page"))
 
 ;;; test eval-action
 (deftest eval-action-1

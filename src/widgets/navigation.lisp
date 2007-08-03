@@ -8,8 +8,9 @@
 
 (defwidget navigation (widget)
   ((name :initform nil
-	 :documentation "A navigation widget doesn't have a name
-	 assigned to automatically.")
+	 :documentation "A navigation widget doesn't have a random
+	 name assigned to automatically because the name is also
+	 displayed to the user.")
    (panes :accessor navigation-panes
 	  :initform nil
 	  :initarg :panes

@@ -1,7 +1,16 @@
 
 (in-package :weblocks)
 
-(export '(render-page-body))
+(export '(render-page-body page-title))
+
+(defun page-title ()
+  "Generates a page title from the application name, application
+description, and current navigation state."
+  (declare (special *current-page-description*))
+  (apply #'concatenate 'string (humanize-name *webapp-name*)
+	 (cond
+	   (*current-page-description* (list " - " *current-page-description*))
+	   (*webapp-description* (list " - " *webapp-description*)))))
 
 (defun render-page ()
   "Takes the widget and application dependency information and wraps
@@ -18,7 +27,7 @@ page HTML (title, stylesheets, etc.)."
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
-	      (:title "Weblocks - a Common Lisp web framework")
+	      (:title (str (page-title)))
 	      ; render stylesheets
 	      (loop for i in (remove-duplicates combined-dependencies
 						:test #'equalp :from-end t)

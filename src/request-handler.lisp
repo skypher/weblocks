@@ -1,8 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(*on-ajax-complete-scripts* *uri-tokens* refresh-request-p
-	  initial-request-p))
+(export '(*on-ajax-complete-scripts* *uri-tokens*
+	  *current-page-description* refresh-request-p initial-request-p))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -60,10 +60,11 @@ customize behavior)."))
     (let ((*weblocks-output-stream* (make-string-output-stream))
 	  (*uri-tokens* (tokenize-uri (request-uri)))
 	  (*current-navigation-url* "/") *dirty-widgets*
-	  *on-ajax-complete-scripts* *page-public-dependencies*)
-      (declare (special *weblocks-output-stream* *current-navigation-url*
-			*dirty-widgets* *on-ajax-complete-scripts*
-			*uri-tokens* *page-public-dependencies*))
+	  *on-ajax-complete-scripts* *page-public-dependencies*
+	  *current-page-description*)
+      (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
+			*on-ajax-complete-scripts* *uri-tokens* *page-public-dependencies*
+			*current-page-description*))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))
       (eval-hook :pre-action)
@@ -75,10 +76,14 @@ customize behavior)."))
 	  (progn
 	    (apply-uri-to-navigation *uri-tokens*
 				     (find-navigation-widget (session-value 'root-composite)))
-	    ; we need to render widgets in before the boilerplate HTML
+	    ; we need to render widgets before the boilerplate HTML
 	    ; that wraps them in order to collect a list of script and
 	    ; stylesheet dependencies.
 	    (render-widget (session-value 'root-composite))
+	    ; set page title if it isn't already set
+	    (when (and (null *current-page-description*)
+		       (last *uri-tokens*))
+	      (setf *current-page-description* (humanize-name (last-item *uri-tokens*))))
 	    ; render page will wrap the HTML already rendered to
 	    ; *weblocks-output-stream* with necessary boilerplate HTML
 	    (render-page)))
