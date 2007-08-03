@@ -114,11 +114,30 @@ controls."))
     (with-html
       (:span :class "value"
 	     (str (if highlight
-		      (ppcre:regex-replace-all
-		       highlight item (concatenate 'string "<strong>" "\\&" "</strong>"))
-		      item))))))
+		      (highlight-regex-matches item highlight)
+		      (escape-for-html item)))))))
 
 (defmethod render-data ((obj (eql nil)) &rest keys)
   (with-html
     (:span :class "value missing" "Not Specified")))
 
+(defun highlight-regex-matches (item highlight)
+  "This function highlights regex matches in text by wrapping them in
+HTML 'string' tag. The complexity arises from the need to escape HTML
+to prevent XSS attacks. If we simply wrap all matches in 'strong' tags
+and then escape the result, we'll escape our 'strong' tags which isn't
+the desired outcome."
+  (apply #'concatenate 'string
+	 (remove ""
+		 (loop for i = 0 then k
+		       for (j k) on (ppcre:all-matches highlight item) by #'cddr
+		       for match = (subseq item j k)
+		    collect (escape-for-html (subseq item i j)) into matches
+		    when (not (equalp match ""))
+		         collect (format nil "<strong>~A</strong>"
+					 (escape-for-html match))
+		            into matches
+		    finally (return (if (and j k)
+				(push-end (escape-for-html (subseq item k (length item)))
+					  matches)
+				(list (escape-for-html item))))))))

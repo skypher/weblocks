@@ -81,3 +81,42 @@
 (deftest-html render-data-6
     (render-data "test" :highlight ".s")
   (:span :class "value" "t<strong>es</strong>t"))
+
+(deftest-html render-data-7
+    (render-data "te<st" :highlight "e<s")
+  (:span :class "value" "t<strong>e&lt;s</strong>t"))
+
+(deftest-html render-data-8
+    (render-data "<script>alert('XSS Attack')</script>")
+  (:span :class "value"
+	 "&lt;script&gt;alert(&#039;XSS Attack&#039;)&lt;/script&gt;"))
+
+;;; test highlight-regex-matches
+(deftest highlight-regex-matches-1
+    (weblocks::highlight-regex-matches "Hello World!" "el")
+  "H<strong>el</strong>lo World!")
+
+(deftest highlight-regex-matches-2
+    (weblocks::highlight-regex-matches "" "el")
+  "")
+
+(deftest highlight-regex-matches-3
+    (weblocks::highlight-regex-matches "te<st" "el")
+  "te&lt;st")
+
+(deftest highlight-regex-matches-4
+    (weblocks::highlight-regex-matches "te<st" "")
+  "te&lt;st")
+
+(deftest highlight-regex-matches-5
+    (weblocks::highlight-regex-matches "ello" "el")
+  "<strong>el</strong>lo")
+
+(deftest highlight-regex-matches-6
+    (weblocks::highlight-regex-matches "ello" "lo")
+  "el<strong>lo</strong>")
+
+(deftest highlight-regex-matches-7
+    (weblocks::highlight-regex-matches "te<st" "e<s")
+  "t<strong>e&lt;s</strong>t")
+
