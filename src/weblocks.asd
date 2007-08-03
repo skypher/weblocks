@@ -18,7 +18,7 @@
 	       (:file "linguistic"
 		      :depends-on ("weblocks"))
 	       (:file "page-template"
-		      :depends-on ("weblocks" "utils"))
+		      :depends-on ("weblocks" "utils" "application"))
 	       (:file "actions"
 		      :depends-on ("weblocks" "utils"))
 	       (:file "debug-mode"
@@ -26,11 +26,12 @@
 	       (:file "request-hooks"
 		      :depends-on ("weblocks"))
 	       (:file "request-handler"
-		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions" "request-hooks"))
+		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions" "request-hooks"
+				   "application" "request"))
 	       (:module blocks
 			:components ((:file "suggest")
 				     (:file "isearch"))
-			:depends-on ("weblocks"))
+			:depends-on ("weblocks" "request"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
@@ -69,11 +70,15 @@
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
 			:depends-on (blocks renderers
-					    form-management "request-handler" "utils" "actions" "server"))
+					    form-management "utils" "actions" "server" "request"))
 	       (:module data-types
 			:components ((:file "us-states"))
 			:depends-on (renderers blocks))
 	       (:file "server"
+		      :depends-on ("weblocks"))
+	       (:file "request"
+		      :depends-on ("weblocks" "actions"))
+	       (:file "application"
 		      :depends-on ("weblocks"))
 	       (:file "default-application"
 		      :depends-on ("server" "weblocks" "utils" "request-handler"))))

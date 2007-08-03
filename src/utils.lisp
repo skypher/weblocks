@@ -7,7 +7,8 @@
 	  request-parameter request-parameters string-whitespace-p
 	  render-extra-tags with-extra-tags strictly-less-p
 	  equivalentp object-id id alist->plist intersperse
-	  remove-keyword-parameter))
+	  remove-keyword-parameter public-file-relative-path
+	  public-files-relative-paths))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -452,4 +453,47 @@ values."
           else when remove
             do (setf remove nil)
           else collect i)))
+
+(defun tokenize-uri (uri)
+  "Tokenizes a URI into a list of elements.
+
+ex:
+\(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
+=> (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
+  (remove-if (curry #'string-equal "")
+	     (cl-ppcre:split "[/\\\\]" (cl-ppcre:regex-replace "\\?.*" uri ""))))
+
+(defun public-file-relative-path (type filename)
+  "Constructs a relative path to a public file from the \"/pub\" directory.
+
+'type' - currently either :stylesheet or :script
+'filename' the name of the file
+
+Ex:
+\(public-file-relative-path :stylesheet \"navigation\")
+=> #P\"stylesheets/navigation\""
+  (make-pathname :directory `(:relative
+			      ,(ecase type
+				      (:stylesheet "stylesheets")
+				      (:script "scripts")))
+		 :name filename
+		 :type (ecase type
+			 (:stylesheet "css")
+			 (:script "js"))))
+
+(defun public-files-relative-paths (&rest args)
+  "A helper function that returns a list of paths for files provided
+in 'args'. Each argument must be a cons cell where car is
+either :stylesheet or :script and cdr is a name of the file.
+
+Useful when generating a list of dependencies for widgets and/or the
+application (see 'widget-public-dependencies' and
+*application-public-dependencies*.)
+
+Ex:
+\(get-public-files-paths '(:stylesheet . \"navigation\")
+                         '(:script . \"effects\"))
+=> (#P\"stylesheets/navigation.css\" #P\"scripts/effects.js\")"
+  (loop for i in args
+     collect (public-file-relative-path (car i) (cdr i))))
 

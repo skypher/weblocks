@@ -2,16 +2,11 @@
 (in-package :weblocks)
 
 (export '(start-weblocks stop-weblocks compute-public-files-path
-	  *public-files-path* ajax-request-p pure-request-p))
+	  *public-files-path* server-type server-version))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
   object. Otherwise, nil.")
-
-(defparameter *render-debug-toolbar* nil
-  "A global flag that defines whether the debug toolbar should be
-  rendered. Normally set to true when weblocks is started in debug
-  mode.")
 
 (defun start-weblocks (&key debug (port 8080))
   "Starts weblocks framework hooked into Hunchentoot server. Set
@@ -59,24 +54,6 @@ your files. Points to the weblocks' 'pub' directory by default.")
 		    (create-prefix-dispatcher "/" 'handle-client-request))
 	      *dispatch-table*))
 
-(defun ajax-request-p ()
-  "Detects if the current request was initiated via AJAX by looking
-for 'X-Requested-With' http header. This function expects to be called
-in a dynamic hunchentoot environment."
-  (header-in "X-Requested-With"))
-
-(defun pure-request-p ()
-  "Detects if the current request is declared as 'pure', i.e. affects
-no widgets or internal application state, but merely is a request for
-information. Such requests simply return the result of the function
-that represents the action and are used by some AJAX operations to
-retreive information (suggest block, etc). When such requests are
-satisfied, the actions have access to the session, the widgets, and
-all other parameters. However, none of the callbacks (see
-*on-pre-request*) are executed, no widgets are sent to the client,
-etc."
-  (string-equal (get-parameter "pure") "true"))
-
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This
 pair is passed to JavaScript because web servers don't normally do URL
@@ -88,3 +65,10 @@ rewriting in JavaScript code."
 	      (url-encode *session-cookie-name*)
 	      (url-encode (hunchentoot::session-cookie-value)))
       ""))
+
+(defun server-type ()
+  "Hunchentoot")
+
+(defun server-version ()
+  hunchentoot::*hunchentoot-version*)
+

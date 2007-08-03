@@ -140,3 +140,42 @@ with the specified name."
 				      (navigation-panes root)
 				      :key #'car
 				      :test #'string-equal))))
+
+;;; Code that implements friendly URLs ;;;
+(defun apply-uri-to-navigation (tokens navigation-widget)
+  "Takes URI tokens and applies them one by one to navigation widgets
+in order to allow for friendly URLs. The URLs are basically intimately
+linked to navigation controls to simulate document resources on the
+server."
+  (when (null tokens)
+    (reset-navigation-widgets navigation-widget)
+    (return-from apply-uri-to-navigation))
+  (if (and navigation-widget (pane-exists-p navigation-widget (car tokens)))
+      (progn
+	(setf (slot-value navigation-widget 'current-pane) (car tokens))
+	(apply-uri-to-navigation (cdr tokens)
+				 (find-navigation-widget (current-pane-widget navigation-widget))))
+      (setf (return-code) +http-not-found+)))
+
+(defun find-navigation-widget (comp)
+  "Given a composite 'comp', returns the first navigation widget
+contained in 'comp' or its children."
+  (when (null comp)
+    (return-from find-navigation-widget))
+  (when (typep comp 'navigation)
+    (return-from find-navigation-widget comp))
+  (car (flatten (remove-if #'null
+			   (mapcar (lambda (w)
+				     (typecase w
+				       (navigation w)
+				       (composite (find-navigation-widget w))
+				       (otherwise nil)))
+				   (composite-widgets comp))))))
+
+(defun reset-navigation-widgets (nav)
+  "Resets all navigation widgets from 'nav' down, using
+'reset-current-pane'."
+  (unless (null nav)
+    (reset-current-pane nav)
+    (reset-navigation-widgets (find-navigation-widget (current-pane-widget nav)))))
+

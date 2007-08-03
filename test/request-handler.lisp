@@ -278,16 +278,6 @@ onclick='disableIrrelevantButtons(this);' />~
 	"<div class='widget function'></div>"
       :title "Hello - Some Page"))
 
-;;; test eval-action
-(deftest eval-action-1
-    (with-request :get `(("name" . "Bob")
-			 ("cancel" . "Cancel")
-			 (,weblocks::*action-string* . "abc123"))
-      (make-action (lambda (&key name cancel &allow-other-keys)
-		     (concatenate 'string name cancel)))
-      (weblocks::eval-action))
-  "BobCancel")
-
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil
@@ -303,58 +293,6 @@ onclick='disableIrrelevantButtons(this);' />~
     (with-request :get '(("action" . "test") ("weblocks-session" "123"))
       (weblocks::remove-session-from-uri "/pub/test/blah"))
   "/pub/test/blah?action=test")
-
-;;; test apply-uri-to-navigation
-(deftest apply-uri-to-navigation-1
-    (let ((site (create-site-layout)) nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (values (slot-value nav1 'current-pane)
-	      (slot-value nav2 'current-pane)))
-  "test2"
-  "test6")
-
-(deftest apply-uri-to-navigation-2
-    (let ((site (create-site-layout)) nav1)
-      (with-request :get nil
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
-	(return-code)))
-  404)
-
-;;; test find-navigation-widget
-(deftest find-navigation-widget-1
-    (let ((site (create-site-layout))
-	  nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (values (widget-name nav1) (widget-name nav2)))
-  "test-nav-1"
-  "test-nav-2")
-
-(deftest find-navigation-widget-2
-    (weblocks::find-navigation-widget nil)
-  nil)
-
-;;; test reset-navigation-widgets
-(deftest reset-navigation-widgets-1
-    (let ((site (create-site-layout))
-	  nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (setf (slot-value nav1 'current-pane) "test2")
-      (setf (slot-value nav2 'current-pane) "test4")
-      (weblocks::reset-navigation-widgets nav1)
-      (values (slot-value nav1 'current-pane)
-	      (slot-value nav2 'current-pane)))
-  "test1"
-  "test3")
-
-;;; test tokenize-uri
-(deftest tokenize-uri-1
-    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7")
-  ("hello" "world" "blah" "test" "world"))
 
 ;;; test render-dirty-widgets
 (deftest render-dirty-widgets-1
@@ -381,36 +319,4 @@ null:\"<p>test</p>\"~
 }")
   ; this is necessary for Safari
   " ")
-
-;;; test refresh-request-p
-(deftest refresh-request-p-1
-    (with-request :get nil
-      (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
-      (refresh-request-p))
-  t)
-
-(deftest refresh-request-p-2
-    (with-request :get nil
-      (setf (session-value 'weblocks::last-request-uri) '("foo"))
-      (refresh-request-p))
-  nil)
-
-(deftest refresh-request-p-3
-    (with-request :get `((,weblocks::*action-string* . "abc123"))
-      (make-action (lambda () nil))
-      (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
-      (refresh-request-p))
-  nil)
-
-;;; test initial-request-p
-(deftest initial-request-p-1
-    (with-request :get nil
-      (initial-request-p))
-  nil)
-
-(deftest initial-request-p-2
-    (with-request :get nil
-      (setf (session-value 'last-request-uri) :none)
-      (initial-request-p))
-  nil)
 

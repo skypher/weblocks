@@ -423,3 +423,24 @@
     (remove-keyword-parameter '(0 :a 1 :b 2 :c 3) :b)
   (0 :a 1 :c 3))
 
+;;; test tokenize-uri
+(deftest tokenize-uri-1
+    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7")
+  ("hello" "world" "blah" "test" "world"))
+
+;;; test public-file-relative-path
+(deftest public-file-relative-path-1
+    (format nil "~A" (public-file-relative-path :stylesheet "foo"))
+  "stylesheets/foo.css")
+
+(deftest public-file-relative-path-2
+    (format nil "~A" (public-file-relative-path :script "bar"))
+  "scripts/bar.js")
+
+;;; test public-files-relative-paths
+(deftest public-files-relative-paths-1
+    (format nil "~A" (public-files-relative-paths
+		      '(:stylesheet . "foo")
+		      '(:script . "bar")))
+  "(stylesheets/foo.css scripts/bar.js)")
+

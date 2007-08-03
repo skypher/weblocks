@@ -31,7 +31,9 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "server"
 		      :depends-on ("weblocks-test"))
-	       (:file "weblocks"
+	       (:file "request"
+		      :depends-on ("weblocks-test"))
+	       (:file "application"
 		      :depends-on ("weblocks-test"))
 	       (:file "page-template"
 		      :depends-on ("weblocks-test"))

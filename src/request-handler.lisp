@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*on-ajax-complete-scripts* *uri-tokens*
-	  *current-page-description* refresh-request-p initial-request-p))
+	  *current-page-description*))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -92,10 +92,6 @@ customize behavior)."))
 	(setf (session-value 'last-request-uri) *uri-tokens*))
       (get-output-stream-string *weblocks-output-stream*))))
 
-(defun eval-action ()
-  "Evaluates the action that came with the request."
-  (safe-apply (get-request-action) (alist->plist (request-parameters))))
-
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
   (let ((path (puri:uri-path (puri:parse-uri uri))))
@@ -103,60 +99,6 @@ customize behavior)."))
        when (not (string-equal (car x) *session-cookie-name*))
        do (setf path (url-rewrite:add-get-param-to-url path (car x) (cdr x))))
     path))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Below is code that implements friendly URLs ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun apply-uri-to-navigation (tokens navigation-widget)
-  "Takes URI tokens and applies them one by one to navigation widgets
-in order to allow for friendly URLs. The URLs are basically intimately
-linked to navigation controls to simulate document resources on the
-server."
-  (when (null tokens)
-    (reset-navigation-widgets navigation-widget)
-    (return-from apply-uri-to-navigation))
-  (if (and navigation-widget (pane-exists-p navigation-widget (car tokens)))
-      (progn
-	(setf (slot-value navigation-widget 'current-pane) (car tokens))
-	(apply-uri-to-navigation (cdr tokens)
-				 (find-navigation-widget (current-pane-widget navigation-widget))))
-      (setf (return-code) +http-not-found+)))
-
-(defun find-navigation-widget (comp)
-  "Given a composite 'comp', returns the first navigation widget
-contained in 'comp' or its children."
-  (when (null comp)
-    (return-from find-navigation-widget))
-  (when (typep comp 'navigation)
-    (return-from find-navigation-widget comp))
-  (car (flatten (remove-if #'null
-			   (mapcar (lambda (w)
-				     (typecase w
-				       (navigation w)
-				       (composite (find-navigation-widget w))
-				       (otherwise nil)))
-				   (composite-widgets comp))))))
-
-(defun reset-navigation-widgets (nav)
-  "Resets all navigation widgets from 'nav' down, using
-'reset-current-pane'."
-  (unless (null nav)
-    (reset-current-pane nav)
-    (reset-navigation-widgets (find-navigation-widget (current-pane-widget nav)))))
-
-(defun tokenize-uri (uri)
-  "Tokenizes a URI into a list of elements.
-
-ex:
-\(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
-=> (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
-  (remove-if (curry #'string-equal "")
-	     (cl-ppcre:split "[/\\\\]" (cl-ppcre:regex-replace "\\?.*" uri ""))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; End of friendly URL code ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun render-dirty-widgets ()
   "Renders widgets that have been marked as dirty into a JSON
@@ -177,16 +119,3 @@ association list. This function is normally called by
 		(encode-json-to-string *on-ajax-complete-scripts*)))
   ;; We need something in the response for Safari to evaluate JSON
   (format *weblocks-output-stream* " "))
-
-(defun refresh-request-p ()
-  "Determines if a request is a result of the user invoking a browser
-refresh function. Note that a request will not be considered a refresh
-if there is an action involved (even if the user hits refresh)."
-  (declare (special *uri-tokens*))
-  (and
-   (null (get-request-action))
-   (equalp *uri-tokens* (session-value 'last-request-uri))))
-
-(defun initial-request-p ()
-  "Returns true if the request is the first request for the session."
-  (equalp (session-value 'last-request-uri) :none))

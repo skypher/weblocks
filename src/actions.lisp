@@ -71,3 +71,7 @@ raises an assertion."
 	      (concatenate 'string "Cannot find action: " action-name))
       request-action)))
 
+(defun eval-action ()
+  "Evaluates the action that came with the request."
+  (safe-apply (get-request-action) (alist->plist (request-parameters))))
+
