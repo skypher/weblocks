@@ -2,9 +2,9 @@
 (in-package :weblocks)
 
 (export '(navigation navigation-panes current-pane
-	  *current-navigation-url* with-navigation-header render-navigation-body
-	  current-pane-widget init-navigation make-navigation pane-exists-p
-	  reset-current-pane))
+	  *current-navigation-url* navigation-default-pane
+	  with-navigation-header render-navigation-body current-pane-widget
+	  init-navigation make-navigation pane-exists-p reset-current-pane))
 
 (defwidget navigation (widget)
   ((name :initform nil
@@ -33,12 +33,22 @@ cycle. This is a special variable modified by the navigation controls
 during rendering so that inner controls can determine their location
 in the application hierarchy.")
 
+(defgeneric navigation-default-pane (obj)
+  (:documentation
+   "Must return the name of the default pane for the navigation
+object. The default implementation returns the first pane from
+'navigation-panes'. Specialize this function to specify how to pick
+default panes for your navigation object."))
+
+(defmethod navigation-default-pane ((obj navigation))
+  (caar (navigation-panes obj)))
+
 ;;; During initialization, current pane will automatically be set to
 ;;; the first available pane in the list, unless specified otherwise.
 (defmethod initialize-instance :after ((obj navigation) &rest initargs &key &allow-other-keys)
   (with-slots (panes current-pane) obj
     (when (null current-pane)
-      (setf current-pane (caar panes)))))
+      (setf current-pane (navigation-default-pane obj)))))
 
 (defgeneric with-navigation-header (obj body-fn &rest args)
   (:documentation
@@ -84,7 +94,9 @@ determine its location in order to properly render paths in links."))
 		      (if item-selected-p
 			  (htm (:span (str (humanize-name (car item)))))
 			  (htm (:a :href (concatenate 'string *current-navigation-url*
-						      (attributize-name (car item)))
+						      (unless (equalp (car item)
+								      (navigation-default-pane obj))
+							(attributize-name (car item))))
 				   (str (humanize-name (car item))))))))))
 	    panes))))
 

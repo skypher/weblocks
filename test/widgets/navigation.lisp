@@ -1,6 +1,11 @@
 
 (in-package :weblocks-test)
 
+;;; test navigation-default-pane
+(deftest navigation-default-pane-1
+    (navigation-default-pane (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
+  "Test One")
+
 ;;; test initialize-instance for navigation
 (deftest initialize-navigation-1
     (slot-value
@@ -125,7 +130,7 @@
 	       (:div :class "extra-top-2" "&nbsp;")
 	       (:div :class "extra-top-3" "&nbsp;")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "/test1" "Test1"))
+	       (:ul (:li (:a :href "/" "Test1"))
 		    (:li :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "&nbsp;")
 	       (:div :class "extra-bottom-2" "&nbsp;")

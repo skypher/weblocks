@@ -143,7 +143,7 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='extra-top-3'>&nbsp;</div>~
 <h1>Test Nav</h1>~
 <ul>~
-<li><a href='/test1'>Test1</a></li>~
+<li><a href='/'>Test1</a></li>~
 <li class='selected-item'><span>Test2</span></li>~
 </ul>~
 <div class='extra-bottom-1'>&nbsp;</div>~
