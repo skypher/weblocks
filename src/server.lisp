@@ -32,13 +32,14 @@ the client."
 
 (defun compute-public-files-path (asdf-system-name)
   "Computes the directory of public files. The function uses the
-following protocol: it finds the '.asd' file of the system specified
-by 'asdf-system-name', goes up one directory, and goes into 'pub'."
+following protocol: it finds the canonical path of the '.asd'
+file of the system specified by 'asdf-system-name', goes up one
+directory, and goes into 'pub'."
   (merge-pathnames
    (make-pathname :directory '(:relative :up "pub"))
    (make-pathname :directory
-		  (pathname-directory (asdf:system-definition-pathname
-				       (asdf:find-system asdf-system-name))))))
+		  (pathname-directory (truename (asdf:system-definition-pathname
+                                                 (asdf:find-system asdf-system-name)))))))
 
 (defparameter *public-files-path*
   (compute-public-files-path :weblocks)
