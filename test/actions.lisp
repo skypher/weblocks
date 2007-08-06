@@ -39,12 +39,6 @@
     (make-action-url "test-action")
   "?action=test-action")
 
-;;; testing render-link
-(deftest-html render-link-1
-    (with-request :get nil
-      (render-link "abc123" "some link"))
-  #.(link-action-template "abc123" "some link"))
-
 ;;; test eval-action
 (deftest eval-action-1
     (with-request :get `(("name" . "Bob")

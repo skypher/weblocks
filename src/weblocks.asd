@@ -31,9 +31,9 @@
 	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch"
-				      :depends-on ("form"))
-				     (:file "form"))
-			:depends-on ("weblocks" "request"))
+				      :depends-on ("html-utils"))
+				     (:file "html-utils"))
+			:depends-on ("weblocks" "request" "server" "actions"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"

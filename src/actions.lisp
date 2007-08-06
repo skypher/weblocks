@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(make-action-url make-action render-link handle-client-request))
+(export '(make-action-url make-action handle-client-request))
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
@@ -32,21 +32,6 @@ Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
   (concatenate 'string "?" *action-string* "=" (princ-to-string action-code)))
-
-(defun render-link (action-code name)
-  "Renders an action into an href link. The link will be rendered in
-such a way that the action will be invoked via AJAX, or will fall back
-to regular request if JavaScript is not available. When the user
-clicks on the link, the action will be called on the server.
-
-'action-code' - The action created with 'make-action'.
-'name' - A string that will be presented to the user in the
-link."
-  (let ((url (make-action-url action-code)))
-    (with-html
-      (:a :href url :onclick (format nil "initiateAction(\"~A\", \"~A\"); return false;"
-				     action-code (session-name-string-pair))
-	  (str name)))))
 
 (defun get-request-action-name ()
   "Gets the name of the action from the request."

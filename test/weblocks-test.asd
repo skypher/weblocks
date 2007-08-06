@@ -17,10 +17,8 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "linguistic"
 		      :depends-on ("weblocks-test"))
-	       (:file "action-utils"
-		      :depends-on ("weblocks-test"))
 	       (:file "actions"
-		      :depends-on ("weblocks-test" "action-utils"))
+		      :depends-on ("weblocks-test"))
 	       (:file "request-hooks"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-handler-utils"
@@ -43,7 +41,9 @@
 	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch")
-				     (:file "form"))
+				     (:file "html-utils-helper")
+				     (:file "html-utils"
+				      :depends-on ("html-utils-helper")))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
@@ -56,7 +56,7 @@
 				      :depends-on ("form-renderer-utils"))
 				     (:file "table-renderer"
 				      :depends-on ("table-renderer-utils")))
-			:depends-on ("weblocks-test" "utils-test" "action-utils" fixtures))
+			:depends-on ("weblocks-test" "utils-test" snippets fixtures))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers")
