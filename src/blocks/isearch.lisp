@@ -32,4 +32,4 @@ initiateFormAction('~A', $('~A'), '~A');
     isearch-action form-id (session-name-string-pair))
   (unless (ajax-request-p)
     (with-javascript "$('~A').remove();"
-      search-id)))))
+      search-id)))
