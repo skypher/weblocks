@@ -182,27 +182,19 @@ defined in 'args'."
   (let ((action (make-action (lambda (&rest args)
 			       (datagrid-clear-selection obj)
 			       (loop for i in (request-parameters)
-				    when (string-starts-with (car i) "item-")
-				    do (datagrid-select-item obj (substring (car i) 5)))
+				  when (string-starts-with (car i) "item-")
+				  do (datagrid-select-item obj (substring (car i) 5)))
 			       (loop for i in (datagrid-item-ops obj)
-				    when (member (car i) (request-parameters)
-						 :key #'car
-						 :test #'string-equal)
-				    do (funcall (cdr i) obj (datagrid-selection obj)))
+				  when (member (car i) (request-parameters)
+					       :key #'car
+					       :test #'string-equal)
+				  do (funcall (cdr i) obj (datagrid-selection obj)))
 			       (datagrid-clear-selection obj)))))
-    (with-html
-      (:form :action "" :method "get"
-	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); ~
-                                    return false;"
-			       action
-			       (session-name-string-pair))
-	     :class "datagrid-form"
-	     (:fieldset
-	      (apply #'render-datagrid-table-body obj args)
-	      (when (and (datagrid-allow-item-ops-p obj)
-			 (datagrid-item-ops obj))
-		(apply #'render-item-ops-bar obj args))
-	      (:input :name "action" :type "hidden" :value action))))))
+    (with-html-form (:get action :class "datagrid-form")
+      (apply #'render-datagrid-table-body obj args)
+      (when (and (datagrid-allow-item-ops-p obj)
+		 (datagrid-item-ops obj))
+	(apply #'render-item-ops-bar obj args)))))
 
 (defun render-datagrid-table-body (grid &rest args)
   "Renders the actual data of the datagrid without any controls before

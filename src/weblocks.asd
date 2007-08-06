@@ -30,7 +30,9 @@
 				   "application" "request"))
 	       (:module blocks
 			:components ((:file "suggest")
-				     (:file "isearch"))
+				     (:file "isearch"
+				      :depends-on ("form"))
+				     (:file "form"))
 			:depends-on ("weblocks" "request"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
@@ -40,7 +42,7 @@
 				      :depends-on ("renderer-output-utils"))
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
-			:depends-on ("weblocks" "utils"))
+			:depends-on ("weblocks" "utils" blocks))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers"

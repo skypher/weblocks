@@ -116,10 +116,13 @@
   (htm
    (:div :class "data-mining-bar"
 	 #.(searchbar-template "I1" "I2" "I3" "abc123"))
-   (:form :action ""
+   (:form :class "datagrid-form"
+	  :action ""
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  :class "datagrid-form"
+	  (:div :class "extra-top-1" "&nbsp;")
+	  (:div :class "extra-top-2" "&nbsp;")
+	  (:div :class "extra-top-3" "&nbsp;")
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -132,7 +135,10 @@
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
-	   (:input :name "action" :type "hidden" :value "abc124")))))
+	   (:input :name "action" :type "hidden" :value "abc124"))
+	  (:div :class "extra-bottom-1" "&nbsp;")
+	  (:div :class "extra-bottom-2" "&nbsp;")
+	  (:div :class "extra-bottom-3" "&nbsp;"))))
 
 (deftest-html render-widget-body-datagrid-2
     (with-request :get nil
@@ -147,20 +153,26 @@
 	(render-widget-body grid)))
   (htm
    (:div :class "data-mining-bar" "")
-   (:form :action ""
+   (:form :class "datagrid-form"
+	  :action ""
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  :class "datagrid-form"
+	  (:div :class "extra-top-1" "&nbsp;")
+	  (:div :class "extra-top-2" "&nbsp;")
+	  (:div :class "extra-top-3" "&nbsp;")
 	  (:fieldset
-   (:div :class "datagrid-body"
-	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
-	    '((:tr
-	       (:td :class "name" (:span :class "value" "Joe"))
-	       (:td :class "manager" (:span :class "value" "Jim"))))
-	    :summary "Ordered by name, ascending."))
-   (:input :name "action" :type "hidden" :value "abc123")))))
+	   (:div :class "datagrid-body"
+		 #.(table-header-template
+		    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+		      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+		    '((:tr
+		       (:td :class "name" (:span :class "value" "Joe"))
+		       (:td :class "manager" (:span :class "value" "Jim"))))
+		    :summary "Ordered by name, ascending."))
+	   (:input :name "action" :type "hidden" :value "abc123"))
+	  (:div :class "extra-bottom-1" "&nbsp;")
+	  (:div :class "extra-bottom-2" "&nbsp;")
+	  (:div :class "extra-bottom-3" "&nbsp;"))))
 
 (deftest-html render-widget-body-datagrid-3
     (with-request :get nil
@@ -175,10 +187,13 @@
 	 #.(searchbar-template "I1" "I2" "I3" "abc123" :value "doesn't exist"
 						       :hidden-items-text
 						       "(2 items are hidden by the search)"))
-   (:form :action ""
+   (:form :class "datagrid-form"
+	  :action ""
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  :class "datagrid-form"
+	  (:div :class "extra-top-1" "&nbsp;")
+	  (:div :class "extra-top-2" "&nbsp;")
+	  (:div :class "extra-top-3" "&nbsp;")
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 (:div :class "renderer table empty-table"
@@ -189,7 +204,10 @@
 		       (:div :class "extra-bottom-1" "&nbsp;")
 		       (:div :class "extra-bottom-2" "&nbsp;")
 		       (:div :class "extra-bottom-3" "&nbsp;")))
-	   (:input :name "action" :type "hidden" :value "abc124")))))
+	   (:input :name "action" :type "hidden" :value "abc124"))
+	  (:div :class "extra-bottom-1" "&nbsp;")
+	  (:div :class "extra-bottom-2" "&nbsp;")
+	  (:div :class "extra-bottom-3" "&nbsp;"))))
 
 (deftest render-widget-body-datagrid-4
     (with-request :get nil

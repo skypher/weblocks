@@ -42,7 +42,8 @@
 			:depends-on ("weblocks-test"))
 	       (:module blocks
 			:components ((:file "suggest")
-				     (:file "isearch"))
+				     (:file "isearch")
+				     (:file "form"))
 			:depends-on ("weblocks-test" fixtures))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")

@@ -19,20 +19,17 @@ box. The user may invoke 'isearch-action' by clicking the button.
 value - an initial value.
 method - form request method, defaults to GET."
   (let* ((a-input-name (attributize-name input-name)))
-    (with-html
-      (:form :id form-id :class "isearch" :action "" :method (attributize-name method)
-	     (:fieldset
-	      (:input :type "text" :id input-id :name a-input-name :class "search-bar" :value value)
-	      (unless (ajax-request-p)
-		(htm (:input :id search-id :name *submit-control-name* :type "submit" :class "submit"
-			     :value "Search")))
-	      (:input :name "action" :type "hidden" :value isearch-action)))
-      (with-javascript "~
+    (with-html-form (method isearch-action :id form-id :class "isearch")
+      (:input :type "text" :id input-id :name a-input-name :class "search-bar" :value value)
+      (unless (ajax-request-p)
+	(htm (:input :id search-id :name *submit-control-name* :type "submit" :class "submit"
+		     :value "Search")))))
+  (with-javascript "~
 new Form.Element.DelayedObserver('~A', 0.4, function(elem, value) {~
 initiateFormAction('~A', $('~A'), '~A');
 });"
-	input-id
-	isearch-action form-id (session-name-string-pair))
-      (unless (ajax-request-p)
-	(with-javascript "$('~A').remove();"
-	  search-id)))))
+    input-id
+    isearch-action form-id (session-name-string-pair))
+  (unless (ajax-request-p)
+    (with-javascript "$('~A').remove();"
+      search-id)))))

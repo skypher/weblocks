@@ -1,16 +1,9 @@
 ;;;; Generic form renderer
 (in-package :weblocks)
 
-(export '(*submit-control-name* *cancel-control-name* with-form-header
-	  render-validation-summary render-form-controls
-	  render-form-slot render-form required-validation-error))
-
-(defparameter *submit-control-name* "submit"
-  "The name of the control responsible for form submission.")
-
-(defparameter *cancel-control-name* "cancel"
-  "The name of the control responsible for cancellation of form
-  submission.")
+(export '(with-form-header render-validation-summary
+	  render-form-controls render-form-slot render-form
+	  required-validation-error))
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
 				  postslots-fn method action &allow-other-keys)
@@ -37,20 +30,14 @@ details."))
 			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj)))))
-    (with-html
-      (:form :class header-class :action "" :method (attributize-name method)
-	     :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
-			       action
-			       (session-name-string-pair))
-	     (with-extra-tags
-	       (htm (:fieldset
-		     (:h1 (:span :class "action" (str (concatenate 'string title-action ":&nbsp;")))
-			  (:span :class "object" (str (humanize-name (object-class-name obj)))))
-		     (render-validation-summary validation-errors)
-		     (safe-apply preslots-fn obj keys)
-		     (:h2 :class "form-fields-title" "Form fields:")
-		     (:ul (funcall body-fn))
-		     (safe-apply postslots-fn obj keys))))))))
+    (with-html-form (method action :class header-class)
+      (:h1 (:span :class "action" (str (concatenate 'string title-action ":&nbsp;")))
+	   (:span :class "object" (str (humanize-name (object-class-name obj)))))
+      (render-validation-summary validation-errors)
+      (safe-apply preslots-fn obj keys)
+      (:h2 :class "form-fields-title" "Form fields:")
+      (:ul (funcall body-fn))
+      (safe-apply postslots-fn obj keys))))
 
 (defun render-validation-summary (errors)
   "Renders a summary of validation errors on top of the form. Redefine
@@ -87,8 +74,7 @@ case the user clicks submit."))
 	  (:input :name *submit-control-name* :type "submit" :class "submit" :value "Submit"
 		  :onclick "disableIrrelevantButtons(this);")
 	  (:input :name *cancel-control-name* :type "submit" :class "submit cancel" :value "Cancel"
-		  :onclick "disableIrrelevantButtons(this);")
-	  (:input :name "action" :type "hidden" :value action))))
+		  :onclick "disableIrrelevantButtons(this);"))))
 
 (defgeneric render-form-slot (obj slot-name slot-value &rest keys
 				  &key human-name validation-errors &allow-other-keys)

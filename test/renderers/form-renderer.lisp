@@ -50,8 +50,7 @@
 	(:input :name "submit" :type "submit" :class "submit" :value "Submit"
 		:onclick "disableIrrelevantButtons(this);")
 	(:input :name "cancel" :type "submit" :class "submit cancel" :value "Cancel"
-		:onclick "disableIrrelevantButtons(this);")
-	(:input :name "action" :type "hidden" :value "abc123")))
+		:onclick "disableIrrelevantButtons(this);")))
 
 ;;; test render-form-slot
 (deftest-html render-form-slot-1
@@ -109,7 +108,7 @@
 (deftest-html render-form-3
     (with-request :post nil
       (render-form *joe* :slots '(address-ref)))
-  #.(form-header-template nil
+  #.(form-header-template ""
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -165,7 +164,7 @@
 (deftest-html render-form-5
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
-  #.(form-header-template nil
+  #.(form-header-template ""
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -186,7 +185,7 @@
 (deftest-html render-form-6
     (with-request :post nil
       (render-form *joe* :slots '((name . nickname))))
-  #.(form-header-template nil
+  #.(form-header-template ""
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -202,7 +201,7 @@
 (deftest-html render-form-7
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
-  #.(form-header-template nil
+  #.(form-header-template ""
      '((:li :class "name item-not-validated"
 	(:label (:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"

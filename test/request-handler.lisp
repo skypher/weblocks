@@ -82,8 +82,8 @@
 <input name='submit' type='submit' class='submit' value='Submit' onclick='disableIrrelevantButtons(this);' />~
 <input name='cancel' type='submit' class='submit cancel' value='Cancel' ~
 onclick='disableIrrelevantButtons(this);' />~
-<input name='action' type='hidden' value='abc124' />~
 </div>~
+<input name='action' type='hidden' value='abc124' />~
 </fieldset>~
 <div class='extra-bottom-1'>&nbsp;</div>~
 <div class='extra-bottom-2'>&nbsp;</div>~

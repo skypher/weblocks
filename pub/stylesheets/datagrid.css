@@ -48,9 +48,19 @@
 .datagrid-search-bar .extra-top-1, .datagrid-search-bar .extra-top-2,
 .datagrid-search-bar .extra-top-3,
 .datagrid-search-bar .extra-bottom-1, .datagrid-search-bar .extra-bottom-2,
-.datagrid-search-bar .extra-bottom-3, .datagrid-search-bar span.title
+.datagrid-search-bar .extra-bottom-3, .datagrid-search-bar span.title,
+.datagrid-form .extra-top-1, .datagrid-form .extra-top-2, .datagrid-form .extra-top-3,
+.datagrid-form .extra-bottom-1, .datagrid-form .extra-bottom-2, .datagrid-form .extra-bottom-3
 {
   display: none;
+}
+
+.datagrid-form .datagrid-body .extra-top-1, .datagrid-form
+.datagrid-body .extra-top-2, .datagrid-form .datagrid-body
+.extra-bottom-1, .datagrid-form .datagrid-body .extra-bottom-2,
+.datagrid-form .datagrid-body .extra-bottom-3
+{
+  display: block;
 }
 
 .datagrid .data-mining-bar

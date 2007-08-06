@@ -9,8 +9,7 @@
 							:onclick "disableIrrelevantButtons(this);")
 						(:input :name "cancel" :type "submit"
 								       :class "submit cancel" :value "Cancel"
-							:onclick "disableIrrelevantButtons(this);")
-						(:input :name "action" :type "hidden" :value ,action)))))
+							:onclick "disableIrrelevantButtons(this);")))))
   `(:form :class "renderer form employee" :action "" :method ,method
 	  :onsubmit ,(format nil "initiateFormAction(\"~A\", ~
                                                        $(this), ~
@@ -26,7 +25,8 @@
 	   ,@preslots
 	   (:h2 :class "form-fields-title" "Form fields:")
 	   (:ul ,@body)
-	   ,@postslots)
+	   ,@postslots
+	  (:input :name "action" :type "hidden" :value ,action))
 	  (:div :class "extra-bottom-1" "&nbsp;")
 	  (:div :class "extra-bottom-2" "&nbsp;")
 	  (:div :class "extra-bottom-3" "&nbsp;")))
