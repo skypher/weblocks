@@ -20,15 +20,15 @@
 </head>~
 <body>~
 <div class='page-wrapper'>~
-<div class='page-extra-top-1'>&nbsp;</div>~
-<div class='page-extra-top-2'>&nbsp;</div>~
-<div class='page-extra-top-3'>&nbsp;</div>~
+<div class='page-extra-top-1'><!-- empty --></div>~
+<div class='page-extra-top-2'><!-- empty --></div>~
+<div class='page-extra-top-3'><!-- empty --></div>~
 <div class='widget composite' id='root'>~
 ~A~
 </div>~
-<div class='page-extra-bottom-1'>&nbsp;</div>~
-<div class='page-extra-bottom-2'>&nbsp;</div>~
-<div class='page-extra-bottom-3'>&nbsp;</div>~
+<div class='page-extra-bottom-1'><!-- empty --></div>~
+<div class='page-extra-bottom-2'><!-- empty --></div>~
+<div class='page-extra-bottom-3'><!-- empty --></div>~
 </div>~
 ~A~
 <div id='ajax-progress'>&nbsp;</div>~

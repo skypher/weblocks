@@ -18,9 +18,9 @@ widget."
 	(render-widget-body w)))
   (htm
    (:div :class "renderer"
-	 (:div :class "extra-top-1" "&nbsp;")
-	 (:div :class "extra-top-2" "&nbsp;")
-	 (:div :class "extra-top-3" "&nbsp;")
+	 (:div :class "extra-top-1" "<!-- empty -->")
+	 (:div :class "extra-top-2" "<!-- empty -->")
+	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
 	       (:div :class "widget string"
@@ -28,9 +28,9 @@ widget."
 	      (:li
 	       (:div :class "widget string"
 		     (:p "Foo"))))
-	 (:div :class "extra-bottom-1" "&nbsp;")
-	 (:div :class "extra-bottom-2" "&nbsp;")
-	 (:div :class "extra-bottom-3" "&nbsp;"))))
+	 (:div :class "extra-bottom-1" "<!-- empty -->")
+	 (:div :class "extra-bottom-2" "<!-- empty -->")
+	 (:div :class "extra-bottom-3" "<!-- empty -->"))))
 
 (deftest render-widget-body-flash-2
     (with-request :get nil

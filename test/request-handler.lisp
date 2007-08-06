@@ -37,9 +37,9 @@
   #.(with-request-template "~
 <div class='widget dataform' id='widget-123'>~
 <div class='renderer data employee'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
+<div class='extra-top-1'><!-- empty --></div>~
+<div class='extra-top-2'><!-- empty --></div>~
+<div class='extra-top-3'><!-- empty --></div>~
 <h1><span class='action'>Viewing:&nbsp;</span><span class='object'>Employee</span></h1>~
 <ul>~
 <li class='name'><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
@@ -48,9 +48,9 @@
 <div class='submit'><a href='/foo/bar?action=abc123' ~
                        onclick='initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); ~
                        return false;'>Modify</a></div>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
+<div class='extra-bottom-1'><!-- empty --></div>~
+<div class='extra-bottom-2'><!-- empty --></div>~
+<div class='extra-bottom-3'><!-- empty --></div>~
 </div>~
 </div>"
       :widget-stylesheets '("dataform")
@@ -61,9 +61,9 @@
 \"<form class='renderer form employee' action='/foo/bar' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3Atest\\\"); ~
                 return false;'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
+<div class='extra-top-1'><!-- empty --></div>~
+<div class='extra-top-2'><!-- empty --></div>~
+<div class='extra-top-3'><!-- empty --></div>~
 <fieldset><h1><span class='action'>Modifying:&nbsp;</span>~
 <span class='object'>Employee</span>~
 </h1>~
@@ -87,9 +87,9 @@ onclick='disableIrrelevantButtons(this);' />~
 </div>~
 <input name='action' type='hidden' value='abc124' />~
 </fieldset>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
+<div class='extra-bottom-1'><!-- empty --></div>~
+<div class='extra-bottom-2'><!-- empty --></div>~
+<div class='extra-bottom-3'><!-- empty --></div>~
 </form>\"},~
 \"on-load\":null}"))
 
@@ -142,17 +142,17 @@ onclick='disableIrrelevantButtons(this);' />~
 <div>hi2</div>~
 </div>~
 <div class='renderer menu'>~
-<div class='extra-top-1'>&nbsp;</div>~
-<div class='extra-top-2'>&nbsp;</div>~
-<div class='extra-top-3'>&nbsp;</div>~
+<div class='extra-top-1'><!-- empty --></div>~
+<div class='extra-top-2'><!-- empty --></div>~
+<div class='extra-top-3'><!-- empty --></div>~
 <h1>Test Nav</h1>~
 <ul>~
 <li><a href='/'>Test1</a></li>~
 <li class='selected-item'><span>Test2</span></li>~
 </ul>~
-<div class='extra-bottom-1'>&nbsp;</div>~
-<div class='extra-bottom-2'>&nbsp;</div>~
-<div class='extra-bottom-3'>&nbsp;</div>~
+<div class='extra-bottom-1'><!-- empty --></div>~
+<div class='extra-bottom-2'><!-- empty --></div>~
+<div class='extra-bottom-3'><!-- empty --></div>~
 </div>~
 </div>"
       :widget-stylesheets '("navigation")

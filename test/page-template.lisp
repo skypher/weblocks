@@ -59,11 +59,11 @@
      (:script :src "/pub/scripts/scriptaculous.js" :type "text/javascript" ""))
     (:body
      (:div :class "page-wrapper"
-	   (:div :class "page-extra-top-1" "&nbsp;")
-	   (:div :class "page-extra-top-2" "&nbsp;")
-	   (:div :class "page-extra-top-3" "&nbsp;")
+	   (:div :class "page-extra-top-1" "<!-- empty -->")
+	   (:div :class "page-extra-top-2" "<!-- empty -->")
+	   (:div :class "page-extra-top-3" "<!-- empty -->")
 	   (:div "test")
-	   (:div :class "page-extra-bottom-1" "&nbsp;")
-	   (:div :class "page-extra-bottom-2" "&nbsp;")
-	   (:div :class "page-extra-bottom-3" "&nbsp;"))
+	   (:div :class "page-extra-bottom-1" "<!-- empty -->")
+	   (:div :class "page-extra-bottom-2" "<!-- empty -->")
+	   (:div :class "page-extra-bottom-3" "<!-- empty -->"))
      (:div :id "ajax-progress" "&nbsp;")))))

@@ -46,7 +46,7 @@ search."
 		hidden-items-count
 		(proper-number-form hidden-items-count "item")
 		(proper-number-form hidden-items-count "is"))
-	"&nbsp;")))
+	"<!-- empty -->")))
 
 (defun datagrid-render-search-bar (grid &rest keys)
   "Renders a search bar for the datagrid."

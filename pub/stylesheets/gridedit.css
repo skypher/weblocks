@@ -12,22 +12,27 @@ div.gridedit .flash .renderer .extra-top-1
   position: absolute;
   z-index: 10;
   left: 0;
+  width: 5px;
+  overflow: hidden;
 }
 
 div.gridedit .flash .renderer .extra-top-2
 {
   right: 0;
+  width: 5px;
   border: none;
   position: absolute;
   margin-top: 0;
   z-index: 10;
+  overflow: hidden;
 }
 
 div.gridedit .flash .renderer .extra-top-3
 {
+  height: 2px;
   background: url(/pub/images/widget/flash/top_background.png) repeat-x;
-  margin-bottom: -14px;
   display: block;
+  overflow: hidden;
 }
 
 div.gridedit .flash .renderer

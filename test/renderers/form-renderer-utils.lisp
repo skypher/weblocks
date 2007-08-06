@@ -17,9 +17,9 @@
                                                        \"weblocks-session=1%3Atest\"); ~
                                                        return false;"
 			     (or action ""))
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
+	  (:div :class "extra-top-1" "<!-- empty -->")
+	  (:div :class "extra-top-2" "<!-- empty -->")
+	  (:div :class "extra-top-3" "<!-- empty -->")
 	  (:fieldset 
 	   (:h1 (:span :class "action" (str ,title-action))
 		(:span :class "object" "Employee"))
@@ -28,7 +28,7 @@
 	   (:ul ,@body)
 	   ,@postslots
 	  (:input :name "action" :type "hidden" :value ,action))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;")))
+	  (:div :class "extra-bottom-1" "<!-- empty -->")
+	  (:div :class "extra-bottom-2" "<!-- empty -->")
+	  (:div :class "extra-bottom-3" "<!-- empty -->")))
 

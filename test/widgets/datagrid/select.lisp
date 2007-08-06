@@ -118,9 +118,9 @@
 	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
+	  (:div :class "extra-top-1" "<!-- empty -->")
+	  (:div :class "extra-top-2" "<!-- empty -->")
+	  (:div :class "extra-top-3" "<!-- empty -->")
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -139,9 +139,9 @@
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc126"))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;"))
+	  (:div :class "extra-bottom-1" "<!-- empty -->")
+	  (:div :class "extra-bottom-2" "<!-- empty -->")
+	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; select all clicked
    (:div :class "data-mining-bar"
 	 #.(searchbar-template "I1" "I2" "I3" "abc129")
@@ -157,9 +157,9 @@
 	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
+	  (:div :class "extra-top-1" "<!-- empty -->")
+	  (:div :class "extra-top-2" "<!-- empty -->")
+	  (:div :class "extra-top-3" "<!-- empty -->")
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -178,9 +178,9 @@
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc132"))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;"))
+	  (:div :class "extra-bottom-1" "<!-- empty -->")
+	  (:div :class "extra-bottom-2" "<!-- empty -->")
+	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; select none clicked
    (:div :class "data-mining-bar"
 	 #.(searchbar-template "I1" "I2" "I3" "abc135")
@@ -196,9 +196,9 @@
 	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3Atest\"); return false;"
-	  (:div :class "extra-top-1" "&nbsp;")
-	  (:div :class "extra-top-2" "&nbsp;")
-	  (:div :class "extra-top-3" "&nbsp;")
+	  (:div :class "extra-top-1" "<!-- empty -->")
+	  (:div :class "extra-top-2" "<!-- empty -->")
+	  (:div :class "extra-top-3" "<!-- empty -->")
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
@@ -217,7 +217,7 @@
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc138"))
-	  (:div :class "extra-bottom-1" "&nbsp;")
-	  (:div :class "extra-bottom-2" "&nbsp;")
-	  (:div :class "extra-bottom-3" "&nbsp;"))))
+	  (:div :class "extra-bottom-1" "<!-- empty -->")
+	  (:div :class "extra-bottom-2" "<!-- empty -->")
+	  (:div :class "extra-bottom-3" "<!-- empty -->"))))
 

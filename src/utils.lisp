@@ -325,7 +325,7 @@ Ex:
   (with-html-output (*weblocks-output-stream*)
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
-       do (htm (:div :class attr "&nbsp;")))))
+       do (htm (:div :class attr "<!-- empty -->")))))
 
 (defmacro with-extra-tags (&body body)
   "A macro used to wrap html into extra tags necessary for

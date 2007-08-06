@@ -7,26 +7,26 @@
 			       (with-html
 				 (:p "hi"))))
   (:div :class "renderer table employee"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
+	(:div :class "extra-top-1" "<!-- empty -->")
+	(:div :class "extra-top-2" "<!-- empty -->")
+	(:div :class "extra-top-3" "<!-- empty -->")
 	(:p "hi")
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;")))
+	(:div :class "extra-bottom-1" "<!-- empty -->")
+	(:div :class "extra-bottom-2" "<!-- empty -->")
+	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
 (deftest-html with-table-header-2
     (with-table-header nil (lambda ()
 			     (with-html
 			       (:p "hi"))))
   (:div :class "renderer table empty-table"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
+	(:div :class "extra-top-1" "<!-- empty -->")
+	(:div :class "extra-top-2" "<!-- empty -->")
+	(:div :class "extra-top-3" "<!-- empty -->")
 	(:p "hi")
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;")))
+	(:div :class "extra-bottom-1" "<!-- empty -->")
+	(:div :class "extra-bottom-2" "<!-- empty -->")
+	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
 ;; with-table-row
 (deftest-html with-table-row-1
@@ -159,22 +159,22 @@
 (deftest-html render-empty-table-1
     (render-empty-table)
   (:div :class "renderer table empty-table"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
+	(:div :class "extra-top-1" "<!-- empty -->")
+	(:div :class "extra-top-2" "<!-- empty -->")
+	(:div :class "extra-top-3" "<!-- empty -->")
 	(:p (:span :class "message" "NIL"))
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;")))
+	(:div :class "extra-bottom-1" "<!-- empty -->")
+	(:div :class "extra-bottom-2" "<!-- empty -->")
+	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
 (deftest-html render-empty-table-2
     (render-empty-table :on-empty-string "no data" :caption "caption")
   (:div :class "renderer table empty-table"
-	(:div :class "extra-top-1" "&nbsp;")
-	(:div :class "extra-top-2" "&nbsp;")
-	(:div :class "extra-top-3" "&nbsp;")
+	(:div :class "extra-top-1" "<!-- empty -->")
+	(:div :class "extra-top-2" "<!-- empty -->")
+	(:div :class "extra-top-3" "<!-- empty -->")
 	(:p (:span :class "caption" "caption:&nbsp;")
 	    (:span :class "message" "no data"))
-	(:div :class "extra-bottom-1" "&nbsp;")
-	(:div :class "extra-bottom-2" "&nbsp;")
-	(:div :class "extra-bottom-3" "&nbsp;")))
+	(:div :class "extra-bottom-1" "<!-- empty -->")
+	(:div :class "extra-bottom-2" "<!-- empty -->")
+	(:div :class "extra-bottom-3" "<!-- empty -->")))
