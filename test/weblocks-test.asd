@@ -40,7 +40,7 @@
 	       (:module fixtures
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
-	       (:module blocks
+	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch")
 				     (:file "form"))

@@ -28,7 +28,7 @@
 	       (:file "request-handler"
 		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions" "request-hooks"
 				   "application" "request"))
-	       (:module blocks
+	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch"
 				      :depends-on ("form"))
@@ -42,7 +42,7 @@
 				      :depends-on ("renderer-output-utils"))
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
-			:depends-on ("weblocks" "utils" blocks))
+			:depends-on ("weblocks" "utils" snippets))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers"
@@ -71,11 +71,11 @@
 				      :depends-on ("widget"))
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
-			:depends-on (blocks renderers
+			:depends-on (snippets renderers
 					    form-management "utils" "actions" "server" "request"))
 	       (:module data-types
 			:components ((:file "us-states"))
-			:depends-on (renderers blocks))
+			:depends-on (renderers snippets))
 	       (:file "server"
 		      :depends-on ("weblocks"))
 	       (:file "request"
