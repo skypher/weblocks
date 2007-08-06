@@ -1,26 +1,38 @@
 
 (in-package :weblocks)
 
-(export '(make-action-url make-action handle-client-request))
+(export '(make-action-url make-action))
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
   'get-request-action'.")
 
-(defun make-action (action-fn &optional (action-code (gensym)))
-  "Coverts a function into an action that can be rendered into
-HTML. A unique string is generated for the function, and a
+(defun generate-action-code ()
+  "Generates unique, hard to guess action codes."
+  (let ((new-action-id (gensym "")))
+    (format nil "~A:~A"
+	    new-action-id
+	    (hunchentoot::md5-hex
+	     (hunchentoot::create-random-string 10 36)))))
+
+(defun make-action (action-fn &optional (action-code (generate-action-code)))
+  "Coverts a function into an action that can be rendered into HTML. A
+unique, hard to guess string is generated for the function, and a
 function is added to the session hashtable under this string. The
 string is then returned. When later requests come in,
-'get-request-action' machinery determines if the action string
-that came with the request is stored in the hashtable, and if so,
-invokes the stored function.
+'get-request-action' machinery determines if the action string that
+came with the request is stored in the hashtable, and if so, invokes
+the stored function.
 
 'action-fn' - A function of zero arguments that will be called if
 the user initiates appropriate control (link, form, etc.)
 
 'action-code' - The code to use for an action (if not specified
-make-action generates a unique value for each action)"
+make-action generates a unique value for each action). Note, if you
+don't provide a hard to guess code ('generate-action-code' is used by
+default), the user will be vulnerable to an attack where a malicious
+attacker can attempt to guess a dangerour action id and send the user
+a link to it. Only use guessable action codes for GET actions."
   (setf (session-value action-code) action-fn)
   action-code)
 
@@ -31,7 +43,9 @@ the action. Used, among others, by 'render-link'.
 Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
-  (concatenate 'string "?" *action-string* "=" (princ-to-string action-code)))
+  (concatenate 'string
+	       "?" *action-string* "="
+	       (url-encode (princ-to-string action-code))))
 
 (defun get-request-action-name ()
   "Gets the name of the action from the request."

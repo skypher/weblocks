@@ -16,12 +16,12 @@
   `(with-html
      (:form :id ,id :class ,class :action "" :method (attributize-name ,method-type)
 	    :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
-			      ,action-code
+			      (url-encode ,action-code)
 			      (session-name-string-pair))
 	    (with-extra-tags
 	      (htm (:fieldset
 		    ,@body
-		    (:input :name "action" :type "hidden" :value ,action-code)))))))
+		    (:input :name "action" :type "hidden" :value (url-encode ,action-code))))))))
 
 (defun render-link (action-code name)
   "Renders an action into an href link. The link will be rendered in

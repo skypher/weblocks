@@ -1,8 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(*on-ajax-complete-scripts* *uri-tokens*
-	  *current-page-description*))
+(export '(handle-client-request *on-ajax-complete-scripts*
+	  *uri-tokens* *current-page-description*))
 
 (defgeneric handle-client-request ()
   (:documentation
