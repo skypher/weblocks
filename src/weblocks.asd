@@ -72,7 +72,8 @@
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
 			:depends-on (snippets renderers
-					    form-management "utils" "actions" "server" "request"))
+					      form-management "utils" "actions" "server" "request"
+					      "request-hooks"))
 	       (:module data-types
 			:components ((:file "us-states"))
 			:depends-on (renderers snippets))
