@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
-  :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri")
+  :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri" "md5")
   :components ((:file "weblocks")
 	       (:file "utils"
 		      :depends-on ("weblocks"))
