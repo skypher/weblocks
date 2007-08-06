@@ -166,7 +166,7 @@ rendered."))
 	    (apply body-fn obj args)
 	    (safe-apply postwidget-body-fn args)))))
 
-(defgeneric render-widget-body (obj &rest args)
+(defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
    "A generic function that renders a widget in its current state. In
 order to actually render the widget, call 'render-widget' instead.
