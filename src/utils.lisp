@@ -8,7 +8,7 @@
 	  render-extra-tags with-extra-tags strictly-less-p
 	  equivalentp object-id id alist->plist intersperse
 	  remove-keyword-parameter public-file-relative-path
-	  public-files-relative-paths))
+	  public-files-relative-paths request-uri-path))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -497,3 +497,11 @@ Ex:
   (loop for i in args
      collect (public-file-relative-path (car i) (cdr i))))
 
+(defun request-uri-path ()
+  "Returns the path component of the request URI. The path component
+does not include the domain name, and any query string parameters.
+Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
+\(request-uri-path)
+=> \"/foo/bar\""
+  (declare (special *uri-tokens*))
+  (apply #'concatenate 'string "/" (intersperse *uri-tokens* "/")))

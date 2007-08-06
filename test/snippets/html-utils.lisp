@@ -8,7 +8,7 @@
 	(:div "test1")
 	(:div "test2")))
   (:form
-   :action ""
+   :action "/foo/bar"
    :method "get"
    :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")
@@ -29,7 +29,7 @@
   (:form
    :id "some-id"
    :class "some-class"
-   :action ""
+   :action "/foo/bar"
    :method "get"
    :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")

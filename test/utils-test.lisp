@@ -444,3 +444,15 @@
 		      '(:script . "bar")))
   "(stylesheets/foo.css scripts/bar.js)")
 
+;;; test request-uri-path
+(deftest request-uri-path-1
+    (with-request :get nil
+      (request-uri-path))
+  "/foo/bar")
+
+(deftest request-uri-path-2
+    (let (*uri-tokens*)
+      (declare (special *uri-tokens*))
+      (request-uri-path))
+  "/")
+

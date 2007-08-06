@@ -86,13 +86,15 @@
    (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"
 	     (:strong "Select: ")
-	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     (:a :href "/foo/bar?action=abc123"
+		 :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
-	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	     (:a :href "/foo/bar?action=abc124"
+		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :class "datagrid-form"
-    :action ""
+    :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")
@@ -125,13 +127,15 @@
    (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"
 	     (:strong "Select: ")
-	     (:a :href "?action=abc128" :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     (:a :href "/foo/bar?action=abc128"
+		 :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
-	     (:a :href "?action=abc129" :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	     (:a :href "/foo/bar?action=abc129"
+		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :class "datagrid-form"
-    :action ""
+    :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")
@@ -173,9 +177,11 @@
    (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"
 	     (:strong "Select: ")
-	     (:a :href "?action=abc134" :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     (:a :href "/foo/bar?action=abc134"
+		 :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
-	     (:a :href "?action=abc135" :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	     (:a :href "/foo/bar?action=abc135"
+		 :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123"
 	 (:div :class "renderer"
 	 (:div :class "extra-top-1" "&nbsp;")
@@ -190,7 +196,7 @@
 	 (:div :class "extra-bottom-3" "&nbsp;")))
    (:form
     :class "datagrid-form"
-    :action ""
+    :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")
@@ -241,13 +247,15 @@
    (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"
 	     (:strong "Select: ")
-	     (:a :href "?action=abc123" :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
+	     (:a :href "/foo/bar?action=abc123"
+		 :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;" "All")
 	     ", "
-	     (:a :href "?action=abc124" :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	     (:a :href "/foo/bar?action=abc124"
+		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
     :class "datagrid-form"
-    :action ""
+    :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")
@@ -289,7 +297,7 @@
 	 (:div :class "extra-bottom-3" "&nbsp;")))
    (:form
     :class "datagrid-form"
-    :action ""
+    :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc128\", $(this), \"weblocks-session=1%3Atest\"); return false;"
     (:div :class "extra-top-1" "&nbsp;")

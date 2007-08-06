@@ -14,7 +14,7 @@
 (defmacro with-html-form ((method-type action-code &key id class) &body body)
   "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
   `(with-html
-     (:form :id ,id :class ,class :action "" :method (attributize-name ,method-type)
+     (:form :id ,id :class ,class :action (request-uri-path) :method (attributize-name ,method-type)
 	    :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
 			      (url-encode ,action-code)
 			      (session-name-string-pair))

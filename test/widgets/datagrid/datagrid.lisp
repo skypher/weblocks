@@ -117,7 +117,7 @@
    (:div :class "data-mining-bar"
 	 #.(searchbar-template "I1" "I2" "I3" "abc123"))
    (:form :class "datagrid-form"
-	  :action ""
+	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:div :class "extra-top-1" "&nbsp;")
@@ -154,7 +154,7 @@
   (htm
    (:div :class "data-mining-bar" "")
    (:form :class "datagrid-form"
-	  :action ""
+	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:div :class "extra-top-1" "&nbsp;")
@@ -188,7 +188,7 @@
 						       :hidden-items-text
 						       "(2 items are hidden by the search)"))
    (:form :class "datagrid-form"
-	  :action ""
+	  :action "/foo/bar"
 	  :method "get"
 	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 	  (:div :class "extra-top-1" "&nbsp;")

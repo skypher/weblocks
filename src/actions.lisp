@@ -44,6 +44,7 @@ Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
   (concatenate 'string
+	       (request-uri-path) ; we need this for w3m
 	       "?" *action-string* "="
 	       (url-encode (princ-to-string action-code))))
 

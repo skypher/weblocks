@@ -1,7 +1,8 @@
 
 (in-package :weblocks-test)
 
-(defun searchbar-template (form-id search-id submit-id action &key hidden-items-text value)
+(defun searchbar-template (form-id search-id submit-id action &key hidden-items-text value
+			   (uri "/foo/bar"))
   `(:div :class "datagrid-search-bar"
 	 (:div :class "extra-top-1" "&nbsp;")
 	 (:div :class "extra-top-2" "&nbsp;")
@@ -10,7 +11,7 @@
 		(:strong "Search table&nbsp;"))
 	 ,(when hidden-items-text
 	      `(htm (:span :class "hidden-items" ,hidden-items-text)))
-	 (:form :id ,form-id :class "isearch" :action "" :method "get" :onsubmit
+	 (:form :id ,form-id :class "isearch" :action ,uri :method "get" :onsubmit
 		,(format
 		  nil "initiateFormAction(\"~A\", $(this), \"weblocks-session=1%3Atest\"); return false;"
 		  action)

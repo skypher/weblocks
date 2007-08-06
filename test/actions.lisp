@@ -36,8 +36,9 @@
 
 ;;; testing make-action-url
 (deftest make-action-url-1
-    (make-action-url "test-action")
-  "?action=test-action")
+    (with-request :get nil
+      (make-action-url "test-action"))
+  "/foo/bar?action=test-action")
 
 ;;; test eval-action
 (deftest eval-action-1

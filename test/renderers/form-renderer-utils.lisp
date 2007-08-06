@@ -9,13 +9,14 @@
 							:onclick "disableIrrelevantButtons(this);")
 						(:input :name "cancel" :type "submit"
 								       :class "submit cancel" :value "Cancel"
-							:onclick "disableIrrelevantButtons(this);")))))
-  `(:form :class "renderer form employee" :action "" :method ,method
+							:onclick "disableIrrelevantButtons(this);"))))
+			     (uri "/foo/bar"))
+  `(:form :class "renderer form employee" :action ,uri :method ,method
 	  :onsubmit ,(format nil "initiateFormAction(\"~A\", ~
                                                        $(this), ~
                                                        \"weblocks-session=1%3Atest\"); ~
                                                        return false;"
-			     action)
+			     (or action ""))
 	  (:div :class "extra-top-1" "&nbsp;")
 	  (:div :class "extra-top-2" "&nbsp;")
 	  (:div :class "extra-top-3" "&nbsp;")

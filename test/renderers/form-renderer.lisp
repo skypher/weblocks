@@ -108,7 +108,7 @@
 (deftest-html render-form-3
     (with-request :post nil
       (render-form *joe* :slots '(address-ref)))
-  #.(form-header-template ""
+  #.(form-header-template nil
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -164,7 +164,7 @@
 (deftest-html render-form-5
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
-  #.(form-header-template ""
+  #.(form-header-template nil
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -185,7 +185,7 @@
 (deftest-html render-form-6
     (with-request :post nil
       (render-form *joe* :slots '((name . nickname))))
-  #.(form-header-template ""
+  #.(form-header-template nil
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -201,7 +201,7 @@
 (deftest-html render-form-7
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
-  #.(form-header-template ""
+  #.(form-header-template nil
      '((:li :class "name item-not-validated"
 	(:label (:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"

@@ -18,6 +18,7 @@
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
+	(setf (slot-value *request* 'hunchentoot::uri) "/foo/bar")
 	(defun init-user-session (comp)
 	  (push (make-instance 'dataform :data *joe*) (composite-widgets comp)))
 	;; handle the first request (make sure data is drawn)
@@ -44,7 +45,7 @@
 <li class='name'><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
 <li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
-<div class='submit'><a href='?action=abc123' ~
+<div class='submit'><a href='/foo/bar?action=abc123' ~
                        onclick='initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); ~
                        return false;'>Modify</a></div>~
 <div class='extra-bottom-1'>&nbsp;</div>~
@@ -52,11 +53,12 @@
 <div class='extra-bottom-3'>&nbsp;</div>~
 </div>~
 </div>"
-      :widget-stylesheets '("dataform"))
+      :widget-stylesheets '("dataform")
+      :title "Hello - Bar")
   " "
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
-\"<form class='renderer form employee' action='' method='post' ~
+\"<form class='renderer form employee' action='/foo/bar' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3Atest\\\"); ~
                 return false;'>~
 <div class='extra-top-1'>&nbsp;</div>~
@@ -99,6 +101,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
+	(setf (slot-value *request* 'hunchentoot::uri) "/foo/bar")
 	(defun init-user-session (comp)
 	  (setf (composite-widgets comp) (list (lambda () nil))))
 	;; handle the first request (make sure data is drawn)
@@ -108,7 +111,8 @@ onclick='disableIrrelevantButtons(this);' />~
   #.(with-request-template
 	    "~
 <div class='widget function'>~
-</div>" :render-debug-toolbar-p t)
+</div>" :render-debug-toolbar-p t
+:title "Hello - Bar")
   t)
 
 ;;; make sure navigation controls are modified by request uri

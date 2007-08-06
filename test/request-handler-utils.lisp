@@ -47,7 +47,7 @@
 	  (format nil body)
 	  (if render-debug-toolbar-p (format nil "~
 	       <div class='debug-toolbar'>~
-               <a href='?action=debug-reset-sessions' title='Reset Sessions'>~
+               <a href='/foo/bar?action=debug-reset-sessions' title='Reset Sessions'>~
                <img src='/pub/images/reset.png' alt='Reset Sessions' /></a>~
                </div>")
 	      "")))
