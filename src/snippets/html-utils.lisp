@@ -21,7 +21,7 @@
 	    (with-extra-tags
 	      (htm (:fieldset
 		    ,@body
-		    (:input :name "action" :type "hidden" :value (url-encode ,action-code))))))))
+		    (:input :name *action-string* :type "hidden" :value ,action-code)))))))
 
 (defun render-link (action-code name)
   "Renders an action into an href link. The link will be rendered in
