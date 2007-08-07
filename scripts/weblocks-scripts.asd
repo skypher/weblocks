@@ -11,9 +11,11 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A set of scripts for weblocks framework."
-  :depends-on ("cl-fad")
+  :depends-on ("cl-fad" "cl-ppcre")
   :components ((:file "weblocks-scripts")
 	       (:file "gen-doc"
+		      :depends-on ("weblocks-scripts"))
+	       (:file "make-new-app"
 		      :depends-on ("weblocks-scripts"))))
 
 

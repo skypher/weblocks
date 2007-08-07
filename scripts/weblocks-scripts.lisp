@@ -1,4 +1,4 @@
 
 (defpackage #:weblocks-scripts
-  (:use :cl))
+  (:use :cl :cl-fad))
 
