@@ -45,16 +45,21 @@
 	     :initform nil
 	     :initarg :ui-state
 	     :documentation "A state of the gridedit control. When set
-	     to nil, gridedit simply renders an 'add entry' button,
-	     assuming its permitted (see 'allow-add-p'). When set
-	     to :add, renders an empty form that allows adding a new
-	     entry.")
+	     to nil, gridedit simply renders an 'add entry' button and
+	     a 'delete entry' button, assuming they are permitted (see
+	     'allow-add-p' and 'allow-delete-p'). When set to :add,
+	     renders an empty form that allows adding a new entry.")
    (flash :accessor gridedit-flash
 	  :initform (make-instance 'flash)
 	  :initarg :flash
-	  :documentation "A flash control used by gridedit to display
+	  :documentation "A flash widget used by gridedit to display
 	  relevant information to the user (how many items have been
-	  deleted, etc.)"))
+	  deleted, etc.)")
+   (dataform :accessor gridedit-dataform
+	     :initform nil
+	     :documentation "A dataform widget used by gridedit to
+	     display a form for adding and editing items. This widget
+	     will be created and destroyed as necessary."))
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
@@ -69,18 +74,23 @@ Specialize this method to provide different ways to add items to the
 grid."))
 
 (defmethod gridedit-render-new-item-form ((grid datagrid))
-  (render-widget (make-instance 'dataform
-				:data (make-instance (datagrid-data-class grid))
-				:ui-state :form
-				:on-cancel (lambda (obj)
-					     (setf (gridedit-ui-state grid) nil)
-					     (setf (datagrid-allow-item-ops-p grid) t))
-				:on-success (lambda (obj)
-					      (gridedit-add-item grid (dataform-data obj))
-					      (setf (datagrid-allow-item-ops-p grid) t)
-					      (setf (gridedit-ui-state grid) nil))
-				:widget-args '(:title-action "Adding"
-					       :ignore-unbound-slots-p t))))
+  (unless (gridedit-dataform grid)
+    (setf (gridedit-dataform grid)
+	  (make-instance 'dataform
+			 :data (make-instance (datagrid-data-class grid))
+			 :ui-state :form
+			 :on-cancel (lambda (obj)
+				      (setf (gridedit-ui-state grid) nil)
+				      (setf (datagrid-allow-item-ops-p grid) t)
+				      (setf (gridedit-dataform grid) nil))
+			 :on-success (lambda (obj)
+				       (gridedit-add-item grid (dataform-data obj))
+				       (setf (datagrid-allow-item-ops-p grid) t)
+				       (setf (gridedit-ui-state grid) nil)
+				       (setf (gridedit-dataform grid) nil))
+			 :widget-args '(:title-action "Adding"
+					:ignore-unbound-slots-p t))))
+  (render-widget (gridedit-dataform grid)))
 
 (defun gridedit-add-item (grid item)
   "If 'on-add-item' is specified, simply calls
