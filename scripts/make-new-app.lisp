@@ -93,6 +93,9 @@ application. Note, 'name' is expected to be a symbol naming the
 application."
   ; ensure name is a symbol
   (assert (symbolp name))
+  ; if target is missing, set default
+  (unless target
+    (setf target *default-pathname-defaults*))
   ; create a directory 'name' under 'target'
   (let* ((new-project-dir (merge-pathnames
 			   (make-pathname :directory `(:relative ,(attributize-name name)))
