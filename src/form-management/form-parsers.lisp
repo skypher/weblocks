@@ -3,6 +3,25 @@
 
 (export '(parse-validation-error parse-slot-from-request))
 
+;;; Determine parser precidence list from typespec
+(defun parsers-from-typespec (typespec)
+  "Walks the typespec and returns a list of potential parser names."
+  (when (not (listp typespec))
+    (return-from parsers-from-typespec (list typespec)))
+  (remove-duplicates
+   (remove nil
+	   (case (car typespec)
+	     ('mod (list 'integer))
+	     ('eql (list (type-of (cadr typespec))))
+	     ('member (mapcar #'type-of (cdr typespec)))
+	     ('not (list nil))
+	     ('satisfies (list nil))
+	     ('values (list nil))
+	     ('and (apply #'append (mapcar #'parsers-from-typespec (cdr typespec))))
+	     ('or (apply #'append (mapcar #'parsers-from-typespec (cdr typespec))))
+	     (otherwise (list (car typespec)))))))
+
+;;; Error condition
 (define-condition parse-validation-error (form-validation-error)
   ((expected-type :accessor validation-expected-type :initarg :expected-type))
   (:report (lambda (condition stream)
@@ -14,6 +33,7 @@
   type specified on an object slot. See 'parse-slot-from-request' for
   more details."))
 
+;;; Parsers
 (defgeneric parse-slot-from-request (slot-type slot-name request-slot-value)
   (:documentation
    "Parses 'request-slot-value' into a type specified by

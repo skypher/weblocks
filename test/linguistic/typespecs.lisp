@@ -45,7 +45,7 @@
   "either an integer or a string")
 
 (deftest typespec-to-error-aux-2
-    (weblocks::typespec-to-error-aux 'integer))
+    (weblocks::typespec-to-error-aux 'integer)
   "an integer")
 
 ;;; test atomic-typespec-to-error
@@ -166,42 +166,42 @@
   "an integer, even, and positive")
 
 (deftest compound-typespec-to-error-and-7
-    (compound-typespec-to-error 'and '((integer 1 100) (satisfies evenp) (satisfies positivep)))
+    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
   "an even, positive integer between 1 and 100")
 
 (deftest compound-typespec-to-error-and-8
     (compound-typespec-to-error 'and '((satisfies evenp)))
   "even")
 
-(deftest compound-typespec-to-error-and-7
+(deftest compound-typespec-to-error-and-9
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) integer))
   "an even, positive integer")
 
-(deftest compound-typespec-to-error-and-8
+(deftest compound-typespec-to-error-and-10
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
   "an even, positive integer between 1 and 100")
 
-(deftest compound-typespec-to-error-and-9
+(deftest compound-typespec-to-error-and-11
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) integer
 				       (satisfies nicep) string))
   "an even, positive integer and a nice string")
 
-(deftest compound-typespec-to-error-and-10
+(deftest compound-typespec-to-error-and-12
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (or integer string)
 				       (satisfies nicep) string))
   "even, positive integer or string and a nice string")
 
-(deftest compound-typespec-to-error-and-11
+(deftest compound-typespec-to-error-and-13
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (or integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, or pathname and a nice string")
 
-(deftest compound-typespec-to-error-and-12
+(deftest compound-typespec-to-error-and-14
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, and pathname and a nice string")
 
-(deftest compound-typespec-to-error-and-12
+(deftest compound-typespec-to-error-and-15
     (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, and pathname and a nice string")
@@ -258,7 +258,7 @@
   "odd and either 1, 2, or 3")
 
 ;;; test compound-typespec-to-error-values-1
-(deftest compound-typespec-to-error-member-1
+(deftest compound-typespec-to-error-values-1
     (multiple-value-bind (res err)
 	(ignore-errors (compound-typespec-to-error 'values nil))
       res)
