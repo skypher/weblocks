@@ -35,8 +35,18 @@
   t nil)
 
 ;;; test typespec-to-error
+(deftest typespec-to-error-1
+    (typespec-to-error '(or integer string))
+  "must be either an integer or a string")
 
 ;;; test typespec-to-error-aux
+(deftest typespec-to-error-aux-1
+    (weblocks::typespec-to-error-aux '(or integer string))
+  "either an integer or a string")
+
+(deftest typespec-to-error-aux-2
+    (weblocks::typespec-to-error-aux 'integer))
+  "an integer")
 
 ;;; test atomic-typespec-to-error
 (deftest atomic-typespec-to-error-1

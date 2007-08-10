@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(value-required-p typespec-compound-only-p
+(export '(value-required-p typespec-compound-only-p typespec-to-error
 	  atomic-typespec-to-error compound-typespec-to-error))
 
 ;;; Required fields
