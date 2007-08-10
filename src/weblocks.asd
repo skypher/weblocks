@@ -15,8 +15,6 @@
   :components ((:file "weblocks")
 	       (:file "utils"
 		      :depends-on ("weblocks"))
-	       (:file "linguistic"
-		      :depends-on ("weblocks"))
 	       (:file "page-template"
 		      :depends-on ("weblocks" "utils" "application"))
 	       (:file "actions"
@@ -34,6 +32,11 @@
 				      :depends-on ("html-utils"))
 				     (:file "html-utils"))
 			:depends-on ("weblocks" "request" "server" "actions"))
+	       (:module linguistic
+			:components ((:file "grammar")
+				     (:file "typespecs"
+				      :depends-on ("grammar")))
+			:depends-on ("weblocks" "utils"))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
@@ -73,7 +76,7 @@
 				      :depends-on ("composite" "widget")))
 			:depends-on (snippets renderers
 					      form-management "utils" "actions" "server" "request"
-					      "request-hooks"))
+					      "request-hooks" linguistic))
 	       (:module data-types
 			:components ((:file "us-states"))
 			:depends-on (renderers snippets))

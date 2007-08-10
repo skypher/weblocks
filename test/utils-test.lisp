@@ -392,6 +392,22 @@
     (intersperse nil 0)
   nil)
 
+(deftest intersperse-4
+    (intersperse '((1 2) (3 4) (5 6)) 0)
+  ((1 2) 0 (3 4) 0 (5 6)))
+
+(deftest intersperse-5
+    (intersperse '(1 2) 0)
+  (1 0 2))
+
+(deftest intersperse-6
+    (intersperse '(1 2) 0 :last -1)
+  (1 -1 2))
+
+(deftest intersperse-7
+    (intersperse '(1 2 3 4 5 6) 0 :last -1)
+  (1 0 2 0 3 0 4 0 5 -1 6))
+
 ;;; test insert-after
 (deftest insert-after-1
     (let ((a (list 1 3 4 5)))
@@ -456,3 +472,42 @@
       (request-uri-path))
   "/")
 
+;;; test string-remove-left
+(deftest string-remove-left-1
+    (string-remove-left "Hello World" "he")
+  nil)
+
+(deftest string-remove-left-2
+    (string-remove-left "Hello World" "He")
+  "llo World")
+
+(deftest string-remove-left-3
+    (string-remove-left "Hello World" "he" :ignore-case-p t)
+  "llo World")
+
+;;; test string-remove-right
+(deftest string-remove-right-1
+    (string-remove-right "Hello World" "Ld")
+  nil)
+
+(deftest string-remove-right-2
+    (string-remove-right "Hello World" "ld")
+  "Hello Wor")
+
+(deftest string-remove-right-3
+    (string-remove-right "Hello World" "Ld" :ignore-case-p t)
+  "Hello Wor")
+
+;;; test find-all
+(deftest find-all-1
+    (find-all '(1 2 3 4 5 6) #'oddp)
+  (1 3 5))
+
+(deftest find-all-2
+    (find-all '(1 2 3 4 5 6) #'oddp :key #'1+)
+  (2 4 6))
+
+;;; test stable-set-difference
+(deftest stable-set-difference-1
+    (stable-set-difference '(1 2 3 4 5 6 7 8) '(2 5 6))
+  (1 3 4 7 8))

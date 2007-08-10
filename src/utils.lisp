@@ -8,7 +8,9 @@
 	  render-extra-tags with-extra-tags strictly-less-p
 	  equivalentp object-id id alist->plist intersperse
 	  remove-keyword-parameter public-file-relative-path
-	  public-files-relative-paths request-uri-path))
+	  public-files-relative-paths request-uri-path
+	  string-remove-left string-remove-right find-all
+	  stable-set-difference))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -429,17 +431,23 @@ values."
 		   (intern (string-upcase (car i)) keyword-package))
        collect (cdr i))))
 
-(defun intersperse (list delimeter)
+(defun intersperse (list delimeter &key (last delimeter))
   "Intersperses a list with a delimeter.
+
+If 'last' is specified, it will be used for the last delimeter,
+instead of 'delimeter'.
 
 \(intersperse '(1 2 3 4 5) 0)
 => (1 0 2 0 3 0 4 0 5)"
-  (if (null list)
-      list
-      (flatten
-       (cons (car list)
-	     (loop for i in (cdr list)
-		collect (list delimeter i))))))
+  (cond
+    ((null list) list)
+    ((null (cdr list)) list)
+    ((null (cddr list)) (list (car list)
+			      last
+			      (cadr list)))
+    (t (cons (car list)
+	     (cons delimeter
+		   (intersperse (cdr list) delimeter :last last))))))
 
 
 (defun remove-keyword-parameter (parameter-list keyword)
@@ -505,3 +513,31 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 => \"/foo/bar\""
   (declare (special *uri-tokens*))
   (apply #'concatenate 'string "/" (intersperse *uri-tokens* "/")))
+
+(defun string-remove-left (str suffix &key ignore-case-p)
+  "If string 'str' starts with 'suffix', remove 'suffix' from the
+start of 'str'."
+  (when (string-starts-with str suffix :ignore-case-p ignore-case-p)
+    (subseq str (length suffix))))
+
+(defun string-remove-right (str suffix &key ignore-case-p)
+  "If string 'str' ends with 'suffix', remove 'suffix' from the end of
+'str'."
+  (when (string-ends-with str suffix :ignore-case-p ignore-case-p)
+    (subseq str 0 (- (length str)
+		     (length suffix)))))
+
+(defun find-all (sequence predicate &key (key #'identity))
+  "Returns a sequence of all elements found in 'sequence' that match
+'predicate'. If 'key' is provides, each it is used to retreive each
+item before passing it to 'predicate'."
+  (loop for i in sequence
+       when (funcall predicate (funcall key i))
+       collect i))
+
+(defun stable-set-difference (list-1 list-2 &key (test #'eql) (key #'identity))
+  "Returns a list of element of 'list-1' that do not appear in 'list-2'. "
+  (loop for i in list-1
+       unless (find (funcall key i) list-2 :test test :key key)
+       collect i))
+

@@ -15,8 +15,6 @@
   :components ((:file "weblocks-test")
 	       (:file "utils-test"
 		      :depends-on ("weblocks-test"))
-	       (:file "linguistic"
-		      :depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-hooks"
@@ -35,6 +33,10 @@
 		      :depends-on ("weblocks-test"))
 	       (:file "page-template"
 		      :depends-on ("weblocks-test"))
+	       (:module linguistic
+			:components ((:file "grammar")
+				     (:file "typespecs"))
+			:depends-on ("weblocks-test"))
 	       (:module fixtures
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
