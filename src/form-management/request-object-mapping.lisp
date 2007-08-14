@@ -67,7 +67,8 @@ done by 'update-object-from-request'."
 		   (slot-key (attributize-name slot-name))
 		   (request-slot-value (request-parameter slot-key))
 		   (slot-type (slot-definition-type (car slot)))
-		   (slot-value (ignore-errors (get-slot-value obj (car slot)))))
+		   (slot-value (ignore-errors (get-slot-value obj (car slot))))
+		   (human-slot-name (humanize-name (cdr slot))))
 	      (if (and (typep slot-value 'standard-object)
 		       (render-slot-inline-p obj slot-name))
 		  (multiple-value-bind (success res)
@@ -78,18 +79,18 @@ done by 'update-object-from-request'."
 		  (when request-slot-value
 		    (if (slot-in-request-empty-p slot-type request-slot-value)
 			(if (slot-value-required-p (class-name-of obj) (car slot))
-			    (push `(,slot-key . ,(make-condition 'required-validation-error
-								 :slot-name (cdr slot))) errors)
-			    (push `(,slot-key . nil) results))
-			(let (parsed-value)
-			  (handler-case (progn
-					  (setf parsed-value
-						(parse-slot-from-request slot-type slot-name
-									 request-slot-value))
-					  (validate-slot-from-request obj slot parsed-value)
-					  (push `(,slot-key . ,parsed-value) results))
-			    (form-validation-error (condition)
-			      (push `(,slot-key . ,condition) errors)))))))))
+			    (push (cons slot-key (format nil *required-field-message*
+							 human-slot-name))
+				  errors)
+			    (push (cons slot-key nil) results))
+			(multiple-value-bind (parsedp parsed-value)
+			    (invoke-parsers-on-slot slot-type slot-name request-slot-value)
+			  (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
+			      (push (cons slot-key parsed-value) results)
+			      (push (cons slot-key
+					  (invalid-input-error-message obj slot-name human-slot-name
+								       slot-type parsed-value))
+				    errors))))))))
 	  (object-visible-slots obj :slots slots))
     (if errors
 	(values nil errors)

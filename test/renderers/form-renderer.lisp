@@ -19,8 +19,7 @@
 
 ;;; test render-validation-summary
 (deftest-html render-validation-summary-1
-    (render-validation-summary `(("Hello" . ,(make-condition 'required-validation-error
-							     :slot-name "HELLO"))))
+    (render-validation-summary '(("Hello" . "Hello is a required field.")))
   (:div :class "validation-errors-summary"
 	    (:h2 :class "error-count"
 		 "There is 1 validation error:")
@@ -28,10 +27,8 @@
 	     (:li "Hello is a required field."))))
 
 (deftest-html render-validation-summary-2
-    (render-validation-summary `(("Hello" . ,(make-condition 'required-validation-error
-							     :slot-name "HELLO"))
-				 ("World" . ,(make-condition 'required-validation-error
-							     :slot-name "WORLD"))))
+    (render-validation-summary '(("Hello" . "Hello is a required field.")
+				 ("World" . "World is a required field.")))
   (:div :class "validation-errors-summary"
 	    (:h2 :class "error-count"
 		 "There are 2 validation errors:")

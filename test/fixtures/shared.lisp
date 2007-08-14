@@ -10,23 +10,19 @@
 
 (defclass education-history ()
   ((university :reader university :initform "Bene Gesserit University")
-   (graduation-year :reader graduation-year :initform 2000 :type integer)))
+   (graduation-year :reader graduation-year :initform 2000 :type (or null integer))))
 
 (defparameter *some-college* (make-instance 'education-history))
 
 (defclass person ()
   ((id :initarg :id :initform (gen-object-id))
-   (name :accessor first-name :initarg :name)
-   (age :type integer :initarg :age)
+   (name :accessor first-name :initarg :name :type string)
+   (age :initarg :age :type integer)
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))
 
 (defclass employee (person)
   ((manager :reader manager :initform "Jim")))
-
-(decl-validate employee
-	       name (:required)
-	       age (:required))
 
 ;;; Create instances for introspection testing
 (defparameter *joe* (make-instance 'employee :name "Joe" :age 30 :id 1))
@@ -59,4 +55,13 @@
 					       (make-navigation "test-nav-3"
 								"test5" (lambda (&rest args) nil)
 								"test6" (lambda (&rest args) nil))))))))))
+
+;;; Some dummy typespecs
+(deftype foo1 () 'integer)
+(deftype foo2 () 'foo1)
+(deftype dummy-exported-type () 'foo2)
+
+; dummy-exported-type needs to be exported for
+; invalid-input-error-message tests to work properly
+(export '(dummy-exported-type))
 

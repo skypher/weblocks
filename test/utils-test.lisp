@@ -181,6 +181,10 @@
     (object-visible-slot-names *joe* :custom-slots '((1 . (foo . hello)) (bar . world)))
   ((name . name) (foo . hello) (manager . manager) (bar . world)))
 
+(deftest object-visible-slots-14
+    (class-name (class-of (caar (object-visible-slots *joe*))))
+  standard-direct-slot-definition)
+
 ;;; test safe-apply
 (deftest safe-apply-1
     (safe-apply #'identity '(5))
@@ -511,3 +515,52 @@
 (deftest stable-set-difference-1
     (stable-set-difference '(1 2 3 4 5 6 7 8) '(2 5 6))
   (1 3 4 7 8))
+
+;;; test typespec-compound-only-p
+(deftest typespec-compound-only-p-1
+    (values (typespec-compound-only-p 'and) (typespec-compound-only-p 'satisfies)
+	    (typespec-compound-only-p 'eql) (typespec-compound-only-p 'member)
+	    (typespec-compound-only-p 'mod) (typespec-compound-only-p 'values)
+	    (typespec-compound-only-p 'not) (typespec-compound-only-p 'or)
+	    (typespec-compound-only-p 'int))
+  t t t t t t t t nil)
+
+;;; test type-expand
+(deftest type-expand-1
+    (type-expand 'foo1)
+  integer)
+
+(deftest type-expand-2
+    (type-expand 'foo2)
+  integer)
+
+(deftest type-expand-3
+    (type-expand 'integer)
+  integer)
+
+;;; test expand-typespec
+(deftest expand-typespec-1
+    (expand-typespec 'integer)
+  integer)
+
+(deftest expand-typespec-2
+    (expand-typespec 'foo2)
+  integer)
+
+(deftest expand-typespec-3
+    (expand-typespec '(or integer))
+  (or integer))
+
+(deftest expand-typespec-4
+    (expand-typespec '(or integer (and foo2 pathname)))
+  (or integer (and integer pathname)))
+
+;;; test symbol-status
+(deftest symbol-status-1
+    (symbol-status 'integer)
+  :external)
+
+(deftest symbol-status-2
+    (symbol-status 'symbol-status-1)
+  :internal)
+

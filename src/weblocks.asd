@@ -52,7 +52,7 @@
 				      :depends-on ("validation"))
 				     (:file "request-object-mapping"
 				      :depends-on ("validation" "form-parsers")))
-			:depends-on ("utils"))
+			:depends-on ("utils" linguistic))
 	       (:module widgets
 			:components ((:file "widget")
 				     (:file "flash"

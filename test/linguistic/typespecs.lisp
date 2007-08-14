@@ -1,24 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test value-required-p
-(deftest value-required-p-1
-    (value-required-p '(or string integer))
-  t)
-
-(deftest value-required-p-2
-    (value-required-p '(or string integer null))
-  nil)
-
-;;; test typespec-compound-only-p
-(deftest typespec-compound-only-p-1
-    (values (typespec-compound-only-p 'and) (typespec-compound-only-p 'satisfies)
-	    (typespec-compound-only-p 'eql) (typespec-compound-only-p 'member)
-	    (typespec-compound-only-p 'mod) (typespec-compound-only-p 'values)
-	    (typespec-compound-only-p 'not) (typespec-compound-only-p 'or)
-	    (typespec-compound-only-p 'int))
-  t t t t t t t t nil)
-
 ;;; test typespec-accepts-adjectives-p
 (deftest typespec-accepts-adjectives-p-1
     (values (weblocks::typespec-accepts-adjectives-p 'not)
@@ -34,238 +16,241 @@
 	    (weblocks::typespec-accepts-adjectives-p '(not 1)))
   t nil)
 
-;;; test typespec-to-error
-(deftest typespec-to-error-1
-    (typespec-to-error '(or integer string))
-  "must be either an integer or a string")
-
-;;; test typespec-to-error-aux
-(deftest typespec-to-error-aux-1
-    (weblocks::typespec-to-error-aux '(or integer string))
+;;; test humanize-typespec
+(deftest humanize-typespec-1
+    (weblocks::humanize-typespec '(or integer string))
   "either an integer or a string")
 
-(deftest typespec-to-error-aux-2
-    (weblocks::typespec-to-error-aux 'integer)
+(deftest humanize-typespec-2
+    (weblocks::humanize-typespec 'integer)
   "an integer")
 
-;;; test atomic-typespec-to-error
-(deftest atomic-typespec-to-error-1
-    (atomic-typespec-to-error 'integer)
+;;; test humanize-atomic-typespec-aux
+(deftest humanize-atomic-typespec-aux-1
+    (humanize-atomic-typespec-aux 'integer)
   "an integer")
 
-(deftest atomic-typespec-to-error-2
+(deftest humanize-atomic-typespec-aux-2
     (multiple-value-bind (res err)
-	(ignore-errors (atomic-typespec-to-error '(integer)))
+	(ignore-errors (humanize-atomic-typespec-aux '(integer)))
       res)
   nil)
 
-(deftest atomic-typespec-to-error-3
-    (atomic-typespec-to-error 'null)
+(deftest humanize-atomic-typespec-aux-3
+    (humanize-atomic-typespec-aux 'null)
   "empty")
 
-(deftest atomic-typespec-to-error-4
-    (atomic-typespec-to-error 'integer :adjectives "even, positive")
+(deftest humanize-atomic-typespec-aux-4
+    (humanize-atomic-typespec-aux 'integer :adjectives "even, positive")
   "an even, positive integer")
 
-(deftest atomic-typespec-to-error-5
-    (atomic-typespec-to-error 'integer :adjectives "positive, even")
+(deftest humanize-atomic-typespec-aux-5
+    (humanize-atomic-typespec-aux 'integer :adjectives "positive, even")
   "a positive, even integer")
 
-(deftest atomic-typespec-to-error-6
-    (atomic-typespec-to-error 'null  :adjectives "even, positive")
+(deftest humanize-atomic-typespec-aux-6
+    (humanize-atomic-typespec-aux 'null  :adjectives "even, positive")
   "even, positive, and empty")
 
-(deftest atomic-typespec-to-error-7
-    (compound-typespec-to-error 'integer '(1 5) :adjectives "positive, even")
-  "a positive, even integer between 1 and 5")
-
-;;; test compound-typespec-to-error (integer)
-(deftest compound-typespec-to-error-integer-1
+;;; test humanize-compound-typespec-aux (integer)
+(deftest humanize-compound-typespec-aux-integer-1
     (multiple-value-bind (res err)
-	(ignore-errors (compound-typespec-to-error 'integer nil))
+	(ignore-errors (humanize-compound-typespec-aux 'integer nil))
       res)
   nil)
 
-(deftest compound-typespec-to-error-integer-2
-    (compound-typespec-to-error 'integer '(3))
+(deftest humanize-compound-typespec-aux-integer-2
+    (humanize-compound-typespec-aux 'integer '(3))
   "an integer greater than or equal to 3")
 
-(deftest compound-typespec-to-error-integer-3
-    (compound-typespec-to-error 'integer '(*))
+(deftest humanize-compound-typespec-aux-integer-3
+    (humanize-compound-typespec-aux 'integer '(*))
   "an integer")
 
-(deftest compound-typespec-to-error-integer-4
-    (compound-typespec-to-error 'integer '(3 7))
+(deftest humanize-compound-typespec-aux-integer-4
+    (humanize-compound-typespec-aux 'integer '(3 7))
   "an integer between 3 and 7")
 
-(deftest compound-typespec-to-error-integer-5
-    (compound-typespec-to-error 'integer '(* 7))
+(deftest humanize-compound-typespec-aux-integer-5
+    (humanize-compound-typespec-aux 'integer '(* 7))
   "an integer less than or equal to 7")
 
-(deftest compound-typespec-to-error-integer-6
-    (compound-typespec-to-error 'integer '(3 *))
+(deftest humanize-compound-typespec-aux-integer-6
+    (humanize-compound-typespec-aux 'integer '(3 *))
   "an integer greater than or equal to 3")
 
-;;; test  compound-typespec-to-error (satisfies)
-(deftest compound-typespec-to-error-satisfies-1
+(deftest humanize-compund-typespec-aux-integer-7
+    (humanize-compound-typespec-aux 'integer '(1 5) :adjectives "positive, even")
+  "a positive, even integer between 1 and 5")
+
+;;; test  humanize-compound-typespec-aux (satisfies)
+(deftest humanize-compound-typespec-aux-satisfies-1
     (multiple-value-bind (res err)
-	(ignore-errors (compound-typespec-to-error 'satisfies nil))
+	(ignore-errors (humanize-compound-typespec-aux 'satisfies nil))
       res)
   nil)
 
-(deftest compound-typespec-to-error-satisfies-2
-    (compound-typespec-to-error 'satisfies '(lowercasep))
+(deftest humanize-compound-typespec-aux-satisfies-2
+    (humanize-compound-typespec-aux 'satisfies '(lowercasep))
   "lowercase")
 
-;;; test compound-typespec-to-error (or)
-(deftest compound-typespec-to-error-or-1
+;;; test humanize-compound-typespec-aux (or)
+(deftest humanize-compound-typespec-aux-or-1
     (multiple-value-bind (res err)
-	(ignore-errors (compound-typespec-to-error 'or nil))
+	(ignore-errors (humanize-compound-typespec-aux 'or nil))
       res)
   nil)
 
-(deftest compound-typespec-to-error-or-2
-    (compound-typespec-to-error 'or '(integer))
+(deftest humanize-compound-typespec-aux-or-2
+    (humanize-compound-typespec-aux 'or '(integer))
   "an integer")
 
-(deftest compound-typespec-to-error-or-3
-    (compound-typespec-to-error 'or '(integer string))
+(deftest humanize-compound-typespec-aux-or-3
+    (humanize-compound-typespec-aux 'or '(integer string))
   "either an integer or a string")
 
-(deftest compound-typespec-to-error-or-4
-    (compound-typespec-to-error 'or '(integer string pathname))
+(deftest humanize-compound-typespec-aux-or-4
+    (humanize-compound-typespec-aux 'or '(integer string pathname))
   "either an integer, a string, or a pathname")
 
-(deftest compound-typespec-to-error-or-5
-    (compound-typespec-to-error 'or '(integer string pathname null))
+(deftest humanize-compound-typespec-aux-or-5
+    (humanize-compound-typespec-aux 'or '(integer string pathname null))
   "either an integer, a string, or a pathname")
 
-;;; test compound-typespec-to-error (and)
-(deftest compound-typespec-to-error-and-1
-    (compound-typespec-to-error 'and nil)
-  "anything you want")
-
-(deftest compound-typespec-to-error-and-2
-    (compound-typespec-to-error 'and '(integer))
+(deftest humanize-compound-typespec-aux-or-6
+    (humanize-compound-typespec-aux 'or '(null integer))
   "an integer")
 
-(deftest compound-typespec-to-error-and-3
-    (compound-typespec-to-error 'and '(integer string))
+(deftest humanize-compound-typespec-aux-or-7
+    (humanize-compound-typespec-aux 'or '(null integer string))
+  "either an integer or a string")
+
+;;; test humanize-compound-typespec-aux (and)
+(deftest humanize-compound-typespec-aux-and-1
+    (humanize-compound-typespec-aux 'and nil)
+  "anything you want")
+
+(deftest humanize-compound-typespec-aux-and-2
+    (humanize-compound-typespec-aux 'and '(integer))
+  "an integer")
+
+(deftest humanize-compound-typespec-aux-and-3
+    (humanize-compound-typespec-aux 'and '(integer string))
   "an integer and a string")
 
-(deftest compound-typespec-to-error-and-4
-    (compound-typespec-to-error 'and '(integer string pathname))
+(deftest humanize-compound-typespec-aux-and-4
+    (humanize-compound-typespec-aux 'and '(integer string pathname))
   "an integer, a string, and a pathname")
 
-(deftest compound-typespec-to-error-and-5
-    (compound-typespec-to-error 'and '(integer (satisfies evenp)))
+(deftest humanize-compound-typespec-aux-and-5
+    (humanize-compound-typespec-aux 'and '(integer (satisfies evenp)))
   "an integer and even")
 
-(deftest compound-typespec-to-error-and-6
-    (compound-typespec-to-error 'and '(integer (satisfies evenp) (satisfies positivep)))
+(deftest humanize-compound-typespec-aux-and-6
+    (humanize-compound-typespec-aux 'and '(integer (satisfies evenp) (satisfies positivep)))
   "an integer, even, and positive")
 
-(deftest compound-typespec-to-error-and-7
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
+(deftest humanize-compound-typespec-aux-and-7
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
   "an even, positive integer between 1 and 100")
 
-(deftest compound-typespec-to-error-and-8
-    (compound-typespec-to-error 'and '((satisfies evenp)))
+(deftest humanize-compound-typespec-aux-and-8
+    (humanize-compound-typespec-aux 'and '((satisfies evenp)))
   "even")
 
-(deftest compound-typespec-to-error-and-9
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) integer))
+(deftest humanize-compound-typespec-aux-and-9
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) integer))
   "an even, positive integer")
 
-(deftest compound-typespec-to-error-and-10
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
+(deftest humanize-compound-typespec-aux-and-10
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (integer 1 100)))
   "an even, positive integer between 1 and 100")
 
-(deftest compound-typespec-to-error-and-11
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) integer
+(deftest humanize-compound-typespec-aux-and-11
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) integer
 				       (satisfies nicep) string))
   "an even, positive integer and a nice string")
 
-(deftest compound-typespec-to-error-and-12
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (or integer string)
+(deftest humanize-compound-typespec-aux-and-12
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (or integer string)
 				       (satisfies nicep) string))
   "even, positive integer or string and a nice string")
 
-(deftest compound-typespec-to-error-and-13
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (or integer string pathname)
+(deftest humanize-compound-typespec-aux-and-13
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (or integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, or pathname and a nice string")
 
-(deftest compound-typespec-to-error-and-14
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
+(deftest humanize-compound-typespec-aux-and-14
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, and pathname and a nice string")
 
-(deftest compound-typespec-to-error-and-15
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
+(deftest humanize-compound-typespec-aux-and-15
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (and integer string pathname)
 				       (satisfies nicep) string))
   "even, positive integer, string, and pathname and a nice string")
 
-;;; test compound-typespec-to-error (eql)
-(deftest compound-typespec-to-error-eql-1
-    (compound-typespec-to-error 'eql '(5))
+;;; test humanize-compound-typespec-aux (eql)
+(deftest humanize-compound-typespec-aux-eql-1
+    (humanize-compound-typespec-aux 'eql '(5))
   "equal to 5")
 
-(deftest compound-typespec-to-error-eql-2
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (eql 3)))
+(deftest humanize-compound-typespec-aux-eql-2
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (eql 3)))
   "even, positive, and equal to 3")
 
 
-;;; test compound-typespec-to-error (not)
-(deftest compound-typespec-to-error-not-1
-    (compound-typespec-to-error 'not '(integer))
+;;; test humanize-compound-typespec-aux (not)
+(deftest humanize-compound-typespec-aux-not-1
+    (humanize-compound-typespec-aux 'not '(integer))
   "not an integer")
 
-(deftest compound-typespec-to-error-not-2
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (not integer)))
+(deftest humanize-compound-typespec-aux-not-2
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (not integer)))
   "even, positive, and not an integer")
 
-;;; test compound-typespec-to-error (mod)
-(deftest compound-typespec-to-error-mod-1
-    (compound-typespec-to-error 'mod '(8))
+;;; test humanize-compound-typespec-aux (mod)
+(deftest humanize-compound-typespec-aux-mod-1
+    (humanize-compound-typespec-aux 'mod '(8))
   "a non-negative integer less than 8")
 
-(deftest compound-typespec-to-error-mod-2
-    (compound-typespec-to-error 'and '((satisfies evenp) (satisfies positivep) (mod 5)))
+(deftest humanize-compound-typespec-aux-mod-2
+    (humanize-compound-typespec-aux 'and '((satisfies evenp) (satisfies positivep) (mod 5)))
   "an even, positive, non-negative integer less than 5")
 
-;;; test compound-typespec-to-error-member-1
-(deftest compound-typespec-to-error-member-1
+;;; test humanize-compound-typespec-aux-member-1
+(deftest humanize-compound-typespec-aux-member-1
     (multiple-value-bind (res err)
-	(ignore-errors (compound-typespec-to-error 'member nil))
+	(ignore-errors (humanize-compound-typespec-aux 'member nil))
       res)
   nil)
 
-(deftest compound-typespec-to-error-member-2
-    (compound-typespec-to-error 'member '(1))
+(deftest humanize-compound-typespec-aux-member-2
+    (humanize-compound-typespec-aux 'member '(1))
   "1")
 
-(deftest compound-typespec-to-error-member-3
-    (compound-typespec-to-error 'member '(1 2))
+(deftest humanize-compound-typespec-aux-member-3
+    (humanize-compound-typespec-aux 'member '(1 2))
   "either 1 or 2")
 
-(deftest compound-typespec-to-error-member-4
-    (compound-typespec-to-error 'member '(1 2 3 4))
+(deftest humanize-compound-typespec-aux-member-4
+    (humanize-compound-typespec-aux 'member '(1 2 3 4))
   "either 1, 2, 3, or 4")
 
-(deftest compound-typespec-to-error-member-5
-    (compound-typespec-to-error 'and '((satisfies oddp) (member 1 2 3)))
+(deftest humanize-compound-typespec-aux-member-5
+    (humanize-compound-typespec-aux 'and '((satisfies oddp) (member 1 2 3)))
   "odd and either 1, 2, or 3")
 
-;;; test compound-typespec-to-error-values-1
-(deftest compound-typespec-to-error-values-1
+;;; test humanize-compound-typespec-aux-values-1
+(deftest humanize-compound-typespec-aux-values-1
     (multiple-value-bind (res err)
-	(ignore-errors (compound-typespec-to-error 'values nil))
+	(ignore-errors (humanize-compound-typespec-aux 'values nil))
       res)
   nil)
 
 ;;; default
-(deftest compound-typespec-to-error-default-1
-    (compound-typespec-to-error 'weird-type '(1 2 3))
+(deftest humanize-compound-typespec-aux-default-1
+    (humanize-compound-typespec-aux 'weird-type '(1 2 3))
   "a weird type")
 

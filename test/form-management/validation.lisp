@@ -4,7 +4,7 @@
 ;;; test slot-value-required-p
 (deftest slot-value-required-p-1
     (weblocks::slot-value-required-p 'employee (get-slot-definition 'employee 'age))
-  :required)
+  t)
 
 (deftest slot-value-required-p-2
     (weblocks::slot-value-required-p 'education-history
@@ -13,46 +13,36 @@
 
 (deftest slot-value-required-p-3
     (weblocks::slot-value-required-p 'employee (get-slot-definition 'employee 'name))
-  :required)
+  t)
 
 (deftest slot-value-required-p-4
     (weblocks::slot-value-required-p 'employee 'age)
-  :required)
-
-;;; validate-slot-from-request
-(deftest validate-slot-from-request-1
-    (multiple-value-bind (success error)
-	(ignore-errors
-	  (weblocks::validate-slot-from-request *joe* `(,(get-slot-definition 'employee 'age) . age) nil))
-      (values success (format nil "~A" error)))
-    
-  nil
-  "Age is a required field.")
-
-(deftest validate-slot-from-request-2
-    (weblocks::validate-slot-from-request *joe* `(,(get-slot-definition 'employee 'age) . age) 20)
   t)
 
-(deftest validate-slot-from-request-3
-    (weblocks::validate-slot-from-request *joe* `(,(get-slot-definition 'employee 'name) . age) "Bob")
-  t)
-
-;;; apply-validator
-(deftest apply-validator-1
-    (apply-validator :required *joe* 'age 20)
+;;; slot-from-request-valid-p
+(deftest slot-from-request-valid-p-1
+    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) nil)
   nil)
 
-(deftest apply-validator-2
-    (multiple-value-bind (success error)
-	(ignore-errors
-	  (apply-validator :required *joe* 'age nil))
-      (values success (format nil "~A" error)))
-  nil
-  "Age is a required field.")
+(deftest slot-from-request-valid-p-2
+    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) 20)
+  t)
 
-;;; Note, declare-validators and decl-validate get tested as a
-;;; consequence of the previous tests since we use decl-validate in
-;;; fixtures
+(deftest slot-from-request-valid-p-3
+    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) "Bob")
+  nil)
 
 
+;;; test invalid-input-error-message
+(deftest invalid-input-error-message-1
+    (invalid-input-error-message nil "some-slot" "Some Human Slot" 'integer "t")
+  "Some Human Slot must be an integer.")
+
+(deftest invalid-input-error-message-2
+    (invalid-input-error-message nil "some-slot" "Some Human Slot" 'foo1 "t")
+  "Some Human Slot must be an integer.")
+
+(deftest invalid-input-error-message-3
+    (invalid-input-error-message nil "some-slot" "Some Human Slot" 'dummy-exported-type "t")
+  "Some Human Slot must be a dummy exported type.")
 

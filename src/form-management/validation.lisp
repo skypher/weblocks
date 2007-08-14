@@ -1,17 +1,17 @@
 
 (in-package :weblocks)
 
-(export '(form-validation-error apply-validator
-	  required-validation-error declare-validators decl-validate))
+(export '(*required-field-message* *invalid-input-message*
+	  invalid-input-error-message))
 
-(defparameter *slot-validators-indicator* 'validators
-  "An indicator that stores validators in a slot's plist.")
+(defparameter *required-field-message* "~A is a required field."
+  "This message will be passed to 'format' along with the humanized
+name of the field to inform users that the field is required.")
 
-(defmacro slot-validators (class-name slot-name)
-  "Expands to a place where validators for a slot are stored."
-  `(get ,class-name (intern (concatenate 'string (symbol-name *slot-validators-indicator*) "-"
-					 (symbol-name ,slot-name))
-			    (symbol-package ,class-name))))
+(defparameter *invalid-input-message* "~A must be ~A."
+  "This message will be passed to 'format' along with the humanized
+name of the field and humanized typespec to inform users that their
+input is not valid.")
 
 (defun slot-value-required-p (class-name slot)
   "Returns true if 'slot' is declared to have an existance validator,
@@ -19,77 +19,43 @@ nil otherwise. See 'decl-validate' for more detauls.
 
 'class-name' - the name of the class that contains the slot.
 'slot' - either a slot definition or a slot name."
-  (find :required
-	(slot-validators class-name
-			 (slot-definition-name (if (symbolp slot)
-						   (get-slot-definition class-name slot)
-						   slot)))))
+  (let ((type (slot-definition-type (if (symbolp slot)
+					(get-slot-definition class-name slot)
+					slot))))
+    (and type
+	 (not (typep nil type)))))
 
-(defun validate-slot-from-request (obj slot parsed-request-slot-value)
-  "Call all validators recorded on the symbol that names the slot. If
-any of the validators fails, the appropriate condition is propagated
-up the call stack."
-  (mapc (lambda (validator)
-	  (apply-validator validator obj (cdr slot) parsed-request-slot-value))
-	(slot-validators (class-name (class-of obj)) (slot-definition-name (car slot))))
-  t)
+(defun slot-from-request-valid-p (obj slot parsed-request-slot-value)
+  "Checks if the type of 'parsed-request-slot-value' is a valid
+subtype of the slot-definition-type for 'slot'. Returns true if the
+parsed value is valid, false otherwise.
 
-(define-condition form-validation-error (error)
-  ((slot-name :accessor validation-error-slot :initarg :slot-name))
-  (:documentation "An error condition at the root of all conditions
-  caused by problems with parsing form values into objects."))
+Note, if type isn't declared this function always returns true.
 
-(defgeneric apply-validator (validator obj slot-name parsed-value)
+'obj' - the object we're trying to deserialize into.
+'slot' - slot definition object of the slot we're trying to
+deserialize into.
+'parsed-value-from-request' - value entered by the user after it was
+parsed."
+  (let ((type (slot-definition-type slot)))
+    (if type
+	(typep parsed-request-slot-value type)
+	t)))
+
+(defgeneric invalid-input-error-message (obj slot-name humanized-name slot-type parsed-request-slot-value)
   (:documentation
-   "Validates 'parsed-value' with a validator specified by
-'validator'. This generic function is called by
-'validate-slot-from-request'. There are default specializations for
-various validators. Specialize the methods on 'validator' to add more
-custom validators."))
+   "This function returns an error message that's displayed to the
+user when he enters invalid data. By default a message defined in
+*invalid-input-message* is used. Specialize this function to output
+custom error messages for specific slots/types.
 
-;;; Required validator
-(define-condition required-validation-error (form-validation-error) ()
-  (:report (lambda (condition stream)
-	     (format stream "~A is a required field." (humanize-name (validation-error-slot condition)))))
-  (:documentation "A condition signalled if a required field is
-  missing."))
+Note that by default if slot-type isn't a compound only specifier
+and (car-safe (ensure-list slot-type)) is not an external symbol,
+slot-type is expanded via 'expand-typespec' to generate a better error
+message."))
 
-(defmethod apply-validator ((validator (eql :required)) obj slot-name parsed-value)
-  (unless parsed-value
-    (error (make-condition 'required-validation-error
-			   :slot-name slot-name))))
-
-;;; Declaring validators
-(defun declare-validators (class-name args)
-  "Specifies validators for slots of a particular class.
-
-Ex:
-\(decl-validate 'employee
-   '(ssn (:unique :required)
-     first-name (:required))
-
-'args' is a list that contains pairs of elements. Each odd element is
-expected to be the name of the slot, while the element that follows
-is expected to be a list of validators.
-
-The validators are mapped to those defined by 'apply-validator'
-generic function.
-
-See macro 'decl-validate' for a more comfortable syntax."
-  (mapc (lambda (slot-name)	
-	  (let* ((validation-slot (member slot-name args))
-		 (validators (when validation-slot
-			       (cadr validation-slot))))
-	    (when validators
-	      (setf (slot-validators class-name slot-name) validators))))
-    (slot-names class-name)))
-
-(defmacro decl-validate (class-name &rest args)
-  "Provides a more comfortable interface to 'declare-validators'.
-
-Ex:
-\(decl-validate employee
-   ssn (:unique :required)
-   first-name (:required))"
-  `(declare-validators ',class-name ',args))
-
+(defmethod invalid-input-error-message (obj slot-name humanized-name slot-type parsed-request-slot-value)
+  (format nil *invalid-input-message* humanized-name
+	  (humanize-typespec (case (symbol-status (car-safe (ensure-list slot-type)))
+			       (:external slot-type)
+			       (otherwise (expand-typespec slot-type))))))
