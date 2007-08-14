@@ -53,6 +53,16 @@
 		(slot-value new-joe 'age))))
   "Pink" 25)
 
+(deftest request-object-mapping-7
+    (with-request :post '(("name" . "") ("age" . "r2d2"))
+      (let ((new-joe (copy-template *joe*)))
+	(multiple-value-bind (result errors) (update-object-from-request new-joe :slots '(age))
+	  (mapcar (lambda (res)
+		    `(,(car res) . ,(format nil "~A" (cdr res))))
+		  errors))))
+  (("age" . "Age must not exceed 3 characters.")
+   ("name" . "Name is a required field.")))
+
 ;;; test object-from-request-valid-p (also tested through request-object-mapping)
 (deftest object-from-request-valid-p-1
     (with-request :get '(("name" . "Pink") ("age" . "25"))

@@ -83,14 +83,21 @@ done by 'update-object-from-request'."
 							 human-slot-name))
 				  errors)
 			    (push (cons slot-key nil) results))
-			(multiple-value-bind (parsedp parsed-value)
-			    (invoke-parsers-on-slot slot-type slot-name request-slot-value)
-			  (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
-			      (push (cons slot-key parsed-value) results)
-			      (push (cons slot-key
-					  (invalid-input-error-message obj slot-name human-slot-name
-								       slot-type parsed-value))
-				    errors))))))))
+			(if (> (length request-slot-value)
+			       (max-raw-slot-input-length obj slot-name slot-type))
+			    (push (cons slot-key
+					(format nil *max-raw-input-length-error-message*
+						human-slot-name (max-raw-slot-input-length obj slot-name
+											   slot-type)))
+				  errors)
+			    (multiple-value-bind (parsedp parsed-value)
+				(invoke-parsers-on-slot slot-type slot-name request-slot-value)
+			      (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
+				  (push (cons slot-key parsed-value) results)
+				  (push (cons slot-key
+					      (invalid-input-error-message obj slot-name human-slot-name
+									   slot-type parsed-value))
+					errors)))))))))
 	  (object-visible-slots obj :slots slots))
     (if errors
 	(values nil errors)

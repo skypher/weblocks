@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(*required-field-message* *invalid-input-message*
-	  invalid-input-error-message))
+	  *max-raw-input-length* *max-raw-input-length-error-message*
+	  invalid-input-error-message max-raw-slot-input-length ))
 
 (defparameter *required-field-message* "~A is a required field."
   "This message will be passed to 'format' along with the humanized
@@ -12,6 +13,15 @@ name of the field to inform users that the field is required.")
   "This message will be passed to 'format' along with the humanized
 name of the field and humanized typespec to inform users that their
 input is not valid.")
+
+(defparameter *max-raw-input-length* 40
+  "Default maximum allowed input length for input fields.")
+
+(defparameter *max-raw-input-length-error-message*
+  "~A must not exceed ~A characters."
+  "A 'format' string that accepts two parameters (humanized slot name
+and number of characters) used to display a max input size error
+messages to the user.")
 
 (defun slot-value-required-p (class-name slot)
   "Returns true if 'slot' is declared to have an existance validator,
@@ -59,3 +69,14 @@ message."))
 	  (humanize-typespec (case (symbol-status (car-safe (ensure-list slot-type)))
 			       (:external slot-type)
 			       (otherwise (expand-typespec slot-type))))))
+
+;;; Some pre-parse validation
+(defgeneric max-raw-slot-input-length (obj slot-name slot-type)
+  (:documentation
+   "Must return a maximum length of user input for a given
+slot. Default implementation returns the value of
+*max-raw-input-length*."))
+
+(defmethod max-raw-slot-input-length (obj slot-name slot-type)
+  *max-raw-input-length*)
+
