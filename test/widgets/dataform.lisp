@@ -20,6 +20,7 @@
 	(render-widget edit-joe)
 	;; change to bob and click submit
 	(do-request `(("name" . "Bob")
+		      ("manager" . "Jim")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc126")))
 	(render-widget edit-joe)))
@@ -166,11 +167,15 @@
 	(render-widget edit-joe)
 	;; change age to an error
 	(do-request `(("age" . "bad")
+		      ("name" . "Joe")
+		      ("manager" . "Jim")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc124")))
 	(render-widget edit-joe)
 	;; change age
 	(do-request `(("age" . "18")
+		      ("name" . "Joe")
+		      ("manager" . "Jim")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc125")))
 	(render-widget edit-joe)))
@@ -261,8 +266,9 @@
 	;; click modify
 	(do-request `((,weblocks::*action-string* . "abc124")))
 	(render-widget edit-joe)
-	;; change to bob and click submit
-	(do-request `(("submit" . "Submit")
+	;; click submit
+	(do-request `(("name" . "Foo")
+		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc125")))
 	(render-widget edit-joe)
 	(values on-cancel-called-p on-success-called-p)))

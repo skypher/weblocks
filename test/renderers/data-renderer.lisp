@@ -9,7 +9,7 @@
 
 ;;; test render-data-slot
 (deftest-html render-data-slot-1
-    (render-data-slot *joe* 'first-name "Joe")
+    (render-data-slot *joe* 'first-name 'string "Joe")
   (:li :class "first-name"
        (:span :class "label"
 	      "First Name:&nbsp;")
@@ -17,7 +17,7 @@
 	      "Joe")))
 
 (deftest-html render-data-slot-2
-    (render-data-slot *joe* 'address-ref *home-address*)
+    (render-data-slot *joe* 'address-ref t *home-address*)
   (:li :class "address-ref"
        (:span :class "label"
 	      "Address:&nbsp;")
@@ -25,7 +25,7 @@
 	      "Address")))
 
 (deftest-html render-data-slot-3
-    (render-data-slot *joe* 'education *some-college*)
+    (render-data-slot *joe* 'education t *some-college*)
   (htm
    (:li :class "university"
 	(:span :class "label" "University:&nbsp;")

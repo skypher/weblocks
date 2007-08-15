@@ -70,6 +70,6 @@ selection slot (both are accepted for convinience)."
 	       (htm (:input :type "checkbox"
 			    :name checkbox-name)))))))
 
-(defmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-value &rest keys
+(defmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
 				     &key grid-obj &allow-other-keys)
   (with-html (:th :class "select" "")))

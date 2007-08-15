@@ -108,7 +108,8 @@ customize form behavior."))
 					  (progn
 					    (setf (slot-value obj 'validation-errors) errors)
 					    (setf (slot-value obj 'intermediate-form-values)
-						  (copy-alist (request-parameters)))))))
+						  (apply #'request-parameters-for-object
+							 (request-parameters) data args))))))
 				  (when cancel
 				    (safe-funcall (dataform-on-cancel obj) obj)
 				    (setf break-out t))

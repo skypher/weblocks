@@ -2,11 +2,12 @@
 (in-package :weblocks-test)
 
 ;; Slot rendering helper
-(defun render-slot-simple (obj slot-name slot-value &rest keys)
+(defun render-slot-simple (obj slot-name slot-type slot-value &rest keys)
   (if (typep slot-value 'standard-object)
       (apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
       (with-html
 	(:p (str slot-name))
+	(:p (str (format nil "~A" slot-type)))
 	(:p (str slot-value)))))
 
 ;;; Test humanize-name function
@@ -299,6 +300,7 @@
      :slots '(name) :mode :strict)
   (htm
    (:p "NAME")
+   (:p "STRING")
    (:p "Joe")))
 
 (deftest-html visit-object-slots-2
@@ -310,6 +312,7 @@
   (htm
    (:p "TEST")
    (:p "MANAGER")
+   (:p "T")
    (:p "Jim")))
 
 (deftest-html visit-object-slots-3
@@ -318,33 +321,37 @@
      #'render-slot-simple
      :slots `(name)
      :mode :strict
-     :custom-slots `((blah . ,(lambda (obj slot-name slot-value &rest args)
+     :custom-slots `((blah . ,(lambda (obj slot-name slot-type slot-value &rest args)
 				      (with-html (:p "TEST"))))
 		     hello))
   (htm
    (:p "NAME")
+   (:p "STRING")
    (:p "Joe")
    (:p "TEST")
    (:p "HELLO")
+   (:p "T")
    (:p "NIL")))
 
 (deftest-html visit-object-slots-4
     (weblocks::visit-object-slots
      *joe*
      #'render-slot-simple
-     :slots `((name . ,(lambda (obj slot-name slot-value &rest args)
+     :slots `((name . ,(lambda (obj slot-name slot-type slot-value &rest args)
 			       (with-html (:p "TEST")))))
      :call-around-fn-p nil)
   (htm
    (:p "NAME")
+   (:p "STRING")
    (:p "Joe")
    (:p "MANAGER")
+   (:p "T")
    (:p "Jim")))
 
 (deftest visit-object-slots-5
     (weblocks::visit-object-slots
      *joe*
-     (lambda (obj slot-name slot-value &rest keys)
+     (lambda (obj slot-name slot-type slot-value &rest keys)
        1))
   (1 1))
 
@@ -354,11 +361,11 @@
      #'render-slot-simple
      :slots '(name education) :custom-slots '(test))
   (htm
-   (:p "NAME") (:p "Joe")
-   (:p "UNIVERSITY") (:p "Bene Gesserit University")
-   (:p "GRADUATION-YEAR") (:p "2000")
-   (:p "MANAGER") (:p "Jim")
-   (:p "TEST") (:p "NIL")))
+   (:p "NAME") (:p "STRING") (:p "Joe")
+   (:p "UNIVERSITY") (:p "T") (:p "Bene Gesserit University")
+   (:p "GRADUATION-YEAR") (:p "(OR NULL INTEGER)") (:p "2000")
+   (:p "MANAGER") (:p "T") (:p "Jim")
+   (:p "TEST") (:p "T") (:p "NIL")))
 
 (deftest-html visit-object-slots-7
     (weblocks::visit-object-slots
@@ -368,6 +375,7 @@
      :ignore-unbound-slots-p t)
   (htm
    (:p "NAME")
+   (:p "STRING")
    (:p "NIL")))
 
 ;;; test alist->plist

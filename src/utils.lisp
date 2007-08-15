@@ -385,7 +385,7 @@ object identification schemes."))
     (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
 
 (defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
-			   (ignore-unbound-slots-p nil) &allow-other-keys)
+			   (ignore-unbound-slots-p t) &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
 object and apply a render function to them.
 
@@ -406,16 +406,18 @@ values."
 				      (functionp (cdr slot)))
 				 (cdr slot)
 				 render-slot-fn))
-		  slot-name slot-value)
+		  slot-name slot-type slot-value)
 	      (if (typep (car slot) 'standard-direct-slot-definition)
 		  (progn
-		    (setf slot-name (slot-definition-name (car slot)))
+		    (setf slot-name (slot-definition-name (car slot))
+			  slot-type (slot-definition-type (car slot)))
 		    (if ignore-unbound-slots-p
 			(ignore-errors (setf slot-value (get-slot-value obj (car slot))))
 			(setf slot-value (get-slot-value obj (car slot)))))
-		  (setf slot-name (car slot)))
+		  (setf slot-name (car slot)
+			slot-type t))
 	      (apply render-fn obj slot-name
-		     slot-value
+		     slot-type slot-value
 		     :human-name (if (not (functionp (cdr slot)))
 				     (cdr slot)
 				     slot-name)

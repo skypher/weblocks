@@ -81,7 +81,7 @@
 
 ;;; test render-table-header-cell-select
 (deftest-html render-table-header-cell-select-1
-    (render-table-header-cell *joe* 'weblocks::select nil)
+    (render-table-header-cell *joe* 'weblocks::select t nil)
   (:th :class "select" ""))
 
 ;;; test selection process

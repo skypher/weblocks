@@ -20,7 +20,7 @@ on that column. If this isn't done the datagrid UI is confusing when
 it's sorted on nothing."
   (apply #'visit-object-slots
 	 data-obj
-	 (lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
+	 (lambda (obj slot-name slot-type slot-value &rest keys &key slot-path &allow-other-keys)
 	   (if (typep slot-value 'standard-object)
 	       (if (render-slot-inline-p obj slot-name)
 		   (datagrid-update-sort-column-aux grid slot-value :slot-path slot-path)
@@ -31,7 +31,6 @@ it's sorted on nothing."
 			  (datagrid-column-sortable-p grid slot-path slot-value))
 		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
 	 :call-around-fn-p nil
-	 :ignore-unbound-slots-p t
 	 args))
 
 (defun datagrid-column-sortable-p (grid-obj column-path column-value)
@@ -86,15 +85,15 @@ for :descending and vica versa)."
 ;;; appropriate to support sorting via clicking on
 ;;; headers. Additionally, specialize header rendering for 'select'
 ;;; slot to allow for selecting all/none slot selection
-(defmethod render-table-header-cell :around (obj slot-name slot-value &rest keys
+(defmethod render-table-header-cell :around (obj slot-name slot-type slot-value &rest keys
 						 &key grid-obj &allow-other-keys)
   (if (or (null grid-obj)
 	  (typep slot-value 'standard-object)
 	  (not (datagrid-column-sortable-p grid-obj slot-name slot-value)))
-      (apply #'call-next-method obj slot-name slot-value keys)
-      (apply #'render-datagrid-header-cell obj slot-name slot-value keys)))
+      (apply #'call-next-method obj slot-name slot-type slot-value keys)
+      (apply #'render-datagrid-header-cell obj slot-name slot-type slot-value keys)))
 
-(defgeneric render-datagrid-header-cell (obj slot-name slot-value &rest keys
+(defgeneric render-datagrid-header-cell (obj slot-name slot-type slot-value &rest keys
 					&key human-name slot-path grid-obj &allow-other-keys)
   (:documentation
    "Renders table headers for the datagrid. The default implementation
@@ -102,7 +101,7 @@ renders a link that it associates with a sorting action which modifies
 'sort' slot of the datagrid object. Specialize this function to
 customize the way datagrid headers are rendered."))
 
-(defmethod render-datagrid-header-cell (obj slot-name slot-value &rest keys
+(defmethod render-datagrid-header-cell (obj slot-name slot-type slot-value &rest keys
 					&key (human-name slot-name) slot-path grid-obj &allow-other-keys)
   (let ((th-class (when (equalp slot-name (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
 		    (concatenate 'string " sort-"

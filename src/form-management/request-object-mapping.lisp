@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(update-object-from-request slot-in-request-empty-p))
+(export '(update-object-from-request slot-in-request-empty-p request-parameters-for-object))
 
 (defgeneric update-object-from-request (obj &key slots &allow-other-keys)
   (:documentation
@@ -76,28 +76,27 @@ done by 'update-object-from-request'."
 		    (if success
 			(setf results (append results res))
 			(setf errors (append errors res))))
-		  (when request-slot-value
-		    (if (slot-in-request-empty-p slot-type request-slot-value)
-			(if (slot-value-required-p (class-name-of obj) (car slot))
-			    (push (cons slot-key (format nil *required-field-message*
-							 human-slot-name))
-				  errors)
-			    (push (cons slot-key nil) results))
-			(if (> (length request-slot-value)
-			       (max-raw-slot-input-length obj slot-name slot-type))
-			    (push (cons slot-key
-					(format nil *max-raw-input-length-error-message*
-						human-slot-name (max-raw-slot-input-length obj slot-name
-											   slot-type)))
-				  errors)
-			    (multiple-value-bind (parsedp parsed-value)
-				(invoke-parsers-on-slot slot-type slot-name request-slot-value)
-			      (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
-				  (push (cons slot-key parsed-value) results)
-				  (push (cons slot-key
-					      (invalid-input-error-message obj slot-name human-slot-name
-									   slot-type parsed-value))
-					errors)))))))))
+		  (if (slot-in-request-empty-p slot-type request-slot-value)
+		      (if (slot-value-required-p (class-name-of obj) (car slot))
+			  (push (cons slot-key (format nil *required-field-message*
+						       human-slot-name))
+				errors)
+			  (push (cons slot-key nil) results))
+		      (if (> (length request-slot-value)
+			     (max-raw-slot-input-length obj slot-name slot-type))
+			  (push (cons slot-key
+				      (format nil *max-raw-input-length-error-message*
+					      human-slot-name (max-raw-slot-input-length obj slot-name
+											 slot-type)))
+				errors)
+			  (multiple-value-bind (parsedp parsed-value)
+			      (invoke-parsers-on-slot slot-type slot-name request-slot-value)
+			    (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
+				(push (cons slot-key parsed-value) results)
+				(push (cons slot-key
+					    (invalid-input-error-message obj slot-name human-slot-name
+									 slot-type parsed-value))
+				      errors))))))))
 	  (object-visible-slots obj :slots slots))
     (if errors
 	(values nil errors)
@@ -114,3 +113,26 @@ value are a whitespace."))
 (defmethod slot-in-request-empty-p (slot-type request-slot-value)
   (string-whitespace-p request-slot-value))
 
+(defun request-parameters-for-object (parameters object &rest args)
+  "Returns a copy of the request parameters taking into account a
+particular object. This function is necessary because in certain cases
+web browsers don't send some parameters (e.g. unchecked checkboxes).
+
+Note that the object is *not* modified by this function.
+
+'parameters' - an alist of request parameters (can be obtained
+via 'request-parameters'.)
+'object' - the object to take account of.
+'args' - a set of arguments to be passed to 'object-visible-slots'."
+  (apply #'append
+	 (mapcar (lambda (slot)
+		   (let* ((slot-name (slot-definition-name (car slot)))
+			  (slot-key (attributize-name slot-name))
+			  (request-slot-value (request-parameter slot-key))
+			  (slot-value (ignore-errors (get-slot-value object (car slot))))
+			  (human-slot-name (humanize-name (cdr slot))))
+		     (if (and (typep slot-value 'standard-object)
+			      (render-slot-inline-p object slot-name))
+			 (request-parameters-for-object parameters slot-value)
+			 (list (cons slot-key request-slot-value)))))
+		 (apply #'object-visible-slots object args))))

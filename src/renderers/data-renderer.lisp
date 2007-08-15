@@ -1,7 +1,7 @@
 ;;;; Generic data renderer
 (in-package :weblocks)
 
-(export '(with-data-header render-data-slot render-data))
+(export '(with-data-header render-data-slot render-data render-data-aux))
 
 (defgeneric with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
   (:documentation
@@ -20,7 +20,7 @@ function that takes the object being rendered ('obj') and a list
 of keys and render appropriate html. See 'render-form-controls'
 for an example.
 
-'with-data-header' is normally called by 'render-data' and should
+'with-data-header' is normally called by 'render-data-aux' and should
 not be called by the programmer. Override 'with-data-header' to
 provide customized header rendering."))
 
@@ -36,42 +36,60 @@ provide customized header rendering."))
 		   (:ul (funcall body-fn))
 		   (safe-apply postslots-fn obj keys)))))))
 
-(defgeneric render-data-slot (obj slot-name slot-value &rest keys &key human-name &allow-other-keys)
+(defgeneric render-data-slot (obj slot-name slot-type slot-value &rest keys &key human-name &allow-other-keys)
   (:documentation
    "Renders a given slot of a particular object.
 
 'obj' - The object whose slot is being rendered.
 'slot-name' - The name of a slot (a symbol) being rendered.
+'slot-type' - The type of a slot being rendered.
 'slot-value' - The value of a slot determined with 'get-slot-value'.
-'args' - A list of arguments to pass to 'render-data'.
+'args' - A list of arguments to pass to 'render-data-aux'.
 
-The default implementation renders a list item. If the slot's
-value is a CLOS object, 'render-data-slot' determines whether the
-slot should be rendered iline via 'render-slot-inline-p' and then
-calls 'render-data' with 'inlinep' value being set
-appropriately.
+The default implementation renders a list item. If the slot's value is
+a CLOS object, 'render-data-slot' determines whether the slot should
+be rendered iline via 'render-slot-inline-p' and then calls
+'render-data-aux' with 'inlinep' value being set appropriately.
 
 Override this function to render a slot in a customized
 manner. Note that you can override based on the object as well as
 slot name, which gives significant freedom in selecting the
 proper slot to override."))
 
-(defmethod render-data-slot (obj slot-name (slot-value standard-object) &rest keys)
-  (render-object-slot #'render-data #'render-data-slot obj slot-name slot-value keys))
+(defmethod render-data-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (render-object-slot #'render-data-aux #'render-data-slot obj slot-name slot-type slot-value keys))
 
-(defmethod render-data-slot (obj slot-name slot-value &rest keys
+(defmethod render-data-slot (obj slot-name slot-type slot-value &rest keys
 			     &key (human-name slot-name) &allow-other-keys)
   (with-html
     (:li :class (attributize-name slot-name)
 	 (:span :class "label"
 		(str (humanize-name human-name)) ":&nbsp;")
-	 (apply #'render-data slot-value keys))))
+	 (apply #'render-data-aux obj slot-name slot-type slot-value keys))))
 
-(defgeneric render-data (obj &rest keys &key inlinep highlight &allow-other-keys)
+(defun render-data (obj &rest keys &key parent-object slot-name
+		    (slot-type t) &allow-other-keys)
+  "A convinient wrapper for 'render-data-aux'. 
+
+Ex:
+\(render-data address)
+\(render-data address :slots (city) :mode :hide
+\(render-data address :slots ((city . town))
+\(render-data address :slots ((city . town) :mode :strict)"
+  (apply #'render-data-aux parent-object slot-name slot-type obj keys))
+
+(defgeneric render-data-aux (obj slot-name slot-type slot-value &rest keys
+				 &key inlinep highlight &allow-other-keys)
   (:documentation
-   "A generic data presentation renderer. The default
-implementation of 'render-data' for CLOS objects dynamically
-introspects object instances and serializes them to HTML
+   "A generic data presentation renderer.
+
+'obj' - an object that contains the slot whose value is to be rendered.
+'slot-name' - name of the slot whose value is to be rendered.
+'slot-type' - type of the slot whose value is to be rendered.
+'slot-value' - value to be rendered.
+
+The default implementation of 'render-data-aux' for CLOS objects
+dynamically introspects object instances and serializes them to HTML
 according to the following protocol:
 
 1. If 'inlinep' is false a generic function 'with-data-header' is
@@ -81,7 +99,7 @@ to customize header and footer HTML.
 
 2. 'object-visible-slots' is called to determine which slots in
 the object instance should be rendered. Any additional keys
-passed to 'render-data' are forwarded to
+passed to 'render-data-aux' are forwarded to
 'object-visible-slots'. To customize the order of the slots,
 their names, visibility, etc. look at 'object-visible-slots'
 documentation for necessary arguments, or specialize
@@ -93,31 +111,27 @@ to render the slot. Specialize 'render-data-slot' to get
 customized behavior.
 
 If specializing above steps isn't sufficient to produce required
-HTML, 'render-data' should be specialized for particular objects.
+HTML, 'render-data-aux' should be specialized for particular objects.
 
-Ex:
-\(render-data address)
-\(render-data address :slots (city) :mode :hide
-\(render-data address :slots ((city . town))
-\(render-data address :slots ((city . town) :mode :strict)
-
-When 'highlight' is set not null, render-data searches for the ppcre
-regular expression it represents and renders it as a strong
+When 'highlight' is set not null, render-data-aux searches for the
+ppcre regular expression it represents and renders it as a strong
 element. This is done to support incremental searching in some
-controls."))
+controls.
 
-(defmethod render-data ((obj standard-object) &rest keys)
-  (apply #'render-standard-object #'with-data-header #'render-data-slot obj keys))
+See 'render-data' for examples."))
 
-(defmethod render-data (obj &rest keys &key highlight &allow-other-keys)
-  (let* ((item (format nil "~A" obj)))
+(defmethod render-data-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (apply #'render-standard-object #'with-data-header #'render-data-slot slot-value keys))
+
+(defmethod render-data-aux (obj slot-name slot-type slot-value &rest keys &key highlight &allow-other-keys)
+  (let* ((item (format nil "~A" slot-value)))
     (with-html
       (:span :class "value"
 	     (str (if highlight
 		      (highlight-regex-matches item highlight)
 		      (escape-for-html item)))))))
 
-(defmethod render-data ((obj (eql nil)) &rest keys)
+(defmethod render-data-aux (obj slot-name slot-type (slot-value (eql nil)) &rest keys)
   (with-html
     (:span :class "value missing" "Not Specified")))
 

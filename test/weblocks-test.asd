@@ -40,6 +40,9 @@
 	       (:module fixtures
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
+	       (:module types
+			:components ((:file "boolean"))
+			:depends-on ("weblocks-test"))
 	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch")

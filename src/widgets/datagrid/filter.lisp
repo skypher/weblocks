@@ -20,7 +20,7 @@ true."
   (some (compose #'not #'null)
 	(flatten
 	 (apply #'visit-object-slots object
-		(lambda (obj slot-name slot-value &rest keys &key slot-path &allow-other-keys)
+		(lambda (obj slot-name slot-type slot-value &rest keys &key slot-path &allow-other-keys)
 		  (if (typep slot-value 'standard-object)
 		      (if (render-slot-inline-p obj slot-name)
 			  (object-satisfies-search-p search-regex slot-value :slot-path slot-path)

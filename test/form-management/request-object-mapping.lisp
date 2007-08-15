@@ -69,28 +69,39 @@
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '(age))))
   t
-  (("age" . 25) ("name" . "Pink")))
+  (("manager") ("age" . 25) ("name" . "Pink")))
 
 (deftest object-from-request-valid-p-2
     (with-request :get '(("university" . "Stony Brook"))
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '(education))))
-  t
-  (("university" . "Stony Brook")))
+  nil
+  (("name" . "Name is a required field.")))
 
 (deftest object-from-request-valid-p-3
+    (with-request :get '(("university" . "Stony Brook")
+			 ("name" . "Foo"))
+      (let ((new-joe (copy-template *joe*)))
+	(weblocks::object-from-request-valid-p new-joe '(education))))
+  t
+  (("manager")
+   ("name" . "Foo")
+   ("graduation-year")
+   ("university" . "Stony Brook")))
+
+(deftest object-from-request-valid-p-4
     (with-request :get '(("name" . "Pink") ("age" . "25"))
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '((name . nick) (age . how-old)))))
   t
-  (("age" . 25) ("name" . "Pink")))
+  (("manager") ("age" . 25) ("name" . "Pink")))
 
-(deftest object-from-request-valid-p-4
-    (with-request :get '(("university" . "Stony Brook"))
+(deftest object-from-request-valid-p-5
+    (with-request :get '(("university" . "Stony Brook") ("name" . "Foo"))
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '(education (university . college)))))
   t
-  (("university" . "Stony Brook")))
+  (("manager") ("name" . "Foo") ("graduation-year") ("university" . "Stony Brook")))
 
 ;;; test slot-in-request-empty-p
 (deftest slot-in-request-empty-p-1

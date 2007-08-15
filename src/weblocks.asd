@@ -77,8 +77,9 @@
 			:depends-on (snippets renderers
 					      form-management "utils" "actions" "server" "request"
 					      "request-hooks" linguistic))
-	       (:module data-types
-			:components ((:file "us-states"))
+	       (:module types
+			:components ((:file "us-states")
+				     (:file "boolean"))
 			:depends-on (renderers snippets))
 	       (:file "server"
 		      :depends-on ("weblocks"))

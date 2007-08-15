@@ -172,7 +172,7 @@
 
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
-    (render-table-header-cell *joe* 'name "Joe"
+    (render-table-header-cell *joe* 'name 'string "Joe"
 			      :grid-obj (make-instance 'datagrid :allow-sorting nil
 						       :data-class 'employee))
   (:th :class "name" "Name"))
@@ -180,7 +180,7 @@
 ;;; test render-datagrid-header-cell
 (deftest-html render-datagrid-header-cell-1
     (with-request :get nil
-      (render-datagrid-header-cell *joe* 'name "Joe"
+      (render-datagrid-header-cell *joe* 'name 'string "Joe"
 				   :slot-path '(name)
 				   :grid-obj (make-instance 'datagrid :sort '((name) . :ascending)
 							    :data-class 'employee)))
@@ -189,7 +189,7 @@
 
 (deftest-html render-datagrid-header-cell-2
     (with-request :get nil
-      (render-datagrid-header-cell *joe* 'name "Joe"
+      (render-datagrid-header-cell *joe* 'name 'string "Joe"
 				   :slot-path '(name)
 				   :grid-obj (make-instance 'datagrid :sort '((manager) . :ascending)
 							    :data-class 'employee)))

@@ -51,7 +51,7 @@
 
 ;;; test render-form-slot
 (deftest-html render-form-slot-1
-    (render-form-slot *joe* 'name "Joe" :slot-path '(name))
+    (render-form-slot *joe* 'name 'string "Joe" :slot-path '(name))
   (:li :class "name"
        (:label
 	(:span :class "slot-name"
@@ -60,7 +60,7 @@
 	(:input :type "text" :name "name" :value "Joe"))))
 
 (deftest-html render-form-slot-2
-    (render-form-slot *joe* 'address-ref *home-address* :slot-path '(address-ref))
+    (render-form-slot *joe* 'address-ref t *home-address* :slot-path '(address-ref))
   (:li :class "address-ref"
        (:label
 	(:span :class "slot-name"
@@ -68,7 +68,7 @@
 	       (:input :type "text" :name "address-ref" :value "Address"))))
 
 (deftest-html render-form-slot-3
-    (render-form-slot *joe* 'education *some-college*)
+    (render-form-slot *joe* 'education t *some-college*)
   (htm
    (:li :class "university"
 	(:label

@@ -88,8 +88,7 @@ grid."))
 				       (setf (datagrid-allow-item-ops-p grid) t)
 				       (setf (gridedit-ui-state grid) nil)
 				       (setf (gridedit-dataform grid) nil))
-			 :widget-args '(:title-action "Adding"
-					:ignore-unbound-slots-p t))))
+			 :widget-args '(:title-action "Adding"))))
   (render-widget (gridedit-dataform grid)))
 
 (defun gridedit-add-item (grid item)

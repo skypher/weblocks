@@ -39,7 +39,8 @@ div's along with classes necessary for CSS styling. Look at
 	 (funcall body-fn))))
 
 ;; Table header
-(defgeneric render-table-header-row (obj &rest keys &key inlinep &allow-other-keys)
+(defgeneric render-table-header-row (obj slot-name slot-type
+					 slot-value &rest keys &key inlinep &allow-other-keys)
   (:documentation
    "Renders the row in the 'thead' element of the table. The
 default implementation uses 'render-table-header-cell' to render
@@ -47,18 +48,21 @@ particular cells. Specialize this method to achieve customized
 header row rendering. See 'render-standard-object' for more
 details.
 
-'obj' - the object being rendered.
+'obj' - an object that contains the slot whose value is to be rendered.
+'slot-name' - name of the slot whose value is to be rendered.
+'slot-type' - type of the slot whose value is to be rendered.
+'slot-value' - value to be rendered.
 
 'inlinep' - whether the object should be rendered inline or should
 have its own header."))
 
-(defmethod render-table-header-row (obj &rest keys)
-  (apply #'render-standard-object #'with-table-row #'render-table-header-cell obj
+(defmethod render-table-header-row (obj slot-name slot-type slot-value &rest keys)
+  (apply #'render-standard-object #'with-table-row #'render-table-header-cell slot-value
 	 :alternp nil
 	 :call-around-fn-p nil
 	 keys))
 
-(defgeneric render-table-header-cell (obj slot-name slot-value &rest keys
+(defgeneric render-table-header-cell (obj slot-name slot-type slot-value &rest keys
 					  &key human-name &allow-other-keys)
   (:documentation
    "Renders the 'th' elements of the table. The default
@@ -72,45 +76,50 @@ the current header. See 'render-object-slot' function.
 
 'obj' - Object whose slot is being rendered.
 'slot-name' - Name of the slot.
+'slot-type' - type of the slot whose value is to be rendered.
 'slot-value' - Value of the slot."))
 
-(defmethod render-table-header-cell (obj slot-name slot-value &rest keys
+(defmethod render-table-header-cell (obj slot-name slot-type slot-value &rest keys
 				     &key (human-name slot-name) &allow-other-keys)
   (with-html
     (:th :class (attributize-name slot-name) (str (humanize-name human-name)))))
 
-(defmethod render-table-header-cell (obj slot-name (slot-value standard-object) &rest keys)
-  (render-object-slot #'render-table-header-row #'render-table-header-cell obj slot-name slot-value keys))
+(defmethod render-table-header-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (render-object-slot #'render-table-header-row
+		      #'render-table-header-cell obj slot-name slot-type slot-value keys))
 
 ;; Table body
-(defgeneric render-table-body-row (obj &rest keys &key inlinep &allow-other-keys)
+(defgeneric render-table-body-row (obj slot-name slot-type slot-value
+				       &rest keys &key inlinep &allow-other-keys)
   (:documentation
    "Renders the rows in the 'tbody' element of the table. The
 default implementation uses 'render-table-body-cell' to render
 particular cells. See 'render-table-header-row' for more
 details."))
 
-(defmethod render-table-body-row (obj &rest keys)
-  (apply #'render-standard-object #'with-table-row #'render-table-body-cell obj keys))
+(defmethod render-table-body-row (obj slot-name slot-type slot-value &rest keys)
+  (apply #'render-standard-object #'with-table-row #'render-table-body-cell slot-value keys))
 
-(defgeneric render-table-body-cell (obj slot-name slot-value
+(defgeneric render-table-body-cell (obj slot-name slot-type slot-value
 				     &rest keys &key inlinep &allow-other-keys)
   (:documentation
    "Renders the 'td' elements of the table. See
 'render-table-header-cell' for more details."))
 
-(defmethod render-table-body-cell (obj slot-name slot-value &rest keys)
+(defmethod render-table-body-cell (obj slot-name slot-type slot-value &rest keys)
   (with-html
     (:td :class (attributize-name slot-name)
-	 (apply #'render-data slot-value keys))))
+	 (apply #'render-data slot-value :slot-type slot-type keys))))
 
-(defmethod render-table-body-cell (obj slot-name (slot-value standard-object) &rest keys)
-  (render-object-slot #'render-table-body-row #'render-table-body-cell obj slot-name slot-value keys))
+(defmethod render-table-body-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (render-object-slot #'render-table-body-row #'render-table-body-cell
+		      obj slot-name slot-type slot-value keys))
 
 ;; The table itself
 (defun render-table (objs &rest keys
 		     &key (on-empty-string *render-empty-sequence-string*)
-		     caption summary &allow-other-keys)
+		     caption summary parent-object slot-name
+		     (slot-type t) &allow-other-keys)
   "A generic table presentation renderer. This implementation
 renders a sequence of objects into a table by calling
 'render-table-body-row' for each object in the sequence. Table
@@ -151,10 +160,10 @@ typed objects at your own risk.
 		(if caption
 		    (htm (:caption (str caption))))
 		(htm
-		 (:thead (apply #'render-table-header-row first-obj keys)))
+		 (:thead (apply #'render-table-header-row parent-object slot-name slot-type first-obj keys)))
 		(:tbody
 		 (map 'list (lambda (obj)
-			      (apply #'render-table-body-row obj
+			      (apply #'render-table-body-row parent-object slot-name slot-type obj
 				     :alternp (oddp (incf row-num))
 				     keys))
 		      objs)))))

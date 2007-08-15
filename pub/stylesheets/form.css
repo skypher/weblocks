@@ -1,0 +1,76 @@
+
+.form
+{
+  width: 27em;
+  margin-top: 0;
+}
+
+.form fieldset
+{
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form fieldset .validation-errors-summary
+{
+  display: none;
+}
+
+.form fieldset .form-fields-title
+{
+  display: none;
+}
+
+form.renderer fieldset ul li label em.required-slot
+{
+  font-weight: normal;
+  display: inline;
+  font-size: x-small;
+  font-style: normal;
+  color: red;
+}
+
+form.renderer fieldset ul li label input,
+form.renderer fieldset ul li label select
+{
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 0;
+  width: 12em;
+}
+
+form.renderer fieldset ul li label input.checkbox
+{
+  width: auto;
+  /* A hack for IE to line up the checkbox */
+  margin-left: -4px;
+}
+
+/* Set normal margin for other browsers (comment is necessary to hide
+from IE7) */
+form.renderer >/**/fieldset ul li label input.checkbox
+{
+  margin-left: 0;
+}
+
+form.renderer fieldset div.submit input.submit
+{
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-right: 0.5em;
+}
+
+p.validation-error
+{
+  color: red;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+p.validation-error span.validation-error-heading
+{
+  display: none;
+}
+

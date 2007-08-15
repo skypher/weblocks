@@ -78,6 +78,7 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "submit"
 	(do-request `(("name" . "Jill")
+		      ("manager" . "Jim")
 		      ("submit" . "Submit")
 		      (,weblocks::*action-string* . "abc133")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))

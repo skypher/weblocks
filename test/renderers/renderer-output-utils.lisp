@@ -31,26 +31,28 @@
 
 ;;; test render-object-slot
 (deftest render-object-slot-1
-    (let ((render-object-tmp (lambda (obj &key inlinep testkey)
-			       (list obj inlinep testkey))))
-      (render-object-slot render-object-tmp nil "some-object" "some-slot" "some-value"
+    (let ((render-object-tmp (lambda (obj slot-name slot-type slot-value &key inlinep testkey)
+			       (list slot-type slot-value inlinep testkey))))
+      (render-object-slot render-object-tmp nil "some-object" "some-slot" 'some-type "some-value"
 			  '(:testkey "some-key")))
-  ("some-value" t "some-key"))
+  (some-type "some-value" t "some-key"))
 
 (deftest render-object-slot-2
-    (let ((render-slot-tmp (lambda (obj slot-name obj-name &key testkey)
-			       (list obj slot-name obj-name testkey))))
-      (render-object-slot nil render-slot-tmp "some-object" "some-slot-ref" 1
+    (let ((render-slot-tmp (lambda (obj slot-name slot-type obj-name &key testkey)
+			       (list obj slot-name (subtypep slot-type 'string) obj-name testkey))))
+      (render-object-slot nil render-slot-tmp "some-object" "some-slot-ref" 'integer 1
 			  '(:testkey "some-key")))
-  ("some-object" "some-slot-ref" "Fixnum" "some-key"))
+  ("some-object" "some-slot-ref" t "Fixnum" "some-key"))
 
 ;; test render-standard-object
 (deftest-html render-standard-object-1
     (render-standard-object nil #'render-slot-simple *joe* :inlinep t)
   (htm
    (:p "NAME")
+   (:p "STRING")
    (:p "Joe")
    (:p "MANAGER")
+   (:p "T")
    (:p "Jim")))
 
 (deftest-html render-standard-object-2
@@ -62,6 +64,8 @@
   (htm
    (:div
     (:p "NAME")
+    (:p "STRING")
     (:p "Joe")
     (:p "MANAGER")
+    (:p "T")
     (:p "Jim"))))

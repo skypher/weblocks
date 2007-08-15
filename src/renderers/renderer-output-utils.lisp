@@ -44,7 +44,7 @@ Override this method to provide object names."))
 	      (return-from object-name obj-name)))))
   (humanize-name (object-class-name obj)))
 
-(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-value keys)
+(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-type slot-value keys)
   "Renders a given slot of a CLOS object (usually if the slot
 itself is a standard CLOS object). This function encapsulates
 rendering behavior common to multiple generic renderers.
@@ -56,8 +56,10 @@ with :inlinep set to true. Otherwise, grabs the name of the
 object using 'object-name' and simply renders the name using
 'render-slot-fn'."
   (if (render-slot-inline-p obj slot-name)
-      (apply render-object-fn slot-value :inlinep t keys)
-      (apply render-slot-fn obj slot-name (object-name slot-value) keys)))
+      (apply render-object-fn obj slot-name slot-type slot-value :inlinep t keys)
+      (let* ((object-name (object-name slot-value))
+	     (object-name-type (type-of object-name)))
+	(apply render-slot-fn obj slot-name object-name-type object-name keys))))
 
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
   "Renders the slots of a CLOS object into HTML. This function

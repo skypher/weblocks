@@ -3,7 +3,7 @@
 
 (export '(with-form-header render-validation-summary
 	  render-form-controls render-form-slot render-form
-	  required-validation-error))
+	  render-form-aux required-validation-error))
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
 				  postslots-fn method action &allow-other-keys)
@@ -76,16 +76,16 @@ case the user clicks submit."))
 	  (:input :name *cancel-control-name* :type "submit" :class "submit cancel" :value "Cancel"
 		  :onclick "disableIrrelevantButtons(this);"))))
 
-(defgeneric render-form-slot (obj slot-name slot-value &rest keys
+(defgeneric render-form-slot (obj slot-name slot-type slot-value &rest keys
 				  &key human-name validation-errors &allow-other-keys)
   (:documentation
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
 
-(defmethod render-form-slot (obj slot-name (slot-value standard-object) &rest keys)
-  (render-object-slot #'render-form #'render-form-slot obj slot-name slot-value keys))
+(defmethod render-form-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (render-object-slot #'render-form-aux #'render-form-slot obj slot-name slot-type slot-value keys))
 
-(defmethod render-form-slot (obj slot-name slot-value &rest keys
+(defmethod render-form-slot (obj slot-name slot-type slot-value &rest keys
 			     &key (human-name slot-name) validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
 	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal))
@@ -99,18 +99,27 @@ case the user clicks submit."))
 		     (str (humanize-name human-name)) ":&nbsp;"
 		     (when (slot-value-required-p (class-name (class-of obj)) slot-name)
 		       (htm (:em :class "required-slot" "(required)&nbsp;")))))
-	    (apply #'render-form slot-value keys)
+	    (apply #'render-form-aux obj slot-name slot-type slot-value keys)
 	    (when validation-error
 	      (htm (:p :class "validation-error"
 		       (:em
 			(:span :class "validation-error-heading" "Error:&nbsp;")
 			(str (format nil "~A" (cdr validation-error))))))))))))
 
-(defgeneric render-form (obj &rest keys &key inlinep name validation-errors
-			     intermediate-fields &allow-other-keys)
+(defun render-form (obj &rest keys &key parent-object slot-name
+		    (slot-type t) &allow-other-keys)
+  "A convinient wrapper for 'render-form-aux'.
+
+See 'render-data' for examples."
+  (apply #'render-form-aux parent-object slot-name slot-type obj keys))
+
+(defgeneric render-form-aux (obj slot-name slot-type slot-value &rest
+				 keys &key inlinep name
+				 validation-errors intermediate-fields
+				 &allow-other-keys)
   (:documentation
    "A generic form presentation renderer. Similar to
-'render-data'.
+'render-data-aux'.
 
 'validation-errors' - an association list of slot names and associated
 errors that may have happened during a previous for submission. These
@@ -123,14 +132,15 @@ entered. 'intermediate-fields' should be a copy of the request, in
 which case form renderer chooses values entered as part of the request
 over values obtained from the object."))
 
-(defmethod render-form ((obj standard-object) &rest keys)
-  (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
+(defmethod render-form-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (apply #'render-standard-object #'with-form-header #'render-form-slot slot-value keys))
 
-(defmethod render-form (obj &rest keys &key inlinep slot-path intermediate-fields &allow-other-keys)
-  (let* ((slot-name (attributize-name (last-item slot-path)))
-	 (intermediate-value (assoc slot-name intermediate-fields :test #'string-equal)))
+(defmethod render-form-aux (obj slot-name slot-type slot-value &rest
+			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+  (let* ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
+	 (intermediate-value (assoc attributized-slot-name intermediate-fields :test #'string-equal)))
     (with-html
-      (:input :type "text" :name slot-name :value (if intermediate-value
-								  (cdr intermediate-value)
-								  obj)))))
+      (:input :type "text" :name attributized-slot-name :value (if intermediate-value
+								   (cdr intermediate-value)
+								   slot-value)))))
 
