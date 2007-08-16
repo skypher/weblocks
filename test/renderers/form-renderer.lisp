@@ -81,12 +81,12 @@
 		(:span :class "extra" "Graduation Year:&nbsp;"))
 	 (:input :type "text" :name "graduation-year" :value "2000")))))
 
-;;; test render-form
-(deftest-html render-form-1
+;;; test render-form/aux
+(deftest-html render-form/aux-1
     (render-form "test" :slot-path '(test))
   (:input :type "text" :name "test" :value "test"))
 
-(deftest-html render-form-2
+(deftest-html render-form/aux-2
     (with-request :get nil
       (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
@@ -102,7 +102,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim"))))))
 
-(deftest-html render-form-3
+(deftest-html render-form/aux-3
     (with-request :post nil
       (render-form *joe* :slots '(address-ref)))
   #.(form-header-template nil
@@ -123,7 +123,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim"))))))
 
-(deftest-html render-form-4
+(deftest-html render-form/aux-4
     (with-request :post nil
       (render-form *joe* :slots '(education)
 		   :preslots-fn (lambda (obj &rest keys)
@@ -158,7 +158,7 @@
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
 
-(deftest-html render-form-5
+(deftest-html render-form/aux-5
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
   #.(form-header-template nil
@@ -179,7 +179,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim"))))))
 
-(deftest-html render-form-6
+(deftest-html render-form/aux-6
     (with-request :post nil
       (render-form *joe* :slots '((name . nickname))))
   #.(form-header-template nil
@@ -195,7 +195,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim"))))))
 
-(deftest-html render-form-7
+(deftest-html render-form/aux-7
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
   #.(form-header-template nil

@@ -116,3 +116,9 @@
     (slot-in-request-empty-p 'integer "")
   t)
 
+;;; test request-parameters-for-object
+(deftest request-parameters-for-object-1
+    (with-request :get '(("name" . "Foo"))
+      (request-parameters-for-object (copy-template *joe*)))
+  (("name" . "Foo") ("manager")))
+

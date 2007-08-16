@@ -113,7 +113,7 @@ value are a whitespace."))
 (defmethod slot-in-request-empty-p (slot-type request-slot-value)
   (string-whitespace-p request-slot-value))
 
-(defun request-parameters-for-object (parameters object &rest args)
+(defun request-parameters-for-object (object &rest args)
   "Returns a copy of the request parameters taking into account a
 particular object. This function is necessary because in certain cases
 web browsers don't send some parameters (e.g. unchecked checkboxes).
@@ -129,10 +129,9 @@ via 'request-parameters'.)
 		   (let* ((slot-name (slot-definition-name (car slot)))
 			  (slot-key (attributize-name slot-name))
 			  (request-slot-value (request-parameter slot-key))
-			  (slot-value (ignore-errors (get-slot-value object (car slot))))
-			  (human-slot-name (humanize-name (cdr slot))))
+			  (slot-value (ignore-errors (get-slot-value object (car slot)))))
 		     (if (and (typep slot-value 'standard-object)
 			      (render-slot-inline-p object slot-name))
-			 (request-parameters-for-object parameters slot-value)
+			 (request-parameters-for-object slot-value)
 			 (list (cons slot-key request-slot-value)))))
 		 (apply #'object-visible-slots object args))))
