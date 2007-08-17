@@ -31,8 +31,7 @@
 	(setf (slot-value *request* 'hunchentoot::headers-in)
 	    (cons '("X-Requested-With" . "blah") (slot-value *request* 'hunchentoot::headers-in)))
 	(setf result2 (handle-client-request))
-	(setf result3 (header-out "X-JSON"))
-	(values (null (session-value "debug-reset-sessions")) result1 result2 result3)))
+	(values (null (session-value "debug-reset-sessions")) result1 result2)))
   t
   #.(with-request-template "~
 <div class='widget dataform' id='widget-123'>~
@@ -55,7 +54,6 @@
 </div>"
       :widget-stylesheets '("dataform")
       :title "Hello - Bar")
-  " "
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
 \"<form class='renderer form employee' action='/foo/bar' method='post' ~
@@ -309,9 +307,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	(declare (special weblocks::*dirty-widgets*
 			  *weblocks-output-stream* *on-ajax-complete-scripts*))
 	(weblocks::render-dirty-widgets)
-	(values
-	 (header-out "X-JSON")
-	 (get-output-stream-string *weblocks-output-stream*))))
+	(get-output-stream-string *weblocks-output-stream*)))
   #.(format nil "~
 {~
 \"widgets\":~
@@ -320,7 +316,5 @@ onclick='disableIrrelevantButtons(this);' />~
 null:\"<p>test</p>\"~
 },~
 \"on-load\":[\"testjs\"]~
-}")
-  ; this is necessary for Safari
-  " ")
+}"))
 

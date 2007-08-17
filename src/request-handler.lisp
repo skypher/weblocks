@@ -106,8 +106,8 @@ association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *on-ajax-complete-scripts*))
-  (setf (header-out "X-JSON")
-	(format nil "{\"widgets\":~A,\"on-load\":~A}"
+  (setf (content-type) "application/json; charset=utf-8")
+  (format *weblocks-output-stream* "{\"widgets\":~A,\"on-load\":~A}"
 		(encode-json-alist-to-string
 		 (mapcar (lambda (w)
 			   (cons
@@ -117,5 +117,3 @@ association list. This function is normally called by
 			      (get-output-stream-string *weblocks-output-stream*))))
 			 *dirty-widgets*))
 		(encode-json-to-string *on-ajax-complete-scripts*)))
-  ;; We need something in the response for Safari to evaluate JSON
-  (format *weblocks-output-stream* " "))

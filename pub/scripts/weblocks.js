@@ -14,7 +14,10 @@ Ajax.Responders.register({
 	}
 });
 
-function onActionSuccess(transport, json) {
+function onActionSuccess(transport) {
+    // Grab json value
+    var json = transport.responseText.evalJSON(true);
+    
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {

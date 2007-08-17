@@ -17,7 +17,7 @@ description, and current navigation state."
 the HTML already rendered to *weblocks-output-stream* with boilerplate
 page HTML (title, stylesheets, etc.)."
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
-  ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>")
+  ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
   (declare (special *page-public-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(combined-dependencies (append *application-public-dependencies*
@@ -27,6 +27,7 @@ page HTML (title, stylesheets, etc.)."
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
+	      (:meta :http-equiv "Content-type" :content *default-content-type*)
 	      (:title (str (page-title)))
 	      ; render stylesheets
 	      (loop for i in (remove-duplicates combined-dependencies

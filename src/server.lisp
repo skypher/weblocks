@@ -8,6 +8,14 @@
   "If the server is started, bound to hunchentoot server
   object. Otherwise, nil.")
 
+;;; Tell hunchentoot to output in utf-8 and to try utf-8 on input by
+;;; default (if no encoding information is provided by the client)
+(setf *hunchentoot-default-external-format*
+      (flexi-streams:make-external-format :utf-8))
+
+;;; Set outgoing encoding to utf-8
+(setf *default-content-type* "text/html; charset=utf-8")
+
 (defun start-weblocks (&key debug (port 8080))
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to
