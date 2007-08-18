@@ -159,12 +159,7 @@ defined in 'args'."
   (with-html
     (:div :class "item-operations"
 	  (mapc (lambda (op)
-		  (with-html
-		    (:input :name (attributize-name (car op))
-			    :type "submit"
-			    :class "submit"
-			    :value (humanize-name (car op))
-			    :onclick "disableIrrelevantButtons(this);")))
+		  (render-button (car op)))
 		(datagrid-item-ops grid)))))
 
 ;;; Renders the body of the data grid.

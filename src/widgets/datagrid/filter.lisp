@@ -1,6 +1,8 @@
 
 (in-package :weblocks)
 
+(export '(object-satisfies-search-p))
+
 (defun datagrid-filter-data (grid-obj data)
   "Returns filtered datagrid data. Applies 'object-satisfies-search-p'
 repeatedly to each item in the sequence."
@@ -8,26 +10,37 @@ repeatedly to each item in the sequence."
     (if search
 	(remove nil
 		(mapcar (lambda (item)
-			  (when (object-satisfies-search-p (make-isearch-regex search) item)
+			  (when (object-satisfies-search-p (make-isearch-regex search) nil nil t item)
 			    item))
 			data))
 	data)))
 
-(defun object-satisfies-search-p (search-regex object &rest args)
-  "Determines if an object satisfies a search regex. Applies regex to
-string representations of each slot value, and if one matches returns
-true."
+(defgeneric object-satisfies-search-p (search-regex obj slot-name slot-type slot-value &rest args)
+  (:documentation
+   "Determines if 'slot-value' satisfies a search regex. Default
+implementation applies 'search-regex' to string representations of
+each slot value, and if one matches returns true.
+
+'obj' - the object that contains the slot in question.
+'slot-name' - name of the slot.
+'slot-type' - declared type of the slot.
+'slot-value' - the value to be tested."))
+
+(defmethod object-satisfies-search-p (search-regex obj slot-name slot-type (slot-value standard-object)
+				      &rest args)
   (some (compose #'not #'null)
 	(flatten
-	 (apply #'visit-object-slots object
-		(lambda (obj slot-name slot-type slot-value &rest keys &key slot-path &allow-other-keys)
-		  (if (typep slot-value 'standard-object)
-		      (if (render-slot-inline-p obj slot-name)
-			  (object-satisfies-search-p search-regex slot-value :slot-path slot-path)
-			  (ppcre:scan search-regex (format nil "~A" (object-name slot-value))))
-		      (ppcre:scan search-regex (format nil "~A" slot-value))))
-		:call-around-fn-p nil
-		args))))
+	 (apply #'visit-object-slots slot-value	(curry #'object-satisfies-search-p search-regex)
+		:call-around-fn-p nil args))))
+
+(defmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
+				      &rest args)
+  (if (typep slot-value 'standard-object)
+      (if (render-slot-inline-p obj slot-name)
+	  (apply #'object-satisfies-search-p
+		 obj slot-name slot-type slot-value search-regex args)
+	  (ppcre:scan search-regex (format nil "~A" (object-name slot-value))))
+      (ppcre:scan search-regex (format nil "~A" slot-value))))
 
 (defun make-isearch-regex (search)
   "Create a regular expression from the user's input that tries to be

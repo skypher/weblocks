@@ -48,3 +48,24 @@
       (render-link "abc123" "some link"))
   #.(link-action-template "abc123" "some link"))
 
+;;; test render-button
+(deftest-html render-button-1
+    (render-button 'some-button)
+  (:input :name "some-button" :type "submit" :class "submit" :value "Some Button"
+	  :onclick "disableIrrelevantButtons(this);"))
+
+(deftest-html render-button-2
+    (render-button 'some-button :class "foo" :value "bar" :id "baz")
+  (:input :name "some-button" :type "submit" :id "baz" :class "foo" :value "bar"
+	  :onclick "disableIrrelevantButtons(this);"))
+
+;;; test render-checkbox
+(deftest-html render-checkbox-1
+    (render-checkbox 'foo nil)
+  (:input :name "foo" :type "checkbox" :class "checkbox" :value "t"))
+
+(deftest-html render-checkbox-2
+    (render-checkbox 'foo t :id "bar" :class "baz")
+  (:input :name "foo" :type "checkbox" :id "bar" :class "baz" :value "t"
+	  :checked "checked"))
+

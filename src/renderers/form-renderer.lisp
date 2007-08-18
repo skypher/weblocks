@@ -3,7 +3,8 @@
 
 (export '(with-form-header render-validation-summary
 	  render-form-controls render-form-slot render-form
-	  render-form-aux required-validation-error))
+	  render-form-aux required-validation-error
+	  slot-intermedia-value))
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
 				  postslots-fn method action &allow-other-keys)
@@ -71,10 +72,8 @@ case the user clicks submit."))
 (defmethod render-form-controls (obj &rest keys &key action &allow-other-keys)
   (with-html
     (:div :class "submit"
-	  (:input :name *submit-control-name* :type "submit" :class "submit" :value "Submit"
-		  :onclick "disableIrrelevantButtons(this);")
-	  (:input :name *cancel-control-name* :type "submit" :class "submit cancel" :value "Cancel"
-		  :onclick "disableIrrelevantButtons(this);"))))
+	  (render-button *submit-control-name*)
+	  (render-button *cancel-control-name* :class "submit cancel"))))
 
 (defgeneric render-form-slot (obj slot-name slot-type slot-value &rest keys
 				  &key human-name validation-errors &allow-other-keys)
@@ -113,6 +112,14 @@ case the user clicks submit."))
 See 'render-data' for examples."
   (apply #'render-form-aux parent-object slot-name slot-type obj keys))
 
+
+(defun slot-intermedia-value (slot-name intermediate-fields)
+  "Returns an intermediate field for 'slot-name' from
+'intermediate-fields'. If the field is not present, returns
+nil. Otherwise returns a cons cell the car of which is slot-name and
+the cdr is the intermediate value."
+  (assoc (attributize-name slot-name) intermediate-fields :test #'string-equal))
+
 (defgeneric render-form-aux (obj slot-name slot-type slot-value &rest
 				 keys &key inlinep name
 				 validation-errors intermediate-fields
@@ -137,8 +144,8 @@ over values obtained from the object."))
 
 (defmethod render-form-aux (obj slot-name slot-type slot-value &rest
 			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
-  (let* ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
-	 (intermediate-value (assoc attributized-slot-name intermediate-fields :test #'string-equal)))
+  (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
+	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
     (with-html
       (:input :type "text" :name attributized-slot-name :value (if intermediate-value
 								   (cdr intermediate-value)

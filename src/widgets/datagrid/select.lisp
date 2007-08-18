@@ -63,12 +63,9 @@ selection slot (both are accepted for convinience)."
 				    "item-" (attributize-name (object-id obj)))))
     (with-html
       (:td :class "select"
-	   (if (datagrid-item-selected-p grid (object-id obj))
-	       (htm (:input :type "checkbox"
-			    :name checkbox-name
-			    :checked "checked"))
-	       (htm (:input :type "checkbox"
-			    :name checkbox-name)))))))
+	   (render-checkbox checkbox-name
+			    (datagrid-item-selected-p grid (object-id obj))
+			    :class nil)))))
 
 (defmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
 				     &key grid-obj &allow-other-keys)

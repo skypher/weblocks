@@ -81,6 +81,19 @@
 		(:span :class "extra" "Graduation Year:&nbsp;"))
 	 (:input :type "text" :name "graduation-year" :value "2000")))))
 
+;;; test slot-intermedia-value
+(deftest slot-intermedia-value-1
+    (slot-intermedia-value 'some-slot '((a . b) (c . d)))
+  nil)
+
+(deftest slot-intermedia-value-2
+    (slot-intermedia-value 'some-slot '((a . b) (some-slot . d)))
+  (some-slot . d))
+
+(deftest slot-intermedia-value-3
+    (slot-intermedia-value 'some-slot '((a . b) (some-slot . nil)))
+  (some-slot . nil))
+
 ;;; test render-form/aux
 (deftest-html render-form/aux-1
     (render-form "test" :slot-path '(test))

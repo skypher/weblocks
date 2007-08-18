@@ -18,28 +18,32 @@
 
 ;;; test object-satisfies-search-p
 (deftest object-satisfies-search-p-1
-    (weblocks::object-satisfies-search-p "hi" *joe*)
+    (weblocks::object-satisfies-search-p "hi" nil nil t *joe*)
   nil)
 
 (deftest object-satisfies-search-p-2
-    (weblocks::object-satisfies-search-p "Joe" *joe*)
+    (weblocks::object-satisfies-search-p "Joe" nil nil t *joe*)
   t)
 
 (deftest object-satisfies-search-p-3
-    (weblocks::object-satisfies-search-p "30" *joe*)
+    (weblocks::object-satisfies-search-p "30" nil nil t *joe*)
   nil)
 
 (deftest object-satisfies-search-p-4
-    (weblocks::object-satisfies-search-p "30" *joe* :slots '(age))
+    (weblocks::object-satisfies-search-p "30" nil nil t *joe* :slots '(age))
   t)
 
 (deftest object-satisfies-search-p-5
-    (weblocks::object-satisfies-search-p "Broadway" *joe*)
+    (weblocks::object-satisfies-search-p "Broadway" nil nil t *joe*)
   nil)
 
 (deftest object-satisfies-search-p-6
-    (weblocks::object-satisfies-search-p "address" *joe*)
+    (weblocks::object-satisfies-search-p "address" nil nil t *joe*)
   nil)
+
+(deftest object-satisfies-search-p-7
+    (not (null (weblocks::object-satisfies-search-p "Joe" *joe* 'name 'string "Joe")))
+  t)
 
 ;;; test make-isearch-regex
 (deftest make-isearch-regex-1

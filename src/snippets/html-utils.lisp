@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*submit-control-name* *cancel-control-name* with-html-form
-	  render-link))
+	  render-link render-button render-checkbox))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -38,3 +38,29 @@ link."
 				     action-code (session-name-string-pair))
 	  (str name)))))
 
+(defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
+  "Renders a button in a form.
+
+'name' - name of the html control. The name is attributized before
+being rendered.
+'value' - a value on html control. Humanized name is default.
+'id' - id of the html control. Default is nil.
+'class' - a class used for styling. By default, \"submit\"."
+  (with-html
+    (:input :name (attributize-name name) :type "submit" :id id :class class
+	    :value value :onclick "disableIrrelevantButtons(this);")))
+
+(defun render-checkbox (name checkedp &key id (class "checkbox"))
+  "Renders a checkbox in a form.
+
+'name' - name of the html control. The name is attributized before
+being rendered.
+'checkedp' - if true, renders the box checked.
+'id' - id of the html control. Default is nil.
+'class' - a class used for styling. By default, \"submit\"."
+  (with-html
+    (if checkedp
+	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
+		     :value "t" :checked "checked"))
+	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
+		     :value "t")))))

@@ -80,7 +80,7 @@
 	       (:module types
 			:components ((:file "us-states")
 				     (:file "boolean"))
-			:depends-on (renderers snippets))
+			:depends-on (renderers snippets widgets))
 	       (:file "server"
 		      :depends-on ("weblocks"))
 	       (:file "request"
