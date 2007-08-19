@@ -1,6 +1,7 @@
 
 (in-package :weblocks-test)
 
+;;; test render-isearch
 (deftest-html render-isearch-1
     (with-request :get nil
       (render-isearch "some-search" (lambda (&rest args) nil) :form-id 'i1 :input-id 'i2 :search-id 'i3
@@ -52,3 +53,18 @@
 	    (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
 });")
 	    (fmt "~%// ]]>~%"))))
+
+;;; test isearch process in general
+(deftest render-isearch-3
+    (with-request :get nil
+      (let (result
+	    (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *weblocks-output-stream*))
+	(render-isearch "some-search"
+			(lambda (&key some-search &allow-other-keys)
+			  (setf result some-search))
+			:form-id 'i1 :input-id 'i2 :search-id 'i3)
+	(do-request '(("action" . "abc123")
+		      ("some-search" . "foo")))
+	result))
+  "foo")
