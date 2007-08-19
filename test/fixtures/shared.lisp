@@ -25,7 +25,8 @@
   3)
 
 (defclass employee (person)
-  ((manager :reader manager :initform "Jim")))
+  ((manager :reader manager :initform "Jim")
+   (veteran :initform nil :type boolean :initarg :veteranp)))
 
 ;;; Create instances for introspection testing
 (defparameter *joe* (make-instance 'employee :name "Joe" :age 30 :id 1))

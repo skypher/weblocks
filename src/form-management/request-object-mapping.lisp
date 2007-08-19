@@ -107,6 +107,9 @@ done by 'update-object-from-request'."
    "Returns true if the slot value in request is to be considered
 'empty', i.e. all whitespace, 'Select State' dropdown value, etc.
 
+Note, 'request-slot-value' is a string value entered by the user, not
+the parsed value.
+
 Default implementation returns true when all characters of the request
 value are a whitespace."))
 

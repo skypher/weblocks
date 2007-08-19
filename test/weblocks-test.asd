@@ -42,7 +42,7 @@
 			:depends-on ("weblocks-test"))
 	       (:module types
 			:components ((:file "boolean"))
-			:depends-on ("weblocks-test"))
+			:depends-on ("weblocks-test" renderers))
 	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch")
