@@ -57,7 +57,7 @@
 	(:span :class "slot-name"
 	       (:span :class "extra" "Name:&nbsp;"
 		      (:em :class "required-slot" "(required)&nbsp;")))
-	(:input :type "text" :name "name" :value "Joe"))))
+	(:input :type "text" :name "name" :value "Joe" :maxlength "40"))))
 
 (deftest-html render-form-slot-2
     (render-form-slot *joe* 'address-ref t *home-address* :slot-path '(address-ref))
@@ -65,7 +65,7 @@
        (:label
 	(:span :class "slot-name"
 	       (:span :class "extra" "Address:&nbsp;"))
-	       (:input :type "text" :name "address-ref" :value "Address"))))
+	       (:input :type "text" :name "address-ref" :value "Address" :maxlength "40"))))
 
 (deftest-html render-form-slot-3
     (render-form-slot *joe* 'education t *some-college*)
@@ -74,12 +74,12 @@
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "University:&nbsp;"))
-	 (:input :type "text" :name "university" :value "Bene Gesserit University")))
+	 (:input :type "text" :name "university" :value "Bene Gesserit University" :maxlength "40")))
    (:li :class "graduation-year"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Graduation Year:&nbsp;"))
-	 (:input :type "text" :name "graduation-year" :value "2000")))))
+	 (:input :type "text" :name "graduation-year" :value "2000" :maxlength "40")))))
 
 ;;; test slot-intermedia-value
 (deftest slot-intermedia-value-1
@@ -97,7 +97,7 @@
 ;;; test render-form/aux
 (deftest-html render-form/aux-1
     (render-form "test" :slot-path '(test))
-  (:input :type "text" :name "test" :value "test"))
+  (:input :type "text" :name "test" :value "test" :maxlength "40"))
 
 (deftest-html render-form/aux-2
     (with-request :get nil
@@ -108,12 +108,12 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe")))
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
 (deftest-html render-form/aux-3
     (with-request :post nil
@@ -124,17 +124,17 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe")))
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "address-ref"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address")))
+	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
 (deftest-html render-form/aux-4
     (with-request :post nil
@@ -152,22 +152,22 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe")))
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "university"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "University:&nbsp;"))
-	 (:input :type "text" :name "university" :value "Bene Gesserit University")))
+	 (:input :type "text" :name "university" :value "Bene Gesserit University" :maxlength "40")))
        (:li :class "graduation-year"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Graduation Year:&nbsp;"))
-	     (:input :type "text" :name "graduation-year" :value "2000")))
+	     (:input :type "text" :name "graduation-year" :value "2000" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
 
@@ -180,17 +180,17 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Bill")))
+	 (:input :type "text" :name "name" :value "Bill" :maxlength "40")))
        (:li :class "address-ref"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address")))
+	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
 (deftest-html render-form/aux-6
     (with-request :post nil
@@ -201,12 +201,12 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Nickname:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe")))
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
 (deftest-html render-form/aux-7
     (with-request :get nil
@@ -216,19 +216,19 @@
 	(:label (:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe")
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")
 	 (:p :class "validation-error"
 	     (:em (:span :class "validation-error-heading" "Error:&nbsp;") "Some error."))))
        (:li :class "address-ref"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address")))
+	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim"))))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
      :preslots '((:div :class "validation-errors-summary"
 		  (:h2 :class "error-count" "There is 1 validation error:")
 		  (:ul (:li "Some error."))))))

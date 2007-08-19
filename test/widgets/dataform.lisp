@@ -41,12 +41,12 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "manager"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; change name to Bob and click cancel
    (:div :class "widget dataform" :id "widget-123"
@@ -64,12 +64,12 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "manager"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; change name to Bob and click submit
    (:div :class "widget dataform" :id "widget-123"
@@ -117,12 +117,12 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "manager"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; manager changed to Bill and name to changed error, submit clicked
    (:div :class "widget dataform" :id "widget-123"
@@ -132,7 +132,7 @@
 	       (:label (:span :class "slot-name"
 			      (:span :class "extra" "Name:&nbsp;"
 				     (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "")
+		(:input :type "text" :name "name" :value "" :maxlength "40")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
 			 "Name is a required field."))))
@@ -140,7 +140,7 @@
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Bill"))))
+		(:input :type "text" :name "manager" :value "Bill" :maxlength "40"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
@@ -196,18 +196,18 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "age"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Age:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "age" :value "30")))
+		(:input :type "text" :name "age" :value "30" :maxlength "3")))
 	      (:li :class "manager"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template
@@ -217,13 +217,13 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "age item-not-validated"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Age:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "age" :value "bad")
+		(:input :type "text" :name "age" :value "bad" :maxlength "3")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
 			 "Age must be an integer."))))
@@ -231,7 +231,7 @@
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")

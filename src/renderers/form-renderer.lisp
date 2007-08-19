@@ -149,5 +149,6 @@ over values obtained from the object."))
     (with-html
       (:input :type "text" :name attributized-slot-name :value (if intermediate-value
 								   (cdr intermediate-value)
-								   slot-value)))))
+								   slot-value)
+	      :maxlength (max-raw-slot-input-length obj slot-name slot-type)))))
 

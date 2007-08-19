@@ -69,12 +69,12 @@
 <ul><li class='name'><label>~
 <span class='slot-name'><span class='extra'>Name:&nbsp;~
 <em class='required-slot'>(required)&nbsp;</em></span></span>~
-<input type='text' name='name' value='Joe' />~
+<input type='text' name='name' value='Joe' maxlength='40' />~
 </label>~
 </li>~
 <li class='manager'><label>~
 <span class='slot-name'><span class='extra'>Manager:&nbsp;</span></span>~
-<input type='text' name='manager' value='Jim' />~
+<input type='text' name='manager' value='Jim' maxlength='40' />~
 </label>~
 </li>~
 </ul>~

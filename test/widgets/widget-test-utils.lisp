@@ -19,7 +19,8 @@
 		(:div :class "extra-top-2" "<!-- empty -->")
 		(:div :class "extra-top-3" "<!-- empty -->")
 		(:fieldset
-		 (:input :type "text" :id ,search-id :name "search" :class "search-bar" :value ,value)
+		 (:input :type "text" :id ,search-id :name "search" :class "search-bar" :value ,value
+			 :maxlength "80")
 		 (:input :id ,submit-id :name "submit" :type "submit" :class "submit" :value "Search")
 		 (:input :name "action" :type "hidden" :value ,action))
 		(:div :class "extra-bottom-1" "<!-- empty -->")

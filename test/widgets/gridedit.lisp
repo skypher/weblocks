@@ -14,12 +14,12 @@
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name")))
+	       (:input :type "text" :name "name" :maxlength "40")))
 	     (:li :class "manager"
 	      (:label
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim"))))
+	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	   :method "post"
 	   :title-action "Adding:&nbsp;")))
 
@@ -166,12 +166,12 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name")))
+		(:input :type "text" :name "name" :maxlength "40")))
 	      (:li :class "manager"
 	       (:label
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim"))))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"
 	    :title-action "Adding:&nbsp;"))
    ;; "Submit" clicked
