@@ -4,7 +4,8 @@
 ;;; Define classes for introspection testing
 (defclass address ()
   ((street :reader address-street :initform "100 Broadway")
-   (city :reader address-city :initform "New York")))
+   (city :reader address-city :initform "New York")
+   (state :type us-state :initarg :state :initform "NY")))
 
 (defparameter *home-address* (make-instance 'address))
 

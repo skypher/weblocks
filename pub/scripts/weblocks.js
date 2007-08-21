@@ -81,13 +81,26 @@ function disableIrrelevantButtons(currentButton) {
 }
 
 // Support suggest control
-function replaceDropdownWithSuggest(inputId, inputName, choicesId, value) {
+function declareSuggest(inputId, choicesId, resultSet, sessionString) {
+    if(resultSet instanceof Array) {
+	new Autocompleter.Local(inputId, choicesId, resultSet, {});
+    } else {
+	new Ajax.Autocompleter(inputId, choicesId, getActionUrl(resultSet, sessionString, true), {});
+    }
+}
+
+function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choicesId, value) {
     var dropdownOptions = $(inputId).childElements();
     var suggestOptions = [];
     dropdownOptions.each(function(i)
 			 {
-			     suggestOptions.push(i.innerHTML);
+			     if(!(i == dropdownOptions[0] && ignoreWelcomeMsg)) {
+				 suggestOptions.push(i.innerHTML);
+			     }
 			 });
+    if(ignoreWelcomeMsg) {
+	
+    }
 
     var inputBox = '<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest"';
     if(value) {
@@ -98,9 +111,6 @@ function replaceDropdownWithSuggest(inputId, inputName, choicesId, value) {
     var suggestHTML = inputBox + '<div id="' + choicesId + '" class="suggest"></div>';
     $(inputId).replace(suggestHTML);
     
-    new Autocompleter.Local(inputId, choicesId, suggestOptions, {});
+    declareSuggest(inputId, choicesId, suggestOptions);
 }
 
-function declareSuggest(inputId, choicesId, actionCode, sessionString) {
-    new Ajax.Autocompleter(inputId, choicesId, getActionUrl(actionCode, sessionString, true), {});
-}

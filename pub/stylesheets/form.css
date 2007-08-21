@@ -36,8 +36,12 @@ form.renderer fieldset ul li label select
 {
   margin-top: 2px;
   margin-bottom: 2px;
-  padding: 0;
   width: 12em;
+}
+
+form.renderer fieldset ul li label input
+{
+  padding: 0;
 }
 
 form.renderer fieldset ul li label input.checkbox

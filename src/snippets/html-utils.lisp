@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(*submit-control-name* *cancel-control-name* with-html-form
-	  render-link render-button render-checkbox))
+	  render-link render-button render-checkbox render-dropdown
+	  *dropdown-welcome-message*))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -64,3 +65,48 @@ being rendered.
 		     :value "t" :checked "checked"))
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
 		     :value "t")))))
+
+(defparameter *dropdown-welcome-message* "[Select ~A]"
+  "A welcome message used by dropdowns as the first entry.")
+
+(defun render-dropdown (name selections &key id class selected-value welcome-name)
+  "Renders a dropdown HTML element (select).
+
+'name' - the name of html control. The name is attributized before
+being rendered.
+
+'selections' - a list of strings to render as selections. Each element
+may be a string or a cons cell. If it is a cons cell, the car of each
+sell will be used as the text for each option and the cdr will be used
+for the value.
+
+'id' - an id of the element.
+
+'class' - css class of the element.
+
+'selected-value' - a list of strings. Each option will be tested
+against this list and if an option is a member it will be marked as
+selected. A single string can also be provided.
+
+'welcome-name' - a string used to specify dropdown welcome option (see
+*dropdown-welcome-message*). If nil, no welcome message is used. If
+'welcome-name' is a cons cell, car will be treated as the welcome name
+and cdr will be returned as value in case it's selected."
+  (when welcome-name
+    (setf welcome-name (car (list->assoc (list welcome-name)
+					 :map (lambda (&rest args) nil)))))
+  (with-html
+    (:select :id id
+	     :class class
+	     :name (attributize-name name)
+	     (mapc (lambda (i)
+		     (if (member (car i) (ensure-list selected-value) :test #'string=)
+			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
+			 (htm (:option :value (cdr i) (str (car i))))))
+		   (list->assoc (append (when welcome-name
+					  (list
+					   (cons (format nil *dropdown-welcome-message* (car welcome-name))
+						 (cdr welcome-name))))
+					selections)
+				:map (lambda (i) nil))))))
+

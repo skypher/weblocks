@@ -41,7 +41,8 @@
 			:components ((:file "shared"))
 			:depends-on ("weblocks-test"))
 	       (:module types
-			:components ((:file "boolean"))
+			:components ((:file "boolean")
+				     (:file "us-states"))
 			:depends-on ("weblocks-test" renderers))
 	       (:module snippets
 			:components ((:file "suggest")

@@ -69,3 +69,52 @@
   (:input :name "foo" :type "checkbox" :id "bar" :class "baz" :value "t"
 	  :checked "checked"))
 
+;;; test render-dropdown
+(deftest-html render-dropdown-3
+    (render-dropdown 'some-name '("a" "b" "c"))
+  (:select :name "some-name"
+	   (:option "a")
+	   (:option "b")
+	   (:option "c")))
+
+(deftest-html render-dropdown-4
+    (render-dropdown 'some-name '("a") :id "some-id" :class "some-class")
+  (:select :id "some-id" :class "some-class" :name "some-name"
+	   (:option "a")))
+
+(deftest-html render-dropdown-5
+    (render-dropdown 'some-name '(("a" . "-a") ("b" . "-b")))
+  (:select :name "some-name"
+	   (:option :value "-a" "a")
+	   (:option :value "-b" "b")))
+
+(deftest-html render-dropdown-6
+    (render-dropdown 'some-name '("a" "b" "c") :selected-value "b")
+  (:select :name "some-name"
+	   (:option "a")
+	   (:option :selected "selected" "b")
+	   (:option "c")))
+
+(deftest-html render-dropdown-7
+    (render-dropdown 'some-name '("a" "b" "c") :selected-value '("foo" "bar" "b"))
+  (:select :name "some-name"
+	   (:option "a")
+	   (:option :selected "selected" "b")
+	   (:option "c")))
+
+(deftest-html render-dropdown-8
+    (render-dropdown 'some-name '("a" "b" "c") :welcome-name "Value")
+  (:select :name "some-name"
+	   (:option "[Select Value]")
+	   (:option "a")
+	   (:option "b")
+	   (:option "c")))
+
+(deftest-html render-dropdown-9
+    (render-dropdown 'some-name '("a" "b" "c") :welcome-name (cons "Value" "blah"))
+  (:select :name "some-name"
+	   (:option :value "blah" "[Select Value]")
+	   (:option "a")
+	   (:option "b")
+	   (:option "c")))
+
