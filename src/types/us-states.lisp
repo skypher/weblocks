@@ -68,7 +68,7 @@ state."
 	  (let ((state (assoc request-slot-value *us-states* :test #'equalp)))
 	    (if state
 		(cdr state)
-		(error 'parse-error "Invalid US state."))))))
+		(error 'parse-error))))))
 
 (defmethod invalid-input-error-message (obj slot-name humanized-name (slot-type (eql 'us-state))
 					parsed-request-slot-value)

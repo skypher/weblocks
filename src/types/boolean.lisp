@@ -23,7 +23,7 @@
   (cond
     ((string-equal "t" request-slot-value) t)
     ((null request-slot-value) nil)
-    (t (error 'parse-error "Improper value for a boolean type."))))
+    (t (error 'parse-error))))
 
 (defmethod slot-in-request-empty-p ((slot-type (eql 'boolean)) request-slot-value)
   nil)
