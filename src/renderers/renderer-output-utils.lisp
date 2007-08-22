@@ -25,7 +25,7 @@ name.
 By default this method looks for a symbol of a form
 [class-name]-NAME (e.g. EMPLOYEE-NAME) in the same package where
 the class of 'obj' was defined. If this symbol is bound to a
-function the function is then callsed with the object as the only
+function the function is then called with the object as the only
 argument. If it returns a string, the value is returned as the
 name of the object. Otherwise, the value of 'object-class-name'
 is returned.
