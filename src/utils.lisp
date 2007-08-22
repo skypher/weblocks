@@ -350,7 +350,16 @@ used by the framework for sorting data."))
   (< a b))
 
 (defmethod strictly-less-p ((a string) (b string))
-  (string-lessp a b))
+  (not (null (string-lessp a b))))
+
+(defmethod strictly-less-p ((a symbol) (b symbol))
+  (not (null (string-lessp a b))))
+
+(defmethod strictly-less-p ((a string) (b symbol))
+  (not (null (string-lessp a b))))
+
+(defmethod strictly-less-p ((a symbol) (b string))
+  (not (null (string-lessp a b))))
 
 (defmethod strictly-less-p ((a (eql nil)) (b (eql nil)))
   nil)
@@ -572,6 +581,8 @@ compound-only specifiers."
 
 ;;; Status of a symbol
 (defun symbol-status (symbol)
+  "Returns a status of 'symbol' in its package (internal, external,
+etc.)"
   (multiple-value-bind (sym status)
       (find-symbol (symbol-name symbol) (symbol-package symbol))
     status))

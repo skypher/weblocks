@@ -278,6 +278,14 @@
     (strictly-less-p 'a nil)
   t)
 
+(deftest strictly-less-p-6
+    (strictly-less-p 'a "b")
+  t)
+
+(deftest strictly-less-p-7
+    (strictly-less-p 'b "a")
+  nil)
+
 ;;; test equivalentp
 (deftest equivalentp-1
     (equivalentp "a" "a")
