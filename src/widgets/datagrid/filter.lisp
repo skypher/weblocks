@@ -19,7 +19,8 @@ repeatedly to each item in the sequence."
   (:documentation
    "Determines if 'slot-value' satisfies a search regex. Default
 implementation applies 'search-regex' to string representations of
-each slot value, and if one matches returns true.
+each slot value obtained via calling 'data-print-object', and if one
+matches returns true.
 
 'obj' - the object that contains the slot in question.
 'slot-name' - name of the slot.
@@ -35,12 +36,14 @@ each slot value, and if one matches returns true.
 
 (defmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
 				      &rest args)
-  (if (typep slot-value 'standard-object)
-      (if (render-slot-inline-p obj slot-name)
-	  (apply #'object-satisfies-search-p
-		 obj slot-name slot-type slot-value search-regex args)
-	  (ppcre:scan search-regex (format nil "~A" (object-name slot-value))))
-      (ppcre:scan search-regex (format nil "~A" slot-value))))
+  (not (null
+	(if (typep slot-value 'standard-object)
+	    (if (render-slot-inline-p obj slot-name)
+		(apply #'object-satisfies-search-p
+		       obj slot-name slot-type slot-value search-regex args)
+		(ppcre:scan search-regex (object-name slot-value)))
+	    (ppcre:scan search-regex (apply #'data-print-object
+					    obj slot-name slot-type slot-value args))))))
 
 (defun make-isearch-regex (search)
   "Create a regular expression from the user's input that tries to be

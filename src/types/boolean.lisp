@@ -1,14 +1,12 @@
 
 (in-package :weblocks)
 
-(defmethod render-data-aux (obj slot-name (slot-type (eql 'boolean))
-			    slot-value &rest keys &key highlight &allow-other-keys)
-  (let* ((item (if slot-value "Yes" "No")))
-    (with-html
-      (:span :class "value"
-	     (str (if highlight
-		      (highlight-regex-matches item highlight)
-		      (escape-for-html item)))))))
+(defmethod data-print-object (obj slot-name (slot-type (eql 'boolean)) slot-value &rest args)
+  (if slot-value "Yes" "No"))
+
+(defmethod render-data-aux (obj slot-name (slot-type (eql 'boolean)) (slot-value (eql nil))
+			    &rest keys &key highlight &allow-other-keys)
+  (apply #'call-next-method obj slot-name slot-type slot-value :ignore-missing-values-p t keys))
 
 (defmethod render-form-aux (obj slot-name (slot-type (eql 'boolean)) slot-value &rest
 			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
@@ -27,8 +25,4 @@
 
 (defmethod slot-in-request-empty-p ((slot-type (eql 'boolean)) request-slot-value)
   nil)
-
-(defmethod object-satisfies-search-p (search-regex obj slot-name (slot-type (eql 'boolean))
-				      slot-value &rest args)
-  (not (null (ppcre:scan search-regex (if slot-value "Yes" "No")))))
 

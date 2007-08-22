@@ -42,7 +42,7 @@
 				     (:file "data-renderer"
 				      :depends-on ("renderer-output-utils"))
 				     (:file "form-renderer"
-				      :depends-on ("renderer-output-utils"))
+				      :depends-on ("renderer-output-utils" "data-renderer"))
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
 			:depends-on ("weblocks" "utils" snippets))

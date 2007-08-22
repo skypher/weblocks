@@ -1,7 +1,8 @@
 ;;;; Generic data renderer
 (in-package :weblocks)
 
-(export '(with-data-header render-data-slot render-data render-data-aux))
+(export '(with-data-header render-data-slot render-data
+	  data-print-object render-data-aux))
 
 (defgeneric with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
   (:documentation
@@ -78,6 +79,17 @@ Ex:
 \(render-data address :slots ((city . town) :mode :strict)"
   (apply #'render-data-aux parent-object slot-name slot-type obj keys))
 
+(defgeneric data-print-object (obj slot-name slot-type slot-value &rest args)
+  (:documentation
+   "Prints 'slot-value' to a string that will be used to render the
+value in a data renderer. This function is called by
+'render-data-aux'. Default implementation simply uses (format nil
+\"~A\" slot-value). Specialize this function to customize simple data
+printing without having to specialize more heavy 'render-data-aux'."))
+
+(defmethod data-print-object (obj slot-name slot-type slot-value &rest args)
+  (format nil "~A" slot-value))
+
 (defgeneric render-data-aux (obj slot-name slot-type slot-value &rest keys
 				 &key inlinep highlight &allow-other-keys)
   (:documentation
@@ -124,16 +136,19 @@ See 'render-data' for examples."))
   (apply #'render-standard-object #'with-data-header #'render-data-slot slot-value keys))
 
 (defmethod render-data-aux (obj slot-name slot-type slot-value &rest keys &key highlight &allow-other-keys)
-  (let* ((item (format nil "~A" slot-value)))
+  (let* ((item (apply #'data-print-object obj slot-name slot-type slot-value keys)))
     (with-html
       (:span :class "value"
 	     (str (if highlight
 		      (highlight-regex-matches item highlight)
 		      (escape-for-html item)))))))
 
-(defmethod render-data-aux (obj slot-name slot-type (slot-value (eql nil)) &rest keys)
-  (with-html
-    (:span :class "value missing" "Not Specified")))
+(defmethod render-data-aux (obj slot-name slot-type (slot-value (eql nil))
+			    &rest keys &key ignore-missing-values-p &allow-other-keys)
+  (if ignore-missing-values-p
+      (call-next-method)
+      (with-html
+	(:span :class "value missing" "Not Specified"))))
 
 (defun highlight-regex-matches (item highlight)
   "This function highlights regex matches in text by wrapping them in

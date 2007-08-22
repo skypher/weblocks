@@ -34,6 +34,11 @@
 	(:span :class "label" "Graduation Year:&nbsp;")
 	(:span :class "value" "2000"))))
 
+;;; test data-print-object-1
+(deftest data-print-object-1
+    (data-print-object nil 'name 'integer 42)
+  "42")
+
 ;;; test render-data/aux
 (deftest-html render-data/aux-1
     (render-data "test")

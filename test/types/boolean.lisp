@@ -1,6 +1,15 @@
 
 (in-package :weblocks-test)
 
+;;; test data-print-object for booleans
+(deftest data-print-object-booleans-1
+    (data-print-object nil 'name 'boolean t)
+  "Yes")
+
+(deftest data-print-object-booleans-2
+    (data-print-object nil 'name 'boolean nil)
+  "No")
+
 ;;; test render-data/aux for booleans
 (deftest-html render-data/aux-booleans-1
     (render-data *joe* :slots '(name veteran) :mode :strict)

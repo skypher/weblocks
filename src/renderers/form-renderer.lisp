@@ -3,7 +3,7 @@
 
 (export '(with-form-header render-validation-summary
 	  render-form-controls render-form-slot render-form
-	  render-form-aux required-validation-error
+	  form-print-object render-form-aux required-validation-error
 	  slot-intermedia-value))
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
@@ -120,6 +120,19 @@ nil. Otherwise returns a cons cell the car of which is slot-name and
 the cdr is the intermediate value."
   (assoc (attributize-name slot-name) intermediate-fields :test #'string-equal))
 
+(defgeneric form-print-object (obj slot-name slot-type slot-value &rest args)
+  (:documentation
+   "Prints 'slot-value' to a string that will be used to render the
+value in a form renderer. This function is called by
+'render-form-aux'. Default implementation returns nil if 'slot-value'
+is nil, otherwise calls 'data-print-object'. Specialize this function
+to customize simple data printing without having to specialize more
+heavy 'render-data-aux'."))
+
+(defmethod form-print-object (obj slot-name slot-type slot-value &rest args)
+  (when slot-value
+    (apply #'data-print-object obj slot-name slot-type slot-value args)))
+
 (defgeneric render-form-aux (obj slot-name slot-type slot-value &rest
 				 keys &key inlinep name
 				 validation-errors intermediate-fields
@@ -147,8 +160,10 @@ over values obtained from the object."))
   (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
 	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
     (with-html
-      (:input :type "text" :name attributized-slot-name :value (if intermediate-value
-								   (cdr intermediate-value)
-								   slot-value)
+      (:input :type "text" :name attributized-slot-name
+	      :value (if intermediate-value
+			 (cdr intermediate-value)
+			 (apply #'form-print-object obj slot-name
+				slot-type slot-value keys))
 	      :maxlength (max-raw-slot-input-length obj slot-name slot-type)))))
 

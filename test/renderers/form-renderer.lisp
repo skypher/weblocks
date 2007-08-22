@@ -94,6 +94,15 @@
     (slot-intermedia-value 'some-slot '((a . b) (some-slot . nil)))
   (some-slot . nil))
 
+;;; test form-print-object
+(deftest form-print-object-1
+    (form-print-object nil 'name 'integer 42)
+  "42")
+
+(deftest form-print-object-2
+    (form-print-object nil 'name 'integer nil)
+  nil)
+
 ;;; test render-form/aux
 (deftest-html render-form/aux-1
     (render-form "test" :slot-path '(test))
