@@ -580,3 +580,16 @@
     (symbol-status 'symbol-status-1)
   :internal)
 
+;;; test string-invert-case
+(deftest string-invert-case-1
+    (string-invert-case "tEst")
+  "TeST")
+
+(deftest string-invert-case-2
+    (string-invert-case "")
+  "")
+
+(deftest string-invert-case-3
+    (string-invert-case 'nil)
+  "nil")
+

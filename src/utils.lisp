@@ -11,7 +11,7 @@
 	  public-files-relative-paths request-uri-path
 	  string-remove-left string-remove-right find-all
 	  stable-set-difference typespec-compound-only-p type-expand
-	  expand-typespec symbol-status))
+	  expand-typespec symbol-status string-invert-case))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -586,4 +586,14 @@ etc.)"
   (multiple-value-bind (sym status)
       (find-symbol (symbol-name symbol) (symbol-package symbol))
     status))
+
+;;; String helpers
+(defun string-invert-case (str)
+  (map 'string (lambda (char)
+		 (if (upper-case-p char)
+		     (char-downcase char)
+		     (char-upcase char)))
+       (etypecase str
+	 (string str)
+	 (symbol (symbol-name str)))))
 

@@ -79,7 +79,10 @@
 					      "request-hooks" linguistic))
 	       (:module types
 			:components ((:file "us-states")
-				     (:file "boolean"))
+				     (:file "boolean")
+				     (:file "symbol")
+				     (:file "keyword"
+				      :depends-on ("symbol")))
 			:depends-on (renderers snippets widgets))
 	       (:file "server"
 		      :depends-on ("weblocks"))

@@ -42,7 +42,9 @@
 			:depends-on ("weblocks-test"))
 	       (:module types
 			:components ((:file "boolean")
-				     (:file "us-states"))
+				     (:file "us-states")
+				     (:file "symbol")
+				     (:file "keyword"))
 			:depends-on ("weblocks-test" renderers))
 	       (:module snippets
 			:components ((:file "suggest")
