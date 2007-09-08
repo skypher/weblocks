@@ -46,6 +46,10 @@
     (invalid-input-error-message nil "some-slot" "Some Human Slot" 'dummy-exported-type "t")
   "Some Human Slot must be a dummy exported type.")
 
+(deftest invalid-input-error-message-4
+    (invalid-input-error-message nil "some-slot" "Some Human Slot" '(member a b) "t")
+  "Some Human Slot must be either A or B.")
+
 ;;; test max-raw-slot-input-length
 (deftest max-raw-slot-input-length-1
     (max-raw-slot-input-length *joe* 'name 'string)

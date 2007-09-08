@@ -57,12 +57,15 @@ parsed.")
 	t)))
 
 (defgeneric invalid-input-error-message (obj slot-name humanized-name slot-type parsed-request-slot-value)
-  (:generic-function-class slot-management-generic-function)
   (:documentation
    "This function returns an error message that's displayed to the
 user when he enters invalid data. By default a message defined in
 *invalid-input-message* is used. Specialize this function to output
 custom error messages for specific slots/types.
+
+Note, slot-management-generic-function is *not* the metaclass for this
+generic function as it would interfere with the functionality.
+Therefore flexible specialization on 'slot-type' isn't possible.
 
 Note that by default if slot-type isn't a compound only specifier
 and (car-safe (ensure-list slot-type)) is not an external symbol,
