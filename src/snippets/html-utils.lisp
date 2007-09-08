@@ -77,7 +77,7 @@ being rendered.
 
 'selections' - a list of strings to render as selections. Each element
 may be a string or a cons cell. If it is a cons cell, the car of each
-sell will be used as the text for each option and the cdr will be used
+cell will be used as the text for each option and the cdr will be used
 for the value.
 
 'id' - an id of the element.
