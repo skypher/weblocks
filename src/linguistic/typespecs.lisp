@@ -140,9 +140,10 @@ and 'args' are the 'cdr- of the list."))
   (assert (null adjectives))
   (case (length args)
     (0 (error "~A is an impossible type." (cons typespec args)))
-    (1 (format nil "~A" (car args)))
+    (1 (humanize-name (format nil "~A" (car args))))
     (otherwise (apply #'concatenate 'string "either "
-		      (intersperse (mapcar (curry #'format nil "~A") (remove 'null args))
+		      (intersperse (mapcar (compose #'humanize-name (curry #'format nil "~A"))
+					   (remove 'null args))
 				   ", " :last (if (eql (length args) 2) " or " ", or "))))))
 
 (defmethod humanize-compound-typespec-aux ((typespec (eql 'values)) args &key adjectives)

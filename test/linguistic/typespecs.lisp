@@ -242,6 +242,14 @@
     (humanize-compound-typespec-aux 'and '((satisfies oddp) (member 1 2 3)))
   "odd and either 1, 2, or 3")
 
+(deftest humanize-compound-typespec-aux-member-6
+    (humanize-compound-typespec-aux 'member '(hi))
+  "Hi")
+
+(deftest humanize-compound-typespec-aux-member-7
+    (humanize-compound-typespec-aux 'member '(hi bye))
+  "either Hi or Bye")
+
 ;;; test humanize-compound-typespec-aux-values-1
 (deftest humanize-compound-typespec-aux-values-1
     (multiple-value-bind (res err)
