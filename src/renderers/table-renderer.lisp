@@ -41,6 +41,7 @@ div's along with classes necessary for CSS styling. Look at
 ;; Table header
 (defgeneric render-table-header-row (obj slot-name slot-type
 					 slot-value &rest keys &key inlinep &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders the row in the 'thead' element of the table. The
 default implementation uses 'render-table-header-cell' to render
@@ -64,6 +65,7 @@ have its own header."))
 
 (defgeneric render-table-header-cell (obj slot-name slot-type slot-value &rest keys
 					  &key human-name &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders the 'th' elements of the table. The default
 implementation adds a class for CSS styling and renders a
@@ -91,6 +93,7 @@ the current header. See 'render-object-slot' function.
 ;; Table body
 (defgeneric render-table-body-row (obj slot-name slot-type slot-value
 				       &rest keys &key inlinep &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders the rows in the 'tbody' element of the table. The
 default implementation uses 'render-table-body-cell' to render
@@ -102,6 +105,7 @@ details."))
 
 (defgeneric render-table-body-cell (obj slot-name slot-type slot-value
 				     &rest keys &key inlinep &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders the 'td' elements of the table. See
 'render-table-header-cell' for more details."))

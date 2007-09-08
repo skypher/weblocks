@@ -13,8 +13,11 @@
   :description "A test harness for weblocks framework."
   :depends-on ("weblocks" "rt" "closer-mop" "metatilities")
   :components ((:file "weblocks-test")
-	       (:file "utils-test"
-		      :depends-on ("weblocks-test"))
+	       (:module utils-test
+			:components ((:file "misc")
+				     (:file "typespec"
+				      :depends-on ("misc")))
+			:depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test"))
 	       (:file "request-hooks"

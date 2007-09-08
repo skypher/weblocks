@@ -91,7 +91,7 @@ done by 'update-object-from-request'."
 				errors)
 			  (multiple-value-bind (parsedp parsed-value)
 			      (invoke-parsers-on-slot slot-type slot-name request-slot-value)
-			    (if (and parsedp (slot-from-request-valid-p obj (car slot) parsed-value))
+			    (if (and parsedp (slot-from-request-valid-p obj slot-name slot-type parsed-value))
 				(push (cons slot-key parsed-value) results)
 				(push (cons slot-key
 					    (invalid-input-error-message obj slot-name human-slot-name
@@ -103,6 +103,7 @@ done by 'update-object-from-request'."
 	(values t results))))
 
 (defgeneric slot-in-request-empty-p (slot-type request-slot-value)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Returns true if the slot value in request is to be considered
 'empty', i.e. all whitespace, 'Select State' dropdown value, etc.

@@ -1,9 +1,10 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function
 			  #:standard-class)
+  (:shadowing-import-from :fare-matcher #:match)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of
 web application development. It achieves its goals by

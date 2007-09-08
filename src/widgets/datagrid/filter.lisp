@@ -16,6 +16,7 @@ repeatedly to each item in the sequence."
 	data)))
 
 (defgeneric object-satisfies-search-p (search-regex obj slot-name slot-type slot-value &rest args)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Determines if 'slot-value' satisfies a search regex. Default
 implementation applies 'search-regex' to string representations of

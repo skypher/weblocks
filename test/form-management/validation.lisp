@@ -21,15 +21,15 @@
 
 ;;; slot-from-request-valid-p
 (deftest slot-from-request-valid-p-1
-    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) nil)
+    (weblocks::slot-from-request-valid-p *joe* 'age 'integer nil)
   nil)
 
 (deftest slot-from-request-valid-p-2
-    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) 20)
+    (weblocks::slot-from-request-valid-p *joe* 'age 'integer 20)
   t)
 
 (deftest slot-from-request-valid-p-3
-    (weblocks::slot-from-request-valid-p *joe* (get-slot-definition 'employee 'age) "Bob")
+    (weblocks::slot-from-request-valid-p *joe* 'age 'integer "Bob")
   nil)
 
 

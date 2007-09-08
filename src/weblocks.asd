@@ -11,20 +11,24 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
-  :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri" "md5")
+  :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri" "md5"
+			    "fare-matcher")
   :components ((:file "weblocks")
-	       (:file "utils"
-		      :depends-on ("weblocks"))
+	       (:module utils
+			:components ((:file "misc")
+				     (:file "typespec"
+					    :depends-on ("misc")))
+			:depends-on ("weblocks"))
 	       (:file "page-template"
-		      :depends-on ("weblocks" "utils" "application"))
+		      :depends-on ("weblocks" utils "application"))
 	       (:file "actions"
-		      :depends-on ("weblocks" "utils"))
+		      :depends-on ("weblocks" utils))
 	       (:file "debug-mode"
 		      :depends-on ("weblocks" "actions"))
 	       (:file "request-hooks"
 		      :depends-on ("weblocks"))
 	       (:file "request-handler"
-		      :depends-on ("weblocks" "utils" "page-template" "debug-mode" "actions" "request-hooks"
+		      :depends-on ("weblocks" utils "page-template" "debug-mode" "actions" "request-hooks"
 				   "application" "request"))
 	       (:module snippets
 			:components ((:file "suggest")
@@ -36,7 +40,7 @@
 			:components ((:file "grammar")
 				     (:file "typespecs"
 				      :depends-on ("grammar")))
-			:depends-on ("weblocks" "utils"))
+			:depends-on ("weblocks" utils))
 	       (:module renderers
 			:components ((:file "renderer-output-utils")
 				     (:file "data-renderer"
@@ -45,14 +49,14 @@
 				      :depends-on ("renderer-output-utils" "data-renderer"))
 				     (:file "table-renderer"
 				      :depends-on ("renderer-output-utils")))
-			:depends-on ("weblocks" "utils" snippets))
+			:depends-on ("weblocks" utils snippets))
 	       (:module form-management
 			:components ((:file "validation")
 				     (:file "form-parsers"
 				      :depends-on ("validation"))
 				     (:file "request-object-mapping"
 				      :depends-on ("validation" "form-parsers")))
-			:depends-on ("utils" linguistic))
+			:depends-on (utils linguistic))
 	       (:module widgets
 			:components ((:file "widget")
 				     (:file "flash"
@@ -75,7 +79,7 @@
 				     (:file "navigation"
 				      :depends-on ("composite" "widget")))
 			:depends-on (snippets renderers
-					      form-management "utils" "actions" "server" "request"
+					      form-management utils "actions" "server" "request"
 					      "request-hooks" linguistic))
 	       (:module types
 			:components ((:file "us-states")
@@ -91,6 +95,6 @@
 	       (:file "application"
 		      :depends-on ("weblocks"))
 	       (:file "default-application"
-		      :depends-on ("server" "weblocks" "utils" "request-handler"))))
+		      :depends-on ("server" "weblocks" utils "request-handler"))))
 
 

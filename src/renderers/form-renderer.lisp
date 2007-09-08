@@ -77,6 +77,7 @@ case the user clicks submit."))
 
 (defgeneric render-form-slot (obj slot-name slot-type slot-value &rest keys
 				  &key human-name validation-errors &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
@@ -121,6 +122,7 @@ the cdr is the intermediate value."
   (assoc (attributize-name slot-name) intermediate-fields :test #'string-equal))
 
 (defgeneric form-print-object (obj slot-name slot-type slot-value &rest args)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Prints 'slot-value' to a string that will be used to render the
 value in a form renderer. This function is called by
@@ -137,6 +139,7 @@ heavy 'render-data-aux'."))
 				 keys &key inlinep name
 				 validation-errors intermediate-fields
 				 &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "A generic form presentation renderer. Similar to
 'render-data-aux'.

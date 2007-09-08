@@ -38,6 +38,7 @@ provide customized header rendering."))
 		   (safe-apply postslots-fn obj keys)))))))
 
 (defgeneric render-data-slot (obj slot-name slot-type slot-value &rest keys &key human-name &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders a given slot of a particular object.
 
@@ -80,6 +81,7 @@ Ex:
   (apply #'render-data-aux parent-object slot-name slot-type obj keys))
 
 (defgeneric data-print-object (obj slot-name slot-type slot-value &rest args)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Prints 'slot-value' to a string that will be used to render the
 value in a data renderer. This function is called by
@@ -92,6 +94,7 @@ printing without having to specialize more heavy 'render-data-aux'."))
 
 (defgeneric render-data-aux (obj slot-name slot-type slot-value &rest keys
 				 &key inlinep highlight &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "A generic data presentation renderer.
 

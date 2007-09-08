@@ -95,6 +95,7 @@ for :descending and vica versa)."
 
 (defgeneric render-datagrid-header-cell (obj slot-name slot-type slot-value &rest keys
 					&key human-name slot-path grid-obj &allow-other-keys)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders table headers for the datagrid. The default implementation
 renders a link that it associates with a sorting action which modifies

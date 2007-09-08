@@ -10,8 +10,8 @@
 	  remove-keyword-parameter public-file-relative-path
 	  public-files-relative-paths request-uri-path
 	  string-remove-left string-remove-right find-all
-	  stable-set-difference typespec-compound-only-p type-expand
-	  expand-typespec symbol-status string-invert-case))
+	  stable-set-difference symbol-status string-invert-case
+	  ninsert))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -553,32 +553,6 @@ item before passing it to 'predicate'."
        unless (find (funcall key i) list-2 :test test :key key)
        collect i))
 
-;;; Compound-only typespecs
-(defun typespec-compound-only-p (typespec-name)
-  (not (null (member typespec-name '(and eql member mod not or satisfies values)))))
-
-;;; Expanding typespecs
-(defun type-expand (typespec)
-  "Expands user type aliases defined by 'deftype'. This function calls
-implementation specific non-ANSI functions."
-  #+cmu (kernel:type-expand typespec)
-  #+sbcl (sb-kernel:type-expand typespec)
-  #+clisp (ext:type-expand typespec)
-  #+(or openmcl mcl) (ccl::type-expand typespec)
-  #+allegro (excl:normalize-type typespec)
-  #+lispworks (type:expand-user-type typespec)
-  #-(or cmu sbcl clisp openmcl mcl allegro lispworks) (error "Not implemented on this lisp system."))
-
-(defun expand-typespec (typespec)
-  "Uses 'type-expand' to expand complex typespecs that may contain
-compound-only specifiers."
-  (when (not (listp typespec))
-    (return-from expand-typespec
-      (type-expand typespec)))
-  (if (typespec-compound-only-p (car typespec))
-      (apply #'list (car typespec) (mapcar #'expand-typespec (cdr typespec)))
-      (type-expand typespec)))
-
 ;;; Status of a symbol
 (defun symbol-status (symbol)
   "Returns a status of 'symbol' in its package (internal, external,
@@ -596,4 +570,12 @@ etc.)"
        (etypecase str
 	 (string str)
 	 (symbol (symbol-name str)))))
+
+;;; Element insertion
+(defun ninsert (list thing pos)
+    (if (zerop pos)
+        (cons thing list)
+        (let ((old-tail (nthcdr (1- pos) list)))
+          (setf (cdr old-tail) (cons thing (cdr old-tail)))
+          list)))
 

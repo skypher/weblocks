@@ -3,7 +3,8 @@
 
 (export '(*required-field-message* *invalid-input-message*
 	  *max-raw-input-length* *max-raw-input-length-error-message*
-	  invalid-input-error-message max-raw-slot-input-length ))
+	  slot-from-request-valid-p invalid-input-error-message
+	  max-raw-slot-input-length ))
 
 (defparameter *required-field-message* "~A is a required field."
   "This message will be passed to 'format' along with the humanized
@@ -35,24 +36,28 @@ nil otherwise. See 'decl-validate' for more detauls.
     (and type
 	 (not (typep nil type)))))
 
-(defun slot-from-request-valid-p (obj slot parsed-request-slot-value)
-  "Checks if the type of 'parsed-request-slot-value' is a valid
+(defgeneric slot-from-request-valid-p (obj slot-name slot-type parsed-request-slot-value &rest args)
+  (:documentation "Checks if the type of 'parsed-request-slot-value' is a valid
 subtype of the slot-definition-type for 'slot'. Returns true if the
 parsed value is valid, false otherwise.
 
 Note, if type isn't declared this function always returns true.
 
 'obj' - the object we're trying to deserialize into.
-'slot' - slot definition object of the slot we're trying to
-deserialize into.
+'slot-name' - name of the slot.
+'slot-type' - declared type of the slot. Note,
+slot-management-generic-function is *not* the metaclass for this
+generic function as it would interfere with checking the
+type. Therefore flexible specialization on 'slot-type' isn't possible.
 'parsed-value-from-request' - value entered by the user after it was
-parsed."
-  (let ((type (slot-definition-type slot)))
-    (if type
-	(typep parsed-request-slot-value type)
+parsed.")
+  (:method (obj slot-name slot-type parsed-request-slot-value &rest args)
+    (if slot-type
+	(typep parsed-request-slot-value slot-type)
 	t)))
 
 (defgeneric invalid-input-error-message (obj slot-name humanized-name slot-type parsed-request-slot-value)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "This function returns an error message that's displayed to the
 user when he enters invalid data. By default a message defined in
@@ -72,6 +77,7 @@ message."))
 
 ;;; Some pre-parse validation
 (defgeneric max-raw-slot-input-length (obj slot-name slot-type)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Must return a maximum length of user input for a given
 slot. Default implementation returns the value of

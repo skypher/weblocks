@@ -5,6 +5,7 @@
 
 ;;; Parsers
 (defgeneric parse-slot-from-request (slot-type slot-name request-slot-value)
+  (:generic-function-class slot-management-generic-function)
   (:documentation
    "Parses 'request-slot-value' into a type specified by
 'slot-type'. By default implementations are provided for basic
