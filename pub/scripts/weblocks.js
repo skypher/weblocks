@@ -16,7 +16,13 @@ Ajax.Responders.register({
 
 function onActionSuccess(transport) {
     // Grab json value
-    var json = transport.responseText.evalJSON(true);
+    var json;
+    if(Prototype.Browser.WebKit) {
+	// We should sanitize JSON, but at the moment it crashes Safari
+        json = transport.responseText.evalJSON();
+    } else {
+        json = transport.responseText.evalJSON(true);
+    }
     
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
