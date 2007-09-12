@@ -319,3 +319,7 @@ widget object, in which case it is simply returned.
 
 (defun find-widget-by-path (path &optional (root (session-value 'root-composite)))
   (find-widget-by-path* path root))
+
+(defmethod print-object ((obj widget) stream)
+  (print-unreadable-object (obj stream :type t)
+    (format stream "~s" (slot-value obj 'name))))

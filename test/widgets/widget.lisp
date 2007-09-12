@@ -237,3 +237,12 @@
       (setf (session-value 'weblocks::root-composite) (create-site-layout))
       (find-widget-by-path '(doesnt exist)))
   nil)
+
+;;; test customized widget printing
+(deftest widget-printing-1
+    (format nil "~s" (make-instance 'weblocks::navigation))
+  "#<NAVIGATION NIL>")
+
+(deftest widget-printing-2
+    (format nil "~s" (make-instance 'weblocks::dataform :name 'users))
+  "#<DATAFORM USERS>")
