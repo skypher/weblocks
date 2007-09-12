@@ -34,12 +34,14 @@ page HTML (title, stylesheets, etc.)."
 						:test #'equalp :from-end t)
 		 when (equalp (pathname-type i) "css")
 		 do (htm (:link :rel "stylesheet" :type "text/css"
-				:href (merge-pathnames i (make-pathname :directory '(:absolute "pub"))))))
+				:href (puri:uri (merge-pathnames i (make-pathname :directory
+										  '(:absolute "pub")))))))
 	      ; render scripts
 	      ; empty quote in script tags are a fix for w3m
 	      (loop for i in combined-dependencies
 		 when (equalp (pathname-type i) "js")
-		 do (htm (:script :src (merge-pathnames i (make-pathname :directory '(:absolute "pub")))
+		 do (htm (:script :src (puri:uri (merge-pathnames i (make-pathname :directory
+										   '(:absolute "pub"))))
 				  :type "text/javascript" ""))))
 	     (:body
 	      (render-page-body rendered-html)

@@ -573,3 +573,16 @@
       (ninsert l 0 4))
   (1 2 3 4 0))
 
+;;; test puri:uri from pathname
+(deftest puri-uri-pathname-1
+    (puri:render-uri (puri:uri (make-pathname :directory '(:relative "foo" "bar"))) nil)
+  "foo/bar/")
+
+(deftest puri-uri-pathname-2
+    (puri:render-uri (puri:uri (make-pathname :directory '(:absolute "foo" "bar"))) nil)
+  "/foo/bar/")
+
+(deftest puri-uri-pathname-3
+    (puri:render-uri (puri:uri (make-pathname :directory '(:absolute "foo" "bar")
+					      :name "baz" :type "txt")) nil)
+  "/foo/bar/baz.txt")

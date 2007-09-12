@@ -491,7 +491,7 @@ ex:
 
 Ex:
 \(public-file-relative-path :stylesheet \"navigation\")
-=> #P\"stylesheets/navigation\""
+=> #P\"stylesheets/navigation.css\""
   (make-pathname :directory `(:relative
 			      ,(ecase type
 				      (:stylesheet "stylesheets")
@@ -578,4 +578,15 @@ etc.)"
         (let ((old-tail (nthcdr (1- pos) list)))
           (setf (cdr old-tail) (cons thing (cdr old-tail)))
           list)))
+
+;;; URI from pathname
+(defmethod puri:uri ((thing pathname))
+  (puri:uri
+   (format nil "~A~{~A/~}~A~A"
+	   (if (eql (car (pathname-directory thing)) :absolute) "/" "")
+	   (cdr (pathname-directory thing))
+	   (or (pathname-name thing) "")
+	   (if (pathname-type thing)
+	       (format nil ".~A" (pathname-type thing))
+	       ""))))
 
