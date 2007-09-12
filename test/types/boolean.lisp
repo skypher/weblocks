@@ -66,18 +66,15 @@
 ;;; test parse-slot-from-request for booleans
 (deftest parse-slot-from-request-booleans-1
     (parse-slot-from-request 'boolean nil "t")
-  t)
+  t t)
 
 (deftest parse-slot-from-request-booleans-2
     (parse-slot-from-request 'boolean nil nil)
-  nil)
+  t nil)
 
 (deftest parse-slot-from-request-booleans-3
-    (multiple-value-bind (res err)
-	(ignore-errors
-	  (parse-slot-from-request 'boolean nil "blah"))
-      (format nil "~A" (type-of err)))
-  "PARSE-ERROR")
+    (parse-slot-from-request 'boolean nil "blah")
+  nil)
 
 ;;; test slot-in-request-empty-p for booleans
 (deftest slot-in-request-empty-p-booleans-1

@@ -45,6 +45,7 @@
 			:depends-on ("weblocks-test"))
 	       (:module types
 			:components ((:file "boolean")
+				     (:file "member")
 				     (:file "us-states")
 				     (:file "symbol")
 				     (:file "keyword"))

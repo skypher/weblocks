@@ -28,15 +28,15 @@ matches returns true.
 'slot-type' - declared type of the slot.
 'slot-value' - the value to be tested."))
 
-(defmethod object-satisfies-search-p (search-regex obj slot-name slot-type (slot-value standard-object)
-				      &rest args)
+(defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type (slot-value standard-object)
+						       &rest args)
   (some (compose #'not #'null)
 	(flatten
 	 (apply #'visit-object-slots slot-value	(curry #'object-satisfies-search-p search-regex)
 		:call-around-fn-p nil args))))
 
-(defmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
-				      &rest args)
+(defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
+						       &rest args)
   (not (null
 	(if (typep slot-value 'standard-object)
 	    (if (render-slot-inline-p obj slot-name)

@@ -84,6 +84,7 @@
 	       (:module types
 			:components ((:file "us-states")
 				     (:file "boolean")
+				     (:file "member")
 				     (:file "symbol")
 				     (:file "keyword"
 				      :depends-on ("symbol")))

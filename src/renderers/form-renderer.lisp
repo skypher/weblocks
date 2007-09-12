@@ -82,11 +82,11 @@ case the user clicks submit."))
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
 
-(defmethod render-form-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-form-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (render-object-slot #'render-form-aux #'render-form-slot obj slot-name slot-type slot-value keys))
 
-(defmethod render-form-slot (obj slot-name slot-type slot-value &rest keys
-			     &key (human-name slot-name) validation-errors &allow-other-keys)
+(defslotmethod render-form-slot (obj slot-name slot-type slot-value &rest keys
+				     &key (human-name slot-name) validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
 	 (validation-error (assoc attribute-slot-name validation-errors :test #'string-equal))
 	 (field-class (concatenate 'string attribute-slot-name
@@ -131,7 +131,7 @@ is nil, otherwise calls 'data-print-object'. Specialize this function
 to customize simple data printing without having to specialize more
 heavy 'render-data-aux'."))
 
-(defmethod form-print-object (obj slot-name slot-type slot-value &rest args)
+(defslotmethod form-print-object (obj slot-name slot-type slot-value &rest args)
   (when slot-value
     (apply #'data-print-object obj slot-name slot-type slot-value args)))
 
@@ -155,11 +155,11 @@ entered. 'intermediate-fields' should be a copy of the request, in
 which case form renderer chooses values entered as part of the request
 over values obtained from the object."))
 
-(defmethod render-form-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-form-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (apply #'render-standard-object #'with-form-header #'render-form-slot slot-value keys))
 
-(defmethod render-form-aux (obj slot-name slot-type slot-value &rest
-			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+(defslotmethod render-form-aux (obj slot-name slot-type slot-value &rest
+				    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
   (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
 	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
     (with-html

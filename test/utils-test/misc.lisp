@@ -3,14 +3,15 @@
 
 ;; Slot rendering helper
 (defgeneric render-slot-simple (obj slot-name slot-type slot-value &rest keys)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name slot-type slot-value &rest keys)
+  (:generic-function-class slot-management-generic-function))
+
+(defslotmethod render-slot-simple (obj slot-name slot-type slot-value &rest keys)
     (if (typep slot-value 'standard-object)
 	(apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
 	(with-html
 	  (:p (str slot-name))
 	  (:p (str (format nil "~A" slot-type)))
-	  (:p (str slot-value))))))
+	  (:p (str slot-value)))))
 
 ;;; Test humanize-name function
 (deftest humanize-name-1
@@ -373,7 +374,7 @@
   (htm
    (:p "NAME") (:p "STRING") (:p "Joe")
    (:p "UNIVERSITY") (:p "T") (:p "Bene Gesserit University")
-   (:p "GRADUATION-YEAR") (:p "INTEGER") (:p "2000")
+   (:p "GRADUATION-YEAR") (:p "(OR NULL INTEGER)") (:p "2000")
    (:p "MANAGER") (:p "T") (:p "Jim")
    (:p "TEST") (:p "T") (:p "NIL")))
 

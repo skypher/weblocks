@@ -86,6 +86,6 @@ message."))
 slot. Default implementation returns the value of
 *max-raw-input-length*."))
 
-(defmethod max-raw-slot-input-length (obj slot-name slot-type)
+(defslotmethod max-raw-slot-input-length (obj slot-name slot-type)
   *max-raw-input-length*)
 

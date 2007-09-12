@@ -1,14 +1,14 @@
 
 (in-package :weblocks)
 
-(defmethod data-print-object (obj slot-name (slot-type (eql 'boolean)) slot-value &rest args)
+(defslotmethod data-print-object (obj slot-name (slot-type (eql 'boolean)) slot-value &rest args)
   (if slot-value "Yes" "No"))
 
-(defmethod render-data-aux (obj slot-name (slot-type (eql 'boolean)) (slot-value (eql nil))
+(defslotmethod render-data-aux (obj slot-name (slot-type (eql 'boolean)) (slot-value (eql nil))
 			    &rest keys &key highlight &allow-other-keys)
   (apply #'call-next-method obj slot-name slot-type slot-value :ignore-missing-values-p t keys))
 
-(defmethod render-form-aux (obj slot-name (slot-type (eql 'boolean)) slot-value &rest
+(defslotmethod render-form-aux (obj slot-name (slot-type (eql 'boolean)) slot-value &rest
 			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
   (check-type slot-value boolean)
   (let* ((intermediate-value (slot-intermedia-value slot-name intermediate-fields))
@@ -17,12 +17,12 @@
 		       slot-value)))
     (render-checkbox slot-name checkedp)))
 
-(defmethod parse-slot-from-request ((slot-type (eql 'boolean)) slot-name request-slot-value)
+(defslotmethod parse-slot-from-request ((slot-type (eql 'boolean)) slot-name request-slot-value)
   (cond
-    ((string-equal "t" request-slot-value) t)
-    ((null request-slot-value) nil)
-    (t (error 'parse-error))))
+    ((string-equal "t" request-slot-value) (values t t))
+    ((null request-slot-value) (values t nil))
+    (t nil)))
 
-(defmethod slot-in-request-empty-p ((slot-type (eql 'boolean)) request-slot-value)
+(defslotmethod slot-in-request-empty-p ((slot-type (eql 'boolean)) request-slot-value)
   nil)
 

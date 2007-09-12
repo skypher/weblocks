@@ -85,8 +85,8 @@ for :descending and vica versa)."
 ;;; appropriate to support sorting via clicking on
 ;;; headers. Additionally, specialize header rendering for 'select'
 ;;; slot to allow for selecting all/none slot selection
-(defmethod render-table-header-cell :around (obj slot-name slot-type slot-value &rest keys
-						 &key grid-obj &allow-other-keys)
+(defslotmethod render-table-header-cell :around (obj slot-name slot-type slot-value &rest keys
+						     &key grid-obj &allow-other-keys)
   (if (or (null grid-obj)
 	  (typep slot-value 'standard-object)
 	  (not (datagrid-column-sortable-p grid-obj slot-name slot-value)))
@@ -102,8 +102,12 @@ renders a link that it associates with a sorting action which modifies
 'sort' slot of the datagrid object. Specialize this function to
 customize the way datagrid headers are rendered."))
 
-(defmethod render-datagrid-header-cell (obj slot-name slot-type slot-value &rest keys
-					&key (human-name slot-name) slot-path grid-obj &allow-other-keys)
+(defslotmethod render-datagrid-header-cell (obj slot-name slot-type
+						slot-value &rest keys
+						&key (human-name
+						slot-name) slot-path
+						grid-obj
+						&allow-other-keys)
   (let ((th-class (when (equalp slot-name (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
 		    (concatenate 'string " sort-"
 				 (attributize-name (string (cdr (datagrid-sort grid-obj)))))))

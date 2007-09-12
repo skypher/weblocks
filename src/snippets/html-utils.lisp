@@ -3,7 +3,7 @@
 
 (export '(*submit-control-name* *cancel-control-name* with-html-form
 	  render-link render-button render-checkbox render-dropdown
-	  *dropdown-welcome-message*))
+	  *dropdown-welcome-message* render-radio-buttons))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -110,3 +110,31 @@ and cdr will be returned as value in case it's selected."
 					selections)
 				:map (lambda (i) nil))))))
 
+(defun render-radio-buttons (name selections &key id (class "radio") selected-value)
+  "Renders a group of radio buttons.
+
+'name' - name of radio buttons.
+'selections' - a list of selections. May be an association list, in
+which case its car is used to dispaly selection text, and cdr is used
+for the value.
+'id' - id of a label that holds the radio buttons.
+'class' - class of the label and of radio buttons.
+'selected-value' - selected radio button."
+  (loop for i in (list->assoc selections)
+        for j from 1
+        with count = (length selections)
+        for label-class = (cond
+			    ((eq j 1) (concatenate 'string class " first"))
+			    ((eq j count) (concatenate 'string class " last"))
+			    (t class))
+        do (progn
+	     (when (null selected-value)
+	       (setf selected-value (cdr i)))
+	     (with-html
+	       (:label :id id :class label-class
+		       (if (equalp (cdr i) selected-value)
+			   (htm (:input :name (attributize-name name) :type "radio" :class "radio"
+					:value (cdr i) :checked "checked"))
+			   (htm (:input :name (attributize-name name) :type "radio" :class "radio"
+					:value (cdr i))))
+		       (:span (str (car i))))))))

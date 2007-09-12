@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(defmethod data-print-object (obj slot-name slot-type (slot-value symbol) &rest args)
+(defslotmethod data-print-object (obj slot-name slot-type (slot-value symbol) &rest args)
   (humanize-name (call-next-method)))
 
 (defun parse-symbol-from-request (request-slot-value)
@@ -18,8 +18,8 @@ on 'symbol' and 'keyword'."
 		 (string-invert-case request-slot-value)
 		 request-slot-value))))
 
-(defmethod parse-slot-from-request ((slot-type (eql 'symbol)) slot-name request-slot-value)
-  (intern
-   (parse-symbol-from-request request-slot-value)
-   (symbol-package slot-name)))
+(defslotmethod parse-slot-from-request ((slot-type (eql 'symbol)) slot-name request-slot-value)
+  (values t (intern
+	     (parse-symbol-from-request request-slot-value)
+	     (symbol-package slot-name))))
 

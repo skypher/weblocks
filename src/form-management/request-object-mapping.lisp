@@ -90,7 +90,7 @@ done by 'update-object-from-request'."
 											 slot-type)))
 				errors)
 			  (multiple-value-bind (parsedp parsed-value)
-			      (invoke-parsers-on-slot slot-type slot-name request-slot-value)
+			      (invoke-parsers-on-slot-with-count slot-type slot-name request-slot-value)
 			    (if (and parsedp (slot-from-request-valid-p obj slot-name slot-type parsed-value))
 				(push (cons slot-key parsed-value) results)
 				(push (cons slot-key
@@ -114,7 +114,7 @@ the parsed value.
 Default implementation returns true when all characters of the request
 value are a whitespace."))
 
-(defmethod slot-in-request-empty-p (slot-type request-slot-value)
+(defslotmethod slot-in-request-empty-p (slot-type request-slot-value)
   (string-whitespace-p request-slot-value))
 
 (defun request-parameters-for-object (object &rest args)

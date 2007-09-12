@@ -118,3 +118,31 @@
 	   (:option "b")
 	   (:option "c")))
 
+;;; test render-radio-buttons
+(deftest-html render-radio-buttons-1
+    (render-radio-buttons 'some-name '("a" "b" "c") :id "some-id" :class "some-class")
+  (htm
+   (:label :id "some-id" :class "some-class first"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "a" :checked "checked")
+	   (:span "a"))
+   (:label :id "some-id" :class "some-class"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "b")
+	   (:span "b"))
+   (:label :id "some-id" :class "some-class last"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "c")
+	   (:span "c"))))
+
+(deftest-html render-radio-buttons-2
+    (render-radio-buttons 'some-name '("a" ("b" . "test") "c") :id "some-id"
+			  :selected-value "test")
+  (htm
+   (:label :id "some-id" :class "radio first"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "a")
+	   (:span "a"))
+   (:label :id "some-id" :class "radio"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "test" :checked "checked")
+	   (:span "b"))
+   (:label :id "some-id" :class "radio last"
+	   (:input :name "some-name" :type "radio" :class "radio" :value "c")
+	   (:span "c"))))
+

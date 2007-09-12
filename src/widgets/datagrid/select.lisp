@@ -67,6 +67,6 @@ selection slot (both are accepted for convinience)."
 			    (datagrid-item-selected-p grid (object-id obj))
 			    :class nil)))))
 
-(defmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
-				     &key grid-obj &allow-other-keys)
+(defslotmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
+					     &key grid-obj &allow-other-keys)
   (with-html (:th :class "select" "")))

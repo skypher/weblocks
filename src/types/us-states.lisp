@@ -39,8 +39,8 @@ state."
 (deftype us-state ()
   '(satisfies us-state-p))
 
-(defmethod render-form-aux (obj slot-name (slot-type (eql 'us-state)) slot-value &rest
-			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+(defslotmethod render-form-aux (obj slot-name (slot-type (eql 'us-state)) slot-value &rest
+				    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
   (let* ((intermediate-value (slot-intermedia-value slot-name intermediate-fields))
 	 (selections (mapcar #'car *us-states*))
 	 (default-value (if intermediate-value
@@ -59,18 +59,16 @@ state."
 	(render-dropdown slot-name selections :selected-value default-value
 			 :welcome-name welcome-name))))
 
-(defmethod parse-slot-from-request ((slot-type (eql 'us-state)) slot-name request-slot-value)
+(defslotmethod parse-slot-from-request ((slot-type (eql 'us-state)) slot-name request-slot-value)
   (setf request-slot-value (string-trim +whitespace-characters+ request-slot-value))
-  (if (empty-p request-slot-value)
-      nil
-      (if (eq (length request-slot-value) 2)
-	  (string-upcase request-slot-value)
-	  (let ((state (assoc request-slot-value *us-states* :test #'equalp)))
-	    (if state
-		(cdr state)
-		(error 'parse-error))))))
+  (when (not (empty-p request-slot-value))
+    (if (eq (length request-slot-value) 2)
+	(values t (string-upcase request-slot-value))
+	(let ((state (assoc request-slot-value *us-states* :test #'equalp)))
+	  (when state
+	    (values t (cdr state)))))))
 
-(defmethod invalid-input-error-message (obj slot-name humanized-name (slot-type (eql 'us-state))
-					parsed-request-slot-value)
+(defslotmethod invalid-input-error-message (obj slot-name humanized-name (slot-type (eql 'us-state))
+						parsed-request-slot-value)
   "Please enter a valid US State.")
 

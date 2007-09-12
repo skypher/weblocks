@@ -22,7 +22,8 @@
   display: none;
 }
 
-form.renderer fieldset ul li label em.required-slot
+form.renderer fieldset ul li label em.required-slot,
+form.renderer fieldset ul li span.label em.required-slot
 {
   font-weight: normal;
   display: inline;
@@ -44,16 +45,19 @@ form.renderer fieldset ul li label input
   padding: 0;
 }
 
-form.renderer fieldset ul li label input.checkbox
+form.renderer fieldset ul li label input.checkbox,
+form.renderer fieldset ul li label.radio input.radio
 {
   width: auto;
-  /* A hack for IE to line up the checkbox */
+  /* A hack for IE to line up the checkbox and radio button */
   margin-left: -4px;
 }
 
 /* Set normal margin for other browsers (comment is necessary to hide
 from IE7) */
-form.renderer >/**/fieldset ul li label input.checkbox
+form.renderer >/**/fieldset ul li label input.checkbox,
+form.renderer >/**/fieldset ul li label.radio input.radio
+
 {
   margin-left: 0;
 }
@@ -76,5 +80,38 @@ p.validation-error
 p.validation-error span.validation-error-heading
 {
   display: none;
+}
+
+/* Radio buttons */
+form.renderer fieldset ul li label.radio
+{
+  display: block;
+  margin-left: 12em;
+}
+
+form.renderer >/**/fieldset ul li label.radio
+{
+  /* We only need this for non-IE browsers */
+  margin-top: 0.25em;
+}
+
+form.renderer fieldset ul li label.radio.first
+{
+  display: inline;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+form.renderer fieldset ul li label.radio input.radio
+{
+  width: auto;
+  vertical-align: middle;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+form.renderer fieldset ul li label.radio span
+{
+  vertical-align: middle;
 }
 

@@ -57,7 +57,7 @@ details.
 'inlinep' - whether the object should be rendered inline or should
 have its own header."))
 
-(defmethod render-table-header-row (obj slot-name slot-type slot-value &rest keys)
+(defslotmethod render-table-header-row (obj slot-name slot-type slot-value &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-header-cell slot-value
 	 :alternp nil
 	 :call-around-fn-p nil
@@ -81,12 +81,12 @@ the current header. See 'render-object-slot' function.
 'slot-type' - type of the slot whose value is to be rendered.
 'slot-value' - Value of the slot."))
 
-(defmethod render-table-header-cell (obj slot-name slot-type slot-value &rest keys
-				     &key (human-name slot-name) &allow-other-keys)
+(defslotmethod render-table-header-cell (obj slot-name slot-type slot-value &rest keys
+					     &key (human-name slot-name) &allow-other-keys)
   (with-html
     (:th :class (attributize-name slot-name) (str (humanize-name human-name)))))
 
-(defmethod render-table-header-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-table-header-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (render-object-slot #'render-table-header-row
 		      #'render-table-header-cell obj slot-name slot-type slot-value keys))
 
@@ -100,22 +100,22 @@ default implementation uses 'render-table-body-cell' to render
 particular cells. See 'render-table-header-row' for more
 details."))
 
-(defmethod render-table-body-row (obj slot-name slot-type slot-value &rest keys)
+(defslotmethod render-table-body-row (obj slot-name slot-type slot-value &rest keys)
   (apply #'render-standard-object #'with-table-row #'render-table-body-cell slot-value keys))
 
 (defgeneric render-table-body-cell (obj slot-name slot-type slot-value
-				     &rest keys &key inlinep &allow-other-keys)
+					&rest keys &key inlinep &allow-other-keys)
   (:generic-function-class slot-management-generic-function)
   (:documentation
    "Renders the 'td' elements of the table. See
 'render-table-header-cell' for more details."))
 
-(defmethod render-table-body-cell (obj slot-name slot-type slot-value &rest keys)
+(defslotmethod render-table-body-cell (obj slot-name slot-type slot-value &rest keys)
   (with-html
     (:td :class (attributize-name slot-name)
 	 (apply #'render-data slot-value :slot-type slot-type keys))))
 
-(defmethod render-table-body-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-table-body-cell (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (render-object-slot #'render-table-body-row #'render-table-body-cell
 		      obj slot-name slot-type slot-value keys))
 

@@ -40,6 +40,47 @@
     (expand-typespec '(or integer (and foo2 pathname)))
   (or integer (and integer pathname)))
 
+;;; test inspect-typespec
+(deftest inspect-typespec-1
+    (weblocks::inspect-typespec 'integer)
+  integer nil)
+
+(deftest inspect-typespec-2
+    (weblocks::inspect-typespec '(or null integer))
+  integer nil)
+
+(deftest inspect-typespec-3
+    (weblocks::inspect-typespec '(or integer null))
+  integer nil)
+
+(deftest inspect-typespec-4
+    (weblocks::inspect-typespec '(or blah integer))
+  or (blah integer))
+
+;;; test slot-management-[method/generic].initialize-instance
+(defgeneric slot-management-method/generic-initialize-instance-test (a b)
+  (:generic-function-class slot-management-generic-function))
+
+(deftest slot-management-initialize-instance-1
+    (car (multiple-value-list
+	  (ignore-errors
+	    (defmethod slot-management-method/generic-initialize-instance-test (a b)
+	      1))))
+  nil)
+
+;;; test defslotmethod
+(deftest defslotmethod-1
+    (macroexpand-1
+     '(defslotmethod some-method (a1 a2)
+       (+ a1 a2)))
+  (let ((weblocks::*defmethod-type-d* t))
+    (declare (special weblocks::*defmethod-type-d*))
+    (defmethod some-method (a1 a2)
+      (declare (special weblocks::*full-slot-type*))
+      (let ((slot-type weblocks::*full-slot-type*))
+	(+ a1 a2))))
+  t)
+
 ;;; test type-prototype
 (deftest type-prototype-1
     (every (lambda (type)
@@ -52,11 +93,15 @@
 
 ;;; test slot-management-generic-function
 (defgeneric slot-management-generic-function-test-fn-1 (obj slot-name slot-type value &rest args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name (slot-type (eql 'foo)) value &rest args)
+  (:generic-function-class slot-management-generic-function))
+
+(defslotmethod slot-management-generic-function-test-fn-1 (obj slot-name (slot-type (eql 'foo)) value
+							       &rest args)
     1)
-  (:method (obj slot-name (slot-type fixnum) value &rest args)
-    2))
+
+(defslotmethod slot-management-generic-function-test-fn-1 (obj slot-name (slot-type fixnum) value
+							       &rest args)
+    2)
 
 (deftest slot-management-generic-function-1
     (slot-management-generic-function-test-fn-1 nil nil 'foo nil)
@@ -67,58 +112,57 @@
   2)
 
 (defgeneric slot-management-generic-function-test-fn-2 (obj slot-name slot-type value &rest args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name (slot-type (eql 'integer)) value &rest args)
-    1)
-  (:method (obj slot-name (slot-type integer) value &rest args)
-    2))
+  (:generic-function-class slot-management-generic-function))
+
+(defslotmethod slot-management-generic-function-test-fn-2 (obj slot-name (slot-type (eql 'integer))
+							   value &rest args)
+  1)
+
+(defslotmethod slot-management-generic-function-test-fn-2 (obj slot-name (slot-type integer)
+							   value &rest args)
+  2)
 
 (deftest slot-management-generic-function-3
     (slot-management-generic-function-test-fn-2 nil nil 'integer nil)
   1)
 
 (defgeneric slot-management-generic-function-test-fn-3 (obj slot-name slot-type value &rest args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name slot-type value &rest args)
-    1))
+  (:generic-function-class slot-management-generic-function))
+
+(defslotmethod slot-management-generic-function-test-fn-3 (obj slot-name slot-type value &rest args)
+    1)
 
 (deftest slot-management-generic-function-4
     (slot-management-generic-function-test-fn-3 nil nil 'integer nil)
   1)
 
 (defgeneric slot-management-generic-function-test-fn-4 (obj slot-name slot-type value &rest args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name slot-type value &key slot-type-args)
-    slot-type-args))
+  (:generic-function-class slot-management-generic-function))
+  
+(defslotmethod slot-management-generic-function-test-fn-4 (obj slot-name (slot-type fixnum) value &rest args)
+    slot-type)
 
 (deftest slot-management-generic-function-5
     (slot-management-generic-function-test-fn-4 nil nil '(integer 1 2) nil)
-  (1 2))
+  (integer 1 2))
 
 (defgeneric slot-management-generic-function-test-fn-5 (obj slot-name slot-type value &rest args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (obj slot-name slot-type value &key slot-type-args)
-    slot-type))
+  (:generic-function-class slot-management-generic-function))
+
+(defslotmethod slot-management-generic-function-test-fn-5 (obj slot-name slot-type value &rest args)
+    slot-type)
 
 (deftest slot-management-generic-function-6
     (slot-management-generic-function-test-fn-5 nil nil '(or null integer) nil)
-  integer)
+  (or null integer))
 
-(defgeneric slot-management-generic-function-test-fn-6 (a slot-type b &key slot-type-args)
-  (:generic-function-class slot-management-generic-function)
-  (:method (a slot-type b &key slot-type-args)
-    (values a slot-type b slot-type-args)))
+(defgeneric slot-management-generic-function-test-fn-6 (a slot-type b)
+  (:generic-function-class slot-management-generic-function))
+  
+(defslotmethod slot-management-generic-function-test-fn-6 (a slot-type b)
+    (values a slot-type b))
 
 (deftest slot-management-generic-function-7
     (slot-management-generic-function-test-fn-6 1 '(integer 5 6) 2)
-  1 integer 2 (5 6))
-
-(defgeneric slot-management-generic-function-test-fn-7 (a slot-type b)
-  (:generic-function-class slot-management-generic-function)
-  (:method (a slot-type b)
-    (values a slot-type b)))
-
-(deftest slot-management-generic-function-8
-    (slot-management-generic-function-test-fn-7 1 '(integer 5 6) 2)
-  1 integer 2)
+  1 (integer 5 6) 2)
 

@@ -58,11 +58,11 @@ manner. Note that you can override based on the object as well as
 slot name, which gives significant freedom in selecting the
 proper slot to override."))
 
-(defmethod render-data-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-data-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (render-object-slot #'render-data-aux #'render-data-slot obj slot-name slot-type slot-value keys))
 
-(defmethod render-data-slot (obj slot-name slot-type slot-value &rest keys
-			     &key (human-name slot-name) &allow-other-keys)
+(defslotmethod render-data-slot (obj slot-name slot-type slot-value &rest keys
+				     &key (human-name slot-name) &allow-other-keys)
   (with-html
     (:li :class (attributize-name slot-name)
 	 (:span :class "label"
@@ -89,7 +89,7 @@ value in a data renderer. This function is called by
 \"~A\" slot-value). Specialize this function to customize simple data
 printing without having to specialize more heavy 'render-data-aux'."))
 
-(defmethod data-print-object (obj slot-name slot-type slot-value &rest args)
+(defslotmethod data-print-object (obj slot-name slot-type slot-value &rest args)
   (format nil "~A" slot-value))
 
 (defgeneric render-data-aux (obj slot-name slot-type slot-value &rest keys
@@ -135,10 +135,11 @@ controls.
 
 See 'render-data' for examples."))
 
-(defmethod render-data-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
+(defslotmethod render-data-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (apply #'render-standard-object #'with-data-header #'render-data-slot slot-value keys))
 
-(defmethod render-data-aux (obj slot-name slot-type slot-value &rest keys &key highlight &allow-other-keys)
+(defslotmethod render-data-aux (obj slot-name slot-type slot-value
+				    &rest keys &key highlight &allow-other-keys)
   (let* ((item (apply #'data-print-object obj slot-name slot-type slot-value keys)))
     (with-html
       (:span :class "value"
@@ -146,8 +147,8 @@ See 'render-data' for examples."))
 		      (highlight-regex-matches item highlight)
 		      (escape-for-html item)))))))
 
-(defmethod render-data-aux (obj slot-name slot-type (slot-value (eql nil))
-			    &rest keys &key ignore-missing-values-p &allow-other-keys)
+(defslotmethod render-data-aux (obj slot-name slot-type (slot-value (eql nil))
+				    &rest keys &key ignore-missing-values-p &allow-other-keys)
   (if ignore-missing-values-p
       (call-next-method)
       (with-html

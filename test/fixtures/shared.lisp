@@ -22,7 +22,7 @@
    (address-ref :initform *home-address*)
    (education :initform *some-college*)))
 
-(defmethod max-raw-slot-input-length ((obj person) (slot-name (eql 'age)) slot-type)
+(defslotmethod max-raw-slot-input-length ((obj person) (slot-name (eql 'age)) slot-type)
   3)
 
 (defclass employee (person)
