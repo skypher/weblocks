@@ -137,4 +137,4 @@ for the value.
 					:value (cdr i) :checked "checked"))
 			   (htm (:input :name (attributize-name name) :type "radio" :class "radio"
 					:value (cdr i))))
-		       (:span (str (car i))))))))
+		       (:span (str (format nil "~A&nbsp;" (car i)))))))))

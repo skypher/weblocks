@@ -124,13 +124,13 @@
   (htm
    (:label :id "some-id" :class "some-class first"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "a" :checked "checked")
-	   (:span "a"))
+	   (:span "a&nbsp;"))
    (:label :id "some-id" :class "some-class"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "b")
-	   (:span "b"))
+	   (:span "b&nbsp;"))
    (:label :id "some-id" :class "some-class last"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "c")
-	   (:span "c"))))
+	   (:span "c&nbsp;"))))
 
 (deftest-html render-radio-buttons-2
     (render-radio-buttons 'some-name '("a" ("b" . "test") "c") :id "some-id"
@@ -138,11 +138,11 @@
   (htm
    (:label :id "some-id" :class "radio first"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "a")
-	   (:span "a"))
+	   (:span "a&nbsp;"))
    (:label :id "some-id" :class "radio"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "test" :checked "checked")
-	   (:span "b"))
+	   (:span "b&nbsp;"))
    (:label :id "some-id" :class "radio last"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "c")
-	   (:span "c"))))
+	   (:span "c&nbsp;"))))
 

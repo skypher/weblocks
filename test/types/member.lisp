@@ -10,10 +10,10 @@
 		     (:span :class "extra" "Test:&nbsp;")))
        (:label :class "radio first"
 	       (:input :name "test" :type "radio" :class "radio" :value "1" :checked "checked")
-	       (:span "1"))
+	       (:span "1&nbsp;"))
        (:label :class "radio"
 	       (:input :name "test" :type "radio" :class "radio" :value "two")
-	       (:span "Two"))
+	       (:span "Two&nbsp;"))
        (:label :class "radio last"
 	       (:input :name "test" :type "radio" :class "radio" :value "3")
-	       (:span "3"))))
+	       (:span "3&nbsp;"))))
