@@ -115,7 +115,7 @@ Default implementation returns true when all characters of the request
 value are a whitespace."))
 
 (defslotmethod slot-in-request-empty-p (slot-type request-slot-value)
-  (string-whitespace-p request-slot-value))
+  (string-whitespace-p (or request-slot-value "")))
 
 (defun request-parameters-for-object (object &rest args)
   "Returns a copy of the request parameters taking into account a

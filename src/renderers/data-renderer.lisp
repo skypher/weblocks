@@ -163,14 +163,14 @@ the desired outcome."
   (apply #'concatenate 'string
 	 (remove ""
 		 (loop for i = 0 then k
-		       for (j k) on (ppcre:all-matches highlight item) by #'cddr
+		       for (j k . rest) on (ppcre:all-matches highlight item) by #'cddr
 		       for match = (subseq item j k)
 		    collect (escape-for-html (subseq item i j)) into matches
 		    when (not (equalp match ""))
 		         collect (format nil "<strong>~A</strong>"
 					 (escape-for-html match))
-		            into matches
-		    finally (return (if (and j k)
-				(push-end (escape-for-html (subseq item k (length item)))
-					  matches)
-				(list (escape-for-html item))))))))
+		           into matches
+		    when (null rest) collect (escape-for-html (subseq item k (length item))) into matches
+		    finally (return (if matches
+					matches
+					(list (escape-for-html item))))))))

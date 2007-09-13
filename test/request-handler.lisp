@@ -158,14 +158,16 @@ onclick='disableIrrelevantButtons(this);' />~
 
 (deftest handle-client-request-4
     (with-request :get nil
-      (let (weblocks::*webapp-name* result1 result2 result3
-				    (weblocks::*render-debug-toolbar* nil))
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name* result1 result2 result3)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
 	;; make sure we handle cookies
 	(setf *session* nil)
 	(catch 'hunchentoot::handler-done
 	  (handle-client-request))
 	(header-out "Location")))
-  "http://NILNIL?weblocks-session=1%3Atest")
+  "http://NIL/?weblocks-session=1%3Atest")
 
 (deftest handle-client-request-5
     (with-request :get nil

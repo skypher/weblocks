@@ -18,7 +18,7 @@ implementation specific non-ANSI functions."
   #+clisp (ext:type-expand typespec)
   #+(or openmcl mcl) (ccl::type-expand typespec)
   #+allegro (excl:normalize-type typespec)
-  #+lispworks (type:expand-user-type typespec)
+  #+lispworks (car (multiple-value-list (type:expand-user-type typespec)))
   #-(or cmu sbcl clisp openmcl mcl allegro lispworks) (error "Not implemented on this lisp system."))
 
 (defun expand-typespec (typespec)
@@ -139,7 +139,8 @@ for built-in classes accross implementations."
 		      ((eq type (find-class 'cons nil)) (cons 4 2))
 		      ((eq type (find-class 'list nil)) (list 4 2))
 		      ((eq type (find-class 'null nil)) nil)
-		      ((subtypep type (find-class 'sequence nil)) (list))))))
+		      ((subtypep type (find-class 'sequence nil)) (list))))
+    (null nil)))
 
 (defmethod compute-applicable-methods-using-classes ((gf slot-management-generic-function) classes)
   (values nil nil))

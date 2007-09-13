@@ -84,12 +84,18 @@
 ;;; test type-prototype
 (deftest type-prototype-1
     (every (lambda (type)
-	     (typep (type-prototype (find-class type)) type))
-	   '(t character symbol function number complex real integer
-	     rational ratio fixnum bignum float simple-base-string
-	     base-string string bit-vector vector array cons list null
-	     sequence widget))
+	     (typep (type-prototype type) type))
+	   (remove nil
+		   (mapcar (curry-after #'find-class nil)
+			   '(t character symbol function number complex real integer
+			     rational ratio fixnum bignum float simple-base-string
+			     base-string string bit-vector vector array cons list null
+			     sequence widget))))
   t)
+
+(deftest type-prototype-2
+    (type-prototype nil)
+  nil)
 
 ;;; test slot-management-generic-function
 (defgeneric slot-management-generic-function-test-fn-1 (obj slot-name slot-type value &rest args)
