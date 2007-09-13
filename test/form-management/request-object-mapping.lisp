@@ -42,8 +42,8 @@
 	  (mapcar (lambda (res)
 		    `(,(car res) . ,(format nil "~A" (cdr res))))
 		  errors))))
-  (("age" . "Age must be an integer.")
-   ("name" . "Name is a required field.")))
+  (("name" . "Name is a required field.")
+   ("age" . "Age must be an integer.")))
 
 (deftest request-object-mapping-6
     (with-request :post '(("name" . "Pink") ("age" . "25"))
@@ -60,8 +60,30 @@
 	  (mapcar (lambda (res)
 		    `(,(car res) . ,(format nil "~A" (cdr res))))
 		  errors))))
-  (("age" . "Age must not exceed 3 characters.")
-   ("name" . "Name is a required field.")))
+  (("name" . "Name is a required field.")
+   ("age" . "Age must not exceed 3 characters.")))
+
+;;; We need to make sure validation summary errors are returned in the
+;;; right order. For a full test we need new fixtures
+(defclass vseo-inner () ; validation-symmary-error-order
+  ((b :accessor vseo-inner-b :initform 1 :type integer)
+   (c :accessor vseo-inner-c :initform 1 :type integer)))
+
+(defclass vseo ()
+  ((a :accessor vseo-a :initform 1 :type integer)
+   (inner :accessor vseo-inner :initform (make-instance 'vseo-inner))
+   (d :accessor vseo-d :initform 1 :type integer)))
+
+(deftest request-object-mapping-8
+    (with-request :post '(("a" . "a") ("b" . "b") ("c" . "c") ("d" . "d"))
+      (multiple-value-bind (result errors) (update-object-from-request (make-instance 'vseo))
+	(mapcar (lambda (res)
+		  `(,(car res) . ,(format nil "~A" (cdr res))))
+		errors)))
+  (("a" . "A must be an integer.")
+   ("b" . "B must be an integer.")
+   ("c" . "C must be an integer.")
+   ("d" . "D must be an integer.")))
 
 ;;; test object-from-request-valid-p (also tested through request-object-mapping)
 (deftest object-from-request-valid-p-1

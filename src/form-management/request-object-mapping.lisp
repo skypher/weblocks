@@ -21,7 +21,7 @@ details)."))
   (multiple-value-bind (success results) (object-from-request-valid-p obj slots)
     (if success
 	(update-object-from-request-aux obj results slots)
-	(values nil results))))
+	(values nil (reverse results)))))
 
 (defun update-object-from-request-aux (obj parsed-request slots)
   "An auxillary function used to implement update-object-from-request
@@ -75,7 +75,7 @@ done by 'update-object-from-request'."
 		      (object-from-request-valid-p slot-value slots)
 		    (if success
 			(setf results (append results res))
-			(setf errors (append errors res))))
+			(setf errors (append res errors))))
 		  (if (slot-in-request-empty-p slot-type request-slot-value)
 		      (if (slot-value-required-p (class-name-of obj) (car slot))
 			  (push (cons slot-key (format nil *required-field-message*
