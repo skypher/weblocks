@@ -17,6 +17,35 @@
 			  :method "post"
 			  :title-action "Changing:&nbsp;"))
 
+(deftest-html with-form-header-3
+    (let ((*form-error-summary-threshold* 1))
+      (with-request :get nil
+	(with-form-header *joe* (lambda () nil) :action "test-action" :method :post)))
+  (:form :class "renderer form employee long-form"
+	 :action "/foo/bar"
+	 :method "post"
+	 :onsubmit
+	 "initiateFormAction(\"test-action\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 (:div :class "extra-top-1" "<!-- empty -->")
+	 (:div :class "extra-top-2" "<!-- empty -->")
+	 (:div :class "extra-top-3" "<!-- empty -->")
+	 (:fieldset
+	  (:h1 (:span :class "action" (str "Modifying:&nbsp;"))
+	       (:span :class "object" "Employee"))
+	  (:h2 :class "form-fields-title" "Form fields:") (:ul nil)
+	  (:div :class "submit"
+		(:input :name "submit" :type "submit"
+				       :class "submit"
+				       :value "Submit"
+				       :onclick "disableIrrelevantButtons(this);")
+		(:input :name "cancel" :type "submit" :class "submit cancel"
+						      :value "Cancel"
+						      :onclick "disableIrrelevantButtons(this);"))
+	  (:input :name "action" :type "hidden" :value "test-action"))
+	 (:div :class "extra-bottom-1" "<!-- empty -->")
+	 (:div :class "extra-bottom-2" "<!-- empty -->")
+	 (:div :class "extra-bottom-3" "<!-- empty -->")))
+
 ;;; test render-validation-summary
 (deftest-html render-validation-summary-1
     (render-validation-summary '(("Hello" . "Hello is a required field.")))

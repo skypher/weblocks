@@ -17,6 +17,25 @@
   display: none;
 }
 
+/* For long forms, change display of validation summary back */
+.long-form fieldset .validation-errors-summary
+{
+  display: block;
+}
+
+.long-form fieldset .validation-errors-summary h2.error-count
+{
+  color: red;
+}
+
+.long-form fieldset .validation-errors-summary ul li
+{
+  font-style: italic;
+  color: red;
+  border-top: none;
+  border-bottom: none;
+}
+
 .form fieldset .form-fields-title
 {
   display: none;
@@ -73,6 +92,7 @@ p.validation-error
 {
   color: red;
   font-weight: normal;
+  font-style: italic;
   margin-top: 0;
   margin-bottom: 0;
 }

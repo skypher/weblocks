@@ -15,8 +15,9 @@ with the unit tests, this function removes the application. All
 changes are rolled back after the tests are done. Note, the steps that
 this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
-  `(let ((app-name weblocks::*webapp-name*) interference-methods
-	 result)
+  `(let ((app-name weblocks::*webapp-name*)
+	 (*form-error-summary-threshold* 15)
+	 interference-methods result)
      ;; hide application
      (setf weblocks::*webapp-name* nil)
      ;; remove before/after methods from render-page-body

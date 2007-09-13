@@ -586,3 +586,21 @@
     (puri:render-uri (puri:uri (make-pathname :directory '(:absolute "foo" "bar")
 					      :name "baz" :type "txt")) nil)
   "/foo/bar/baz.txt")
+
+;;; test object-full-visible-slot-count
+(deftest object-full-visible-slot-count-1
+    (object-full-visible-slot-count *joe*)
+  2)
+
+(deftest object-full-visible-slot-count-2
+    (object-full-visible-slot-count *joe* :slots '(education))
+  4)
+
+(deftest object-full-visible-slot-count-3
+    (object-full-visible-slot-count *joe* :slots '(education address-ref))
+  5)
+
+(deftest object-full-visible-slot-count-4
+    (object-full-visible-slot-count (make-instance 'unbound-slots-test))
+  2)
+

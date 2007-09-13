@@ -1,10 +1,15 @@
 ;;;; Generic form renderer
 (in-package :weblocks)
 
-(export '(with-form-header render-validation-summary
-	  render-form-controls render-form-slot render-form
-	  form-print-object render-form-aux required-validation-error
+(export '(*form-error-summary-threshold* with-form-header
+	  render-validation-summary render-form-controls
+	  render-form-slot render-form form-print-object
+	  render-form-aux required-validation-error
 	  slot-intermedia-value))
+
+(defparameter *form-error-summary-threshold* 15
+  "When the number of fields in a form is longer than this threshold,
+an error summary is rendered at top whenever applicable.")
 
 (defgeneric with-form-header (obj body-fn &rest keys &key name preslots-fn 
 				  postslots-fn method action &allow-other-keys)
@@ -31,6 +36,9 @@ details."))
 			     &allow-other-keys)
   (let ((header-class (format nil "renderer form ~A"
 			      (attributize-name (object-class-name obj)))))
+    (when (>= (apply #'object-full-visible-slot-count obj keys)
+	      *form-error-summary-threshold*)
+      (setf header-class (concatenate 'string header-class " long-form")))
     (with-html-form (method action :class header-class)
       (:h1 (:span :class "action" (str (concatenate 'string title-action ":&nbsp;")))
 	   (:span :class "object" (str (humanize-name (object-class-name obj)))))
@@ -41,8 +49,8 @@ details."))
       (safe-apply postslots-fn obj keys))))
 
 (defun render-validation-summary (errors)
-  "Renders a summary of validation errors on top of the form. Redefine
-this function to render validation summary differently."
+  "Renders a summary of validation errors on top of the form. This
+function can be redefined to render validation summary differently."
   (when errors
     (with-html
       (:div :class "validation-errors-summary"

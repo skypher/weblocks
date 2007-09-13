@@ -70,3 +70,7 @@
 ; invalid-input-error-message tests to work properly
 (export '(dummy-exported-type))
 
+;;; A class to test behavior on unbound slots
+(defclass unbound-slots-test ()
+    ((slot1 :accessor unbound-slots-test-slot1)
+     (slot2 :accessor unbound-slots-test-slot2)))

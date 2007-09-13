@@ -11,7 +11,7 @@
 	  public-files-relative-paths request-uri-path
 	  string-remove-left string-remove-right find-all
 	  stable-set-difference symbol-status string-invert-case
-	  ninsert))
+	  ninsert object-full-visible-slot-count))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -590,3 +590,14 @@ etc.)"
 	       (format nil ".~A" (pathname-type thing))
 	       ""))))
 
+(defun object-full-visible-slot-count (obj &rest args)
+  "Returns the full number of visible slots (including the slots rendered inline)."
+  (let ((count 0))
+    (dolist (single-slot (apply #'object-visible-slots obj args) count)
+      (let* ((slot-name (slot-definition-name (car single-slot)))
+	     (slot-value (when (slot-boundp obj slot-name)
+			   (slot-value obj slot-name))))
+	(if (and (typep slot-value 'standard-object)
+		 (render-slot-inline-p obj slot-name))
+	    (incf count (apply #'object-full-visible-slot-count slot-value args))
+	    (incf count))))))
