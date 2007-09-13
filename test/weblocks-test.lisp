@@ -1,8 +1,8 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rt :c2mop :cl-who :hunchentoot :metatilities :moptilities)
+  (:use :cl :weblocks :rtest :c2mop :cl-who :hunchentoot :metatilities :moptilities)
   (:shadowing-import-from :c2mop #:defclass #:ensure-generic-function
-			  #:standard-generic-function #:defgeneric #:standard-class)
+			  #:standard-generic-function #:defmethod #:defgeneric #:standard-class)
   (:shadow #:do-test #:do-tests #:continue-testing)
   (:export #:test-weblocks))
 
@@ -40,13 +40,13 @@ the test suite without loading an application."
   "Shadows rt's 'do-test'. This function calls rt's do test in a clean
 test environment. See 'with-test-environment'."
   (with-test-environment
-      (rt::do-test)))
+      (rtest::do-test)))
 
 (defun do-tests ()
   "Shadows rt's 'do-tests'. This function calls rt's do-tests in a
 clean test environment. See 'with-test-environment'."
   (with-test-environment
-      (rt::do-tests)))
+      (rtest::do-tests)))
 
 (defun test-weblocks ()
   "Call this function to run all unit tests defined in 'weblocks-test'
@@ -59,7 +59,7 @@ package. This function tests weblocks in a clean environment. See
 continue-testing in a clean test environment. See
 'with-test-environment'."
   (with-test-environment
-      (rt::continue-testing)))
+      (rtest::continue-testing)))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
