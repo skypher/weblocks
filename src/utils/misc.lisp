@@ -267,8 +267,8 @@ determine whether the fields of a complex slot should be rendered
 as part of the object, or the name of the object the slot
 represents should be rendered instead.
 
-The default implementation returns true if the slot name ends
-with \"-ref\" and nil otherwise.
+The default implementation returns false if the slot name ends
+with \"-ref\" and true otherwise.
 
 Override this method to specify whether objects should be
 rendered inline.
