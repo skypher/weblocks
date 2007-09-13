@@ -162,7 +162,7 @@
 	(:div :class "extra-top-1" "<!-- empty -->")
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
-	(:p (:span :class "message" "NIL"))
+	(:p (:span :class "message" ""))
 	(:div :class "extra-bottom-1" "<!-- empty -->")
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))

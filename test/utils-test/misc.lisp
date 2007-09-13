@@ -342,7 +342,7 @@
    (:p "TEST")
    (:p "HELLO")
    (:p "T")
-   (:p "NIL")))
+   (:p "")))
 
 (deftest-html visit-object-slots-4
     (weblocks::visit-object-slots
@@ -376,7 +376,7 @@
    (:p "UNIVERSITY") (:p "T") (:p "Bene Gesserit University")
    (:p "GRADUATION-YEAR") (:p "(OR NULL INTEGER)") (:p "2000")
    (:p "MANAGER") (:p "T") (:p "Jim")
-   (:p "TEST") (:p "T") (:p "NIL")))
+   (:p "TEST") (:p "T") (:p "")))
 
 (deftest-html visit-object-slots-7
     (weblocks::visit-object-slots
@@ -387,7 +387,7 @@
   (htm
    (:p "NAME")
    (:p "STRING")
-   (:p "NIL")))
+   (:p "")))
 
 ;;; test alist->plist
 (deftest alist->plist-1
