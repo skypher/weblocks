@@ -72,7 +72,7 @@ rewriting in JavaScript code."
 	   (hunchentoot::session-cookie-value))
       (format nil "~A=~A"
 	      (url-encode *session-cookie-name*)
-	      (url-encode (hunchentoot::session-cookie-value)))
+	      (string-upcase (url-encode (hunchentoot::session-cookie-value))))
       ""))
 
 (defun server-type ()

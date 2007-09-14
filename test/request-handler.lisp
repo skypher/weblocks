@@ -45,7 +45,7 @@
 <li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
 <div class='submit'><a href='/foo/bar?action=abc123' ~
-                       onclick='initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); ~
+                       onclick='initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); ~
                        return false;'>Modify</a></div>~
 <div class='extra-bottom-1'><!-- empty --></div>~
 <div class='extra-bottom-2'><!-- empty --></div>~
@@ -57,7 +57,7 @@
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
 \"<form class='renderer form employee' action='/foo/bar' method='post' ~
-      onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3Atest\\\"); ~
+      onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3ATEST\\\"); ~
                 return false;'>~
 <div class='extra-top-1'><!-- empty --></div>~
 <div class='extra-top-2'><!-- empty --></div>~
@@ -166,8 +166,8 @@ onclick='disableIrrelevantButtons(this);' />~
 	(setf *session* nil)
 	(catch 'hunchentoot::handler-done
 	  (handle-client-request))
-	(header-out "Location")))
-  "http://NIL/?weblocks-session=1%3Atest")
+	(string-downcase (header-out "Location"))))
+  "http://nil/?weblocks-session=1%3atest")
 
 (deftest handle-client-request-5
     (with-request :get nil

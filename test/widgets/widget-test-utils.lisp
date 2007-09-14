@@ -13,7 +13,7 @@
 	      `(htm (:span :class "hidden-items" ,hidden-items-text)))
 	 (:form :id ,form-id :class "isearch" :action ,uri :method "get" :onsubmit
 		,(format
-		  nil "initiateFormAction(\"~A\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+		  nil "initiateFormAction(\"~A\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 		  action)
 		(:div :class "extra-top-1" "<!-- empty -->")
 		(:div :class "extra-top-2" "<!-- empty -->")
@@ -28,7 +28,7 @@
 		(:div :class "extra-bottom-3" "<!-- empty -->"))
 	 (:script :type "text/javascript"
 		  (fmt "~%// <![CDATA[~%")
-		  (fmt "new Form.Element.DelayedObserver('~A', 0.4, function(elem, value) {initiateFormAction('~A', $('~A'), 'weblocks-session=1%3Atest');
+		  (fmt "new Form.Element.DelayedObserver('~A', 0.4, function(elem, value) {initiateFormAction('~A', $('~A'), 'weblocks-session=1%3ATEST');
 });" ,search-id ,action ,form-id)
 		  (fmt "~%// ]]>~%"))
 	 (:script :type "text/javascript"

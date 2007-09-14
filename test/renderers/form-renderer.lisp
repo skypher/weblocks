@@ -25,7 +25,7 @@
 	 :action "/foo/bar"
 	 :method "post"
 	 :onsubmit
-	 "initiateFormAction(\"test-action\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	 "initiateFormAction(\"test-action\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
 	 (:div :class "extra-top-3" "<!-- empty -->")

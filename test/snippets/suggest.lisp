@@ -23,7 +23,7 @@
    (:div :id "C1" :class "suggest" :style "display: none" "")
    (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
-	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3Atest');")
+	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3ATEST');")
 	      (fmt "~%// ]]>~%"))))
 
 (deftest render-suggest-3
@@ -56,7 +56,7 @@
    (:div :id "C1" :class "suggest" :style "display: none" "")
    (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
-	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3Atest');")
+	      (fmt "declareSuggest('I1', 'C1', 'abc123', 'weblocks-session=1%3ATEST');")
 	      (fmt "~%// ]]>~%"))))
 
 (deftest-html render-suggest-6
@@ -97,7 +97,7 @@
    (:div :id "C1" :class "suggest" :style "display: none" "")
    (:script :type "text/javascript"
 	      (fmt "~%// <![CDATA[~%")
-	      (fmt "declareSuggest('I1', 'C1', [\"a\",\"b\",\"c\"], 'weblocks-session=1%3Atest');")
+	      (fmt "declareSuggest('I1', 'C1', [\"a\",\"b\",\"c\"], 'weblocks-session=1%3ATEST');")
 	      (fmt "~%// ]]>~%"))))
 
 ;;; test format-suggest-list

@@ -10,11 +10,11 @@
   (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "/foo/bar?action=abc123"
-	  :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3Atest\"); return false;"
+	  :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
 	  "All")
       ", "
       (:a :href "/foo/bar?action=abc124"
-	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
 
 ;;; test datagrid-item-selected-p
 (deftest datagrid-item-selected-p-1
@@ -109,15 +109,15 @@
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "/foo/bar?action=abc124"
-	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3Atest\"); return false;"
+	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;"
 	  "All")
       ", "
       (:a :href "/foo/bar?action=abc125"
-	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -148,15 +148,15 @@
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "/foo/bar?action=abc130"
-	  :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3Atest\"); return false;"
+	  :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;"
 	  "All")
       ", "
       (:a :href "/foo/bar?action=abc131"
-	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -187,15 +187,15 @@
    (:p :class "datagrid-select-bar"
       (:strong "Select: ")
       (:a :href "/foo/bar?action=abc136"
-	  :onclick "initiateAction(\"abc136\", \"weblocks-session=1%3Atest\"); return false;"
+	  :onclick "initiateAction(\"abc136\", \"weblocks-session=1%3ATEST\"); return false;"
 	  "All")
       ", "
       (:a :href "/foo/bar?action=abc137"
-	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3Atest\"); return false;" "None")))
+	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")

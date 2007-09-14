@@ -14,7 +14,7 @@
   `(:form :class "renderer form employee" :action ,uri :method ,method
 	  :onsubmit ,(format nil "initiateFormAction(\"~A\", ~
                                                        $(this), ~
-                                                       \"weblocks-session=1%3Atest\"); ~
+                                                       \"weblocks-session=1%3ATEST\"); ~
                                                        return false;"
 			     (or action ""))
 	  (:div :class "extra-top-1" "<!-- empty -->")

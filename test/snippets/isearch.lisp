@@ -8,7 +8,7 @@
 		      :value "test"))
   (htm
    (:form :id "I1" :class "isearch" :action "/foo/bar" :method "get" :onsubmit
-	  "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -22,7 +22,7 @@
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    (:script :type "text/javascript"
 	    (fmt "~%// <![CDATA[~%")
-	    (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
+	    (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3ATEST');
 });")
 	    (fmt "~%// ]]>~%"))
    (:script :type "text/javascript"
@@ -37,7 +37,7 @@
 		      :value "test"))
   (htm
    (:form :id "I1" :class "isearch" :action "/foo/bar" :method "get" :onsubmit
-	  "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -50,7 +50,7 @@
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    (:script :type "text/javascript"
 	    (fmt "~%// <![CDATA[~%")
-	    (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3Atest');
+	    (fmt "new Form.Element.DelayedObserver('I2', 0.4, function(elem, value) {initiateFormAction('abc123', $('I1'), 'weblocks-session=1%3ATEST');
 });")
 	    (fmt "~%// ]]>~%"))))
 

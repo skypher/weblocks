@@ -22,4 +22,4 @@
       (let ((*rewrite-for-session-urls* t))
 	(declare (special *rewrite-for-session-urls*))
 	(weblocks::session-name-string-pair)))
-  "weblocks-session=1%3Atest")
+  "weblocks-session=1%3ATEST")

@@ -119,7 +119,7 @@
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -156,7 +156,7 @@
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -190,7 +190,7 @@
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3Atest\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc124\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
