@@ -6,12 +6,12 @@
   (:generic-function-class slot-management-generic-function))
 
 (defslotmethod render-slot-simple (obj slot-name slot-type slot-value &rest keys)
-    (if (typep slot-value 'standard-object)
-	(apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
-	(with-html
-	  (:p (str slot-name))
-	  (:p (str (format nil "~A" slot-type)))
-	  (:p (str slot-value)))))
+  (if (typep slot-value 'standard-object)
+      (apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
+      (with-html
+	(:p (str slot-name))
+	(:p (str (format nil "~A" slot-type)))
+	(:p (str slot-value)))))
 
 ;;; Test humanize-name function
 (deftest humanize-name-1
