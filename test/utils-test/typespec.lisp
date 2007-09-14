@@ -57,6 +57,23 @@
     (weblocks::inspect-typespec '(or blah integer))
   or (blah integer))
 
+;;; test normalized-type-of
+(deftest normalized-type-of-1
+    (normalized-type-of (make-instance 'widget))
+  widget)
+
+(deftest normalized-type-of-2
+    (normalized-type-of "hi")
+  string)
+
+(deftest normalized-type-of-3
+    (normalized-type-of :foo)
+  keyword)
+
+(deftest normalized-type-of-4
+    (normalized-type-of 'foo)
+  symbol)
+
 ;;; test slot-management-[method/generic].initialize-instance
 (defgeneric slot-management-method/generic-initialize-instance-test (a b)
   (:generic-function-class slot-management-generic-function))

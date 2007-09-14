@@ -41,7 +41,7 @@ function to provide customized behavior."))
 			   slot-name request-slot-value))
 
 (defslotmethod parse-slot-from-request ((slot-type (eql 'eql)) slot-name request-slot-value)
-  (invoke-parsers-on-slot (type-of (cadr slot-type)) slot-name request-slot-value))
+  (invoke-parsers-on-slot (normalized-type-of (cadr slot-type)) slot-name request-slot-value))
 
 (defslotmethod parse-slot-from-request ((slot-type (eql 'satisfies)) slot-name request-slot-value)
   (let ((sym (string-downcase (symbol-name (cadr slot-type)))))
@@ -71,7 +71,7 @@ function to provide customized behavior."))
 (defslotmethod parse-slot-from-request ((slot-type (eql 'member)) slot-name request-slot-value)
   (loop for i in (cdr slot-type)
        do (multiple-value-bind (successp value)
-	      (invoke-parsers-on-slot (type-of i) slot-name request-slot-value)
+	      (invoke-parsers-on-slot (normalized-type-of i) slot-name request-slot-value)
 	    (when (and successp
 		       (typep value slot-type))
 	      (return (values t value))))))

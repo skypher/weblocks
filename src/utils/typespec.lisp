@@ -2,8 +2,9 @@
 (in-package :weblocks)
 
 (export '(typespec-compound-only-p type-expand expand-typespec
-	  defslotmethod type-prototype slot-management-method
-	  slot-management-generic-function slot-type))
+	  normalized-type-of defslotmethod type-prototype
+	  slot-management-method slot-management-generic-function
+	  slot-type))
 
 ;;; Compound-only typespecs
 (defun typespec-compound-only-p (typespec-name)
@@ -61,6 +62,16 @@ This function also implements certain useful logic. For example:
 		       (y (values (car typespec) (cdr typespec)))))
 	    (otherwise (values (car typespec) (cdr typespec))))
       (values typespec nil)))
+
+;;; A predictable version of type-of
+(defun normalized-type-of (object)
+  "Acts like 'type-of', but in a predictable manner accross
+implementations."
+  (typecase object
+    (keyword 'keyword)
+    (symbol 'symbol)
+    (string 'string)
+    (t (type-of object))))
 
 (defclass slot-management-method (standard-method)
   ()

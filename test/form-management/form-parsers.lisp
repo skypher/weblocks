@@ -50,6 +50,10 @@
     (weblocks::invoke-parsers-on-slot-with-count '(member test 1) 'age "test")
   t test)
 
+(deftest parse-slot-from-request-member-5
+    (weblocks::invoke-parsers-on-slot-with-count '(member :a :b) 'age "a")
+  t :a)
+
 (deftest parse-slot-from-request-eql-1
     (weblocks::invoke-parsers-on-slot-with-count '(eql 5) 'age "6")
   t 6)

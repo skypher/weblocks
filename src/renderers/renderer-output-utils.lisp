@@ -58,7 +58,7 @@ object using 'object-name' and simply renders the name using
   (if (render-slot-inline-p obj slot-name)
       (apply render-object-fn obj slot-name slot-type slot-value :inlinep t keys)
       (let* ((object-name (object-name slot-value))
-	     (object-name-type (type-of object-name)))
+	     (object-name-type (normalized-type-of object-name)))
 	(apply render-slot-fn obj slot-name object-name-type object-name keys))))
 
 (defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
