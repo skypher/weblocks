@@ -94,6 +94,9 @@
     (declare (special weblocks::*defmethod-type-d*))
     (defmethod some-method (a1 a2)
       (declare (special weblocks::*full-slot-type*))
+      #+allegro (set-funcallable-instance-function
+			     #'some-method
+			     (compute-discriminating-function #'some-method))
       (let ((slot-type weblocks::*full-slot-type*))
 	(+ a1 a2))))
   t)

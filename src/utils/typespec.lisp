@@ -118,6 +118,9 @@ implementations."
        (declare (special *defmethod-type-d*))
        (defmethod ,(car args) ,@spec ,(car rest)
 		  (declare (special *full-slot-type*))
+		  #+allegro (set-funcallable-instance-function
+			     #',(car args)
+			     (compute-discriminating-function #',(car args)))
 		  (let ((slot-type *full-slot-type*))
 		    ,@(cdr rest))))))
 
@@ -163,8 +166,7 @@ for built-in classes accross implementations."
 	 (type-argument-index (position 'slot-type lambda-list
 					:end required-args-count)))
     (lambda (&rest args)
-      (multiple-value-bind (typespec-symbol typespec-args)
-	  (inspect-typespec (nth type-argument-index args))
+      (let ((typespec-symbol (inspect-typespec (nth type-argument-index args))))
 	(flet ((generate-args-list (type-argument)
 		 (let ((new-list (copy-list args)))
 		   (setf (nth type-argument-index new-list) type-argument)
