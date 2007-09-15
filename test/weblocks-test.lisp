@@ -4,7 +4,7 @@
   (:shadowing-import-from :c2mop #:defclass #:ensure-generic-function
 			  #:standard-generic-function #:defmethod #:defgeneric #:standard-class)
   (:shadow #:do-test #:do-tests #:continue-testing)
-  (:export #:test-weblocks))
+  (:export #:test-weblocks #:do-pending))
 
 (in-package :weblocks-test)
 
@@ -61,6 +61,10 @@ continue-testing in a clean test environment. See
 'with-test-environment'."
   (with-test-environment
       (rtest::continue-testing)))
+
+(defun do-pending ()
+  "An alias for 'continue-testing'."
+  (continue-testing))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
