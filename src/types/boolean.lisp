@@ -10,7 +10,7 @@
 
 (defslotmethod render-form-aux (obj slot-name (slot-type (eql 'boolean)) slot-value &rest
 			    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
-  (check-type slot-value boolean)
+  (check-type slot-value (member t nil))
   (let* ((intermediate-value (slot-intermedia-value slot-name intermediate-fields))
 	 (checkedp (if intermediate-value
 		       (cdr intermediate-value)

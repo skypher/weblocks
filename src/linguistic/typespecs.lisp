@@ -51,6 +51,7 @@ for displaying to users. 'typespec' is the 'car' of the compound list,
 and 'args' are the 'cdr- of the list."))
 
 (defmethod humanize-compound-typespec-aux ((typespec (eql 'integer)) args &key adjectives)
+  (declare (optimize (safety 3)))
   (apply #'concatenate 'string (if adjectives
 				   (articlize adjectives)
 				   "an ")
@@ -68,6 +69,7 @@ and 'args' are the 'cdr- of the list."))
 			  (format nil " less than or equal to ~A" b))))))))
 
 (defmethod humanize-compound-typespec-aux ((typespec (eql 'satisfies)) args &key adjectives)
+  (declare (optimize (safety 3)))
   (assert (null adjectives))
   (destructuring-bind (p) args
     (check-type p symbol)
