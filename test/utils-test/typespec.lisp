@@ -10,35 +10,21 @@
 	    (typespec-compound-only-p 'int))
   t t t t t t t t nil)
 
-;;; test type-expand
+;;; make sure type-expand works (it's too implementation dependent to
+;;; have specific tests)
 (deftest type-expand-1
-    (type-expand 'foo1)
-  integer)
+    (not (null (type-expand 'foo1)))
+  t)
 
 (deftest type-expand-2
-    (type-expand 'foo2)
-  integer)
+    (type-expand 'someundefinedtype)
+  someundefinedtype)
 
-(deftest type-expand-3
-    (type-expand 'integer)
-  integer)
-
-;;; test expand-typespec
+;;; test expand-typespec (we can't do a comprehensive test because of
+;;; implementation differences)
 (deftest expand-typespec-1
-    (expand-typespec 'integer)
-  integer)
-
-(deftest expand-typespec-2
-    (expand-typespec 'foo2)
-  integer)
-
-(deftest expand-typespec-3
-    (expand-typespec '(or integer))
-  (or integer))
-
-(deftest expand-typespec-4
-    (expand-typespec '(or integer (and foo2 pathname)))
-  (or integer (and integer pathname)))
+    (not (null (expand-typespec 'integer)))
+  t)
 
 ;;; test inspect-typespec
 (deftest inspect-typespec-1
@@ -74,6 +60,22 @@
     (normalized-type-of 'foo)
   symbol)
 
+;;; normalized find-class
+(deftest normalized-find-class-1
+    (normalized-find-class 'boolean nil)
+  nil)
+
+(deftest normalized-find-class-2
+    (car
+     (multiple-value-list
+      (ignore-errors
+	(normalized-find-class 'boolean))))
+  nil)
+
+(deftest normalized-find-class-3
+    (class-name (normalized-find-class 'widget))
+  widget)
+
 ;;; test slot-management-[method/generic].initialize-instance
 (defgeneric slot-management-method/generic-initialize-instance-test (a b)
   (:generic-function-class slot-management-generic-function))
@@ -106,7 +108,7 @@
     (every (lambda (type)
 	     (typep (type-prototype type) type))
 	   (remove nil
-		   (mapcar (curry-after #'find-class nil)
+		   (mapcar (curry-after #'normalized-find-class nil)
 			   '(t character symbol function number complex real integer
 			     rational ratio fixnum bignum float simple-base-string
 			     base-string string bit-vector vector array cons list null

@@ -2,9 +2,9 @@
 (in-package :weblocks)
 
 (export '(typespec-compound-only-p type-expand expand-typespec
-	  normalized-type-of defslotmethod type-prototype
-	  slot-management-method slot-management-generic-function
-	  slot-type))
+	  normalized-type-of normalized-find-class defslotmethod
+	  type-prototype slot-management-method
+	  slot-management-generic-function slot-type))
 
 ;;; Compound-only typespecs
 (defun typespec-compound-only-p (typespec-name)
@@ -18,7 +18,7 @@ implementation specific non-ANSI functions."
   #+sbcl (sb-kernel:type-expand typespec)
   #+clisp (ext:type-expand typespec)
   #+(or openmcl mcl) (ccl::type-expand typespec)
-  #+allegro (excl:normalize-type typespec)
+  #+allegro (excl:normalize-type typespec :default typespec)
   #+lispworks (car (multiple-value-list (type:expand-user-type typespec)))
   #-(or cmu sbcl clisp openmcl mcl allegro lispworks) (error "Not implemented on this lisp system."))
 
@@ -72,6 +72,14 @@ implementations."
     (symbol 'symbol)
     (string 'string)
     (t (type-of object))))
+
+;;; A predictable version of find-class
+(defun normalized-find-class (object &optional errorp)
+  "Acts like 'find-class', but in a predictable manner accross
+implementations."
+  (case object
+    (boolean (if errorp (error "Can't find class ~A" object) nil))
+    (t (find-class object errorp))))
 
 (defclass slot-management-method (standard-method)
   ()
@@ -133,7 +141,9 @@ for built-in classes accross implementations."
 		      ((eq type (find-class 't nil)) t)
 		      ((eq type (find-class 'character nil)) (code-char 42))
 		      ((eq type (find-class 'symbol nil)) '#:mu)
-		      ((eq type (find-class 'function nil)) (lambda (&rest args) (declare (ignore args)) 42))
+		      ((eq type (find-class 'function nil)) (lambda (&rest args)
+							      (declare (ignore args))
+							      42))
 		      ((eq type (find-class 'number nil)) 42)
 		      ((eq type (find-class 'complex nil)) (complex 42 42))
 		      ((eq type (find-class 'real nil)) 42)
@@ -143,7 +153,8 @@ for built-in classes accross implementations."
 		      ((eq type (find-class 'fixnum nil)) 42)
 		      ((eq type (find-class 'bignum nil)) (+ 1 most-positive-fixnum))
 		      ((subtypep type (find-class 'float nil)) (float 42))
-		      ((eq type (find-class 'simple-base-string nil)) (make-array 0 :element-type 'base-char))
+		      ((eq type (find-class 'simple-base-string nil)) (make-array 0 :element-type
+										  'base-char))
 		      ((eq type (find-class 'base-string nil)) (make-array 0 :element-type 'base-char
 									   :fill-pointer t))
 		      ((subtypep type (find-class 'string nil)) "42")
@@ -171,18 +182,20 @@ for built-in classes accross implementations."
 		 (let ((new-list (copy-list args)))
 		   (setf (nth type-argument-index new-list) type-argument)
 		   new-list)))
-	  (let ((typespec-class (find-class typespec-symbol nil))
+	  (let ((typespec-class (normalized-find-class typespec-symbol nil))
 		(*full-slot-type* (nth type-argument-index args)))
 	    (declare (special *full-slot-type*))
-	    (apply default-discriminating-function
-		   (generate-args-list
-		    (if (and typespec-class
-			     (> (length (funcall
-					 #'compute-applicable-methods gf 
-					 (generate-args-list (type-prototype typespec-class))))
-				(length (funcall
-					 #'compute-applicable-methods gf
-					 (generate-args-list typespec-symbol)))))
-			(type-prototype typespec-class)
-			typespec-symbol)))))))))
+	    (unwind-protect
+		 (apply default-discriminating-function
+			(generate-args-list
+			 (if (and typespec-class
+				  (> (length (funcall
+					      #'compute-applicable-methods gf 
+					      (generate-args-list (type-prototype typespec-class))))
+				     (length (funcall
+					      #'compute-applicable-methods gf
+					      (generate-args-list typespec-symbol)))))
+			     (type-prototype typespec-class)
+			     typespec-symbol)))
+	      #+allegro (set-funcallable-instance-function gf (compute-discriminating-function gf)))))))))
 

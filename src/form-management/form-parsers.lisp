@@ -104,6 +104,10 @@ parsed value."
 	  (parse-slot-from-request slot-type slot-name request-slot-value))
       (if successp
 	  (values t value)
-	  (ignore-errors
-	    (parse-slot-from-request (expand-typespec slot-type) slot-name request-slot-value))))))
+	  (multiple-value-bind (successp value)
+	      (ignore-errors
+		(parse-slot-from-request (expand-typespec slot-type) slot-name request-slot-value))
+	    (if successp
+		(values t value)
+		nil))))))
 
