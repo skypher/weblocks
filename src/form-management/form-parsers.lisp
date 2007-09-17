@@ -3,7 +3,7 @@
 
 (export '(*nested-parser-count* parse-slot-from-request))
 
-(defparameter *nested-parser-count* 100
+(defparameter *nested-parser-count* 50
   "Because weblocks tries to expand typespecs, parsers can get into
 infinite loops. This is the maximum number of nested calls before a
 parser fails.")
