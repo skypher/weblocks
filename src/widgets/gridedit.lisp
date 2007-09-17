@@ -73,7 +73,7 @@ slot named 'id', with an initform that assigns an ID to the object.
 Specialize this method to provide different ways to add items to the
 grid."))
 
-(defmethod gridedit-render-new-item-form ((grid datagrid))
+(defmethod gridedit-render-new-item-form ((grid gridedit))
   (unless (gridedit-dataform grid)
     (setf (gridedit-dataform grid)
 	  (make-instance 'dataform
