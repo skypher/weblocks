@@ -170,32 +170,49 @@ for built-in classes accross implementations."
 (defmethod compute-applicable-methods-using-classes ((gf slot-management-generic-function) classes)
   (values nil nil))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun make-slot-management-discriminating-lambda (gf default-discriminating-function type-argument-index)
+    "Returns a discriminating function lambda that can be converted to a
+discriminating function. We need this indirection because of
+limitations of some Lisp implementations."
+    `(lambda (&rest args)
+       (let ((typespec-symbol (inspect-typespec (nth ,type-argument-index args))))
+	 (flet ((generate-args-list (type-argument)
+		  (let ((new-list (copy-list args)))
+		    (setf (nth ,type-argument-index new-list) type-argument)
+		    new-list)))
+	   (let ((typespec-class (normalized-find-class typespec-symbol nil))
+		 (*full-slot-type* (nth ,type-argument-index args)))
+	     (declare (special *full-slot-type*))
+	     (unwind-protect
+		  (apply ,default-discriminating-function
+			 (generate-args-list
+			  (if (and typespec-class
+				   (> (length (funcall
+					       #'compute-applicable-methods ,gf 
+					       (generate-args-list (type-prototype typespec-class))))
+				      (length (funcall
+					       #'compute-applicable-methods ,gf
+					       (generate-args-list typespec-symbol)))))
+			      (type-prototype typespec-class)
+			      typespec-symbol)))
+	       #+allegro (set-funcallable-instance-function ,gf (compute-discriminating-function ,gf)))))))))
+
+(defmacro slot-management-discriminating-lambda (gf default-discriminating-function type-argument-index)
+  "Returns discriminating function code for those implementations that
+support it."
+  (make-slot-management-discriminating-lambda gf default-discriminating-function type-argument-index))
+
 (defmethod compute-discriminating-function ((gf slot-management-generic-function))
   (let* ((default-discriminating-function (call-next-method))
 	 (required-args-count (length (generic-function-argument-precedence-order gf)))
 	 (lambda-list (generic-function-lambda-list gf))
 	 (type-argument-index (position 'slot-type lambda-list
 					:end required-args-count)))
-    (lambda (&rest args)
-      (let ((typespec-symbol (inspect-typespec (nth type-argument-index args))))
-	(flet ((generate-args-list (type-argument)
-		 (let ((new-list (copy-list args)))
-		   (setf (nth type-argument-index new-list) type-argument)
-		   new-list)))
-	  (let ((typespec-class (normalized-find-class typespec-symbol nil))
-		(*full-slot-type* (nth type-argument-index args)))
-	    (declare (special *full-slot-type*))
-	    (unwind-protect
-		 (apply default-discriminating-function
-			(generate-args-list
-			 (if (and typespec-class
-				  (> (length (funcall
-					      #'compute-applicable-methods gf 
-					      (generate-args-list (type-prototype typespec-class))))
-				     (length (funcall
-					      #'compute-applicable-methods gf
-					      (generate-args-list typespec-symbol)))))
-			     (type-prototype typespec-class)
-			     typespec-symbol)))
-	      #+allegro (set-funcallable-instance-function gf (compute-discriminating-function gf)))))))))
+    #+cmu (compile nil (make-slot-management-discriminating-lambda
+			gf
+			`(pcl::default-secondary-dispatch-function ,gf)
+			type-argument-index))
+    #-cmu (slot-management-discriminating-lambda
+	   gf default-discriminating-function type-argument-index)))
 
