@@ -1,8 +1,9 @@
 
 (defpackage #:weblocks-test
   (:use :cl :weblocks :rtest :c2mop :cl-who :hunchentoot :metatilities :moptilities)
-  (:shadowing-import-from :c2mop #:defclass #:ensure-generic-function
-			  #:standard-generic-function #:defmethod #:defgeneric #:standard-class)
+  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+			  #:standard-generic-function #:ensure-generic-function #:standard-class
+			  #:typep #:subtypep)
   (:shadow #:do-test #:do-tests #:continue-testing)
   (:export #:test-weblocks #:do-pending))
 

@@ -3,7 +3,7 @@
   (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function
-			  #:standard-class)
+			  #:standard-class #:typep #:subtypep)
   (:shadowing-import-from :fare-matcher #:match)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of
