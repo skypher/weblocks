@@ -167,9 +167,6 @@ for built-in classes accross implementations."
 		      ((subtypep type (find-class 'sequence nil)) (list))))
     (null nil)))
 
-(defmethod compute-applicable-methods-using-classes ((gf slot-management-generic-function) classes)
-  (values nil nil))
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun make-slot-management-discriminating-lambda (gf default-discriminating-function type-argument-index)
     "Returns a discriminating function lambda that can be converted to a
