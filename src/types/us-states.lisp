@@ -40,7 +40,9 @@ state."
   '(satisfies us-state-p))
 
 (defslotmethod render-form-aux (obj slot-name (slot-type (eql 'us-state)) slot-value &rest
-				    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+				    keys &key inlinep slot-path intermediate-fields
+				    (input-id (gensym)) (choices-id (gensym))
+				    &allow-other-keys)
   (let* ((intermediate-value (slot-intermedia-value slot-name intermediate-fields))
 	 (selections (mapcar #'car *us-states*))
 	 (default-value (if intermediate-value
@@ -55,9 +57,12 @@ state."
 			selections
 			:default-value default-value
 			:welcome-name welcome-name
-			:max-length (max-raw-slot-input-length obj slot-name slot-type))
+			:max-length (max-raw-slot-input-length obj slot-name slot-type)
+			:input-id input-id
+			:choices-id choices-id)
 	(render-dropdown slot-name selections :selected-value default-value
-			 :welcome-name welcome-name))))
+			 :welcome-name welcome-name
+			 :id input-id))))
 
 (defslotmethod parse-slot-from-request ((slot-type (eql 'us-state)) slot-name request-slot-value)
   (setf request-slot-value (string-trim +whitespace-characters+ request-slot-value))

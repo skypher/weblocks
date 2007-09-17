@@ -17,8 +17,7 @@
 ;;; test render-form-aux for us-state
 (deftest-html render-form/aux-us-states-1
     (with-request :post nil
-      (progv '(*gensym-counter*) '(0)
-	(render-form-aux *home-address* 'state 'us-state "NY")))
+      (render-form-aux *home-address* 'state 'us-state "NY" :input-id "G0" :choices-id "G1"))
   (htm
    (:select :id "G0" :name "state"
 	    (:option :value "" "[Select State]")
