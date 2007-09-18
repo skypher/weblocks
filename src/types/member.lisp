@@ -29,5 +29,6 @@
 					    (cdr slot-type))
 			  :selected-value (if intermediate-value
 					      (cdr intermediate-value)
-					      (attributize-name slot-value)))))
+					      (when slot-value
+						(attributize-name slot-value))))))
 
