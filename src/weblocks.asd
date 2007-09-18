@@ -17,7 +17,9 @@
 	       (:module utils
 			:components ((:file "misc")
 				     (:file "typespec"
-					    :depends-on ("misc")))
+					    :depends-on ("misc"))
+				     #+(or openmcl mcl) (:file "dfun-mcl"
+							       :depends-on ("typespec")))
 			:depends-on ("weblocks"))
 	       (:file "page-template"
 		      :depends-on ("weblocks" utils "application"))
