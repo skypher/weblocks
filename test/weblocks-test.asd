@@ -16,7 +16,9 @@
 	       (:module utils-test
 			:components ((:file "misc")
 				     (:file "typespec"
-				      :depends-on ("misc")))
+				      :depends-on ("misc"))
+				     #+(or openmcl mcl) (:file "dfun-mcl"
+							       :depends-on ("typespec")))
 			:depends-on ("weblocks-test"))
 	       (:file "actions"
 		      :depends-on ("weblocks-test"))
