@@ -95,7 +95,7 @@ implementations."
   (call-next-method))
 
 (defclass slot-management-generic-function (standard-generic-function)
-  ()
+  (#+allegro (smgf-lock :accessor smgf-lock)) ; we need to sync access to smgf on ACL
   (:metaclass funcallable-standard-class)
   (:documentation "A custom metaclass for generic functions that
   operate on slots. Such generic functions have four required
@@ -112,8 +112,10 @@ implementations."
   hierarchy."))
 
 (defmethod initialize-instance ((gf slot-management-generic-function) &rest args)
-  (apply #'call-next-method gf :method-class (find-class 'slot-management-method)
-	 (remove-keyword-parameter (copy-list args) :method-class)))
+  (prog1
+      (apply #'call-next-method gf :method-class (find-class 'slot-management-method)
+	     (remove-keyword-parameter (copy-list args) :method-class))
+    #+allegro (setf (smgf-lock gf) (hunchentoot-mp:make-lock (generic-function-name gf)))))
 
 (defmacro defslotmethod (&rest args)
   (destructuring-bind (spec . rest)
@@ -182,19 +184,22 @@ limitations of some Lisp implementations."
 	   (let ((typespec-class (normalized-find-class typespec-symbol nil))
 		 (*full-slot-type* (nth ,type-argument-index args)))
 	     (declare (special *full-slot-type*))
-	     (unwind-protect
-		  (apply ,default-discriminating-function
-			 (generate-args-list
-			  (if (and typespec-class
-				   (> (length (funcall
-					       #'compute-applicable-methods ,gf 
-					       (generate-args-list (type-prototype typespec-class))))
-				      (length (funcall
-					       #'compute-applicable-methods ,gf
-					       (generate-args-list typespec-symbol)))))
-			      (type-prototype typespec-class)
-			      typespec-symbol)))
-	       #+allegro (set-funcallable-instance-function ,gf (compute-discriminating-function ,gf)))))))))
+	     (#+allegro hunchentoot-mp:with-lock #+allegro ((smgf-lock ,gf)) ;; we need to lock on ACL
+	      #-allegro progn
+	       (unwind-protect
+		    (apply ,default-discriminating-function
+			   (generate-args-list
+			    (if (and typespec-class
+				     (> (length (funcall
+						 #'compute-applicable-methods ,gf 
+						 (generate-args-list (type-prototype typespec-class))))
+					(length (funcall
+						 #'compute-applicable-methods ,gf
+						 (generate-args-list typespec-symbol)))))
+				(type-prototype typespec-class)
+				typespec-symbol)))
+		 #+allegro (set-funcallable-instance-function
+			    ,gf (compute-discriminating-function ,gf))))))))))
 
 (defmacro slot-management-discriminating-lambda (gf default-discriminating-function type-argument-index)
   "Returns discriminating function code for those implementations that
