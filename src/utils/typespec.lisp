@@ -126,6 +126,7 @@ implementations."
        (declare (special *defmethod-type-d*))
        (defmethod ,(car args) ,@spec ,(car rest)
 		  (declare (special *full-slot-type*))
+		  (assert (boundp '*full-slot-type*))
 		  #+allegro (set-funcallable-instance-function
 			     #',(car args)
 			     (compute-discriminating-function #',(car args)))
