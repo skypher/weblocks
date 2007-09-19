@@ -25,8 +25,8 @@ and number of characters) used to display a max input size error
 messages to the user.")
 
 (defun slot-value-required-p (class-name slot)
-  "Returns true if 'slot' is declared to have an existance validator,
-nil otherwise. See 'decl-validate' for more detauls.
+  "Gets the declared type of the slot and checks if nil is of that
+type. If so, returns false, otherwise returns true.
 
 'class-name' - the name of the class that contains the slot.
 'slot' - either a slot definition or a slot name."
