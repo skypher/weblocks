@@ -96,7 +96,8 @@ determine its location in order to properly render paths in links."))
 			  (htm (:a :href (concatenate 'string *current-navigation-url*
 						      (unless (equalp (car item)
 								      (navigation-default-pane obj))
-							(attributize-name (car item))))
+							(string-downcase
+							 (url-encode (attributize-name (car item))))))
 				   (str (humanize-name (car item))))))))))
 	    panes))))
 
@@ -104,7 +105,8 @@ determine its location in order to properly render paths in links."))
   (when (current-pane-widget obj)
     (let ((*current-navigation-url* (concatenate 'string
 						 *current-navigation-url*
-						 (slot-value obj 'current-pane)
+						 (string-downcase
+						  (url-encode (slot-value obj 'current-pane)))
 						 "/")))
       (declare (special *current-navigation-url*))
       (render-widget (current-pane-widget obj))))
@@ -168,12 +170,13 @@ server."
   (when (null tokens)
     (reset-navigation-widgets navigation-widget)
     (return-from apply-uri-to-navigation))
-  (if (and navigation-widget (pane-exists-p navigation-widget (car tokens)))
-      (progn
-	(setf (slot-value navigation-widget 'current-pane) (car tokens))
-	(apply-uri-to-navigation (cdr tokens)
-				 (find-navigation-widget (current-pane-widget navigation-widget))))
-      (setf (return-code) +http-not-found+)))
+  (let ((first-token (url-decode (car tokens))))
+    (if (and navigation-widget (pane-exists-p navigation-widget first-token))
+	(progn
+	  (setf (slot-value navigation-widget 'current-pane) first-token)
+	  (apply-uri-to-navigation (cdr tokens)
+				   (find-navigation-widget (current-pane-widget navigation-widget))))
+	(setf (return-code) +http-not-found+))))
 
 (defun find-navigation-widget (comp)
   "Given a composite 'comp', returns the first navigation widget
