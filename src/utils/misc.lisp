@@ -79,9 +79,10 @@ usually generated dynamically by examining class instances. See
 'object-visible-slots' for more details."
   (slot-definition nil :read-only t)
   (slot-presentation nil :read-only t)
+  (slot-path nil :read-only t)
   (object nil :read-only t))
 
-(defgeneric object-visible-slots (obj &key slots mode &allow-other-keys)
+(defgeneric object-visible-slots (obj &rest keys &key slots mode &allow-other-keys)
   (:documentation
    "Returns a list of 'visible-slot' structures where
 'vs-slot-definition' of each structure is the 'direct-slot-object' (if
@@ -206,7 +207,7 @@ appended at the end.
          :OBJECT #<EMPLOYEE {BBA1271}>))
 "))
 
-(defmethod object-visible-slots (obj &key slots mode custom-slots &allow-other-keys)
+(defmethod object-visible-slots (obj &rest keys &key slots mode custom-slots slot-path &allow-other-keys)
   (let ((visible-slots (remove
 			nil
 			(if (eql mode :hide)
@@ -239,11 +240,25 @@ appended at the end.
 		(insert-at (cdr obj) visible-slots (car obj))
 		(push-end obj visible-slots)))
 	  custom-slots)
-    (mapcar (lambda (i)
-	      (make-visible-slot :slot-definition (car i)
-				 :slot-presentation (cdr i)
-				 :object obj))
-	    (list->assoc visible-slots))))
+    (flatten 
+     (mapcar (lambda (i)
+	       (let ((slot-path (append slot-path
+					(list (if (typep (car i) 'direct-slot-definition)
+						  (slot-definition-name (car i))
+						  (car i))))))
+		 (if (and (typep (car i) 'direct-slot-definition)
+			  (typep (ignore-errors
+				   (get-slot-value obj (car i))) 'standard-object)
+			  (render-slot-inline-p obj (slot-definition-name (car i))))
+		     (apply #'object-visible-slots (ignore-errors
+						     (get-slot-value obj (car i)))
+			    :slot-path slot-path
+			    (remove-keyword-parameter keys :custom-slots))
+		     (make-visible-slot :slot-definition (car i)
+					:slot-presentation (cdr i)
+					:slot-path slot-path
+					:object obj))))
+	     (list->assoc visible-slots)))))
 
 (defun class-visible-slots (cls &key visible-slots)
   "Returns a list of 'standard-direct-slot' objects for a class
@@ -453,7 +468,7 @@ object identification schemes."))
   (handler-case (slot-value obj 'id)
     (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
 
-(defun visit-object-slots (obj render-slot-fn &rest keys &key slot-path (call-around-fn-p t)
+(defun visit-object-slots (obj render-slot-fn &rest keys &key (call-around-fn-p t)
 			   (ignore-unbound-slots-p t) &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
 object and apply a render function to them.
@@ -481,16 +496,18 @@ values."
 		    (setf slot-name (slot-definition-name (vs-slot-definition slot))
 			  slot-type (slot-definition-type (vs-slot-definition slot)))
 		    (if ignore-unbound-slots-p
-			(ignore-errors (setf slot-value (get-slot-value obj (vs-slot-definition slot))))
-			(setf slot-value (get-slot-value obj (vs-slot-definition slot)))))
+			(ignore-errors (setf slot-value (get-slot-value (vs-object slot)
+									(vs-slot-definition slot))))
+			(setf slot-value (get-slot-value (vs-object slot)
+							 (vs-slot-definition slot)))))
 		  (setf slot-name (vs-slot-definition slot)
 			slot-type t))
-	      (apply render-fn obj slot-name
+	      (apply render-fn (vs-object slot) slot-name
 		     slot-type slot-value
 		     :human-name (if (not (functionp (vs-slot-presentation slot)))
 				     (vs-slot-presentation slot)
 				     slot-name)
-		     :slot-path (append slot-path (list slot-name))
+		     :slot-path (vs-slot-path slot)
 		     (remove-keyword-parameter keys :custom-slots))))
 	  (apply #'object-visible-slots obj keys)))
 
@@ -652,12 +669,4 @@ etc.)"
 
 (defun object-full-visible-slot-count (obj &rest args)
   "Returns the full number of visible slots (including the slots rendered inline)."
-  (let ((count 0))
-    (dolist (single-slot (apply #'object-visible-slots obj args) count)
-      (let* ((slot-name (slot-definition-name (vs-slot-definition single-slot)))
-	     (slot-value (when (slot-boundp obj slot-name)
-			   (slot-value obj slot-name))))
-	(if (and (typep slot-value 'standard-object)
-		 (render-slot-inline-p obj slot-name))
-	    (incf count (apply #'object-full-visible-slot-count slot-value args))
-	    (incf count))))))
+  (length (apply #'object-visible-slots obj args)))

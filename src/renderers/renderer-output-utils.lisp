@@ -1,8 +1,7 @@
 ;;;; Utility functions for generic renderers
 (in-package :weblocks)
 
-(export '(object-class-name object-name render-object-slot
-	  render-standard-object))
+(export '(object-class-name object-name render-standard-object))
 
 (defgeneric object-class-name (obj)
   (:documentation
@@ -44,38 +43,10 @@ Override this method to provide object names."))
 	      (return-from object-name obj-name)))))
   (humanize-name (object-class-name obj)))
 
-(defun render-object-slot (render-object-fn render-slot-fn obj slot-name slot-type slot-value keys)
-  "Renders a given slot of a CLOS object (usually if the slot
-itself is a standard CLOS object). This function encapsulates
-rendering behavior common to multiple generic renderers.
-
-If the members of the slot object are meant to be rendered
-inline (tested with 'render-slot-inline-p', checks for '-ref' in
-the name of the slot by default), calls 'render-object-fn'
-with :inlinep set to true. Otherwise, grabs the name of the
-object using 'object-name' and simply renders the name using
-'render-slot-fn'."
-  (if (render-slot-inline-p obj slot-name)
-      (apply render-object-fn obj slot-name slot-type slot-value :inlinep t keys)
-      (let* ((object-name (object-name slot-value))
-	     (object-name-type (normalized-type-of object-name)))
-	(apply render-slot-fn obj slot-name object-name-type object-name keys))))
-
-(defun render-standard-object (header-fn render-slot-fn obj &rest keys &key inlinep &allow-other-keys)
+(defun render-standard-object (header-fn render-slot-fn obj &rest keys)
   "Renders the slots of a CLOS object into HTML. This function
-encapsulates rendering behavior common to multiple generic
-renderers.
-
-If the object needs to be rendered inline within another
-object ('inlinep' is true), 'render-standard-object' walks
-through the visible slots of the object (obtained via
-'object-visible-slots') and applies 'render-slot-fn' to each of
-those.
-
-If the object is not rendered inline ('inlinep' is nil, which is
-the default), 'render-standard-object' applies the same logic as
-above, except it wraps it with a call to 'header-fn' in order to
-render a header."
-  (if inlinep
-      (apply #'visit-object-slots obj render-slot-fn keys)
-      (apply header-fn obj (curry #'apply #'visit-object-slots obj render-slot-fn keys) keys)))
+encapsulates rendering behavior common to multiple generic renderers -
+it walks through the visible slots of the object (obtained via
+'object-visible-slots') and applies 'render-slot-fn' to each of those,
+wrapping the call with 'header-fn' in order to render a header."
+  (apply header-fn obj (curry #'apply #'visit-object-slots obj render-slot-fn keys) keys))

@@ -107,9 +107,9 @@
 	(weblocks::object-from-request-valid-p new-joe '(education))))
   t
   (("manager")
-   ("name" . "Foo")
    ("graduation-year")
-   ("university" . "Stony Brook")))
+   ("university" . "Stony Brook")
+   ("name" . "Foo")))
 
 (deftest object-from-request-valid-p-4
     (with-request :get '(("name" . "Pink") ("age" . "25"))
@@ -123,7 +123,7 @@
       (let ((new-joe (copy-template *joe*)))
 	(weblocks::object-from-request-valid-p new-joe '(education (university . college)))))
   t
-  (("manager") ("name" . "Foo") ("graduation-year") ("university" . "Stony Brook")))
+  (("manager") ("graduation-year") ("university" . "Stony Brook") ("name" . "Foo")))
 
 ;;; test slot-in-request-empty-p
 (deftest slot-in-request-empty-p-1

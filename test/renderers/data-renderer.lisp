@@ -27,24 +27,21 @@
 (deftest-html render-data-slot-3
     (render-data-slot *joe* 'education t *some-college*)
   (htm
-   (:li :class "university"
-	(:span :class "label" "University:&nbsp;")
-	(:span :class "value" "Bene Gesserit University"))
-   (:li :class "graduation-year"
-	(:span :class "label" "Graduation Year:&nbsp;")
-	(:span :class "value" "2000"))))
+   (:li :class "education"
+	(:span :class "label" "Education:&nbsp;")
+	(:span :class "value" "Education History"))))
 
 ;;; test data-print-object-1
 (deftest data-print-object-1
     (data-print-object nil 'name 'integer 42)
   "42")
 
-;;; test render-data/aux
-(deftest-html render-data/aux-1
-    (render-data "test")
+;;; test render-data/value
+(deftest-html render-data/value-1
+    (render-data-value nil nil t "test")
   (:span :class "value" "test"))
 
-(deftest-html render-data/aux-2
+(deftest-html render-data/value-2
     (render-data *joe* :preslots-fn (lambda (obj &rest keys)
 							  (with-html
 							    (:div "test1")))
@@ -57,7 +54,7 @@
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
 
-(deftest-html render-data/aux-3
+(deftest-html render-data/value-3
     (render-data *joe* :slots '(address-ref))
   #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -65,7 +62,7 @@
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 
-(deftest-html render-data/aux-4
+(deftest-html render-data/value-4
     (render-data *joe* :slots '(education))
   #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -76,23 +73,23 @@
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 
-(deftest-html render-data/aux-5
+(deftest-html render-data/value-5
     (render-data *joe* :slots '((name . nickname)))
   #.(data-header-template nil
      '((:li :class "name" (:span :class "label" "Nickname:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 
-(deftest-html render-data/aux-6
-    (render-data "test" :highlight ".s")
+(deftest-html render-data/value-6
+    (render-data-value nil nil t "test" :highlight ".s")
   (:span :class "value" "t<strong>es</strong>t"))
 
-(deftest-html render-data/aux-7
-    (render-data "te<st" :highlight "e<s")
+(deftest-html render-data/value-7
+    (render-data-value nil nil t "te<st" :highlight "e<s")
   (:span :class "value" "t<strong>e&lt;s</strong>t"))
 
-(deftest-html render-data/aux-8
-    (render-data "<script>alert('XSS Attack')</script>")
+(deftest-html render-data/value-8
+    (render-data-value nil nil t "<script>alert('XSS Attack')</script>")
   (:span :class "value"
 	 "&lt;script&gt;alert(&#039;XSS Attack&#039;)&lt;/script&gt;"))
 

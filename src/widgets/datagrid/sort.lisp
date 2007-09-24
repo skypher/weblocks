@@ -21,15 +21,12 @@ it's sorted on nothing."
   (apply #'visit-object-slots
 	 data-obj
 	 (lambda (obj slot-name slot-type slot-value &rest keys &key slot-path &allow-other-keys)
-	   (if (typep slot-value 'standard-object)
-	       (if (render-slot-inline-p obj slot-name)
-		   (datagrid-update-sort-column-aux grid slot-value :slot-path slot-path)
-		   (when (and (null (datagrid-sort grid))
-			      (datagrid-column-sortable-p grid slot-path (object-name slot-value)))
-		     (setf (datagrid-sort grid) (cons slot-path :ascending))))
-	       (when (and (null (datagrid-sort grid))
-			  (datagrid-column-sortable-p grid slot-path slot-value))
-		 (setf (datagrid-sort grid) (cons slot-path :ascending)))))
+	   (when (and (null (datagrid-sort grid))
+		      (datagrid-column-sortable-p grid slot-path
+						  (if (typep slot-value 'standard-object)
+						      (object-name slot-value)
+						      slot-value)))
+	     (setf (datagrid-sort grid) (cons slot-path :ascending))))
 	 :call-around-fn-p nil
 	 args))
 
@@ -88,7 +85,6 @@ for :descending and vica versa)."
 (defslotmethod render-table-header-cell :around (obj slot-name slot-type slot-value &rest keys
 						     &key grid-obj &allow-other-keys)
   (if (or (null grid-obj)
-	  (typep slot-value 'standard-object)
 	  (not (datagrid-column-sortable-p grid-obj slot-name slot-value)))
       (apply #'call-next-method obj slot-name slot-type slot-value keys)
       (apply #'render-datagrid-header-cell obj slot-name slot-type slot-value keys)))

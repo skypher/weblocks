@@ -99,16 +99,11 @@
 (deftest-html render-form-slot-3
     (render-form-slot *joe* 'education t *some-college*)
   (htm
-   (:li :class "university"
+   (:li :class "education"
 	(:label
 	 (:span :class "slot-name"
-		(:span :class "extra" "University:&nbsp;"))
-	 (:input :type "text" :name "university" :value "Bene Gesserit University" :maxlength "40")))
-   (:li :class "graduation-year"
-	(:label
-	 (:span :class "slot-name"
-		(:span :class "extra" "Graduation Year:&nbsp;"))
-	 (:input :type "text" :name "graduation-year" :value "2000" :maxlength "40")))))
+		(:span :class "extra" "Education:&nbsp;"))
+	 (:input :type "text" :name "education" :value "Education History" :maxlength "40")))))
 
 ;;; test slot-intermedia-value
 (deftest slot-intermedia-value-1
@@ -132,12 +127,12 @@
     (form-print-object nil 'name 'integer nil)
   nil)
 
-;;; test render-form/aux
-(deftest-html render-form/aux-1
-    (render-form "test" :slot-path '(test))
+;;; test render-form/value
+(deftest-html render-form/value-1
+    (render-form-value nil nil t "test" :slot-path '(test))
   (:input :type "text" :name "test" :value "test" :maxlength "40"))
 
-(deftest-html render-form/aux-2
+(deftest-html render-form/value-2
     (with-request :get nil
       (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
@@ -153,7 +148,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
-(deftest-html render-form/aux-3
+(deftest-html render-form/value-3
     (with-request :post nil
       (render-form *joe* :slots '(address-ref)))
   #.(form-header-template nil
@@ -174,7 +169,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
-(deftest-html render-form/aux-4
+(deftest-html render-form/value-4
     (with-request :post nil
       (render-form *joe* :slots '(education)
 		   :preslots-fn (lambda (obj &rest keys)
@@ -209,7 +204,7 @@
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
 
-(deftest-html render-form/aux-5
+(deftest-html render-form/value-5
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
   #.(form-header-template nil
@@ -230,7 +225,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
-(deftest-html render-form/aux-6
+(deftest-html render-form/value-6
     (with-request :post nil
       (render-form *joe* :slots '((name . nickname))))
   #.(form-header-template nil
@@ -246,7 +241,7 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
-(deftest-html render-form/aux-7
+(deftest-html render-form/value-7
     (with-request :get nil
       (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
   #.(form-header-template nil

@@ -28,17 +28,13 @@ details)."))
 method."
   (mapc (lambda (slot)
 	  (let* ((slot-name (slot-definition-name (vs-slot-definition slot)))
-		 (parsed-value (assoc (attributize-name slot-name) parsed-request :test #'string-equal))
-		 (slot-value (ignore-errors (get-slot-value obj (vs-slot-definition slot)))))
-	    (if (and (typep slot-value 'standard-object)
-		     (render-slot-inline-p obj slot-name))
-		(update-object-from-request-aux slot-value parsed-request slots)
-		(when parsed-value
-		  (setf (slot-value obj slot-name)
-			(cdr parsed-value))))))
+		 (parsed-value (assoc (attributize-name slot-name) parsed-request :test #'string-equal)))
+	    (when parsed-value
+	      (setf (slot-value (vs-object slot) slot-name)
+		    (cdr parsed-value)))))
 	(object-visible-slots obj :slots slots)))
 
-(defun object-from-request-valid-p (obj slots)
+(defun object-from-request-valid-p (object slots)
   "Verifies whether form data that came in with the request can be
 successfully deserialized into an object. In the process,
 'parse-slot-from-request' is called to convert request strings into
@@ -67,37 +63,30 @@ done by 'update-object-from-request'."
 		   (slot-key (attributize-name slot-name))
 		   (request-slot-value (request-parameter slot-key))
 		   (slot-type (slot-definition-type (vs-slot-definition slot)))
-		   (slot-value (ignore-errors (get-slot-value obj (vs-slot-definition slot))))
-		   (human-slot-name (humanize-name (vs-slot-presentation slot))))
-	      (if (and (typep slot-value 'standard-object)
-		       (render-slot-inline-p obj slot-name))
-		  (multiple-value-bind (success res)
-		      (object-from-request-valid-p slot-value slots)
-		    (if success
-			(setf results (append results res))
-			(setf errors (append res errors))))
-		  (if (slot-in-request-empty-p slot-type request-slot-value)
-		      (if (slot-value-required-p (class-name-of obj) (vs-slot-definition slot))
-			  (push (cons slot-key (format nil *required-field-message*
-						       human-slot-name))
-				errors)
-			  (push (cons slot-key nil) results))
-		      (if (> (length request-slot-value)
-			     (max-raw-slot-input-length obj slot-name slot-type))
-			  (push (cons slot-key
-				      (format nil *max-raw-input-length-error-message*
-					      human-slot-name (max-raw-slot-input-length obj slot-name
-											 slot-type)))
-				errors)
-			  (multiple-value-bind (parsedp parsed-value)
-			      (invoke-parsers-on-slot-with-count slot-type slot-name request-slot-value)
-			    (if (and parsedp (slot-from-request-valid-p obj slot-name slot-type parsed-value))
-				(push (cons slot-key parsed-value) results)
-				(push (cons slot-key
-					    (invalid-input-error-message obj slot-name human-slot-name
-									 slot-type parsed-value))
-				      errors))))))))
-	  (object-visible-slots obj :slots slots))
+		   (human-slot-name (humanize-name (vs-slot-presentation slot)))
+		   (obj (vs-object slot)))
+	      (if (slot-in-request-empty-p slot-type request-slot-value)
+		  (if (slot-value-required-p (class-name-of obj) (vs-slot-definition slot))
+		      (push (cons slot-key (format nil *required-field-message*
+						   human-slot-name))
+			    errors)
+		      (push (cons slot-key nil) results))
+		  (if (> (length request-slot-value)
+			 (max-raw-slot-input-length obj slot-name slot-type))
+		      (push (cons slot-key
+				  (format nil *max-raw-input-length-error-message*
+					  human-slot-name (max-raw-slot-input-length obj slot-name
+										     slot-type)))
+			    errors)
+		      (multiple-value-bind (parsedp parsed-value)
+			  (invoke-parsers-on-slot-with-count slot-type slot-name request-slot-value)
+			(if (and parsedp (slot-from-request-valid-p obj slot-name slot-type parsed-value))
+			    (push (cons slot-key parsed-value) results)
+			    (push (cons slot-key
+					(invalid-input-error-message obj slot-name human-slot-name
+								     slot-type parsed-value))
+				  errors)))))))
+	  (object-visible-slots object :slots slots))
     (if errors
 	(values nil errors)
 	(values t results))))
@@ -132,10 +121,6 @@ via 'request-parameters'.)
 	 (mapcar (lambda (slot)
 		   (let* ((slot-name (slot-definition-name (vs-slot-definition slot)))
 			  (slot-key (attributize-name slot-name))
-			  (request-slot-value (request-parameter slot-key))
-			  (slot-value (ignore-errors (get-slot-value object (vs-slot-definition slot)))))
-		     (if (and (typep slot-value 'standard-object)
-			      (render-slot-inline-p object slot-name))
-			 (request-parameters-for-object slot-value)
-			 (list (cons slot-key request-slot-value)))))
+			  (request-slot-value (request-parameter slot-key)))
+		     (list (cons slot-key request-slot-value))))
 		 (apply #'object-visible-slots object args))))

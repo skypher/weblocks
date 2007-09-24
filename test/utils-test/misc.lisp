@@ -190,6 +190,10 @@
     (class-name (class-of (vs-slot-definition (car (object-visible-slots *joe*)))))
   standard-direct-slot-definition)
 
+(deftest object-visible-slots-15
+    (object-visible-slot-names *joe* :slots '(education (university . uni)))
+  ((name . name) (university . uni) (graduation-year . graduation-year) (manager . manager)))
+
 ;;; test safe-apply
 (deftest safe-apply-1
     (safe-apply #'identity '(5))

@@ -4,7 +4,7 @@
 (export '(*form-error-summary-threshold* with-form-header
 	  render-validation-summary render-form-controls
 	  render-form-slot render-form form-print-object
-	  render-form-aux required-validation-error
+	  render-form-value required-validation-error
 	  slot-intermedia-value))
 
 (defparameter *form-error-summary-threshold* 15
@@ -90,9 +90,6 @@ case the user clicks submit."))
    "Renders a given slot of a particular object. Similar to
 'render-data-slot'."))
 
-(defslotmethod render-form-slot (obj slot-name slot-type (slot-value standard-object) &rest keys)
-  (render-object-slot #'render-form-aux #'render-form-slot obj slot-name slot-type slot-value keys))
-
 (defslotmethod render-form-slot (obj slot-name slot-type slot-value &rest keys
 				     &key (human-name slot-name) validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name slot-name))
@@ -107,7 +104,7 @@ case the user clicks submit."))
 		     (str (humanize-name human-name)) ":&nbsp;"
 		     (when (slot-value-required-p (class-name (class-of obj)) slot-name)
 		       (htm (:em :class "required-slot" "(required)&nbsp;")))))
-	    (apply #'render-form-aux obj slot-name slot-type slot-value keys)
+	    (apply #'render-form-value obj slot-name slot-type slot-value keys)
 	    (when validation-error
 	      (htm (:p :class "validation-error"
 		       (:em
@@ -116,10 +113,10 @@ case the user clicks submit."))
 
 (defun render-form (obj &rest keys &key parent-object slot-name
 		    (slot-type t) &allow-other-keys)
-  "A convinient wrapper for 'render-form-aux'.
+  "A convinient wrapper for 'render-form-value'.
 
 See 'render-data' for examples."
-  (apply #'render-form-aux parent-object slot-name slot-type obj keys))
+  (apply #'render-standard-object #'with-form-header #'render-form-slot obj keys))
 
 
 (defun slot-intermedia-value (slot-name intermediate-fields)
@@ -134,18 +131,18 @@ the cdr is the intermediate value."
   (:documentation
    "Prints 'slot-value' to a string that will be used to render the
 value in a form renderer. This function is called by
-'render-form-aux'. Default implementation returns nil if 'slot-value'
-is nil, otherwise calls 'data-print-object'. Specialize this function
-to customize simple data printing without having to specialize more
-heavy 'render-data-aux'."))
+'render-form-value'. Default implementation returns nil if
+'slot-value' is nil, otherwise calls 'data-print-object'. Specialize
+this function to customize simple data printing without having to
+specialize more heavy 'render-data-aux'."))
 
 (defslotmethod form-print-object (obj slot-name slot-type slot-value &rest args)
   (when slot-value
     (apply #'data-print-object obj slot-name slot-type slot-value args)))
 
-(defgeneric render-form-aux (obj slot-name slot-type slot-value &rest
-				 keys &key inlinep name
-				 validation-errors intermediate-fields
+(defgeneric render-form-value (obj slot-name slot-type slot-value &rest
+				 keys &key name validation-errors
+				 intermediate-fields
 				 &allow-other-keys)
   (:generic-function-class slot-management-generic-function)
   (:documentation
@@ -163,11 +160,13 @@ entered. 'intermediate-fields' should be a copy of the request, in
 which case form renderer chooses values entered as part of the request
 over values obtained from the object."))
 
-(defslotmethod render-form-aux (obj slot-name slot-type (slot-value standard-object) &rest keys)
-  (apply #'render-standard-object #'with-form-header #'render-form-slot slot-value keys))
+(defslotmethod render-form-value (obj slot-name slot-type (slot-value standard-object) &rest keys)
+  (let* ((name (object-name slot-value))
+	 (type (normalized-type-of name)))
+    (render-form-value obj slot-name type name)))
 
-(defslotmethod render-form-aux (obj slot-name slot-type slot-value &rest
-				    keys &key inlinep slot-path intermediate-fields &allow-other-keys)
+(defslotmethod render-form-value (obj slot-name slot-type slot-value &rest
+				    keys &key slot-path intermediate-fields &allow-other-keys)
   (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
 	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
     (with-html

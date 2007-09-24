@@ -13,14 +13,14 @@
 		  (:span :class "slot-name"
 			 (:span :class "extra"
 				(str (humanize-name human-name)) ":&nbsp;")))
-	   (apply #'render-form-aux obj slot-name slot-type slot-value keys)
+	   (apply #'render-form-value obj slot-name slot-type slot-value keys)
 	   (when validation-error
 	     (htm (:p :class "validation-error"
 		      (:em
 		       (:span :class "validation-error-heading" "Error:&nbsp;")
 		       (str (format nil "~A" (cdr validation-error)))))))))))
 
-(defslotmethod render-form-aux (obj slot-name (slot-type (eql 'member)) slot-value &rest
+(defslotmethod render-form-value (obj slot-name (slot-type (eql 'member)) slot-value &rest
 			    keys &key intermediate-fields &allow-other-keys)
   (let ((intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
     (render-radio-buttons slot-name (mapcar (lambda (i)

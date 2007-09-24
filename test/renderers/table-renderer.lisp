@@ -50,16 +50,10 @@
    (:th :class "manager" "Manager")))
 
 (deftest-html render-table-header-row-2
-    (render-table-header-row nil nil t *joe* :inlinep t)
-  (htm
-   (:th :class "name" "Name")
-   (:th :class "manager" "Manager")))
+    (render-table-header-row nil nil t *joe* :slots '((name . blah)) :mode :strict)
+  (:tr (:th :class "name" "Blah")))
 
 (deftest-html render-table-header-row-3
-    (render-table-header-row nil nil t *joe* :inlinep t :slots '((name . blah)) :mode :strict)
-  (:th :class "name" "Blah"))
-
-(deftest-html render-table-header-row-4
     (render-table-header-row nil nil t *joe* :slots '(education))
   (:tr
    (:th :class "name" "Name")
@@ -67,7 +61,7 @@
    (:th :class "graduation-year" "Graduation Year")
    (:th :class "manager" "Manager")))
 
-(deftest-html render-table-header-row-5
+(deftest-html render-table-header-row-4
     (render-table-header-row nil nil t *joe* :slots `((name . ,(lambda () nil))))
   (:tr
    (:th :class "name" "Name")
@@ -85,12 +79,7 @@
 (deftest-html render-table-header-cell-3
     (render-table-header-cell *joe* 'address t *home-address*)
   (htm
-   (:th :class "street" "Street")
-   (:th :class "city" "City")))
-
-(deftest-html render-table-header-cell-4
-    (render-table-header-cell *joe* 'address t *home-address* :slots '(city) :mode :strict)
-  (:th :class "city" "City"))
+   (:th :class "address" "Address")))
 
 ;; render-table-body-row
 (deftest-html render-table-body-row-1
@@ -100,16 +89,10 @@
    (:td :class "manager" (:span :class "value" "Jim"))))
 
 (deftest-html render-table-body-row-2
-    (render-table-body-row nil nil t *joe* :inlinep t)
-  (htm
-   (:td :class "name" (:span :class "value" "Joe"))
-   (:td :class "manager" (:span :class "value" "Jim"))))
+    (render-table-body-row nil nil t *joe* :slots '((name . blah)) :mode :strict)
+  (:tr (:td :class "name" (:span :class "value" "Joe"))))
 
 (deftest-html render-table-body-row-3
-    (render-table-body-row nil nil t *joe* :inlinep t :slots '((name . blah)) :mode :strict)
-  (:td :class "name" (:span :class "value" "Joe")))
-
-(deftest-html render-table-body-row-4
     (render-table-body-row nil nil t *joe* :slots '(education))
   (:tr
    (:td :class "name" (:span :class "value" "Joe"))
@@ -128,13 +111,7 @@
 
 (deftest-html render-table-body-cell-3
     (render-table-body-cell *joe* 'address t *home-address*)
-  (htm
-   (:td :class "street" (:span :class "value" "100 Broadway"))
-   (:td :class "city" (:span :class "value" "New York"))))
-
-(deftest-html render-table-body-cell-4
-    (render-table-body-cell *joe* 'address t *home-address* :slots '(city) :mode :strict)
-  (:td :class "city" (:span :class "value" "New York")))
+  (:td :class "address" (:span :class "value" "Address")))
 
 ;; render-table
 (deftest-html render-table-1

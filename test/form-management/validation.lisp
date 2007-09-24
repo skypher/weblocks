@@ -32,7 +32,6 @@
     (weblocks::slot-from-request-valid-p *joe* 'age 'integer "Bob")
   nil)
 
-
 ;;; test invalid-input-error-message
 (deftest invalid-input-error-message-1
     (invalid-input-error-message nil "some-slot" "Some Human Slot" 'integer "t")

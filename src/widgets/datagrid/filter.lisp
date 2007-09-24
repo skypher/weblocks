@@ -39,10 +39,7 @@ matches returns true.
 						       &rest args)
   (not (null
 	(if (typep slot-value 'standard-object)
-	    (if (render-slot-inline-p obj slot-name)
-		(apply #'object-satisfies-search-p
-		       obj slot-name slot-type slot-value search-regex args)
-		(ppcre:scan search-regex (object-name slot-value)))
+	    (ppcre:scan search-regex (object-name slot-value))
 	    (ppcre:scan search-regex (apply #'data-print-object
 					    obj slot-name slot-type slot-value args))))))
 

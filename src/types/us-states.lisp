@@ -39,10 +39,10 @@ state."
 (deftype us-state ()
   '(satisfies us-state-p))
 
-(defslotmethod render-form-aux (obj slot-name (slot-type (eql 'us-state)) slot-value &rest
-				    keys &key inlinep slot-path intermediate-fields
-				    (input-id (gensym)) (choices-id (gensym))
-				    &allow-other-keys)
+(defslotmethod render-form-value (obj slot-name (slot-type (eql 'us-state)) slot-value &rest
+				      keys &key inlinep slot-path intermediate-fields
+				      (input-id (gensym)) (choices-id (gensym))
+				      &allow-other-keys)
   (let* ((intermediate-value (slot-intermedia-value slot-name intermediate-fields))
 	 (selections (mapcar #'car *us-states*))
 	 (default-value (if intermediate-value
