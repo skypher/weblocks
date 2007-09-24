@@ -68,11 +68,11 @@
 
 ;;; Test get-slot-value
 (deftest get-slot-value-1
-    (get-slot-value *joe* (car (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
+    (get-slot-value *joe* (vs-slot-definition (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
   30)
 
 (deftest get-slot-value-2
-    (get-slot-value *joe* (car (car (object-visible-slots *joe*))))
+    (get-slot-value *joe* (vs-slot-definition (car (object-visible-slots *joe*))))
   "Joe")
 
 ;;; Test slot-value-by-path
@@ -99,9 +99,10 @@
 ;;; Introspection helper
 (defun object-visible-slot-names (obj &rest args)
   (mapcar (lambda (x)
-	    (if (typep (car x) 'standard-direct-slot-definition)
-		(cons (slot-definition-name (car x)) (cdr x))
-		x))
+	    (cons (if (typep (vs-slot-definition x) 'standard-direct-slot-definition)
+		      (slot-definition-name (vs-slot-definition x))
+		      (vs-slot-definition x))
+		  (vs-slot-presentation x)))
 	  (apply #'object-visible-slots obj args)))
 
 ;;; Test render-slot-inline-p
@@ -186,7 +187,7 @@
   ((name . name) (foo . hello) (manager . manager) (bar . world)))
 
 (deftest object-visible-slots-14
-    (class-name (class-of (caar (object-visible-slots *joe*))))
+    (class-name (class-of (vs-slot-definition (car (object-visible-slots *joe*)))))
   standard-direct-slot-definition)
 
 ;;; test safe-apply
