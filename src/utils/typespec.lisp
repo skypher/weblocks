@@ -55,10 +55,13 @@ This function also implements certain useful logic. For example:
 	    (not (values nil nil))
 	    (satisfies (values (car typespec) (cdr typespec)))
 	    (values (values nil nil))
-	    (and (values (car typespec) (cdr typespec)))
+	    (and (match typespec
+			((list 'and y) (inspect-typespec y))
+			(y (values (car typespec) (cdr typespec)))))
 	    (or (match typespec
 		       ((list 'or 'null y) (inspect-typespec y))
 		       ((list 'or y 'null) (inspect-typespec y))
+		       ((list 'or y) (inspect-typespec y))
 		       (y (values (car typespec) (cdr typespec)))))
 	    (otherwise (values (car typespec) (cdr typespec))))
       (values typespec nil)))

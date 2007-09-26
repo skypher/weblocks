@@ -43,6 +43,14 @@
     (weblocks::inspect-typespec '(or blah integer))
   or (blah integer))
 
+(deftest inspect-typespec-5
+    (weblocks::inspect-typespec '(or integer))
+  integer nil)
+
+(deftest inspect-typespec-6
+    (weblocks::inspect-typespec '(and integer))
+  integer nil)
+
 ;;; test normalized-type-of
 (deftest normalized-type-of-1
     (normalized-type-of (make-instance 'widget))
