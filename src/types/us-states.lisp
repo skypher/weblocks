@@ -51,7 +51,7 @@ state."
 				    (ensure-list
 				     (cdr (assoc slot-value *us-states-abreviation->name*
 						 :test #'equalp))))))
-	 (welcome-name (cons "State" "")))
+	 (welcome-name "State"))
     (if *use-suggest-for-us-states*
 	(render-suggest slot-name
 			selections
@@ -64,7 +64,7 @@ state."
 			 :welcome-name welcome-name
 			 :id input-id))))
 
-(defslotmethod parse-slot-from-request ((slot-type (eql 'us-state)) slot-name request-slot-value)
+(defslotmethod parse-slot-from-request (obj slot-name (slot-type (eql 'us-state)) request-slot-value)
   (setf request-slot-value (string-trim +whitespace-characters+ request-slot-value))
   (when (not (empty-p request-slot-value))
     (if (eq (length request-slot-value) 2)

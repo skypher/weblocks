@@ -4,8 +4,8 @@
 (export '(*form-error-summary-threshold* with-form-header
 	  render-validation-summary render-form-controls
 	  render-form-slot render-form form-print-object
-	  render-form-value required-validation-error
-	  slot-intermedia-value))
+	  form-potential-values render-form-value
+	  required-validation-error slot-intermedia-value))
 
 (defparameter *form-error-summary-threshold* 15
   "When the number of fields in a form is longer than this threshold,
@@ -140,6 +140,37 @@ specialize more heavy 'render-data-aux'."))
   (when slot-value
     (apply #'data-print-object obj slot-name slot-type slot-value args)))
 
+(defgeneric form-potential-values (obj slot-name slot-type)
+  (:generic-function-class slot-management-generic-function)
+  (:documentation
+   "Returns possible slot values for the slot. This function is
+normally called by the framework when a form render renders an object
+reference (a foreign key). Specialize this function to specify entry
+options. The default implementation returns a single object - the
+current value of the slot.
+
+Note, each returned object must have an id slot (see 'object-id')."))
+
+(defslotmethod form-potential-values (obj slot-name slot-type)
+    (ignore-errors
+      (remove nil (list (slot-value obj slot-name)))))
+
+(defun render-form-foreign-value (obj slot-name slot-type slot-value
+				      &rest keys &key (human-name slot-name) slot-path
+				      intermediate-fields &allow-other-keys)
+  "An auxillary function used by 'render-form-value' to render foreign values."
+  (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
+	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
+    (render-dropdown attributized-slot-name
+		     (mapcar (lambda (i)
+			       (cons (object-name i) (object-id i)))
+			     (form-potential-values obj slot-name slot-type))
+		     :welcome-name (humanize-name human-name)
+		     :selected-value (if intermediate-value
+					 (cdr intermediate-value)
+					 (when slot-value
+					   (object-id slot-value))))))
+
 (defgeneric render-form-value (obj slot-name slot-type slot-value &rest
 				 keys &key name validation-errors
 				 intermediate-fields
@@ -160,10 +191,13 @@ entered. 'intermediate-fields' should be a copy of the request, in
 which case form renderer chooses values entered as part of the request
 over values obtained from the object."))
 
+(defslotmethod render-form-value (obj slot-name (slot-type standard-object) slot-value &rest keys)
+  (if (render-slot-inline-p obj slot-name)
+      (apply #'call-next-method obj slot-name slot-type slot-value keys)
+      (apply #'render-form-foreign-value obj slot-name slot-type slot-value keys)))
+
 (defslotmethod render-form-value (obj slot-name slot-type (slot-value standard-object) &rest keys)
-  (let* ((name (object-name slot-value))
-	 (type (normalized-type-of name)))
-    (render-form-value obj slot-name type name)))
+  (apply #'render-form-foreign-value obj slot-name slot-type slot-value keys))
 
 (defslotmethod render-form-value (obj slot-name slot-type slot-value &rest
 				    keys &key slot-path intermediate-fields &allow-other-keys)

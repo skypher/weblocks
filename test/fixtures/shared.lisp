@@ -3,14 +3,16 @@
 
 ;;; Define classes for introspection testing
 (defclass address ()
-  ((street :reader address-street :initform "100 Broadway")
+  ((id :initarg :id :initform (gen-object-id))
+   (street :reader address-street :initform "100 Broadway")
    (city :reader address-city :initform "New York")
    (state :type us-state :initarg :state :initform "NY")))
 
-(defparameter *home-address* (make-instance 'address))
+(defparameter *home-address* (make-instance 'address :id "*home-address*"))
 
 (defclass education-history ()
-  ((university :reader university :initform "Bene Gesserit University")
+  ((id :initarg :id :initform (gen-object-id))
+   (university :reader university :initform "Bene Gesserit University")
    (graduation-year :reader graduation-year :initform 2000 :type (or null integer))))
 
 (defparameter *some-college* (make-instance 'education-history))
@@ -20,7 +22,7 @@
    (name :accessor first-name :initarg :name :type string)
    (age :initarg :age :type integer)
    (address-ref :initform *home-address*)
-   (education :initform *some-college*)))
+   (education :initform *some-college* :type (or null education-history))))
 
 (defslotmethod max-raw-slot-input-length ((obj person) (slot-name (eql 'age)) slot-type)
   3)

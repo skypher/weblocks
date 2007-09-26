@@ -17,7 +17,7 @@
 		       slot-value)))
     (render-checkbox slot-name checkedp)))
 
-(defslotmethod parse-slot-from-request ((slot-type (eql 'boolean)) slot-name request-slot-value)
+(defslotmethod parse-slot-from-request (obj slot-name (slot-type (eql 'boolean)) request-slot-value)
   (cond
     ((string-equal "t" request-slot-value) (values t t))
     ((null request-slot-value) (values t nil))

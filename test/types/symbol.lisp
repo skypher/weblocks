@@ -29,20 +29,21 @@
 
 ;;; test parse-slot-from-request for symbols
 (deftest parse-slot-from-request-symbols-1
-    (let ((sym (cadr (multiple-value-list (parse-slot-from-request 'symbol 'test "t")))))
+    (let ((sym (cadr (multiple-value-list (parse-slot-from-request nil 'test 'symbol "t")))))
       (unwind-protect
 	   (values (symbol-name sym) (package-name (symbol-package sym)))
 	(unintern sym)))
   "T" "COMMON-LISP")
 
 (deftest parse-slot-from-request-symbols-2
-    (let ((sym (cadr (multiple-value-list (parse-slot-from-request 'symbol 'test "veryunlikelytoexist")))))
+    (let ((sym (cadr (multiple-value-list (parse-slot-from-request nil 'test 'symbol
+								   "veryunlikelytoexist")))))
       (unwind-protect
 	   (values (symbol-name sym) (package-name (symbol-package sym)))
 	(unintern sym)))
   "VERYUNLIKELYTOEXIST" "WEBLOCKS-TEST")
 
 (deftest parse-slot-from-request-symbols-3
-    (parse-slot-from-request 'symbol 'test "test")
+    (parse-slot-from-request nil 'test 'symbol "test")
   t test)
 

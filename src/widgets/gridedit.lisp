@@ -68,7 +68,8 @@
    "The default implementation renders a form that allows adding a new
 entry utilizing 'dataform' widget. Note, in order for this
 functionality to work properly, the object in question needs to have a
-slot named 'id', with an initform that assigns an ID to the object.
+slot named 'id' (see 'object-id'), with an initform that assigns an ID
+to the object.
 
 Specialize this method to provide different ways to add items to the
 grid."))

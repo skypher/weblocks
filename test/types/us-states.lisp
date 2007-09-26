@@ -43,19 +43,19 @@
 
 ;;; test parse-slot-from-request for us-state
 (deftest parse-slot-from-request-us-states-1
-    (parse-slot-from-request 'us-state nil "NJ")
+    (parse-slot-from-request nil nil 'us-state "NJ")
   t "NJ")
 
 (deftest parse-slot-from-request-us-states-2
-    (parse-slot-from-request 'us-state nil "New Jersey")
+    (parse-slot-from-request nil nil 'us-state "New Jersey")
   t "NJ")
 
 (deftest parse-slot-from-request-us-states-3
-    (parse-slot-from-request 'us-state nil "")
+    (parse-slot-from-request nil nil 'us-state "")
   nil)
 
 (deftest parse-slot-from-request-us-states-4
-    (parse-slot-from-request 'us-state nil "Ukraine")
+    (parse-slot-from-request nil nil 'us-state "Ukraine")
   nil)
 
 ;;; test invalid-input-error-message

@@ -18,7 +18,7 @@ on 'symbol' and 'keyword'."
 		 (string-invert-case request-slot-value)
 		 request-slot-value))))
 
-(defslotmethod parse-slot-from-request ((slot-type (eql 'symbol)) slot-name request-slot-value)
+(defslotmethod parse-slot-from-request (obj slot-name (slot-type (eql 'symbol)) request-slot-value)
   (values t (intern
 	     (parse-symbol-from-request request-slot-value)
 	     (symbol-package slot-name))))

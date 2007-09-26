@@ -94,13 +94,13 @@ selected. A single string can also be provided.
 and cdr will be returned as value in case it's selected."
   (when welcome-name
     (setf welcome-name (car (list->assoc (list welcome-name)
-					 :map (lambda (&rest args) nil)))))
+					 :map (constantly "")))))
   (with-html
     (:select :id id
 	     :class class
 	     :name (attributize-name name)
 	     (mapc (lambda (i)
-		     (if (member (car i) (ensure-list selected-value) :test #'string=)
+		     (if (member (or (cdr i) (car i)) (ensure-list selected-value) :test #'equalp)
 			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
 			 (htm (:option :value (cdr i) (str (car i))))))
 		   (list->assoc (append (when welcome-name
@@ -108,7 +108,7 @@ and cdr will be returned as value in case it's selected."
 					   (cons (format nil *dropdown-welcome-message* (car welcome-name))
 						 (cdr welcome-name))))
 					selections)
-				:map (lambda (i) nil))))))
+				:map (constantly nil))))))
 
 (defun render-radio-buttons (name selections &key id (class "radio") selected-value)
   "Renders a group of radio buttons.

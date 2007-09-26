@@ -94,16 +94,18 @@
        (:label
 	(:span :class "slot-name"
 	       (:span :class "extra" "Address:&nbsp;"))
-	       (:input :type "text" :name "address-ref" :value "Address" :maxlength "40"))))
+	       (:select :name "address-ref"
+			(:option :value "" "[Select Address]")
+			(:option :value "*home-address*" :selected "selected" "Address")))))
 
 (deftest-html render-form-slot-3
-    (render-form-slot *joe* 'education t *some-college*)
+    (render-form-slot *home-address* 'city t "Brooklyn")
   (htm
-   (:li :class "education"
+   (:li :class "city"
 	(:label
 	 (:span :class "slot-name"
-		(:span :class "extra" "Education:&nbsp;"))
-	 (:input :type "text" :name "education" :value "Education History" :maxlength "40")))))
+		(:span :class "extra" "City:&nbsp;"))
+	 (:input :type "text" :name "city" :value "Brooklyn" :maxlength "40")))))
 
 ;;; test slot-intermedia-value
 (deftest slot-intermedia-value-1
@@ -126,6 +128,18 @@
 (deftest form-print-object-2
     (form-print-object nil 'name 'integer nil)
   nil)
+
+;;; form-potential-values
+(deftest form-potential-values-1
+    (mapcar #'object-id (form-potential-values *joe* 'address-ref t))
+  ("*home-address*"))
+
+;;; render-form-foreign-value
+(deftest-html render-form-foreign-value-1
+    (weblocks::render-form-foreign-value *joe* 'address-ref t *home-address*)
+  (:select :name "address-ref"
+	   (:option :value "" "[Select Address]")
+	   (:option :value "*home-address*" :selected "selected" "Address")))
 
 ;;; test render-form/value
 (deftest-html render-form/value-1
@@ -162,7 +176,9 @@
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
+	 (:select :name "address-ref"
+		  (:option :value "" "[Select Address]")
+		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
@@ -218,7 +234,9 @@
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
+	 (:select :name "address-ref"
+		  (:option :value "" "[Select Address]")
+		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
@@ -256,7 +274,9 @@
 	(:label
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
-	 (:input :type "text" :name "address-ref" :value "Address" :maxlength "40")))
+	 (:select :name "address-ref"
+		  (:option :value "" "[Select Address]")
+		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
@@ -265,3 +285,4 @@
      :preslots '((:div :class "validation-errors-summary"
 		  (:h2 :class "error-count" "There is 1 validation error:")
 		  (:ul (:li "Some error."))))))
+
