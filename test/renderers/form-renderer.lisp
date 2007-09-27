@@ -95,7 +95,7 @@
 	(:span :class "slot-name"
 	       (:span :class "extra" "Address:&nbsp;"))
 	       (:select :name "address-ref"
-			(:option :value "" "[Select Address]")
+			(:option :value "" "[Select None]")
 			(:option :value "*home-address*" :selected "selected" "Address")))))
 
 (deftest-html render-form-slot-3
@@ -138,7 +138,7 @@
 (deftest-html render-form-foreign-value-1
     (weblocks::render-form-foreign-value *joe* 'address-ref t *home-address*)
   (:select :name "address-ref"
-	   (:option :value "" "[Select Address]")
+	   (:option :value "" "[Select None]")
 	   (:option :value "*home-address*" :selected "selected" "Address")))
 
 ;;; test render-form/value
@@ -177,7 +177,7 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
-		  (:option :value "" "[Select Address]")
+		  (:option :value "" "[Select None]")
 		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label
@@ -235,7 +235,7 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
-		  (:option :value "" "[Select Address]")
+		  (:option :value "" "[Select None]")
 		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label
@@ -275,7 +275,7 @@
 	 (:span :class "slot-name"
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
-		  (:option :value "" "[Select Address]")
+		  (:option :value "" "[Select None]")
 		  (:option :value "*home-address*" :selected "selected" "Address"))))
        (:li :class "manager"
 	(:label

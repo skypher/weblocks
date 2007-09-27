@@ -159,13 +159,18 @@ Note, each returned object must have an id slot (see 'object-id')."))
 				      &rest keys &key (human-name slot-name) slot-path
 				      intermediate-fields &allow-other-keys)
   "An auxillary function used by 'render-form-value' to render foreign values."
-  (let ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
-	(intermediate-value (slot-intermedia-value slot-name intermediate-fields)))
+  (let* ((attributized-slot-name (attributize-name (if slot-name slot-name (last-item slot-path))))
+	 (intermediate-value (slot-intermedia-value slot-name intermediate-fields))
+	 (welcome-name (if slot-value
+			   (if (slot-value-required-p (class-name (class-of obj)) slot-name)
+			       nil
+			       "None")
+			   (humanize-name human-name))))
     (render-dropdown attributized-slot-name
 		     (mapcar (lambda (i)
 			       (cons (object-name i) (object-id i)))
 			     (form-potential-values obj slot-name slot-type))
-		     :welcome-name (humanize-name human-name)
+		     :welcome-name welcome-name
 		     :selected-value (if intermediate-value
 					 (cdr intermediate-value)
 					 (when slot-value
