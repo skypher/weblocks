@@ -445,6 +445,9 @@ used by the framework for sorting data."))
 (defmethod strictly-less-p ((a (eql nil)) b)
   nil)
 
+(defmethod strictly-less-p ((a symbol) (b (eql nil)))
+  t)
+
 (defgeneric equivalentp (a b)
   (:documentation
    "Returns true if 'a' is in some sense equivalent to 'b'. This
