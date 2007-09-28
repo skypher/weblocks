@@ -132,6 +132,20 @@
 	   (:option "b")
 	   (:option "c")))
 
+(deftest-html render-dropdown-10
+    (render-dropdown 'some-name '("a" "b" "c") :selected-value 'b)
+  (:select :name "some-name"
+	   (:option "a")
+	   (:option :selected "selected" "b")
+	   (:option "c")))
+
+(deftest-html render-dropdown-11
+    (render-dropdown 'some-name '(1 2 3) :selected-value "2")
+  (:select :name "some-name"
+	   (:option "1")
+	   (:option :selected "selected" "2")
+	   (:option "3")))
+
 ;;; test render-radio-buttons
 (deftest-html render-radio-buttons-1
     (render-radio-buttons 'some-name '("a" "b" "c") :id "some-id" :class "some-class")

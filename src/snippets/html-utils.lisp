@@ -100,7 +100,9 @@ and cdr will be returned as value in case it's selected."
 	     :class class
 	     :name (attributize-name name)
 	     (mapc (lambda (i)
-		     (if (member (or (cdr i) (car i)) (ensure-list selected-value) :test #'equalp)
+		     (if (member (format nil "~A" (or (cdr i) (car i)))
+				 (ensure-list selected-value)
+				 :test #'equalp :key (curry #'format nil "~A"))
 			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
 			 (htm (:option :value (cdr i) (str (car i))))))
 		   (list->assoc (append (when welcome-name
