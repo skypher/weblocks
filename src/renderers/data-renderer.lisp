@@ -134,7 +134,7 @@ See 'render-data' for examples."))
 (defslotmethod render-data-value (obj slot-name slot-type (slot-value standard-object) &rest keys)
   (let* ((name (object-name slot-value))
 	 (type (normalized-type-of name)))
-    (render-data-value obj slot-name type name)))
+    (apply #'render-data-value obj slot-name type name keys)))
 
 (defslotmethod render-data-value (obj slot-name slot-type (slot-value (eql nil))
 				    &rest keys &key ignore-missing-values-p &allow-other-keys)
