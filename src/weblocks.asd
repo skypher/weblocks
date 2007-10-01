@@ -92,7 +92,7 @@
 				      :depends-on ("symbol")))
 			:depends-on (renderers snippets widgets))
 	       (:file "server"
-		      :depends-on ("weblocks"))
+		      :depends-on ("weblocks" utils))
 	       (:file "request"
 		      :depends-on ("weblocks" "actions"))
 	       (:file "application"

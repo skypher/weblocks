@@ -16,7 +16,7 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&key debug (port 8080))
+(defun start-weblocks (&rest keys &key debug (port 8080) &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to
 the client."
@@ -28,7 +28,8 @@ the client."
     (setf *show-lisp-backtraces-p* t))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
-    (setf *weblocks-server* (start-server :port port))))
+    (setf *weblocks-server*
+	  (apply #'start-server (remove-keyword-parameter keys :debug)))))
 
 (defun stop-weblocks ()
   "Stops weblocks."
