@@ -1,6 +1,27 @@
 
 (in-package :weblocks-test)
 
+;;; test defwidget
+(deftest defwidget-1
+    (macroexpand-1
+     '(defwidget foo (bar)
+       ((slot1 :initarg :slot1) (slot2 :initform nil))))
+  (defclass foo (bar)
+    ((slot1 :initarg :slot1)
+     (slot2 :initform nil))
+    (:metaclass widget-class))
+  t)
+
+(deftest defwidget-2
+    (macroexpand-1
+     '(defwidget foo ()
+       ((slot1 :initarg :slot1) (slot2 :initform nil))))
+  (defclass foo (widget)
+    ((slot1 :initarg :slot1)
+     (slot2 :initform nil))
+    (:metaclass widget-class))
+  t)
+
 ;;; test widget-public-dependencies-aux
 (deftest widget-public-dependencies-aux-1
     (weblocks::widget-public-dependencies-aux 'non-existant-widget-name)

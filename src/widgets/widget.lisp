@@ -60,13 +60,15 @@
   "Generates a unique ID that can be used to identify a widget."
   (gensym))
 
-(defmacro defwidget (&body body)
+(defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
-defclass, except adds 'widget-class' metaclass specification."
-  `(defclass ,@body
+defclass, except adds 'widget-class' metaclass specification and
+inherits from 'widget' if no direct superclasses are provided."
+  `(defclass ,name ,(or direct-superclasses '(widget))
+       ,@body
        (:metaclass widget-class)))
 
-(defwidget widget ()
+(defclass widget ()
   ((name :accessor widget-name
 	 :initform (generate-widget-id)
 	 :initarg :name
@@ -90,6 +92,7 @@ defclass, except adds 'widget-class' metaclass specification."
                     multiple widgets update automatically during AJAX
                     requests."))
   #+lispworks (:optimize-slot-access nil)
+  (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
 (defgeneric widget-public-dependencies (obj)
