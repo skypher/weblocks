@@ -78,19 +78,23 @@
 			:depends-on ("weblocks-test" fixtures))
 	       (:module widgets
 			:components ((:file "widget-test-utils")
+				     (:module widget
+				      :components ((:file "widget")
+						   (:file "widget-mop"))
+				      :depends-on ("widget-test-utils"))
 				     (:file "dataform")
 				     (:file "flash")
 				     (:module datagrid
 				      :components ((:file "datagrid")
 						   (:file "filter")
 						   (:file "sort")
-						   (:file "select"))
+						   (:file "select")
+						   (:file "drilldown"))
 				      :depends-on ("widget-test-utils"))
 				     (:file "gridedit"
 					    :depends-on ("widget-test-utils"))
 				     (:file "navigation")
-				     (:file "composite")
-				     (:file "widget"))
+				     (:file "composite"))
 			:depends-on ("weblocks-test" fixtures renderers))))
 
 

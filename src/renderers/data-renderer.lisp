@@ -4,7 +4,8 @@
 (export '(with-data-header render-data-slot render-data
 	  data-print-object render-data-value))
 
-(defgeneric with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
+(defgeneric with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn
+				  &allow-other-keys)
   (:documentation
    "Responsible for rendering headers of a data presentation. The
 default method renders a humanized name of the object along with
@@ -25,7 +26,8 @@ for an example.
 not be called by the programmer. Override 'with-data-header' to
 provide customized header rendering."))
 
-(defmethod with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn &allow-other-keys)
+(defmethod with-data-header (obj body-fn &rest keys &key preslots-fn postslots-fn
+			     &allow-other-keys)
   (let ((header-class (format nil "renderer data ~A"
 			      (attributize-name (object-class-name obj)))))
     (with-html
@@ -34,7 +36,7 @@ provide customized header rendering."))
 	      (htm (:h1 (:span :class "action" "Viewing:&nbsp;")
 			(:span :class "object" (str (humanize-name (object-class-name obj)))))
 		   (safe-apply preslots-fn obj keys)
-		   (:ul (funcall body-fn))
+		   (:ul (apply body-fn keys))
 		   (safe-apply postslots-fn obj keys)))))))
 
 (defgeneric render-data-slot (obj slot-name slot-type slot-value &rest keys &key human-name &allow-other-keys)

@@ -95,7 +95,8 @@ for :descending and vica versa)."
   (:documentation
    "Renders table headers for the datagrid. The default implementation
 renders a link that it associates with a sorting action which modifies
-'sort' slot of the datagrid object. Specialize this function to
+'sort' slot of the datagrid object. Additionally, an empty header is
+rendered for the 'drilldown' action. Specialize this function to
 customize the way datagrid headers are rendered."))
 
 (defslotmethod render-datagrid-header-cell (obj slot-name slot-type
@@ -104,6 +105,9 @@ customize the way datagrid headers are rendered."))
 						slot-name) slot-path
 						grid-obj
 						&allow-other-keys)
+  (when (datagrid-drilldown-slot-p grid-obj slot-name)
+    (apply #'render-datagrid-drilldown-header-cell grid-obj obj slot-name slot-type slot-value keys)
+    (return-from render-datagrid-header-cell))
   (let ((th-class (when (equalp slot-name (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
 		    (concatenate 'string " sort-"
 				 (attributize-name (string (cdr (datagrid-sort grid-obj)))))))

@@ -3,7 +3,7 @@
 
 ;; with-table-header
 (deftest-html with-table-header-1
-    (with-table-header *joe* (lambda ()
+    (with-table-header *joe* (lambda (&rest args)
 			       (with-html
 				 (:p "hi"))))
   (:div :class "renderer table employee"
@@ -16,7 +16,7 @@
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
 (deftest-html with-table-header-2
-    (with-table-header nil (lambda ()
+    (with-table-header nil (lambda (&rest args)
 			     (with-html
 			       (:p "hi"))))
   (:div :class "renderer table empty-table"
@@ -28,17 +28,30 @@
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
-;; with-table-row
-(deftest-html with-table-row-1
-    (weblocks::with-table-row *joe* (lambda ()
-				      (with-html
-					(:td "hi"))))
+;; with-table-header-row
+(deftest-html with-table-header-row-1
+    (with-table-header-row *joe* (lambda (&rest args)
+				   (with-html
+				     (:td "hi"))))
   (:tr (:td "hi")))
 
-(deftest-html with-table-row-2
-    (weblocks::with-table-row *joe* (lambda ()
-				      (with-html
-					(:td "hi"))) :alternp t)
+(deftest-html with-table-header-row-2
+    (with-table-header-row *joe* (lambda (&rest args)
+				   (with-html
+				     (:td "hi"))) :alternp t) ;; no altern for headers
+  (:tr (:td "hi")))
+
+;; with-table-body-row
+(deftest-html with-table-body-row-1
+    (with-table-body-row *joe* (lambda (&rest args)
+				 (with-html
+				   (:td "hi"))))
+  (:tr (:td "hi")))
+
+(deftest-html with-table-body-row-2
+    (with-table-body-row *joe* (lambda (&rest args)
+				   (with-html
+				     (:td "hi"))) :alternp t)
   (:tr :class "altern"
        (:td "hi")))
 

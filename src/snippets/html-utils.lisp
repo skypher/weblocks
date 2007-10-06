@@ -3,7 +3,8 @@
 
 (export '(*submit-control-name* *cancel-control-name* with-html-form
 	  render-link render-button render-checkbox render-dropdown
-	  *dropdown-welcome-message* render-radio-buttons))
+	  *dropdown-welcome-message* render-radio-buttons
+	  render-close-button))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -24,19 +25,21 @@
 		    ,@body
 		    (:input :name *action-string* :type "hidden" :value ,action-code)))))))
 
-(defun render-link (action-code name)
-  "Renders an action into an href link. The link will be rendered in
-such a way that the action will be invoked via AJAX, or will fall back
-to regular request if JavaScript is not available. When the user
-clicks on the link, the action will be called on the server.
+(defun render-link (action-code name &key (ajaxp t))
+  "Renders an action into an href link. If 'ajaxp' is true (the
+default), the link will be rendered in such a way that the action will
+be invoked via AJAX, or will fall back to regular request if
+JavaScript is not available. When the user clicks on the link, the
+action will be called on the server.
 
 'action-code' - The action created with 'make-action'.
 'name' - A string that will be presented to the user in the
 link."
   (let ((url (make-action-url action-code)))
     (with-html
-      (:a :href url :onclick (format nil "initiateAction(\"~A\", \"~A\"); return false;"
-				     action-code (session-name-string-pair))
+      (:a :href url :onclick (when ajaxp
+			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
+				       action-code (session-name-string-pair)))
 	  (str name)))))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
@@ -140,3 +143,12 @@ for the value.
 			   (htm (:input :name (attributize-name name) :type "radio" :class "radio"
 					:value (cdr i))))
 		       (:span (str (format nil "~A&nbsp;" (car i)))))))))
+
+(defun render-close-button (close-action &optional (button-string "(Close)"))
+  "Renders a close button. If the user clicks on the close button,
+'close-action' is called back. If 'button-string' is provided, it used
+used instead of the default 'Close'."
+  (with-html
+    (:span :class "close-button"
+	   (render-link close-action (humanize-name button-string)))))
+

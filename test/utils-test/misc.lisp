@@ -194,6 +194,12 @@
     (object-visible-slot-names *joe* :slots '(education (university . uni)))
   ((name . name) (university . uni) (graduation-year . graduation-year) (manager . manager)))
 
+(deftest object-visible-slots-16
+    (some #'null
+	  (object-visible-slots *joe* :slots '(education) :mode :strict))
+  nil)
+
+
 ;;; test safe-apply
 (deftest safe-apply-1
     (safe-apply #'identity '(5))

@@ -48,6 +48,11 @@
       (render-link "abc123" "some link"))
   #.(link-action-template "abc123" "some link"))
 
+(deftest-html render-link-2
+    (with-request :get nil
+      (render-link "abc123" "some link" :ajaxp nil))
+  (:a :href "/foo/bar?action=abc123" "some link"))
+
 ;;; test render-button
 (deftest-html render-button-1
     (render-button 'some-button)
@@ -173,4 +178,21 @@
    (:label :id "some-id" :class "radio last"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "c")
 	   (:span "c&nbsp;"))))
+
+;;; test render-close-button
+(deftest-html render-close-button-1
+    (with-request :get nil
+      (render-close-button "abc123"))
+  (:span :class "close-button"
+	 (:a :href "/foo/bar?action=abc123"
+	     :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
+	     "(Close)")))
+
+(deftest-html render-close-button-2
+    (with-request :get nil
+      (render-close-button "abc123" "Foo"))
+  (:span :class "close-button"
+	 (:a :href "/foo/bar?action=abc123"
+	     :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
+	     "Foo")))
 

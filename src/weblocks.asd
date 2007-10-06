@@ -60,26 +60,31 @@
 				      :depends-on ("validation" "form-parsers")))
 			:depends-on (utils linguistic))
 	       (:module widgets
-			:components ((:file "widget")
+			:components ((:module widget
+				      :components ((:file "widget"
+						    :depends-on ("widget-mop"))
+						   (:file "widget-mop")))
 				     (:file "flash"
-				      :depends-on ("widget"))
+				      :depends-on (widget))
 				     (:file "dataform"
-				      :depends-on ("widget"))
+				      :depends-on (widget))
 				     (:module datagrid
-					      :components ((:file "datagrid"
-								  :depends-on ("filter" "sort" "select"))
-							   (:file "filter")
-							   (:file "sort")
-							   (:file "select"))
-					      :depends-on ("widget"))
+				      :components ((:file "datagrid"
+						    :depends-on ("filter" "sort" "select"
+									  "drilldown"))
+						   (:file "filter")
+						   (:file "sort")
+						   (:file "select")
+						   (:file "drilldown"))
+				      :depends-on (widget))
 				     (:file "gridedit"
 				      :depends-on ("datagrid" "dataform"))
 				     (:file "paging"
-				      :depends-on ("widget"))
+				      :depends-on (widget))
 				     (:file "composite"
-				      :depends-on ("widget"))
+				      :depends-on (widget))
 				     (:file "navigation"
-				      :depends-on ("composite" "widget")))
+				      :depends-on ("composite" widget)))
 			:depends-on (snippets renderers
 					      form-management utils "actions" "server" "request"
 					      "request-hooks" linguistic))

@@ -163,3 +163,30 @@ input[type=hidden]
                    + 'px')
   top: expression(documentElement.scrollTop + 'px');
 }
+
+/* Common styles for form, data, and dataform */
+.data, .form
+{
+  width: 27em;
+}
+
+/* Close button */
+span.close-button 
+{
+  display: block;
+  width: 15px;
+  height: 15px;
+  overflow: hidden;
+}
+
+span.close-button a
+{
+  /* background: url(/pub/images/close.png) no-repeat top left; */
+  padding-left: 1000em;
+}
+
+span.close-button a:hover
+{
+  /* background: url(/pub/images/close_hl.png) no-repeat top left; */
+}
+

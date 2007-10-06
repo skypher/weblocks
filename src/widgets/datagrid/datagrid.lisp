@@ -6,8 +6,10 @@
 	  datagrid-search datagrid-allow-searching-p
 	  datagrid-show-hidden-entries-count-p datagrid-selection
 	  datagrid-allow-select-p datagrid-item-ops
-	  datagrid-allow-item-ops-p datagrid-data
-	  datagrid-data-count))
+	  datagrid-allow-item-ops-p datagrid-allow-drilldown-p
+	  datagrid-on-drilldown datagrid-drilled-down-item
+	  datagrid-autoset-drilled-down-item-p datagrid-data
+	  datagrid-data-count render-datagrid-table-body))
 
 (defwidget datagrid (widget)
   ((data-class :accessor datagrid-data-class
@@ -106,7 +108,45 @@
 		     :initform t
 		     :initarg :allow-item-ops-p
 		     :documentation "If true, datagrid provides UI to
-		     access operations defined in 'item-ops'."))
+		     access operations defined in 'item-ops'.")
+   (on-drilldown :accessor datagrid-on-drilldown
+		 :initform nil
+		 :initarg :on-drilldown
+		 :documentation "A cons cell that represents a
+	         drilldown operation. The car of the cell should
+	         contain symbol representing the name of the
+	         operation (i.e. 'details', 'edit', etc.) and the cdr
+	         of the cell should contain a function of two
+	         arguments (grid obj and item object). If this slot
+	         isn't set to nill and 'allow-drilldown-p' is true,
+	         datagrid provides the UI to drill down into items.")
+   (allow-drilldown-p :accessor datagrid-allow-drilldown-p
+		      :initform t
+		      :initarg :allow-drilldown-p
+		      :documentation "If set to true and
+		      'on-drilldown' isn't nil, datagrid provides the
+		      UI to drill down into items.")
+   (drilled-down-item :accessor datagrid-drilled-down-item
+		      :initform nil
+		      :initarg :drilled-down-item
+		      :documentation "If 'allow-drilldown-p' is set
+		      to true and the user drills down on an item this
+		      slot can be set to the item in question. The
+		      datagrid will then render the appropriate row
+		      with a 'drilled-down' class for CSS
+		      styling. This slot is set to the drilled down
+		      item automatically only when
+		      'autoset-drilled-down-item-p' is true. Note, it
+		      is always the responsibility of the datagrid's
+		      client to reset this slot back to nil.")
+   (autoset-drilled-down-item-p :accessor datagrid-autoset-drilled-down-item-p
+				:initform nil
+				:initarg :autoset-drilled-down-item-p
+				:documentation "If set to true,
+				'drilled-down-item' will be
+				automatically set to the appropriate
+				item when the user drills down on the
+				grid."))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
 
@@ -191,10 +231,13 @@ defined in 'args'."
 		 (datagrid-item-ops obj))
 	(apply #'render-item-ops-bar obj args)))))
 
-(defun render-datagrid-table-body (grid &rest args)
-  "Renders the actual data of the datagrid without any controls before
-or after. This function is used to update the body during ajax search
-requests."
+(defgeneric render-datagrid-table-body (grid &rest args)
+  (:documentation
+   "Renders the actual data of the datagrid without any controls
+before or after. This function is used to update the body during ajax
+search requests."))
+
+(defmethod render-datagrid-table-body ((grid datagrid) &rest args)
   (apply #'datagrid-update-sort-column grid args)
   (with-html
     (:div :class "datagrid-body"
@@ -211,9 +254,14 @@ requests."
 		 :highlight (when (datagrid-search grid)
 			      (make-isearch-regex (datagrid-search grid)))
 		 :custom-slots (append-custom-slots
-				(when (datagrid-allow-select-p grid)
-				  `((0 . (select
-					  . ,(curry #'datagrid-render-select-body-cell grid)))))
+				(remove nil
+				 (list
+				  (when (datagrid-allow-select-p grid)
+				    `(0 . (select . ,(curry #'datagrid-render-select-body-cell grid))))
+				  (when (and (datagrid-allow-drilldown-p grid)
+					     (datagrid-on-drilldown grid))
+				    (cons (car (datagrid-on-drilldown grid))
+					  (curry #'render-datagrid-drilldown-body-cell grid)))))
 				args)
 		 args))))
 

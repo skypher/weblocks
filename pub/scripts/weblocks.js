@@ -4,6 +4,27 @@ function updateElementBody(element, newBody) {
     element.update(newBody);
 }
 
+function selectionEmpty() {
+    if(document.getSelection) {
+	return document.getSelection() == "";
+    } else if(document.selection && document.selection.createRange) {
+	return document.selection.createRange().text == "";
+    } else {
+	return true;
+    }
+}
+
+function addCss(cssCode) {
+    var styleElement = document.createElement("style");
+    styleElement.type = "text/css";
+    if (styleElement.styleSheet) {
+	styleElement.styleSheet.cssText = cssCode;
+    } else {
+	styleElement.appendChild(document.createTextNode(cssCode));
+    }
+    document.getElementsByTagName("head")[0].appendChild(styleElement);
+}
+
 // Register global AJAX handlers to show progress
 Ajax.Responders.register({
   onCreate: function() {
@@ -64,6 +85,13 @@ function initiateAction(actionCode, sessionString) {
 		     });
 }
 
+function initiateActionOnEmptySelection(actionCode, sessionString) {
+    if(selectionEmpty()) {
+	initiateAction(actionCode, sessionString);
+	return false;
+    }
+}
+
 function initiateFormAction(actionCode, form, sessionString) {
     // Hidden "action" field should not be serialized on AJAX
     var serializedForm = form.serialize(true);
@@ -104,9 +132,6 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
 				 suggestOptions.push(i.innerHTML);
 			     }
 			 });
-    if(ignoreWelcomeMsg) {
-	
-    }
 
     var inputBox = '<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest"';
     if(value) {
@@ -118,5 +143,25 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
     $(inputId).replace(suggestHTML);
     
     declareSuggest(inputId, choicesId, suggestOptions);
+}
+
+// Support datagrid control
+function stopPropagation(event) {
+    if(event.preventDefault) {
+	event.stopPropagation();
+    } else {
+	event.cancelBubble = true;
+    };
+}
+
+// These styles need to be added dynamically because we only want them
+// when JS is turned on
+addCss(".datagrid td.details, .datagrid th.details { display: none; }");
+
+// Fix IE6 flickering issue
+if(Prototype.Browser.IE) {
+    try {
+	document.execCommand("BackgroundImageCache", false, true);
+    } catch(err) {}
 }
 

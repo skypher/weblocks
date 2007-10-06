@@ -67,7 +67,7 @@
 (deftest-html datagrid-render-select-body-cell-1
     (let ((grid (make-instance 'datagrid
 			       :data-class 'employee)))
-      (weblocks::datagrid-render-select-body-cell grid *joe* 'name "Joe"))
+      (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
   (:td :class "select"
        (:input :name "item-1" :type "checkbox" :value "t")))
 
@@ -75,7 +75,7 @@
     (let ((grid (make-instance 'datagrid
 			       :data-class 'employee
 			       :selection '(:none . (1)))))
-      (weblocks::datagrid-render-select-body-cell grid *joe* 'name "Joe"))
+      (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
   (:td :class "select"
        (:input :name "item-1" :type "checkbox" :value "t" :checked "checked")))
 

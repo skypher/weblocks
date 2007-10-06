@@ -19,6 +19,10 @@
     (weblocks::slot-value-required-p 'employee 'age)
   t)
 
+(deftest slot-value-required-p-5
+    (weblocks::slot-value-required-p 'employee 'foobarbaz)
+  nil)
+
 ;;; slot-from-request-valid-p
 (deftest slot-from-request-valid-p-1
     (weblocks::slot-from-request-valid-p *joe* 'age 'integer nil)

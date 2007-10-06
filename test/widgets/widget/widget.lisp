@@ -184,6 +184,17 @@
 	(format nil "~A" weblocks::*page-public-dependencies*)))
   "(stylesheets/dataform.css)")
 
+(deftest render-widget-5
+    (with-request :get nil
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(let ((w (make-instance 'dataform :data *joe*))
+	      res1 res2)
+	  (setf res1 (widget-rendered-p w))
+	  (render-widget w :inlinep t)
+	  (setf res2 (widget-rendered-p w))
+	  (values res1 res2))))
+  nil t)
+
 ;;; test mark-dirty
 (deftest mark-dirty-1
     (multiple-value-bind (res errors)
@@ -192,13 +203,26 @@
   nil nil)
 
 (deftest mark-dirty-2
-    (let ((weblocks::*dirty-widgets* nil))
-      (declare (special weblocks::*dirty-widgets*))
-      (mark-dirty (make-instance 'composite :name "test"))
-      (widget-name (car weblocks::*dirty-widgets*)))
+    (with-request :get nil
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(let ((weblocks::*dirty-widgets* nil)
+	      (w (make-instance 'composite :name "test")))
+	  (declare (special weblocks::*dirty-widgets*))
+	  (render-widget w)
+	  (mark-dirty w)
+	  (widget-name (car weblocks::*dirty-widgets*)))))
   "test")
 
 (deftest mark-dirty-3
+    (with-request :get nil
+      (let ((weblocks::*dirty-widgets* nil)
+	    (w (make-instance 'composite :name "test")))
+	(declare (special weblocks::*dirty-widgets*))
+	(mark-dirty w)
+	(widget-name (car weblocks::*dirty-widgets*))))
+  nil)
+
+(deftest mark-dirty-4
     (with-request :get nil
       (setf (session-value 'weblocks::root-composite) (create-site-layout))	
       (let ((weblocks::*dirty-widgets* nil))
@@ -207,7 +231,31 @@
 				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
 		    :putp t)
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))
+  nil)
+
+(deftest mark-dirty-5
+    (with-request :get nil
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(setf (session-value 'weblocks::root-composite) (create-site-layout))	
+	(let* ((weblocks::*dirty-widgets* nil)
+	       (path '((root-inner test-nav-1 test2 test2-leaf)))
+	       (w (make-instance 'composite :name "test"
+					    :propagate-dirty path)))
+	  (declare (special weblocks::*dirty-widgets*))
+	  (render-widget w)
+	  (render-widget (find-widget-by-path (car path)))
+	  (mark-dirty w :putp t)
+	  (mapcar #'widget-name weblocks::*dirty-widgets*))))
   (test2-leaf "test"))
+
+(deftest mark-dirty-6
+    (with-request :get nil
+      (let ((weblocks::*dirty-widgets* nil)
+	    (w (make-instance 'composite :name "test")))
+	(declare (special weblocks::*dirty-widgets*))
+	(setf (widget-rendered-p w) t)
+	(widget-name (car weblocks::*dirty-widgets*))))
+  nil)
 
 ;;; test widget-dirty-p
 (deftest widget-dirty-p-1
@@ -218,23 +266,38 @@
   nil)
 
 (deftest widget-dirty-p-2
-    (let ((weblocks::*dirty-widgets* nil)
-	  (w (make-instance 'composite :name "test")))
-      (declare (special weblocks::*dirty-widgets*))
-      (mark-dirty w)
-      (not (null (widget-dirty-p w))))
+    (with-request :get nil
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(let ((weblocks::*dirty-widgets* nil)
+	      (w (make-instance 'composite :name "test")))
+	  (declare (special weblocks::*dirty-widgets*))
+	  (render-widget w)
+	  (mark-dirty w)
+	  (not (null (widget-dirty-p w))))))
   t)
 
 ;;; test that (setf slot-value-using-class) method is modified for
 ;;; widgets to automatically mark them as dirty
 (deftest setf-slot-value-using-class-1
     (with-request :get nil
-      (let ((weblocks::*dirty-widgets* nil)
-	    (w (make-instance 'dataform)))
-	(declare (special weblocks::*dirty-widgets*))
-	(setf (slot-value w 'weblocks::ui-state) :form)
-	(widget-name (car weblocks::*dirty-widgets*))))
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(let ((weblocks::*dirty-widgets* nil)
+	      (w (make-instance 'dataform)))
+	  (declare (special weblocks::*dirty-widgets*))
+	  (render-widget w)
+	  (setf (slot-value w 'weblocks::ui-state) :form)
+	  (widget-name (car weblocks::*dirty-widgets*)))))
   "widget-123")
+
+(deftest setf-slot-value-using-class-2
+    (with-request :get nil
+      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
+	(let ((weblocks::*dirty-widgets* nil)
+	      (w (make-instance 'dataform)))
+	  (declare (special weblocks::*dirty-widgets*))
+	  (render-widget w)
+	  weblocks::*dirty-widgets*)))
+  nil)
 
 ;;; test find-widget-by-path
 (deftest find-widget-by-path-1
@@ -261,9 +324,12 @@
 
 ;;; test customized widget printing
 (deftest widget-printing-1
-    (format nil "~s" (make-instance 'weblocks::navigation))
+    (progv '(*package*) (list (find-package :weblocks-test))
+      (format nil "~s" (make-instance 'weblocks::navigation)))
   "#<NAVIGATION NIL>")
 
 (deftest widget-printing-2
-    (format nil "~s" (make-instance 'weblocks::dataform :name 'users))
+    (progv '(*package*) (list (find-package :weblocks-test))
+      (format nil "~s" (make-instance 'weblocks::dataform :name 'users)))
   "#<DATAFORM USERS>")
+

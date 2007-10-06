@@ -240,25 +240,26 @@ appended at the end.
 		(insert-at (cdr obj) visible-slots (car obj))
 		(push-end obj visible-slots)))
 	  custom-slots)
-    (flatten 
-     (mapcar (lambda (i)
-	       (let ((slot-path (append slot-path
-					(list (if (typep (car i) 'direct-slot-definition)
-						  (slot-definition-name (car i))
-						  (car i))))))
-		 (if (and (typep (car i) 'direct-slot-definition)
-			  (typep (ignore-errors
-				   (get-slot-value obj (car i))) 'standard-object)
-			  (render-slot-inline-p obj (slot-definition-name (car i))))
-		     (apply #'object-visible-slots (ignore-errors
-						     (get-slot-value obj (car i)))
-			    :slot-path slot-path
-			    (remove-keyword-parameter keys :custom-slots))
-		     (make-visible-slot :slot-definition (car i)
-					:slot-presentation (cdr i)
-					:slot-path slot-path
-					:object obj))))
-	     (list->assoc visible-slots)))))
+    (remove nil
+	    (flatten 
+	     (mapcar (lambda (i)
+		       (let ((slot-path (append slot-path
+						(list (if (typep (car i) 'direct-slot-definition)
+							  (slot-definition-name (car i))
+							  (car i))))))
+			 (if (and (typep (car i) 'direct-slot-definition)
+				  (typep (ignore-errors
+					   (get-slot-value obj (car i))) 'standard-object)
+				  (render-slot-inline-p obj (slot-definition-name (car i))))
+			     (apply #'object-visible-slots (ignore-errors
+							     (get-slot-value obj (car i)))
+				    :slot-path slot-path
+				    (remove-keyword-parameter keys :custom-slots))
+			     (make-visible-slot :slot-definition (car i)
+						:slot-presentation (cdr i)
+						:slot-path slot-path
+						:object obj))))
+		     (list->assoc visible-slots))))))
 
 (defun class-visible-slots (cls &key visible-slots)
   "Returns a list of 'standard-direct-slot' objects for a class

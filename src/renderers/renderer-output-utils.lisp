@@ -49,4 +49,4 @@ encapsulates rendering behavior common to multiple generic renderers -
 it walks through the visible slots of the object (obtained via
 'object-visible-slots') and applies 'render-slot-fn' to each of those,
 wrapping the call with 'header-fn' in order to render a header."
-  (apply header-fn obj (curry #'apply #'visit-object-slots obj render-slot-fn keys) keys))
+  (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn) keys))

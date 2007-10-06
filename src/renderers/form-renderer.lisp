@@ -45,7 +45,7 @@ details."))
       (render-validation-summary validation-errors)
       (safe-apply preslots-fn obj keys)
       (:h2 :class "form-fields-title" "Form fields:")
-      (:ul (funcall body-fn))
+      (:ul (apply body-fn keys))
       (safe-apply postslots-fn obj keys))))
 
 (defun render-validation-summary (errors)

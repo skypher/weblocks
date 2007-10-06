@@ -30,9 +30,11 @@ type. If so, returns false, otherwise returns true.
 
 'class-name' - the name of the class that contains the slot.
 'slot' - either a slot definition or a slot name."
-  (let ((type (slot-definition-type (if (symbolp slot)
-					(get-slot-definition class-name slot)
-					slot))))
+  (let ((type (if (symbolp slot)
+		  (if (get-slot-definition class-name slot)
+		      (slot-definition-type (get-slot-definition class-name slot))
+		      t)
+		  (slot-definition-type slot))))
     (and type
 	 (not (typep nil type)))))
 

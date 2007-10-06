@@ -2,9 +2,10 @@
 (in-package :weblocks)
 
 (export '(*render-empty-sequence-string* with-table-header
+	  with-table-header-row with-table-body-row
 	  render-table-header-row render-table-header-cell
-	  render-table-body-row render-table-body-cell
-	  render-table render-empty-table))
+	  render-table-body-row render-table-body-cell render-table
+	  render-empty-table))
 
 (defparameter *render-empty-sequence-string* "No information available."
   "The default string used by the table renderer to signify that
@@ -31,12 +32,26 @@ div's along with classes necessary for CSS styling. Look at
 	      (funcall body-fn)
 	      (safe-apply posttable-fn obj keys))))))
 
-;; Auxilary functions
-(defun with-table-row (obj body-fn &key alternp &allow-other-keys)
-  "Used internally by table renderer to render rows."
+;; Template for rendering header row
+(defgeneric with-table-header-row (obj body-fn &rest keys)
+  (:documentation
+   "Used by table renderer to render header rows. Specialize this
+function to modify HTML around a given header row's cells."))
+
+(defmethod with-table-header-row (obj body-fn &rest keys)
+  (with-html
+    (:tr (apply body-fn keys))))
+
+;; Template for rendering body row
+(defgeneric with-table-body-row (obj body-fn &key alternp &allow-other-keys)
+  (:documentation
+   "Used by table renderer to render body rows. Specialize this
+function to modify HTML around a given row's cells."))
+
+(defmethod with-table-body-row (obj body-fn &rest keys &key alternp &allow-other-keys)
   (with-html
     (:tr :class (if alternp "altern" nil)
-	 (funcall body-fn))))
+	 (apply body-fn keys))))
 
 ;; Table header
 (defgeneric render-table-header-row (obj slot-name slot-type
@@ -56,7 +71,7 @@ details.
 "))
 
 (defslotmethod render-table-header-row (obj slot-name slot-type slot-value &rest keys)
-  (apply #'render-standard-object #'with-table-row #'render-table-header-cell slot-value
+  (apply #'render-standard-object #'with-table-header-row #'render-table-header-cell slot-value
 	 :alternp nil
 	 :call-around-fn-p nil
 	 keys))
@@ -95,7 +110,7 @@ particular cells. See 'render-table-header-row' for more
 details."))
 
 (defslotmethod render-table-body-row (obj slot-name slot-type slot-value &rest keys)
-  (apply #'render-standard-object #'with-table-row #'render-table-body-cell slot-value keys))
+  (apply #'render-standard-object #'with-table-body-row #'render-table-body-cell slot-value keys))
 
 (defgeneric render-table-body-cell (obj slot-name slot-type slot-value
 					&rest keys)

@@ -113,15 +113,19 @@
   t)
 
 ;;; test type-prototype
+(defclass type-prototype-test-class () (foo))
+
 (deftest type-prototype-1
-    (every (lambda (type)
-	     (typep (type-prototype type) type))
-	   (remove nil
-		   (mapcar (curry-after #'normalized-find-class nil)
-			   '(t character symbol function number complex real integer
-			     rational ratio fixnum bignum float simple-base-string
-			     base-string string bit-vector vector array cons list null
-			     sequence widget))))
+    (progn
+      (finalize-inheritance (find-class 'type-prototype-test-class))
+      (every (lambda (type)
+	       (typep (type-prototype type) type))
+	     (remove nil
+		     (mapcar (curry-after #'normalized-find-class nil)
+			     '(t character symbol function number complex real integer
+			       rational ratio fixnum bignum float simple-base-string
+			       base-string string bit-vector vector array cons list null
+			       sequence widget type-prototype-test-class)))))
   t)
 
 (deftest type-prototype-2

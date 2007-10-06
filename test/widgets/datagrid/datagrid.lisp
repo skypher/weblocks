@@ -229,13 +229,13 @@
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
-	(weblocks::render-datagrid-table-body grid)
+	(render-datagrid-table-body grid)
 	;; sort by name (should be descending)
 	(do-request `((,weblocks::*action-string* . "abc123")))
-	(weblocks::render-datagrid-table-body grid)
+	(render-datagrid-table-body grid)
 	;; refresh the action (should still be descending)
 	(do-request `((,weblocks::*action-string* . "abc123")))
-	(weblocks::render-datagrid-table-body grid)))
+	(render-datagrid-table-body grid)))
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
@@ -277,7 +277,7 @@
 				 :data (list *joe* *bob*)
 				 :allow-sorting '(manager)
 				 :data-class 'employee)))
-	(weblocks::render-datagrid-table-body grid)))
+	(render-datagrid-table-body grid)))
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" "Name")
@@ -296,7 +296,7 @@
 				 :data (list *joe* *bob*)
 				 :allow-sorting nil
 				 :data-class 'employee)))
-	(weblocks::render-datagrid-table-body grid)))
+	(render-datagrid-table-body grid)))
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "name" "Name")
@@ -313,9 +313,9 @@
       (let ((grid (make-instance 'datagrid
 				 :data (list *joe* *bob*)
 				 :data-class 'employee)))
-	(weblocks::render-datagrid-table-body grid)
+	(render-datagrid-table-body grid)
 	(setf (first-name *bob*) "Zed")
-	(weblocks::render-datagrid-table-body grid)
+	(render-datagrid-table-body grid)
 	(setf (first-name *bob*) "Bob")))
   (htm
    (:div :class "datagrid-body"
@@ -348,7 +348,7 @@
 				 :search "J"
 				 :data-class 'employee)))
 	;; render datagrid
-	(weblocks::render-datagrid-table-body grid)))
+	(render-datagrid-table-body grid)))
   (htm
    (:div :class "datagrid-body"
    #.(table-header-template
@@ -369,10 +369,10 @@
 				 :sort '(address-ref . :ascending)
 				 :data-class 'employee)))
 	;; render datagrid
-	(weblocks::render-datagrid-table-body grid :slots '(address-ref))
+	(render-datagrid-table-body grid :slots '(address-ref))
 	;; sort by name (should be descending)
 	(do-request `((,weblocks::*action-string* . "abc124")))
-	(weblocks::render-datagrid-table-body grid :slots '(address-ref))))
+	(render-datagrid-table-body grid :slots '(address-ref))))
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template

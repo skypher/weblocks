@@ -4,12 +4,12 @@
 ;;; test with-form-header
 (deftest-html with-form-header-1
     (with-request :get nil
-      (with-form-header *joe* (lambda () nil) :action "test-action" :method :post))
+      (with-form-header *joe* (lambda (&rest args) nil) :action "test-action" :method :post))
   #.(form-header-template "test-action" '(nil) :method "post"))
 
 (deftest-html with-form-header-2
     (with-request :get nil
-      (with-form-header *joe* (lambda () nil)
+      (with-form-header *joe* (lambda (&rest args) nil)
 			:action "test-action"
 			:method :post
 			:title-action "Changing"))
@@ -20,7 +20,7 @@
 (deftest-html with-form-header-3
     (let ((*form-error-summary-threshold* 1))
       (with-request :get nil
-	(with-form-header *joe* (lambda () nil) :action "test-action" :method :post)))
+	(with-form-header *joe* (lambda (&rest args) nil) :action "test-action" :method :post)))
   (:form :class "renderer form employee long-form"
 	 :action "/foo/bar"
 	 :method "post"

@@ -57,12 +57,16 @@ selection slot (both are accepted for convinience)."
 			 t
 			 nil)))))))
 
-(defun datagrid-render-select-body-cell (grid obj slot-name slot-value &rest args)
+(defun datagrid-render-select-body-cell (grid obj slot-name slot-type slot-value &rest args)
   "Renders a cell with a checkbox used to select items."
   (let ((checkbox-name (concatenate 'string
-				    "item-" (attributize-name (object-id obj)))))
+				    "item-" (attributize-name (object-id obj))))
+	(drilldownp (and (datagrid-allow-drilldown-p grid)
+			 (datagrid-on-drilldown grid))))
     (with-html
       (:td :class "select"
+	   :onclick (when drilldownp "stopPropagation(event);")
+	   :style (when drilldownp "cursor: default;")
 	   (render-checkbox checkbox-name
 			    (datagrid-item-selected-p grid (object-id obj))
 			    :class nil)))))

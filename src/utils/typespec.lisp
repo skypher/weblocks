@@ -142,7 +142,7 @@ implementations."
   "Behaves like 'class-prototype', except returns reasonable values
 for built-in classes accross implementations."
   (etypecase type
-    (standard-class (class-prototype type))
+    (cl:standard-class (class-prototype type)) ; we need cl prefix due to closer
     (built-in-class (cond
 		      ((eq type (find-class 't nil)) t)
 		      ((eq type (find-class 'character nil)) (code-char 42))

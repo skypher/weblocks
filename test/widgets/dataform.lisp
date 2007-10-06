@@ -274,3 +274,45 @@
 	(values on-cancel-called-p on-success-called-p)))
   t t)
 
+(deftest-html render-dataform-5
+    (with-request :get nil
+      (let* ((a 0)
+	     (edit-joe (make-instance 'dataform :data (copy-template *joe*)
+						:on-close (lambda (&rest args)
+							    (setf a 1)))))
+	;; initial state
+	(render-widget edit-joe)
+	;; click close
+	(do-request `((,weblocks::*action-string* . "abc124")))
+	(with-html (:div (str a)))))
+  (htm
+   ;; initial state
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template
+	    "abc123"
+	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	       (:span :class "value" "Jim")))
+	    :postslots
+	    `((:div :class "submit"
+		    ,(link-action-template "abc123" "Modify") (str "&nbsp;")
+		    ,(link-action-template "abc124" "Close")))))
+   (:div "1")))
+
+(deftest-html render-dataform-6
+    (with-request :get nil
+      (let* ((a 0)
+	     (edit-joe (make-instance 'dataform :data (copy-template *joe*)
+						:on-close (lambda (&rest args)
+							    (setf a 1))
+						:allow-close-p nil)))
+	;; initial state
+	(render-widget edit-joe)))
+  (htm
+   ;; initial state
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template
+	    "abc123"
+	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	       (:span :class "value" "Jim")))))))

@@ -1,60 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(widget-class transient-slot defwidget widget widget-name
-	  widget-args widget-public-dependencies with-widget-header
+(export '(defwidget widget widget-name widget-args
+	  widget-propagate-dirty widget-rendered-p
+	  widget-public-dependencies with-widget-header
 	  render-widget-body widget-css-classes render-widget
 	  mark-dirty widget-dirty-p find-widget-by-path*
 	  find-widget-by-path))
-
-(defclass widget-class (standard-class)
-  ()
-  (:documentation "A metaclass used for all widget classes. A
-  custom metaclass is necessary to specialize
-  'slot-value-using-class'."))
-
-;;; Necessary to allow deriving
-(defmethod validate-superclass ((class widget-class)
-				(superclass standard-class))
-  t)
-
-;;; Allow customization of widget slot options
-(defclass widget-slot-definition-mixin ()
-  ((affects-dirty-status-p :accessor widget-slot-affects-dirty-status-p
-			   :initform t
-			   :initarg :affects-dirty-status-p
-			   :documentation "When set to true (the
-			   default), the widget will be made dirty
-			   when this slot is modified."))
-  (:documentation "A mixin class used in
-  'widget-direct-slot-definition' and
-  'widget-effective-slot-definition' to allow specifying custom widget
-  properties."))
-
-(defclass widget-direct-slot-definition
-    (standard-direct-slot-definition widget-slot-definition-mixin) 
-  ()
-  (:documentation "Allows specifying custom widget properties."))
-
-(defmethod direct-slot-definition-class ((class widget-class) &rest initargs) 
-   (find-class 'widget-direct-slot-definition))
-
-;;; Copy slot options over to runtime definition of the slot
-(defclass widget-effective-slot-definition
-    (standard-effective-slot-definition widget-slot-definition-mixin) 
-  ()
-  (:documentation "Allows specifying custom widget properties."))
-
-(defmethod effective-slot-definition-class ((class widget-class) &rest initargs) 
-  (find-class 'widget-effective-slot-definition))
-
-(defmethod compute-effective-slot-definition ((class widget-class) slot-name dslotds)
-  (let ((result (call-next-method)))
-    (loop for dsd in dslotds
-	 when (typep dsd 'widget-direct-slot-definition)
-	 do (setf (widget-slot-affects-dirty-status-p result) (widget-slot-affects-dirty-status-p dsd))
-	 return dsd)
-    result))
 
 (defun generate-widget-id ()
   "Generates a unique ID that can be used to identify a widget."
@@ -90,10 +42,26 @@ inherits from 'widget' if no direct superclasses are provided."
                     via a POST request. This slot allows setting up
                     dependencies between widgets that will make
                     multiple widgets update automatically during AJAX
-                    requests."))
+                    requests.")
+   (renderedp :accessor widget-rendered-p
+	      :initform nil
+	      :affects-dirty-status-p nil
+	      :documentation "This slot holds a boolean flag
+              indicating whether the widget has been rendered at least
+              once. Because marking unrendered widgets as dirty may
+              cause JS problems, 'mark-dirty' will use this flag to
+              determine the status of a widget."))
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
+
+;;; Define widget-rendered-p for objects that don't derive from
+;;; 'widget'
+(defmethod widget-rendered-p (obj)
+  nil)
+
+(defmethod (setf widget-rendered-p) (obj val)
+  nil)
 
 (defgeneric widget-public-dependencies (obj)
   (:documentation
@@ -253,7 +221,8 @@ declare stylesheets and javascript links in the page header."
 		(widget-public-dependencies obj)))
   (if inlinep
       (apply #'render-widget-body obj (widget-args obj))
-      (apply #'with-widget-header obj #'render-widget-body (widget-args obj))))
+      (apply #'with-widget-header obj #'render-widget-body (widget-args obj)))
+  (setf (widget-rendered-p obj) t))
 
 ;;; Make all widgets act as composites to simplify development
 (defmethod composite-widgets ((obj widget))
@@ -283,13 +252,13 @@ modified, unless slots are marked with affects-dirty-status-p."))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
     into a CLOS object derived from 'widget'."))
-  (setf *dirty-widgets* (adjoin w *dirty-widgets*))
-  (when putp
-    (mapc
-     (lambda (i)
-       (setf *dirty-widgets* (adjoin i *dirty-widgets*)))
-     (remove nil (loop for i in (widget-propagate-dirty w)
-		    collect (find-widget-by-path i))))))
+  (ignore-errors
+    (when (widget-rendered-p w)
+      (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
+    (when putp
+      (mapc #'mark-dirty
+	    (remove nil (loop for i in (widget-propagate-dirty w)
+			   collect (find-widget-by-path i)))))))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
@@ -326,3 +295,4 @@ widget object, in which case it is simply returned.
 (defmethod print-object ((obj widget) stream)
   (print-unreadable-object (obj stream :type t)
     (format stream "~s" (slot-value obj 'name))))
+
