@@ -156,7 +156,7 @@ function stopPropagation(event) {
 
 // These styles need to be added dynamically because we only want them
 // when JS is turned on
-addCss(".datagrid td.details, .datagrid th.details { display: none; }");
+addCss(".datagrid td.drilldown, .datagrid th.drilldown { display: none; }");
 
 // Fix IE6 flickering issue
 if(Prototype.Browser.IE) {
