@@ -38,11 +38,13 @@ otherwise."
 							     &key row-action &allow-other-keys)
   (with-html
     (:td :class (datagrid-drilldown-style slot-name)
-	 (:noscript
-	  (:div
-	   (render-link row-action
-			(humanize-name (car (datagrid-on-drilldown grid-obj)))
-			:ajaxp nil))))))
+	 (unless (ajax-request-p)
+	   (htm
+	    (:noscript
+	     (:div
+	      (render-link row-action
+			   (humanize-name (car (datagrid-on-drilldown grid-obj)))
+			   :ajaxp nil))))))))
 
 (defmethod with-table-body-row :around (obj body-fn &rest keys &key alternp grid-obj &allow-other-keys)
   (if (and grid-obj
