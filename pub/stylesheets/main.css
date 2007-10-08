@@ -88,7 +88,7 @@ h1, h2
   margin: 0;
 }
 
-.renderer ul li, .renderer fieldset ul li
+.renderer ul li, .renderer fieldset ul li, .menu ul li a
 {
   list-style: none;
   padding-left: 1.5em;
