@@ -29,8 +29,9 @@
 (deftest request-object-mapping-4
     (with-request :post '(("name" . "Pink") ("age" . "30"))
       (let ((new-joe (copy-template *joe*)))
-	(multiple-value-bind (success results) (weblocks::object-from-request-valid-p new-joe '(age))
-	  (weblocks::update-object-from-request-aux new-joe results '(age)))
+	(multiple-value-bind (success results)
+	    (weblocks::object-from-request-valid-p new-joe :slots '(age))
+	  (weblocks::update-object-from-request-aux new-joe results :slots '(age)))
 	(values (slot-value new-joe 'name)
 		(slot-value new-joe 'age))))
   "Pink" 30)
@@ -85,18 +86,25 @@
    ("c" . "C must be an integer.")
    ("d" . "D must be an integer.")))
 
+(deftest request-object-mapping-9
+    (with-request :get '(("age" . "25"))
+      (let ((new-joe (copy-template *joe*)))
+	(update-object-from-request new-joe :slots '(age) :mode :strict)
+	(slot-value new-joe 'age)))
+  25)
+
 ;;; test object-from-request-valid-p (also tested through request-object-mapping)
 (deftest object-from-request-valid-p-1
     (with-request :get '(("name" . "Pink") ("age" . "25"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe '(age))))
+	(weblocks::object-from-request-valid-p new-joe :slots '(age))))
   t
   (("manager") ("age" . 25) ("name" . "Pink")))
 
 (deftest object-from-request-valid-p-2
     (with-request :get '(("university" . "Stony Brook"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe '(education))))
+	(weblocks::object-from-request-valid-p new-joe :slots '(education))))
   nil
   (("name" . "Name is a required field.")))
 
@@ -104,7 +112,7 @@
     (with-request :get '(("university" . "Stony Brook")
 			 ("name" . "Foo"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe '(education))))
+	(weblocks::object-from-request-valid-p new-joe :slots '(education))))
   t
   (("manager")
    ("graduation-year")
@@ -114,14 +122,14 @@
 (deftest object-from-request-valid-p-4
     (with-request :get '(("name" . "Pink") ("age" . "25"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe '((name . nick) (age . how-old)))))
+	(weblocks::object-from-request-valid-p new-joe :slots '((name . nick) (age . how-old)))))
   t
   (("manager") ("age" . 25) ("name" . "Pink")))
 
 (deftest object-from-request-valid-p-5
     (with-request :get '(("university" . "Stony Brook") ("name" . "Foo"))
       (let ((new-joe (copy-template *joe*)))
-	(weblocks::object-from-request-valid-p new-joe '(education (university . college)))))
+	(weblocks::object-from-request-valid-p new-joe :slots '(education (university . college)))))
   t
   (("manager") ("graduation-year") ("university" . "Stony Brook") ("name" . "Foo")))
 

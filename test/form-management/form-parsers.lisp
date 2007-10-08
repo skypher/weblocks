@@ -1,6 +1,17 @@
 
 (in-package :weblocks-test)
 
+;;; test parse-foreign-object
+(deftest parse-foreign-object-1
+    (multiple-value-bind (res value)
+	(weblocks::parse-foreign-object *joe* 'address-ref t "*work-address*")
+      (values res (object-id value)))
+  t "*work-address*")
+
+(deftest parse-foreign-object-2
+    (weblocks::parse-foreign-object *joe* 'address-ref t "foo-bar")
+  nil nil)
+
 ;;; test parse-slot-from-request
 (deftest parse-slot-from-request-1
     (parse-slot-from-request nil "AGE" 'integer "25")
@@ -38,6 +49,10 @@
 	(parse-slot-from-request *joe* 'address-ref t "*home-address*")
       (values result (object-id value)))
   t "*home-address*")
+
+(deftest parse-slot-from-request-9
+    (parse-slot-from-request *joe* 'address-ref t "*foo-bar*")
+  nil nil)
 
 ;;; test complex parsers
 (deftest parse-slot-from-request-member-1

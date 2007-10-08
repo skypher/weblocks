@@ -96,7 +96,8 @@
 	       (:span :class "extra" "Address:&nbsp;"))
 	       (:select :name "address-ref"
 			(:option :value "" "[Select None]")
-			(:option :value "*home-address*" :selected "selected" "Address")))))
+			(:option :value "*home-address*" :selected "selected" "Address")
+			(:option :value "*work-address*" "Address")))))
 
 (deftest-html render-form-slot-3
     (render-form-slot *home-address* 'city t "Brooklyn")
@@ -132,14 +133,57 @@
 ;;; form-potential-values
 (deftest form-potential-values-1
     (mapcar #'object-id (form-potential-values *joe* 'address-ref t))
-  ("*home-address*"))
+  ("*home-address*" "*work-address*"))
+
+(deftest form-potential-values-2
+    (mapcar #'object-id (form-potential-values *joe* 'education t))
+  (1))
 
 ;;; render-form-foreign-value
 (deftest-html render-form-foreign-value-1
     (weblocks::render-form-foreign-value *joe* 'address-ref t *home-address*)
   (:select :name "address-ref"
 	   (:option :value "" "[Select None]")
-	   (:option :value "*home-address*" :selected "selected" "Address")))
+	   (:option :value "*home-address*" :selected "selected" "Address")
+	   (:option :value "*work-address*" "Address")))
+
+(deftest-html render-form-foreign-value-2
+    (weblocks::render-form-foreign-value *joe* 'address-ref t *work-address*)
+  (:select :name "address-ref"
+	   (:option :value "" "[Select None]")
+	   (:option :value "*home-address*" "Address")
+	   (:option :value "*work-address*" :selected "selected" "Address")))
+
+(deftest-html render-form-foreign-value-3
+    (weblocks::render-form-foreign-value *joe* 'address-ref t nil)
+  (:select :name "address-ref"
+	   (:option :value "" "[Select Address]")
+	   (:option :value "*home-address*" "Address")
+	   (:option :value "*work-address*" "Address")))
+
+(defclass required-foreign-slot-test-class ()
+  ((address-ref :initarg :address
+		:initform *home-address*
+		:type address)))
+
+(defslotmethod form-potential-values ((obj required-foreign-slot-test-class)
+				      (slot-name (eql 'address-ref)) slot-type)
+  (list *home-address* *work-address*))
+
+(deftest-html render-form-foreign-value-4
+    (weblocks::render-form-foreign-value (make-instance 'required-foreign-slot-test-class)
+					 'address-ref 'address *work-address*)
+  (:select :name "address-ref"
+	   (:option :value "*home-address*" "Address")
+	   (:option :value "*work-address*" :selected "selected" "Address")))
+
+(deftest-html render-form-foreign-value-5
+    (weblocks::render-form-foreign-value (make-instance 'required-foreign-slot-test-class)
+					 'address-ref 'address nil)
+  (:select :name "address-ref"
+	   (:option :value "" "[Select Address]")
+	   (:option :value "*home-address*" "Address")
+	   (:option :value "*work-address*" "Address")))
 
 ;;; test render-form/value
 (deftest-html render-form/value-1
@@ -178,7 +222,8 @@
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
 		  (:option :value "" "[Select None]")
-		  (:option :value "*home-address*" :selected "selected" "Address"))))
+		  (:option :value "*home-address*" :selected "selected" "Address")
+		  (:option :value "*work-address*" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
@@ -236,7 +281,8 @@
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
 		  (:option :value "" "[Select None]")
-		  (:option :value "*home-address*" :selected "selected" "Address"))))
+		  (:option :value "*home-address*" :selected "selected" "Address")
+		  (:option :value "*work-address*" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"
@@ -276,7 +322,8 @@
 		(:span :class "extra" "Address:&nbsp;"))
 	 (:select :name "address-ref"
 		  (:option :value "" "[Select None]")
-		  (:option :value "*home-address*" :selected "selected" "Address"))))
+		  (:option :value "*home-address*" :selected "selected" "Address")
+		  (:option :value "*work-address*" "Address"))))
        (:li :class "manager"
 	(:label
 	 (:span :class "slot-name"

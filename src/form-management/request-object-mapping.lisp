@@ -3,7 +3,7 @@
 
 (export '(update-object-from-request slot-in-request-empty-p request-parameters-for-object))
 
-(defgeneric update-object-from-request (obj &key slots &allow-other-keys)
+(defgeneric update-object-from-request (obj &rest args)
   (:documentation
    "Tries to deserialize an object from a request via
 'object-from-request-valid-p' (used to easily process forms), and in
@@ -13,17 +13,18 @@ If succeeded returns true. Otherwise returns nil as the first value,
 and an association list of slot names and errors as the second value.
 
 'obj' - An object to be updated from the request.
-'slots' - A list of slots to update that wouldn't be
-rendered/updated normally (see 'object-visible-slots' for more
-details)."))
 
-(defmethod update-object-from-request ((obj standard-object) &key slots &allow-other-keys)
-  (multiple-value-bind (success results) (object-from-request-valid-p obj slots)
+Other arguments normally passed to weblocks functions (see
+'object-visible-slots') apply to 'update-object-from-request' as
+well."))
+
+(defmethod update-object-from-request ((obj standard-object) &rest args)
+  (multiple-value-bind (success results) (apply #'object-from-request-valid-p obj args)
     (if success
-	(update-object-from-request-aux obj results slots)
+	(apply #'update-object-from-request-aux obj results args)
 	(values nil (reverse results)))))
 
-(defun update-object-from-request-aux (obj parsed-request slots)
+(defun update-object-from-request-aux (obj parsed-request &rest args)
   "An auxillary function used to implement update-object-from-request
 method."
   (mapc (lambda (slot)
@@ -32,9 +33,9 @@ method."
 	    (when parsed-value
 	      (setf (slot-value (vs-object slot) slot-name)
 		    (cdr parsed-value)))))
-	(object-visible-slots obj :slots slots)))
+	(apply #'object-visible-slots obj args)))
 
-(defun object-from-request-valid-p (object slots)
+(defun object-from-request-valid-p (object &rest args)
   "Verifies whether form data that came in with the request can be
 successfully deserialized into an object. In the process,
 'parse-slot-from-request' is called to convert request strings into
@@ -86,7 +87,7 @@ done by 'update-object-from-request'."
 					(invalid-input-error-message obj slot-name human-slot-name
 								     slot-type parsed-value))
 				  errors)))))))
-	  (object-visible-slots object :slots slots))
+	  (apply #'object-visible-slots object args))
     (if errors
 	(values nil errors)
 	(values t results))))

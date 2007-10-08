@@ -795,7 +795,7 @@
      (:div :class "extra-bottom-2" "<!-- empty -->")
      (:div :class "extra-bottom-3" "<!-- empty -->"))))
 
-(deftest-html render-widget-body-gridedit-4
+(deftest-html render-widget-body-gridedit-5
     (with-request :get nil
       (make-request-ajax)
       (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))

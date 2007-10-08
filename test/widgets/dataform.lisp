@@ -316,3 +316,89 @@
 	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))))
+
+(deftest-html render-dataform-7
+    (with-request :get nil
+      (let* ((new-joe (copy-template *joe*))
+	     (edit-joe (make-instance 'dataform :data new-joe
+						:widget-args '(:slots (name address-ref) :mode :strict))))
+	;; initial state
+	(render-widget edit-joe)
+	;; click modify
+	(do-request `((,weblocks::*action-string* . "abc123")))
+	(render-widget edit-joe)
+	;; change Address but forget a required value
+	(do-request `(("address-ref" . "*work-address*")
+		      ("submit" . "Submit")
+		      (,weblocks::*action-string* . "abc124")))
+	(render-widget edit-joe)
+	;; change Address
+	(do-request `(("address-ref" . "*work-address*")
+		      ("name" . "Joe")
+		      ("submit" . "Submit")
+		      (,weblocks::*action-string* . "abc125")))
+	(render-widget edit-joe)
+	;; make sure address is persisted
+	(assert (eq (slot-value new-joe 'address-ref) *work-address*))))
+  (htm
+   ;; initial state
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template
+	    "abc123"
+	    '((:li :class "name" (:span :class "label" "Name:&nbsp;")
+	       (:span :class "value" "Joe"))
+	      (:li :class "address-ref" (:span :class "label" "Address:&nbsp;")
+	       (:span :class "value" "Address")))))
+   ;; click modify
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(form-header-template
+	    "abc124"
+	    '((:li :class "name"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+	      (:li :class "address-ref"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Address:&nbsp;"))
+		(:select :name "address-ref"
+			 (:option :value "" "[Select None]")
+			 (:option :value "*home-address*" :selected "selected" "Address")
+			 (:option :value "*work-address*" "Address")))))
+	    :method "post"))
+   ;; click submit
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(form-header-template
+	    "abc125"
+	    '((:li :class "name item-not-validated"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :maxlength "40")
+		(:p :class "validation-error"
+		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
+			 "Name is a required field."))))
+	      (:li :class "address-ref"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Address:&nbsp;"))
+		(:select :name "address-ref"
+			 (:option :value "" "[Select None]")
+			 (:option :value "*home-address*" "Address")
+			 (:option :value "*work-address*" :selected "selected" "Address")))))
+	    :method "post"
+	    :preslots '((:div :class "validation-errors-summary"
+			 (:h2 :class "error-count" "There is 1 validation error:")
+			 (:ul (:li "Name is a required field."))))))
+   ;; click submit again
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(data-header-template
+	    "abc126"
+	    '((:li :class "name" (:span :class "label" "Name:&nbsp;")
+	       (:span :class "value" "Joe"))
+	      (:li :class "address-ref" (:span :class "label" "Address:&nbsp;")
+	       (:span :class "value" "Address")))))))
+
