@@ -596,7 +596,15 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc137"
 		 :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+    (:div :class "widget flash" :id "widget-123"
+	  (:div :class "renderer"
+		(:div :class "extra-top-1" "<!-- empty -->")
+		(:div :class "extra-top-2" "<!-- empty -->")
+		(:div :class "extra-top-3" "<!-- empty -->")
+		(:ul :class "messages" (:li (:div :class "widget string" (:p "Item Modified."))))
+		(:div :class "extra-bottom-1" "<!-- empty -->")
+		(:div :class "extra-bottom-2" "<!-- empty -->")
+		(:div :class "extra-bottom-3" "<!-- empty -->")))
     (:form
      :class "datagrid-form"
      :action "/foo/bar"

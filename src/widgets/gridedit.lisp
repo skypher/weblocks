@@ -142,6 +142,7 @@ value of 'gridedit-drilldown-type' and create its widget accordingly."))
 			       :form
 			       :data)
 		 :on-success (lambda (obj)
+			       (flash-message (gridedit-flash grid) "Item Modified.")
 			       (if (eql (gridedit-drilldown-type grid) :edit)
 				   (gridedit-reset-state grid)
 				   (mark-dirty grid)))
