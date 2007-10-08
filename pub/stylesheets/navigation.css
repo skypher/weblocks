@@ -76,8 +76,14 @@
   display: block;
 }
 
+/* IE 6 and 7 hover hack */
+*:first-child+html {} * html {} .menu a
+{
+  height: 1%;
+}
+
 .menu a:hover
 {
-   background-color: #bfd9ec;
+  background-color: #bfd9ec;
 }
 
