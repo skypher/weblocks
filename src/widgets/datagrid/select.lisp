@@ -67,9 +67,10 @@ selection slot (both are accepted for convinience)."
       (:td :class "select"
 	   :onclick (when drilldownp "stopPropagation(event);")
 	   :style (when drilldownp "cursor: default;")
-	   (render-checkbox checkbox-name
-			    (datagrid-item-selected-p grid (object-id obj))
-			    :class nil)))))
+	   (:div
+	    (render-checkbox checkbox-name
+			     (datagrid-item-selected-p grid (object-id obj))
+			     :class nil))))))
 
 (defslotmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
 					     &key grid-obj &allow-other-keys)

@@ -69,7 +69,7 @@
 			       :data-class 'employee)))
       (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
   (:td :class "select"
-       (:input :name "item-1" :type "checkbox" :value "t")))
+       (:div (:input :name "item-1" :type "checkbox" :value "t"))))
 
 (deftest-html datagrid-render-select-body-cell-2
     (let ((grid (make-instance 'datagrid
@@ -77,7 +77,7 @@
 			       :selection '(:none . (1)))))
       (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
   (:td :class "select"
-       (:input :name "item-1" :type "checkbox" :value "t" :checked "checked")))
+       (:div (:input :name "item-1" :type "checkbox" :value "t" :checked "checked"))))
 
 ;;; test render-table-header-cell-select
 (deftest-html render-table-header-cell-select-1
@@ -129,12 +129,12 @@
 		      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
-			(:input :name "item-2" :type "checkbox" :value "t"))
+			(:div (:input :name "item-2" :type "checkbox" :value "t")))
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
 		      (:tr :class "altern"
 		       (:td :class "select"
-			(:input :name "item-1" :type "checkbox" :value "t"))
+			(:div (:input :name "item-1" :type "checkbox" :value "t")))
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
@@ -168,12 +168,12 @@
 		      (:th :class "manager" (:span #.(link-action-template "abc134" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
-			(:input :name "item-2" :type "checkbox" :value "t" :checked "checked"))
+			(:div (:input :name "item-2" :type "checkbox" :value "t" :checked "checked")))
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
 		      (:tr :class "altern"
 		       (:td :class "select"
-			(:input :name "item-1" :type "checkbox" :value "t" :checked "checked"))
+			(:div (:input :name "item-1" :type "checkbox" :value "t" :checked "checked")))
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
@@ -207,12 +207,12 @@
 		      (:th :class "manager" (:span #.(link-action-template "abc140" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
-			(:input :name "item-2" :type "checkbox" :value "t"))
+			(:div (:input :name "item-2" :type "checkbox" :value "t")))
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
 		      (:tr :class "altern"
 		       (:td :class "select"
-			(:input :name "item-1" :type "checkbox" :value "t"))
+			(:div (:input :name "item-1" :type "checkbox" :value "t")))
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))

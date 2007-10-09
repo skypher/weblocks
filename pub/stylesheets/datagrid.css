@@ -133,6 +133,16 @@ p.datagrid-select-bar strong
   width: 1em;
 }
 
+.datagrid table tbody tr.drilled-down td.select input
+{
+  visibility: hidden;
+}
+
+.datagrid table tbody tr.drilled-down td.select div
+{
+  background: url(/pub/images/widget/arrow.png) no-repeat center center;
+}
+
 /* Operations */
 div.item-operations
 {
