@@ -16,8 +16,9 @@
 ~A~
 ~A~
 <script src='/pub/scripts/prototype.js' type='text/javascript'></script>~
-<script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
 <script src='/pub/scripts/scriptaculous.js' type='text/javascript'></script>~
+<script src='/pub/scripts/shortcut.js' type='text/javascript'></script>~
+<script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
 </head>~
 <body>~
 <div class='page-wrapper'>~

@@ -39,7 +39,7 @@
 (deftest widget-public-dependencies-2
     (with-request :get nil
       (format nil "~A" (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
-  "(stylesheets/datagrid.css stylesheets/gridedit.css)")
+  "(stylesheets/datagrid.css scripts/datagrid.js stylesheets/gridedit.css)")
 
 (deftest widget-public-dependencies-3
     (with-request :get nil

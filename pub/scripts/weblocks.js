@@ -25,6 +25,14 @@ function addCss(cssCode) {
     document.getElementsByTagName("head")[0].appendChild(styleElement);
 }
 
+function stopPropagation(event) {
+    if(event.preventDefault) {
+	event.stopPropagation();
+    } else {
+	event.cancelBubble = true;
+    };
+}
+
 // Register global AJAX handlers to show progress
 Ajax.Responders.register({
   onCreate: function() {
@@ -85,13 +93,6 @@ function initiateAction(actionCode, sessionString) {
 		     });
 }
 
-function initiateActionOnEmptySelection(actionCode, sessionString) {
-    if(selectionEmpty()) {
-	initiateAction(actionCode, sessionString);
-	return false;
-    }
-}
-
 function initiateFormAction(actionCode, form, sessionString) {
     // Hidden "action" field should not be serialized on AJAX
     var serializedForm = form.serialize(true);
@@ -112,6 +113,31 @@ function disableIrrelevantButtons(currentButton) {
 						       obj.disable();
 						       currentButton.enable();
 						   });
+}
+
+// Fix IE6 flickering issue
+if(Prototype.Browser.IE) {
+    try {
+	document.execCommand("BackgroundImageCache", false, true);
+    } catch(err) {}
+}
+
+// Table hovering for IE (can't use CSS expressions because
+// Event.observe isn't available there and we can't overwrite events
+// using assignment
+if(!window.XMLHttpRequest) {
+    // IE6 only
+    Event.observe(window, 'load', function() {
+	    var tableRows = $$('.table table tbody tr');
+	    tableRows.each(function(row) {
+		    Event.observe(row, 'mouseover', function() {
+			    row.addClassName('hover');
+			}); 
+		    Event.observe(row, 'mouseout', function() {
+			    row.removeClassName('hover');
+			}); 
+		});
+	});
 }
 
 // Support suggest control
@@ -143,25 +169,5 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
     $(inputId).replace(suggestHTML);
     
     declareSuggest(inputId, choicesId, suggestOptions);
-}
-
-// Support datagrid control
-function stopPropagation(event) {
-    if(event.preventDefault) {
-	event.stopPropagation();
-    } else {
-	event.cancelBubble = true;
-    };
-}
-
-// These styles need to be added dynamically because we only want them
-// when JS is turned on
-addCss(".datagrid td.drilldown, .datagrid th.drilldown { display: none; }");
-
-// Fix IE6 flickering issue
-if(Prototype.Browser.IE) {
-    try {
-	document.execCommand("BackgroundImageCache", false, true);
-    } catch(err) {}
 }
 

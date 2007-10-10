@@ -50,17 +50,10 @@ div.empty-table p span.caption
 
 /* Hover on table */
 .table table tbody tr:hover,
-.datagrid table tbody tr.drilled-down
+.datagrid table tbody tr.drilled-down,
+.table table tr.hover
 {
   background: #dbeac1;
-}
-
-/* Make the hover work for IE 6 */
-* html .table table tbody tr
-{
-  background-color: expression(
-    this.onmouseover = new Function("this.runtimeStyle.backgroundColor = '#dbeac1';"),
-    this.onmouseout = new Function("this.runtimeStyle.backgroundColor = '#ecf8d7';"));
 }
 
 /* IE specific border behavior (no support for border-spacing) */

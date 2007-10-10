@@ -52,7 +52,8 @@ Scripts: prototype.js, weblocks.js, scriptaculous.js"
 	 '(:stylesheet . "layout")
 	 '(:stylesheet . "main")
 	 '(:script . "prototype")
-	 '(:script . "weblocks")
-	 '(:script . "scriptaculous"))))
+	 '(:script . "scriptaculous")
+	 '(:script . "shortcut")
+	 '(:script . "weblocks"))))
 
 

@@ -17,8 +17,9 @@
   ("stylesheets/layout.css"
    "stylesheets/main.css"
    "scripts/prototype.js"
-   "scripts/weblocks.js"
-   "scripts/scriptaculous.js")
+   "scripts/scriptaculous.js"
+   "scripts/shortcut.js"
+   "scripts/weblocks.js")
   "foo bar")
 
 (deftest defwebapp-2
