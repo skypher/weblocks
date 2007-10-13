@@ -53,6 +53,12 @@
       (render-link "abc123" "some link" :ajaxp nil))
   (:a :href "/foo/bar?action=abc123" "some link"))
 
+(deftest-html render-link-3
+    (with-request :get nil
+      (render-link (lambda (&rest args)
+		     nil) "some link"))
+  #.(link-action-template "abc123" "some link"))
+
 ;;; test render-button
 (deftest-html render-button-1
     (render-button 'some-button)
