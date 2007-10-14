@@ -25,7 +25,7 @@
 		    ,@body
 		    (:input :name *action-string* :type "hidden" :value ,action-code)))))))
 
-(defun render-link (action name &key (ajaxp t))
+(defun render-link (action name &key (ajaxp t) id class)
   "Renders an action into an href link. If 'ajaxp' is true (the
 default), the link will be rendered in such a way that the action will
 be invoked via AJAX, or will fall back to regular request if
@@ -36,13 +36,16 @@ action will be called on the server.
 automatically call 'make-action'), or a result of a call
 to 'make-action'.
 'name' - A string that will be presented to the user in the
-link."
-  (let* ((action-code (if (functionp action)
-			  (make-action action)
-			  action))
+link.
+'ajaxp' - whether link is submitted via AJAX if JS is available (true
+by default).
+'id' - An id passed into HTML.
+'class' - A class placed into HTML."
+  (let* ((action-code (make-action action))
 	 (url (make-action-url action-code)))
     (with-html
-      (:a :href url :onclick (when ajaxp
+      (:a :id id :class class
+	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
 	  (str name)))))

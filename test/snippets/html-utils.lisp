@@ -59,6 +59,12 @@
 		     nil) "some link"))
   #.(link-action-template "abc123" "some link"))
 
+(deftest-html render-link-4
+    (with-request :get nil
+      (render-link "abc123" "some link" :id "some-id" :class "some-class"))
+  #.(link-action-template "abc123" "some link"
+			  :id "some-id" :class "some-class"))
+
 ;;; test render-button
 (deftest-html render-button-1
     (render-button 'some-button)
