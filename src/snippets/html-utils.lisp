@@ -13,17 +13,19 @@
   "The name of the control responsible for cancellation of form
   submission.")
 
-(defmacro with-html-form ((method-type action-code &key id class) &body body)
+(defmacro with-html-form ((method-type action &key id class) &body body)
   "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
-  `(with-html
-     (:form :id ,id :class ,class :action (request-uri-path) :method (attributize-name ,method-type)
-	    :onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
-			      (url-encode (or ,action-code ""))
-			      (session-name-string-pair))
-	    (with-extra-tags
-	      (htm (:fieldset
-		    ,@body
-		    (:input :name *action-string* :type "hidden" :value ,action-code)))))))
+  (let ((action-code (gensym)))
+    `(let ((,action-code (function-or-action->action ,action)))
+       (with-html
+	 (:form :id ,id :class ,class :action (request-uri-path) :method (attributize-name ,method-type)
+		:onsubmit (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
+				  (url-encode (or ,action-code ""))
+				  (session-name-string-pair))
+		(with-extra-tags
+		  (htm (:fieldset
+			,@body
+			(:input :name *action-string* :type "hidden" :value ,action-code)))))))))
 
 (defun render-link (action name &key (ajaxp t) id class)
   "Renders an action into an href link. If 'ajaxp' is true (the
@@ -41,7 +43,7 @@ link.
 by default).
 'id' - An id passed into HTML.
 'class' - A class placed into HTML."
-  (let* ((action-code (make-action action))
+  (let* ((action-code (function-or-action->action action))
 	 (url (make-action-url action-code)))
     (with-html
       (:a :id id :class class

@@ -36,6 +36,19 @@ a link to it. Only use guessable action codes for GET actions."
   (setf (session-value action-code) action-fn)
   action-code)
 
+(defun function-or-action->action (function-or-action)
+  "Accepts a function or an existing action. If the value is a
+function, calls 'make-action' and returns its result. Otherwise,
+checks if the action already exists. If it does, returns the value. If
+it does not, signals an error."
+  (if (functionp function-or-action)
+      (make-action function-or-action)
+      (multiple-value-bind (res presentp)
+	  (session-value function-or-action)
+	(if presentp
+	    function-or-action
+	    (error "The value '~A' is not an existing action." function-or-action)))))
+
 (defun make-action-url (action-code)
   "Accepts action code and returns a URL that can be used to render
 the action. Used, among others, by 'render-link'.

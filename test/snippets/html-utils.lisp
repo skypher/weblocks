@@ -4,6 +4,7 @@
 ;;; test with-form-html macro
 (deftest-html with-form-html-1
     (with-request :get nil
+      (make-action #'identity "abc123")
       (with-html-form (:get "abc123")
 	(:div "test1")
 	(:div "test2")))
@@ -24,6 +25,7 @@
 
 (deftest-html with-form-html-2
     (with-request :get nil
+      (make-action #'identity "abc123")
       (with-html-form (:get "abc123" :id "some-id" :class "some-class")
 	(:div "test")))
   (:form
@@ -45,11 +47,13 @@
 ;;; testing render-link
 (deftest-html render-link-1
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-link "abc123" "some link"))
   #.(link-action-template "abc123" "some link"))
 
 (deftest-html render-link-2
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-link "abc123" "some link" :ajaxp nil))
   (:a :href "/foo/bar?action=abc123" "some link"))
 
@@ -61,9 +65,18 @@
 
 (deftest-html render-link-4
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-link "abc123" "some link" :id "some-id" :class "some-class"))
   #.(link-action-template "abc123" "some link"
 			  :id "some-id" :class "some-class"))
+
+(deftest render-link-5
+    (multiple-value-bind (res err)
+	(ignore-errors
+	  (with-request :get nil
+	    (render-link "abc123" "some link")))
+      (values res (format nil "~A" err)))
+  nil "The value 'abc123' is not an existing action.")
 
 ;;; test render-button
 (deftest-html render-button-1
@@ -194,6 +207,7 @@
 ;;; test render-close-button
 (deftest-html render-close-button-1
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-close-button "abc123"))
   (:span :class "close-button"
 	 (:a :href "/foo/bar?action=abc123"
@@ -202,6 +216,7 @@
 
 (deftest-html render-close-button-2
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-close-button "abc123" "Foo"))
   (:span :class "close-button"
 	 (:a :href "/foo/bar?action=abc123"

@@ -34,6 +34,26 @@
 	(weblocks::eval-action)))
   123)
 
+;;; test function-or-action->action
+(deftest function-or-action->action-1
+    (with-request :get nil
+      (multiple-value-bind (res err)
+	  (ignore-errors
+	    (weblocks::function-or-action->action "abc123"))
+	(values res (format nil "~A" err))))
+  nil "The value 'abc123' is not an existing action.")
+
+(deftest function-or-action->action-2
+    (with-request :get nil
+      (make-action #'identity "abc123")
+      (weblocks::function-or-action->action "abc123"))
+  "abc123")
+
+(deftest function-or-action->action-3
+    (with-request :get nil
+      (weblocks::function-or-action->action #'identity))
+  "abc123")
+
 ;;; testing make-action-url
 (deftest make-action-url-1
     (with-request :get nil

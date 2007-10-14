@@ -4,11 +4,13 @@
 ;;; test with-form-header
 (deftest-html with-form-header-1
     (with-request :get nil
+      (make-action #'identity "test-action")
       (with-form-header *joe* (lambda (&rest args) nil) :action "test-action" :method :post))
   #.(form-header-template "test-action" '(nil) :method "post"))
 
 (deftest-html with-form-header-2
     (with-request :get nil
+      (make-action #'identity "test-action")
       (with-form-header *joe* (lambda (&rest args) nil)
 			:action "test-action"
 			:method :post
@@ -20,6 +22,7 @@
 (deftest-html with-form-header-3
     (let ((*form-error-summary-threshold* 1))
       (with-request :get nil
+	(make-action #'identity "test-action")
 	(with-form-header *joe* (lambda (&rest args) nil) :action "test-action" :method :post)))
   (:form :class "renderer form employee long-form"
 	 :action "/foo/bar"
@@ -192,6 +195,7 @@
 
 (deftest-html render-form/value-2
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
@@ -208,8 +212,9 @@
 
 (deftest-html render-form/value-3
     (with-request :post nil
-      (render-form *joe* :slots '(address-ref)))
-  #.(form-header-template nil
+      (make-action #'identity "abc123")
+      (render-form *joe* :slots '(address-ref) :action "abc123"))
+  #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -232,6 +237,7 @@
 
 (deftest-html render-form/value-4
     (with-request :post nil
+      (make-action "abc123")
       (render-form *joe* :slots '(education)
 		   :preslots-fn (lambda (obj &rest keys)
 				  (with-html
@@ -267,8 +273,10 @@
 
 (deftest-html render-form/value-5
     (with-request :get nil
-      (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))))
-  #.(form-header-template nil
+      (make-action #'identity "abc123")
+      (render-form *joe* :slots '(address-ref) :intermediate-fields '(("name" . "Bill"))
+		   :action "abc123"))
+  #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -291,8 +299,10 @@
 
 (deftest-html render-form/value-6
     (with-request :post nil
-      (render-form *joe* :slots '((name . nickname))))
-  #.(form-header-template nil
+      (make-action #'identity "abc123")
+      (render-form *joe* :slots '((name . nickname))
+		   :action "abc123"))
+  #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -307,8 +317,10 @@
 
 (deftest-html render-form/value-7
     (with-request :get nil
-      (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))))
-  #.(form-header-template nil
+      (make-action #'identity "abc123")
+      (render-form *joe* :slots '(address-ref) :validation-errors '(("name" . "Some error."))
+		   :action "abc123"))
+  #.(form-header-template "abc123"
      '((:li :class "name item-not-validated"
 	(:label (:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"

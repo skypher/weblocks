@@ -30,8 +30,10 @@
 ;;; test render-form/aux for booleans
 (deftest-html render-form/aux-booleans-1
     (with-request :post nil
-      (render-form *joe* :slots '(name veteran) :mode :strict))
-  #.(form-header-template nil
+      (make-action #'identity "abc123")
+      (render-form *joe* :slots '(name veteran) :mode :strict
+		   :action "abc123"))
+  #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"
@@ -47,9 +49,11 @@
 (deftest-html render-form/aux-booleans-2
     (with-request :post nil
     (let ((employee (copy-template *joe*)))
+      (make-action #'identity "abc123")
       (setf (slot-value employee 'veteran) t)
-      (render-form employee  :slots '(name veteran) :mode :strict)))
-  #.(form-header-template nil
+      (render-form employee  :slots '(name veteran) :mode :strict
+		   :action "abc123")))
+  #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label
 	 (:span :class "slot-name"

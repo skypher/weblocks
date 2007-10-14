@@ -35,6 +35,7 @@
 ;;; test render-datagrid-drilldown-body-cell
 (deftest-html render-datagrid-drilldown-body-cell-1
     (with-request :get nil
+      (make-action #'identity "abc123")
       (render-datagrid-drilldown-body-cell (make-instance 'datagrid
 							  :data-class 'employee
 							  :on-drilldown
