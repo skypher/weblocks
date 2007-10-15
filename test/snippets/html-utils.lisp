@@ -44,6 +44,26 @@
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->")))
 
+(deftest-html with-form-html-3
+    (with-request :get nil
+      (with-html-form (:get (lambda (&rest args) nil))
+	(:div "test1")
+	(:div "test2")))
+  (:form
+   :action "/foo/bar"
+   :method "get"
+   :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div "test1")
+     (:div "test2")
+     (:input :name "action" :type "hidden" :value "abc123"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->")))
+
 ;;; testing render-link
 (deftest-html render-link-1
     (with-request :get nil
