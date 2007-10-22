@@ -149,15 +149,17 @@ the request."
 	    (hunchentoot::*remote-host* "localhost")
 	    (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
 	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-	    (*session* (start-session))
 	    (make-action-orig #'weblocks::make-action)
 	    (generate-widget-id-orig #'weblocks::generate-widget-id)
 	    (dummy-action-count 123)
 	    (*session-cookie-name* "weblocks-session")
 	    (*uri-tokens* '("foo" "bar"))
-	    weblocks::*page-public-dependencies*)
-       (declare (special *uri-tokens* weblocks::*page-public-dependencies*))
+	    weblocks::*page-public-dependencies* *session*
+	    *on-ajax-complete-scripts*)
+       (declare (special *uri-tokens* weblocks::*page-public-dependencies* *session*
+			 *on-ajax-complete-scripts*))
        (unwind-protect (progn
+			 (start-session)
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)
 				 (if action-code
