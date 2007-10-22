@@ -76,11 +76,11 @@
 						   (:file "sort")
 						   (:file "select")
 						   (:file "drilldown"))
-				      :depends-on (widget))
+				      :depends-on (widget "flash"))
 				     (:file "gridedit"
 				      :depends-on ("datagrid" "dataform"))
-				     (:file "paging"
-				      :depends-on (widget))
+				     (:file "pagination"
+				      :depends-on (widget "flash"))
 				     (:file "composite"
 				      :depends-on (widget))
 				     (:file "navigation"

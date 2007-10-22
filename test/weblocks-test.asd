@@ -94,6 +94,9 @@
 				     (:file "gridedit"
 					    :depends-on ("widget-test-utils"))
 				     (:file "navigation")
+				     (:file "pagination-utils")
+				     (:file "pagination"
+					    :depends-on ("pagination-utils"))
 				     (:file "composite"))
 			:depends-on ("weblocks-test" fixtures renderers))))
 

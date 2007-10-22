@@ -190,3 +190,10 @@ span.close-button a:hover
   /* background: url(/pub/images/close_hl.png) no-repeat top left; */
 }
 
+/* Total Items */
+span.total-items
+{
+  color: gray;
+  font-size: x-small;
+}
+
