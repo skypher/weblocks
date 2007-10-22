@@ -80,12 +80,13 @@ Borrowed from cl-darcs with permission of copyright owner."
     (with-open-file (stream target :direction :output :if-does-not-exist :create :if-exists nil)
       (write-sequence text stream))))
 
-(defun make-application (target name)
+(defun make-application (name &optional target)
   "Creates a directory 'name' under directory 'target' and fills it
 with files that allow to easily get started with a new Weblocks
 application.
 
-If 'target' is NIL, uses *default-pathname-defaults*.
+If 'target' isn't specified, 'make-applicaiton' uses
+*default-pathname-defaults*.
 
 'name' cannot be NIL, as it's being used in numerous places in the
 generated files to specify the name of the newly created
