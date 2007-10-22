@@ -86,5 +86,8 @@ messages that need to be shown for AJAX effects."
 		 (:ul :class "messages"
 		      (mapc (lambda (msg)
 			      (htm (:li (apply #'render-widget msg args))))
-			    messages)))))))))
+			    messages))))))
+      (push (format nil "new Function(\"$('~A').show();\")"
+		    (attributize-name (widget-name obj)))
+	    *on-ajax-complete-scripts*))))
 
