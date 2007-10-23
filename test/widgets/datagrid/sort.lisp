@@ -3,105 +3,116 @@
 
 ;;; test datagrid-update-sort-column/aux-datagrid-update-sort-column
 (deftest datagrid-update-sort-column-1
-    (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)
-			       :data-class 'employee))
-	  sort1 sort2)
-      (setf sort1 (datagrid-sort grid))
-      (weblocks::datagrid-update-sort-column grid)
-      (setf sort2 (datagrid-sort grid))
-      (values sort1 sort2))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid :data (list *joe* *joe*)
+					   :data-class 'employee))
+	    sort1 sort2)
+	(setf sort1 (datagrid-sort grid))
+	(weblocks::datagrid-update-sort-column grid)
+	(setf sort2 (datagrid-sort grid))
+	(values sort1 sort2)))
   nil
   ((name) . :ascending))
 
 (deftest datagrid-update-sort-column-2
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *joe*)
-			       :allow-sorting '(manager)
-			       :data-class 'employee)))
-      (weblocks::datagrid-update-sort-column grid)
-      (datagrid-sort grid))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *joe*)
+				 :allow-sorting '(manager)
+				 :data-class 'employee)))
+	(weblocks::datagrid-update-sort-column grid)
+	(datagrid-sort grid)))
   ((manager) . :ascending))
 
 (deftest datagrid-update-sort-column-3
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *joe*)
-			       :allow-sorting '(university)
-			       :data-class 'employee)))
-      (weblocks::datagrid-update-sort-column grid :slots '(education university))
-      (datagrid-sort grid))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *joe*)
+				 :allow-sorting '(university)
+				 :data-class 'employee)))
+	(weblocks::datagrid-update-sort-column grid :slots '(education university))
+	(datagrid-sort grid)))
   ((education university) . :ascending))
 
 (deftest datagrid-update-sort-column-4
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *joe*)
-			       :allow-sorting '(address-ref)
-			       :data-class 'employee)))
-      (weblocks::datagrid-update-sort-column grid :slots '(address-ref))
-      (datagrid-sort grid))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *joe*)
+				 :allow-sorting '(address-ref)
+				 :data-class 'employee)))
+	(weblocks::datagrid-update-sort-column grid :slots '(address-ref))
+	(datagrid-sort grid)))
   ((address-ref) . :ascending))
 
 ;;; test datagrid-column-sortable-p
 (deftest datagrid-column-sortable-p-1
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting nil
-							       :data-class 'employee)
-						'(name) "Joe")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting nil
+								 :data-class 'employee)
+						  '(name) "Joe"))))
   nil)
 
 (deftest datagrid-column-sortable-p-2
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting t
-							       :data-class 'employee)
-						'(name) "Joe")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting t
+								 :data-class 'employee)
+						  '(name) "Joe"))))
   t)
 
 (deftest datagrid-column-sortable-p-3
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting '(manager)
-							       :data-class 'employee)
-						'(name) "Joe")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting '(manager)
+								 :data-class 'employee)
+						  '(name) "Joe"))))
   nil)
 
 (deftest datagrid-column-sortable-p-4
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting '(manager)
-							       :data-class 'employee)
-						'(manager) "Jim")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting '(manager)
+								 :data-class 'employee)
+						  '(manager) "Jim"))))
   t)
 
 (deftest datagrid-column-sortable-p-5
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting '(education graduation-year)
-							       :data-class 'employee)
-						'(education university) "Jim")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting '(education graduation-year)
+								 :data-class 'employee)
+						  '(education university) "Jim"))))
   nil)
 
 (deftest datagrid-column-sortable-p-6
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :allow-sorting '(education graduation-year)
-							       :data-class 'employee)
-						'(education graduation-year) "Jim")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :allow-sorting '(education graduation-year)
+								 :data-class 'employee)
+						  '(education graduation-year) "Jim"))))
   t)
 
 (deftest datagrid-column-sortable-p-7
-    (not (null
-	  (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
-							       :data (list *joe*)
-							       :forbid-sorting-on '(name)
-							       :data-class 'employee)
-						'(name) "Joe")))
+    (with-request :get nil
+      (not (null
+	    (weblocks::datagrid-column-sortable-p (make-instance 'datagrid
+								 :data (list *joe*)
+								 :forbid-sorting-on '(name)
+								 :data-class 'employee)
+						  '(name) "Joe"))))
   nil)
 
 ;;; test datagrid-sorted-slot-name
@@ -123,42 +134,45 @@
 
 ;;; test datagrid-sort-data
 (deftest datagrid-sort-data-1
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *bob*)
-			       :sort '((name) . :ascending)
-			       :data-class 'employee))
-	  res)
-      (setf res (weblocks::datagrid-sort-data grid
-					      (slot-value grid 'weblocks::data)))
-      (values
-       (first-name (car res))
-       (first-name (cadr res))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :sort '((name) . :ascending)
+				 :data-class 'employee))
+	    res)
+	(setf res (weblocks::datagrid-sort-data grid
+						(slot-value grid 'weblocks::data)))
+	(values
+	 (first-name (car res))
+	 (first-name (cadr res)))))
   "Bob" "Joe")
 
 (deftest datagrid-sort-data-2
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *bob*)
-			       :sort '((name) . :descending)
-			       :data-class 'employee))
-	  res)
-      (setf res (weblocks::datagrid-sort-data grid
-					      (slot-value grid 'weblocks::data)))
-      (values
-       (first-name (car res))
-       (first-name (cadr res))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :sort '((name) . :descending)
+				 :data-class 'employee))
+	    res)
+	(setf res (weblocks::datagrid-sort-data grid
+						(slot-value grid 'weblocks::data)))
+	(values
+	 (first-name (car res))
+	 (first-name (cadr res)))))
   "Joe" "Bob")
 
 (deftest datagrid-sort-data-3
-    (let ((grid (make-instance 'datagrid
-			       :data (list *joe* *bob*)
-			       :sort '((age) . :descending)
-			       :data-class 'employee))
-	  res)
-      (setf res (weblocks::datagrid-sort-data grid
-					      (slot-value grid 'weblocks::data)))
-      (values
-       (first-name (car res))
-       (first-name (cadr res))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data (list *joe* *bob*)
+				 :sort '((age) . :descending)
+				 :data-class 'employee))
+	    res)
+	(setf res (weblocks::datagrid-sort-data grid
+						(slot-value grid 'weblocks::data)))
+	(values
+	 (first-name (car res))
+	 (first-name (cadr res)))))
   "Bob" "Joe")
 
 ;;; test negate-sort-direction
@@ -172,9 +186,10 @@
 
 ;;; test datagrid's hook into render-table-header-cell
 (deftest-html render-table-header-cell-around
-    (render-table-header-cell *joe* 'name 'string "Joe"
-			      :grid-obj (make-instance 'datagrid :allow-sorting nil
-						       :data-class 'employee))
+    (with-request :get nil
+		  (render-table-header-cell *joe* 'name 'string "Joe"
+					    :grid-obj (make-instance 'datagrid :allow-sorting nil
+									       :data-class 'employee)))
   (:th :class "name" "Name"))
 
 ;;; test render-datagrid-header-cell

@@ -4,8 +4,8 @@
 (export '(gridedit gridedit-on-add-item gridedit-allow-add-p
 	  gridedit-on-delete-items gridedit-allow-delete-p
 	  gridedit-allow-select-p gridedit-drilldown-type
-	  gridedit-ui-state gridedit-flash gridedit-item-widget
-	  gridedit-reset-state gridedit-create-new-item-widget
+	  gridedit-ui-state gridedit-item-widget gridedit-reset-state
+	  gridedit-create-new-item-widget
 	  gridedit-create-drilldown-widget gridedit-add-item
 	  gridedit-delete-items))
 
@@ -72,12 +72,6 @@
 	     renders an empty form that allows adding a new
 	     entry. When set to :drilldown, renders details for a
 	     particular item.")
-   (flash :accessor gridedit-flash
-	  :initform (make-instance 'flash)
-	  :initarg :flash
-	  :documentation "A flash widget used by gridedit to display
-	  relevant information to the user (how many items have been
-	  deleted, etc.)")
    (item-widget :accessor gridedit-item-widget
 		:initform nil
 		:documentation "A widget used by gridedit to display a
@@ -95,10 +89,17 @@
   "Resets the state of the gridedit. This function should be used by
 'gridedit-create-new-item-widget' and 'gridedit-create-drilldown-widget'
 in order to reset the state after the widget has done its job."
-  (setf (datagrid-allow-item-ops-p grid) t)
   (setf (gridedit-ui-state grid) nil)
   (setf (gridedit-item-widget grid) nil)
   (setf (datagrid-drilled-down-item grid) nil))
+
+(defmethod datagrid-render-item-ops-bar ((grid gridedit) &rest args)
+  (when (null (gridedit-ui-state grid))
+    (call-next-method)))
+
+(defmethod datagrid-render-pagination-widget ((grid gridedit) &rest args)
+  (when (null (gridedit-ui-state grid))
+    (call-next-method)))
 
 (defgeneric gridedit-create-new-item-widget (grid)
   (:documentation
@@ -142,7 +143,7 @@ value of 'gridedit-drilldown-type' and create its widget accordingly."))
 			       :form
 			       :data)
 		 :on-success (lambda (obj)
-			       (flash-message (gridedit-flash grid) "Item Modified.")
+			       (flash-message (datagrid-flash grid) "Item Modified.")
 			       (if (eql (gridedit-drilldown-type grid) :edit)
 				   (gridedit-reset-state grid)
 				   (mark-dirty grid)))
@@ -167,7 +168,7 @@ standard behavior for adding items to a sequence."))
       (funcall (gridedit-on-add-item grid) grid item)
       (when (typep (slot-value grid 'data) 'sequence)
 	(push item (slot-value grid 'data))))
-  (flash-message (gridedit-flash grid) "Item added."))
+  (flash-message (datagrid-flash grid) "Item added."))
 
 
 (defgeneric gridedit-delete-items (grid items)
@@ -180,7 +181,7 @@ standard behavior for adding items to a sequence."))
 
 (defmethod gridedit-delete-items ((grid gridedit) items)
   (when (datagrid-selection-empty-p items)
-    (flash-message (gridedit-flash grid) "Please select items to delete.")
+    (flash-message (datagrid-flash grid) "Please select items to delete.")
     (mark-dirty grid)
     (return-from gridedit-delete-items))
   (let ((initial-items-count (datagrid-data-count grid :totalp t))
@@ -202,7 +203,7 @@ standard behavior for adding items to a sequence."))
 				    (slot-value grid 'data)
 				    :key (compose #'princ-to-string #'object-id)))))))
     (setf deleted-items-count (- initial-items-count (datagrid-data-count grid :totalp t)))
-    (flash-message (gridedit-flash grid)
+    (flash-message (datagrid-flash grid)
 		   (format nil "~A ~A deleted."
 			   deleted-items-count
 			   (proper-number-form deleted-items-count "item")))))
@@ -213,8 +214,7 @@ standard behavior for adding items to a sequence."))
 attempts to drill down on a given item."
   (setf (gridedit-item-widget grid)
 	(gridedit-create-drilldown-widget grid item))
-  (setf (gridedit-ui-state grid) :drilldown)
-  (setf (datagrid-allow-item-ops-p grid) nil))
+  (setf (gridedit-ui-state grid) :drilldown))
 
 ;;; Renders the body of the gridedit. Essentially, just calls
 ;;; datagrid's render method, except that proper controls (add item,
@@ -239,14 +239,10 @@ attempts to drill down on a given item."
 		 (gridedit-on-add-item obj)))
     (pushnew `(add . ,(lambda (&rest args)
 			      (setf (gridedit-item-widget obj) (gridedit-create-new-item-widget obj))
-			      (setf (gridedit-ui-state obj) :add)
-			      (setf (datagrid-allow-item-ops-p obj) nil)))
+			      (setf (gridedit-ui-state obj) :add)))
 	     (datagrid-item-ops obj)
 	     :key #'car))
-  (apply #'call-next-method obj
-	 :post-data-mining-fn
-	 (compose #'render-widget #'gridedit-flash)
-	 args)
+  (apply #'call-next-method obj args)
   (case (gridedit-ui-state obj)
     (:add (render-widget (gridedit-item-widget obj)))
     (:drilldown (render-widget (gridedit-item-widget obj)))))

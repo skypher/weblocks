@@ -41,6 +41,12 @@
   margin-right: 0.5em;
 }
 
+/* We need to increate input width on Safari */
+html[xmlns*=""] body:last-child .pagination form fieldset input.page-number
+{
+  width: 2.5em;
+}
+
 .pagination form fieldset input.item-not-validated
 {
   border: solid 1px red;

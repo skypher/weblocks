@@ -95,8 +95,8 @@
 	(ignore-errors
 	  (with-request :get nil
 	    (render-link "abc123" "some link")))
-      (values res (format nil "~A" err)))
-  nil "The value 'abc123' is not an existing action.")
+      (values res (not (null err))))
+  nil t)
 
 ;;; test render-button
 (deftest-html render-button-1

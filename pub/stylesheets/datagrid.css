@@ -2,6 +2,13 @@
 @import url(/pub/stylesheets/isearch.css);
 
 /* Body */
+.datagrid
+{
+  margin-bottom: 1em;
+  position: relative;
+  _height: 1%; /* IE 6 fix */
+}
+
 .datagrid form.datagrid-form fieldset
 {
   border: none;
@@ -97,7 +104,7 @@
   margin-left: 0.5em;
 }
 
-.datagrid-search-bar span.hidden-items
+.datagrid-search-bar span.total-items
 {
   margin: 0;
   padding: 0;
@@ -105,8 +112,6 @@
   display: -moz-inline-box;
   display: inline-block;
   vertical-align: bottom;
-  color: gray;
-  font-size: x-small;
 }
 
 /* Selecting */
@@ -143,15 +148,40 @@ p.datagrid-select-bar strong
   background: url(/pub/images/widget/arrow.png) no-repeat center center;
 }
 
+/* We need to adjust margins to properly style pagination and item
+operations */
+.datagrid .datagrid-body .renderer.table
+{
+  margin-bottom: 0;
+}
+
+.datagrid form.datagrid-form
+{
+  margin-bottom: 1em;
+}
+
 /* Operations */
 div.item-operations
 {
-  text-align: right;
-  margin-bottom: 1em;
+  position: absolute;
+  right: 0;
+  margin-top: 0.25em;
 }
 
 div.item-operations input.submit
 {
   margin-left: 0.5em;
+}
+
+/* Datagrid specific pagination styles */
+.datagrid div.pagination
+{
+  margin-top: -1em;
+}
+
+.datagrid div.pagination,
+.datagrid div.pagination form fieldset input
+{
+  font-size: x-small;
 }
 

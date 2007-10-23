@@ -50,17 +50,19 @@ faithful to Emacs' isearch."
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
 
-(defun hidden-items-message (grid)
-  "Returns a text message specifying how many items are hidden by the
-search."
-  (let ((hidden-items-count (- (datagrid-data-count grid :totalp t)
-			       (datagrid-data-count grid :totalp nil))))
-    (if (> hidden-items-count 0)
-	(format nil "(~A ~A ~A hidden by the search)"
-		hidden-items-count
-		(proper-number-form hidden-items-count "item")
-		(proper-number-form hidden-items-count "is"))
-	"<!-- empty -->")))
+(defun total-items-message (grid)
+  "Returns a text message specifying the total number of items and the
+number of items that matched the search."
+  (let ((total-items-count (datagrid-data-count grid :totalp t))
+	(matched-items-count (datagrid-data-count grid :totalp nil)))
+    (if (datagrid-search grid)
+	(format nil "(Found ~A of ~A ~A)"
+		matched-items-count
+		total-items-count
+		(proper-number-form total-items-count "Item"))
+	(format nil "(Total of ~A ~A)"
+		total-items-count
+		(proper-number-form total-items-count "Item")))))
 
 (defun datagrid-render-search-bar (grid &rest keys)
   "Renders a search bar for the datagrid."
@@ -68,12 +70,12 @@ search."
     (:div :class "datagrid-search-bar"
 	  (with-extra-tags
 	    (htm (:span :class "title" (:strong "Search table&nbsp;")))
-	    (when (datagrid-show-hidden-entries-count-p grid)
-	      (let ((hidden-items-message (hidden-items-message grid)))
-		(when hidden-items-message
+	    (when (datagrid-show-total-items-count-p grid)
+	      (let ((total-items-message (total-items-message grid)))
+		(when total-items-message
 		  (with-html
-		    (:span :class "hidden-items"
-			   (str hidden-items-message))))))
+		    (:span :class "total-items"
+			   (str total-items-message))))))
 	    (apply #'render-isearch "search"
 		   (lambda (&key search &allow-other-keys)
 		     (declare (special *on-ajax-complete-scripts*))
@@ -92,15 +94,15 @@ search."
 					       (apply #'render-datagrid-table-body grid (widget-args grid))
 					       (get-output-stream-string *weblocks-output-stream*))))))
 			   *on-ajax-complete-scripts*)
-		     (when (datagrid-show-hidden-entries-count-p grid)
+		     (when (datagrid-show-total-items-count-p grid)
 		       (push
 			(format nil
 				"new Function(~A)"
 				(encode-json-to-string
 				 (format nil "updateElementBody($('~A').~
-                                                 getElementsByClassName('hidden-items')[0], '~A');"
+                                                 getElementsByClassName('total-items')[0], '~A');"
 					 (attributize-name (widget-name grid))
-					 (hidden-items-message grid))))
+					 (total-items-message grid))))
 			*on-ajax-complete-scripts*)))
 		   :value (datagrid-search grid)
 		   keys)))))

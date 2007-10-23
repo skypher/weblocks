@@ -8,28 +8,31 @@
 
 ;;; test datagrid-drilldown-slot-p
 (deftest datagrid-drilldown-slot-p-1
-    (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
+    (with-request :get nil
+      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
 							  :data-class 'employee
 							  :on-drilldown
 							  (cons 'details
 								(lambda (&rest args)
 								  nil)))
-					 'view)
+					   'view))
   nil)
 
 (deftest datagrid-drilldown-slot-p-2
-    (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid :data-class 'employee)
-					 'view)
+    (with-request :get nil
+      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid :data-class 'employee)
+					   'view))
   nil)
 
 (deftest datagrid-drilldown-slot-p-3
-    (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
+    (with-request :get nil
+      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
 							  :data-class 'employee
 							  :on-drilldown
 							  (cons 'details
 								(lambda (&rest args)
 								  nil)))
-					 'details)
+					   'details))
   t)
 
 ;;; test render-datagrid-drilldown-body-cell

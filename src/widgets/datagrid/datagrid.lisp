@@ -1,15 +1,19 @@
 
 (in-package :weblocks)
 
-(export '(datagrid datagrid-data-class datagrid-data datagrid-sort
+(export '(datagrid datagrid-data-class datagrid-data
+	  datagrid-render-item-ops-bar
+	  datagrid-render-pagination-widget datagrid-sort
 	  datagrid-allow-sorting datagrid-forbid-sorting-on
 	  datagrid-search datagrid-allow-searching-p
-	  datagrid-show-hidden-entries-count-p datagrid-selection
+	  datagrid-pagination-widget datagrid-allow-pagination-p
+	  datagrid-show-total-items-count-p datagrid-selection
 	  datagrid-allow-select-p datagrid-item-ops
 	  datagrid-allow-item-ops-p datagrid-allow-drilldown-p
 	  datagrid-on-drilldown datagrid-drilled-down-item
-	  datagrid-autoset-drilled-down-item-p datagrid-data
-	  datagrid-data-count render-datagrid-table-body))
+	  datagrid-autoset-drilled-down-item-p datagrid-flash
+	  datagrid-data datagrid-data-count
+	  render-datagrid-table-body))
 
 (defwidget datagrid (widget)
   ((data-class :accessor datagrid-data-class
@@ -25,18 +29,17 @@
    (data :accessor datagrid-data
 	 :initform nil
 	 :initarg :data
-	 :documentation "Either a sequence of data objects that
-	 will be rendered and modified by this widget, or a
-	 function designator that accepts searching, sorting, and
-	 paging parameters. If this slot is bound to a sequence,
-	 datagrid will do the paging and sorting itself in memory
+	 :documentation "Either a sequence of data objects that will
+	 be rendered and modified by this widget, or a function
+	 designator that accepts searching, sorting, and pagination
+	 parameters. If this slot is bound to a sequence, datagrid
+	 will do the pagination and sorting itself in memory
 	 destructively. If the slot is bound to a function (or a
-	 symbol that designates a function), the function is
-	 expected to return a properly sorted and paged
-	 sequence. The function should also accept a :countp
-	 keyword argument. If true, the function should return
-	 only the number of items with the given search
-	 parameters, not the actual items themselves.")
+	 symbol that designates a function), the function is expected
+	 to return a properly sorted and paged sequence. The function
+	 should also accept a :countp keyword argument. If true, the
+	 function should return only the number of items with the
+	 given search parameters, not the actual items themselves.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
@@ -70,14 +73,33 @@
 		      :initarg :allow-searching-p
 		      :documentation "Set to true to enable searching,
 		      or to nil to disable it.")
-   (show-hidden-entries-count-p :accessor datagrid-show-hidden-entries-count-p
-				:initform t
-				:initarg :show-hidden-entries-count-p
-				:documentation "If set to true (the
-				default), and searching is allowed,
-				the datagrid displays a message during
-				search specifying how many items have
-				been hidden.")
+   (pagination-widget :accessor datagrid-pagination-widget
+		      :initform nil
+		      :initarg :pagination-widget
+		      :documentation "An instance of a pagination
+		      widget used by the datagrid to manage data
+		      pagination.")
+   (allow-pagination-p :accessor datagrid-allow-pagination-p
+		       :initform t
+		       :initarg :allow-pagination-p
+		       :documentation "Set to true to enable
+		       pagination (default) or nil to disable it.")
+   (search-pagination-history :accessor datagrid-search-pagination-history
+			      :initform nil
+			      :affects-dirty-status-p nil
+			      :documentation "When the user searches
+			      the datagrid, the current page is stored
+			      in this slot, to be restored when the
+			      user clears the search.")
+   (show-total-items-count-p :accessor datagrid-show-total-items-count-p
+			     :initform t
+			     :initarg :show-total-items-count-p
+			     :documentation "If set to true (the
+			     default), the datagrid displays a message
+			     specifying how many items are visible. If
+			     searching is enabled, the message
+			     specifies how many items have been hidden
+			     by the search.")
    (selection :accessor datagrid-selection
 	      :initform (cons :none nil)
 	      :initarg :selection
@@ -146,13 +168,28 @@
 				'drilled-down-item' will be
 				automatically set to the appropriate
 				item when the user drills down on the
-				grid."))
+				grid.")
+   (flash :accessor datagrid-flash
+	  :initform (make-instance 'flash)
+	  :initarg :flash
+	  :documentation "A flash widget provided by the datagrid to
+	  display relevant information to the user (errors, item
+	  modification information, etc.)"))
   (:documentation "Represents a sortable, pagable table. This
   widget is inspired by ASP.NET's datagrid control."))
 
 ;;; Ensure that data-class is specified and that we cannot sort on the
-;;; "select" slot
+;;; "select" slot. Additionally, ensure pagination widget exists.
 (defmethod initialize-instance :after ((obj datagrid) &rest initargs &key &allow-other-keys)
+  (unless (datagrid-pagination-widget obj)
+    (setf (datagrid-pagination-widget obj)
+	  (make-instance 'pagination
+			 :on-change (lambda (&rest args)
+				      (datagrid-clear-selection obj)
+				      (mark-dirty obj))
+			 :on-error (datagrid-flash obj)
+			 :show-total-items-p nil
+			 :total-items (datagrid-data-count obj :totalp t))))
   (pushnew 'select (datagrid-forbid-sorting-on obj))
   (when (null (datagrid-data-class obj))
     (error "data-class must be specified to initialize a datagrid.")))
@@ -162,12 +199,18 @@
 ;;; appropriate parameters. Signals an error otherwise.
 (defmethod datagrid-data ((grid-obj datagrid))
   (with-slots (data) grid-obj
-    (etypecase data
-      (sequence ; 'sequence' also handles null values
-       (datagrid-sort-data grid-obj
-			   (datagrid-filter-data grid-obj data)))
-      ((or function symbol)
-       (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj))))))
+    (multiple-value-bind (begin end)
+	(when (datagrid-allow-pagination-p grid-obj)
+	  (pagination-page-item-range (datagrid-pagination-widget grid-obj)))
+      (etypecase data
+	(sequence		 ; 'sequence' also handles null values
+	 (let ((dataseq (datagrid-sort-data grid-obj
+					    (datagrid-filter-data grid-obj data))))
+	   (if (and begin end)
+	       (subseq dataseq begin end)
+	       dataseq)))
+	((or function symbol)
+	 (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj) (cons begin end)))))))
 
 (defun datagrid-data-count (grid &key totalp)
   "Returns the number of items in the grid. This function works
@@ -185,6 +228,7 @@ ignores searching parameters."
                 (when (not totalp)
                   (datagrid-search grid))
                 nil
+		nil
                 :countp t)))))
 
 (defun append-custom-slots (custom-slots args)
@@ -193,18 +237,34 @@ defined in 'args'."
   (append (cadr (member :custom-slots args))
 	  custom-slots))
 
-(defun render-item-ops-bar (grid &rest args)
-  "Renders the operations define in 'item-ops' slot if
-'allow-item-ops-p' is true."
-  (with-html
-    (:div :class "item-operations"
-	  (mapc (lambda (op)
-		  (render-button (car op)))
-		(datagrid-item-ops grid)))))
+(defgeneric datagrid-render-item-ops-bar (grid &rest args)
+  (:documentation
+   "This function is responsible for rendering item-ops bar for the
+datagrid. Specialize this function to provide custom item ops bar
+rendering."))
+
+(defmethod datagrid-render-item-ops-bar ((grid datagrid) &rest args)
+  (when (and (datagrid-allow-item-ops-p grid)
+	     (datagrid-item-ops grid))
+    (with-html
+      (:div :class "item-operations"
+	    (mapc (lambda (op)
+		    (render-button (car op)))
+		  (datagrid-item-ops grid))))))
+
+(defgeneric datagrid-render-pagination-widget (grid &rest args)
+  (:documentation
+   "This function is responsible for rendering the pagination widget
+for the datagrid."))
+
+(defmethod datagrid-render-pagination-widget ((grid datagrid) &rest args)
+  (when (datagrid-allow-pagination-p grid)
+    (render-widget (datagrid-pagination-widget grid))))
 
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args
 			       &key pre-data-mining-fn post-data-mining-fn)
+   ; Render Data mining
   (safe-funcall pre-data-mining-fn obj)
   (when (>= (datagrid-data-count obj :totalp t) 1)
     (with-html
@@ -214,6 +274,9 @@ defined in 'args'."
 	    (when (datagrid-allow-select-p obj)
 	      (apply #'render-select-bar obj args)))))
   (safe-funcall post-data-mining-fn obj)
+  ; Render flash
+  (render-widget (datagrid-flash obj))
+  ; Render Body
   (let ((action (make-action (lambda (&rest args)
 			       (datagrid-clear-selection obj)
 			       (loop for i in (request-parameters)
@@ -227,9 +290,10 @@ defined in 'args'."
 			       (datagrid-clear-selection obj)))))
     (with-html-form (:get action :class "datagrid-form")
       (apply #'render-datagrid-table-body obj args)
-      (when (and (datagrid-allow-item-ops-p obj)
-		 (datagrid-item-ops obj))
-	(apply #'render-item-ops-bar obj args)))))
+      ; Render Item ops
+      (apply #'datagrid-render-item-ops-bar obj args)))
+  ; Render Pagination
+  (datagrid-render-pagination-widget obj))
 
 (defgeneric render-datagrid-table-body (grid &rest args)
   (:documentation
@@ -239,6 +303,9 @@ search requests."))
 
 (defmethod render-datagrid-table-body ((grid datagrid) &rest args)
   (apply #'datagrid-update-sort-column grid args)
+  (when (datagrid-allow-pagination-p grid)
+    (setf (pagination-total-items (datagrid-pagination-widget grid))
+	  (datagrid-data-count grid :totalp nil)))
   (with-html
     (:div :class "datagrid-body"
 	  (apply #'render-table (datagrid-data grid)
@@ -264,4 +331,21 @@ search requests."))
 					  (curry #'render-datagrid-drilldown-body-cell grid)))))
 				args)
 		 args))))
+
+(defmethod (setf datagrid-search) :before (value (obj datagrid))
+  (when (and (datagrid-allow-pagination-p obj)
+	     (null (datagrid-search obj)))
+    (setf (datagrid-search-pagination-history obj)
+	  (pagination-current-page (datagrid-pagination-widget obj)))))
+
+(defmethod (setf datagrid-search) :after (value (obj datagrid))
+  (when (and (datagrid-allow-pagination-p obj)
+	     (null value))
+    (setf (pagination-current-page (datagrid-pagination-widget obj))
+	  (datagrid-search-pagination-history obj))
+    (setf (datagrid-search-pagination-history obj) nil)))
+
+(defmethod widget-public-dependencies ((obj datagrid))
+  (append (list (public-file-relative-path :stylesheet "pagination"))
+	  (call-next-method)))
 

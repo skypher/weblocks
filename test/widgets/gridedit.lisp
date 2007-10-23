@@ -168,7 +168,8 @@
 (deftest gridedit-add-item-1
     (with-request :get nil
       (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee)))
+					   :data-class 'employee
+					   :allow-pagination-p nil)))
 	(weblocks::gridedit-add-item grid *joe*)
 	(length (datagrid-data grid))))
   2)
@@ -179,7 +180,8 @@
 					   :data-class 'employee
 					   :on-add-item (lambda (grid item)
 							  (push item (slot-value grid 'weblocks::data))
-							  (push item (slot-value grid 'weblocks::data))))))
+							  (push item (slot-value grid 'weblocks::data)))
+					   :allow-pagination-p nil)))
 	(weblocks::gridedit-add-item grid *joe*)
 	(length (datagrid-data grid))))
   3)
@@ -189,7 +191,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'gridedit
 				 :data (list *joe* *bob*)
-				 :data-class 'employee)))
+				 :data-class 'employee
+				 :allow-pagination-p nil)))
 	(gridedit-delete-items grid (cons :none (list (object-id *joe*))))
 	(mapcar #'first-name (datagrid-data grid))))
   ("Bob"))
@@ -198,7 +201,8 @@
     (with-request :get nil
       (let ((grid (make-instance 'gridedit
 				 :data (list *joe* *bob*)
-				 :data-class 'employee)))
+				 :data-class 'employee
+				 :allow-pagination-p nil)))
 	(gridedit-delete-items grid (cons :none (list (object-id *joe*)
 						      (object-id *bob*))))
 	(mapcar #'first-name (datagrid-data grid))))
@@ -211,7 +215,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :allow-drilldown-p nil)))
+					   :allow-drilldown-p nil
+					   :allow-pagination-p nil)))
 	;; render datagrid
 	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
@@ -378,7 +383,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :allow-drilldown-p nil)))
+					   :allow-drilldown-p nil
+					   :allow-pagination-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Delete"
@@ -470,7 +476,8 @@
       (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
-					   :allow-searching-p nil)))
+					   :allow-searching-p nil
+					   :allow-pagination-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; Drilldown
@@ -648,7 +655,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :drilldown-type :view)))
+					   :drilldown-type :view
+					   :allow-pagination-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; Drilldown
@@ -809,7 +817,8 @@
       (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
-					   :allow-searching-p nil)))
+					   :allow-searching-p nil
+					   :allow-pagination-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
@@ -858,4 +867,114 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))))
+
+(deftest-html render-widget-body-gridedit-6
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+					   :data-class 'employee
+					   :forbid-sorting-on '(test)
+					   :allow-searching-p nil
+					   :allow-drilldown-p nil)))
+	;; set items per page
+	(setf (pagination-items-per-page (datagrid-pagination-widget grid)) 1)
+	;; render datagrid
+	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
+	;; click "Add"
+	(do-request `(("add" . "Add")
+		      (,weblocks::*action-string* . "abc125")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
+  (htm
+   ;; datagrid
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc123"
+		 :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;" "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc124"
+		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:form
+    :class "datagrid-form"
+    :action "/foo/bar"
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "test" "Test"))
+	      '((:tr
+		 (:td :class "select"
+		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))
+		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
+	      :summary "Ordered by name, ascending."))
+     (:div :class "item-operations"
+	   (:input :name "add" :type "submit" :class "submit" :value "Add"
+		   :onclick "disableIrrelevantButtons(this);")
+	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		   :onclick "disableIrrelevantButtons(this);"))
+     (:input :name "action" :type "hidden" :value "abc125"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->"))
+   (:div :class "widget pagination" :id "widget-123"
+	 #.(pagination-page-info-template 1 1))
+   ;; "Add Employee" clicked
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc128"
+		 :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3ATEST\"); return false;" "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc129"
+		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:form
+    :class "datagrid-form"
+    :action "/foo/bar"
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-ascending" (:span #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+	      '((:tr
+		 (:td :class "select"
+		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))))
+	      :summary "Ordered by name, ascending."))
+     (:input :name "action" :type "hidden" :value "abc130"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->"))
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(form-header-template
+	    "abc133"
+	    '((:li :class "name"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :maxlength "40")))
+	      (:li :class "manager"
+	       (:label
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+	    :method "post"
+	    :title-action "Adding:&nbsp;"))))
 

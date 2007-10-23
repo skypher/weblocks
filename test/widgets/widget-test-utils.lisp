@@ -1,7 +1,7 @@
 
 (in-package :weblocks-test)
 
-(defun searchbar-template (form-id search-id submit-id action &key hidden-items-text value
+(defun searchbar-template (form-id search-id submit-id action &key total-items-text value
 			   (uri "/foo/bar"))
   `(:div :class "datagrid-search-bar"
 	 (:div :class "extra-top-1" "<!-- empty -->")
@@ -9,8 +9,8 @@
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:span :class "title"
 		(:strong "Search table&nbsp;"))
-	 ,(when hidden-items-text
-	      `(htm (:span :class "hidden-items" ,hidden-items-text)))
+	 ,(when total-items-text
+	      `(htm (:span :class "total-items" ,total-items-text)))
 	 (:form :id ,form-id :class "isearch" :action ,uri :method "get" :onsubmit
 		,(format
 		  nil "initiateFormAction(\"~A\", $(this), \"weblocks-session=1%3ATEST\"); return false;"

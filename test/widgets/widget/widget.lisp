@@ -38,8 +38,12 @@
 
 (deftest widget-public-dependencies-2
     (with-request :get nil
-      (format nil "~A" (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
-  "(stylesheets/datagrid.css scripts/datagrid.js stylesheets/gridedit.css)")
+      (mapcar
+       (curry #'format nil "~A")
+       (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
+  ; note, pagination is there because for gridedit
+  ; widget-public-dependencies is specialized
+  ("stylesheets/pagination.css" "stylesheets/datagrid.css" "scripts/datagrid.js" "stylesheets/gridedit.css"))
 
 (deftest widget-public-dependencies-3
     (with-request :get nil

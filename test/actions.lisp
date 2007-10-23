@@ -40,8 +40,8 @@
       (multiple-value-bind (res err)
 	  (ignore-errors
 	    (weblocks::function-or-action->action "abc123"))
-	(values res (format nil "~A" err))))
-  nil "The value 'abc123' is not an existing action.")
+	(values res (not (null err)))))
+  nil t)
 
 (deftest function-or-action->action-2
     (with-request :get nil

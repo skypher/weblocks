@@ -18,64 +18,72 @@
 
 ;;; test datagrid-item-selected-p
 (deftest datagrid-item-selected-p-1
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . (1 2 3)))))
-      (not (null (datagrid-item-selected-p grid 1))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . (1 2 3)))))
+	(not (null (datagrid-item-selected-p grid 1)))))
   t)
 
 (deftest datagrid-item-selected-p-2
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . (1 2 3)))))
-      (not (null (datagrid-item-selected-p grid 4))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . (1 2 3)))))
+	(not (null (datagrid-item-selected-p grid 4)))))
   nil)
 
 ;;; test datagrid-select-item
 (deftest datagrid-select-item-1
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . ()))))
-      (datagrid-select-item grid 2)
-      (not (null (datagrid-item-selected-p grid 2))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . ()))))
+	(datagrid-select-item grid 2)
+	(not (null (datagrid-item-selected-p grid 2)))))
   t)
 
 ;;; test datagrid-clear-selection
 (deftest datagrid-clear-selection-1
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . (1 2 3)))))
-      (datagrid-clear-selection grid)
-      (not (null (datagrid-item-selected-p grid 2))))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . (1 2 3)))))
+	(datagrid-clear-selection grid)
+	(not (null (datagrid-item-selected-p grid 2)))))
   nil)
 
 ;;; test datagrid-selection-empty-p
 (deftest datagrid-selection-empty-p-1
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . (1 2 3)))))
-      (datagrid-selection-empty-p grid))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . (1 2 3)))))
+	(datagrid-selection-empty-p grid)))
   nil)
 
 (deftest datagrid-selection-empty-p-2
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee)))
-      (datagrid-selection-empty-p grid))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee)))
+	(datagrid-selection-empty-p grid)))
   t)
 
 ;;; test datagrid-render-select-body-cell
 (deftest-html datagrid-render-select-body-cell-1
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee)))
-      (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee)))
+	(weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe")))
   (:td :class "select"
        (:div (:input :name "item-1" :type "checkbox" :value "t"))))
 
 (deftest-html datagrid-render-select-body-cell-2
-    (let ((grid (make-instance 'datagrid
-			       :data-class 'employee
-			       :selection '(:none . (1)))))
-      (weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe"))
+    (with-request :get nil
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'employee
+				 :selection '(:none . (1)))))
+	(weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe")))
   (:td :class "select"
        (:div (:input :name "item-1" :type "checkbox" :value "t" :checked "checked"))))
 
@@ -91,7 +99,8 @@
 				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-select-p t
-				 :show-hidden-entries-count-p nil))
+				 :show-total-items-count-p nil
+				 :allow-pagination-p nil))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
@@ -114,6 +123,7 @@
       ", "
       (:a :href "/foo/bar?action=abc125"
 	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -153,6 +163,7 @@
       ", "
       (:a :href "/foo/bar?action=abc131"
 	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -192,6 +203,7 @@
       ", "
       (:a :href "/foo/bar?action=abc137"
 	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
 	  :method "get"

@@ -90,9 +90,9 @@
 						   (:file "sort")
 						   (:file "select")
 						   (:file "drilldown"))
-				      :depends-on ("widget-test-utils"))
+				      :depends-on ("widget-test-utils" "pagination-utils"))
 				     (:file "gridedit"
-					    :depends-on ("widget-test-utils"))
+					    :depends-on ("widget-test-utils" "pagination-utils"))
 				     (:file "navigation")
 				     (:file "pagination-utils")
 				     (:file "pagination"
