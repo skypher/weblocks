@@ -7,7 +7,7 @@
 	  pagination-on-change pagination-on-error pagination-page-count
 	  pagination-render-total-item-count pagination-page-item-range))
 
-(defparameter *pagination-items-per-page* 2
+(defparameter *pagination-items-per-page* 15
   "Default number of items visible on a page.")
 
 (defwidget pagination (widget)
