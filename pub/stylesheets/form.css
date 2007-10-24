@@ -58,6 +58,23 @@ form.renderer fieldset ul li label select
   width: 12em;
 }
 
+/* IE6 font size hacks */
+form.renderer fieldset ul li label input
+{
+  font-size: 1em;
+}
+
+form.renderer fieldset ul li label select
+{
+  font-size: small;
+}
+
+form.renderer > fieldset ul li label input,
+form.renderer > fieldset ul li label select
+{
+  font-size: auto;
+}
+
 form.renderer fieldset ul li label input
 {
   padding: 0;
