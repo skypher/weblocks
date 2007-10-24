@@ -3,10 +3,11 @@
 
 (export '(datagrid datagrid-data-class datagrid-data
 	  datagrid-render-item-ops-bar
-	  datagrid-render-pagination-widget datagrid-sort
-	  datagrid-allow-sorting datagrid-forbid-sorting-on
-	  datagrid-search datagrid-allow-searching-p
-	  datagrid-pagination-widget datagrid-allow-pagination-p
+	  datagrid-render-pagination-widget datagrid-render-mining-bar
+	  datagrid-sort datagrid-allow-sorting
+	  datagrid-forbid-sorting-on datagrid-search
+	  datagrid-allow-searching-p datagrid-pagination-widget
+	  datagrid-allow-pagination-p
 	  datagrid-show-total-items-count-p datagrid-selection
 	  datagrid-allow-select-p datagrid-item-ops
 	  datagrid-allow-item-ops-p datagrid-allow-drilldown-p
@@ -261,18 +262,52 @@ for the datagrid."))
   (when (datagrid-allow-pagination-p grid)
     (render-widget (datagrid-pagination-widget grid))))
 
+(defun total-items-message (grid)
+  "Returns a text message specifying the total number of items and the
+number of items that matched the search."
+  (let ((total-items-count (datagrid-data-count grid :totalp t))
+	(matched-items-count (datagrid-data-count grid :totalp nil)))
+    (if (datagrid-search grid)
+	(format nil "(Found ~A of ~A ~A)"
+		matched-items-count
+		total-items-count
+		(proper-number-form total-items-count "Item"))
+	(format nil "(Total of ~A ~A)"
+		total-items-count
+		(proper-number-form total-items-count "Item")))))
+
+(defun render-total-items-message (grid)
+  "Renders the total items message."
+  (with-html
+    (:span :class "total-items"
+	   (str (total-items-message grid)))))
+
+(defgeneric datagrid-render-mining-bar (obj &rest args)
+  (:documentation
+   "This function renders the data mining bad for the data
+grid (including selection controls, searching controls, and total
+items available)."))
+
+(defmethod datagrid-render-mining-bar ((obj datagrid) &rest args)
+  (when (and (>= (datagrid-data-count obj :totalp t) 1)
+	     (or (datagrid-allow-searching-p obj)
+		 (datagrid-allow-select-p obj)
+		 (datagrid-show-total-items-count-p obj)))
+    (with-html
+      (:div :class "data-mining-bar"
+	    (if (datagrid-allow-searching-p obj)
+		(apply #'datagrid-render-search-bar obj args)
+		(when (datagrid-show-total-items-count-p obj)
+		  (render-total-items-message obj)))
+	    (when (datagrid-allow-select-p obj)
+	      (apply #'render-select-bar obj args))))))
+
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args
 			       &key pre-data-mining-fn post-data-mining-fn)
    ; Render Data mining
   (safe-funcall pre-data-mining-fn obj)
-  (when (>= (datagrid-data-count obj :totalp t) 1)
-    (with-html
-      (:div :class "data-mining-bar"
-	    (when (datagrid-allow-searching-p obj)
-	      (apply #'datagrid-render-search-bar obj args))
-	    (when (datagrid-allow-select-p obj)
-	      (apply #'render-select-bar obj args)))))
+  (apply #'datagrid-render-mining-bar obj args)
   (safe-funcall post-data-mining-fn obj)
   ; Render flash
   (render-widget (datagrid-flash obj))

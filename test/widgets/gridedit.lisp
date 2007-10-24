@@ -216,7 +216,8 @@
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
-					   :allow-pagination-p nil)))
+					   :allow-pagination-p nil
+					   :show-total-items-count-p nil)))
 	;; render datagrid
 	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
@@ -384,7 +385,8 @@
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
-					   :allow-pagination-p nil)))
+					   :allow-pagination-p nil
+					   :show-total-items-count-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Delete"
@@ -477,7 +479,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :allow-pagination-p nil)))
+					   :allow-pagination-p nil
+					   :show-total-items-count-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; Drilldown
@@ -656,7 +659,8 @@
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :drilldown-type :view
-					   :allow-pagination-p nil)))
+					   :allow-pagination-p nil
+					   :show-total-items-count-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; Drilldown
@@ -818,7 +822,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :allow-pagination-p nil)))
+					   :allow-pagination-p nil
+					   :show-total-items-count-p nil)))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
@@ -874,7 +879,8 @@
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
-					   :allow-drilldown-p nil)))
+					   :allow-drilldown-p nil
+					   :show-total-items-count-p nil)))
 	;; set items per page
 	(setf (pagination-items-per-page (datagrid-pagination-widget grid)) 1)
 	;; render datagrid
@@ -977,4 +983,32 @@
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"
 	    :title-action "Adding:&nbsp;"))))
+
+;;; testing render-item-ops-bar for gridedit
+(deftest-html gridedit-render-item-ops-bar-1
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+				 :data-class 'employee)))
+	(let ((*weblocks-output-stream* (make-string-output-stream)))
+	  (declare (special *weblocks-output-stream*))
+	  (render-widget-body grid))
+	(datagrid-render-item-ops-bar grid)))
+  (:div :class "item-operations"
+	(:input :name "add" :type "submit" :class "submit" :value "Add"
+		:onclick "disableIrrelevantButtons(this);")
+	(:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		:onclick "disableIrrelevantButtons(this);")))
+
+(deftest-html gridedit-render-item-ops-bar-2
+    (with-request :get nil
+      (let ((grid (make-instance 'gridedit :data (list *joe*)
+				 :data-class 'employee
+				 :allow-select-p nil)))
+	(let ((*weblocks-output-stream* (make-string-output-stream)))
+	  (declare (special *weblocks-output-stream*))
+	  (render-widget-body grid))
+	(datagrid-render-item-ops-bar grid)))
+  (:div :class "item-operations"
+	(:input :name "add" :type "submit" :class "submit" :value "Add"
+		:onclick "disableIrrelevantButtons(this);")))
 

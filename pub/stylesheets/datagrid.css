@@ -65,17 +65,13 @@
   position: relative;
   margin-bottom: 0.25em;
   text-align: right;
+  height: 1em;
 }
 
-/* IE specific hasLayout fixes */
-*:first-child+html .datagrid .data-mining-bar
+.datagrid > .data-mining-bar
 {
-  height: 1%; 
-}
-
-* html .datagrid .data-mining-bar
-{
-  height: 1%; 
+  height: auto;
+  min-height: 1em;
 }
 
 .datagrid-search-bar form, .datagrid-search-bar form fieldset

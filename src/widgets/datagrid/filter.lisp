@@ -50,20 +50,6 @@ faithful to Emacs' isearch."
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
 
-(defun total-items-message (grid)
-  "Returns a text message specifying the total number of items and the
-number of items that matched the search."
-  (let ((total-items-count (datagrid-data-count grid :totalp t))
-	(matched-items-count (datagrid-data-count grid :totalp nil)))
-    (if (datagrid-search grid)
-	(format nil "(Found ~A of ~A ~A)"
-		matched-items-count
-		total-items-count
-		(proper-number-form total-items-count "Item"))
-	(format nil "(Total of ~A ~A)"
-		total-items-count
-		(proper-number-form total-items-count "Item")))))
-
 (defun datagrid-render-search-bar (grid &rest keys)
   "Renders a search bar for the datagrid."
   (with-html
@@ -71,11 +57,7 @@ number of items that matched the search."
 	  (with-extra-tags
 	    (htm (:span :class "title" (:strong "Search table&nbsp;")))
 	    (when (datagrid-show-total-items-count-p grid)
-	      (let ((total-items-message (total-items-message grid)))
-		(when total-items-message
-		  (with-html
-		    (:span :class "total-items"
-			   (str total-items-message))))))
+	      (render-total-items-message grid))
 	    (apply #'render-isearch "search"
 		   (lambda (&key search &allow-other-keys)
 		     (declare (special *on-ajax-complete-scripts*))

@@ -62,20 +62,6 @@
 	      (ppcre:scan regex "test")))
   0 nil nil)
 
-;;; test total-items-message
-(deftest total-items-message-1
-    (with-request :get nil
-      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
-						    :data-class 'employee)))
-  "(Total of 2 Items)")
-
-(deftest total-items-message-2
-    (with-request :get nil
-      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
-						    :search "Test"
-						    :data-class 'employee)))
-  "(Found 0 of 2 Items)")
-
 ;;; test datagrid-render-search-bar
 (deftest datagrid-render-search-bar-1
     (with-request :get nil

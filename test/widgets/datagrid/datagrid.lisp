@@ -171,6 +171,51 @@
 							:allow-pagination-p nil)))
   "")
 
+;;; test total-items-message
+(deftest total-items-message-1
+    (with-request :get nil
+      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+						    :data-class 'employee)))
+  "(Total of 2 Items)")
+
+(deftest total-items-message-2
+    (with-request :get nil
+      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+						    :search "Test"
+						    :data-class 'employee)))
+  "(Found 0 of 2 Items)")
+
+;;; test render-total-items-message
+(deftest-html render-total-items-message-1
+    (with-request :get nil
+      (weblocks::render-total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+							   :data-class 'employee)))
+  (:span :class "total-items" "(Total of 2 Items)"))
+
+;;; test datagrid-render-mining-bar
+(deftest-html datagrid-render-mining-bar-1
+    (with-request :get nil
+      (datagrid-render-mining-bar
+       (make-instance 'datagrid
+		      :data (list *joe* *bob*)
+		      :data-class 'employee
+		      :show-total-items-count-p nil
+		      :allow-searching-p nil
+		      :allow-select-p nil)))
+  nil)
+
+(deftest-html datagrid-render-mining-bar-2
+    (with-request :get nil
+      (datagrid-render-mining-bar
+       (make-instance 'datagrid
+		      :data (list *joe* *bob*)
+		      :data-class 'employee
+		      :show-total-items-count-p t
+		      :allow-searching-p nil
+		      :allow-select-p nil)))
+  (:div :class "data-mining-bar"
+	(:span :class "total-items" "(Total of 2 Items)")))
+
 ;;; test render-widget-body for datagrid
 (deftest-html render-widget-body-datagrid-1
     (with-request :get nil
@@ -218,13 +263,13 @@
 				 :data-class 'employee
 				 :allow-select-p nil
 				 :allow-searching-p nil
-				 :allow-pagination-p nil))
+				 :allow-pagination-p nil
+				 :show-total-items-count-p nil))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
 	;; render datagrid
 	(render-widget-body grid)))
   (htm
-   (:div :class "data-mining-bar" "")
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form :class "datagrid-form"
 	  :action "/foo/bar"
