@@ -249,3 +249,8 @@ attempts to drill down on a given item."
 
 (defmethod render-datagrid-table-body ((grid gridedit) &rest args)
   (apply #'call-next-method grid args))
+
+(defmethod widget-public-dependencies ((obj gridedit))
+  (append (list (public-file-relative-path :stylesheet "dataform"))
+	  (call-next-method)))
+
