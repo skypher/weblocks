@@ -18,6 +18,15 @@
 	       (list *joe* *bob*))))
   2)
 
+(deftest datagrid-filter-data-3
+    (with-request :get nil
+      (length (weblocks::datagrid-filter-data
+	       (make-instance 'datagrid :search "o"
+					:data-class 'employee
+					:widget-args '(:slots (age) :mode :strict))
+	       (list *joe* *bob*))))
+  0)
+
 ;;; test object-satisfies-search-p
 (deftest object-satisfies-search-p-1
     (weblocks::object-satisfies-search-p "hi" nil nil t *joe*)
@@ -46,6 +55,14 @@
 (deftest object-satisfies-search-p-7
     (not (null (weblocks::object-satisfies-search-p "Joe" *joe* 'name 'string "Joe")))
   t)
+
+(deftest object-satisfies-search-p-8
+    (weblocks::object-satisfies-search-p "Bene" nil nil t *joe* :slots '(education))
+  t)
+
+(deftest object-satisfies-search-p-9
+    (weblocks::object-satisfies-search-p "Broadway" nil nil t *joe* :slots '(address-ref))
+  nil)
 
 ;;; test make-isearch-regex
 (deftest make-isearch-regex-1

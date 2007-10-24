@@ -10,7 +10,8 @@ repeatedly to each item in the sequence."
     (if search
 	(remove nil
 		(mapcar (lambda (item)
-			  (when (object-satisfies-search-p (make-isearch-regex search) nil nil t item)
+			  (when (apply #'object-satisfies-search-p (make-isearch-regex search) nil nil t item
+				       (widget-args grid-obj))
 			    item))
 			data))
 	data)))
@@ -30,18 +31,18 @@ matches returns true.
 
 (defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type (slot-value standard-object)
 						       &rest args)
-  (some (compose #'not #'null)
-	(flatten
-	 (apply #'visit-object-slots slot-value	(curry #'object-satisfies-search-p search-regex)
-		:call-around-fn-p nil args))))
+  (if (render-slot-inline-p obj slot-name)
+      (some (compose #'not #'null)
+	    (flatten
+	     (apply #'visit-object-slots slot-value (curry #'object-satisfies-search-p search-regex)
+		    :call-around-fn-p nil args)))
+      (not (null (ppcre:scan search-regex (object-name slot-value))))))
 
 (defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
 						       &rest args)
   (not (null
-	(if (typep slot-value 'standard-object)
-	    (ppcre:scan search-regex (object-name slot-value))
-	    (ppcre:scan search-regex (apply #'data-print-object
-					    obj slot-name slot-type slot-value args))))))
+	(ppcre:scan search-regex (apply #'data-print-object
+					obj slot-name slot-type slot-value args)))))
 
 (defun make-isearch-regex (search)
   "Create a regular expression from the user's input that tries to be
