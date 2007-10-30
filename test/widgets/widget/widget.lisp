@@ -44,7 +44,7 @@
   ; note, pagination and dataform are there because for gridedit and
   ; datagrid widget-public-dependencies is specialized
   ("stylesheets/dataform.css" "stylesheets/pagination.css" "stylesheets/datagrid.css"
-			      "scripts/datagrid.js" "stylesheets/gridedit.css"))
+			      "scripts/datagrid.js"))
 
 (deftest widget-public-dependencies-3
     (with-request :get nil
