@@ -1,8 +1,13 @@
 
 (in-package :weblocks)
 
-(export '(handle-client-request *on-ajax-complete-scripts*
-	  *uri-tokens* *current-page-description*))
+(export '(root-composite handle-client-request
+	  *on-ajax-complete-scripts* *uri-tokens* *current-page-description*))
+
+(defmacro root-composite ()
+  "Expands to code that can be used as a place to access to the root
+composite."
+  `(session-value 'root-composite))
 
 (defgeneric handle-client-request ()
   (:documentation
@@ -46,14 +51,14 @@ customize behavior)."))
     (redirect (request-uri)))
   (let ((*request-hook* (make-instance 'request-hooks)))
     (declare (special *request-hook*))
-    (when (null (session-value 'root-composite))
+    (when (null (root-composite))
       (let ((root-composite (make-instance 'composite :name "root")))
 	(when *render-debug-toolbar*
 	  (initialize-debug-actions))
+	(setf (root-composite) root-composite)
 	(funcall (symbol-function (find-symbol (symbol-name '#:init-user-session)
 					       (symbol-package *webapp-name*)))
-		 root-composite)
-	(setf (session-value 'root-composite) root-composite))
+		 root-composite))
       (when (cookie-in *session-cookie-name*)
 	(redirect (remove-session-from-uri (request-uri)))))
 
@@ -75,11 +80,11 @@ customize behavior)."))
 	  (render-dirty-widgets)
 	  (progn
 	    (apply-uri-to-navigation *uri-tokens*
-				     (find-navigation-widget (session-value 'root-composite)))
+				     (find-navigation-widget (root-composite)))
 	    ; we need to render widgets before the boilerplate HTML
 	    ; that wraps them in order to collect a list of script and
 	    ; stylesheet dependencies.
-	    (render-widget (session-value 'root-composite))
+	    (render-widget (root-composite))
 	    ; set page title if it isn't already set
 	    (when (and (null *current-page-description*)
 		       (last *uri-tokens*))
