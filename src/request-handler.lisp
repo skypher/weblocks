@@ -75,6 +75,10 @@ customize behavior)."))
       (eval-hook :pre-action)
       (eval-action)
       (eval-hook :post-action)
+      (when (and (not (ajax-request-p))
+		 (find *action-string* (get-parameters)
+		       :key #'car :test #'string-equal))
+	(redirect (remove-action-from-uri (request-uri))))
       (eval-hook :pre-render)
       (if (ajax-request-p)
 	  (render-dirty-widgets)
@@ -99,11 +103,11 @@ customize behavior)."))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
-  (let ((path (puri:uri-path (puri:parse-uri uri))))
-    (loop for x in (get-parameters)
-       when (not (string-equal (car x) *session-cookie-name*))
-       do (setf path (url-rewrite:add-get-param-to-url path (car x) (cdr x))))
-    path))
+  (remove-parameter-from-uri uri *session-cookie-name*))
+
+(defun remove-action-from-uri (uri)
+  "Removes the action info from a URI."
+  (remove-parameter-from-uri uri *action-string*))
 
 (defun render-dirty-widgets ()
   "Renders widgets that have been marked as dirty into a JSON

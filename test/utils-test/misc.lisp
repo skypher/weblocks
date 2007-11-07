@@ -623,3 +623,14 @@
     (object-full-visible-slot-count (make-instance 'unbound-slots-test))
   2)
 
+;;; test remove-parameter-from-uri
+(deftest remove-parameter-from-uri-1
+    (with-request :get '(("action" . "test1") ("session" . "test2"))
+      (weblocks::remove-parameter-from-uri "/pub/baz" "session"))
+  "/pub/baz?action=test1")
+
+(deftest remove-parameter-from-uri-2
+    (with-request :get '(("action" . "test1") ("session" . "test2"))
+      (weblocks::remove-parameter-from-uri "/pub/baz" "action"))
+  "/pub/baz?session=test2")
+

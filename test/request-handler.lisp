@@ -296,6 +296,85 @@ onclick='disableIrrelevantButtons(this);' />~
 	"<div class='widget function'></div>"
       :title "Hello - Some Page"))
 
+(deftest handle-client-request-10
+    (with-request :get '(("action" . "abc123"))
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name* (res 0))
+	;; set up mini application
+	(declare (special weblocks::*webapp-name*  *request-hook*))
+	(defwebapp 'hello)
+	(start-session)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
+	;; prepare action
+	(make-action (lambda (&rest args)
+		       nil)
+		     "abc123")
+	;; prepare hooks
+	(push (lambda ()
+		  (incf res))
+		(request-hook :session :pre-action))
+	(push (lambda ()
+		(incf res))
+	      (request-hook :session :post-action))
+	;; prepare dummy app
+	(setf (root-composite) (make-instance 'composite))
+	;; make sure we redirect to hide ugly URLs
+	(catch 'hunchentoot::handler-done
+	  (handle-client-request))
+	;; clean up app
+	(fmakunbound 'init-user-session)
+	;; result
+	(values (string-downcase (header-out "Location")) res)))
+  "http://nil/?weblocks-session=1%3atest" 2)
+
+(deftest handle-client-request-11
+    (with-request :get '(("action" . "abc123"))
+      (make-request-ajax)
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name*)
+	;; set up mini application
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(start-session)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
+	;; prepare action
+	(make-action (lambda (&rest args)
+		       nil)
+		     "abc123")
+	;; prepare dummy app
+	(setf (root-composite) (make-instance 'composite))
+	;; make sure we redirect to hide ugly URLs
+	(catch 'hunchentoot::handler-done
+	  (handle-client-request))
+	;; clean up app
+	(fmakunbound 'init-user-session)
+	;; result
+	(header-out "Location")))
+  nil)
+
+(deftest handle-client-request-12
+    (with-request :get nil
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name*)
+	;; set up mini application
+	(declare (special weblocks::*webapp-name*))
+	(defwebapp 'hello)
+	(start-session)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
+	;; prepare dummy app
+	(setf (root-composite) (make-instance 'composite))
+	;; make sure we redirect to hide ugly URLs
+	(catch 'hunchentoot::handler-done
+	  (handle-client-request))
+	;; clean up app
+	(fmakunbound 'init-user-session)
+	;; result
+	(header-out "Location")))
+  nil)
+
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil
@@ -311,6 +390,12 @@ onclick='disableIrrelevantButtons(this);' />~
     (with-request :get '(("action" . "test") ("weblocks-session" "123"))
       (weblocks::remove-session-from-uri "/pub/test/blah"))
   "/pub/test/blah?action=test")
+
+;;; test remove-action-from-uri
+(deftest remove-action-from-uri-1
+    (with-request :get '(("action" . "test") ("weblocks-session" . "123"))
+      (weblocks::remove-action-from-uri "/pub/test/blah"))
+  "/pub/test/blah?weblocks-session=123")
 
 ;;; test render-dirty-widgets
 (deftest render-dirty-widgets-1
