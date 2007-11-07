@@ -12,7 +12,7 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on ("closer-mop" "metatilities" "hunchentoot" "cl-who" "cl-ppcre" "cl-json" "puri" "md5"
-			    "fare-matcher")
+			    "fare-matcher" "cl-cont")
   :components ((:file "weblocks")
 	       (:module utils
 			:components ((:file "misc")
@@ -96,6 +96,11 @@
 				     (:file "keyword"
 				      :depends-on ("symbol")))
 			:depends-on (renderers snippets widgets))
+	       (:module control-flow
+			:components ((:file "call-answer")
+				     (:file "workflow"
+					    :depends-on ("call-answer")))
+			:depends-on ("weblocks" "widgets" "request-handler"))
 	       (:file "server"
 		      :depends-on ("weblocks" utils))
 	       (:file "request"

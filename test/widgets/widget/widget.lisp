@@ -144,6 +144,24 @@
     (composite-widgets 'identity)
   nil)
 
+(deftest composite-widgets-4
+    (let ((w (make-instance 'composite)))
+      (setf (composite-widgets w) 1)
+      (composite-widgets w))
+  (1))
+
+(deftest composite-widgets-5
+    (let ((w (make-instance 'composite)))
+      (setf (composite-widgets w) nil)
+      (composite-widgets w))
+  nil)
+
+(deftest composite-widgets-6
+    (let ((w (make-instance 'composite)))
+      (setf (composite-widgets w) (list 1))
+      (composite-widgets w))
+  (1))
+
 ;;; render function as a widget
 (deftest-html render-function-1
     (with-request :get nil

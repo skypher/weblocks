@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function
 			  #:standard-class #:typep #:subtypep)
@@ -13,6 +13,10 @@ extensible generic renderers, and exposing a unique widget-based
 approach to maintaining UI state."))
 
 (in-package :weblocks)
+
+; re-export external symbols from cl-cont
+(do-external-symbols (s (find-package :cont))
+  (export (list s)))
 
 (export '(*weblocks-output-stream* with-html reset-sessions str
 	  with-javascript))

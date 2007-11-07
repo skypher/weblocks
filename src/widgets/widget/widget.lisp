@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(defwidget widget widget-name widget-args
-	  widget-propagate-dirty widget-rendered-p
+	  widget-propagate-dirty widget-rendered-p widget-continuation
 	  widget-public-dependencies with-widget-header
 	  render-widget-body widget-css-classes render-widget
 	  mark-dirty widget-dirty-p find-widget-by-path*
@@ -50,7 +50,14 @@ inherits from 'widget' if no direct superclasses are provided."
               indicating whether the widget has been rendered at least
               once. Because marking unrendered widgets as dirty may
               cause JS problems, 'mark-dirty' will use this flag to
-              determine the status of a widget."))
+              determine the status of a widget.")
+   (continuation :accessor widget-continuation
+		 :initform nil
+		 :documentation "Stores the continuation object for
+                 widgets that were invoked via one of the do-*
+                 functions ('do-page', etc.). When 'answer' is called
+                 on a widget, this value is used to resume the
+                 computation."))
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))

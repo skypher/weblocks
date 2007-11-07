@@ -98,6 +98,10 @@
 				     (:file "pagination"
 					    :depends-on ("pagination-utils"))
 				     (:file "composite"))
-			:depends-on ("weblocks-test" fixtures renderers))))
+			:depends-on ("weblocks-test" fixtures renderers))
+	       (:module control-flow
+			:components ((:file "call-answer")
+				     (:file "workflow"))
+			:depends-on ("weblocks-test"))))
 
 
