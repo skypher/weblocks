@@ -19,7 +19,7 @@ approach to maintaining UI state."))
   (export (list s)))
 
 (export '(*weblocks-output-stream* with-html reset-sessions str
-	  with-javascript))
+	  with-javascript root-composite))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -49,6 +49,11 @@ having to worry about special characters in JavaScript code."
 	      (fmt "~%// <![CDATA[~%")
 	      (fmt ,source ,@args)
 	      (fmt "~%// ]]>~%"))))
+
+(defmacro root-composite ()
+  "Expands to code that can be used as a place to access to the root
+composite."
+  `(session-value 'root-composite))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

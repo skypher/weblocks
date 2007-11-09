@@ -1,13 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(root-composite handle-client-request
-	  *on-ajax-complete-scripts* *uri-tokens* *current-page-description*))
-
-(defmacro root-composite ()
-  "Expands to code that can be used as a place to access to the root
-composite."
-  `(session-value 'root-composite))
+(export '(handle-client-request *on-ajax-complete-scripts*
+	  *uri-tokens* *current-page-description*))
 
 (defgeneric handle-client-request ()
   (:documentation
