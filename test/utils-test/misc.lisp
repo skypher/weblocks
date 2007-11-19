@@ -623,14 +623,24 @@
     (object-full-visible-slot-count (make-instance 'unbound-slots-test))
   2)
 
+;;; test add-get-param-to-url
+(deftest add-get-param-to-url-1
+    (weblocks:add-get-param-to-url "/foo/bar/baz?hi=bye" "a" "b")
+  "/foo/bar/baz?hi=bye&a=b")
+
 ;;; test remove-parameter-from-uri
 (deftest remove-parameter-from-uri-1
     (with-request :get '(("action" . "test1") ("session" . "test2"))
-      (weblocks::remove-parameter-from-uri "/pub/baz" "session"))
+      (weblocks:remove-parameter-from-uri "/pub/baz" "session"))
   "/pub/baz?action=test1")
 
 (deftest remove-parameter-from-uri-2
     (with-request :get '(("action" . "test1") ("session" . "test2"))
-      (weblocks::remove-parameter-from-uri "/pub/baz" "action"))
+      (weblocks:remove-parameter-from-uri "/pub/baz" "action"))
   "/pub/baz?session=test2")
+
+(deftest remove-parameter-from-uri-3
+    (with-request :get '(("action" . "test1") ("session" . "test2") ("foo" . "bar"))
+      (weblocks:remove-parameter-from-uri "/pub/baz" "action"))
+  "/pub/baz?session=test2&foo=bar")
 

@@ -16,10 +16,12 @@
   hello
   ("stylesheets/layout.css"
    "stylesheets/main.css"
+   "stylesheets/dialog.css"
    "scripts/prototype.js"
    "scripts/scriptaculous.js"
    "scripts/shortcut.js"
-   "scripts/weblocks.js")
+   "scripts/weblocks.js"
+   "scripts/dialog.js")
   "foo bar")
 
 (deftest defwebapp-2

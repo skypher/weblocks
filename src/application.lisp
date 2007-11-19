@@ -51,9 +51,11 @@ Scripts: prototype.js, weblocks.js, scriptaculous.js"
 	(public-files-relative-paths
 	 '(:stylesheet . "layout")
 	 '(:stylesheet . "main")
+	 '(:stylesheet . "dialog")
 	 '(:script . "prototype")
 	 '(:script . "scriptaculous")
 	 '(:script . "shortcut")
-	 '(:script . "weblocks"))))
+	 '(:script . "weblocks")
+	 '(:script . "dialog"))))
 
 

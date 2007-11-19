@@ -312,7 +312,8 @@ items available)."))
   ; Render flash
   (render-widget (datagrid-flash obj))
   ; Render Body
-  (let ((action (make-action (lambda (&rest args)
+  (let ((action (make-action (lambda/cc (&rest args)
+			       (declare (ignore args))
 			       (datagrid-clear-selection obj)
 			       (loop for i in (request-parameters)
 				  when (string-starts-with (car i) "item-")

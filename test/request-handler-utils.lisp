@@ -13,12 +13,14 @@
 <title>~A</title>~
 <link rel='stylesheet' type='text/css' href='/pub/stylesheets/layout.css' />~
 <link rel='stylesheet' type='text/css' href='/pub/stylesheets/main.css' />~
+<link rel='stylesheet' type='text/css' href='/pub/stylesheets/dialog.css' />~
 ~A~
 ~A~
 <script src='/pub/scripts/prototype.js' type='text/javascript'></script>~
 <script src='/pub/scripts/scriptaculous.js' type='text/javascript'></script>~
 <script src='/pub/scripts/shortcut.js' type='text/javascript'></script>~
 <script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
+<script src='/pub/scripts/dialog.js' type='text/javascript'></script>~
 </head>~
 <body>~
 <div class='page-wrapper'>~

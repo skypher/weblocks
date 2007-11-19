@@ -152,6 +152,7 @@ input[type=hidden]
   position: fixed;
   right: 0;
   top: 0;
+  z-index: 1000;
 }
 
 /* IE 6 specific progress bar fix */
@@ -164,7 +165,7 @@ input[type=hidden]
   top: expression(documentElement.scrollTop + 'px');
 }
 
-/* Common styles for form, data, and dataform */
+/* Common styles for form, and data */
 .data, .form
 {
   width: 27em;

@@ -1,4 +1,3 @@
-
 body
 {
   background: url(/pub/images/page/background.png);
@@ -12,8 +11,6 @@ div.page-wrapper
 
   margin: 0 auto;
   text-align: left;
-  
-  background-color: white;
 }
 
 /* IE 6 specific hacks (has layout and min-width)*/
@@ -22,14 +19,16 @@ div.page-wrapper
   width: 70em;
 }
 
-.page-wrapper .page-extra-top-1
+.page-wrapper .page-extra-top-1,
+.dialog .dialog-extra-top-1
 {
   height: 5px;
   background: url(/pub/images/page/top_left.png) no-repeat top left;
   overflow: hidden;
 }
 
-.page-wrapper .page-extra-top-2
+.page-wrapper .page-extra-top-2,
+.dialog .dialog-extra-top-2
 {
   height: 5px;
   margin-top: -5px;
@@ -37,7 +36,8 @@ div.page-wrapper
   overflow: hidden;
 }
 
-.page-wrapper .page-extra-top-3
+.page-wrapper .page-extra-top-3,
+.dialog .dialog-extra-top-3
 {
   height: 5px;
   margin-top: -5px;
@@ -47,12 +47,17 @@ div.page-wrapper
   overflow: hidden;
 }
 
+div#root, .dialog-body, .dialog h1
+{
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
 div#root
 {
   padding: 1em;
-  border-left: solid black 1px;
-  border-right: solid 1px black;
   min-height: 60em;
+  background-color: white;
 }
 
 /* IE 6 specific hacks (has layout and min-height)*/
@@ -78,14 +83,16 @@ div#main-menu div.menu
   top: 0;
 }
 
-.page-wrapper .page-extra-bottom-1
+.page-wrapper .page-extra-bottom-1,
+.dialog .dialog-extra-bottom-1
 {
   height: 5px;
   background: url(/pub/images/page/bottom_left.png) no-repeat top left;
   overflow: hidden;
 }
 
-.page-wrapper .page-extra-bottom-2
+.page-wrapper .page-extra-bottom-2,
+.dialog .dialog-extra-bottom-2
 {
   height: 5px;
   margin-top: -5px;
@@ -93,7 +100,8 @@ div#main-menu div.menu
   overflow: hidden;
 }
 
-.page-wrapper .page-extra-bottom-3
+.page-wrapper .page-extra-bottom-3,
+.dialog .dialog-extra-bottom-3
 {
   height: 5px;
   margin-top: -5px;

@@ -98,9 +98,11 @@
 			:depends-on (renderers snippets widgets))
 	       (:module control-flow
 			:components ((:file "call-answer")
+				     (:file "dialog"
+					    :depends-on ("call-answer"))
 				     (:file "workflow"
 					    :depends-on ("call-answer")))
-			:depends-on ("weblocks" "widgets" "request-handler"))
+			:depends-on ("weblocks" "widgets" "request-handler" "snippets"))
 	       (:file "server"
 		      :depends-on ("weblocks" utils))
 	       (:file "request"

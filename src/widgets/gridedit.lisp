@@ -170,16 +170,12 @@ standard behavior for adding items to a sequence."))
 	(push item (slot-value grid 'data))))
   (flash-message (datagrid-flash grid) "Item added."))
 
-
-(defgeneric gridedit-delete-items (grid items)
-  (:documentation
-   "If 'on-delete-items' is specified, simply calls
+(defun/cc gridedit-delete-items (grid items)
+  "If 'on-delete-items' is specified, simply calls
 'on-delete-items'. Otherwise, if 'data' is a sequence, deletes the
 specified items from the sequence. The 'items' parameter is similar to
 datagrid's 'selection' slot. Specialize this function to modify
-standard behavior for adding items to a sequence."))
-
-(defmethod gridedit-delete-items ((grid gridedit) items)
+standard behavior for deleting items from a sequence."
   (when (datagrid-selection-empty-p items)
     (flash-message (datagrid-flash grid) "Please select items to delete.")
     (mark-dirty grid)
@@ -189,6 +185,14 @@ standard behavior for adding items to a sequence."))
     (if (gridedit-on-delete-items grid)
 	(funcall (gridedit-on-delete-items grid) grid items)
 	(when (typep (slot-value grid 'data) 'sequence)
+	  (unless (eq :yes (do-confirmation (let ((item-count (ecase (car items)
+								;; (:all ...)
+								(:none (length (cdr items))))))
+					      (format nil "Delete ~A ~A?"
+						      item-count
+						      (proper-number-form item-count "item")))
+			     :type :yes/no))
+	    (return-from gridedit-delete-items))
 	  (setf (slot-value grid 'data)
 		(ecase (car items)
 		  ;; 		(:all (delete-if (compose #'not (curry-after #'member
@@ -207,6 +211,19 @@ standard behavior for adding items to a sequence."))
 		   (format nil "~A ~A deleted."
 			   deleted-items-count
 			   (proper-number-form deleted-items-count "item")))))
+
+#|
+;;; TODO: implement defgeneric/cc defmethod/cc in cl-cont and make
+;;; gridedit-delete-items a generic function
+
+(defgeneric gridedit-delete-items (grid items)
+  (:documentation
+   "If 'on-delete-items' is specified, simply calls
+'on-delete-items'. Otherwise, if 'data' is a sequence, deletes the
+specified items from the sequence. The 'items' parameter is similar to
+datagrid's 'selection' slot. Specialize this function to modify
+standard behavior for deleting items from a sequence."))
+|#
 
 ;;; Drilldown action
 (defun gridedit-drilldown-action (grid item)

@@ -13,7 +13,7 @@
 	  request-uri-path string-remove-left string-remove-right
 	  find-all stable-set-difference symbol-status
 	  string-invert-case ninsert object-full-visible-slot-count
-	  remove-parameter-from-uri))
+	  add-get-param-to-url remove-parameter-from-uri))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -676,11 +676,23 @@ etc.)"
   "Returns the full number of visible slots (including the slots rendered inline)."
   (length (apply #'object-visible-slots obj args)))
 
+(defun add-get-param-to-url (url name value)
+  "Based on Edi's code in URL-REWRITE but uses & instead of &amp;
+which is more appropriate for our uses."
+  (concatenate 'string
+               url
+               (if (find #\? url :test #'char=)
+                 "&"
+                 "?")
+               name
+               "="
+               (url-rewrite:url-encode value)))
+
 (defun remove-parameter-from-uri (uri parameter)
   "Removes the given parameter from a URI."
   (let ((path (puri:uri-path (puri:parse-uri uri))))
     (loop for x in (get-parameters)
        when (not (string-equal (car x) parameter))
-       do (setf path (url-rewrite:add-get-param-to-url path (car x) (cdr x))))
+       do (setf path (add-get-param-to-url path (car x) (cdr x))))
     path))
 

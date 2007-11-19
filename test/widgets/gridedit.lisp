@@ -189,22 +189,28 @@
 ;;; testing gridedit-delete-items
 (deftest gridedit-delete-items-1
     (with-request :get nil
+      (make-request-ajax)
       (let ((grid (make-instance 'gridedit
 				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-pagination-p nil)))
 	(gridedit-delete-items grid (cons :none (list (object-id *joe*))))
+	(do-request `(("yes" . "Yes")
+		      (,weblocks::*action-string* . "abc123")))
 	(mapcar #'first-name (datagrid-data grid))))
   ("Bob"))
 
 (deftest gridedit-delete-items-2
     (with-request :get nil
+      (make-request-ajax)
       (let ((grid (make-instance 'gridedit
 				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-pagination-p nil)))
 	(gridedit-delete-items grid (cons :none (list (object-id *joe*)
 						      (object-id *bob*))))
+	(do-request `(("yes" . "Yes")
+		      (,weblocks::*action-string* . "abc123")))
 	(mapcar #'first-name (datagrid-data grid))))
   nil)
 
@@ -380,6 +386,7 @@
 
 (deftest-html render-widget-body-gridedit-2
     (with-request :get nil
+      (make-request-ajax)
       (let ((grid (make-instance 'gridedit :data (list *joe*)
 					   :data-class 'employee
 					   :forbid-sorting-on '(test)
@@ -393,6 +400,8 @@
 	(do-request `(("item-1" . "on")
 		      ("delete" . "Delete")
 		      (,weblocks::*action-string* . "abc125")))
+	(do-request `(("yes" . "Yes")
+		      (,weblocks::*action-string* . "abc128")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -451,7 +460,7 @@
     :class "datagrid-form"
     :action "/foo/bar"
     :method "get"
-    :onsubmit "initiateFormAction(\"abc128\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    :onsubmit "initiateFormAction(\"abc129\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
     (:div :class "extra-top-1" "<!-- empty -->")
     (:div :class "extra-top-2" "<!-- empty -->")
     (:div :class "extra-top-3" "<!-- empty -->")
@@ -468,7 +477,7 @@
      (:div :class "item-operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);"))
-     (:input :name "action" :type "hidden" :value "abc128"))
+     (:input :name "action" :type "hidden" :value "abc129"))
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))))

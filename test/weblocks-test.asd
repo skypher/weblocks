@@ -103,7 +103,8 @@
 			:depends-on ("weblocks-test" fixtures renderers))
 	       (:module control-flow
 			:components ((:file "call-answer")
+				     (:file "dialog")
 				     (:file "workflow"))
-			:depends-on ("weblocks-test"))))
+			:depends-on ("weblocks-test" snippets))))
 
 
