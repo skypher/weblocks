@@ -387,6 +387,7 @@ onclick='disableIrrelevantButtons(this);' />~
 (deftest render-dirty-widgets-1
     (with-request :get nil
       (let ((weblocks::*dirty-widgets* (list (make-instance 'composite)
+					     (make-instance 'composite :name 'foo-bar)
 					     (lambda (&rest args)
 					       (with-html (:p "test")))))
 	    (*weblocks-output-stream* (make-string-output-stream))
@@ -400,6 +401,7 @@ onclick='disableIrrelevantButtons(this);' />~
 \"widgets\":~
 {~
 \"widget-123\":\"\",~
+\"foo-bar\":\"\",~
 null:\"<p>test</p>\"~
 },~
 \"on-load\":[\"testjs\"]~
