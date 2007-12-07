@@ -302,6 +302,13 @@ items available)."))
 	    (when (datagrid-allow-select-p obj)
 	      (apply #'render-select-bar obj args))))))
 
+;;; This file needs to be loaded with CMU because it CMUCL doesn't
+;;; compile it properly. Bytecompiler, however, works.
+#+cmu (load (merge-pathnames
+	     (make-pathname :directory '(:relative "widgets" "datagrid")
+			    :name "item-ops-action" :type "lisp")
+	     (asdf-system-directory :weblocks)))
+
 ;;; Renders the body of the data grid.
 (defmethod render-widget-body ((obj datagrid) &rest args
 			       &key pre-data-mining-fn post-data-mining-fn)
@@ -312,18 +319,7 @@ items available)."))
   ; Render flash
   (render-widget (datagrid-flash obj))
   ; Render Body
-  (let ((action (make-action (lambda/cc (&rest args)
-			       (declare (ignore args))
-			       (datagrid-clear-selection obj)
-			       (loop for i in (request-parameters)
-				  when (string-starts-with (car i) "item-")
-				  do (datagrid-select-item obj (substring (car i) 5)))
-			       (loop for i in (datagrid-item-ops obj)
-				  when (member (car i) (request-parameters)
-					       :key #'car
-					       :test #'string-equal)
-				  do (funcall (cdr i) obj (datagrid-selection obj)))
-			       (datagrid-clear-selection obj)))))
+  (let ((action (make-action (curry #'item-ops-action obj))))
     (with-html-form (:get action :class "datagrid-form")
       (apply #'render-datagrid-table-body obj args)
       ; Render Item ops

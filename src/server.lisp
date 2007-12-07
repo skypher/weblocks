@@ -49,9 +49,7 @@ file of the system specified by 'asdf-system-name', goes up one
 directory, and goes into 'pub'."
   (merge-pathnames
    (make-pathname :directory '(:relative :up "pub"))
-   (make-pathname :directory
-		  (pathname-directory (truename (asdf:system-definition-pathname
-                                                 (asdf:find-system asdf-system-name)))))))
+   (asdf-system-directory asdf-system-name)))
 
 (defparameter *public-files-path*
   (compute-public-files-path :weblocks)

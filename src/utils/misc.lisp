@@ -13,7 +13,8 @@
 	  request-uri-path string-remove-left string-remove-right
 	  find-all stable-set-difference symbol-status
 	  string-invert-case ninsert object-full-visible-slot-count
-	  add-get-param-to-url remove-parameter-from-uri))
+	  add-get-param-to-url remove-parameter-from-uri
+	  asdf-system-directory))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -695,4 +696,11 @@ which is more appropriate for our uses."
        when (not (string-equal (car x) parameter))
        do (setf path (add-get-param-to-url path (car x) (cdr x))))
     path))
+
+(defun asdf-system-directory (asdf-system-name)
+  "Computes the directory in which the .asdf file for a given ASDF
+system resides."
+  (make-pathname :directory
+		 (pathname-directory (truename (asdf:system-definition-pathname
+						(asdf:find-system asdf-system-name))))))
 
