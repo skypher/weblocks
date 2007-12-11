@@ -67,7 +67,9 @@ function onActionSuccess(transport) {
     if(onLoadCalls) {
 	onLoadCalls.each(function(item)
 			 {
-			     item.evalJSON().call();
+			     try {
+				 item.evalJSON().call();
+			     } catch(e) {}
 			 });
     }
 }
