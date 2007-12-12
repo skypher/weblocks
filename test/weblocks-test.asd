@@ -51,6 +51,7 @@
 			:components ((:file "boolean")
 				     (:file "member")
 				     (:file "us-states")
+				     (:file "password")
 				     (:file "symbol")
 				     (:file "keyword"))
 			:depends-on ("weblocks-test" renderers))

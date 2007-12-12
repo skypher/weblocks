@@ -243,3 +243,14 @@
 	     :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
 	     "Foo")))
 
+;;; test render-password
+(deftest-html render-password-1
+    (render-password 'name1 "value1" :id "id1"  :class "class1")
+  (:input :type "password" :name "name1"  :id "id1" :value "value1"
+			   :class "class1"))
+
+(deftest-html render-password-2
+    (render-password 'name2 "value2" :id "id2" :class "class2" :maxlength 25)
+  (:input :type "password" :name "name2"  :id "id2" :value "value2"
+			   :maxlength 25 :class "class2"))
+

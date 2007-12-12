@@ -4,7 +4,7 @@
 (export '(*submit-control-name* *cancel-control-name* with-html-form
 	  render-link render-button render-checkbox render-dropdown
 	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button))
+	  render-close-button render-password))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -161,4 +161,17 @@ used instead of the default 'Close'."
   (with-html
     (:span :class "close-button"
 	   (render-link close-action (humanize-name button-string)))))
+
+;;; render password implementation
+(defun render-password (name value &key id (class "password") maxlength)
+    "Renders a password in a form.
+'name' - name of the html control. The name is attributized before being rendered.
+'value' - a value on html control. Humanized name is default.
+'id' - id of the html control. Default is nil.
+ maxlength - maximum lentgh of the field
+'class' - a class used for styling. By default, \"password\"."
+  (with-html
+    (:input :type "password" :name (attributize-name name) :id id
+	    :value value :maxlength maxlength :class class)))
+
 
