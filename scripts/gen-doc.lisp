@@ -14,8 +14,10 @@ reside."
 
 (defun document-weblocks ()
   ; lazily load necessary systems
-  (asdf:operate 'asdf:load-op 'tinaa)
-  (asdf:operate 'asdf:load-op 'weblocks)
+  (unless (find-package :tinaa)
+    (asdf:operate 'asdf:load-op 'tinaa))
+  (unless (find-package :weblocks)
+    (asdf:operate 'asdf:load-op 'weblocks))
   ; dynamically invoke 'document-system' (since reader has no access to tinaa)
   (funcall (symbol-function (find-symbol (symbol-name '#:document-system) (find-package 'tinaa)))
 	   'package

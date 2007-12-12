@@ -1,6 +1,8 @@
 ;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
 (defpackage #:weblocks-asd
-  (:use :cl :asdf))
+  (:use :cl :asdf)
+  (:nicknames :wop)
+  (:export #:test #:test-op #:doc #:doc-op #:make-app #:make-app-op))
 
 (in-package :weblocks-asd)
 
@@ -112,6 +114,83 @@
 	       (:file "application"
 		      :depends-on ("weblocks"))
 	       (:file "default-application"
-		      :depends-on ("server" "weblocks" utils "request-handler"))))
+		      :depends-on ("server" "weblocks" utils "request-handler")))
+  :in-order-to ((asdf:test-op (load-op "weblocks-test"))
+		(test-op (load-op "weblocks-test"))
+		(doc-op (load-op "weblocks-scripts"))
+		(make-app-op (load-op "weblocks-scripts"))))
 
+;;; test-op
+(defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))
+  "A method specializer to run the weblocks test suite through ASDF."
+  (funcall (intern (symbol-name :test-weblocks) (find-package :weblocks-test))))
+
+(defmethod operation-done-p ((o asdf:test-op) (c (eql (find-system :weblocks))))
+  nil)
+
+;;;; test operation (same functionality as asdf:test-op, but defined for consistency)
+(defclass wop::test-op (operation)
+  ()
+  (:documentation "Allows to specialize built-in ASDF methods to run
+   the Weblocks test suite."))
+
+(defmethod perform ((o wop::test-op) (c (eql (find-system :weblocks))))
+  "A method specializer to run the weblocks test suite through ASDF."
+  (funcall (intern (symbol-name :test-weblocks) (find-package :weblocks-test))))
+
+(defmethod operation-done-p ((o wop::test-op) (c (eql (find-system :weblocks))))
+  nil)
+
+;;;; doc-op operation
+(defclass doc-op (operation)
+  ()
+  (:documentation "Allows to specialize built-in ASDF methods to run
+   the Weblocks documentation generation."))
+
+(defmethod perform ((o doc-op) (c component))
+  "Runs the documentation generating function."
+  nil)
+
+(defmethod perform ((o doc-op) (c (eql (find-system :weblocks))))
+  "Runs the documentation generating function."
+  (funcall (intern (symbol-name :document-weblocks) (find-package :weblocks-scripts))))
+
+(defmethod operation-done-p ((o doc-op) (c (eql (find-system :weblocks))))
+  nil)
+
+;;;; make-app-op operation
+(defclass make-app-op (operation)
+  ()
+  (:documentation "Allows to specialize built-in ASDF methods to create
+   a new Weblocks app."))
+
+(defmethod perform ((o make-app-op) (c component))
+  "Creates a new Weblocks application"
+  nil)
+
+(defmethod perform ((o make-app-op) (c (eql (find-system :weblocks))))
+  "Creates a new Weblocks application when (wop:make-app 'name \"/path/to/target/\")
+   is called."
+  (let ((app-name (cadr (member :name (asdf::operation-original-initargs o))))
+	(app-target (cadr (member :target (asdf::operation-original-initargs o)))))
+    (funcall (intern (symbol-name :make-application) (find-package :weblocks-scripts))
+	     app-name app-target)))
+
+(defmethod operation-done-p ((o make-app-op) (c (eql (find-system :weblocks))))
+  nil)
+
+;;;; helper functions that hide away the unnecessary arguments to
+;;;; (asdf:operate)
+(defun test ()
+  "Runs the Weblocks test suite together with loading the necessary packages."
+  (asdf:operate 'test-op :weblocks))
+
+(defun doc ()
+  "Generates Weblocks documentation together with loading the necessary packages."
+  (asdf:operate 'doc-op :weblocks))
+
+(defun make-app (name &optional target)
+  "Creates a new Weblocks app named <name> into directory <target> 
+   based on the new-app-template."
+  (asdf:operate 'make-app-op :weblocks :name name :target target))
 

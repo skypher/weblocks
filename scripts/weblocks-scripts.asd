@@ -18,4 +18,3 @@
 	       (:file "make-new-app"
 		      :depends-on ("weblocks-scripts"))))
 
-
