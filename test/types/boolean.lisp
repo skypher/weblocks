@@ -14,8 +14,8 @@
 (deftest-html render-data/aux-booleans-1
     (render-data *joe* :slots '(name veteran) :mode :strict)
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-       (:li :class "veteran" (:span :class "label" "Veteran:&nbsp;") (:span :class "value" "No")))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
+       (:li :class "veteran" (:span :class "label boolean" "Veteran:&nbsp;") (:span :class "value" "No")))
      :postslots nil))
 
 (deftest-html render-data/aux-booleans-2
@@ -23,8 +23,8 @@
       (setf (slot-value employee 'veteran) t)
       (render-data employee  :slots '(name veteran) :mode :strict))
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-       (:li :class "veteran" (:span :class "label" "Veteran:&nbsp;") (:span :class "value" "Yes")))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
+       (:li :class "veteran" (:span :class "label boolean" "Veteran:&nbsp;") (:span :class "value" "Yes")))
      :postslots nil))
 
 ;;; test render-form/aux for booleans
@@ -35,13 +35,13 @@
 		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
 	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "veteran"
-	(:label
+	(:label :class "boolean"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Veteran:&nbsp;"))
 	 (:input :name "veteran" :type "checkbox" :class "checkbox" :value "t"))))))
@@ -55,13 +55,13 @@
 		   :action "abc123")))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
 	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
        (:li :class "veteran"
-	(:label
+	(:label :class "boolean"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Veteran:&nbsp;"))
 	 (:input :name "veteran" :type "checkbox" :class "checkbox" :value "t"

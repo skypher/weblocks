@@ -57,11 +57,14 @@ freedom in selecting the proper slot to override."))
 
 (defslotmethod render-data-slot (obj slot-name slot-type slot-value &rest keys
 				     &key (human-name slot-name) &allow-other-keys)
-  (with-html
-    (:li :class (attributize-name slot-name)
-	 (:span :class "label"
-		(str (humanize-name human-name)) ":&nbsp;")
-	 (apply #'render-data-value obj slot-name slot-type slot-value keys))))
+  (let ((slot-type-class (slot-type->css-class slot-type)))
+    (with-html
+      (:li :class (attributize-name slot-name)
+	   (:span :class (concatenate 'string "label"
+				      (when slot-type-class
+					(format nil " ~A" slot-type-class)))
+		  (str (humanize-name human-name)) ":&nbsp;")
+	   (apply #'render-data-value obj slot-name slot-type slot-value keys)))))
 
 (defun render-data (obj &rest keys &key parent-object slot-name
 		    (slot-type t) &allow-other-keys)

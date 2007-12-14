@@ -51,28 +51,38 @@ form.renderer fieldset ul li span.label em.required-slot
 }
 
 form.renderer fieldset ul li label input,
-form.renderer fieldset ul li label select
+form.renderer fieldset ul li label select,
+form.renderer fieldset ul li label textarea
 {
   margin-top: 2px;
   margin-bottom: 2px;
   width: 12em;
 }
 
+/* Target firefox */
+html>/**/body form.renderer fieldset ul li label textarea, x:-moz-any-link
+{
+  width: auto;
+}
+
 /* IE6 font size hacks */
-form.renderer fieldset ul li label input
+* html form.renderer fieldset ul li label input,
+* html form.renderer fieldset ul li label textarea
 {
   font-size: 1em;
 }
-
-form.renderer fieldset ul li label select
+* html form.renderer fieldset ul li label select
 {
   font-size: small;
 }
 
-form.renderer > fieldset ul li label input,
-form.renderer > fieldset ul li label select
+/* Target Safari */
+/* Safari and WebKit specific caption fix */
+html[xmlns*=""] form.renderer fieldset ul li label input,
+html[xmlns*=""] form.renderer fieldset ul li label select,
+html[xmlns*=""] form.renderer fieldset ul li label textarea
 {
-  font-size: auto;
+  font-size: 1em;
 }
 
 form.renderer fieldset ul li label input
@@ -149,5 +159,11 @@ form.renderer fieldset ul li label.radio input.radio
 form.renderer fieldset ul li label.radio span
 {
   vertical-align: middle;
+}
+
+/* Text area label alignment */
+form fieldset ul li label.text span.slot-name
+{
+  vertical-align: top;
 }
 

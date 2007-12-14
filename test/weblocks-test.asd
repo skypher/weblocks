@@ -51,6 +51,7 @@
 			:components ((:file "boolean")
 				     (:file "member")
 				     (:file "us-states")
+                                     (:file "text")
 				     (:file "password")
 				     (:file "symbol")
 				     (:file "keyword"))

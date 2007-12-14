@@ -1,7 +1,8 @@
 ;;;; Utility functions for generic renderers
 (in-package :weblocks)
 
-(export '(object-class-name object-name render-standard-object))
+(export '(object-class-name object-name render-standard-object
+	  slot-type->css-class))
 
 (defgeneric object-class-name (obj)
   (:documentation
@@ -50,3 +51,11 @@ it walks through the visible slots of the object (obtained via
 'object-visible-slots') and applies 'render-slot-fn' to each of those,
 wrapping the call with 'header-fn' in order to render a header."
   (apply header-fn obj (curry #'visit-object-slots obj render-slot-fn) keys))
+
+(defun slot-type->css-class (slot-type)
+  "Converts slot type to CSS class if reasonably possible."
+  (when (atom slot-type)
+    (let ((attr-slot-type (attributize-name slot-type)))
+      (when (> (length attr-slot-type) 1)
+	attr-slot-type))))
+

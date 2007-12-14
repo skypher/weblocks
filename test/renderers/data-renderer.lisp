@@ -11,7 +11,7 @@
 (deftest-html render-data-slot-1
     (render-data-slot *joe* 'first-name 'string "Joe")
   (:li :class "first-name"
-       (:span :class "label"
+       (:span :class "label string"
 	      "First Name:&nbsp;")
        (:span :class "value"
 	      "Joe")))
@@ -49,7 +49,7 @@
 				       (with-html
 					 (:div "test2"))))
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :preslots '((:div "test1"))
      :postslots '((:div "test2"))))
@@ -57,7 +57,7 @@
 (deftest-html render-data/value-3
     (render-data *joe* :slots '(address-ref))
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "address-ref" (:span :class "label" "Address:&nbsp;") (:span :class "value" "Address"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
@@ -65,7 +65,7 @@
 (deftest-html render-data/value-4
     (render-data *joe* :slots '(education))
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "university" (:span :class "label" "University:&nbsp;")
 	(:span :class "value" "Bene Gesserit University"))
        (:li :class "graduation-year"
@@ -76,7 +76,7 @@
 (deftest-html render-data/value-5
     (render-data *joe* :slots '((name . nickname)))
   #.(data-header-template nil
-     '((:li :class "name" (:span :class "label" "Nickname:&nbsp;") (:span :class "value" "Joe"))
+     '((:li :class "name" (:span :class "label string" "Nickname:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 

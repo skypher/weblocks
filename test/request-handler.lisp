@@ -41,7 +41,7 @@
 <div class='extra-top-3'><!-- empty --></div>~
 <h1><span class='action'>Viewing:&nbsp;</span><span class='object'>Employee</span></h1>~
 <ul>~
-<li class='name'><span class='label'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
+<li class='name'><span class='label string'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
 <li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
 <div class='submit'><a href='/foo/bar?action=abc123' ~
@@ -66,7 +66,7 @@
 <span class='object'>Employee</span>~
 </h1>~
 <h2 class='form-fields-title'>Form fields:</h2>~
-<ul><li class='name'><label>~
+<ul><li class='name'><label class='string'>~
 <span class='slot-name'><span class='extra'>Name:&nbsp;~
 <em class='required-slot'>(required)&nbsp;</em></span></span>~
 <input type='text' name='name' value='Joe' maxlength='40' />~

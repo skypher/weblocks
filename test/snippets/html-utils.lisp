@@ -254,3 +254,14 @@
   (:input :type "password" :name "name2"  :id "id2" :value "value2"
 			   :maxlength 25 :class "class2"))
 
+;; test render-textarea
+(deftest-html render-textarea-1
+    (render-textarea 'name1 "value1" 4 20 :id "id1" :class "class1")
+  (:textarea :name "name1" :id "id1" :rows 4 :cols 20 :class "class1"
+	     "value1"))
+
+(deftest-html render-textarea-2
+    (render-textarea 'name2 "value2" 4 20)
+  (:textarea :name "name2" :rows 4 :cols 20
+	     "value2")) 
+

@@ -98,7 +98,7 @@ case the user clicks submit."))
 				   (when validation-error " item-not-validated"))))
     (with-html
       (:li :class field-class
-	   (:label
+	   (:label :class (slot-type->css-class slot-type)
 	     (:span :class "slot-name"
 		    (:span :class "extra"
 		     (str (humanize-name human-name)) ":&nbsp;"

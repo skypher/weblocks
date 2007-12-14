@@ -94,6 +94,7 @@
 					      "request-hooks" linguistic))
 	       (:module types
 			:components ((:file "us-states")
+				     (:file "text")
                                      (:file "password")
 				     (:file "boolean")
 				     (:file "member")

@@ -177,7 +177,7 @@
   (:div :class "widget dataform" :id "widget-123"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	      (:span :class "value" "Jim"))))))
 
@@ -188,7 +188,7 @@
   (:div :class "widget dataform" :id "test-widget"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	      (:span :class "value" "Jim"))))))
 
@@ -196,7 +196,7 @@
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*) :inlinep t))
   #.(data-header-template "abc123"
-     '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
        (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
 (deftest render-widget-4

@@ -44,3 +44,13 @@
     (:p "MANAGER")
     (:p "T")
     (:p "Jim"))))
+
+;;; test slot-type->css-class
+(deftest slot-type->css-class-1
+    (slot-type->css-class 'foobar)
+  "foobar")
+
+(deftest slot-type->css-class-2
+    (slot-type->css-class '(or foobar baz))
+  nil)
+

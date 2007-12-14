@@ -11,7 +11,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -34,7 +34,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -59,7 +59,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -83,7 +83,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -106,7 +106,7 @@
   (:div :class "widget dataform" :id "widget-123"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))
 	   :postslots
@@ -125,7 +125,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -151,7 +151,7 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label
+	      (:label :class "string"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
@@ -316,7 +316,7 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -594,7 +594,7 @@
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -770,7 +770,7 @@
     (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc135"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))
 	    :postslots
@@ -980,7 +980,7 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))

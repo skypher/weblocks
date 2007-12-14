@@ -198,3 +198,20 @@ span.total-items
   font-size: x-small;
 }
 
+/* Text */
+.ellipsis
+{
+  color: gray;
+  font-weight: bold;
+}
+
+p.text
+{
+  margin: 0;
+}
+
+.renderer ul li p.text
+{
+  margin-left: 0.5em;
+}
+

@@ -85,7 +85,7 @@
 (deftest-html render-form-slot-1
     (render-form-slot *joe* 'name 'string "Joe" :slot-path '(name))
   (:li :class "name"
-       (:label
+       (:label :class "string"
 	(:span :class "slot-name"
 	       (:span :class "extra" "Name:&nbsp;"
 		      (:em :class "required-slot" "(required)&nbsp;")))
@@ -199,7 +199,7 @@
       (render-form *joe* :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
@@ -216,7 +216,7 @@
       (render-form *joe* :slots '(address-ref) :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
@@ -248,7 +248,7 @@
 		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
@@ -278,7 +278,7 @@
 		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
@@ -304,7 +304,7 @@
 		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label
+	(:label :class "string"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Nickname:&nbsp;"
 		       (:em :class "required-slot" "(required)&nbsp;")))
@@ -322,9 +322,10 @@
 		   :action "abc123"))
   #.(form-header-template "abc123"
      '((:li :class "name item-not-validated"
-	(:label (:span :class "slot-name"
-		       (:span :class "extra" "Name:&nbsp;"
-			      (:em :class "required-slot" "(required)&nbsp;")))
+	(:label :class "string"
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
 	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")
 	 (:p :class "validation-error"
 	     (:em (:span :class "validation-error-heading" "Error:&nbsp;") "Some error."))))

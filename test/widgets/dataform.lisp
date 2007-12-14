@@ -29,7 +29,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; click modify
@@ -37,7 +37,7 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -52,7 +52,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc125"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; click modify
@@ -60,7 +60,7 @@
 	 #.(form-header-template
 	    "abc126"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -75,7 +75,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc127"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Bob"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Bob"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))))
 
@@ -105,7 +105,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; modify clicked
@@ -113,7 +113,7 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -129,9 +129,10 @@
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name item-not-validated"
-	       (:label (:span :class "slot-name"
-			      (:span :class "extra" "Name:&nbsp;"
-				     (:em :class "required-slot" "(required)&nbsp;")))
+	       (:label :class "string"
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :value "" :maxlength "40")
 		(:p :class "validation-error"
 		    (:em (:span :class "validation-error-heading" "Error:&nbsp;")
@@ -149,7 +150,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc126"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Ivan"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Ivan"))
 	      (:li :class "manager"
 	       (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Bill")))))))
@@ -184,21 +185,21 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "age" (:span :class "label" "Age:&nbsp;") (:span :class "value" "30"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "age" (:span :class "label integer" "Age:&nbsp;") (:span :class "value" "30"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
    ;; modify clicked
    (:div :class "widget dataform" :id "widget-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "age"
-	       (:label
+	       (:label :class "integer"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Age:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -213,13 +214,13 @@
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "age item-not-validated"
-	       (:label
+	       (:label :class "integer"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Age:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -240,8 +241,8 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc126"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "age" (:span :class "label" "Age:&nbsp;") (:span :class "value" "18"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "age" (:span :class "label integer" "Age:&nbsp;") (:span :class "value" "18"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))))
 
@@ -290,7 +291,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))
 	    :postslots
@@ -313,7 +314,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;") (:span :class "value" "Joe"))
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))))
 
@@ -345,7 +346,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc123"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;")
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;")
 	       (:span :class "value" "Joe"))
 	      (:li :class "address-ref" (:span :class "label" "Address:&nbsp;")
 	       (:span :class "value" "Address")))))
@@ -354,7 +355,7 @@
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -373,7 +374,7 @@
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name item-not-validated"
-	       (:label
+	       (:label :class "string"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
@@ -397,7 +398,7 @@
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc126"
-	    '((:li :class "name" (:span :class "label" "Name:&nbsp;")
+	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;")
 	       (:span :class "value" "Joe"))
 	      (:li :class "address-ref" (:span :class "label" "Address:&nbsp;")
 	       (:span :class "value" "Address")))))))

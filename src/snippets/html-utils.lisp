@@ -4,7 +4,7 @@
 (export '(*submit-control-name* *cancel-control-name* with-html-form
 	  render-link render-button render-checkbox render-dropdown
 	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-password))
+	  render-close-button render-password render-textarea))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -174,4 +174,18 @@ used instead of the default 'Close'."
     (:input :type "password" :name (attributize-name name) :id id
 	    :value value :maxlength maxlength :class class)))
 
+
+(defun render-textarea (name value rows cols &key id class)
+  "Renders a textarea in a form.
+'name' - name of the html control. The name is attributized before being rendered.
+'value' - a value on html control. Humanized name is default.
+'id' - id of the html control. Default is nil.
+'maxlength' - maximum lentgh of the field  
+'rows' - number of rows in textarea
+'cols' - number of columns in textarea
+'class' - a class used for styling. By default, \"textarea\"."
+  (with-html
+      (:textarea :name (attributize-name name) :id id
+		 :rows rows :cols cols :class class
+		 (str (or value "")))))
 
