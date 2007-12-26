@@ -55,7 +55,8 @@ returned."
       (mapcar (lambda (obj)
 		(list (p-1-s-1 obj)
 		      (p-1-s-2 obj)))
-	      (find-persistent-objects *default-store* 'persistent-1)))
+	      (find-persistent-objects *default-store* 'persistent-1
+				       :order-by (cons 'slot-1 :asc))))
   ((1 2) (3 4)))
 
 (deftest-store persist-object-2
@@ -127,10 +128,12 @@ returned."
       (list
        (mapcar #'view-object
 	       (find-persistent-objects *default-store* 'persistent-1
-					:range (cons 0 2)))
+					:range (cons 0 2)
+					:order-by (cons 'slot-1 :asc)))
        (mapcar #'view-object
 	       (find-persistent-objects *default-store* 'persistent-1
-					:range (cons 2 5)))))
+					:range (cons 2 5)
+					:order-by (cons 'slot-1 :asc)))))
   (((1 10) (3 8))
    ((5 6) (7 4) (9 2))))
 
