@@ -89,20 +89,3 @@
     (slot-in-request-empty-p 'boolean "nil")
   nil)
 
-;;; test object-satisfies-search-p for booleans
-(deftest object-satisfies-search-p-booleans-1
-    (object-satisfies-search-p "Yes" *joe* 'veteran 'boolean t)
-  t)
-
-(deftest object-satisfies-search-p-booleans-2
-    (object-satisfies-search-p "Yes" *joe* 'veteran 'boolean nil)
-  nil)
-
-(deftest object-satisfies-search-p-booleans-3
-    (object-satisfies-search-p "No" *joe* 'veteran 'boolean nil)
-  t)
-
-(deftest object-satisfies-search-p-booleans-4
-    (object-satisfies-search-p "No" nil nil t *joe* :slots '(veteran))
-  t)
-

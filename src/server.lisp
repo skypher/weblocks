@@ -20,13 +20,15 @@
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to the
-client. Other keys are passed to 'hunchentoot:start-server'."
+client. Other keys are passed to 'hunchentoot:start-server'. Opens all
+stores declared via 'defstore'."
   (if debug
       (setf *render-debug-toolbar* t)
       (setf *render-debug-toolbar* nil))
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
+  (open-stores)
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server*
@@ -35,12 +37,13 @@ client. Other keys are passed to 'hunchentoot:start-server'."
 		  (remove-keyword-parameter keys :port) :debug)))))
 
 (defun stop-weblocks ()
-  "Stops weblocks."
+  "Stops weblocks. Closes all stores declared via 'defstore'."
   (if (not (null *weblocks-server*))
       (progn
 	(reset-sessions)
 	(stop-server *weblocks-server*)
-	(setf *weblocks-server* nil))))
+	(setf *weblocks-server* nil)))
+  (close-stores))
 
 (defun compute-public-files-path (asdf-system-name)
   "Computes the directory of public files. The function uses the

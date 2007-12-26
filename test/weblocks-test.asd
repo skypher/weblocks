@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
-  :depends-on (:weblocks :rt :closer-mop :metatilities)
+  :depends-on (:weblocks :weblocks-store-test :rt :closer-mop :metatilities)
   :components ((:file "weblocks-test")
 	       (:file "weblocks"
 		      :depends-on ("weblocks-test"))
@@ -46,6 +46,9 @@
 			:depends-on ("weblocks-test"))
 	       (:module fixtures
 			:components ((:file "shared"))
+			:depends-on ("weblocks-test"))
+	       (:module store
+			:components ((:file "store-utils"))
 			:depends-on ("weblocks-test"))
 	       (:module types
 			:components ((:file "boolean")

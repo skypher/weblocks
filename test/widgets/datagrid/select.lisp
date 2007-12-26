@@ -95,8 +95,8 @@
 ;;; test selection process
 (deftest-html render-widget-body-datagrid-select-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-select-p t
 				 :show-total-items-count-p nil
@@ -135,7 +135,7 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-ascending" (:span #.(link-action-template "abc127" "Name")))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc127" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
@@ -175,7 +175,7 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-ascending" (:span #.(link-action-template "abc133" "Name")))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc133" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc134" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
@@ -215,7 +215,7 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-ascending" (:span #.(link-action-template "abc139" "Name")))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc139" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc140" "Manager"))))
 		    '((:tr
 		       (:td :class "select"

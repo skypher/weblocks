@@ -167,34 +167,26 @@
 ;;; testing gridedit-add-item
 (deftest gridedit-add-item-1
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee
-					   :allow-pagination-p nil)))
-	(weblocks::gridedit-add-item grid *joe*)
-	(length (datagrid-data grid))))
-  2)
-
-(deftest gridedit-add-item-2
-    (with-request :get nil
+      (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'gridedit :data (list *joe*)
 					   :data-class 'employee
 					   :on-add-item (lambda (grid item)
-							  (push item (slot-value grid 'weblocks::data))
-							  (push item (slot-value grid 'weblocks::data)))
+							  (persist-object *default-store* item))
 					   :allow-pagination-p nil)))
-	(weblocks::gridedit-add-item grid *joe*)
+	(weblocks::gridedit-add-item grid *bob*)
+	(weblocks::gridedit-add-item grid *employee1*)
 	(length (datagrid-data grid))))
   3)
 
 ;;; testing gridedit-delete-items
 (deftest gridedit-delete-items-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (make-request-ajax)
       (let ((grid (make-instance 'gridedit
-				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-pagination-p nil)))
-	(gridedit-delete-items grid (cons :none (list (object-id *joe*))))
+	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*)))))
 	(do-request `(("yes" . "Yes")
 		      (,weblocks::*action-string* . "abc123")))
 	(mapcar #'first-name (datagrid-data grid))))
@@ -202,23 +194,37 @@
 
 (deftest gridedit-delete-items-2
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (make-request-ajax)
       (let ((grid (make-instance 'gridedit
-				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :allow-pagination-p nil)))
-	(gridedit-delete-items grid (cons :none (list (object-id *joe*)
-						      (object-id *bob*))))
+	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*))
+						      (format nil "~A" (object-id *bob*)))))
 	(do-request `(("yes" . "Yes")
 		      (,weblocks::*action-string* . "abc123")))
 	(mapcar #'first-name (datagrid-data grid))))
   nil)
 
+(deftest gridedit-delete-items-3
+    (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
+      (make-request-ajax)
+      (let ((grid (make-instance 'gridedit
+				 :data-class 'employee
+				 :allow-pagination-p nil)))
+	(setf (widget-rendered-p grid) t)
+	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*)))))
+	(do-request `(("yes" . "Yes")
+		      (,weblocks::*action-string* . "abc123")))
+	(not (null (widget-dirty-p grid)))))
+  t)
+
 ;;; testing render-widget-body for gridedit
 (deftest-html render-widget-body-gridedit-1
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
@@ -259,7 +265,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "test" "Test"))
 	      '((:tr
@@ -300,7 +306,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc131" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
@@ -361,11 +367,11 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc137" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc137" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1002" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-0" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
@@ -386,9 +392,9 @@
 
 (deftest-html render-widget-body-gridedit-2
     (with-request :get nil
+      (persist-object *default-store* *joe*)
       (make-request-ajax)
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
@@ -426,7 +432,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
@@ -484,8 +490,8 @@
 
 (deftest-html render-widget-body-gridedit-3
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))
-					   :data-class 'employee
+      (persist-object *default-store* (copy-template *joe*))
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-pagination-p nil
@@ -524,7 +530,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown edit" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
@@ -570,7 +576,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc132" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
 		(:th :class "drilldown edit" ""))
 	      '((:tr :class "drilled-down"
@@ -636,7 +642,7 @@
       (:div :class "datagrid-body"
 	    #.(table-header-template
 	       '((:th :class "select" "")
-		 (:th :class "name sort-ascending" (:span #.(link-action-template "abc139" "Name")))
+		 (:th :class "name sort-asc" (:span #.(link-action-template "abc139" "Name")))
 		 (:th :class "manager" (:span #.(link-action-template "abc140" "Manager")))
 		 (:th :class "drilldown edit" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc141\", \"weblocks-session=1%3ATEST\");"
@@ -663,8 +669,8 @@
 
 (deftest-html render-widget-body-gridedit-4
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))
-					   :data-class 'employee
+      (persist-object *default-store* (copy-template *joe*))
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :drilldown-type :view
@@ -701,7 +707,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown edit" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
@@ -747,7 +753,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc132" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
 		(:th :class "drilldown edit" ""))
 	      '((:tr :class "drilled-down"
@@ -799,7 +805,7 @@
       (:div :class "datagrid-body"
 	    #.(table-header-template
 	       '((:th :class "select" "")
-		 (:th :class "name sort-ascending" (:span #.(link-action-template "abc140" "Name")))
+		 (:th :class "name sort-asc" (:span #.(link-action-template "abc140" "Name")))
 		 (:th :class "manager" (:span #.(link-action-template "abc141" "Manager")))
 		 (:th :class "drilldown edit" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc142\", \"weblocks-session=1%3ATEST\");"
@@ -826,9 +832,9 @@
 
 (deftest-html render-widget-body-gridedit-5
     (with-request :get nil
+      (persist-object *default-store* (copy-template *joe*))
       (make-request-ajax)
-      (let ((grid (make-instance 'gridedit :data (list (copy-template *joe*))
-					   :data-class 'employee
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-pagination-p nil
@@ -858,7 +864,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown edit" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
@@ -884,8 +890,8 @@
 
 (deftest-html render-widget-body-gridedit-6
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'gridedit :data-class 'employee
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
@@ -921,7 +927,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
 		(:th :class "test" "Test"))
 	      '((:tr
@@ -964,7 +970,7 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-ascending" (:span #.(link-action-template "abc131" "Name")))
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
@@ -996,7 +1002,8 @@
 ;;; testing render-item-ops-bar for gridedit
 (deftest-html gridedit-render-item-ops-bar-1
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'gridedit
 				 :data-class 'employee)))
 	(let ((*weblocks-output-stream* (make-string-output-stream)))
 	  (declare (special *weblocks-output-stream*))
@@ -1010,7 +1017,8 @@
 
 (deftest-html gridedit-render-item-ops-bar-2
     (with-request :get nil
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'gridedit
 				 :data-class 'employee
 				 :allow-select-p nil)))
 	(let ((*weblocks-output-stream* (make-string-output-stream)))

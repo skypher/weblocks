@@ -16,13 +16,9 @@
 		:documentation "A function called by gridedit when an
 		item is added. The function should accept two
 		arguments (the gridedit object and a new item), and
-		should take appropriate action (write to the database,
-		etc.) If 'data' is set to a function and 'on-add-item'
-		is not specified, the UI to add items will not be
-		provided regardless of the value of 'allow-add-p'. If
-		'data' is a sequence, 'on-add-item' will be
-		responsible for adding the data to the sequence, if
-		specified.")
+		should take appropriate action. Note that the
+		'dataform' widget will persist the item to the store
+		via the API.")
    (allow-add-p :accessor gridedit-allow-add-p
 		:initform t
 		:initarg :allow-add-p
@@ -35,9 +31,8 @@
 		    one or more items are deleted. The function should
 		    accept two arguments (the gridedit object and a
 		    value that has semantics similar to datagrid's
-		    'selection' slot). 'on-delete-items' has the same
-		    semantics as 'on-add-item' if terms of managing
-		    items and providing deletion UI.")
+		    'selection' slot). If the function is missing, the
+		    item is deleted via store API.")
    (allow-delete-p :accessor gridedit-allow-delete-p
 		   :initform t
 		   :initarg :allow-delete-p
@@ -164,10 +159,9 @@ the beginning of the sequence. Specialize this function to modify
 standard behavior for adding items to a sequence."))
 
 (defmethod gridedit-add-item ((grid gridedit) item)
-  (if (gridedit-on-add-item grid)
-      (funcall (gridedit-on-add-item grid) grid item)
-      (when (typep (slot-value grid 'data) 'sequence)
-	(push item (slot-value grid 'data))))
+  (when (gridedit-on-add-item grid)
+    (funcall (gridedit-on-add-item grid) grid item))
+  ; dataform persists this item for us, no need to do it again
   (flash-message (datagrid-flash grid) "Item added."))
 
 (defun/cc gridedit-delete-items (grid items)
@@ -184,7 +178,7 @@ standard behavior for deleting items from a sequence."
 	deleted-items-count)
     (if (gridedit-on-delete-items grid)
 	(funcall (gridedit-on-delete-items grid) grid items)
-	(when (typep (slot-value grid 'data) 'sequence)
+	(progn
 	  (unless (eq :yes (do-confirmation (let ((item-count (ecase (car items)
 								;; (:all ...)
 								(:none (length (cdr items))))))
@@ -193,20 +187,14 @@ standard behavior for deleting items from a sequence."
 						      (proper-number-form item-count "item")))
 			     :type :yes/no))
 	    (return-from gridedit-delete-items))
-	  (setf (slot-value grid 'data)
-		(ecase (car items)
-		  ;; 		(:all (delete-if (compose #'not (curry-after #'member
-		  ;; 							     (cdr items)
-		  ;; 							     :test #'equalp))
-		  ;; 				 (slot-value grid 'data)
-		  ;; 				 :key #'object-id))
-		  (:none (delete-if (curry-after #'member
-						 (cdr items)
-						 :key #'princ-to-string
-						 :test #'equalp)
-				    (slot-value grid 'data)
-				    :key (compose #'princ-to-string #'object-id)))))))
+	  (ecase (car items)
+	    ;; (:all ...)
+	    (:none (dolist (item (cdr items))
+		     (delete-persistent-object-by-id (class-store (datagrid-data-class grid))
+						     (datagrid-data-class grid)
+						     (parse-integer item)))))))
     (setf deleted-items-count (- initial-items-count (datagrid-data-count grid :totalp t)))
+    (mark-dirty grid)
     (flash-message (datagrid-flash grid)
 		   (format nil "~A ~A deleted."
 			   deleted-items-count
@@ -245,15 +233,11 @@ attempts to drill down on a given item."
 		   :key #'car))
   (when (and (gridedit-allow-delete-p obj)
 	     (> (datagrid-data-count obj :totalp t) 0)
-	     (datagrid-allow-select-p obj)
-	     (or (typep (slot-value obj 'data) 'sequence)
-		 (gridedit-on-add-item obj)))
+	     (datagrid-allow-select-p obj))
     (pushnew (cons 'delete #'gridedit-delete-items)
 	     (datagrid-item-ops obj)
 	     :key #'car))
-  (when (and (gridedit-allow-add-p obj)
-	     (or (typep (slot-value obj 'data) 'sequence)
-		 (gridedit-on-add-item obj)))
+  (when (gridedit-allow-add-p obj)
     (pushnew `(add . ,(lambda (&rest args)
 			      (setf (gridedit-item-widget obj) (gridedit-create-new-item-widget obj))
 			      (setf (gridedit-ui-state obj) :add)))

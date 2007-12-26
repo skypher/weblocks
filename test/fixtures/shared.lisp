@@ -3,7 +3,7 @@
 
 ;;; Define classes for introspection testing
 (defclass address ()
-  ((id :initarg :id :initform (gen-object-id))
+  ((id :initarg :id :initform nil)
    (street :reader address-street :initarg :street :initform "100 Broadway")
    (city :reader address-city :initarg :city :initform "New York")
    (state :type us-state :initarg :state :initform "NY")))
@@ -15,14 +15,14 @@
 					    :state "IL"))
 
 (defclass education-history ()
-  ((id :initarg :id :initform (gen-object-id))
+  ((id :initarg :id :initform nil)
    (university :reader university :initform "Bene Gesserit University")
    (graduation-year :reader graduation-year :initform 2000 :type (or null integer))))
 
-(defparameter *some-college* (make-instance 'education-history))
+(defparameter *some-college* (make-instance 'education-history :id 1))
 
 (defclass person ()
-  ((id :initarg :id :initform (gen-object-id))
+  ((id :initarg :id :initform nil)
    (name :accessor first-name :initarg :name :type string)
    (age :initarg :age :type integer)
    (address-ref :initform *home-address*)
@@ -41,6 +41,10 @@
 ;;; Create instances for introspection testing
 (defparameter *joe* (make-instance 'employee :name "Joe" :age 30 :id 1))
 (defparameter *bob* (make-instance 'employee :name "Bob" :age 50 :id 2))
+(defparameter *employee1* (make-instance 'employee :name "Andy" :age 51 :id 3))
+(defparameter *employee2* (make-instance 'employee :name "Tom" :age 52 :id 4))
+(defparameter *employee3* (make-instance 'employee :name "Harry" :age 53 :id 5))
+(defparameter *employee4* (make-instance 'employee :name "Guy" :age 54 :id 6))
 
 ;;; helper to create complex site layout
 (defun create-site-layout ()

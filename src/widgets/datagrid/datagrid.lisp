@@ -20,33 +20,32 @@
   ((data-class :accessor datagrid-data-class
 	       :initform nil
 	       :initarg :data-class
-	       :documentation "The class of the objects rendered by
-	       this datagrid. While the class can potentially be
+	       :documentation "The class name of the objects rendered
+	       by this datagrid. While the class can potentially be
 	       obtained from the data directly, it is not always
 	       possible. Additionally, specifying the class makes
 	       datagrid more efficient. For these reasons it is
 	       required to specify this slot at the instantiation
 	       time.")
-   (data :accessor datagrid-data
-	 :initform nil
-	 :initarg :data
-	 :documentation "Either a sequence of data objects that will
-	 be rendered and modified by this widget, or a function
-	 designator that accepts searching, sorting, and pagination
-	 parameters. If this slot is bound to a sequence, datagrid
-	 will do the pagination and sorting itself in memory
-	 destructively. If the slot is bound to a function (or a
-	 symbol that designates a function), the function is expected
-	 to return a properly sorted and paged sequence. The function
-	 should also accept a :countp keyword argument. If true, the
-	 function should return only the number of items with the
-	 given search parameters, not the actual items themselves.")
+   (on-query :accessor datagrid-on-query
+	     :initform nil
+	     :initarg :on-query
+	     :documentation "A function designator that accepts the
+	     grid instance, as well as searching, sorting, and
+	     pagination parameters. The function is expected to return
+	     a properly sorted and paged sequence. The function should
+	     also accept a :countp keyword argument. If true, the
+	     function should return only the number of items with the
+	     given search parameters, not the actual items
+	     themselves. If this slot is NIL (the default), the
+	     datagrid will operate on all persistent classes specified
+	     in 'data-class'.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
 	 :documentation "Holds a dotted pair of a path to the sorted
-         column and the direction of the sort (:ascending
-         or :descending).")
+         column and the direction of the sort (:asc
+         or :desc).")
    (allow-sorting :accessor datagrid-allow-sorting
 		  :initform t
 		  :initarg :allow-sorting
@@ -195,42 +194,43 @@
   (when (null (datagrid-data-class obj))
     (error "data-class must be specified to initialize a datagrid.")))
 
-;;; If the 'data' slot is a sequence, filters it, sorts the filtered
-;;; data, and returns the result. If it is a function, calls it with
-;;; appropriate parameters. Signals an error otherwise.
-(defmethod datagrid-data ((grid-obj datagrid))
-  (with-slots (data) grid-obj
-    (multiple-value-bind (begin end)
-	(when (datagrid-allow-pagination-p grid-obj)
-	  (pagination-page-item-range (datagrid-pagination-widget grid-obj)))
-      (etypecase data
-	(sequence		 ; 'sequence' also handles null values
-	 (let ((dataseq (datagrid-sort-data grid-obj
-					    (datagrid-filter-data grid-obj data))))
-	   (if (and begin end)
-	       (subseq dataseq begin end)
-	       dataseq)))
-	((or function symbol)
-	 (funcall data (datagrid-search grid-obj) (datagrid-sort grid-obj) (cons begin end)))))))
+(defun datagrid-data (grid)
+  "Returns the items in the grid. If 'datagrid-on-query' is not nil,
+calls the function designated by 'datagrid-on-query'. Otherwise, uses
+persistent store API."
+  (multiple-value-bind (begin end)
+      (when (datagrid-allow-pagination-p grid)
+	(pagination-page-item-range (datagrid-pagination-widget grid)))
+    (if (datagrid-on-query grid)
+	(funcall (datagrid-on-query grid)
+		 grid
+		 (datagrid-search grid) (datagrid-sort grid)
+		 (when (and begin end) (cons begin end)))
+	(find-persistent-objects (class-store (datagrid-data-class grid))
+				 (datagrid-data-class grid)
+				 :filter (datagrid-search grid)
+				 :filter-args (widget-args grid)
+				 :order-by (datagrid-sort grid)
+				 :range (when (and begin end) (cons begin end))))))
 
 (defun datagrid-data-count (grid &key totalp)
   "Returns the number of items in the grid. This function works
 similarly to datagrid-data in principle. Note, if totalp is set to
 true, 'datagrid-data-count' returns the the total number of items and
 ignores searching parameters."
-  (with-slots (data) grid
-    (etypecase data
-      (sequence ; 'sequence' also handles null values
-       (if totalp
-	   (length data)
-	   (length (datagrid-filter-data grid data))))
-      ((or function symbol)
-       (funcall data
-                (when (not totalp)
-                  (datagrid-search grid))
-                nil
-		nil
-                :countp t)))))
+  (if (datagrid-on-query grid)
+      (funcall (datagrid-on-query grid)
+	       grid
+	       (when (not totalp)
+		 (datagrid-search grid))
+	       nil nil :countp t)
+      (if totalp
+	  (count-persistent-objects (class-store (datagrid-data-class grid))
+				    (datagrid-data-class grid))
+	  (count-persistent-objects (class-store (datagrid-data-class grid))
+				    (datagrid-data-class grid)
+				    :filter (datagrid-search grid)
+				    :filter-args (widget-args grid)))))
 
 (defun append-custom-slots (custom-slots args)
   "Appends 'custom-slots' to whatever custom slots that are already
@@ -295,7 +295,10 @@ items available)."))
 		 (datagrid-show-total-items-count-p obj)))
     (with-html
       (:div :class "data-mining-bar"
-	    (if (datagrid-allow-searching-p obj)
+	    (if (and (datagrid-allow-searching-p obj)
+		     (if (datagrid-on-query obj)
+			 t
+			 (supports-filter-p (class-store (datagrid-data-class obj)))))
 		(apply #'datagrid-render-search-bar obj args)
 		(when (datagrid-show-total-items-count-p obj)
 		  (render-total-items-message obj)))
@@ -347,8 +350,11 @@ search requests."))
 				      (string-downcase (humanize-name
 							(datagrid-sorted-slot-name
 							 (datagrid-sort grid))))
-				      (string-downcase (humanize-name
-							(cdr (datagrid-sort grid)))))
+				      (string-downcase
+				       (humanize-name
+					(ecase (cdr (datagrid-sort grid))
+					  (:asc "ascending")
+					  (:desc "descending")))))
 			      nil)
 		 :highlight (when (datagrid-search grid)
 			      (make-isearch-regex (datagrid-search grid)))

@@ -3,7 +3,7 @@
 
 (export '(update-object-from-request slot-in-request-empty-p request-parameters-for-object))
 
-(defgeneric update-object-from-request (obj &rest args)
+(defgeneric update-object-from-request (obj &rest args &key persist-object-p &allow-other-keys)
   (:documentation
    "Tries to deserialize an object from a request via
 'object-from-request-valid-p' (used to easily process forms), and in
@@ -13,15 +13,22 @@ If succeeded returns true. Otherwise returns nil as the first value,
 and an association list of slot names and errors as the second value.
 
 'obj' - An object to be updated from the request.
+'persist-object-p' - if true (the default), the updated object will
+also be persisted via 'persist-object'.
 
 Other arguments normally passed to weblocks functions (see
 'object-visible-slots') apply to 'update-object-from-request' as
 well."))
 
-(defmethod update-object-from-request ((obj standard-object) &rest args)
+(defmethod update-object-from-request ((obj standard-object) &rest args
+				       &key (persist-object-p t)  &allow-other-keys)
   (multiple-value-bind (success results) (apply #'object-from-request-valid-p obj args)
     (if success
-	(apply #'update-object-from-request-aux obj results args)
+	(progn
+	  (apply #'update-object-from-request-aux obj results args)
+	  (when persist-object-p
+	    (persist-object (object-store obj) obj))
+	  t)
 	(values nil (reverse results)))))
 
 (defun update-object-from-request-aux (obj parsed-request &rest args)

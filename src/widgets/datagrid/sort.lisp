@@ -26,7 +26,7 @@ it's sorted on nothing."
 						  (if (typep slot-value 'standard-object)
 						      (object-name slot-value)
 						      slot-value)))
-	     (setf (datagrid-sort grid) (cons slot-path :ascending))))
+	     (setf (datagrid-sort grid) (cons slot-path :asc))))
 	 :call-around-fn-p nil
 	 args))
 
@@ -57,25 +57,12 @@ functions."
 			      (car sort-info)
 			      sort-info)))))
 
-(defun datagrid-sort-data (grid-obj data)
-  "Sorts the data of the datagrid."
-  (with-slots (sort) grid-obj
-    (if sort
-	(stable-sort (copy-list data)
-		     (if (equalp (cdr sort) :ascending)
-			 #'strictly-less-p
-			 (lambda (a b)
-			   (and (not (strictly-less-p a b))
-				(not (equivalentp a b)))))
-		     :key (curry-after #'slot-value-by-path (car sort) :observe-inline-p t))
-	data)))
-
 (defun negate-sort-direction (dir)
-  "Returns a negated direction of a sort (returns :ascending
-for :descending and vica versa)."
+  "Returns a negated direction of a sort (returns :asc
+for :desc and vica versa)."
   (ecase dir
-    (:ascending :descending)
-    (:descending :ascending)))
+    (:asc :desc)
+    (:desc :asc)))
 
 ;;; Hooks into table renderer's header rendering mechanism and
 ;;; forwards the calls to 'render-datagrid-header-cell' whenever
@@ -111,7 +98,7 @@ customize the way datagrid headers are rendered."))
   (let ((th-class (when (equalp slot-name (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
 		    (concatenate 'string " sort-"
 				 (attributize-name (string (cdr (datagrid-sort grid-obj)))))))
-	slot dir (new-dir :ascending))
+	slot dir (new-dir :asc))
     (unless (null (datagrid-sort grid-obj))
       (setf slot (datagrid-sorted-slot-name (datagrid-sort grid-obj)))
       (setf dir (cdr (datagrid-sort grid-obj))))

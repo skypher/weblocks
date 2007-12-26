@@ -21,37 +21,41 @@
 ;;; test datagrid-data
 (deftest datagrid-data-1
     (with-request :get nil
-      (datagrid-data (make-instance 'datagrid
-				    :data (list 1 2)
-				    :data-class 'employee)))
-  (1 2))
+      (persist-objects *default-store* (list *joe* *bob*))
+      (mapcar #'first-name
+	      (datagrid-data (make-instance 'datagrid
+					    :data-class 'employee))))
+  ("Joe" "Bob"))
 
 (deftest datagrid-data-2
     (with-request :get nil
       (datagrid-data (make-instance 'datagrid
-				    :data (lambda (search sort pagination &key countp)
-					    (if countp
-						2 (list 1 2)))
+				    :on-query (lambda (grid search sort pagination &key countp)
+						(if countp
+						    2 (list 1 2)))
 				    :data-class 'employee)))
   (1 2))
 
 (deftest datagrid-data-3
     (with-request :get nil
-      (datagrid-data (make-instance 'datagrid
-				    :data (list 1 2 3 4 5 6)
-				    :data-class 'integer
-				    :pagination-widget
-				    (make-instance 'pagination
-						   :total-items 6
-						   :items-per-page 4
-						   :current-page 1))))
-  (1 2 3 4))
+      (persist-objects *default-store* (list *joe* *bob* *employee1* *employee2*
+					     *employee3* *employee4*))
+      (mapcar #'first-name
+	      (datagrid-data (make-instance 'datagrid
+					    :data-class 'employee
+					    :sort (cons 'name :asc)
+					    :pagination-widget
+					    (make-instance 'pagination
+							   :total-items 6
+							   :items-per-page 4
+							   :current-page 1)))))
+  ("Andy" "Bob" "Guy" "Harry"))
 
 (deftest datagrid-data-4
     (with-request :get nil
       (datagrid-data (make-instance 'datagrid
-				    :data (lambda (search sort pagination &key countp)
-					    pagination)
+				    :on-query (lambda (grid search sort pagination &key countp)
+						pagination)
 				    :data-class 'integer
 				    :pagination-widget
 				    (make-instance 'pagination
@@ -60,37 +64,36 @@
 						   :current-page 1))))
   (0 . 4))
 
-(defun datagrid-data-foo (search sort pagination &key countp)
+(defun datagrid-data-foo (grid search sort pagination &key countp)
   (if countp
       2 (list 1 2)))
 
 (deftest datagrid-data-5
     (with-request :get nil
       (datagrid-data (make-instance 'datagrid
-				    :data 'datagrid-data-foo
+				    :on-query 'datagrid-data-foo
 				    :data-class 'employee)))
   (1 2))
 
 (deftest datagrid-data-6
     (with-request :get nil
       (datagrid-data (make-instance 'datagrid
-				    :data nil
 				    :data-class 'employee)))
   nil)
 
 ;;; test datagrid-data-count
 (deftest datagrid-data-count-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (datagrid-data-count (make-instance 'datagrid
-					  :data (list 1 2)
 					  :data-class 'employee)))
   2)
 
 (deftest datagrid-data-count-2
     (with-request :get nil
       (datagrid-data-count (make-instance 'datagrid
-					  :data (lambda (search sort pagination &key countp)
-						  (list search sort pagination countp))
+					  :on-query (lambda (grid search sort pagination &key countp)
+						      (list search sort pagination countp))
 					  :search "foo"
 					  :data-class 'employee)))
   ("foo" nil nil t))
@@ -98,20 +101,20 @@
 (deftest datagrid-data-count-3
     (with-request :get nil
       (datagrid-data-count (make-instance 'datagrid
-					  :data (lambda (search sort pagination &key countp)
-						  (list search sort countp))
+					  :on-query (lambda (grid search sort pagination &key countp)
+						      (list search sort countp))
 					  :search "foo"
 					  :data-class 'employee)
 			   :totalp t))
   (nil nil t))
 
-(defun datagrid-data-count-foo (search sort pagination &key countp)
+(defun datagrid-data-count-foo (grid search sort pagination &key countp)
   (list search sort pagination countp))
 
 (deftest datagrid-data-count-4
     (with-request :get nil
       (datagrid-data-count (make-instance 'datagrid
-					  :data 'datagrid-data-count-foo
+					  :on-query 'datagrid-data-count-foo
 					  :search "foo"
 					  :data-class 'employee)))
   ("foo" nil nil t))
@@ -119,7 +122,7 @@
 (deftest datagrid-data-count-5
     (with-request :get nil
       (datagrid-data-count (make-instance 'datagrid
-					  :data 'datagrid-data-count-foo
+					  :on-query 'datagrid-data-count-foo
 					  :search "foo"
 					  :data-class 'employee)
 			   :totalp t))
@@ -128,7 +131,6 @@
 (deftest datagrid-data-count-6
     (with-request :get nil
       (datagrid-data-count (make-instance 'datagrid
-					  :data nil
 					  :data-class 'employee)))
   0)
 
@@ -174,13 +176,15 @@
 ;;; test total-items-message
 (deftest total-items-message-1
     (with-request :get nil
-      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+      (persist-objects *default-store* (list *joe* *bob*))
+      (weblocks::total-items-message (make-instance 'datagrid
 						    :data-class 'employee)))
   "(Total of 2 Items)")
 
 (deftest total-items-message-2
     (with-request :get nil
-      (weblocks::total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+      (persist-objects *default-store* (list *joe* *bob*))
+      (weblocks::total-items-message (make-instance 'datagrid
 						    :search "Test"
 						    :data-class 'employee)))
   "(Found 0 of 2 Items)")
@@ -188,16 +192,17 @@
 ;;; test render-total-items-message
 (deftest-html render-total-items-message-1
     (with-request :get nil
-      (weblocks::render-total-items-message (make-instance 'datagrid :data (list *joe* *bob*)
+      (persist-objects *default-store* (list *joe* *bob*))
+      (weblocks::render-total-items-message (make-instance 'datagrid
 							   :data-class 'employee)))
   (:span :class "total-items" "(Total of 2 Items)"))
 
 ;;; test datagrid-render-mining-bar
 (deftest-html datagrid-render-mining-bar-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (datagrid-render-mining-bar
        (make-instance 'datagrid
-		      :data (list *joe* *bob*)
 		      :data-class 'employee
 		      :show-total-items-count-p nil
 		      :allow-searching-p nil
@@ -206,9 +211,9 @@
 
 (deftest-html datagrid-render-mining-bar-2
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (datagrid-render-mining-bar
        (make-instance 'datagrid
-		      :data (list *joe* *bob*)
 		      :data-class 'employee
 		      :show-total-items-count-p t
 		      :allow-searching-p nil
@@ -219,8 +224,8 @@
 ;;; test render-widget-body for datagrid
 (deftest-html render-widget-body-datagrid-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :show-total-items-count-p nil
 				 :allow-pagination-p nil))
@@ -242,7 +247,7 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc125" "Name")))
+		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc125" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Bob"))
@@ -258,8 +263,8 @@
 
 (deftest-html render-widget-body-datagrid-2
     (with-request :get nil
+      (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe*)
 				 :data-class 'employee
 				 :allow-select-p nil
 				 :allow-searching-p nil
@@ -281,7 +286,7 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc124" "Name")))
+		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc124" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Joe"))
@@ -294,8 +299,8 @@
 
 (deftest-html render-widget-body-datagrid-3
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)
-					   :data-class 'employee
+      (persist-objects *default-store* (list *joe* *bob*))
+      (let ((grid (make-instance 'datagrid :data-class 'employee
 					   :search "doesn't exist"
 					   :allow-pagination-p nil)))
 	;; render datagrid
@@ -331,8 +336,8 @@
 
 (deftest render-widget-body-datagrid-4
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe*)
-					   :data-class 'employee))
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'datagrid :data-class 'employee))
 	    (*weblocks-output-stream* (make-string-output-stream)))
 	(declare (special *weblocks-output-stream*))
 	;; render datagrid
@@ -342,8 +347,9 @@
 
 (deftest-html render-widget-body-datagrid-5
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
+				 :sort (cons 'name :asc)
 				 :data-class 'employee
 				 :show-total-items-count-p nil))
 	    (*on-ajax-complete-scripts* nil))
@@ -353,7 +359,7 @@
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; add another item
-	(push-end *joe* (slot-value grid 'weblocks::data))
+	(persist-object *default-store* *employee4*)
 	;; go to next page
 	(do-request `((,weblocks::*action-string* . "abc127")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
@@ -372,7 +378,7 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc125" "Name")))
+		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc125" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Bob"))
@@ -400,10 +406,10 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc131" "Name")))
+		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
 		      (:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 		    '((:tr
-		       (:td :class "name" (:span :class "value" "Joe"))
+		       (:td :class "name" (:span :class "value" "Guy"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
 	   (:input :name "action" :type "hidden" :value "abc130"))
@@ -418,8 +424,8 @@
 
 (deftest render-widget-body-datagrid-6
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :data-class 'employee
 				 :show-total-items-count-p nil))
 	    (*on-ajax-complete-scripts* nil)
@@ -445,11 +451,69 @@
 	t))
   t)
 
+(defclass not-searchable-person ()
+  ((id :initform nil)
+   (first-name :accessor nsp-first-name
+	       :initarg :first-name)
+   (last-name :accessor nsp-last-name
+	      :initarg :last-name)))
+
+(defmethod class-store ((class-name (eql 'not-searchable-person)))
+  *not-searchable-store*)
+
+(defmethod supports-filter-p :around (store)
+  (if (eql store *not-searchable-store*)
+      nil
+      (call-next-method)))
+
+(deftest-html render-widget-body-datagrid-7
+    (with-request :get nil
+      (persist-objects *not-searchable-store*
+		       (list
+			(make-instance 'not-searchable-person :first-name "foo1"
+				       :last-name "bar1")
+			(make-instance 'not-searchable-person :first-name "foo2"
+				       :last-name "bar2")))
+      (let ((grid (make-instance 'datagrid
+				 :data-class 'not-searchable-person
+				 :show-total-items-count-p nil
+				 :allow-pagination-p nil)))
+	;; render datagrid
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
+  (htm
+   (:div :class "data-mining-bar")
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:form :class "datagrid-form"
+	  :action "/foo/bar"
+	  :method "get"
+	  :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+	  (:div :class "extra-top-1" "<!-- empty -->")
+	  (:div :class "extra-top-2" "<!-- empty -->")
+	  (:div :class "extra-top-3" "<!-- empty -->")
+	  (:fieldset
+	   (:div :class "datagrid-body"
+		 #.(table-header-template
+		    '((:th :class "first-name sort-asc"
+		       (:span #.(link-action-template "abc124" "First Name")))
+		      (:th :class "last-name" (:span #.(link-action-template "abc125" "Last Name"))))
+		    '((:tr
+		       (:td :class "first-name" (:span :class "value" "foo1"))
+		       (:td :class "last-name" (:span :class "value" "bar1")))
+		      (:tr :class "altern"
+		       (:td :class "first-name" (:span :class "value" "foo2"))
+		       (:td :class "last-name" (:span :class "value" "bar2"))))
+		    :summary "Ordered by first name, ascending."
+		    :table-class "not-searchable-person"))
+	   (:input :name "action" :type "hidden" :value "abc123"))
+	  (:div :class "extra-bottom-1" "<!-- empty -->")
+	  (:div :class "extra-bottom-2" "<!-- empty -->")
+	  (:div :class "extra-bottom-3" "<!-- empty -->"))))
+
 ;;; test render-datagrid-table-body
 (deftest-html render-datagrid-table-body-1
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :data-class 'employee))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *on-ajax-complete-scripts*))
@@ -464,7 +528,7 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
@@ -475,7 +539,7 @@
 	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-descending" (:span #.(link-action-template "abc125" "Name")))
+	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc125" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
@@ -486,7 +550,7 @@
 	    :summary "Ordered by name, descending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-descending" (:span #.(link-action-template "abc127" "Name")))
+	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc127" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
@@ -498,15 +562,15 @@
 
 (deftest-html render-datagrid-table-body-2
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :allow-sorting '(manager)
 				 :data-class 'employee)))
 	(render-datagrid-table-body grid)))
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" "Name")
-	      (:th :class "manager sort-ascending" (:span #.(link-action-template "abc123" "Manager"))))
+	      (:th :class "manager sort-asc" (:span #.(link-action-template "abc123" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -517,8 +581,8 @@
 
 (deftest-html render-datagrid-table-body-3
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :allow-sorting nil
 				 :data-class 'employee)))
 	(render-datagrid-table-body grid)))
@@ -535,8 +599,8 @@
 
 (deftest-html render-datagrid-table-body-4
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :data-class 'employee)))
 	(render-datagrid-table-body grid)
 	(setf (first-name *bob*) "Zed")
@@ -545,7 +609,7 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
@@ -556,7 +620,7 @@
 	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc125" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc125" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
@@ -568,8 +632,8 @@
 
 (deftest-html render-datagrid-table-body-5
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
 				 :search "J"
 				 :data-class 'employee)))
 	;; render datagrid
@@ -577,7 +641,7 @@
   (htm
    (:div :class "datagrid-body"
    #.(table-header-template
-      '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+      '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	(:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
       '((:tr
 	 (:td :class "name" (:span :class "value" "Bob"))
@@ -589,9 +653,9 @@
 
 (deftest-html render-datagrid-table-body-6
     (with-request :get nil
+      (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :data (list *joe* *bob*)
-				 :sort '(address-ref . :ascending)
+				 :sort '(address-ref . :asc)
 				 :data-class 'employee)))
 	;; render datagrid
 	(render-datagrid-table-body grid :slots '(address-ref))
@@ -602,7 +666,7 @@
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "address-ref sort-ascending" (:span #.(link-action-template "abc124" "Address")))
+	      (:th :class "address-ref sort-asc" (:span #.(link-action-template "abc124" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
@@ -616,7 +680,7 @@
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" (:span #.(link-action-template "abc126" "Name")))
-	      (:th :class "address-ref sort-descending" (:span #.(link-action-template "abc127" "Address")))
+	      (:th :class "address-ref sort-desc" (:span #.(link-action-template "abc127" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))

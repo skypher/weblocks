@@ -2,8 +2,9 @@
 (in-package :weblocks-test)
 
 ;;; utilities for easier testing
-(defun table-header-template (headers rows &key summary pretable posttable)
-  `(:div :class "renderer table employee"
+(defun table-header-template (headers rows &key summary pretable posttable
+			      (table-class "employee"))
+  `(:div :class ,(format nil "renderer table ~A" table-class)
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
 	 (:div :class "extra-top-3" "<!-- empty -->")

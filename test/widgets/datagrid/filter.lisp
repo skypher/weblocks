@@ -1,84 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test datagrid-filter-data
-(deftest datagrid-filter-data-1
-    (with-request :get nil
-      (length (weblocks::datagrid-filter-data
-	       (make-instance 'datagrid :search "Joe"
-					:data-class 'employee)
-	       (list *joe* *bob*))))
-  1)
-
-(deftest datagrid-filter-data-2
-    (with-request :get nil
-      (length (weblocks::datagrid-filter-data
-	       (make-instance 'datagrid :search "o"
-					:data-class 'employee)
-	       (list *joe* *bob*))))
-  2)
-
-(deftest datagrid-filter-data-3
-    (with-request :get nil
-      (length (weblocks::datagrid-filter-data
-	       (make-instance 'datagrid :search "o"
-					:data-class 'employee
-					:widget-args '(:slots (age) :mode :strict))
-	       (list *joe* *bob*))))
-  0)
-
-;;; test object-satisfies-search-p
-(deftest object-satisfies-search-p-1
-    (weblocks::object-satisfies-search-p "hi" nil nil t *joe*)
-  nil)
-
-(deftest object-satisfies-search-p-2
-    (weblocks::object-satisfies-search-p "Joe" nil nil t *joe*)
-  t)
-
-(deftest object-satisfies-search-p-3
-    (weblocks::object-satisfies-search-p "30" nil nil t *joe*)
-  nil)
-
-(deftest object-satisfies-search-p-4
-    (weblocks::object-satisfies-search-p "30" nil nil t *joe* :slots '(age))
-  t)
-
-(deftest object-satisfies-search-p-5
-    (weblocks::object-satisfies-search-p "Broadway" nil nil t *joe*)
-  nil)
-
-(deftest object-satisfies-search-p-6
-    (weblocks::object-satisfies-search-p "address" nil nil t *joe*)
-  nil)
-
-(deftest object-satisfies-search-p-7
-    (not (null (weblocks::object-satisfies-search-p "Joe" *joe* 'name 'string "Joe")))
-  t)
-
-(deftest object-satisfies-search-p-8
-    (weblocks::object-satisfies-search-p "Bene" nil nil t *joe* :slots '(education))
-  t)
-
-(deftest object-satisfies-search-p-9
-    (weblocks::object-satisfies-search-p "Broadway" nil nil t *joe* :slots '(address-ref))
-  nil)
-
-;;; test make-isearch-regex
-(deftest make-isearch-regex-1
-    (let ((regex (weblocks::make-isearch-regex "hello")))
-      (values (ppcre:scan regex "hello")
-	      (ppcre:scan regex "HeLlO")
-	      (ppcre:scan regex "test")))
-  0 0 nil)
-
-(deftest make-isearch-regex-2
-    (let ((regex (weblocks::make-isearch-regex "Hello")))
-      (values (ppcre:scan regex "Hello")
-	      (ppcre:scan regex "hello")
-	      (ppcre:scan regex "test")))
-  0 nil nil)
-
 ;;; test datagrid-render-search-bar
 (deftest datagrid-render-search-bar-1
     (with-request :get nil
@@ -95,7 +17,8 @@
 
 (deftest datagrid-render-search-bar-2
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)
+      (persist-objects *default-store* (list *joe* *bob*))
+      (let ((grid (make-instance 'datagrid
 				 :data-class 'employee))
 	    (*weblocks-output-stream* (make-string-output-stream))
 	    (*on-ajax-complete-scripts* nil))
@@ -108,12 +31,13 @@
 	(reverse *on-ajax-complete-scripts*)))
   ("new Function(\"updateElementBody($('widget-123').getElementsByClassName('datagrid-body')[0], \\\"<div class='datagrid-body'><div class='renderer table empty-table'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><p><span class='message'>No information available.</span></p><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></div></div>\\\");\")"
                "new Function(\"updateElementBody($('widget-123').getElementsByClassName('total-items')[0], '(Found 0 of 2 Items)');\")"
-               "new Function(\"updateElementBody($('widget-123').getElementsByClassName('datagrid-body')[0], \\\"<div class='datagrid-body'><div class='renderer table employee'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><table summary='Ordered by name, ascending.'><thead><tr><th class='name sort-ascending'><span><a href='/foo/bar?action=abc124' onclick='initiateAction(\\\\\\\"abc124\\\\\\\", \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'>Name</a></span></th><th class='manager'><span><a href='/foo/bar?action=abc125' onclick='initiateAction(\\\\\\\"abc125\\\\\\\", \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'>Manager</a></span></th></tr></thead><tbody><tr><td class='name'><span class='value'><strong>Bob</strong></span></td><td class='manager'><span class='value'>Jim</span></td></tr></tbody></table><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></div></div>\\\");\")"
+               "new Function(\"updateElementBody($('widget-123').getElementsByClassName('datagrid-body')[0], \\\"<div class='datagrid-body'><div class='renderer table employee'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><table summary='Ordered by name, ascending.'><thead><tr><th class='name sort-asc'><span><a href='/foo/bar?action=abc124' onclick='initiateAction(\\\\\\\"abc124\\\\\\\", \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'>Name</a></span></th><th class='manager'><span><a href='/foo/bar?action=abc125' onclick='initiateAction(\\\\\\\"abc125\\\\\\\", \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'>Manager</a></span></th></tr></thead><tbody><tr><td class='name'><span class='value'><strong>Bob</strong></span></td><td class='manager'><span class='value'>Jim</span></td></tr></tbody></table><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></div></div>\\\");\")"
                "new Function(\"updateElementBody($('widget-123').getElementsByClassName('total-items')[0], '(Found 1 of 2 Items)');\")"))
 
 (deftest-html datagrid-render-search-bar-3
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe* *bob*)
+      (persist-objects *default-store* (list *joe* *bob*))
+      (let ((grid (make-instance 'datagrid
 				 :data-class 'employee))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))
@@ -136,7 +60,8 @@
 
 (deftest-html datagrid-render-search-bar-4
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid :data (list *joe*)
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'datagrid
 				 :data-class 'employee))
 	    (*on-ajax-complete-scripts* nil))
 	(declare (special *weblocks-output-stream* *on-ajax-complete-scripts*))

@@ -33,7 +33,7 @@
 		      :depends-on ("weblocks"))
 	       (:file "request-handler"
 		      :depends-on ("weblocks" utils "page-template" "debug-mode" "actions" "request-hooks"
-					      "application" "request"))
+					      "application" "request" store))
 	       (:module snippets
 			:components ((:file "suggest")
 				     (:file "isearch"
@@ -61,6 +61,10 @@
 				     (:file "request-object-mapping"
 					    :depends-on ("validation" "form-parsers")))
 			:depends-on (utils linguistic))
+	       (:module store
+			:components ((:file "store-api")
+				     (:file "store-utils"))
+			:depends-on (weblocks utils))
 	       (:module widgets
 			:components ((:module widget
 					      :components ((:file "widget"
@@ -91,7 +95,7 @@
 					    :depends-on ("composite" widget)))
 			:depends-on (snippets renderers
 					      form-management utils "actions" "server" "request"
-					      "request-hooks" linguistic))
+					      "request-hooks" linguistic store))
 	       (:module types
 			:components ((:file "us-states")
 				     (:file "text")
@@ -110,7 +114,7 @@
 					    :depends-on ("call-answer")))
 			:depends-on ("weblocks" "widgets" "request-handler" "snippets"))
 	       (:file "server"
-		      :depends-on ("weblocks" utils))
+		      :depends-on ("weblocks" utils store))
 	       (:file "request"
 		      :depends-on ("weblocks" "actions"))
 	       (:file "application"

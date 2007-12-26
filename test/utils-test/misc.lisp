@@ -271,57 +271,6 @@
        (:div :class "extra-bottom-2" "<!-- empty -->")
        (:div :class "extra-bottom-3" "<!-- empty -->")))
 
-;;; test strictly-less-p
-(deftest strictly-less-p-1
-    (strictly-less-p 1 2)
-  t)
-
-(deftest strictly-less-p-2
-    (not (null (strictly-less-p "a" "b")))
-  t)
-
-(deftest strictly-less-p-3
-    (not (null (strictly-less-p nil nil)))
-  nil)
-
-(deftest strictly-less-p-4
-    (strictly-less-p nil 'a)
-  nil)
-
-(deftest strictly-less-p-5
-    (strictly-less-p 'a nil)
-  t)
-
-(deftest strictly-less-p-6
-    (strictly-less-p 'a "b")
-  t)
-
-(deftest strictly-less-p-7
-    (strictly-less-p 'b "a")
-  nil)
-
-(deftest strictly-less-p-8
-    (strictly-less-p t nil)
-  t)
-
-(deftest strictly-less-p-9
-    (strictly-less-p nil t)
-  nil)
-
-;;; test equivalentp
-(deftest equivalentp-1
-    (equivalentp "a" "a")
-  t)
-
-(deftest equivalentp-2
-    (equivalentp nil nil)
-  t)
-
-;;; test object-id
-(deftest object-id-1
-    (object-id *joe*)
-  1)
-
 ;;; test visit-object-slots
 (deftest-html visit-object-slots-1
     (weblocks::visit-object-slots
@@ -643,4 +592,19 @@
     (with-request :get '(("action" . "test1") ("session" . "test2") ("foo" . "bar"))
       (weblocks:remove-parameter-from-uri "/pub/baz" "action"))
   "/pub/baz?session=test2&foo=bar")
+
+;;; test make-isearch-regex
+(deftest make-isearch-regex-1
+    (let ((regex (weblocks::make-isearch-regex "hello")))
+      (values (ppcre:scan regex "hello")
+	      (ppcre:scan regex "HeLlO")
+	      (ppcre:scan regex "test")))
+  0 0 nil)
+
+(deftest make-isearch-regex-2
+    (let ((regex (weblocks::make-isearch-regex "Hello")))
+      (values (ppcre:scan regex "Hello")
+	      (ppcre:scan regex "hello")
+	      (ppcre:scan regex "test")))
+  0 nil nil)
 

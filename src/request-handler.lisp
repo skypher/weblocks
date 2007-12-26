@@ -68,9 +68,18 @@ customize behavior)."))
 			*current-page-description*))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))
-      (eval-hook :pre-action)
-      (eval-action)
-      (eval-hook :post-action)
+      ; wrap action and pre/post action hooks in transaction
+      (let (tx-all-committed-p)
+	(unwind-protect
+	     (progn
+	       (mapstores #'begin-transaction)
+	       (eval-hook :pre-action)
+	       (eval-action)
+	       (eval-hook :post-action)
+	       (mapstores #'commit-transaction)
+	       (setf tx-all-committed-p t))
+	  (unless tx-all-committed-p
+	    (mapstores #'rollback-transaction))))
       (when (and (not (ajax-request-p))
 		 (find *action-string* (get-parameters)
 		       :key #'car :test #'string-equal))

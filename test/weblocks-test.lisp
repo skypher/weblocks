@@ -70,12 +70,9 @@ continue-testing in a clean test environment. See
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
 
-(defun gen-object-id ()
-  "Generates an object id that is guranteed to be unique and
-consecutive per test, as long as the instance is created within
-'deftest-html'."
-  (declare (special *test-widget-id*))
-  (incf *test-widget-id*))
+; We'll use memory store for testing
+(defstore *not-searchable-store* :memory)
+(defstore *test-store* :memory)
 
 (defmacro deftest-html (name form value)
   "A helper macro for creating html test cases. The macro writes
@@ -159,6 +156,7 @@ the request."
        (declare (special *uri-tokens* weblocks::*page-public-dependencies* *session*
 			 *on-ajax-complete-scripts*))
        (unwind-protect (progn
+			 (weblocks::open-stores)
 			 (start-session)
 			 (setf (symbol-function 'weblocks::make-action)
 			       (lambda (action-fn &optional action-code)
@@ -180,7 +178,8 @@ the request."
 			 (setf (slot-value *session* 'hunchentoot::session-string) "test")
 			 ,@body)
 	 (setf (symbol-function 'weblocks::make-action) make-action-orig)
-	 (setf (symbol-function 'weblocks::generate-widget-id) generate-widget-id-orig)))))
+	 (setf (symbol-function 'weblocks::generate-widget-id) generate-widget-id-orig)
+	 (weblocks::close-stores)))))
 
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."

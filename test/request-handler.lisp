@@ -361,6 +361,77 @@ onclick='disableIrrelevantButtons(this);' />~
 	(header-out "Location")))
   nil)
 
+(defmethod begin-transaction :after (store)
+  (declare (special *res*))
+  (when (and (eql store *default-store*)
+	     (boundp '*res*))
+    (incf *res*)))
+
+(defmethod commit-transaction :after (store)
+  (declare (special *res*))
+  (when (and (eql store *default-store*)
+	     (boundp '*res*))
+    (incf *res*)))
+
+(defmethod rollback-transaction :after (store)
+  (declare (special *res*))
+  (when (and (eql store *default-store*)
+	     (boundp '*res*))
+    (decf *res*)))
+
+(deftest handle-client-request-13
+    (with-request :get '(("action" . "abc123"))
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name* (*res* 0))
+	;; set up mini application
+	(declare (special weblocks::*webapp-name*  *request-hook* *res*))
+	(make-request-ajax)
+	(defwebapp 'hello)
+	(start-session)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
+	;; prepare action
+	(make-action (lambda (&rest args)
+		       nil)
+		     "abc123")
+	;; prepare dummy app
+	(setf (root-composite) (make-instance 'composite))
+	;; handle the request
+	(catch 'hunchentoot::handler-done
+	  (handle-client-request))
+	;; clean up app
+	(fmakunbound 'init-user-session)
+	;; result
+	*res*))
+  2)
+
+(deftest handle-client-request-14
+    (with-request :get '(("action" . "abc123"))
+      (let ((weblocks::*render-debug-toolbar* nil)
+	    weblocks::*webapp-name* (*res* 0))
+	;; set up mini application
+	(declare (special weblocks::*webapp-name*  *request-hook* *res*))
+	(make-request-ajax)
+	(defwebapp 'hello)
+	(start-session)
+	;; set the uri
+	(setf (slot-value *request* 'hunchentoot::uri) "/")
+	;; prepare action
+	(make-action (lambda (&rest args)
+		       (error "foo"))
+		     "abc123")
+	;; prepare dummy app
+	(setf (root-composite) (make-instance 'composite))
+	;; handle the request
+	(catch 'hunchentoot::handler-done
+	  (ignore-errors
+	    (handle-client-request)))
+	;; clean up app
+	(fmakunbound 'init-user-session)
+	;; result
+	*res*))
+  0)
+
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil

@@ -120,8 +120,8 @@ behavior.
 If specializing above steps isn't sufficient to produce required HTML,
 'render-data-value' should be specialized for particular objects.
 
-When 'highlight' is set not null, render-data-value searches for the
-ppcre regular expression it represents and renders it as a strong
+When 'highlight' is not null, render-data-value searches for the ppcre
+regular expression it represents and renders it as a strong
 element. This is done to support incremental searching in some
 controls.
 

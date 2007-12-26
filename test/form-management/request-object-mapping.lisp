@@ -93,6 +93,24 @@
 	(slot-value new-joe 'age)))
   25)
 
+(deftest request-object-mapping-10
+    (with-request :get '(("name" . "Pink") ("age" . "25"))
+      (let ((new-joe (copy-template *joe*)))
+	(update-object-from-request new-joe :slots '(age))
+	(values (slot-value new-joe 'name)
+		(slot-value new-joe 'age)))
+      (count-persistent-objects *default-store* 'employee))
+  1)
+
+(deftest request-object-mapping-11
+    (with-request :get '(("name" . "Pink") ("age" . "25"))
+      (let ((new-joe (copy-template *joe*)))
+	(update-object-from-request new-joe :slots '(age) :persist-object-p nil)
+	(values (slot-value new-joe 'name)
+		(slot-value new-joe 'age)))
+      (count-persistent-objects *default-store* 'employee))
+  0)
+
 ;;; test object-from-request-valid-p (also tested through request-object-mapping)
 (deftest object-from-request-valid-p-1
     (with-request :get '(("name" . "Pink") ("age" . "25"))

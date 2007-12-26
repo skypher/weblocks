@@ -7,14 +7,14 @@
 	  slot-value-by-path render-slot-inline-p safe-apply
 	  safe-funcall request-parameter request-parameters
 	  string-whitespace-p render-extra-tags with-extra-tags
-	  strictly-less-p equivalentp object-id id alist->plist
-	  intersperse remove-keyword-parameter
-	  public-file-relative-path public-files-relative-paths
-	  request-uri-path string-remove-left string-remove-right
-	  find-all stable-set-difference symbol-status
-	  string-invert-case ninsert object-full-visible-slot-count
-	  add-get-param-to-url remove-parameter-from-uri
-	  asdf-system-directory))
+	  visit-object-slots alist->plist intersperse
+	  remove-keyword-parameter public-file-relative-path
+	  public-files-relative-paths request-uri-path
+	  string-remove-left string-remove-right find-all
+	  stable-set-difference symbol-status string-invert-case
+	  ninsert object-full-visible-slot-count add-get-param-to-url
+	  remove-parameter-from-uri asdf-system-directory
+	  make-isearch-regex))
 
 (defun humanize-name (name)
   "Convert a string or a symbol to a human-readable string
@@ -419,61 +419,6 @@ headers on top and three on the bottom. It uses
      ,@body
      (render-extra-tags "extra-bottom-" 3)))
 
-(defgeneric strictly-less-p (a b)
-  (:documentation
-   "Returns true if 'a' is strictly less than 'b'. This function is
-used by the framework for sorting data."))
-
-(defmethod strictly-less-p ((a number) (b number))
-  (< a b))
-
-(defmethod strictly-less-p ((a string) (b string))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a symbol) (b symbol))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a string) (b symbol))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a symbol) (b string))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a (eql nil)) (b (eql nil)))
-  nil)
-
-(defmethod strictly-less-p (a (b (eql nil)))
-  t)
-
-(defmethod strictly-less-p ((a (eql nil)) b)
-  nil)
-
-(defmethod strictly-less-p ((a symbol) (b (eql nil)))
-  t)
-
-(defgeneric equivalentp (a b)
-  (:documentation
-   "Returns true if 'a' is in some sense equivalent to 'b'. This
-function is used by the framework for sorting data."))
-
-(defmethod equivalentp (a b)
-  (equalp a b))
-
-(defmethod equivalent ((a (eql nil)) (b (eql nil)))
-  t)
-
-(defgeneric object-id (obj)
-  (:documentation
-   "Returns a value that uniquely identifies an object in memory or in
-a backend store. The default implementation looks for an 'id' slot via
-'slot-value'. If such slot is not present, signals an
-error. Specialize this function for various back end stores and other
-object identification schemes."))
-
-(defmethod object-id ((obj standard-object))
-  (handler-case (slot-value obj 'id)
-    (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
-
 (defun visit-object-slots (obj render-slot-fn &rest keys &key (call-around-fn-p t)
 			   (ignore-unbound-slots-p t) &allow-other-keys)
   "Used by 'render-standard-object' to visit visible slots of an
@@ -703,4 +648,11 @@ system resides."
   (make-pathname :directory
 		 (pathname-directory (truename (asdf:system-definition-pathname
 						(asdf:find-system asdf-system-name))))))
+
+(defun make-isearch-regex (search)
+  "Create a regular expression from the user's input that tries to be
+faithful to Emacs' isearch."
+  (if (some #'upper-case-p search)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
 

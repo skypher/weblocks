@@ -84,8 +84,8 @@
 (deftest-html datagrid-drilldown-test-1
     (let ((res))
       (with-request :get nil
+	(persist-objects *default-store* (list *joe* *bob*))
 	(let ((grid (make-instance 'datagrid
-				   :data (list *joe* *bob*)
 				   :data-class 'employee
 				   :allow-drilldown-p t
 				   :on-drilldown (cons 'edit (lambda (grid item)
@@ -101,7 +101,7 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
 	      (:th :class "drilldown edit" ""))
 	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
@@ -130,8 +130,8 @@
 (deftest-html autoset-drilled-down-item-p-1
     (let ((res))
       (with-request :get nil
+	(persist-objects *default-store* (list *joe* *bob*))
 	(let ((grid (make-instance 'datagrid
-				   :data (list *joe* *bob*)
 				   :data-class 'employee
 				   :allow-drilldown-p t
 				   :on-drilldown
@@ -149,7 +149,7 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
 	      (:th :class "drilldown edit" ""))
 	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
@@ -177,8 +177,8 @@
 (deftest-html autoset-drilled-down-item-p-2
     (let ((res))
       (with-request :get nil
+	(persist-objects *default-store* (list *joe* *bob*))
 	(let ((grid (make-instance 'datagrid
-				   :data (list *joe* *bob*)
 				   :data-class 'employee
 				   :allow-drilldown-p t
 				   :autoset-drilled-down-item-p t
@@ -197,7 +197,7 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-ascending" (:span #.(link-action-template "abc123" "Name")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
 	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
 	      (:th :class "drilldown edit" ""))
 	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
