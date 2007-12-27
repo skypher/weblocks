@@ -70,11 +70,15 @@
 	 (objects (or (get-root-object store class-name)
 		      (setf (get-root-object store class-name)
 			    (make-instance 'persistant-objects-of-class))))
-	 (object-id (or (object-id object)
-			(setf (object-id object)
-			      (incf (persistant-objects-of-class-next-id objects))))))
+	 (object-id (object-id object)))
+    ; assign object id
+    (if object-id
+	(when (< (persistant-objects-of-class-next-id objects) object-id)
+	  (setf (persistant-objects-of-class-next-id objects) (1+ object-id)))
+	(setf (object-id object)
+	      (incf (persistant-objects-of-class-next-id objects))))
     ; store the object
-    (setf (gethash object-id (persistent-objects-of-class-by-id objects))
+    (setf (gethash (object-id object) (persistent-objects-of-class-by-id objects))
 	  object)))
 
 (defmethod delete-persistent-object ((store prevalence-system) object)
