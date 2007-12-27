@@ -32,8 +32,10 @@ error. Specialize this function for various back end stores and other
 object identification schemes."))
 
 (defmethod object-id ((obj standard-object))
-  (handler-case (slot-value obj (object-id-slot-name obj))
-    (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
+  (let ((object-id-slot-name (object-id-slot-name obj)))
+    (handler-case (when (slot-boundp obj object-id-slot-name)
+		    (slot-value obj object-id-slot-name))
+      (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj)))))
 
 (defgeneric (setf object-id) (id obj)
   (:documentation

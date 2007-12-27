@@ -3,7 +3,7 @@
 
 ;;; Define classes for introspection testing
 (defclass address ()
-  ((id :initarg :id :initform nil)
+  ((id :initarg :id)
    (street :reader address-street :initarg :street :initform "100 Broadway")
    (city :reader address-city :initarg :city :initform "New York")
    (state :type us-state :initarg :state :initform "NY")))
@@ -15,14 +15,14 @@
 					    :state "IL"))
 
 (defclass education-history ()
-  ((id :initarg :id :initform nil)
+  ((id :initarg :id)
    (university :reader university :initform "Bene Gesserit University")
    (graduation-year :reader graduation-year :initform 2000 :type (or null integer))))
 
 (defparameter *some-college* (make-instance 'education-history :id 1))
 
 (defclass person ()
-  ((id :initarg :id :initform nil)
+  ((id :initarg :id)
    (name :accessor first-name :initarg :name :type string)
    (age :initarg :age :type integer)
    (address-ref :initform *home-address*)
