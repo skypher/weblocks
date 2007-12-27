@@ -85,7 +85,7 @@ is called."
        (defparameter ,name nil)
        (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
 	 (unless (asdf:find-system ,system-name nil)
-	   (load (merge-pathnames (make-pathname :directory '(:relative "store"
+	   (load (merge-pathnames (make-pathname :directory '(:relative "src" "store"
 							      ,(string-downcase (symbol-name type)))
 						 :name (string-downcase (symbol-name ,system-name))
 						 :type "asd")

@@ -12,5 +12,7 @@
   :licence "LLGPL"
   :description "A test suite for weblocks backend stores."
   :depends-on (:rt :weblocks)
-  :components ((:file "weblocks-store-test")))
+  :components ((:module test
+                :components (
+	         (:file "weblocks-store-test")))))
 

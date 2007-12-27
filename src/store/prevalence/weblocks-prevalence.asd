@@ -29,7 +29,7 @@
       (asdf:oos 'asdf:load-op :weblocks))
     ; load weblocks-memory.asd
     (load (merge-pathnames
-	   (make-pathname :directory '(:relative "store" "memory")
+	   (make-pathname :directory '(:relative "src" "store" "memory")
 			  :name "weblocks-memory" :type "asd")
 	   (funcall (symbol-function (find-symbol (symbol-name '#:asdf-system-directory)
 						  (find-package :weblocks)))

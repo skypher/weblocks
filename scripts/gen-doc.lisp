@@ -7,7 +7,7 @@
   "Computes the directory where generated documentation should
 reside."
   (merge-pathnames
-   (make-pathname :directory '(:relative :up "docs" "gen"))
+   (make-pathname :directory '(:relative "docs" "gen"))
    (make-pathname :directory
 		  (pathname-directory (truename (asdf:system-definition-pathname
                                                  (asdf:find-system :weblocks)))))))
