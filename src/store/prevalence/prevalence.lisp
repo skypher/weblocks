@@ -47,13 +47,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass persistant-objects-of-class ()
+(defclass persistent-objects-of-class ()
   ((objects-by-id :initform (make-hash-table)
 		  :accessor persistent-objects-of-class-by-id
 		  :documentation "A hashmap with keys being object
 		  IDs, and values being object instances.")
    (next-id :initform -1
-	    :accessor persistant-objects-of-class-next-id
+	    :accessor persistent-objects-of-class-next-id
 	    :documentation "The ID of the last created object. When
 	    objects are created, this slot is incremented and its
 	    value is used to automatically generate object IDs."))
@@ -69,14 +69,14 @@
   (let* ((class-name (class-name (class-of object)))
 	 (objects (or (get-root-object store class-name)
 		      (setf (get-root-object store class-name)
-			    (make-instance 'persistant-objects-of-class))))
+			    (make-instance 'persistent-objects-of-class))))
 	 (object-id (object-id object)))
     ; assign object id
     (if object-id
-	(when (< (persistant-objects-of-class-next-id objects) object-id)
-	  (setf (persistant-objects-of-class-next-id objects) (1+ object-id)))
+	(when (< (persistent-objects-of-class-next-id objects) object-id)
+	  (setf (persistent-objects-of-class-next-id objects) (1+ object-id)))
 	(setf (object-id object)
-	      (incf (persistant-objects-of-class-next-id objects))))
+	      (incf (persistent-objects-of-class-next-id objects))))
     ; store the object
     (setf (gethash (object-id object) (persistent-objects-of-class-by-id objects))
 	  object)))
@@ -91,7 +91,7 @@
 				   class-name object-id)))
 
 (defun tx-delete-object-by-id-prevalence (store class-name object-id)
-  "Delets a persistant object from the store."
+  "Delets a persistent object from the store."
   (let ((objects (get-root-object store class-name)))
     ; delete the object
     (remhash object-id (persistent-objects-of-class-by-id objects))
