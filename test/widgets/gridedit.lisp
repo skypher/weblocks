@@ -371,7 +371,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-0" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"

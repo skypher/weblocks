@@ -91,9 +91,6 @@ function is used by the framework for sorting data."))
 (defmethod equivalentp (a b)
   (equalp a b))
 
-(defmethod equivalent ((a (eql nil)) (b (eql nil)))
-  t)
-
 (defun order-objects-in-memory (seq order-by)
   "Orders objects in 'seq' according to 'order-by'."
   (if order-by
