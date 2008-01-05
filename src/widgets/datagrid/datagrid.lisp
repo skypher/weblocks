@@ -308,7 +308,7 @@ items available)."))
 ;;; This file needs to be loaded with CMU because it CMUCL doesn't
 ;;; compile it properly. Bytecompiler, however, works.
 #+cmu (load (merge-pathnames
-	     (make-pathname :directory '(:relative "widgets" "datagrid")
+	     (make-pathname :directory '(:relative "src" "widgets" "datagrid")
 			    :name "item-ops-action" :type "lisp")
 	     (asdf-system-directory :weblocks)))
 
