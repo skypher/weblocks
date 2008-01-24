@@ -11,7 +11,7 @@
     :author ""
     :licence ""
     :description "{APPNAME}"
-    :depends-on ("weblocks")
+    :depends-on (:weblocks)
     :components ((:module conf
 		  :components ((:file "stores"))
 		  :depends-on (src))
