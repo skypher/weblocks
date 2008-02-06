@@ -3,8 +3,7 @@
 
 ;;; Employee
 (defclass employee (person)
-  ((company :initform nil
-	    :accessor employee-company
+  ((company :accessor employee-company
 	    :initarg :company
 	    :type company)
    (contract :accessor employee-contract
