@@ -55,11 +55,11 @@ default 'wrapper-fn' is simply an identity function."
 		   (setf ,place (funcall ,wrapper-fn ,new-callee))))
 	 (setf ,place ,original-value)))))
 
+;; Sets 'callee' as the only widget in the root composite, saves the
+;; continuation, and returns from the delimited computation. When
+;; 'callee' answers, restores the original widgets in the root
+;; composite and reactivates the computation.
 (defun/cc do-page (callee)
-  "Sets 'callee' as the only widget in the root composite, saves the
-continuation, and returns from the delimited computation. When
-'callee' answers, restores the original widgets in the root
-composite and reactivates the computation."
   (do-place (composite-widgets (root-composite)) callee))
 
 (defun/cc do-modal (title callee &key css-class)
