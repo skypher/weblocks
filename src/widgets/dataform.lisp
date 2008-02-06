@@ -115,9 +115,9 @@ particular types of data.
 state. Normally called by 'render-dataform'. Override to
 customize data behavior.")
   (:method ((obj dataform) data view &rest args)
-    (declare (ignore args))
     (apply #'render-object-view data view
 	   :fields-suffix-fn (lambda (&rest args)
+			       (declare (ignore args))
 			       (with-html
 				 (:div :class "submit"
 				       (render-link (make-action
@@ -134,6 +134,7 @@ customize data behavior.")
 							 (funcall (dataform-on-close obj)
 								  obj)))
 						      "Close")))))
+	   :widget obj
 	   args)))
 
 ;;; Rendering form
@@ -173,6 +174,7 @@ customize form behavior.")
 	   :intermediate-values (slot-value obj 'intermediate-form-values)
 	   :title (or (dataform-form-title obj)
 		      (form-view-default-title view))
+	   :widget obj
 	   args)))
 
 (defgeneric dataform-submit-action (obj data &rest args)
