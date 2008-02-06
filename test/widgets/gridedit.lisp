@@ -5,19 +5,20 @@
 (deftest-html gridedit-create-new-item-widget-1
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget (make-instance 'gridedit :data (list *joe*)
-								 :data-class 'employee))))
+       (gridedit-create-new-item-widget
+	(make-instance 'gridedit :data (list *joe*)
+		       :data-class 'employee))))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -27,20 +28,23 @@
 (deftest-html gridedit-create-new-item-widget-2
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget (make-instance 'gridedit :data (list *joe*)
-								 :data-class 'employee
-								 :widget-args '(:slots ((name . foo)))))))
+       (gridedit-create-new-item-widget
+	(make-instance 'gridedit :data (list *joe*)
+		       :data-class 'employee
+		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
+					   (name :label "Foo"
+						 :requiredp t))))))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -50,22 +54,25 @@
 (deftest-html gridedit-create-new-item-widget-3
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget (make-instance 'gridedit :data (list *joe*)
-								 :data-class 'employee
-								 :widget-args '(:slots ((name . foo)))
-								 :item-widget-args
-								 '(:slots ((name . bar)))))))
+       (gridedit-create-new-item-widget
+	(make-instance 'gridedit :data (list *joe*)
+		       :data-class 'employee
+		       :view (defview-anon (:type grid :inherit-from '(:scaffold employee))
+				 (name :label "Foo"))
+		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
+					   (name :label "Bar"
+						 :requiredp t))))))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -83,13 +90,13 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -106,8 +113,8 @@
   (:div :class "widget dataform" :id "widget-123"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))
 	   :postslots
 	   `((:div :class "submit"
@@ -117,21 +124,24 @@
 (deftest-html gridedit-create-drilldown-widget-3
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
-								  :data-class 'employee
-								  :widget-args '(:slots ((name . foo))))
-					 *joe*)))
+       (gridedit-create-drilldown-widget
+	(make-instance 'gridedit :data (list *joe*)
+		       :data-class 'employee
+		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
+					   (name :label "Foo"
+						 :requiredp t)))
+	*joe*)))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -141,23 +151,26 @@
 (deftest-html gridedit-create-drilldown-widget-4
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
-								  :data-class 'employee
-								  :widget-args '(:slots ((name . foo)))
-								  :item-widget-args
-								  '(:slots ((name . bar))))
-					 *joe*)))
+       (gridedit-create-drilldown-widget
+	(make-instance 'gridedit :data (list *joe*)
+		       :data-class 'employee
+		       :view (defview-anon (:type grid :inherit-from '(:scaffold employee))
+				 (name :label "Foo"))
+		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
+					   (name :label "Bar"
+						 :requiredp t)))
+	*joe*)))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "string"
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;")))
 	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	     (:li :class "manager"
-	      (:label
+	      (:label :class "input"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -221,17 +234,22 @@
   t)
 
 ;;; testing render-widget-body for gridedit
+(defclass rwbg-1-dummy-field (grid-view-field)
+  ((weblocks::label :initform "Test")
+   (weblocks::reader :initform nil)
+   (weblocks::allow-sorting-p :initform nil)))
+
 (deftest-html render-widget-body-gridedit-1
     (with-request :get nil
       (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'gridedit :data-class 'employee
-					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
 					   :allow-pagination-p nil
 					   :show-total-items-count-p nil)))
 	;; render datagrid
-	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
+	(render-widget-body grid :custom-fields (list (make-instance 'rwbg-1-dummy-field))
+			    :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
 	(do-request `(("add" . "Add")
 		      (,weblocks::*action-string* . "abc125")))
@@ -267,13 +285,13 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "test" "Test"))
+		(:th "Test"))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
+		 (:td (:span :class "value missing" "Not Specified"))))
 	      :summary "Ordered by name, ascending."))
      (:div :class "item-operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -322,13 +340,13 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label :class "string"
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :maxlength "40")))
 	      (:li :class "manager"
-	       (:label
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -344,7 +362,7 @@
 	     (:a :href "/foo/bar?action=abc135"
 		 :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123"
-	 (:div :class "renderer"
+	 (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
 	 (:div :class "extra-top-3" "<!-- empty -->")
@@ -451,7 +469,7 @@
     (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; "Delete" clicked
    (:div :class "widget flash" :id "widget-123"
-	 (:div :class "renderer"
+	 (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
 	 (:div :class "extra-top-3" "<!-- empty -->")
@@ -472,7 +490,7 @@
     (:div :class "extra-top-3" "<!-- empty -->")
     (:fieldset
      (:div :class "datagrid-body"
-	   (:div :class "renderer table empty-table"
+	   (:div :class "view table empty-table"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
@@ -600,13 +618,13 @@
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
-	       (:label :class "string"
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
 	      (:li :class "manager"
-	       (:label
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
@@ -622,7 +640,7 @@
 	     (:a :href "/foo/bar?action=abc137"
 		 :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
     (:div :class "widget flash" :id "widget-123"
-	  (:div :class "renderer"
+	  (:div :class "view"
 		(:div :class "extra-top-1" "<!-- empty -->")
 		(:div :class "extra-top-2" "<!-- empty -->")
 		(:div :class "extra-top-3" "<!-- empty -->")
@@ -776,8 +794,8 @@
     (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
 	    "abc135"
-	    '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
-	      (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+	      (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))
 	    :postslots
 	    `((:div :class "submit"
@@ -892,14 +910,17 @@
     (with-request :get nil
       (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'gridedit :data-class 'employee
-					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
-					   :show-total-items-count-p nil)))
+					   :show-total-items-count-p nil
+					   :view (defview-anon (:type grid
+								:inherit-from '(:scaffold employee))
+						     (test :allow-sorting-p nil
+							   :reader nil)))))
 	;; set items per page
 	(setf (pagination-items-per-page (datagrid-pagination-widget grid)) 1)
 	;; render datagrid
-	(render-widget-body grid :custom-slots '(test) :form-id "I1" :input-id "I2" :search-id "I3")
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
 	(do-request `(("add" . "Add")
 		      (,weblocks::*action-string* . "abc125")))
@@ -971,12 +992,14 @@
 	   #.(table-header-template
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager")))
+		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
-		 (:td :class "manager" (:span :class "value" "Jim"))))
+		 (:td :class "manager" (:span :class "value" "Jim"))
+		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
 	      :summary "Ordered by name, ascending."))
      (:input :name "action" :type "hidden" :value "abc130"))
     (:div :class "extra-bottom-1" "<!-- empty -->")
@@ -986,13 +1009,13 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label :class "string"
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "name" :maxlength "40")))
 	      (:li :class "manager"
-	       (:label
+	       (:label :class "input"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))

@@ -134,11 +134,6 @@
 					  :data-class 'employee)))
   0)
 
-;;; test append-custom-slots
-(deftest append-custom-slots-1
-    (weblocks::append-custom-slots '(a b c) '(:a 1 :b 2 :custom-slots (d e f) :c 3))
-  (d e f a b c))
-
 ;;; test datagrid-render-item-ops-bar
 (deftest-html datagrid-render-item-ops-bar-1
     (with-request :get nil
@@ -321,7 +316,7 @@
 	  (:div :class "extra-top-3" "<!-- empty -->")
 	  (:fieldset
 	   (:div :class "datagrid-body"
-		 (:div :class "renderer table empty-table"
+		 (:div :class "view table empty-table"
 		       (:div :class "extra-top-1" "<!-- empty -->")
 		       (:div :class "extra-top-2" "<!-- empty -->")
 		       (:div :class "extra-top-3" "<!-- empty -->")
@@ -334,18 +329,7 @@
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))))
 
-(deftest render-widget-body-datagrid-4
-    (with-request :get nil
-      (persist-object *default-store* *joe*)
-      (let ((grid (make-instance 'datagrid :data-class 'employee))
-	    (*weblocks-output-stream* (make-string-output-stream)))
-	(declare (special *weblocks-output-stream*))
-	;; render datagrid
-	(render-widget-body grid)
-	(datagrid-forbid-sorting-on grid)))
-  (weblocks::select))
-
-(deftest-html render-widget-body-datagrid-5
+(deftest-html render-widget-body-datagrid-4
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
@@ -422,7 +406,7 @@
 	 #.(link-action-template "abc134" "Next >" :class "next-page")
 	 #.(pagination-goto-form-template "abc135"))))
 
-(deftest render-widget-body-datagrid-6
+(deftest render-widget-body-datagrid-5
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
@@ -466,7 +450,7 @@
       nil
       (call-next-method)))
 
-(deftest-html render-widget-body-datagrid-7
+(deftest-html render-widget-body-datagrid-6
     (with-request :get nil
       (persist-objects *not-searchable-store*
 		       (list
@@ -565,7 +549,10 @@
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
 				 :allow-sorting '(manager)
-				 :data-class 'employee)))
+				 :data-class 'employee
+				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
+							    :allow-sorting-p nil)
+					   (manager :allow-sorting-p t)))))
 	(render-datagrid-table-body grid)))
    (:div :class "datagrid-body"
 	 #.(table-header-template
@@ -583,7 +570,8 @@
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :allow-sorting nil
+				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
+							    :allow-sorting-p nil))
 				 :data-class 'employee)))
 	(render-datagrid-table-body grid)))
      (:div :class "datagrid-body"
@@ -655,40 +643,42 @@
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :sort '(address-ref . :asc)
-				 :data-class 'employee)))
+				 :data-class 'employee
+				 :sort '(address . :asc)
+				 :view (defview-anon (:type grid)
+					   name address manager))))
 	;; render datagrid
-	(render-datagrid-table-body grid :slots '(address-ref))
+	(render-datagrid-table-body grid)
 	;; sort by name (should be descending)
 	(do-request `((,weblocks::*action-string* . "abc124")))
-	(render-datagrid-table-body grid :slots '(address-ref))))
+	(render-datagrid-table-body grid)))
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "address-ref sort-asc" (:span #.(link-action-template "abc124" "Address")))
+	      (:th :class "address sort-asc" (:span #.(link-action-template "abc124" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
-	       (:td :class "address-ref" (:span :class "value" "Address"))
+	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
 	       (:td :class "name" (:span :class "value" "Bob"))
-	       (:td :class "address-ref" (:span :class "value" "Address"))
+	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by address, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" (:span #.(link-action-template "abc126" "Name")))
-	      (:th :class "address-ref sort-desc" (:span #.(link-action-template "abc127" "Address")))
+	      (:th :class "address sort-desc" (:span #.(link-action-template "abc127" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
-	       (:td :class "address-ref" (:span :class "value" "Address"))
+	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
 	       (:td :class "name" (:span :class "value" "Bob"))
-	       (:td :class "address-ref" (:span :class "value" "Address"))
+	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by address, descending."))))
 

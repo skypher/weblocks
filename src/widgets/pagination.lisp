@@ -186,11 +186,13 @@ index (inclusive) and the ending item index (exclusive)."
 		       (<= page (pagination-page-count obj))))
 	  (setf (pagination-current-page obj) page)
 	  (pagination-call-on-change obj)))
+    (declare (ignore res))
     (when err
       (setf (slot-value obj 'last-request-error-p) t)
       (let ((on-error (pagination-on-error obj))
-	    (msg (format nil "Page number must be ~A."
-			 (humanize-typespec `(integer 1 ,(pagination-page-count obj))))))
+	    (msg (format nil "Page number must be an integer between 1 and ~A."
+			 (pagination-page-count obj))))
 	(typecase on-error
 	  (flash (flash-message on-error msg))
 	  (function (funcall on-error msg)))))))
+

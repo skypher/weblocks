@@ -6,11 +6,11 @@
 			  #:standard-class #:typep #:subtypep)
   (:shadowing-import-from :fare-matcher #:match)
   (:documentation
-   "Weblocks is a Common Lisp framework that eases the pain of
-web application development. It achieves its goals by
-standardizing on various libraries, providing flexible and
-extensible generic renderers, and exposing a unique widget-based
-approach to maintaining UI state."))
+   "Weblocks is a Common Lisp framework that eases the pain of web
+application development. It achieves its goals by standardizing on
+various libraries, providing flexible and extensible generic views,
+and exposing a unique widget-based approach to maintaining UI
+state."))
 
 (in-package :weblocks)
 

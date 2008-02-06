@@ -147,7 +147,7 @@ application."
 			(asdf-system-directory :weblocks-scripts))
 		       (merge-pathnames
 			(make-pathname :name (attributize-name name) :type "lisp")
-			new-project-src-dir)
+			new-project-dir)
 			*app-name-placeholder*
 		       (attributize-name name))
     ; copy stores.lisp

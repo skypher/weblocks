@@ -35,50 +35,59 @@
 					   'details))
   t)
 
-;;; test render-datagrid-drilldown-body-cell
-(deftest-html render-datagrid-drilldown-body-cell-1
+;;; test datagrid-render-view-field-drilldown
+(deftest-html datagrid-render-view-field-drilldown-1
     (with-request :get nil
-      (make-action #'identity "abc123")
-      (render-datagrid-drilldown-body-cell (make-instance 'datagrid
-							  :data-class 'employee
-							  :on-drilldown
-							  (cons 'details
-								(lambda (&rest args)
-								  nil)))
-					   nil 'view t nil
-					   :row-action "abc123"))
-  (:td :class "drilldown view"
+      (make-action (lambda (&rest args) nil))
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :on-drilldown (cons 'details
+						      (lambda (&rest args)
+							nil))
+				  :view view))
+	     (field (weblocks::make-drilldown-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(render-view-field field view grid presentation value *joe*
+			   :row-action "abc123")))
+  (:td :class "drilldown details"
        (:noscript (:div (:a :href "/foo/bar?action=abc123" "Details")))))
 
-
-;;; test render-datagrid-drilldown-header-cell
-(deftest-html render-datagrid-drilldown-header-cell-1
+;;; test datagrid-render-view-field-header-drilldown
+(deftest-html datagrid-render-view-field-header-drilldown-1
     (with-request :get nil
-      (render-datagrid-drilldown-header-cell (make-instance 'datagrid
-							    :data-class 'employee
-							    :on-drilldown
-							    (cons 'details
-								  (lambda (&rest args)
-								    nil)))
-					     nil 'view t nil
-					     :row-action "abc123"))
-  (:th :class "drilldown view"))
+      (make-action (lambda (&rest args) nil))
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :on-drilldown (cons 'details
+						      (lambda (&rest args)
+							nil))
+				  :view view))
+	     (field (weblocks::make-drilldown-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(render-view-field-header field view grid presentation value *joe*
+			   :row-action "abc123")))
+  (:th :class "drilldown details"))
 
-;;; test with-datagrid-drilldown-table-body-row
-(deftest-html with-datagrid-drilldown-table-body-row-1
+;;; test datagrid-with-table-view-body-row
+(deftest-html datagrid-with-table-view-body-row-1
     (with-request :get nil
-      (with-datagrid-drilldown-table-body-row (make-instance 'datagrid
-							     :data-class 'employee
-							     :on-drilldown
-							     (cons 'details
-								   (lambda (&rest args)
-								     nil)))
-	nil (lambda (&rest args)
-	      (with-html (:td "foo")))))
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :on-drilldown (cons 'details
+						      (lambda (&rest args)
+							nil))
+				  :view view))
+	     (field (weblocks::make-drilldown-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(with-table-view-body-row view *joe* grid)))
   (:tr :onclick "initiateActionOnEmptySelection(\"abc123\", \"weblocks-session=1%3ATEST\");"
        :onmouseover "this.style.cursor = \"pointer\";"
        :style "cursor: expression(\"hand\");"
-       (:td "foo")))
+       (:td :class "name" (:span :class "value" "Joe"))
+       (:td :class "manager" (:span :class "value" "Jim"))))
 
 ;;; test drilldown
 (deftest-html datagrid-drilldown-test-1

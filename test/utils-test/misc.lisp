@@ -1,18 +1,6 @@
 
 (in-package :weblocks-test)
 
-;; Slot rendering helper
-(defgeneric render-slot-simple (obj slot-name slot-type slot-value &rest keys)
-  (:generic-function-class slot-management-generic-function))
-
-(defslotmethod render-slot-simple (obj slot-name slot-type slot-value &rest keys)
-  (if (typep slot-value 'standard-object)
-      (apply #'weblocks::visit-object-slots slot-value #'render-slot-simple keys)
-      (with-html
-	(:p (str slot-name))
-	(:p (str (format nil "~A" slot-type)))
-	(:p (str slot-value)))))
-
 ;;; Test humanize-name function
 (deftest humanize-name-1
     (humanize-name 'hello-world)
@@ -22,24 +10,16 @@
     (humanize-name "HELLO-WORLD")
   "Hello World")
 
-(deftest humanize-name-3
-    (humanize-name 'hello-ref)
-  "Hello")
-
 ;;; Test attributize-name function
 (deftest attributize-name-1
     (attributize-name 'hello-world)
   "hello-world")
 
 (deftest attributize-name-2
-    (attributize-name "hello World-REF")
-  "hello-world-ref")
-
-(deftest attributize-name-3
     (attributize-name nil)
   "")
 
-(deftest attributize-name-4
+(deftest attributize-name-3
     (attributize-name 1)
   "1")
 
@@ -53,31 +33,9 @@
   (mapcar #'slot-definition-name
 	  (apply #'weblocks::class-visible-slots (class-of obj) args)))
 
-;;; Test class-visible-slots function
-(deftest class-visible-slots-1
-    (class-visible-slot-names *joe*)
-  (name manager))
-
-(deftest class-visible-slots-2
-    (class-visible-slot-names *joe* :visible-slots '(age))
-  (name age manager))
-
-(deftest class-visible-slots-3
-    (class-visible-slot-names *joe* :visible-slots '(age blah))
-  (name age manager))
-
-;;; Test get-slot-value
-(deftest get-slot-value-1
-    (get-slot-value *joe* (vs-slot-definition (car (object-visible-slots *joe* :slots '(age) :mode :strict))))
-  30)
-
-(deftest get-slot-value-2
-    (get-slot-value *joe* (vs-slot-definition (car (object-visible-slots *joe*))))
-  "Joe")
-
 ;;; Test slot-value-by-path
 (deftest slot-value-by-path-1
-    (slot-value-by-path *joe* '(address-ref street))
+    (slot-value-by-path *joe* '(address street))
   "100 Broadway")
 
 (deftest slot-value-by-path-2
@@ -89,116 +47,8 @@
   "Joe")
 
 (deftest slot-value-by-path-4
-    (address-city (slot-value-by-path *joe* '(address-ref)))
+    (address-city (slot-value-by-path *joe* '(address)))
   "New York")
-
-(deftest slot-value-by-path-5
-    (slot-value-by-path *joe* '(address-ref) :observe-inline-p t)
-  "Address")
-
-;;; Introspection helper
-(defun object-visible-slot-names (obj &rest args)
-  (mapcar (lambda (x)
-	    (cons (if (typep (vs-slot-definition x) 'standard-direct-slot-definition)
-		      (slot-definition-name (vs-slot-definition x))
-		      (vs-slot-definition x))
-		  (vs-slot-presentation x)))
-	  (apply #'object-visible-slots obj args)))
-
-;;; Test render-slot-inline-p
-(deftest render-slot-inline-p-1
-    (render-slot-inline-p *joe* 'name)
-  t)
-
-(deftest render-slot-inline-p-2
-    (render-slot-inline-p *joe* 'address-ref)
-  nil)
-
-;;; Test object-visible-slots function
-(deftest object-visible-slots-1
-    (object-visible-slot-names *joe*)
-  ((name . name) (manager . manager)))
-
-(deftest object-visible-slots-2
-    (object-visible-slot-names *joe* :slots '((name . "first-name")))
-  ((name . "first-name") (manager . manager)))
-
-(deftest object-visible-slots-3
-    (object-visible-slot-names *joe* :slots '((name . first-name) age))
-  ((name . first-name) (age . age) (manager . manager)))
-
-(deftest object-visible-slots-4
-    (object-visible-slot-names *joe* :slots '((name . first-name) (age . how-old)))
-  ((name . first-name) (age . how-old) (manager . manager)))
-
-(deftest object-visible-slots-5
-    (object-visible-slot-names *joe* :slots '((manager . boss) doesnt-exist))
-  ((name . name) (manager . boss)))
-
-(deftest object-visible-slots-6
-    (object-visible-slot-names *joe* :slots '(manager) :mode :hide)
-  ((name . name)))
-
-(deftest object-visible-slots-7
-    (object-visible-slot-names *joe* :slots '(manager name) :mode :strict)
-  ((manager . manager) (name . name)))
-
-(deftest object-visible-slots-8
-    (object-visible-slot-names *joe* :slots '(manager (name . first-name) (age . how-old))
-				     :mode :strict)
-  ((manager . manager) (name . first-name) (age . how-old)))
-
-(deftest object-visible-slots-9
-    (object-visible-slot-names *joe* :slots '(manager) :mode :strict)
-  ((manager . manager)))
-
-(deftest object-visible-slots-10
-    (mapcar
-     (lambda (x)
-       (if (functionp x)
-	   (funcall x)
-	   x))
-     (flatten (object-visible-slot-names *joe* :slots `((manager . ,(lambda () 1))))))
-  (name name manager 1))
-
-(deftest object-visible-slots-11
-    (mapcar
-     (lambda (x)
-       (if (functionp x)
-	   (funcall x)
-	   x))
-     (flatten (object-visible-slot-names *joe* :slots `((manager . ,(lambda () 1))) :mode :strict)))
-  (manager 1))
-
-(deftest object-visible-slots-12
-    ;; Make sure we can't add new fields in strict mode - since the
-    ;; arguments propagate recursively, new slots appear more than
-    ;; once for complex objects. Additionally, slots specified for
-    ;; inner objects appear as new slots in the outer objects and vica
-    ;; versa.
-    (values
-     (object-visible-slot-names *joe* :slots '(name test) :mode :strict)
-     (object-visible-slot-names *joe* :slots '(name (test . blah)) :mode :strict))
-  ((name . name))
-  ((name . name)))
-
-(deftest object-visible-slots-13
-    (object-visible-slot-names *joe* :custom-slots '((1 . (foo . hello)) (bar . world)))
-  ((name . name) (foo . hello) (manager . manager) (bar . world)))
-
-(deftest object-visible-slots-14
-    (class-name (class-of (vs-slot-definition (car (object-visible-slots *joe*)))))
-  standard-direct-slot-definition)
-
-(deftest object-visible-slots-15
-    (object-visible-slot-names *joe* :slots '(education (university . uni)))
-  ((name . name) (university . uni) (graduation-year . graduation-year) (manager . manager)))
-
-(deftest object-visible-slots-16
-    (some #'null
-	  (object-visible-slots *joe* :slots '(education) :mode :strict))
-  nil)
-
 
 ;;; test safe-apply
 (deftest safe-apply-1
@@ -270,92 +120,6 @@
        (:div :class "extra-bottom-1" "<!-- empty -->")
        (:div :class "extra-bottom-2" "<!-- empty -->")
        (:div :class "extra-bottom-3" "<!-- empty -->")))
-
-;;; test visit-object-slots
-(deftest-html visit-object-slots-1
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots '(name) :mode :strict)
-  (htm
-   (:p "NAME")
-   (:p "STRING")
-   (:p "Joe")))
-
-(deftest-html visit-object-slots-2
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots `((name . ,(lambda (obj slot-name slot-value &rest args)
-			       (with-html (:p "TEST"))))))
-  (htm
-   (:p "TEST")
-   (:p "MANAGER")
-   (:p "T")
-   (:p "Jim")))
-
-(deftest-html visit-object-slots-3
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots `(name)
-     :mode :strict
-     :custom-slots `((blah . ,(lambda (obj slot-name slot-type slot-value &rest args)
-				      (with-html (:p "TEST"))))
-		     hello))
-  (htm
-   (:p "NAME")
-   (:p "STRING")
-   (:p "Joe")
-   (:p "TEST")
-   (:p "HELLO")
-   (:p "T")
-   (:p "")))
-
-(deftest-html visit-object-slots-4
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots `((name . ,(lambda (obj slot-name slot-type slot-value &rest args)
-			       (with-html (:p "TEST")))))
-     :call-around-fn-p nil)
-  (htm
-   (:p "NAME")
-   (:p "STRING")
-   (:p "Joe")
-   (:p "MANAGER")
-   (:p "T")
-   (:p "Jim")))
-
-(deftest visit-object-slots-5
-    (weblocks::visit-object-slots
-     *joe*
-     (lambda (obj slot-name slot-type slot-value &rest keys)
-       1))
-  (1 1))
-
-(deftest-html visit-object-slots-6
-    (weblocks::visit-object-slots
-     *joe*
-     #'render-slot-simple
-     :slots '(name education) :custom-slots '(test))
-  (htm
-   (:p "NAME") (:p "STRING") (:p "Joe")
-   (:p "UNIVERSITY") (:p "T") (:p "Bene Gesserit University")
-   (:p "GRADUATION-YEAR") (:p "(OR NULL INTEGER)") (:p "2000")
-   (:p "MANAGER") (:p "T") (:p "Jim")
-   (:p "TEST") (:p "T") (:p "")))
-
-(deftest-html visit-object-slots-7
-    (weblocks::visit-object-slots
-     (make-instance 'employee)
-     #'render-slot-simple
-     :slots '(name) :mode :strict
-     :ignore-unbound-slots-p t)
-  (htm
-   (:p "NAME")
-   (:p "STRING")
-   (:p "")))
 
 ;;; test alist->plist
 (deftest alist->plist-1
@@ -429,6 +193,11 @@
 (deftest remove-keyword-parameter-1
     (remove-keyword-parameter '(0 :a 1 :b 2 :c 3) :b)
   (0 :a 1 :c 3))
+
+;;; test remove-keyword-parameters
+(deftest remove-keyword-parameters-1
+    (remove-keyword-parameters '(0 :a 1 :b 2 :c 3) :a :c)
+  (0 :b 2))
 
 ;;; test tokenize-uri
 (deftest tokenize-uri-1
@@ -555,23 +324,6 @@
 					      :name "baz" :type "txt")) nil)
   "/foo/bar/baz.txt")
 
-;;; test object-full-visible-slot-count
-(deftest object-full-visible-slot-count-1
-    (object-full-visible-slot-count *joe*)
-  2)
-
-(deftest object-full-visible-slot-count-2
-    (object-full-visible-slot-count *joe* :slots '(education))
-  4)
-
-(deftest object-full-visible-slot-count-3
-    (object-full-visible-slot-count *joe* :slots '(education address-ref))
-  5)
-
-(deftest object-full-visible-slot-count-4
-    (object-full-visible-slot-count (make-instance 'unbound-slots-test))
-  2)
-
 ;;; test add-get-param-to-url
 (deftest add-get-param-to-url-1
     (weblocks:add-get-param-to-url "/foo/bar/baz?hi=bye" "a" "b")
@@ -607,4 +359,45 @@
 	      (ppcre:scan regex "hello")
 	      (ppcre:scan regex "test")))
   0 nil nil)
+
+;;; Test object-class-name
+(deftest object-class-name-1
+    (object-class-name *joe*)
+  employee)
+
+;;; test append-custom-slots
+(deftest append-custom-fields-1
+    (weblocks::append-custom-fields '(a b c) '(:a 1 :b 2 :custom-fields (d e f) :c 3))
+  (d e f a b c))
+
+;;; test hash-keys
+(deftest hash-keys-1
+    (let ((ht (make-hash-table )))
+      (setf (gethash 'foo ht) 1)
+      (setf (gethash 'bar ht) 1)
+      (hash-keys ht))
+  (foo bar))
+
+;;; Test find-slot-dsd
+(deftest find-slot-dsd-1
+    (slot-definition-name (find-slot-dsd 'employee 'name))
+  name)
+
+;;; Test find-slot-esd
+(deftest find-slot-esd-1
+    (slot-definition-name (find-slot-esd 'employee 'name))
+  name)
+
+;;; Test drop-last
+(deftest drop-last-1
+    (drop-last (list 1 2 3))
+  (1 2))
+
+(deftest drop-last-2
+    (drop-last (list 1))
+  nil)
+
+(deftest drop-last-3
+    (drop-last nil)
+  nil)
 

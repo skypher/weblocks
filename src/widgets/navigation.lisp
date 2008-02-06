@@ -60,7 +60,7 @@ only wraps navigation html."))
 (defmethod with-navigation-header ((obj navigation) body-fn &rest args)
   (with-slots (name panes) obj
     (with-html
-      (:div :class "renderer menu"
+      (:div :class "view menu"
 	    (with-extra-tags
 	      (if (null panes)
 		  (htm

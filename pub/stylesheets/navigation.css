@@ -43,7 +43,7 @@
   padding-left: 1em;
 }
 
-.menu h1, .renderer .empty-navigation, .menu ul li
+.menu h1, .view .empty-navigation, .menu ul li
 {
   border-top-color: #f6fbfd;
   border-bottom-color: #bfd9ec;

@@ -98,8 +98,8 @@
       (with-widget-header (make-instance 'dataform :data *joe*)
 	(lambda (obj &rest args)
 	  (with-html (:p "test")))
-	:prewidget-body-fn (lambda (&rest args) (with-html (:p "hello")))
-	:postwidget-body-fn (lambda (&rest args) (with-html (:p "world")))))
+	:widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
+	:widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
   (:div :class "widget dataform" :id "widget-123"
 	(:p "hello")
 	(:p "test")
@@ -117,19 +117,6 @@
 (deftest widget-name-3
     (widget-name 'identity)
   identity)
-
-;;; test widget-args specialization for widgets
-(deftest widget-args-1
-    (widget-args #'identity)
-  nil)
-
-(deftest widget-args-2
-    (widget-args "identity")
-  nil)
-
-(deftest widget-args-3
-    (widget-args 'identity)
-  nil)
 
 ;;; test composite-widgets specialization for widgets
 (deftest composite-widgets-1
@@ -177,8 +164,8 @@
   (:div :class "widget dataform" :id "widget-123"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	      (:span :class "value" "Jim"))))))
 
 ;;; render some widget with a name
@@ -188,16 +175,16 @@
   (:div :class "widget dataform" :id "test-widget"
 	#.(data-header-template
 	   "abc123"
-	   '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li :class "manager" (:span :class "label" "Manager:&nbsp;")
+	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+	     (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	      (:span :class "value" "Jim"))))))
 
 (deftest-html render-widget-3
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*) :inlinep t))
   #.(data-header-template "abc123"
-     '((:li :class "name" (:span :class "label string" "Name:&nbsp;") (:span :class "value" "Joe"))
-       (:li :class "manager" (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+     '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+       (:li :class "manager" (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
 (deftest render-widget-4
     (let ((*weblocks-output-stream* (make-string-output-stream)))

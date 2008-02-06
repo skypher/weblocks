@@ -35,14 +35,14 @@
   t
   #.(with-request-template "~
 <div class='widget dataform' id='widget-123'>~
-<div class='renderer data employee'>~
+<div class='view data employee'>~
 <div class='extra-top-1'><!-- empty --></div>~
 <div class='extra-top-2'><!-- empty --></div>~
 <div class='extra-top-3'><!-- empty --></div>~
 <h1><span class='action'>Viewing:&nbsp;</span><span class='object'>Employee</span></h1>~
 <ul>~
-<li class='name'><span class='label string'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
-<li class='manager'><span class='label'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
+<li class='name'><span class='label text'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
+<li class='manager'><span class='label text'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
 <div class='submit'><a href='/foo/bar?action=abc123' ~
                        onclick='initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); ~
@@ -56,7 +56,7 @@
       :title "Hello - Bar")
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
-\"<form class='renderer form employee' action='/foo/bar' method='post' ~
+\"<form class='view form employee' action='/foo/bar' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3ATEST\\\"); ~
                 return false;'>~
 <div class='extra-top-1'><!-- empty --></div>~
@@ -66,13 +66,13 @@
 <span class='object'>Employee</span>~
 </h1>~
 <h2 class='form-fields-title'>Form fields:</h2>~
-<ul><li class='name'><label class='string'>~
+<ul><li class='name'><label class='input'>~
 <span class='slot-name'><span class='extra'>Name:&nbsp;~
 <em class='required-slot'>(required)&nbsp;</em></span></span>~
 <input type='text' name='name' value='Joe' maxlength='40' />~
 </label>~
 </li>~
-<li class='manager'><label>~
+<li class='manager'><label class='input'>~
 <span class='slot-name'><span class='extra'>Manager:&nbsp;</span></span>~
 <input type='text' name='manager' value='Jim' maxlength='40' />~
 </label>~
@@ -139,7 +139,7 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='widget function'>~
 <div>hi2</div>~
 </div>~
-<div class='renderer menu'>~
+<div class='view menu'>~
 <div class='extra-top-1'><!-- empty --></div>~
 <div class='extra-top-2'><!-- empty --></div>~
 <div class='extra-top-3'><!-- empty --></div>~

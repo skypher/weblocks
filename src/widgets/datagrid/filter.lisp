@@ -16,7 +16,7 @@
 		     (declare (special *on-ajax-complete-scripts*))
 		     (setf (datagrid-search grid) (when (not (empty-p search))
 						    search))
-					; we also need to clear the selection
+		     ;; we also need to clear the selection
 		     (datagrid-clear-selection grid)
 		     (push (format nil "new Function(~A)"
 				   (encode-json-to-string
@@ -26,7 +26,7 @@
 					    (encode-json-to-string
 					     (let ((*weblocks-output-stream* (make-string-output-stream)))
 					       (declare (special *weblocks-output-stream*))
-					       (apply #'render-datagrid-table-body grid (widget-args grid))
+					       (funcall #'render-datagrid-table-body grid)
 					       (get-output-stream-string *weblocks-output-stream*))))))
 			   *on-ajax-complete-scripts*)
 		     (when (datagrid-show-total-items-count-p grid)

@@ -14,6 +14,23 @@
 					    :city "Chicago"
 					    :state "IL"))
 
+(defclass address-parser (parser)
+  ())
+
+(defmethod parse-view-field-value ((parser address-parser) value obj
+				   (view form-view) (field form-view-field) &rest args)
+  (declare (ignore args))
+  (when (not (text-input-present-p value))
+    (return-from parse-view-field-value (values t nil)))
+  (let ((object (find value (addresses) :key #'object-id :test #'string-equal)))
+    (when object
+      (values t t object))))
+
+(defun addresses (&rest args)
+  "Returns a list of addresses."
+  (declare (ignore args))
+  (list *home-address* *work-address*))
+
 (defclass education-history ()
   ((id :initarg :id)
    (university :reader university :initform "Bene Gesserit University")
@@ -25,17 +42,11 @@
   ((id :initarg :id)
    (name :accessor first-name :initarg :name :type string)
    (age :initarg :age :type integer)
-   (address-ref :initform *home-address*)
+   (address :initform *home-address*)
    (education :initform *some-college* :type (or null education-history))))
 
-(defslotmethod max-raw-slot-input-length ((obj person) (slot-name (eql 'age)) slot-type)
-  3)
-
-(defslotmethod form-potential-values ((obj person) (slot-name (eql 'address-ref)) slot-type)
-  (list *home-address* *work-address*))
-
 (defclass employee (person)
-  ((manager :reader manager :initform "Jim")
+  ((manager :accessor manager :initform "Jim")
    (veteran :initform nil :type boolean :initarg :veteranp)))
 
 ;;; Create instances for introspection testing

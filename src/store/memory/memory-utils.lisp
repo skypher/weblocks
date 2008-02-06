@@ -9,41 +9,35 @@
 ;;;;;;;;;;;;;;
 ;;; Filter ;;;
 ;;;;;;;;;;;;;;
-(defgeneric object-satisfies-search-p (search-regex obj slot-name slot-type slot-value &rest args)
-  (:generic-function-class slot-management-generic-function)
+(defgeneric object-satisfies-search-p (search-regex obj view)
   (:documentation
-   "Determines if 'slot-value' satisfies a search regex. Default
+   "Determines if a view of 'obj' satisfies a search regex. Default
 implementation applies 'search-regex' to string representations of
-each slot value obtained via calling 'data-print-object', and if one
-matches returns true.
+each view field value (obtained via calling 'print-view-field-value'),
+and if one matches returns true.
 
+'search-regex' - regular expression to be applied.
 'obj' - the object that contains the slot in question.
-'slot-name' - name of the slot.
-'slot-type' - declared type of the slot.
-'slot-value' - the value to be tested."))
+'view' - name of the slot.")
+  (:method (search-regex obj view)
+    (when (null view)
+      (setf view (find-view (list 'data (class-name (class-of obj))))))
+    (some (lambda (field-info)
+	    (let ((field (field-info-field field-info))
+		  (obj (field-info-object field-info)))
+	      (not (null (ppcre:scan search-regex (print-view-field-value
+						   (obtain-view-field-value field obj)
+						   (view-field-presentation field)
+						   field view nil obj))))))
+	  (get-object-view-fields obj view))))
 
-(defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type (slot-value standard-object)
-						       &rest args)
-  (if (render-slot-inline-p obj slot-name)
-      (some (compose #'not #'null)
-	    (flatten
-	     (apply #'visit-object-slots slot-value (curry #'object-satisfies-search-p search-regex)
-		    :call-around-fn-p nil args)))
-      (not (null (ppcre:scan search-regex (object-name slot-value))))))
-
-(defslotmethod object-satisfies-search-p (search-regex obj slot-name slot-type slot-value
-						       &rest args)
-  (not (null
-	(ppcre:scan search-regex (apply #'data-print-object
-					obj slot-name slot-type slot-value args)))))
-
-(defun filter-objects-in-memory (seq filter &optional args)
-  "Filters objects in 'seq' according to 'filter'."
+(defun filter-objects-in-memory (seq filter view)
+  "Filters objects in 'seq' presented with view according to
+'filter'."
   (if filter
       (remove nil
 	      (mapcar (lambda (item)
-			(when (apply #'object-satisfies-search-p (make-isearch-regex filter) nil nil t item
-				     args)
+			(when (funcall #'object-satisfies-search-p (make-isearch-regex filter) item view)
 			  item))
 		      seq))
       seq))
@@ -54,42 +48,26 @@ matches returns true.
 (defgeneric strictly-less-p (a b)
   (:documentation
    "Returns true if 'a' is strictly less than 'b'. This function is
-used by the framework for sorting data."))
-
-(defmethod strictly-less-p ((a number) (b number))
-  (< a b))
-
-(defmethod strictly-less-p ((a string) (b string))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a symbol) (b symbol))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a string) (b symbol))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a symbol) (b string))
-  (not (null (string-lessp a b))))
-
-(defmethod strictly-less-p ((a (eql nil)) (b (eql nil)))
-  nil)
-
-(defmethod strictly-less-p (a (b (eql nil)))
-  t)
-
-(defmethod strictly-less-p ((a (eql nil)) b)
-  nil)
-
-(defmethod strictly-less-p ((a symbol) (b (eql nil)))
-  t)
+used by the framework for sorting data.")
+  (:method (a b)
+    (strictly-less-p (format nil "~A" a) (format nil "~A" b)))
+  (:method ((a number) (b number))
+    (< a b))
+  (:method ((a string) (b string))
+    (not (null (string-lessp a b))))
+  (:method ((a null) (b null))
+    nil)
+  (:method (a (b null))
+    t)
+  (:method ((a null) b)
+    nil))
 
 (defgeneric equivalentp (a b)
   (:documentation
    "Returns true if 'a' is in some sense equivalent to 'b'. This
-function is used by the framework for sorting data."))
-
-(defmethod equivalentp (a b)
-  (equalp a b))
+function is used by the framework for sorting data.")
+  (:method (a b)
+    (equalp a b)))
 
 (defun order-objects-in-memory (seq order-by)
   "Orders objects in 'seq' according to 'order-by'."
@@ -100,7 +78,7 @@ function is used by the framework for sorting data."))
 		       (lambda (a b)
 			 (and (not (strictly-less-p a b))
 			      (not (equivalentp a b)))))
-		   :key (curry-after #'slot-value-by-path (car order-by) :observe-inline-p t))
+		   :key (curry-after #'slot-value-by-path (car order-by)))
       seq))
 
 ;;;;;;;;;;;;;

@@ -35,15 +35,35 @@ returned."
   nil)
 
 ;;; object classes
-(defclass persistent-1 ()
-  ((id :initform nil)
-   (slot-1 :initarg :slot-1 :accessor p-1-s-1)
-   (slot-2 :initarg :slot-2 :accessor p-1-s-2)))
+#-weblocks-store-test-clsql
+(progn
+  (defclass persistent-1 ()
+    ((id :initform nil)
+     (slot-1 :initarg :slot-1 :accessor p-1-s-1)
+     (slot-2 :initarg :slot-2 :accessor p-1-s-2)))
 
-(defclass persistent-2 ()
-  ((id :initform nil)
-   (slot-1 :initarg :slot-1 :accessor p-2-s-1)
-   (slot-2 :initarg :slot-2 :accessor p-2-s-2)))
+  (defclass persistent-2 ()
+    ((id :initform nil)
+     (slot-1 :initarg :slot-1 :accessor p-2-s-1)
+     (slot-2 :initarg :slot-2 :accessor p-2-s-2))))
+
+#+weblocks-store-test-clsql
+(progn
+  (clsql:def-view-class persistent-1 ()
+    ((id :initform nil
+	 :db-kind :key
+	 :db-constraints (:not-null :unique)
+	 :type integer)
+     (slot-1 :initarg :slot-1 :accessor p-1-s-1 :type integer)
+     (slot-2 :initarg :slot-2 :accessor p-1-s-2 :type integer)))
+
+  (clsql:def-view-class persistent-2 ()
+    ((id :initform nil
+	 :db-kind :key
+	 :db-constraints (:not-null :unique)
+	 :type integer)
+     (slot-1 :initarg :slot-1 :accessor p-2-s-1 :type integer)
+     (slot-2 :initarg :slot-2 :accessor p-2-s-2 :type integer))))
 
 ;;; test persist-object
 (deftest-store persist-object-1
@@ -81,6 +101,17 @@ returned."
 		      (p-1-s-2 obj)))
 	      (find-persistent-objects *default-store* 'persistent-1)))
   ((1 10)))
+
+;;; test find-persistent-object-by-id
+(deftest-store find-persistent-object-by-id-1
+    (let ((obj1 (make-instance 'persistent-1 :slot-1 1 :slot-2 2))
+	  (obj2 (make-instance 'persistent-1 :slot-1 3 :slot-2 4)))
+      (persist-objects *default-store* (list obj1 obj2))
+      (let ((obj-in-store (find-persistent-object-by-id
+			   *default-store* 'persistent-1 (object-id obj2))))
+	(list (p-1-s-1 obj-in-store)
+	      (p-1-s-2 obj-in-store))))
+  (3 4))
 
 ;;; test delete-persistent-object
 (deftest-store delete-persistent-object-1

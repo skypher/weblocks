@@ -1,11 +1,11 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name widget-args
-	  widget-propagate-dirty widget-rendered-p widget-continuation
-	  widget-public-dependencies with-widget-header
-	  render-widget-body widget-css-classes render-widget
-	  mark-dirty widget-dirty-p find-widget-by-path*
+(export '(defwidget widget widget-name widget-propagate-dirty
+	  widget-rendered-p widget-continuation widget-prefix-fn
+	  widget-suffix-fn widget-public-dependencies
+	  with-widget-header render-widget-body widget-css-classes
+	  render-widget mark-dirty widget-dirty-p find-widget-by-path*
 	  find-widget-by-path))
 
 (defun generate-widget-id ()
@@ -27,12 +27,6 @@ inherits from 'widget' if no direct superclasses are provided."
 	 :documentation "A name of the widget used in rendering CSS
 	 classes. If the name is not provided it will be generated
 	 automatically with 'generate-widget-id'.")
-   (widget-args :accessor widget-args
-		:initform nil
-		:initarg :widget-args
-		:documentation "A list of arguments that will be
-		passed by 'render-widget' to all functions involved in
-		rendering the widget.")
    (propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
@@ -57,7 +51,21 @@ inherits from 'widget' if no direct superclasses are provided."
                  widgets that were invoked via one of the do-*
                  functions ('do-page', etc.). When 'answer' is called
                  on a widget, this value is used to resume the
-                 computation."))
+                 computation.")
+   (widget-prefix-fn :initform nil
+	             :initarg :widget-prefix-fn
+	             :accessor widget-prefix-fn
+		     :documentation "A function called prior to
+	             rendering the widget body. The function should
+	             expect the widget as well as any additional
+	             arguments passed to the widget.")
+   (widget-suffix-fn :initform nil
+	             :initarg :widget-suffix-fn
+		     :accessor widget-suffix-fn
+		     :documentation "A function called after rendering
+	             the widget body. The function should expect the
+	             widget as well as any additional arguments passed
+	             to the widget."))
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
@@ -122,27 +130,27 @@ particular class name."
     (remove nil dependencies)))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
-				    prewidget-body-fn postwidget-body-fn &allow-other-keys)
+				    widget-prefix-fn widget-suffix-fn
+				    &allow-other-keys)
   (:documentation
    "Renders a header and footer for the widget and calls 'body-fn'
 within it. Specialize this function to provide customized headers for
 different widgets.
 
-'prewidget-body-fn' and 'postwidget-body-fn' allow specifying
-functions that will be applied before and after the body is
-rendered."))
-
-(defmethod with-widget-header (obj body-fn &rest args &key
-			       prewidget-body-fn postwidget-body-fn &allow-other-keys)
-  (let* ((obj-name (attributize-name (widget-name obj))) ; obj-name may be null in functions
-	 (widget-id (when (and obj-name (not (string-equal obj-name "")))
-		      (attributize-name obj-name))))
-    (with-html
-      (:div :class (widget-css-classes obj)
-	    :id widget-id
-	    (safe-apply prewidget-body-fn args)
-	    (apply body-fn obj args)
-	    (safe-apply postwidget-body-fn args)))))
+'widget-prefix-fn' and 'widget-suffix-fn' allow specifying functions
+that will be applied before and after the body is rendered.")
+  (:method (obj body-fn &rest args
+	    &key widget-prefix-fn widget-suffix-fn
+	    &allow-other-keys)
+    (let* ((obj-name (attributize-name (widget-name obj))) ; obj-name may be null in functions
+	   (widget-id (when (and obj-name (not (string-equal obj-name "")))
+			(attributize-name obj-name))))
+      (with-html
+	(:div :class (widget-css-classes obj)
+	      :id widget-id
+	      (safe-apply widget-prefix-fn obj args)
+	      (apply body-fn obj args)
+	      (safe-apply widget-suffix-fn obj args))))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
@@ -205,13 +213,10 @@ be present for all widgets."))
 (defmethod widget-name ((obj string))
   nil)
 
-(defmethod widget-args ((obj symbol))
+(defmethod widget-prefix-fn (obj)
   nil)
 
-(defmethod widget-args ((obj function))
-  nil)
-
-(defmethod widget-args ((obj string))
+(defmethod widget-suffix-fn (obj)
   nil)
 
 (defun render-widget (obj &key inlinep)
@@ -227,8 +232,13 @@ declare stylesheets and javascript links in the page header."
 	(append *page-public-dependencies*
 		(widget-public-dependencies obj)))
   (if inlinep
-      (apply #'render-widget-body obj (widget-args obj))
-      (apply #'with-widget-header obj #'render-widget-body (widget-args obj)))
+      (funcall #'render-widget-body obj)
+      (apply #'with-widget-header obj #'render-widget-body
+	     (append
+	      (when (widget-prefix-fn obj)
+		(list :widget-prefix-fn (widget-prefix-fn obj)))
+	      (when (widget-suffix-fn obj)
+		(list :widget-suffix-fn (widget-suffix-fn obj))))))
   (setf (widget-rendered-p obj) t))
 
 ;;; Make all widgets act as composites to simplify development

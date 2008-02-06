@@ -40,8 +40,8 @@
   display: none;
 }
 
-form.renderer fieldset ul li label em.required-slot,
-form.renderer fieldset ul li span.label em.required-slot
+form.view fieldset ul li label em.required-slot,
+form.view fieldset ul li span.label em.required-slot
 {
   font-weight: normal;
   display: inline;
@@ -50,9 +50,9 @@ form.renderer fieldset ul li span.label em.required-slot
   color: red;
 }
 
-form.renderer fieldset ul li label input,
-form.renderer fieldset ul li label select,
-form.renderer fieldset ul li label textarea
+form.view fieldset ul li label input,
+form.view fieldset ul li label select,
+form.view fieldset ul li label textarea
 {
   margin-top: 2px;
   margin-bottom: 2px;
@@ -60,38 +60,38 @@ form.renderer fieldset ul li label textarea
 }
 
 /* Target firefox */
-html>/**/body form.renderer fieldset ul li label textarea, x:-moz-any-link
+html>/**/body form.view fieldset ul li label textarea, x:-moz-any-link
 {
   width: auto;
 }
 
 /* IE6 font size hacks */
-* html form.renderer fieldset ul li label input,
-* html form.renderer fieldset ul li label textarea
+* html form.view fieldset ul li label input,
+* html form.view fieldset ul li label textarea
 {
   font-size: 1em;
 }
-* html form.renderer fieldset ul li label select
+* html form.view fieldset ul li label select
 {
   font-size: small;
 }
 
 /* Target Safari */
 /* Safari and WebKit specific caption fix */
-html[xmlns*=""] form.renderer fieldset ul li label input,
-html[xmlns*=""] form.renderer fieldset ul li label select,
-html[xmlns*=""] form.renderer fieldset ul li label textarea
+html[xmlns*=""] form.view fieldset ul li label input,
+html[xmlns*=""] form.view fieldset ul li label select,
+html[xmlns*=""] form.view fieldset ul li label textarea
 {
   font-size: 1em;
 }
 
-form.renderer fieldset ul li label input
+form.view fieldset ul li label input
 {
   padding: 0;
 }
 
-form.renderer fieldset ul li label input.checkbox,
-form.renderer fieldset ul li label.radio input.radio
+form.view fieldset ul li label input.checkbox,
+form.view fieldset ul li label.radio input.radio
 {
   width: auto;
   /* A hack for IE to line up the checkbox and radio button */
@@ -100,14 +100,14 @@ form.renderer fieldset ul li label.radio input.radio
 
 /* Set normal margin for other browsers (comment is necessary to hide
 from IE7) */
-form.renderer >/**/fieldset ul li label input.checkbox,
-form.renderer >/**/fieldset ul li label.radio input.radio
+form.view >/**/fieldset ul li label input.checkbox,
+form.view >/**/fieldset ul li label.radio input.radio
 
 {
   margin-left: 0;
 }
 
-form.renderer fieldset div.submit input.submit
+form.view fieldset div.submit input.submit
 {
   margin-top: 2px;
   margin-bottom: 2px;
@@ -129,26 +129,26 @@ p.validation-error span.validation-error-heading
 }
 
 /* Radio buttons */
-form.renderer fieldset ul li label.radio
+form.view fieldset ul li label.radio
 {
   display: block;
   margin-left: 12em;
 }
 
-form.renderer >/**/fieldset ul li label.radio
+form.view >/**/fieldset ul li label.radio
 {
   /* We only need this for non-IE browsers */
   margin-top: 0.25em;
 }
 
-form.renderer fieldset ul li label.radio.first
+form.view fieldset ul li label.radio.first
 {
   display: inline;
   margin-left: 0;
   margin-top: 0;
 }
 
-form.renderer fieldset ul li label.radio input.radio
+form.view fieldset ul li label.radio input.radio
 {
   width: auto;
   vertical-align: middle;
@@ -156,13 +156,13 @@ form.renderer fieldset ul li label.radio input.radio
   margin-bottom: 0;
 }
 
-form.renderer fieldset ul li label.radio span
+form.view fieldset ul li label.radio span
 {
   vertical-align: middle;
 }
 
 /* Text area label alignment */
-form fieldset ul li label.text span.slot-name
+form fieldset ul li label.textarea span.slot-name
 {
   vertical-align: top;
 }

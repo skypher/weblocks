@@ -39,7 +39,7 @@ div.empty-table p span.caption
   font-family: Garamond, New York, serif;
 }
 
-.renderer table tbody tr td
+.view table tbody tr td
 {
   border-bottom: 1px solid #dbeac1;
   padding-top: 1px;

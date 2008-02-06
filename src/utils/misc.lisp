@@ -2,53 +2,45 @@
 (in-package :weblocks)
 
 (export '(humanize-name attributize-name insert-after insert-at
-	  visible-slot vs-slot-definition vs-slot-presentation
-	  vs-object object-visible-slots get-slot-value
-	  slot-value-by-path render-slot-inline-p safe-apply
-	  safe-funcall request-parameter request-parameters
-	  string-whitespace-p render-extra-tags with-extra-tags
-	  visit-object-slots alist->plist intersperse
-	  remove-keyword-parameter public-file-relative-path
-	  public-files-relative-paths request-uri-path
-	  string-remove-left string-remove-right find-all
-	  stable-set-difference symbol-status string-invert-case
-	  ninsert object-full-visible-slot-count add-get-param-to-url
+	  slot-value-by-path safe-apply safe-funcall request-parameter
+	  request-parameters string-whitespace-p render-extra-tags
+	  with-extra-tags alist->plist intersperse
+	  remove-keyword-parameter remove-keyword-parameters
+	  public-file-relative-path public-files-relative-paths
+	  request-uri-path string-remove-left string-remove-right
+	  find-all stable-set-difference symbol-status
+	  string-invert-case ninsert add-get-param-to-url
 	  remove-parameter-from-uri asdf-system-directory
-	  make-isearch-regex))
+	  make-isearch-regex hash-keys object-class-name
+	  append-custom-fields find-slot-dsd find-slot-esd drop-last))
 
-(defun humanize-name (name)
-  "Convert a string or a symbol to a human-readable string
-suitable for presentation. If the arguments ends with a '-ref'
-the last four characters are removed, as this suffix is used as a
-cue to to renderers that the attribute shouldn't be rendered
-inline.
+(defgeneric humanize-name (name)
+  (:documentation "Convert objects to a human-readable string suitable
+for presentation. Default implementations beautify strings and
+symbols.
 
 Ex:
 \(humanize-name 'hello-world) => \"Hello World\"
-\(humanize-name \"HELLO-WORLD\") => \"Hello World\"
-\(humanize-name 'hello-ref) => \"Hello\""
-  (let* ((namestr (if (symbolp name)
-		      (string-downcase (symbol-name name))
-		      name))
-	 (namestrpost (if (string-ends-with namestr "-ref")
-			  (substring namestr 0 (- (length namestr) 4))
-			  namestr)))
-    (string-capitalize (substitute #\Space #\- namestrpost))))
+\(humanize-name \"HELLO-WORLD\") => \"Hello World\"")
+  (:method ((name string))
+    (string-capitalize (substitute #\Space #\- name)))
+  (:method ((name symbol))
+    (humanize-name (string-downcase (symbol-name name)))))
 
-(defun attributize-name (name)
-  "Convert a string or a symbol to a format suitable for
+(defgeneric attributize-name (name)
+  (:documentation "Convert objects to a format suitable for
 serialization (in particular for markup languages like HTML).
 
 Ex:
-\(attributize-name 'hello-world) => \"hello-world\"
-\(attributize-name \"Hello world-ref\") => \"hello-world-ref\""
-  (when (null name)
-    (return-from attributize-name ""))
-  (let ((namestr (etypecase name
-		     (symbol (symbol-name name))
-		     (string name)
-		     (integer (format nil "~A" name)))))
-    (string-downcase (substitute #\- #\Space namestr))))
+\(attributize-name 'hello-world) => \"hello-world\"")
+  (:method ((name null))
+    "")
+  (:method ((name string))
+    (string-downcase (substitute #\- #\Space name)))
+  (:method ((name symbol))
+    (attributize-name (symbol-name name)))
+  (:method ((name integer))
+    (format nil "~A" name)))
 
 (defun list->assoc (lst &key (map #'identity))
   "Nondestructively convert a list of elements to an association
@@ -75,250 +67,14 @@ Ex:
        (push ,newelt ,list)
        (insert-after ,newelt ,list (1- ,index))))
 
-(defstruct (visible-slot (:conc-name vs-))
-  "A structure that represents a visible slot. These structures are
-usually generated dynamically by examining class instances. See
-'object-visible-slots' for more details."
-  (slot-definition nil :read-only t)
-  (slot-presentation nil :read-only t)
-  (slot-path nil :read-only t)
-  (object nil :read-only t))
-
-(defgeneric object-visible-slots (obj &rest keys &key slots mode &allow-other-keys)
-  (:documentation
-   "Returns a list of 'visible-slot' structures where
-'vs-slot-definition' of each structure is the 'direct-slot-object' (if
-one exists), 'vs-slot-presentation' of each member is a symbol or a
-string representing the name of the slot (or a function that can be
-used to render the slot), and 'vs-object' is the object that contains
-the slot being rendered. The rules for determining visible slots are
-the same as for 'class-visible-slots'. This method is used by
-renderers to determine which slots should be displayed. Specialize
-this method for your objects to customize this behavior. (Note, look
-for documentation of 'class-visible-slots' for relevant definitions
-used in the examples.)
-
-Ex:
-\(object-visible-slots *joe*) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-         :SLOT-PRESENTATION NAME
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>
-         :SLOT-PRESENTATION MANAGER
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-
-If 'mode' keyword parameter is set to nil (the default), 'slots'
-keyword parameter is expected to contain a list of cons cells
-that modify the names of the slots as well as slot names that
-should be displayed even though they have no accessors. This is
-used by the renderers to easily change rendered field names.
-
-Ex:
-\(object-visible-slots *joe* :slots '(age (name . first-name))) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-         :SLOT-PRESENTATION FIRST-NAME
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION AGE>
-         :SLOT-PRESENTATION AGE
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>
-         :SLOT-PRESENTATION MANAGER
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-
-If 'mode' is set to ':hide', 'slots' is expected to contain a
-list of slot names that should not be displayed (and hence will
-not be returned by 'object-visible-slots'.)
-
-Ex:
-\(object-visible-slots *joe* :slots '(name) :mode :hide) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>
-         :SLOT-PRESENTATION MANAGER
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-
-If 'mode' is set to ':strict', 'slots' has similar semantics to
-when 'mode' is set to nil, except that only the slots listed will
-be displayed and the order will be maintained:
-
-Ex:
-\(object-visible-slots *joe* :slots '(age (name . first-name)) :mode :strict) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION AGE>
-         :SLOT-PRESENTATION AGE
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-         :SLOT-PRESENTATION FIRST-NAME
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-
-A function is a legidimate 'cdr' of a cons pair when passed via :slots
-argument. In this case the argument will be treated by various pieces
-of the framework as an 'override' that will be used to render the slot
-instead of the usual mechanism. 'object-visible-slots' simply returns
-the function in such cases:
-
-\(object-visible-slots *joe* :slots (list
-                                     (cons 'name
-                                           (lambda ()
-                                              nil)))
-                             :mode :strict) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-         :SLOT-PRESENTATION #<FUNCTION # {B384A6D}>
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-
-Custom slots that do not exist can also be added in any mode using
-the :custom-slots keyword. The keyword should be bound to an
-association list where the car of each cons cell is an index and the
-cdr is the slot. The slot will be added and returned as is at the
-specified index. If car of the cons pair is not a number or the
-element isn't a cons pair, it is treated as a slot which will be
-appended at the end.
-
-\(object-visible-slots *joe* :custom-slots '((0 . test))) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION TEST
-         :SLOT-PRESENTATION TEST
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-	 :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-	 :SLOT-PRESENTATION NAME
-	 :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-	 :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>
-	 :SLOT-PRESENTATION MANAGER
-	 :OBJECT #<EMPLOYEE {BBA1271}>))
-
-\(object-visible-slots *joe* :custom-slots '(test)) =>
-    (#S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-         :SLOT-PRESENTATION NAME
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>
-         :SLOT-PRESENTATION MANAGER
-         :OBJECT #<EMPLOYEE {BBA1271}>)
-     #S(VISIBLE-SLOT
-         :SLOT-DEFINITION TEST
-         :SLOT-PRESENTATION TEST
-         :OBJECT #<EMPLOYEE {BBA1271}>))
-"))
-
-(defmethod object-visible-slots (obj &rest keys &key slots mode custom-slots slot-path &allow-other-keys)
-  (let ((visible-slots (remove
-			nil
-			(if (eql mode :hide)
-			    (let ((all-slots (class-visible-slots (class-of obj))))
-			      (list->assoc (remove-if (curry-after #'member slots :test #'string-equal)
-						      all-slots :key #'slot-definition-name)
-					   :map #'slot-definition-name))
-			    (let* ((slot-assoc (list->assoc slots))
-				   (all-slots (class-visible-slots (class-of obj)
-								   :visible-slots
-								   (mapcar #'car slot-assoc))))
-			      (if (eql mode :strict)
-				  (mapcar (lambda (i)
-					    (let ((slot (car (member (car i) all-slots
-								     :test #'string-equal
-								     :key #'slot-definition-name))))
-					      (when (not (null slot))
-						(cons slot (cdr i)))))
-					  slot-assoc)
-				  (mapcar (lambda (i)
-					    (cons i (let* ((slot-name (slot-definition-name i))
-							   (alt-name (assoc slot-name slot-assoc)))
-						      (if (null alt-name)
-							  slot-name
-							  (cdr alt-name)))))
-					  all-slots)))))))
-    (mapc (lambda (obj)
-	    (if (and (consp obj)
-		     (integerp (car obj)))
-		(insert-at (cdr obj) visible-slots (car obj))
-		(push-end obj visible-slots)))
-	  custom-slots)
-    (remove nil
-	    (flatten 
-	     (mapcar (lambda (i)
-		       (let ((slot-path (append slot-path
-						(list (if (typep (car i) 'direct-slot-definition)
-							  (slot-definition-name (car i))
-							  (car i))))))
-			 (if (and (typep (car i) 'direct-slot-definition)
-				  (typep (ignore-errors
-					   (get-slot-value obj (car i))) 'standard-object)
-				  (render-slot-inline-p obj (slot-definition-name (car i))))
-			     (apply #'object-visible-slots (ignore-errors
-							     (get-slot-value obj (car i)))
-				    :slot-path slot-path
-				    (remove-keyword-parameter keys :custom-slots))
-			     (make-visible-slot :slot-definition (car i)
-						:slot-presentation (cdr i)
-						:slot-path slot-path
-						:object obj))))
-		     (list->assoc visible-slots))))))
-
-(defun class-visible-slots (cls &key visible-slots)
-  "Returns a list of 'standard-direct-slot' objects for a class
-and its subclasses. Slots objects for slots that do not have
-reader accessors are filtered out and not returned. This behavior
-can be modified by providing a list of symbols indicating slot
-names via 'visible-slots' keyword argument. Slot objects whose
-names show up in 'visible-slots' list are returned regardless of
-whether an accessor is defined for them.
-
-Ex: \(defclass person ()
-  ((name :reader first-name :initform \"Joe\")
-   (age :initform 30)))
-
-\(defclass employee (person)
-  ((manager :reader manager :initform \"Jim\")))
-
-\(setf *joe* (class-of (make-instance 'employee)))
-
-\(class-visible-slots *joe*) =>
-    (#<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-     #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>)
-\(class-visible-slots *joe* :visible-slots '(age)) =>
-    (#<STANDARD-DIRECT-SLOT-DEFINITION NAME>
-     #<STANDARD-DIRECT-SLOT-DEFINITION AGE>
-     #<STANDARD-DIRECT-SLOT-DEFINITION MANAGER>)"
-  (if (eql (class-name cls) 'standard-object)
-      nil
-      (apply #'append (append (mapcar (curry-after #'class-visible-slots :visible-slots visible-slots)
-				      (class-direct-superclasses cls))
-			      (list (remove-if (lambda (x)
-						 (and (null (slot-definition-readers x))
-						      (not (member (slot-definition-name x) visible-slots))))
-					       (class-direct-slots cls)))))))
-
-(defun get-slot-value (obj slot)
-  "If a reader accessor for the slot exists, gets the value of
-'slot' via the accessor. Otherwise, uses slot-value.
-
-'slot' - slot-definition object."
-  (let ((slot-reader (car (slot-definition-readers slot))))
-    (if (null slot-reader)
-	(slot-value obj (slot-definition-name slot))
-	(funcall slot-reader obj))))
-
-(defun slot-value-by-path (obj path &key observe-inline-p)
+(defun slot-value-by-path (obj path)
   "Retrieves a value of a slot from a hierarchy of objects. A nil on
 the path is ignored. 
 
-If 'observe-inline-p' is set to true, 'slot-value-by-path' will return
-the result of 'object-name' for objects that should not be rendered
-inline according to 'render-slot-inline-p'
-
 ex:
 \(slot-value-by-path employee '(address street)) => \"17 Sunvalley St.\"
-\(slot-value-by-path employee '(address-ref)) => \"Address\"
-\(slot-value-by-path employee 'address-ref) => \"Address\"
+\(slot-value-by-path employee '(address)) => #<ADDRESS {XXX}>
+\(slot-value-by-path employee 'address) => #<ADDRESS {XXX}>
 \(slot-value-by-path address '(street)) => \"17 Sunvalley St.\"
 \(slot-value-by-path address '(nil street)) => \"17 Sunvalley St.\"
 
@@ -326,40 +82,13 @@ obj - a CLOS object
 path - a list of slot names"
   (when (symbolp path)
     (return-from slot-value-by-path
-      (slot-value-by-path obj (list path) :observe-inline-p observe-inline-p)))
+      (slot-value-by-path obj (list path))))
   (let* ((clean-path (remove nil path))
 	 (value (ignore-errors (slot-value obj (car clean-path))))
 	 (path-rest (cdr clean-path)))
     (if path-rest
-	(slot-value-by-path value path-rest :observe-inline-p observe-inline-p)
-	(if (and (not (render-slot-inline-p obj (car clean-path)))
-		 observe-inline-p)
-	    (object-name value)
-	    value))))
-
-(defgeneric render-slot-inline-p (obj slot-name)
-  (:documentation
-   "Returns a boolean value that indicates whether an object
-should be rendered inline. The renderers use this method to
-determine whether the fields of a complex slot should be rendered
-as part of the object, or the name of the object the slot
-represents should be rendered instead.
-
-The default implementation returns false if the slot name ends
-with \"-ref\" and true otherwise.
-
-Override this method to specify whether objects should be
-rendered inline.
-
-'obj' - The object whose slot is being rendered.
-'slot-name' - The name of a slot (a symbol) being rendered.
-"))
-
-(defmethod render-slot-inline-p (obj slot-name)
-  (let ((name (if (symbolp slot-name)
-		  (symbol-name slot-name)
-		  slot-name)))
-    (not (string-ends-with name "-ref" :ignore-case-p t))))
+	(slot-value-by-path value path-rest)
+	value)))
 
 (defmacro safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
@@ -419,49 +148,6 @@ headers on top and three on the bottom. It uses
      ,@body
      (render-extra-tags "extra-bottom-" 3)))
 
-(defun visit-object-slots (obj render-slot-fn &rest keys &key (call-around-fn-p t)
-			   (ignore-unbound-slots-p t) &allow-other-keys)
-  "Used by 'render-standard-object' to visit visible slots of an
-object and apply a render function to them.
-
-If 'object-visible-slots' returns a function as a value of
-'vs-slot-presentation' due to appropriate arguments,
-'visit-object-slots' calls this function instead of
-'render-slot-fn' (unless 'call-around-fn-p' argument is set to
-nil). This can be used to quickly render slots in a custom way without
-specializing CLOS functions.
-
-If 'ignore-unbound-slots-p is true, 'visit-object-slots' will
-ignore errors that result from attempting to get slot values. In case
-of errors, slot-value will simply be set to nil. Use this parameter to
-allow visiting objects whose instances aren't bound to particular
-values."
-  (mapcar (lambda (slot)
-	    (let ((render-fn (if (and call-around-fn-p
-				      (functionp (vs-slot-presentation slot)))
-				 (vs-slot-presentation slot)
-				 render-slot-fn))
-		  slot-name slot-type slot-value)
-	      (if (typep (vs-slot-definition slot) 'standard-direct-slot-definition)
-		  (progn
-		    (setf slot-name (slot-definition-name (vs-slot-definition slot))
-			  slot-type (slot-definition-type (vs-slot-definition slot)))
-		    (if ignore-unbound-slots-p
-			(ignore-errors (setf slot-value (get-slot-value (vs-object slot)
-									(vs-slot-definition slot))))
-			(setf slot-value (get-slot-value (vs-object slot)
-							 (vs-slot-definition slot)))))
-		  (setf slot-name (vs-slot-definition slot)
-			slot-type t))
-	      (apply render-fn (vs-object slot) slot-name
-		     slot-type slot-value
-		     :human-name (if (not (functionp (vs-slot-presentation slot)))
-				     (vs-slot-presentation slot)
-				     slot-name)
-		     :slot-path (vs-slot-path slot)
-		     (remove-keyword-parameter keys :custom-slots))))
-	  (apply #'object-visible-slots obj keys)))
-
 (defun alist->plist (alist)
   "Converts an alist to plist."
   (let ((keyword-package (find-package :keyword)))
@@ -501,6 +187,14 @@ instead of 'delimeter'.
           else when remove
             do (setf remove nil)
           else collect i)))
+
+(defun remove-keyword-parameters (parameter-list &rest keywords)
+  "Removes all parameters with keys in 'keywords' from
+'parameter-list'."
+  (loop for argument in keywords
+        with i = parameter-list
+        do (setf i (remove-keyword-parameter i argument))
+        finally (return i)))
 
 (defun tokenize-uri (uri)
   "Tokenizes a URI into a list of elements.
@@ -618,10 +312,6 @@ etc.)"
 	       (format nil ".~A" (pathname-type thing))
 	       ""))))
 
-(defun object-full-visible-slot-count (obj &rest args)
-  "Returns the full number of visible slots (including the slots rendered inline)."
-  (length (apply #'object-visible-slots obj args)))
-
 (defun add-get-param-to-url (url name value)
   "Based on Edi's code in URL-REWRITE but uses & instead of &amp;
 which is more appropriate for our uses."
@@ -655,4 +345,51 @@ faithful to Emacs' isearch."
   (if (some #'upper-case-p search)
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
       (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
+
+(defun hash-keys (hashtable)
+  "Returns all keys in the hashtable."
+  (loop for key being the hash-keys in hashtable
+        collect key))
+
+(defgeneric object-class-name (obj)
+  (:documentation
+   "Returns an object's class name (i.e. \"Employee\"). This method is
+be used to present the name of an entity to the user. Override this
+method to change the name for particular objects.")
+  (:method (obj)
+    (class-name (class-of obj))))
+
+(defun append-custom-fields (custom-fields args)
+  "Appends 'custom-fields' to the end of custom fields that are
+already defined in 'args'."
+  (append (cadr (member :custom-fields args))
+	  custom-fields))
+
+(defun find-slot-dsd (class slot-name)
+  "Returns a direct-slot-definition object of a slot with 'slot-name'
+in 'class'."
+  (let ((class (if (symbolp class)
+		   (find-class class)
+		   class)))
+    (or (loop
+	   for dsd in (class-direct-slots class)
+	   when (eq (slot-definition-name dsd) slot-name)
+	   do (return dsd))
+	(car (mapcar (curry-after #'find-slot-dsd slot-name)
+		     (class-direct-superclasses class))))))
+
+(defun find-slot-esd (class slot-name)
+  "Returns an effective-slot-definition object of a slot with
+'slot-name' in 'class'."
+  (let ((class (if (symbolp class)
+		   (find-class class)
+		   class)))
+    (loop
+       for esd in (class-slots class)
+       when (eq (slot-definition-name esd) slot-name)
+       do (return esd))))
+
+(defun drop-last (list)
+  "Returns a copy of the list without the last element."
+  (reverse (cdr (reverse list))))
 

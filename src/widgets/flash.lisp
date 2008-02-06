@@ -65,8 +65,9 @@ messages that need to be shown for AJAX effects."
       (call-next-method)
       (apply #'call-next-method
 	     obj body-fn
-	     :prewidget-body-fn (lambda (&rest args)
-				  (format *weblocks-output-stream* "<!-- empty flash -->"))
+	     :widget-prefix-fn (lambda (&rest args)
+				 (declare (ignore args))
+				 (format *weblocks-output-stream* "<!-- empty flash -->"))
 	     args)))
 
 (defun flash-message (flash msg)
@@ -80,7 +81,7 @@ messages that need to be shown for AJAX effects."
   (let ((messages (flash-messages-to-show obj)))
     (when messages
       (with-html
-	(:div :class "renderer"
+	(:div :class "view"
 	      (with-extra-tags
 		(htm
 		 (:ul :class "messages"

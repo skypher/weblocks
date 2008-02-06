@@ -106,13 +106,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Querying persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defmethod find-persistent-object-by-id ((store memory-store) class-name object-id)
+  (let ((objects (get-root-object store class-name)))
+    ; find the object
+    (multiple-value-bind (obj)
+	(gethash object-id (persistent-objects-of-class-by-id objects))
+      obj)))
+
 (defmethod find-persistent-objects ((store memory-store) object-class
-				    &key filter filter-args order-by range)
+				    &key filter filter-view order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
     (filter-objects-in-memory
      (find-persistent-objects-aux store object-class)
-     filter filter-args)
+     filter filter-view)
     order-by)
    range))
 
@@ -124,10 +131,8 @@
 	 collect i))))
 
 (defmethod count-persistent-objects ((store memory-store) class-name
-				     &key filter filter-args order-by range)
+				     &key filter filter-view)
   (length (find-persistent-objects store class-name
 				   :filter filter
-				   :order-by order-by
-				   :range range
-				   :filter-args filter-args)))
+				   :filter-view filter-view)))
 

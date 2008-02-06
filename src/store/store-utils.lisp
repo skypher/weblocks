@@ -8,10 +8,10 @@
 ;;; Object ID management
 (defgeneric class-id-slot-name (class-name)
   (:documentation
-   "Must returns the symbol that identifies the slot name which
-   represents the unique ID of the class named 'class-name'. Default
-   implementation returns 'ID'. Specialize this function if you want
-   to name the slot that holds the class' unique ID differently."))
+   "Must return the symbol that identifies the slot name which
+represents the unique ID of the class named 'class-name'. Default
+implementation returns 'ID'. Specialize this function if you want to
+name the slot that holds the class' unique ID differently."))
 
 (defmethod class-id-slot-name (class-name)
   (declare (ignore class-name))
@@ -29,13 +29,14 @@ of 'obj'. This information is obtained via calling
 a backend store. The default implementation looks for an 'id' slot via
 'slot-value'. If such slot is not present, signals an
 error. Specialize this function for various back end stores and other
-object identification schemes."))
-
-(defmethod object-id ((obj standard-object))
-  (let ((object-id-slot-name (object-id-slot-name obj)))
-    (handler-case (when (slot-boundp obj object-id-slot-name)
-		    (slot-value obj object-id-slot-name))
-      (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj)))))
+object identification schemes.")
+  (:method ((obj null))
+    nil)
+  (:method ((obj standard-object))
+    (let ((object-id-slot-name (object-id-slot-name obj)))
+      (handler-case (when (slot-boundp obj object-id-slot-name)
+		      (slot-value obj object-id-slot-name))
+	(error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))))
 
 (defgeneric (setf object-id) (id obj)
   (:documentation
@@ -73,6 +74,9 @@ persist objects. Default implementation returns *default-store*."))
   "A hashmap of stores, where each item has store name as key, and
 structure of type 'store-info' as value.")
 
+(defparameter *store-names* nil
+  "A list of store names in the order in which they were defined.")
+
 (defmacro defstore (name type &rest args)
   "A macro that helps define a store. A global variable 'name' is
 defined, and 'open-store' is called with appropriate store type and
@@ -84,6 +88,8 @@ is called."
     `(progn
        (setf (gethash ',name *stores*)
 	     (make-store-info :type ,type :args ,(cons 'list args)))
+       (unless (find ',name *store-names*)
+	 (push-end ',name *store-names*))
        (defparameter ,name nil)
        (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
 	 (unless (asdf:find-system ,system-name nil)
@@ -96,28 +102,27 @@ is called."
 
 (defun open-stores ()
   "Opens and binds all stores."
-  (maphash (lambda (store-name store)
-	     (unless (symbol-value store-name)
-	       (setf (symbol-value store-name)
-		     (apply #'open-store (store-info-type store) (store-info-args store)))))
-	   *stores*))
+  (dolist (store-name *store-names*)
+    (unless (symbol-value store-name)
+      (let ((store-info (gethash store-name *stores*)))
+	(setf (symbol-value store-name)
+	      (apply #'open-store
+		     (store-info-type store-info)
+		     (store-info-args store-info)))))))
 
 (defun close-stores ()
   "Closes all stores."
-  (maphash (lambda (store-name store)
-	     (declare (ignore store))
-	     (when (symbol-value store-name)
-	       (close-store (symbol-value store-name))
-	       (setf (symbol-value store-name) nil)))
-	   *stores*))
+  (dolist (store-name *store-names*)
+    (when (symbol-value store-name)
+      (close-store (symbol-value store-name))
+      (setf (symbol-value store-name) nil))))
 
 (defun mapstores (fn)
-  "Maps a function over existing stores. Returns NIL."
-  (maphash (lambda (store-name store)
-	     (declare (ignore store))
-	     (when (symbol-value store-name)
-	       (funcall fn (symbol-value store-name))))
-	   *stores*))
+  "Maps a function over existing stores in the order in which they
+were defined. Returns NIL."
+  (dolist (store-name *store-names*)
+    (when (symbol-value store-name)
+      (funcall fn (symbol-value store-name)))))
 
 ;;; Persisting objects
 (defun persist-objects (store objects)

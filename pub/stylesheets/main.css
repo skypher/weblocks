@@ -10,21 +10,21 @@ a
   color: #A61E2E;
 }
 
-.renderer
+.view
 {
   background: #ecf8d7 url(/pub/images/widget/top_background.png) repeat-x;
   margin-bottom: 1em;
   _height: 0; /* IE specific hasLayout fix */
 }
 
-.renderer .extra-top-1
+.view .extra-top-1
 {
   height: 7px;
   background: url(/pub/images/widget/top_left.png) no-repeat top left;
   overflow: hidden;
 }
 
-.renderer .extra-top-2
+.view .extra-top-2
 {
   height: 7px;
   margin-top: -7px;
@@ -33,7 +33,7 @@ a
   overflow: hidden;
 }
 
-.renderer h1, .renderer fieldset h1,
+.view h1, .view fieldset h1,
 .long-form fieldset .validation-errors-summary h2.error-count
 {
   margin: 0;
@@ -41,27 +41,27 @@ a
   padding-left: 0.4em;
 }
 
-.renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
-.renderer .empty-navigation, .renderer ul li, .renderer fieldset ul li,
-.renderer table thead tr th,
-.renderer fieldset div.submit, .renderer div.submit,
+.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view .empty-navigation, .view ul li, .view fieldset ul li,
+.view table thead tr th,
+.view fieldset div.submit, .view div.submit,
 .long-form fieldset .validation-errors-summary h2.error-count
 {
   border-top: 1px solid #fcfef6;
 }
 
-.renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
-.renderer .empty-navigation, .renderer ul li, .renderer fieldset ul li,
-.renderer table thead tr th,
-.renderer fieldset div.submit, .renderer div.submit,
+.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view .empty-navigation, .view ul li, .view fieldset ul li,
+.view table thead tr th,
+.view fieldset div.submit, .view div.submit,
 .long-form fieldset .validation-errors-summary
 {
   border-bottom: 1px solid #dbeac1;
 }
 
-.renderer h1, .renderer fieldset h1, .table table caption, .empty-table p,
-.renderer .empty-navigation, .renderer ul, .renderer fieldset ul, .table table,
-.renderer fieldset div.submit, .renderer div.submit,
+.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view .empty-navigation, .view ul, .view fieldset ul, .table table,
+.view fieldset div.submit, .view div.submit,
 .long-form fieldset .validation-errors-summary h2.error-count
 {
   border-left: 2px solid #dbeac1;
@@ -76,51 +76,51 @@ h1, h2
   font-family: Garamond, New York, serif;
 }
 
-.renderer h1 .action, .renderer fieldset h1 .action
+.view h1 .action, .view fieldset h1 .action
 {
   display: none;
 }
 
-.renderer ul, .renderer fieldset ul, .table table, .renderer fieldset div.submit,
-.renderer div.submit
+.view ul, .view fieldset ul, .table table, .view fieldset div.submit,
+.view div.submit
 {
   padding-left: 0;
   margin: 0;
 }
 
-.renderer ul li, .renderer fieldset ul li, .menu ul li a
+.view ul li, .view fieldset ul li, .menu ul li a
 {
   list-style: none;
   padding-left: 1.5em;
 }
 
-.renderer div.submit, .form fieldset div.submit
+.view div.submit, .form fieldset div.submit
 {
   padding-left: 13.5em;
 }
 
-.renderer ul li .label, .renderer fieldset ul li label span.slot-name,
+.view ul li .label, .view fieldset ul li label span.slot-name,
 .table table thead
 {
   color: #808080;
   font-weight: bold;
 }
 
-.renderer ul li .label, .renderer fieldset ul li label span.slot-name
+.view ul li .label, .view fieldset ul li label span.slot-name
 {
   display: -moz-inline-box;
   display: inline-block;
   width: 12em;
 }
 
-.renderer .extra-bottom-1
+.view .extra-bottom-1
 {
   height: 7px;
   background: url(/pub/images/widget/bottom_background.png) repeat-x top;
   overflow: hidden;
 }
 
-.renderer .extra-bottom-2
+.view .extra-bottom-2
 {
   height: 7px;
   margin-top: -7px;
@@ -128,7 +128,7 @@ h1, h2
   overflow: hidden;
 }
 
-.renderer .extra-bottom-3
+.view .extra-bottom-3
 {
   height: 7px;
   margin-top: -7px;
@@ -210,7 +210,7 @@ p.text
   margin: 0;
 }
 
-.renderer ul li p.text
+.view ul li p.text
 {
   margin-left: 0.5em;
 }

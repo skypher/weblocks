@@ -17,7 +17,7 @@ widget."
 	(flash-message w "Foo")
 	(render-widget-body w)))
   (htm
-   (:div :class "renderer"
+   (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
 	 (:div :class "extra-top-3" "<!-- empty -->")

@@ -69,27 +69,46 @@
 	(datagrid-selection-empty-p grid)))
   t)
 
-;;; test datagrid-render-select-body-cell
-(deftest-html datagrid-render-select-body-cell-1
+;;; test datagrid-render-view-field-select
+(deftest-html datagrid-render-view-field-select-1
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee)))
-	(weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe")))
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :view view
+				  :sort '(name . :asc)))
+	     (field (weblocks::make-select-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(render-view-field field view grid presentation value *joe*)))
   (:td :class "select"
        (:div (:input :name "item-1" :type "checkbox" :value "t"))))
 
-(deftest-html datagrid-render-select-body-cell-2
+(deftest-html datagrid-render-view-field-select-2
     (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . (1)))))
-	(weblocks::datagrid-render-select-body-cell grid *joe* 'name t "Joe")))
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :selection '(:none . (1))
+				  :view view
+				  :sort '(name . :asc)))
+	     (field (weblocks::make-select-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(render-view-field field view grid presentation value *joe*)))
   (:td :class "select"
        (:div (:input :name "item-1" :type "checkbox" :value "t" :checked "checked"))))
 
-;;; test render-table-header-cell-select
-(deftest-html render-table-header-cell-select-1
-    (render-table-header-cell *joe* 'weblocks::select t nil)
+;;; test datagrid-render-view-field-header-select-1
+(deftest-html datagrid-render-view-field-header-select-1
+    (with-request :get nil
+      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+	     (grid (make-instance 'datagrid :data-class 'employee
+				  :selection '(:none . (1))
+				  :view view
+				  :sort '(name . :asc)))
+	     (field (weblocks::make-select-field grid))
+	     (presentation (view-field-presentation field))
+	     (value (first-name *joe*)))
+	(render-view-field-header field view grid presentation value *joe*)))
   (:th :class "select" ""))
 
 ;;; test selection process

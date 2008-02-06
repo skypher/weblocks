@@ -134,7 +134,7 @@ which case its car is used to dispaly selection text, and cdr is used
 for the value.
 'id' - id of a label that holds the radio buttons.
 'class' - class of the label and of radio buttons.
-'selected-value' - selected radio button."
+'selected-value' - selected radio button value."
   (loop for i in (list->assoc selections)
         for j from 1
         with count = (length selections)
@@ -166,7 +166,7 @@ used instead of the default 'Close'."
 (defun render-password (name value &key id (class "password") maxlength)
     "Renders a password in a form.
 'name' - name of the html control. The name is attributized before being rendered.
-'value' - a value on html control. Humanized name is default.
+'value' - a value on html control.
 'id' - id of the html control. Default is nil.
  maxlength - maximum lentgh of the field
 'class' - a class used for styling. By default, \"password\"."

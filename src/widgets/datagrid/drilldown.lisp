@@ -1,9 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(render-datagrid-drilldown-body-cell
-	  render-datagrid-drilldown-header-cell
-	  with-datagrid-drilldown-table-body-row))
+(export '(datagrid-drilldown-field
+	  with-datagrid-drilldown-table-view-body-row))
 
 ;;; Utilities
 (defun datagrid-drilldown-style (slot-name)
@@ -17,60 +16,56 @@ otherwise."
        (datagrid-on-drilldown grid-obj)
        (eql slot-name (car (datagrid-on-drilldown grid-obj)))))
 
-;;; Drilldown rendering
-(defgeneric render-datagrid-drilldown-header-cell (grid-obj obj slot-name slot-type slot-value &rest args
-							    &key row-action &allow-other-keys)
-  (:generic-function-class slot-management-generic-function)
-  (:documentation
-   "Renders the 'drilldown' action slot's table header."))
+;;; Custom drilldown field
+(defclass datagrid-drilldown-field (grid-view-field)
+  ((allow-sorting-p :initform nil))
+  (:documentation "A field used to render drilldown control."))
 
-(defslotmethod render-datagrid-drilldown-header-cell (grid-obj obj slot-name slot-type slot-value &rest args
-							       &key row-action &allow-other-keys)
-  (with-html (:th :class (datagrid-drilldown-style slot-name) "")))
+(defun make-drilldown-field (grid-obj)
+  "Makes a custom field for rendering drilldown controls."
+  (let ((label (humanize-name (car (datagrid-on-drilldown grid-obj)))))
+    (make-instance 'datagrid-drilldown-field
+		   :label label
+		   :reader label
+		   :present-as nil)))
 
-(defgeneric render-datagrid-drilldown-body-cell (grid-obj obj slot-name slot-type slot-value &rest args
-							  &key row-action &allow-other-keys)
-  (:generic-function-class slot-management-generic-function)
-  (:documentation
-   "Renders a cell with a link used to drill down into items."))
+;;; Drilldown cells
+(defmethod render-view-field-header ((field datagrid-drilldown-field) (view grid-view)
+				     widget presentation value obj &rest args)
+  (declare (ignore args))
+  (with-html (:th :class (datagrid-drilldown-style
+			  (car (datagrid-on-drilldown widget)))
+		  "")))
 
-(defslotmethod render-datagrid-drilldown-body-cell (grid-obj obj slot-name slot-type slot-value &rest args
-							     &key row-action &allow-other-keys)
+(defmethod render-view-field ((field datagrid-drilldown-field) (view grid-view)
+			      widget presentation value obj &rest args
+			      &key row-action &allow-other-keys)
+  (declare (ignore args))
   (with-html
-    (:td :class (datagrid-drilldown-style slot-name)
+    (:td :class (datagrid-drilldown-style (car (datagrid-on-drilldown widget)))
 	 (unless (ajax-request-p)
 	   (htm
 	    (:noscript
 	     (:div
 	      (render-link row-action
-			   (humanize-name (car (datagrid-on-drilldown grid-obj)))
+			   (humanize-name (car (datagrid-on-drilldown widget)))
 			   :ajaxp nil))))))))
 
-(defmethod with-table-body-row :around (obj body-fn &rest keys &key alternp grid-obj &allow-other-keys)
-  (if (and grid-obj
-	   (datagrid-allow-drilldown-p grid-obj)
-	   (datagrid-on-drilldown grid-obj))
-      (apply #'with-datagrid-drilldown-table-body-row grid-obj obj body-fn keys)
-      (call-next-method)))
-
-(defgeneric with-datagrid-drilldown-table-body-row (grid-obj obj body-fn &rest keys
-							     &key alternp &allow-other-keys)
-  (:documentation
-   "Renders datagrid table row templates for rows that provide
-drilldown functionality. The default implementation inserts necessary
-JS code to allow the user to click on a row."))
-
-(defmethod with-datagrid-drilldown-table-body-row (grid-obj obj body-fn &rest keys
-						   &key alternp &allow-other-keys)
-  (let ((row-action (make-action
-		     (lambda (&rest args)
-		       (when (datagrid-autoset-drilled-down-item-p grid-obj)
-			 (setf (datagrid-drilled-down-item grid-obj) obj))
-		       (funcall (cdr (datagrid-on-drilldown grid-obj)) grid-obj obj))))
-	(drilled-down-p (and (datagrid-drilled-down-item grid-obj)
-			     (eql (datagrid-drilled-down-item grid-obj) obj))))
-    (if (and (typep grid-obj 'datagrid)
-	     (datagrid-allow-drilldown-p grid-obj))
+;;; Drilldown row
+(defmethod with-table-view-body-row ((view grid-view) obj widget &rest args
+				     &key alternp &allow-other-keys)
+  (if (and (datagrid-allow-drilldown-p widget)
+	   (datagrid-on-drilldown widget))
+      (let ((row-action (make-action
+			 (lambda (&rest args)
+			   (declare (ignore args))
+			   (when (datagrid-autoset-drilled-down-item-p widget)
+			     (setf (datagrid-drilled-down-item widget) obj))
+			   (funcall (cdr (datagrid-on-drilldown widget)) widget obj))))
+	    (drilled-down-p (and (datagrid-drilled-down-item widget)
+				 (eql (object-id (datagrid-drilled-down-item widget))
+				      (object-id obj)))))
+	(safe-apply (table-view-row-prefix-fn view) view obj args)
 	(with-html
 	  (:tr :class (when (or alternp drilled-down-p)
 			(concatenate 'string
@@ -81,5 +76,7 @@ JS code to allow the user to click on a row."))
 				row-action (session-name-string-pair))
 	       :onmouseover "this.style.cursor = \"pointer\";"
 	       :style "cursor: expression(\"hand\");"
-	       (apply body-fn :row-action row-action keys)))
-	(apply #'call-next-method obj body-fn keys))))
+	       (apply #'render-table-view-body-row view obj widget :row-action row-action args)))
+	(safe-apply (table-view-row-suffix-fn view) view obj args))
+      (call-next-method)))
+

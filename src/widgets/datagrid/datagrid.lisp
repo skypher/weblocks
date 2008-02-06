@@ -27,6 +27,12 @@
 	       datagrid more efficient. For these reasons it is
 	       required to specify this slot at the instantiation
 	       time.")
+   (view :accessor datagrid-view
+	 :initform nil
+	 :initarg :view
+	 :documentation "A grid view used to render the datagrid. If
+	 the value of this slot is nil, a scaffold view will be
+	 used.")
    (on-query :accessor datagrid-on-query
 	     :initform nil
 	     :initarg :on-query
@@ -46,21 +52,6 @@
 	 :documentation "Holds a dotted pair of a path to the sorted
          column and the direction of the sort (:asc
          or :desc).")
-   (allow-sorting :accessor datagrid-allow-sorting
-		  :initform t
-		  :initarg :allow-sorting
-		  :documentation "This slot controls whether the
-		  datagrid object should support sorting. If set to
-		  t (default), sorting is allowed; if set to nil
-		  sorting is disallowed. If set to a list of slot
-		  names, only these slots will be available for the
-		  user to sort on.")
-   (forbid-sorting-on :accessor datagrid-forbid-sorting-on
-		      :initform nil
-		      :initarg :forbid-sorting-on
-		      :documentation "A list of slot names on which
-		      datagrid will not do sorting. Note, this slot
-		      takes precedence over 'allow-sorting'.")
    (search :accessor datagrid-search
 	   :initform nil
 	   :initarg :search
@@ -190,9 +181,17 @@
 			 :on-error (datagrid-flash obj)
 			 :show-total-items-p nil
 			 :total-items (datagrid-data-count obj :totalp t))))
-  (pushnew 'select (datagrid-forbid-sorting-on obj))
   (when (null (datagrid-data-class obj))
     (error "data-class must be specified to initialize a datagrid.")))
+
+;;; Ensure scaffold view is selected if no view is provided explicitly
+(defmethod datagrid-view ((obj datagrid))
+  (or (slot-value obj 'view)
+      (find-view
+       (list 'grid
+	     (if (symbolp (datagrid-data-class obj))
+		 (datagrid-data-class obj)
+		 (class-name (datagrid-data-class obj)))))))
 
 (defun datagrid-data (grid)
   "Returns the items in the grid. If 'datagrid-on-query' is not nil,
@@ -209,7 +208,7 @@ persistent store API."
 	(find-persistent-objects (class-store (datagrid-data-class grid))
 				 (datagrid-data-class grid)
 				 :filter (datagrid-search grid)
-				 :filter-args (widget-args grid)
+				 :filter-view (datagrid-view grid)
 				 :order-by (datagrid-sort grid)
 				 :range (when (and begin end) (cons begin end))))))
 
@@ -230,13 +229,7 @@ ignores searching parameters."
 	  (count-persistent-objects (class-store (datagrid-data-class grid))
 				    (datagrid-data-class grid)
 				    :filter (datagrid-search grid)
-				    :filter-args (widget-args grid)))))
-
-(defun append-custom-slots (custom-slots args)
-  "Appends 'custom-slots' to whatever custom slots that are already
-defined in 'args'."
-  (append (cadr (member :custom-slots args))
-	  custom-slots))
+				    :filter-view (datagrid-view grid)))))
 
 (defgeneric datagrid-render-item-ops-bar (grid &rest args)
   (:documentation
@@ -305,7 +298,7 @@ items available)."))
 	    (when (datagrid-allow-select-p obj)
 	      (apply #'render-select-bar obj args))))))
 
-;;; This file needs to be loaded with CMU because it CMUCL doesn't
+;;; This file needs to be loaded with CMU because CMUCL doesn't
 ;;; compile it properly. Bytecompiler, however, works.
 #+cmu (load (merge-pathnames
 	     (make-pathname :directory '(:relative "src" "widgets" "datagrid")
@@ -337,37 +330,36 @@ before or after. This function is used to update the body during ajax
 search requests."))
 
 (defmethod render-datagrid-table-body ((grid datagrid) &rest args)
-  (apply #'datagrid-update-sort-column grid args)
+  (datagrid-update-sort-column grid)
   (when (datagrid-allow-pagination-p grid)
     (setf (pagination-total-items (datagrid-pagination-widget grid))
 	  (datagrid-data-count grid :totalp nil)))
   (with-html
     (:div :class "datagrid-body"
-	  (apply #'render-table (datagrid-data grid)
-		 :grid-obj grid
+	  (apply #'render-object-view (datagrid-data grid) (datagrid-view grid)
+		 :widget grid
 		 :summary (if (datagrid-sort grid)
 			      (format nil "Ordered by ~A, ~A."
-				      (string-downcase (humanize-name
-							(datagrid-sorted-slot-name
-							 (datagrid-sort grid))))
 				      (string-downcase
 				       (humanize-name
-					(ecase (cdr (datagrid-sort grid))
+					(datagrid-sort-slot grid)))
+				      (string-downcase
+				       (humanize-name
+					(ecase (datagrid-sort-direction grid)
 					  (:asc "ascending")
 					  (:desc "descending")))))
 			      nil)
 		 :highlight (when (datagrid-search grid)
 			      (make-isearch-regex (datagrid-search grid)))
-		 :custom-slots (append-custom-slots
-				(remove nil
-				 (list
-				  (when (datagrid-allow-select-p grid)
-				    `(0 . (select . ,(curry #'datagrid-render-select-body-cell grid))))
-				  (when (and (datagrid-allow-drilldown-p grid)
-					     (datagrid-on-drilldown grid))
-				    (cons (car (datagrid-on-drilldown grid))
-					  (curry #'render-datagrid-drilldown-body-cell grid)))))
-				args)
+		 :custom-fields (append-custom-fields
+				 (remove nil
+					 (list
+					  (when (datagrid-allow-select-p grid)
+					    (cons 0 (make-select-field grid)))
+					  (when (and (datagrid-allow-drilldown-p grid)
+						     (datagrid-on-drilldown grid))
+					    (make-drilldown-field grid))))
+				 args)
 		 args))))
 
 (defmethod (setf datagrid-search) :before (value (obj datagrid))

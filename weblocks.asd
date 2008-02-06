@@ -19,11 +19,7 @@
 		:components (
 		 (:file "weblocks")
 		 (:module utils
-			  :components ((:file "misc")
-				       (:file "typespec"
-					      :depends-on ("misc"))
-				       #+(or openmcl mcl) (:file "dfun-mcl"
-								 :depends-on ("typespec")))
+			  :components ((:file "misc"))
 			  :depends-on ("weblocks"))
 		 (:file "page-template"
 			:depends-on ("weblocks" utils "application"))
@@ -44,27 +40,64 @@
 				       (:file "html-utils"))
 			  :depends-on ("weblocks" "request" "server" "actions"))
 		 (:module linguistic
-			  :components ((:file "grammar")
-				       (:file "typespecs"
-					      :depends-on ("grammar")))
+			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
-		 (:module renderers
-			  :components ((:file "renderer-output-utils")
-				       (:file "data-renderer"
-					      :depends-on ("renderer-output-utils"))
-				       (:file "form-renderer"
-					      :depends-on ("renderer-output-utils"
-							   "data-renderer"))
-				       (:file "table-renderer"
-					      :depends-on ("renderer-output-utils")))
+		 (:module views
+			  :components ((:module view
+						:components ((:file "view")
+							     (:file "utils"
+								    :depends-on ("view"))
+							     (:file "compiler"
+								    :depends-on ("view"))
+							     (:file "scaffold"
+								    :depends-on ("view" "utils"))
+							     (:file "presentation"
+								    :depends-on ("view" "compiler"))))
+				       (:module dataview
+						:components ((:file "dataview")
+							     (:file "scaffold"
+								    :depends-on ("dataview")))
+						:depends-on (view))
+				       (:module formview
+						:components ((:file "formview")
+							     (:file "helpers")
+							     (:file "parser"
+								    :depends-on ("formview"))
+							     (:file "scaffold"
+								    :depends-on ("formview" "parser"))
+							     (:file "validation"
+								    :depends-on ("formview"))
+							     (:file "request-deserialization"
+								    :depends-on ("formview" "parser"
+											    "validation")))
+						:depends-on (view))
+				       (:module tableview
+						:components ((:file "tableview")
+							     (:file "scaffold"
+								    :depends-on ("tableview")))
+						:depends-on (view dataview))
+				       (:module
+					types
+					:components ((:file "us-states")
+						     (:file "boolean")
+						     (:file "member"
+							    :depends-on (presentations parsers))
+						     (:file "password")
+						     (:module
+						      presentations
+						      :components ((:file "choices")
+								   (:file "radio"
+									  :depends-on ("choices"))
+								   (:file "dropdown"
+									  :depends-on ("choices"))
+								   (:file "textarea")
+								   (:file "paragraph")
+								   (:file "excerpt")))
+						     (:module
+						      parsers
+						      :components ((:file "common"))))
+					:depends-on (view formview dataview)))
 			  :depends-on ("weblocks" utils snippets))
-		 (:module form-management
-			  :components ((:file "validation")
-				       (:file "form-parsers"
-					      :depends-on ("validation"))
-				       (:file "request-object-mapping"
-					      :depends-on ("validation" "form-parsers")))
-			  :depends-on (utils linguistic))
 		 (:module store
 			  :components ((:file "store-api")
 				       (:file "store-utils"))
@@ -82,34 +115,31 @@
 					:components ((:file "datagrid"
 							    :depends-on ("filter" "sort" "select"
 										  "drilldown"
+										  "gridview"
 										  #-cmu "item-ops-action"))
 							     #-cmu (:file "item-ops-action")
 							     (:file "filter")
-							     (:file "sort")
-							     (:file "select")
-							     (:file "drilldown"))
+							     (:file "sort"
+								    :depends-on ("gridview"))
+							     (:file "select"
+								    :depends-on ("gridview"))
+							     (:file "drilldown"
+								    :depends-on ("gridview"))
+						             (:file "gridview"))
 						:depends-on (widget "flash"))
-				       (:file "gridedit"
-					      :depends-on ("datagrid" "dataform"))
+				       (:module gridedit
+					:components ((:file "gridedit"
+							    :depends-on (#-cmu "delete-action"))
+						     #-cmu (:file "delete-action"))
+						:depends-on (datagrid "dataform"))
 				       (:file "pagination"
 					      :depends-on (widget "flash"))
 				       (:file "composite"
 					      :depends-on (widget))
 				       (:file "navigation"
 					      :depends-on ("composite" widget)))
-			  :depends-on (snippets renderers
-						form-management utils "actions" "server" "request"
+			  :depends-on (snippets views utils "actions" "server" "request"
 						"request-hooks" linguistic store))
-		 (:module types
-			  :components ((:file "us-states")
-				       (:file "text")
-				       (:file "password")
-				       (:file "boolean")
-				       (:file "member")
-				       (:file "symbol")
-				       (:file "keyword"
-					      :depends-on ("symbol")))
-			  :depends-on (renderers snippets widgets))
 		 (:module control-flow
 			  :components ((:file "call-answer")
 				       (:file "dialog"

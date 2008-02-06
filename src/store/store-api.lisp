@@ -5,7 +5,7 @@
 	  supports-filter-p begin-transaction commit-transaction
 	  rollback-transaction persist-object delete-persistent-object
 	  delete-persistent-object-by-id find-persistent-objects
-	  count-persistent-objects))
+	  find-persistent-object-by-id count-persistent-objects))
 
 ;;; Store initialization and finalization
 (defgeneric open-store (store-type &rest args)
@@ -70,8 +70,13 @@
   deletes object with the specified 'object-id'."))
 
 ;;; Querying persistent objects
+(defgeneric find-persistent-object-by-id (store class-name object-id)
+  (:documentation "Finds and returns a persistent object of a given
+  class name in a given store by its unique id. If the object isn't
+  found, returns NIL."))
+
 (defgeneric find-persistent-objects (store class-name &key filter
-					   filter-args order-by range)
+					   filter-view order-by range)
   (:documentation "Looks up and returns objects of appropriate
   'class-name' in the 'store' bound by the given keyword
   parameters.
@@ -79,8 +84,8 @@
   If 'filter' is specified, filters the returned objects according to
   the string provided. This is expected to be a full text search.
 
-  'filter-args' are implementation dependent argument for the
-  filtering engine that may configure the behavior of the query.
+  'filter-view' a high level object view description used by the
+  filtering engine to configure the behavior of the query.
 
   If 'order-by' is specified, orders the returned objects by the given
   slot in the given order. If 'order-by' is not NIL, it is expected to
@@ -93,8 +98,7 @@
   the range should be applied after the objects have been filtered and
   ordered if necessary."))
 
-(defgeneric count-persistent-objects (store class-name &key filter
-					    filter-args order-by range)
+(defgeneric count-persistent-objects (store class-name &key filter filter-view)
   (:documentation "Returns the number of persistent objects stored in
   'store' of 'class-name', bound by the given keyword parameters. For
   documentation of keyword parameters, see

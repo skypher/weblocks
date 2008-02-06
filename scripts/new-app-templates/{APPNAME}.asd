@@ -12,11 +12,11 @@
     :licence ""
     :description "{APPNAME}"
     :depends-on (:weblocks)
-    :components ((:module conf
+    :components ((:file "{APPNAME}")
+		 (:module conf
 		  :components ((:file "stores"))
-		  :depends-on (src))
+		  :depends-on ("{APPNAME}"))
 		 (:module src
-		  :components ((:file "{APPNAME}")
-			       (:file "init-session"
-				      :depends-on ("{APPNAME}"))))))
+		  :components ((:file "init-session"))
+		  :depends-on ("{APPNAME}" conf))))
 

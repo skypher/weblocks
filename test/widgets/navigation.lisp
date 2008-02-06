@@ -25,7 +25,7 @@
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
-  (:div :class "renderer menu"
+  (:div :class "view menu"
 	(:div :class "extra-top-1" "<!-- empty -->")
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
@@ -38,7 +38,7 @@
     (with-navigation-header (make-instance 'navigation :panes `(("Test One" . nil)))
       (lambda (x &rest args)
 	(with-html (:div "test"))))
-  (:div :class "renderer menu"
+  (:div :class "view menu"
 	(:div :class "extra-top-1" "<!-- empty -->")
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
@@ -52,7 +52,7 @@
     (with-navigation-header (make-instance 'navigation :name "hello!" :panes `(("Test One" . nil)))
       (lambda (x &rest args)
 	(with-html (:div "test"))))
-  (:div :class "renderer menu"
+  (:div :class "view menu"
 	(:div :class "extra-top-1" "<!-- empty -->")
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
@@ -102,11 +102,11 @@
 	 (:div :class "widget dataform" :id "widget-123"
 	       #.(data-header-template
 		  "abc123"
-		  '((:li :class "name" (:span :class "label string" "Name:&nbsp;")
+		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
 		     (:span :class "value" "Joe"))
 		    (:li :class "manager"
-		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
-	 (:div :class "renderer menu"
+		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
@@ -118,7 +118,7 @@
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:div :class "widget navigation" :id "test-navigation"
 	 (:div :class "widget dataform" :id "widget-123"
-	       (:div :class "renderer data education-history"
+	       (:div :class "view data education-history"
 		     (:div :class "extra-top-1" "<!-- empty -->")
 		     (:div :class "extra-top-2" "<!-- empty -->")
 		     (:div :class "extra-top-3" "<!-- empty -->")
@@ -126,16 +126,16 @@
 			  (:span :class "object" "Education History"))
 		     (:ul
 		      (:li :class "university"
-			   (:span :class "label" "University:&nbsp;")
+			   (:span :class "label text" "University:&nbsp;")
 			   (:span :class "value" "Bene Gesserit University"))
 		      (:li :class "graduation-year"
-			   (:span :class "label" "Graduation Year:&nbsp;")
+			   (:span :class "label text" "Graduation Year:&nbsp;")
 			   (:span :class "value" "2000")))
 		     (:div :class "submit" #.(link-action-template "abc124" "Modify"))
 		     (:div :class "extra-bottom-1" "<!-- empty -->")
 		     (:div :class "extra-bottom-2" "<!-- empty -->")
 		     (:div :class "extra-bottom-3" "<!-- empty -->")))
-	 (:div :class "renderer menu"
+	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")

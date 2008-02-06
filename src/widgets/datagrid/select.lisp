@@ -57,21 +57,38 @@ selection slot (both are accepted for convinience)."
 			 t
 			 nil)))))))
 
-(defun datagrid-render-select-body-cell (grid obj slot-name slot-type slot-value &rest args)
-  "Renders a cell with a checkbox used to select items."
+;; Custom selection field
+(defclass datagrid-select-field (grid-view-field)
+  ((allow-sorting-p :initform nil))
+  (:documentation "A field used to render select control."))
+
+(defun make-select-field (grid-obj)
+  "Makes a custom field for rendering select controls."
+  (declare (ignore grid-obj))
+  (make-instance 'datagrid-select-field
+		 :label "Select"
+		 :reader "Select"
+		 :present-as nil))
+
+(defmethod render-view-field-header ((field datagrid-select-field) (view table-view)
+				     widget presentation value obj 
+				     &rest args)
+  (declare (ignore args widget))
+  (with-html (:th :class "select" "")))
+
+(defmethod render-view-field ((field datagrid-select-field) (view table-view)
+			      widget presentation value obj &rest args)
+  (declare (ignore args))
   (let ((checkbox-name (concatenate 'string
 				    "item-" (attributize-name (object-id obj))))
-	(drilldownp (and (datagrid-allow-drilldown-p grid)
-			 (datagrid-on-drilldown grid))))
+	(drilldownp (and (datagrid-allow-drilldown-p widget)
+			 (datagrid-on-drilldown widget))))
     (with-html
       (:td :class "select"
 	   :onclick (when drilldownp "stopPropagation(event);")
 	   :style (when drilldownp "cursor: default;")
 	   (:div
 	    (render-checkbox checkbox-name
-			     (datagrid-item-selected-p grid (object-id obj))
+			     (datagrid-item-selected-p widget (object-id obj))
 			     :class nil))))))
 
-(defslotmethod render-table-header-cell (obj (slot-name (eql 'select)) slot-type slot-value &rest keys
-					     &key grid-obj &allow-other-keys)
-  (with-html (:th :class "select" "")))

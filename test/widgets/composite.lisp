@@ -15,16 +15,17 @@
 	 (:div :class "widget dataform" :id "widget-123"
 	       #.(data-header-template
 		  "abc123"
-		  '((:li :class "name" (:span :class "label string" "Name:&nbsp;")
+		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
 		     (:span :class "value" "Joe"))
 		    (:li :class "manager"
-		     (:span :class "label" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+		     (:span :class "label text" "Manager:&nbsp;")
+		     (:span :class "value" "Jim")))))
 	 (:div :class "widget dataform" :id "widget-123"
 	       #.(data-header-template
 		  "abc124"
 		  '((:li :class "street"
-		     (:span :class "label" "Street:&nbsp;") (:span :class "value" "100 Broadway"))
+		     (:span :class "label text" "Street:&nbsp;") (:span :class "value" "100 Broadway"))
 		    (:li :class "city"
-		     (:span :class "label" "City:&nbsp;") (:span :class "value" "New York")))
+		     (:span :class "label text" "City:&nbsp;") (:span :class "value" "New York")))
 		  :data-class-name "address")))))
 
