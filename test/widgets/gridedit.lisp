@@ -118,8 +118,8 @@
 	       (:span :class "value" "Jim")))
 	   :postslots
 	   `((:div :class "submit"
-		   ,(link-action-template "abc123" "Modify") (str "&nbsp;")
-		   ,(link-action-template "abc124" "Close"))))))
+		   ,(link-action-template "abc123" "Modify" :class "modify") (str "&nbsp;")
+		   ,(link-action-template "abc124" "Close" :class "close"))))))
 
 (deftest-html gridedit-create-drilldown-widget-3
     (with-request :get nil
@@ -799,8 +799,8 @@
 	       (:span :class "value" "Jim")))
 	    :postslots
 	    `((:div :class "submit"
-		    ,(link-action-template "abc135" "Modify") (str "&nbsp;")
-		    ,(link-action-template "abc136" "Close")))))
+		    ,(link-action-template "abc135" "Modify" :class "modify") (str "&nbsp;")
+		    ,(link-action-template "abc136" "Close" :class "close")))))
     ;; Submit clicked
     (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"

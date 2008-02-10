@@ -304,8 +304,8 @@
 	       (:span :class "value" "Jim")))
 	    :postslots
 	    `((:div :class "submit"
-		    ,(link-action-template "abc123" "Modify") (str "&nbsp;")
-		    ,(link-action-template "abc124" "Close")))))
+		    ,(link-action-template "abc123" "Modify" :class "modify") (str "&nbsp;")
+		    ,(link-action-template "abc124" "Close" :class "close")))))
    (:div "1")))
 
 (deftest-html render-dataform-6
