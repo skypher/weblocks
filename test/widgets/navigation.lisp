@@ -131,7 +131,8 @@
 		      (:li :class "graduation-year"
 			   (:span :class "label text" "Graduation Year:&nbsp;")
 			   (:span :class "value" "2000")))
-		     (:div :class "submit" #.(link-action-template "abc124" "Modify"))
+		     (:div :class "submit" #.(link-action-template "abc124" "Modify"
+								   :class "modify"))
 		     (:div :class "extra-bottom-1" "<!-- empty -->")
 		     (:div :class "extra-bottom-2" "<!-- empty -->")
 		     (:div :class "extra-bottom-3" "<!-- empty -->")))

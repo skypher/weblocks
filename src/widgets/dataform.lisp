@@ -124,7 +124,8 @@ customize data behavior.")
 						     (lambda (&rest args)
 						       (declare (ignore args))
 						       (setf (slot-value obj 'ui-state) :form)))
-						    "Modify")
+						    "Modify"
+						    :class "modify")
 				       (when (and (dataform-allow-close-p obj)
 						  (dataform-on-close obj))
 					 (str "&nbsp;")
@@ -133,7 +134,8 @@ customize data behavior.")
 							 (declare (ignore args))
 							 (funcall (dataform-on-close obj)
 								  obj)))
-						      "Close")))))
+						      "Close"
+						      :class "close")))))
 	   :widget obj
 	   args)))
 

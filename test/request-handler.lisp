@@ -44,7 +44,8 @@
 <li class='name'><span class='label text'>Name:&nbsp;</span><span class='value'>Joe</span></li>~
 <li class='manager'><span class='label text'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
-<div class='submit'><a href='/foo/bar?action=abc123' ~
+<div class='submit'><a class='modify' ~
+                       href='/foo/bar?action=abc123' ~
                        onclick='initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); ~
                        return false;'>Modify</a></div>~
 <div class='extra-bottom-1'><!-- empty --></div>~
