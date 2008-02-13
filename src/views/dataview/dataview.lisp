@@ -1,12 +1,17 @@
 
 (in-package :weblocks)
 
-(export '(data data-view data-view-field text-presentation
-	  highlight-regex-matches))
+(export '(data data-view data-view-default-title data-view-field
+	  text-presentation highlight-regex-matches))
 
 ;;; Data view
 (defclass data-view (view)
-  ()
+  ((default-title :initform "Viewing"
+                  :initarg :default-title
+                  :accessor data-view-default-title
+                  :documentation "A default title that will be
+	          presented to the user if :title isn't specified in
+	          keyword parameters when rendering the view."))
   (:documentation "A view designed to present data to the user."))
 
 ;;; Data view field
@@ -22,6 +27,7 @@
 
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view data-view) obj widget body-fn &rest args &key
+			     (title (data-view-default-title view))
 			     (fields-prefix-fn (view-fields-default-prefix-fn view))
 			     (fields-suffix-fn (view-fields-default-suffix-fn view))
 			     &allow-other-keys)
@@ -29,7 +35,7 @@
     (:div :class (format nil "view data ~A"
 			 (attributize-name (object-class-name obj)))
 	  (with-extra-tags
-	    (htm (:h1 (:span :class "action" "Viewing:&nbsp;")
+	    (htm (:h1 (:span :class "action" (str (concatenate 'string title ":&nbsp;")))
 		      (:span :class "object" (str (humanize-name (object-class-name obj)))))
 		 (safe-apply fields-prefix-fn view obj args)
 		 (:ul (apply body-fn view obj args))
