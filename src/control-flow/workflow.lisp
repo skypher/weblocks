@@ -3,21 +3,21 @@
 
 (export '(with-flow yield))
 
-(defun yield->do-place (expr place)
+(defun yield->do-widget (expr widget)
   "Walks the expression tree and converts calls to 'yield' to
-appropriate calls to 'do-place'."
+appropriate calls to 'do-widget'."
   (cond
     ((atom expr) expr)
-    ((eq (car expr) 'yield) `(do-place ,place ,(cadr expr)))
-    (t (mapcar (curry-after #'yield->do-place place) expr))))
+    ((eq (car expr) 'yield) `(do-widget ,widget ,(cadr expr)))
+    (t (mapcar (curry-after #'yield->do-widget widget) expr))))
 
-(defmacro with-flow (place &body body)
-  "Eases the burden of creating flows. Instead of using 'do-place' in
+(defmacro with-flow (widget &body body)
+  "Eases the burden of creating flows. Instead of using 'do-widget' in
 the body, one can use 'yield', which will expand into appropriate
-'do-place' code."
-  (let ((p (gensym)))
-    `(let ((,p ,place))
-       (declare (ignorable ,p))
+'do-widget' code."
+  (let ((w (gensym)))
+    `(let ((,w ,widget))
+       (declare (ignorable ,w))
        (with-call/cc
-	 ,@(yield->do-place body place)))))
+	 ,@(yield->do-widget body w)))))
 

@@ -43,28 +43,68 @@
        (not (null (widget-continuation w1)))))
   t t)
 
-;;; test do-place
-(deftest do-place-1
-    (let ((c1 (make-instance 'composite))
-	  (c2 (make-instance 'composite)))
-      (with-call/cc
-	(do-place (composite-widgets c1) c2))
-      (values (eq (car (composite-widgets c1)) c2)
-	      (progn (answer c2)
-		     (null (composite-widgets c1)))))
+;;; test do-widget
+(deftest do-widget-1
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (w2 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w1)))
+	(with-call/cc
+	  (do-widget w1 w2))
+	(values (eq (car (composite-widgets c)) w2)
+		(progn (answer w2)
+		       (eq (car (composite-widgets c)) w1)))))
   t t)
 
-(deftest do-place-2
-    (let ((c1 (make-instance 'composite))
-	  (c2 (make-instance 'composite)))
-      (with-call/cc
-	(do-place (composite-widgets c1) c2 (lambda (new-callee)
-					      (if (eq new-callee c2)
-						  0
-						  1))))
-      (values (eq (car (composite-widgets c1)) 0)
-	      (progn (answer c2)
-		     (null (composite-widgets c1)))))
+(deftest do-widget-2
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w1)))
+	(with-call/cc
+	  (do-widget w1 "test"))
+	(equalp (car (composite-widgets c)) "test")))
+  t)
+
+(deftest do-widget-3
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w1))
+	     (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *weblocks-output-stream*))
+	(with-call/cc
+	  (do-widget w1 (lambda (k)
+			  (answer k))))
+	(render-widget c)
+	(eq (car (composite-widgets c)) w1)))
+  t)
+
+(deftest do-widget-4
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (w2 (make-instance 'composite))
+	     (w3 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets (list w1 w2))))
+	(setf (root-composite) c)
+	(with-call/cc
+	  (do-widget nil w3))
+	(values (equalp (composite-widgets c) (list w3))
+		(progn (answer w3)
+		       (equalp (composite-widgets c) (list w1 w2))))))
+  t t)
+
+(deftest do-widget-5
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (w2 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w1)))
+	(with-call/cc
+	  (do-widget w1 w2 (lambda (new-callee)
+			     (if (eq new-callee w2)
+				 0
+				 1))))
+	(values (eq (car (composite-widgets c)) 0)
+		(progn (answer w2)
+		       (eq (car (composite-widgets c)) w1)))))
   t t)
 
 ;;; test do-page
