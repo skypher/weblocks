@@ -2,10 +2,11 @@
 (in-package :weblocks)
 
 (export '(defwidget widget widget-name widget-propagate-dirty
-	  widget-rendered-p widget-continuation widget-prefix-fn
-	  widget-suffix-fn widget-public-dependencies
-	  with-widget-header render-widget-body widget-css-classes
-	  render-widget mark-dirty widget-dirty-p find-widget-by-path*
+	  widget-rendered-p widget-continuation widget-parent
+	  widget-prefix-fn widget-suffix-fn
+	  widget-public-dependencies with-widget-header
+	  render-widget-body widget-css-classes render-widget
+	  mark-dirty widget-dirty-p find-widget-by-path*
 	  find-widget-by-path))
 
 (defun generate-widget-id ()
@@ -52,6 +53,14 @@ inherits from 'widget' if no direct superclasses are provided."
                  functions ('do-page', etc.). When 'answer' is called
                  on a widget, this value is used to resume the
                  computation.")
+   (parent :accessor widget-parent
+	   :initform nil
+	   :documentation "Stores the 'parent' of a widget,
+	   i.e. the composite widget in which this widget is
+	   located, if any. This value is automatically set by
+	   composites with the slot 'composite-widgets' is
+	   set. Note, a widget can only have one parent at any
+	   given time.")
    (widget-prefix-fn :initform nil
 	             :initarg :widget-prefix-fn
 	             :accessor widget-prefix-fn
@@ -76,6 +85,15 @@ inherits from 'widget' if no direct superclasses are provided."
   nil)
 
 (defmethod (setf widget-rendered-p) (obj val)
+  nil)
+
+;;; Define widget-parent for objects that don't derive from 'widget'
+(defmethod widget-parent (obj)
+  (declare (ignore obj))
+  nil)
+
+(defmethod (setf widget-parent) (obj val)
+  (declare (ignore obj val))
   nil)
 
 (defgeneric widget-public-dependencies (obj)

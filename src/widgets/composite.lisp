@@ -17,12 +17,27 @@
   on the composite, it invokes 'render-widget' on each widget in the
   list."))
 
+(defmethod initialize-instance :after ((obj composite) &rest initargs &key widgets &allow-other-keys)
+  (declare (ignore initargs))
+  ;; We need this to properly initialize values
+  (setf (slot-value obj 'widgets) nil)
+  (setf (composite-widgets obj) widgets))
+
 (defmethod (setf composite-widgets) (new-value (widget composite))
-  (setf (slot-value widget 'widgets)
-	(if (or (consp new-value)
-		(null new-value))
-	    new-value
-	    (list new-value))))
+  ;; We're no longer a parent of widgets we hold
+  (loop for i in (ensure-list (slot-value widget 'widgets))
+     do (setf (widget-parent i) nil))
+  (let ((widgets (if (or (consp new-value)
+			 (null new-value))
+		     new-value
+		     (list new-value))))
+    ;; But we're a part of new widgets we're passed
+    (loop for i in widgets
+       do (if (widget-parent i)
+	      (error "Widget ~a already has a parent." i)
+	      (setf (widget-parent i) widget)))
+    (setf (slot-value widget 'widgets)
+	  widgets)))
 
 (defmethod render-widget-body ((obj composite) &rest args)
   (mapc (lambda (w)

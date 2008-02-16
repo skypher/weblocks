@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(do-place do-page do-modal answer))
+(export '(do-widget do-page do-modal answer))
 
 ;;; Specialize widget-continuation
 (defmethod widget-continuation ((widget function))
@@ -36,41 +36,63 @@ is returned. Otherwise, continuation isn't saved."
 (defun answer (continuation &optional result)
   "Returns control to location saved in 'continuation', which may be a
 callee widget or the continuation object explicitly. Continuation is
-called with 'result', or nil."
-  (safe-funcall (widget-continuation continuation) result))
+called with 'result', or nil. If the widget doesn't have a
+continuation, recursively tries its parents."
+  (if (widget-continuation continuation)
+      (safe-funcall (widget-continuation continuation) result)
+      (when (widget-parent continuation)
+	(answer (widget-parent continuation) result))))
 
-(defmacro do-place (place callee &optional (wrapper-fn '#'identity))
-  "Expands to code that sets 'callee' as the widget in 'place', saves
-the continuation, and returns from the delimited computation. When
-'callee' answers, restores the original widget in 'place' and
-reactivates the computation. If 'wrapper-fn' is present, passes it the
-new callee and sets the return value as the value of a place. By
-default 'wrapper-fn' is simply an identity function."
-  (let ((original-value (gensym))
-	(new-callee (gensym)))
-    `(let ((,original-value ,place))
-       (prog1
-	   (call ,callee
-		 (lambda (,new-callee)
-		   (setf ,place (funcall ,wrapper-fn ,new-callee))))
-	 (setf ,place ,original-value)))))
+;; Places 'callee' in the place of 'widget', saves the continuation,
+;; and returns from the delimited computation. When 'callee' answers,
+;; restores the original widget and reactivates the computation. If
+;; 'wrapper-fn' is present, passes it the new callee and sets the return
+;; value as the value of a place. By default 'wrapper-fn' is simply an
+;; identity function.
+(defun/cc do-widget (widget callee &optional (wrapper-fn #'identity))
+  (if (or (null widget)
+	  (eq widget (root-composite)))
+      (do-root-widget callee wrapper-fn)
+      (do-widget-aux widget callee wrapper-fn)))
+
+(defun/cc do-root-widget (callee  &optional (wrapper-fn #'identity))
+  (let* ((old-value (composite-widgets (root-composite))))
+    (prog1
+	(call callee
+	      (lambda (new-callee)
+		(setf (composite-widgets (root-composite))
+		      (funcall wrapper-fn new-callee))))
+      (setf (composite-widgets (root-composite))
+	    old-value))))
+
+(defun/cc do-widget-aux (widget callee &optional (wrapper-fn #'identity))
+  (let* ((parent (widget-parent widget))
+	 (place (member widget (composite-widgets (widget-parent widget)))))
+    (flet ((place-widget (value)
+	     (setf (composite-widgets parent)
+		   (rplaca place value))))
+      (prog1
+	  (call callee
+		(lambda (new-callee)
+		  (place-widget (funcall wrapper-fn new-callee))))
+	(place-widget widget)))))
 
 ;; Sets 'callee' as the only widget in the root composite, saves the
 ;; continuation, and returns from the delimited computation. When
 ;; 'callee' answers, restores the original widgets in the root
 ;; composite and reactivates the computation.
 (defun/cc do-page (callee)
-  (do-place (composite-widgets (root-composite)) callee))
+  (do-widget nil callee))
 
 (defun/cc do-modal (title callee &key css-class)
   "Same as 'do-page', but wraps the callee in a div for styling purposes."
-  (do-place (composite-widgets (root-composite)) callee
-	    (lambda (new-callee)
-	      (lambda (&rest args)
-		(declare (ignore args))
-		(with-html
-		  (:div :class "modal"
-			(:h1 (:span (str title)))
-			(:div :class css-class
-			      (render-widget new-callee))))))))
+  (do-widget nil callee
+	     (lambda (new-callee)
+	       (lambda (&rest args)
+		 (declare (ignore args))
+		 (with-html
+		   (:div :class "modal"
+			 (:h1 (:span (str title)))
+			 (:div :class css-class
+			       (render-widget new-callee))))))))
 
