@@ -10,13 +10,14 @@
 						(:input :name "cancel" :type "submit"
 								       :class "submit cancel" :value "Cancel"
 							:onclick "disableIrrelevantButtons(this);"))))
-			     (uri "/foo/bar"))
-  `(:form :class "view form employee" :action ,uri :method ,method
-	  :onsubmit ,(format nil "initiateFormAction(\"~A\", ~
+			     (uri "/foo/bar") enctype (use-ajax-p t))
+  `(:form :class "view form employee" :action ,uri :method ,method :enctype ,enctype
+	  ,@(when use-ajax-p
+		  `(:onsubmit ,(format nil "initiateFormAction(\"~A\", ~
                                                        $(this), ~
                                                        \"weblocks-session=1%3ATEST\"); ~
                                                        return false;"
-			     (or action ""))
+				       (or action ""))))
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")

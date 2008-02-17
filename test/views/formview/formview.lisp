@@ -171,3 +171,25 @@
 		(:span :class "extra" "Manager:&nbsp;"))
 	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
 
+(deftest-html form-view-render-object-view-2
+    (with-request :get nil
+      (render-object-view *joe* (defview-anon (:type form :inherit-from '(form employee)
+						     :use-ajax-p nil
+						     :enctype "fooenc"))
+			  :action (lambda (&rest args)
+				    (declare (ignore args)))))
+  #.(form-header-template "abc123"
+     '((:li :class "name"
+	(:label :class "input"
+	 (:span :class "slot-name"
+		(:span :class "extra" "Name:&nbsp;"
+		       (:em :class "required-slot" "(required)&nbsp;")))
+	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+       (:li :class "manager"
+	(:label :class "input"
+	 (:span :class "slot-name"
+		(:span :class "extra" "Manager:&nbsp;"))
+	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+     :enctype "fooenc"
+     :use-ajax-p nil))
+

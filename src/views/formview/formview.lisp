@@ -3,7 +3,8 @@
 
 (export '(*form-default-error-summary-threshold*
 	  *required-field-message* *invalid-input-message* form form-view
-	  form-view-error-summary-threshold form-view-default-method
+	  form-view-error-summary-threshold form-view-use-ajax-p
+	  form-view-default-method form-view-default-enctype
 	  form-view-default-action form-view-default-title form-view-persist-p
 	  form-view-buttons form-view-field-writer-mixin form-view-field
 	  form-view-field-parser form-view-field-satisfies
@@ -38,6 +39,12 @@ input is not valid.")
                             in a form is longer than this threshold,
                             an error summary is rendered at top
                             whenever applicable.")
+   (use-ajax-p :initform t
+	       :initarg :use-ajax-p
+	       :accessor form-view-use-ajax-p
+	       :documentation "If set to true (default) uses AJAX on
+	       form submission. Otherwise, a full postback is done to
+	       submit the form.")
    (default-method :initform :get
                    :initarg :default-method
 		   :accessor form-view-default-method
@@ -52,6 +59,11 @@ input is not valid.")
 	           called upon submission of the form if :action isn't
 	           specified in keyword parameters when rendering the
 	           view.")
+   (enctype :initform nil
+	    :initarg :enctype
+	    :accessor form-view-default-enctype
+	    :documentation "An enctype that will be
+	    used upon submission of the form.")
    (default-title :initform "Modifying"
                   :initarg :default-title
 		  :accessor form-view-default-title
@@ -199,7 +211,9 @@ differently.
     (when (>= (count-view-fields view)
 	      (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
-    (with-html-form (method action :class header-class)
+    (with-html-form (method action :class header-class
+			    :enctype (form-view-default-enctype view)
+			    :use-ajax-p (form-view-use-ajax-p view))
       (:h1 (:span :class "action" (str (concatenate 'string title ":&nbsp;")))
 	   (:span :class "object" (str (humanize-name (object-class-name obj)))))
       (render-validation-summary view obj widget validation-errors)

@@ -57,7 +57,7 @@
       :title "Hello - Bar")
   #.(format nil "{\"widgets\":~
 {\"widget-123\":~
-\"<form class='view form employee' action='/foo/bar' method='post' ~
+\"<form class='view form employee' action='' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3ATEST\\\"); ~
                 return false;'>~
 <div class='extra-top-1'><!-- empty --></div>~

@@ -79,7 +79,7 @@ function onActionFailure() {
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
-    var url = '/?' + sessionString + '&action=' + actionCode;
+    var url = location.href + '?' + sessionString + '&action=' + actionCode;
     if(isPure) {
 	url += '&pure=true';
     }

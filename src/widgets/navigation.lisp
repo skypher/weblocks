@@ -178,6 +178,18 @@ server."
 				   (find-navigation-widget (current-pane-widget navigation-widget))))
 	(setf (return-code) +http-not-found+))))
 
+(defun obtain-uri-from-navigation (navigation-widget)
+  "Walks the widget tree from the given navigation widget and builds a
+URI string."
+  (if navigation-widget
+      (with-slots (current-pane) navigation-widget
+	(format nil "/~A~A"
+		current-pane
+		(obtain-uri-from-navigation
+		 (find-navigation-widget
+		  (current-pane-widget navigation-widget)))))
+      "/"))
+
 (defun find-navigation-widget (comp)
   "Given a composite 'comp', returns the first navigation widget
 contained in 'comp' or its children."
