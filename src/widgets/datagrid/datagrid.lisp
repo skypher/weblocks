@@ -4,10 +4,8 @@
 (export '(datagrid datagrid-data-class datagrid-data
 	  datagrid-render-item-ops-bar
 	  datagrid-render-pagination-widget datagrid-render-mining-bar
-	  datagrid-sort datagrid-allow-sorting
-	  datagrid-forbid-sorting-on datagrid-search
-	  datagrid-allow-searching-p datagrid-pagination-widget
-	  datagrid-allow-pagination-p
+	  datagrid-sort datagrid-search datagrid-allow-searching-p
+	  datagrid-pagination-widget datagrid-allow-pagination-p
 	  datagrid-show-total-items-count-p datagrid-selection
 	  datagrid-allow-select-p datagrid-item-ops
 	  datagrid-allow-item-ops-p datagrid-allow-drilldown-p
