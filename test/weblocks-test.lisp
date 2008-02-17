@@ -151,6 +151,7 @@ the request."
 	    (dummy-action-count 123)
 	    (*session-cookie-name* "weblocks-session")
 	    (*uri-tokens* '("foo" "bar"))
+	    (*current-navigation-url* "/foo/bar/")
 	    weblocks::*page-public-dependencies* *session*
 	    *on-ajax-complete-scripts*)
        (declare (special *uri-tokens* weblocks::*page-public-dependencies* *session*

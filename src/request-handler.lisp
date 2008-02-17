@@ -86,7 +86,12 @@ customize behavior)."))
 	(redirect (remove-action-from-uri (request-uri))))
       (eval-hook :pre-render)
       (if (ajax-request-p)
-	  (render-dirty-widgets)
+	  (progn
+	    (setf *current-navigation-url*
+		  (obtain-uri-from-navigation
+		   (find-navigation-widget
+		    (root-composite))))
+	    (render-dirty-widgets))
 	  (progn
 	    (apply-uri-to-navigation *uri-tokens*
 				     (find-navigation-widget (root-composite)))

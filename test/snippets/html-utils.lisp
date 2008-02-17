@@ -64,6 +64,48 @@
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->")))
 
+(deftest-html with-form-html-4
+    (with-request :get nil
+      (make-action #'identity "abc123")
+      (with-html-form (:get "abc123" :use-ajax-p nil)
+	(:div "test1")
+	(:div "test2")))
+  (:form
+   :action "/foo/bar"
+   :method "get"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div "test1")
+     (:div "test2")
+     (:input :name "action" :type "hidden" :value "abc123"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->")))
+
+(deftest-html with-form-html-5
+    (with-request :get nil
+      (make-action #'identity "abc123")
+      (with-html-form (:get "abc123" :enctype "fooenc")
+	(:div "test1")
+	(:div "test2")))
+  (:form
+   :action "/foo/bar"
+   :method "get"
+   :enctype "fooenc"
+   :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div "test1")
+     (:div "test2")
+     (:input :name "action" :type "hidden" :value "abc123"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->")))
+
 ;;; testing render-link
 (deftest-html render-link-1
     (with-request :get nil

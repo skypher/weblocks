@@ -72,7 +72,7 @@
 			"test2" nil)))
   (htm
    (:li :class "selected-item" (:span "Test1"))
-   (:li (:a :href "test2" "Test2"))))
+   (:li (:a :href "/foo/bar/test2" "Test2"))))
 
 (deftest-html render-navigation-body-2
     (with-request :post :nil
@@ -82,7 +82,7 @@
 			(url-decode "%C3%A5%C3%A4%C3%B6") nil)))
   (htm
    (:li :class "selected-item" (:span "Foo"))
-   (:li (:a :href "%c3%a5%c3%a4%c3%b6" #.(humanize-name (url-decode "%C3%A5%C3%A4%C3%B6"))))))
+   (:li (:a :href "/foo/bar/%c3%a5%c3%a4%c3%b6" #.(humanize-name (url-decode "%C3%A5%C3%A4%C3%B6"))))))
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
@@ -247,6 +247,14 @@
       (loop for i across (slot-value nav 'current-pane)
 	    collect (char-code i)))
   (229 228 246))
+
+;;; test obtain-uri-from-navigation
+(deftest obtain-uri-from-navigation-1
+    (let* ((site (create-site-layout))
+	   (nav (weblocks::find-navigation-widget site)))
+      (weblocks::apply-uri-to-navigation '("test2" "test6") nav)
+      (weblocks::obtain-uri-from-navigation nav))
+  "/test2/test6/")
 
 ;;; test find-navigation-widget
 (deftest find-navigation-widget-1
