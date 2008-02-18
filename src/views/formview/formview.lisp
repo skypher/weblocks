@@ -250,7 +250,7 @@ differently.
 			       (str (format nil "~A" (cdr validation-error))))))))))))
 
 (defmethod render-view-field-value (value (presentation input-presentation)
-				    (field form-view-field) (view form-view) widget obj
+				    field view widget obj
 				    &rest args &key intermediate-values &allow-other-keys)
   (let ((attributized-slot-name (attributize-name (view-field-slot-name field))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
@@ -263,8 +263,7 @@ differently.
 		  :maxlength (input-presentation-max-length presentation))))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)
-				   (field form-view-field) (view form-view)
-				   widget obj &rest args)
+				   field view widget obj &rest args)
   (declare (ignore presentation obj view field args)))
 
 ;;; Intermediate values helper
