@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(dropdwon dropdown-presentation
+(export '(dropdown dropdown-presentation
 	  dropdown-presentation-welcome-name))
 
 ;;; Dropdown
