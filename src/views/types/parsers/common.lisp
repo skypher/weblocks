@@ -21,19 +21,22 @@
 	:accessor integer-parser-max
 	:documentation "If not null, the parsed value must be less
 	than or equal to this slot."))
+  (:default-initargs :error-message nil)
   (:documentation "A parser designed to parse strings into
   integers."))
 
 (defmethod parser-error-message ((parser integer-parser))
-  (concatenate 'string
-	       "an integer"
-	       (when (integer-parser-min parser)
-		 (format nil " greater than ~A" (- (integer-parser-min parser) 1)))
-	       (when (and (integer-parser-min parser)
-			  (integer-parser-max parser))
-		 " and")
-	       (when (integer-parser-max parser)
-		 (format nil " less than ~A" (+ (integer-parser-max parser) 1)))))
+  (with-slots (error-message) parser
+    (or error-message
+	(concatenate 'string
+		     "an integer"
+		     (when (integer-parser-min parser)
+		       (format nil " greater than ~A" (- (integer-parser-min parser) 1)))
+		     (when (and (integer-parser-min parser)
+				(integer-parser-max parser))
+		       " and")
+		     (when (integer-parser-max parser)
+		       (format nil " less than ~A" (+ (integer-parser-max parser) 1)))))))
 
 (defmethod parse-view-field-value ((parser integer-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
@@ -104,14 +107,17 @@ on 'symbol' and 'keyword'."
 	       :accessor object-id-parser-class-name
 	       :documentation "A class of the object whose id is being
 	       parsed."))
+  (:default-initargs :error-message nil)
   (:documentation "A parser designed to convert an object id into an
   object instance."))
 
 (defmethod parser-error-message ((parser object-id-parser))
-  (format nil "a valid ~A"
-	  (string-downcase
-	   (humanize-name
-	    (object-id-parser-class-name parser)))))
+  (with-slots (error-message) parser
+    (or error-message
+	(format nil "a valid ~A"
+		(string-downcase
+		 (humanize-name
+		  (object-id-parser-class-name parser)))))))
 
 (defmethod parse-view-field-value ((parser object-id-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
