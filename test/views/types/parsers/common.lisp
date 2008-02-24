@@ -17,6 +17,12 @@
 					 :min 3 :max 10))
   "an integer greater than 2 and less than 11")
 
+(deftest integer-parser-error-message-4
+    (parser-error-message (make-instance 'integer-parser
+					 :min 10
+					 :error-message "custom error message"))
+  "custom error message")
+
 ;;; Test integer parse-view-field-value
 (deftest integer-parse-view-field-value-1
     (car
