@@ -107,6 +107,20 @@
 		       (eq (car (composite-widgets c)) w1)))))
   t t)
 
+(deftest do-widget-6
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (w2 (make-instance 'composite))
+	     (w3 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets (list w1 w2 w3)))
+	     (w4 (make-instance 'composite)))
+	(with-call/cc
+	  (do-widget w2 w4))
+	(values (equalp (composite-widgets c) (list w1 w4 w3))
+		(progn (answer w4)
+		       (equalp (composite-widgets c) (list w1 w2 w3))))))
+  t t)
+
 ;;; test do-page
 (deftest do-page-1
     (let ((w (make-instance 'composite)))
