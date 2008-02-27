@@ -26,25 +26,25 @@
 ;;; Test get-object-view-fields
 (deftest get-object-view-fields-1
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee)))))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee)))))
   (name manager))
 
 (deftest get-object-view-fields-2
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					      (name :hidep t))))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					    (name :hidep t))))
   (manager))
 
 (deftest get-object-view-fields-3
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					      (name :hidep t))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					    (name :hidep t))
 				    :include-invisible-p t))
   (name manager))
 
 (deftest get-object-view-fields-4
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee)))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee)))
 				    :custom-fields (list (cons 0 (make-instance 'data-view-field
 										:slot-name 'bar))
 							 (make-instance 'data-view-field
@@ -53,20 +53,20 @@
 
 (deftest get-object-view-fields-5
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					      education)))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					    education)))
   (name manager education))
 
 (deftest get-object-view-fields-6
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					      (education :type mixin
-							 :view '(data education-history)))))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					    (education :type mixin
+						       :view '(data education-history)))))
   (name manager university graduation-year))
 
 (deftest get-object-view-fields-7
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
 					    (education :type mixin
 						       :view '(data education-history))
 					    (graduation-year :hidep t))))
@@ -74,15 +74,15 @@
 
 (deftest get-object-view-fields-8
     (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					      (education :type mixin
-							 :view '(data education-history)))
+	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					    (education :type mixin
+						       :view '(data education-history)))
 				    :expand-mixins nil))
   (name manager education))
 
 ;;; Test map-view-fields
 (deftest map-view-fields-1
-    (map-view-fields #'print-field-info (defview-anon (:inherit-from '(:scaffold employee)))
+    (map-view-fields #'print-field-info (defview () (:inherit-from '(:scaffold employee)))
 		     *joe*)
   (name manager))
 
@@ -91,16 +91,16 @@
     (let (fields)
       (map-mixin-fields (lambda (value)
 			  (push (print-field-info value) fields))
-			(defview-anon (:inherit-from '(:scaffold employee))
-			    (education :type mixin
-				       :view '(data education-history)))
+			(defview () (:inherit-from '(:scaffold employee))
+			  (education :type mixin
+				     :view '(data education-history)))
 			*joe*)
       fields)
   (education))
 
 ;;; Test count-view-fields
 (deftest count-view-fields-1
-    (count-view-fields (defview-anon (:inherit-from '(:scaffold employee))))
+    (count-view-fields (defview () (:inherit-from '(:scaffold employee))))
   2)
 
 ;;; Test slot-reader
@@ -112,15 +112,15 @@
 (deftest obtain-view-field-value-1
     (obtain-view-field-value
      (field-info-field
-      (car (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))))))
+      (car (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))))))
      *joe*)
   "Joe")
 
 (deftest obtain-view-field-value-2
     (obtain-view-field-value
      (field-info-field
-      (car (get-object-view-fields *joe* (defview-anon (:inherit-from '(:scaffold employee))
-					     (name :reader "foo")))))
+      (car (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+					   (name :reader "foo")))))
      *joe*)
   "foo")
 

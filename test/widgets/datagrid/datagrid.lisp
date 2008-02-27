@@ -550,9 +550,9 @@
       (let ((grid (make-instance 'datagrid
 				 :allow-sorting '(manager)
 				 :data-class 'employee
-				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-							    :allow-sorting-p nil)
-					   (manager :allow-sorting-p t)))))
+				 :view (defview () (:type grid :inherit-from '(:scaffold employee)
+							  :allow-sorting-p nil)
+					 (manager :allow-sorting-p t)))))
 	(render-datagrid-table-body grid)))
    (:div :class "datagrid-body"
 	 #.(table-header-template
@@ -570,8 +570,8 @@
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
-				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-							    :allow-sorting-p nil))
+				 :view (defview () (:type grid :inherit-from '(:scaffold employee)
+							  :allow-sorting-p nil))
 				 :data-class 'employee)))
 	(render-datagrid-table-body grid)))
      (:div :class "datagrid-body"
@@ -645,8 +645,8 @@
       (let ((grid (make-instance 'datagrid
 				 :data-class 'employee
 				 :sort '(address . :asc)
-				 :view (defview-anon (:type grid)
-					   name address manager))))
+				 :view (defview () (:type grid)
+					 name address manager))))
 	;; render datagrid
 	(render-datagrid-table-body grid)
 	;; sort by name (should be descending)

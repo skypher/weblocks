@@ -39,7 +39,7 @@
 (deftest-html datagrid-render-view-field-drilldown-1
     (with-request :get nil
       (make-action (lambda (&rest args) nil))
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)
@@ -57,7 +57,7 @@
 (deftest-html datagrid-render-view-field-header-drilldown-1
     (with-request :get nil
       (make-action (lambda (&rest args) nil))
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)
@@ -73,7 +73,7 @@
 ;;; test datagrid-with-table-view-body-row
 (deftest-html datagrid-with-table-view-body-row-1
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)

@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*custom-view-field-argument-compilers*
-	  view-argument-quoting-strategy defview-anon defview))
+	  view-argument-quoting-strategy defview))
 
 ;;; Declarative view definition implementation
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -107,6 +107,8 @@ declarative manner."
 (defmacro defview (name (&rest args &key &allow-other-keys) &rest fields)
   "A macro used to easily define user interface views in a declarative
 manner."
-  `(setf (gethash ',name *views*)
-	 (defview-anon ,args ,@fields)))
+  (if name
+      `(setf (gethash ',name *views*)
+	     (defview-anon ,args ,@fields))
+      `(defview-anon ,args ,@fields)))
 

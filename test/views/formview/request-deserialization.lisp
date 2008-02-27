@@ -16,9 +16,9 @@
     (with-request :get '(("name" . "foo") ("manager" . "bar"))
       (let ((obj (copy-template *joe*)))
 	(update-object-view-from-request obj
-					 (defview-anon (:type form
-							:inherit-from '(:scaffold employee)
-							:persistp nil)))
+					 (defview () (:type form
+						      :inherit-from '(:scaffold employee)
+						      :persistp nil)))
 	(values (first-name obj)
 		(manager obj)
 		(length (find-persistent-objects *default-store* 'employee)))))
