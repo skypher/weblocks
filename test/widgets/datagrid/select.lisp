@@ -72,7 +72,7 @@
 ;;; test datagrid-render-view-field-select
 (deftest-html datagrid-render-view-field-select-1
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :view view
 				  :sort '(name . :asc)))
@@ -85,7 +85,7 @@
 
 (deftest-html datagrid-render-view-field-select-2
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :selection '(:none . (1))
 				  :view view
@@ -100,7 +100,7 @@
 ;;; test datagrid-render-view-field-header-select-1
 (deftest-html datagrid-render-view-field-header-select-1
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :selection '(:none . (1))
 				  :view view

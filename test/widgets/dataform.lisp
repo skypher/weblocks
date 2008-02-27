@@ -160,10 +160,10 @@
 (deftest-html render-dataform-3
     (with-request :get nil
       (let ((edit-joe (make-instance 'dataform :data (copy-template *joe*)
-				     :data-view (defview-anon (:inherit-from '(:scaffold employee))
+				     :data-view (defview () (:inherit-from '(:scaffold employee))
 						  age)
-				     :form-view (defview-anon (:type form
-								     :inherit-from '(:scaffold employee))
+				     :form-view (defview () (:type form
+								   :inherit-from '(:scaffold employee))
 						  (age :parse-as integer :requiredp t
 						       :present-as (input :max-length 3))))))
 	;; initial state
@@ -330,9 +330,9 @@
     (with-request :get nil
       (let* ((new-joe (copy-template *joe*))
 	     (edit-joe (make-instance 'dataform :data new-joe
-				      :data-view (defview-anon ()
+				      :data-view (defview () ()
 						     name address)
-				      :form-view (defview-anon (:type form)
+				      :form-view (defview () (:type form)
 						   (name :requiredp t)
 						   (address :present-as (dropdown :choices #'addresses)
 							    :parse-as address

@@ -31,9 +31,9 @@
        (gridedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
-					   (name :label "Foo"
-						 :requiredp t))))))
+		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+					 (name :label "Foo"
+					       :requiredp t))))))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
@@ -57,11 +57,11 @@
        (gridedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :view (defview-anon (:type grid :inherit-from '(:scaffold employee))
-				 (name :label "Foo"))
-		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
-					   (name :label "Bar"
-						 :requiredp t))))))
+		       :view (defview () (:type grid :inherit-from '(:scaffold employee))
+			       (name :label "Foo"))
+		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+					 (name :label "Bar"
+					       :requiredp t))))))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
 	   "abc123"
@@ -127,9 +127,9 @@
        (gridedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
-					   (name :label "Foo"
-						 :requiredp t)))
+		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+					 (name :label "Foo"
+					       :requiredp t)))
 	*joe*)))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
@@ -154,11 +154,11 @@
        (gridedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :view (defview-anon (:type grid :inherit-from '(:scaffold employee))
+		       :view (defview () (:type grid :inherit-from '(:scaffold employee))
 				 (name :label "Foo"))
-		       :item-form-view (defview-anon (:type form :inherit-from '(:scaffold employee))
-					   (name :label "Bar"
-						 :requiredp t)))
+		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+					 (name :label "Bar"
+					       :requiredp t)))
 	*joe*)))
   (:div :class "widget dataform" :id "widget-123"
 	#.(form-header-template
@@ -913,10 +913,10 @@
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
 					   :show-total-items-count-p nil
-					   :view (defview-anon (:type grid
-								:inherit-from '(:scaffold employee))
-						     (test :allow-sorting-p nil
-							   :reader nil)))))
+					   :view (defview () (:type grid
+								    :inherit-from '(:scaffold employee))
+						   (test :allow-sorting-p nil
+							 :reader nil)))))
 	;; set items per page
 	(setf (pagination-items-per-page (datagrid-pagination-widget grid)) 1)
 	;; render datagrid

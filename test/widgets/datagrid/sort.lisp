@@ -19,8 +19,8 @@
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
 				 :data-class 'employee
-				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-							    :allow-sorting-p nil)
+				 :view (defview () (:type grid :inherit-from '(:scaffold employee)
+							  :allow-sorting-p nil)
 					   (manager :allow-sorting-p t)))))
 	(weblocks::datagrid-update-sort-column grid)
 	(datagrid-sort grid)))
@@ -31,14 +31,14 @@
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
 				 :data-class 'employee
-				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-							    :allow-sorting-p nil)
-					   (education :type mixin
-						      :view (defview-anon
-								(:type grid
-								 :inherit-from
-								   '(:scaffold education-history))
-							    (university :allow-sorting-p t)))))))
+				 :view (defview () (:type grid :inherit-from '(:scaffold employee)
+						    :allow-sorting-p nil)
+					 (education :type mixin
+						    :view (defview ()
+							      (:type grid
+								     :inherit-from
+								     '(:scaffold education-history))
+							      (university :allow-sorting-p t)))))))
 	(weblocks::datagrid-update-sort-column grid)
 	(datagrid-sort grid)))
   ((education university) . :asc))
@@ -48,8 +48,8 @@
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
 				 :data-class 'employee
-				 :view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-							    :allow-sorting-p nil)
+				 :view (defview () (:type grid :inherit-from '(:scaffold employee)
+							  :allow-sorting-p nil)
 					   (address :allow-sorting-p t)))))
 	(weblocks::datagrid-update-sort-column grid)
 	(datagrid-sort grid)))
@@ -58,8 +58,8 @@
 ;;; test datagrid-field-sortable-p
 (deftest datagrid-field-sortable-p-1
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-				  :allow-sorting-p nil)))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee)
+				      :allow-sorting-p nil)))
 	     (field-info (car (get-object-view-fields *joe* view)))
 	     (field (field-info-field field-info))
 	     (grid (make-instance 'datagrid :data-class 'employee
@@ -71,7 +71,7 @@
 
 (deftest datagrid-field-sortable-p-2
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (field-info (car (get-object-view-fields *joe* view)))
 	     (field (field-info-field field-info))
 	     (grid (make-instance 'datagrid :data-class 'employee
@@ -83,9 +83,9 @@
 
 (deftest datagrid-field-sortable-p-3
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee)
-				  :allow-sorting-p nil)
-		       (name :allow-sorting-p t)))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee)
+				      :allow-sorting-p nil)
+		     (name :allow-sorting-p t)))
 	     (field-info (car (get-object-view-fields *joe* view)))
 	     (field (field-info-field field-info))
 	     (grid (make-instance 'datagrid :data-class 'employee
@@ -129,7 +129,7 @@
 ;;; test datagrid-render-view-field-header-sort
 (deftest-html datagrid-render-view-field-header-sort-1
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (field-info (car (get-object-view-fields *joe* view)))
 	     (field (field-info-field field-info))
 	     (grid (make-instance 'datagrid :data-class 'employee
@@ -144,7 +144,7 @@
 
 (deftest-html datagrid-render-view-field-header-sort-2
     (with-request :get nil
-      (let* ((view (defview-anon (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
 	     (field-info (car (get-object-view-fields *joe* view)))
 	     (field (field-info-field field-info))
 	     (grid (make-instance 'datagrid :data-class 'employee

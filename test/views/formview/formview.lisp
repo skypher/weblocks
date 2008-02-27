@@ -4,17 +4,17 @@
 ;;; Test mixin-form-view-field-persist-p
 (deftest mixin-form-view-field-persist-p-1
     (mixin-form-view-field-persist-p (make-instance 'mixin-form-view-field
-						    :view (defview-anon (:type form :persistp nil))))
+						    :view (defview () (:type form :persistp nil))))
   nil)
 
 (deftest mixin-form-view-field-persist-p-2
     (mixin-form-view-field-persist-p (make-instance 'mixin-form-view-field
-						    :view (defview-anon (:type form :persistp t))))
+						    :view (defview () (:type form :persistp t))))
   t)
 
 (deftest mixin-form-view-field-persist-p-3
     (mixin-form-view-field-persist-p (make-instance 'mixin-form-view-field
-						    :view (defview-anon (:type form :persistp t))
+						    :view (defview () (:type form :persistp t))
 						    :persistp nil))
   nil)
 
@@ -173,9 +173,9 @@
 
 (deftest-html form-view-render-object-view-2
     (with-request :get nil
-      (render-object-view *joe* (defview-anon (:type form :inherit-from '(form employee)
-						     :use-ajax-p nil
-						     :enctype "fooenc"))
+      (render-object-view *joe* (defview () (:type form :inherit-from '(form employee)
+					     :use-ajax-p nil
+					     :enctype "fooenc"))
 			  :action (lambda (&rest args)
 				    (declare (ignore args)))))
   #.(form-header-template "abc123"
