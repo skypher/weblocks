@@ -62,6 +62,13 @@
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
+(deftest-html with-navigation-header-4
+    (with-navigation-header (make-instance 'navigation
+					   :render-menu-p nil)
+      (lambda (x &rest args)
+	(with-html (:div "test"))))
+  nil)
+
 ;;; test render-navigation-body
 (deftest-html render-navigation-body-1
     (with-request :post :nil
@@ -146,6 +153,25 @@
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))))
+
+(deftest-html render-navigation-widget-2
+    (with-request :get nil
+      (let ((nav (make-navigation "Test Navigation"
+				  "Test1" (make-instance 'dataform :data *joe*)))
+	    (*current-navigation-url* "/"))
+	(declare (special *current-navigation-url*))
+	(setf (navigation-render-menu-p nav) nil)
+	;; render widget
+	(render-widget nav)))
+  (htm
+   (:div :class "widget navigation" :id "test-navigation"
+	 (:div :class "widget dataform" :id "widget-123"
+	       #.(data-header-template
+		  "abc123"
+		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
+		     (:span :class "value" "Joe"))
+		    (:li :class "manager"
+		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim"))))))))
 
 ;;; test current-pane-widget
 (deftest current-pane-widget-1
