@@ -66,9 +66,12 @@ continuation, recursively tries its parents."
 	    old-value))))
 
 (defun/cc do-widget-aux (widget callee &optional (wrapper-fn #'identity))
-  (let ((place (member widget (composite-widgets (widget-parent widget)))))
+  (let* ((parent (widget-parent widget))
+	 (place (member widget (composite-widgets parent))))
     (flet ((place-widget (value)
-	     (rplaca place value)))
+	     (rplaca place value)
+	     (setf (composite-widgets parent)
+		   (composite-widgets parent))))
       (prog1
 	  (call callee
 		(lambda (new-callee)
