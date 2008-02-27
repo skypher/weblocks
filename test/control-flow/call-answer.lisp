@@ -109,17 +109,21 @@
 
 (deftest do-widget-6
     (with-request :get nil
-      (let* ((w1 (make-instance 'composite))
+      (let* (weblocks::*dirty-widgets*
+	     (w1 (make-instance 'composite))
 	     (w2 (make-instance 'composite))
 	     (w3 (make-instance 'composite))
 	     (c (make-instance 'composite :widgets (list w1 w2 w3)))
 	     (w4 (make-instance 'composite)))
+	(declare (special weblocks::*dirty-widgets*))
 	(with-call/cc
 	  (do-widget w2 w4))
+	(setf (widget-rendered-p c) t)
 	(values (equalp (composite-widgets c) (list w1 w4 w3))
 		(progn (answer w4)
-		       (equalp (composite-widgets c) (list w1 w2 w3))))))
-  t t)
+		       (equalp (composite-widgets c) (list w1 w2 w3)))
+		(not (null (widget-dirty-p c))))))
+  t t t)
 
 ;;; test do-page
 (deftest do-page-1
