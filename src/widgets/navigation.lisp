@@ -1,10 +1,11 @@
 
 (in-package :weblocks)
 
-(export '(navigation navigation-panes current-pane
-	  *current-navigation-url* navigation-default-pane
-	  with-navigation-header render-navigation-body current-pane-widget
-	  init-navigation make-navigation pane-exists-p reset-current-pane))
+(export '(navigation navigation-panes navigation-render-menu-p
+	  current-pane *current-navigation-url*
+	  navigation-default-pane with-navigation-header
+	  render-navigation-body current-pane-widget init-navigation
+	  make-navigation pane-exists-p reset-current-pane))
 
 (defwidget navigation (widget)
   ((name :initform nil
@@ -21,7 +22,14 @@
    (current-pane :initform nil
 		 :initarg :current-pane
 		 :documentation "A name that identifies currently
-                  selected entry."))
+                 selected entry.")
+   (render-menu-p :accessor navigation-render-menu-p
+		  :initform t
+		  :initarg :render-menu-p
+		  :documentation "If this flag is set to
+		  true (default), navigation will render the menu with
+		  links to the panes. Otherwise, no menu is
+		  rendered."))
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It contains a list of section names and widgets
   associated with those sections, and allows the user to select a
@@ -58,19 +66,20 @@ current pane as well as the navigation html, 'with-navigation-header'
 only wraps navigation html."))
 
 (defmethod with-navigation-header ((obj navigation) body-fn &rest args)
-  (with-slots (name panes) obj
-    (with-html
-      (:div :class "view menu"
-	    (with-extra-tags
-	      (if (null panes)
-		  (htm
-		   (:div :class "empty-navigation" "No navigation entries"))
-		  (htm
-		   (:h1 (if name
-			    (str (humanize-name name))
-			    (str "Navigation")))
-		   (:ul
-		    (apply body-fn obj args)))))))))
+  (when (navigation-render-menu-p obj)
+    (with-slots (name panes) obj
+      (with-html
+	(:div :class "view menu"
+	      (with-extra-tags
+		(if (null panes)
+		    (htm
+		     (:div :class "empty-navigation" "No navigation entries"))
+		    (htm
+		     (:h1 (if name
+			      (str (humanize-name name))
+			      (str "Navigation")))
+		     (:ul
+		      (apply body-fn obj args))))))))))
 
 (defgeneric render-navigation-body (obj &rest args)
   (:documentation
