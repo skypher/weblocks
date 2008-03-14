@@ -24,8 +24,9 @@ string is then returned. When later requests come in,
 came with the request is stored in the hashtable, and if so, invokes
 the stored function.
 
-'action-fn' - A function of zero arguments that will be called if
-the user initiates appropriate control (link, form, etc.)
+'action-fn' - A function that will be called if the user initiates
+appropriate control (link, form, etc.) GET and POST parameters will be
+passed to this function as keyword arguments by the framework.
 
 'action-code' - The code to use for an action (if not specified
 make-action generates a unique value for each action). Note, if you
