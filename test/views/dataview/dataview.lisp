@@ -1,6 +1,12 @@
 
 (in-package :weblocks-test)
 
+;;; Test view-caption
+(deftest dataview-view-caption-1
+    (view-caption (make-instance 'data-view
+				 :caption "foo"))
+  "foo")
+
 ;;; Test data view with-view-header
 (deftest-html data-view-with-view-header-1
     (with-view-header (make-instance 'data-view)

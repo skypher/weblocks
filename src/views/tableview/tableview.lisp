@@ -2,8 +2,8 @@
 (in-package :weblocks)
 
 (export '(*render-empty-sequence-string* table table-view
-	  table-view-default-summary table-view-caption
-	  table-view-empty-message table-view-header-row-prefix-fn
+	  table-view-default-summary table-view-empty-message
+	  table-view-header-row-prefix-fn
 	  table-view-header-row-suffix-fn table-view-row-prefix-fn
 	  table-view-row-suffix-fn table-view-field
 	  with-table-view-header with-table-view-header-row
@@ -23,11 +23,6 @@ no information available.")
                     :accessor table-view-default-summary
                     :documentation "A summary string to be used for
 	            the table if no :summary keyword is provided.")
-   (caption :initform nil
-	    :initarg :caption
-	    :accessor table-view-caption
-	    :documentation "A caption string to be used for the
-	    table.")
    (empty-message :initform *render-empty-sequence-string*
 		  :initarg :empty-message
 		  :accessor table-view-empty-message
@@ -97,8 +92,8 @@ table, thead, and tbody HTML.")
 	    &key summary &allow-other-keys)
     (with-html
       (:table :summary (or summary (table-view-default-summary view))
-	      (when (table-view-caption view)
-		(htm (:caption (str (table-view-caption view)))))
+	      (when (view-caption view)
+		(htm (:caption (str (view-caption view)))))
 	      (htm
 	       (:thead
 		(apply header-fn view (car obj) widget args))
@@ -217,7 +212,7 @@ details.")
 	 (lambda (view obj &rest args)
 	   (declare (ignore obj args))
 	   (with-html
-	     (:p (if (table-view-caption view)
-		     (htm (:span :class "caption" (str (table-view-caption view)) ":&nbsp;")))
+	     (:p (if (view-caption view)
+		     (htm (:span :class "caption" (str (view-caption view)) ":&nbsp;")))
 		 (:span :class "message" (str (table-view-empty-message view))))))
 	 args))

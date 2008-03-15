@@ -22,8 +22,7 @@
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
-	   :method "post"
-	   :title-action "Adding:&nbsp;")))
+	   :method "post")))
 
 (deftest-html gridedit-create-new-item-widget-2
     (with-request :get nil
@@ -48,8 +47,7 @@
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
-	   :method "post"
-	   :title-action "Adding:&nbsp;")))
+	   :method "post")))
 
 (deftest-html gridedit-create-new-item-widget-3
     (with-request :get nil
@@ -76,8 +74,7 @@
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Manager:&nbsp;"))
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
-	   :method "post"
-	   :title-action "Adding:&nbsp;")))
+	   :method "post")))
 
 ;;; testing gridedit-create-drilldown-widget
 (deftest-html gridedit-create-drilldown-widget-1
@@ -350,8 +347,7 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
-	    :method "post"
-	    :title-action "Adding:&nbsp;"))
+	    :method "post"))
    ;; "Submit" clicked
    (:div :class "data-mining-bar"
 	 (:p :class "datagrid-select-bar"
@@ -1019,8 +1015,7 @@
 		(:span :class "slot-name"
 		       (:span :class "extra" "Manager:&nbsp;"))
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
-	    :method "post"
-	    :title-action "Adding:&nbsp;"))))
+	    :method "post"))))
 
 ;;; testing render-item-ops-bar for gridedit
 (deftest-html gridedit-render-item-ops-bar-1

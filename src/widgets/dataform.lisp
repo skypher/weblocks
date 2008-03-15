@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(dataform dataform-data dataform-data-view dataform-form-view
-	  dataform-form-title dataform-on-cancel dataform-on-success
+	  dataform-on-cancel dataform-on-success
 	  dataform-allow-close-p dataform-on-close render-dataform
 	  render-dataform-data render-dataform-form
 	  annihilate-dataform dataform-submit-action))
@@ -25,11 +25,6 @@
 	      :documentation "View object used to render 'data' object
 	      into form view. If 'form-view' isn't provided, the
 	      scaffold view will be used by default.")
-   (form-title :accessor dataform-form-title
-	       :initform nil
-	       :initarg :form-title
-	       :documentation "Title of the dataform in form mode. If
-	       not specified, default for the view will be used.")
    (ui-state :initform :data
 	     :initarg :ui-state
 	     :documentation "Current internal state of the
@@ -174,8 +169,6 @@ customize form behavior.")
 					(setf (slot-value obj 'ui-state) :data))))))
 	   :validation-errors (slot-value obj 'validation-errors)
 	   :intermediate-values (slot-value obj 'intermediate-form-values)
-	   :title (or (dataform-form-title obj)
-		      (form-view-default-title view))
 	   :widget obj
 	   args)))
 

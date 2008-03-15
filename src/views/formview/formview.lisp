@@ -5,7 +5,7 @@
 	  *required-field-message* *invalid-input-message* form form-view
 	  form-view-error-summary-threshold form-view-use-ajax-p
 	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-default-title form-view-persist-p
+	  form-view-default-action form-view-persist-p
 	  form-view-buttons form-view-field-writer-mixin form-view-field
 	  form-view-field-parser form-view-field-satisfies
 	  form-view-field-writer form-view-field-required-p mixin-form
@@ -64,12 +64,6 @@ input is not valid.")
 	    :accessor form-view-default-enctype
 	    :documentation "An enctype that will be
 	    used upon submission of the form.")
-   (default-title :initform "Modifying"
-                  :initarg :default-title
-		  :accessor form-view-default-title
-		  :documentation "A default title that will be
-	          presented to the user if :title isn't specified in
-	          keyword parameters when rendering the view.")
    (persistp :initform t
 	     :initarg :persistp
 	     :accessor form-view-persist-p
@@ -197,11 +191,17 @@ differently.
 	    (when (member :cancel (form-view-buttons view))
 	      (render-button *cancel-control-name* :class "submit cancel"))))))
 
+(defmethod view-caption ((view form-view))
+  (if (slot-value view 'caption)
+      (slot-value view 'caption)
+      (with-html-output-to-string (out)
+	(:span :class "action" "Modifying:&nbsp;")
+	(:span :class "object" "~A"))))
+
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view form-view) obj widget body-fn &rest args &key
 			     (method (form-view-default-method view))
 			     (action (form-view-default-action view))
-			     (title (form-view-default-title view))
 			     (fields-prefix-fn (view-fields-default-prefix-fn view))
 			     (fields-suffix-fn (view-fields-default-suffix-fn view))
 			     validation-errors
@@ -214,8 +214,8 @@ differently.
     (with-html-form (method action :class header-class
 			    :enctype (form-view-default-enctype view)
 			    :use-ajax-p (form-view-use-ajax-p view))
-      (:h1 (:span :class "action" (str (concatenate 'string title ":&nbsp;")))
-	   (:span :class "object" (str (humanize-name (object-class-name obj)))))
+      (:h1 (fmt (view-caption view)
+		(humanize-name (object-class-name obj))))
       (render-validation-summary view obj widget validation-errors)
       (:h2 :class "form-fields-title" "Form fields:")
       (safe-apply fields-prefix-fn view obj args)
