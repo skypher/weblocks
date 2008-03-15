@@ -5,10 +5,10 @@
 	  view-fields-default-prefix-fn view-fields-default-suffix-fn
 	  view-field view-field-slot-name view-field-reader
 	  view-field-hide-p view-field-prefix-fn view-field-suffix-fn
-	  inline-view-field view-field-label view-field-presentation
-	  mixin mixin-view-field mixin-view-field-view
-	  mixin-view-field-init-form with-view-header
-	  render-view-field render-view-field-value
+	  view-caption inline-view-field view-field-label
+	  view-field-presentation mixin mixin-view-field
+	  mixin-view-field-view mixin-view-field-init-form
+	  with-view-header render-view-field render-view-field-value
 	  print-view-field-value generate-scaffold-view
 	  entity-class-name view-class-name view-default-field-type
 	  view-field-class-name presentation-class-name))
@@ -46,7 +46,13 @@
      :accessor view-fields-default-suffix-fn
      :documentation "A function called after rendering the fields. The
      function should expect the view object, the object being
-     rendered, and any additional arguments passed to the view."))
+     rendered, and any additional arguments passed to the view.")
+   (caption :initform nil
+	    :initarg :caption
+	    :accessor view-caption
+	    :documentation "A caption string to be used for the
+	    view. If this field is set to NIL (the default), each view
+	    may use a specialized caption."))
   (:documentation "A meta description of the user interface."))
 
 ;;; View field description

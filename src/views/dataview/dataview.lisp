@@ -1,17 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(data data-view data-view-default-title data-view-field
+(export '(data data-view data-view-field
 	  text-presentation highlight-regex-matches))
 
 ;;; Data view
 (defclass data-view (view)
-  ((default-title :initform "Viewing"
-                  :initarg :default-title
-                  :accessor data-view-default-title
-                  :documentation "A default title that will be
-	          presented to the user if :title isn't specified in
-	          keyword parameters when rendering the view."))
+  ()
   (:documentation "A view designed to present data to the user."))
 
 ;;; Data view field
@@ -25,9 +20,16 @@
   (:documentation "A default presentation that renders values as
   text."))
 
+;;; Custom view caption
+(defmethod view-caption ((view data-view))
+  (if (slot-value view 'caption)
+      (slot-value view 'caption)
+      (with-html-output-to-string (out)
+	(:span :class "action" "Viewing:&nbsp;")
+	(:span :class "object" "~A"))))
+
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view data-view) obj widget body-fn &rest args &key
-			     (title (data-view-default-title view))
 			     (fields-prefix-fn (view-fields-default-prefix-fn view))
 			     (fields-suffix-fn (view-fields-default-suffix-fn view))
 			     &allow-other-keys)
@@ -35,11 +37,12 @@
     (:div :class (format nil "view data ~A"
 			 (attributize-name (object-class-name obj)))
 	  (with-extra-tags
-	    (htm (:h1 (:span :class "action" (str (concatenate 'string title ":&nbsp;")))
-		      (:span :class "object" (str (humanize-name (object-class-name obj)))))
-		 (safe-apply fields-prefix-fn view obj args)
-		 (:ul (apply body-fn view obj args))
-		 (safe-apply fields-suffix-fn view obj args))))))
+	    (htm
+	     (:h1 (fmt (view-caption view)
+		       (humanize-name (object-class-name obj))))
+	     (safe-apply fields-prefix-fn view obj args)
+	     (:ul (apply body-fn view obj args))
+	     (safe-apply fields-suffix-fn view obj args))))))
 
 (defmethod render-view-field ((field data-view-field) (view data-view)
 			      widget presentation value obj

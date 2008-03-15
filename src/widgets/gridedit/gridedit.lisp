@@ -141,8 +141,7 @@ grid."))
 			     (declare (ignore obj))
 			     (gridedit-reset-state grid))
 		 :data-view (gridedit-item-data-view grid)
-		 :form-view (gridedit-item-form-view grid)
-		 :form-title "Adding"))
+		 :form-view (gridedit-item-form-view grid)))
 
 (defgeneric gridedit-create-drilldown-widget (grid item)
   (:documentation

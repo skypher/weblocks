@@ -1,6 +1,12 @@
 
 (in-package :weblocks-test)
 
+;;; Test view-caption
+(deftest formview-view-caption-1
+    (view-caption (make-instance 'form-view
+				 :caption "foo"))
+  "foo")
+
 ;;; Test mixin-form-view-field-persist-p
 (deftest mixin-form-view-field-persist-p-1
     (mixin-form-view-field-persist-p (make-instance 'mixin-form-view-field
