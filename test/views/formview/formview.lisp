@@ -76,6 +76,17 @@
 	(:input :name "cancel" :type "submit" :class "submit cancel" :value "Cancel"
 		:onclick "disableIrrelevantButtons(this);")))
 
+(deftest-html render-form-view-buttons-3
+    (render-form-view-buttons (make-instance 'form-view
+					     :buttons (list (cons :submit "Bar")
+							    (cons :cancel "Foo")))
+			      *joe* nil)
+  (:div :class "submit"
+	(:input :name "submit" :type "submit" :class "submit" :value "Bar"
+		:onclick "disableIrrelevantButtons(this);")
+	(:input :name "cancel" :type "submit" :class "submit cancel" :value "Foo"
+		:onclick "disableIrrelevantButtons(this);")))
+
 ;;; Test form view with-view-header
 (deftest-html form-view-with-view-header-1
     (with-request :get nil
