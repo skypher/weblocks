@@ -76,7 +76,10 @@ input is not valid.")
 	    :documentation "Contains a list of keywords that identify
 	    buttons to be rendered (by default contains :submit
 	    and :cancel).  Default form view only recognizes :submit
-	    and :cancel keywords."))
+	    and :cancel keywords. Each item of the list may be a cons
+	    pair, in which case CAR of the pair should be a keyword,
+	    and CDR of the pair should be a string that will be
+	    presented to the user via value of the button."))
   (:documentation "A view designed to interact with the user via input
   forms."))
 
@@ -184,12 +187,24 @@ differently.
 'obj' - the object being rendered.")
   (:method ((view form-view) obj widget &rest args)
     (declare (ignore obj args))
-    (with-html
-      (:div :class "submit"
-	    (when (member :submit (form-view-buttons view))
-	      (render-button *submit-control-name*))
-	    (when (member :cancel (form-view-buttons view))
-	      (render-button *cancel-control-name* :class "submit cancel"))))))
+    (flet ((find-button (name)
+	     (ensure-list
+	      (find name (form-view-buttons view)
+		    :key (lambda (item)
+			   (car (ensure-list item)))))))
+      (with-html
+	(:div :class "submit"
+	      (let ((submit (find-button :submit)))
+		(when submit
+		  (render-button *submit-control-name*
+				 :value (or (cdr submit)
+					    (humanize-name (car submit))))))
+	      (let ((cancel (find-button :cancel)))
+		(when cancel
+		  (render-button *cancel-control-name*
+				 :class "submit cancel"
+				 :value (or (cdr cancel)
+					    (humanize-name (car cancel)))))))))))
 
 (defmethod view-caption ((view form-view))
   (if (slot-value view 'caption)
