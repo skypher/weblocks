@@ -184,7 +184,8 @@
   (when (null (datagrid-data-class obj))
     (error "data-class must be specified to initialize a datagrid."))
   (setf (datagrid-class-store obj)
-	(class-store (datagrid-data-class obj)))
+	(or (datagrid-class-store obj)
+	    (class-store (datagrid-data-class obj))))
   (unless (datagrid-pagination-widget obj)
     (setf (datagrid-pagination-widget obj)
 	  (make-instance 'pagination
