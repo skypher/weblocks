@@ -2,9 +2,10 @@
 (in-package :weblocks)
 
 (export '(*submit-control-name* *cancel-control-name* with-html-form
-	  render-link render-button render-checkbox render-dropdown
-	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-password render-textarea))
+	  render-link render-button render-form-and-button
+	  render-checkbox render-dropdown *dropdown-welcome-message*
+	  render-radio-buttons render-close-button render-password
+	  render-textarea))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -65,6 +66,18 @@ being rendered.
   (with-html
     (:input :name (attributize-name name) :type "submit" :id id :class class
 	    :value value :onclick "disableIrrelevantButtons(this);")))
+
+(defun render-form-and-button (name action &key (value (humanize-name name))
+			       (method :get)
+			       button-id (button-class "submit")
+			       (use-ajax-p t)
+			       form-id form-class)
+  "Renders a button within a form. This function can be used a short
+cut to quickly render a sumbit button."
+  (with-html-form (method action
+			  :use-ajax-p use-ajax-p
+			  :id form-id :class form-class)
+    (render-button name :value value :id button-id :class button-class)))
 
 (defun render-checkbox (name checkedp &key id (class "checkbox"))
   "Renders a checkbox in a form.

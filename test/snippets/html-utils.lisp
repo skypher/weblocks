@@ -151,6 +151,25 @@
   (:input :name "some-button" :type "submit" :id "baz" :class "foo" :value "bar"
 	  :onclick "disableIrrelevantButtons(this);"))
 
+;;; test render-form-and-button
+(deftest-html render-form-and-button-1
+    (with-request :get nil
+      (render-form-and-button "some-button" (lambda ())))
+  (:form
+   :action "/foo/bar"
+   :method "get"
+   :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+   (:div :class "extra-top-1" "<!-- empty -->")
+   (:div :class "extra-top-2" "<!-- empty -->")
+   (:div :class "extra-top-3" "<!-- empty -->")
+   (:fieldset
+    (:input :name "some-button" :type "submit" :class "submit" :value "Some Button"
+	  :onclick "disableIrrelevantButtons(this);")
+    (:input :name "action" :type "hidden" :value "abc123"))
+   (:div :class "extra-bottom-1" "<!-- empty -->")
+   (:div :class "extra-bottom-2" "<!-- empty -->")
+   (:div :class "extra-bottom-3" "<!-- empty -->")))
+
 ;;; test render-checkbox
 (deftest-html render-checkbox-1
     (render-checkbox 'foo nil)
