@@ -155,7 +155,7 @@ function to add ways to present data to users."))
 
 (defgeneric print-view-field-value (value presentation field view widget obj &rest args)
   (:documentation "Converts a value to a textual representation.
-Specialize this function to change the way a value is printe in
+Specialize this function to change the way a value is printed in
 views."))
 
 ;;; Declarative view definition protocol
