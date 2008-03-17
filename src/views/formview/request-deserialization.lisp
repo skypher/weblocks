@@ -4,7 +4,9 @@
 (export '(update-object-view-from-request
 	  request-parameters-for-object-view))
 
-(defgeneric update-object-view-from-request (obj view &rest args)
+(defgeneric update-object-view-from-request (obj view &rest args
+						 &key class-store
+						 &allow-other-keys)
   (:documentation "Parses view fields from request into a given
 object. The 'form-view-field-parser' slot of each field is used to
 parse a string obtained from the request into an appropriate
@@ -20,7 +22,9 @@ The function uses 'form-view-persist-p' to determine whether the
 object is to be persisted. If so, it calls 'persist-object'.
 
 Specialize this function to parse given objects differently.")
-  (:method (obj view &rest args)
+  (:method (obj view &rest args
+	    &key class-store
+	    &allow-other-keys)
     (labels ((parse-object-view-from-request (obj view)
 	       "Parses an object from request. If parsed successfully,
                returns true as the first value and an association list
@@ -106,7 +110,7 @@ Specialize this function to parse given objects differently.")
 						 field-info-list))
 			  (write-value field mixin-obj obj)))
 		      view obj args)
-	       (persist-object (object-store obj) obj)))
+	       (persist-object (or class-store (object-store obj)) obj)))
       ;; Parse, validate, deserialize, and persist the object view
       (multiple-value-bind (parsep results)
 	  (parse-object-view-from-request obj view)

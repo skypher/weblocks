@@ -1017,6 +1017,175 @@
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))))
 
+(deftest-html render-widget-body-gridedit-7
+    (with-request :get nil
+      (persist-object *default-store* *joe*)
+      (let ((grid (make-instance 'gridedit :data-class 'employee
+				 :data-store *test-store*
+				 :allow-searching-p nil
+				 :allow-drilldown-p nil
+				 :allow-pagination-p nil
+				 :show-total-items-count-p nil)))
+	;; render datagrid
+	(render-widget-body grid :custom-fields (list (make-instance 'rwbg-1-dummy-field))
+			    :form-id "I1" :input-id "I2" :search-id "I3")
+	;; click "Add"
+	(do-request `(("add" . "Add")
+		      (,weblocks::*action-string* . "abc125")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
+	;; click "submit"
+	(do-request `(("name" . "Jill")
+		      ("manager" . "Jim")
+		      ("submit" . "Submit")
+		      (,weblocks::*action-string* . "abc133")))
+	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
+  (htm
+   ;; datagrid
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc123"
+		 :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;" "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc124"
+		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:form
+    :class "datagrid-form"
+    :action "/foo/bar"
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th "Test"))
+	      '((:tr
+		 (:td :class "select"
+		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))
+		 (:td (:span :class "value missing" "Not Specified"))))
+	      :summary "Ordered by name, ascending."))
+     (:div :class "item-operations"
+	   (:input :name "add" :type "submit" :class "submit" :value "Add"
+		   :onclick "disableIrrelevantButtons(this);")
+	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		   :onclick "disableIrrelevantButtons(this);"))
+     (:input :name "action" :type "hidden" :value "abc125"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->"))
+   ;; "Add Employee" clicked
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc128"
+		 :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3ATEST\"); return false;" "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc129"
+		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:form
+    :class "datagrid-form"
+    :action "/foo/bar"
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+	      '((:tr
+		 (:td :class "select"
+		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))))
+	      :summary "Ordered by name, ascending."))
+     (:input :name "action" :type "hidden" :value "abc130"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->"))
+   (:div :class "widget dataform" :id "widget-123"
+	 #.(form-header-template
+	    "abc133"
+	    '((:li :class "name"
+	       (:label :class "input"
+		(:span :class "slot-name"
+		       (:span :class "extra" "Name:&nbsp;"
+			      (:em :class "required-slot" "(required)&nbsp;")))
+		(:input :type "text" :name "name" :maxlength "40")))
+	      (:li :class "manager"
+	       (:label :class "input"
+		(:span :class "slot-name"
+		       (:span :class "extra" "Manager:&nbsp;"))
+		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+	    :method "post"))
+   ;; "Submit" clicked
+   (:div :class "data-mining-bar"
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc134"
+		 :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3ATEST\"); return false;" "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc135"
+		 :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+   (:div :class "widget flash" :id "widget-123"
+	 (:div :class "view"
+	 (:div :class "extra-top-1" "<!-- empty -->")
+	 (:div :class "extra-top-2" "<!-- empty -->")
+	 (:div :class "extra-top-3" "<!-- empty -->")
+	 (:ul :class "messages"
+	      (:li
+	       (:div :class "widget string"
+		     (:p "Item added."))))
+	 (:div :class "extra-bottom-1" "<!-- empty -->")
+	 (:div :class "extra-bottom-2" "<!-- empty -->")
+	 (:div :class "extra-bottom-3" "<!-- empty -->")))
+   (:form
+    :class "datagrid-form"
+    :action "/foo/bar"
+    :method "get"
+    :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+    (:div :class "extra-top-1" "<!-- empty -->")
+    (:div :class "extra-top-2" "<!-- empty -->")
+    (:div :class "extra-top-3" "<!-- empty -->")
+    (:fieldset
+     (:div :class "datagrid-body"
+	   #.(table-header-template
+	      '((:th :class "select" "")
+		(:th :class "name sort-asc" (:span #.(link-action-template "abc137" "Name")))
+		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
+	      '((:tr
+		 (:td :class "select"
+		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Jill"))
+		 (:td :class "manager" (:span :class "value" "Jim")))
+		(:tr :class "altern"
+		 (:td :class "select"
+		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "manager" (:span :class "value" "Jim"))))
+	      :summary "Ordered by name, ascending."))
+     (:div :class "item-operations"
+	   (:input :name "add" :type "submit" :class "submit" :value "Add"
+		   :onclick "disableIrrelevantButtons(this);")
+	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
+		   :onclick "disableIrrelevantButtons(this);"))
+     (:input :name "action" :type "hidden" :value "abc136"))
+    (:div :class "extra-bottom-1" "<!-- empty -->")
+    (:div :class "extra-bottom-2" "<!-- empty -->")
+    (:div :class "extra-bottom-3" "<!-- empty -->"))))
+
 ;;; testing render-item-ops-bar for gridedit
 (deftest-html gridedit-render-item-ops-bar-1
     (with-request :get nil

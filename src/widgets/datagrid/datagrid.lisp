@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(datagrid datagrid-data-class datagrid-data
+(export '(datagrid datagrid-data-class datagrid-class-store
 	  datagrid-render-item-ops-bar
 	  datagrid-render-pagination-widget datagrid-render-mining-bar
 	  datagrid-sort datagrid-search datagrid-allow-searching-p
@@ -25,6 +25,16 @@
 	       datagrid more efficient. For these reasons it is
 	       required to specify this slot at the instantiation
 	       time.")
+   (class-store :accessor datagrid-class-store
+		:initform nil
+		:initarg :class-store
+		:documentation "The store responsible for maintaining
+		instances of the 'data-class'. By default, the store
+		is obtained by calling 'class-store' at datagrid
+		initialization. Otherwise, the specified store will be
+		used by the datagrid. This functionality is useful for
+		'scratch' stores - non-persistant repositories of
+		data.")
    (view :accessor datagrid-view
 	 :initform nil
 	 :initarg :view
@@ -170,17 +180,21 @@
 ;;; Ensure that data-class is specified and that we cannot sort on the
 ;;; "select" slot. Additionally, ensure pagination widget exists.
 (defmethod initialize-instance :after ((obj datagrid) &rest initargs &key &allow-other-keys)
+  (declare (ignore initargs))
+  (when (null (datagrid-data-class obj))
+    (error "data-class must be specified to initialize a datagrid."))
+  (setf (datagrid-class-store obj)
+	(class-store (datagrid-data-class obj)))
   (unless (datagrid-pagination-widget obj)
     (setf (datagrid-pagination-widget obj)
 	  (make-instance 'pagination
 			 :on-change (lambda (&rest args)
+				      (declare (ignore args))
 				      (datagrid-clear-selection obj)
 				      (mark-dirty obj))
 			 :on-error (datagrid-flash obj)
 			 :show-total-items-p nil
-			 :total-items (datagrid-data-count obj :totalp t))))
-  (when (null (datagrid-data-class obj))
-    (error "data-class must be specified to initialize a datagrid.")))
+			 :total-items (datagrid-data-count obj :totalp t)))))
 
 ;;; Ensure scaffold view is selected if no view is provided explicitly
 (defmethod datagrid-view ((obj datagrid))
@@ -203,7 +217,7 @@ persistent store API."
 		 grid
 		 (datagrid-search grid) (datagrid-sort grid)
 		 (when (and begin end) (cons begin end)))
-	(find-persistent-objects (class-store (datagrid-data-class grid))
+	(find-persistent-objects (datagrid-class-store grid)
 				 (datagrid-data-class grid)
 				 :filter (datagrid-search grid)
 				 :filter-view (datagrid-view grid)
@@ -222,9 +236,9 @@ ignores searching parameters."
 		 (datagrid-search grid))
 	       nil nil :countp t)
       (if totalp
-	  (count-persistent-objects (class-store (datagrid-data-class grid))
+	  (count-persistent-objects (datagrid-class-store grid)
 				    (datagrid-data-class grid))
-	  (count-persistent-objects (class-store (datagrid-data-class grid))
+	  (count-persistent-objects (datagrid-class-store grid)
 				    (datagrid-data-class grid)
 				    :filter (datagrid-search grid)
 				    :filter-view (datagrid-view grid)))))
@@ -289,7 +303,7 @@ items available)."))
 	    (if (and (datagrid-allow-searching-p obj)
 		     (if (datagrid-on-query obj)
 			 t
-			 (supports-filter-p (class-store (datagrid-data-class obj)))))
+			 (supports-filter-p (datagrid-class-store obj))))
 		(apply #'datagrid-render-search-bar obj args)
 		(when (datagrid-show-total-items-count-p obj)
 		  (render-total-items-message obj)))

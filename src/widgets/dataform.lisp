@@ -1,10 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(dataform dataform-data dataform-data-view dataform-form-view
-	  dataform-on-cancel dataform-on-success
-	  dataform-allow-close-p dataform-on-close render-dataform
-	  render-dataform-data render-dataform-form
+(export '(dataform dataform-data dataform-class-store
+	  dataform-data-view dataform-form-view dataform-on-cancel
+	  dataform-on-success dataform-allow-close-p dataform-on-close
+	  render-dataform render-dataform-data render-dataform-form
 	  annihilate-dataform dataform-submit-action))
 
 (defwidget dataform (widget)
@@ -13,6 +13,13 @@
 	 :initarg :data
 	 :documentation "Data object rendered and modified by
 	 this widget.")
+   (class-store :accessor dataform-class-store
+		:initform nil
+		:initarg :class-store
+		:documentation "A store that will be used for
+		persisting the data object. If this slot isn't
+		specified, the value is obtained by calling
+		class-store on the data class.")
    (data-view :accessor dataform-data-view
 	      :initform nil
 	      :initarg :data-view
@@ -72,6 +79,11 @@ link. If the user clicks on the link, the widget's state is updated
 and it renders into a form via a form view. If a user then submits the
 form, the data object is updated from the form (see
 dataform-submit-action)."))
+
+(defmethod initialize-instance :after ((obj dataform) &rest initargs &key &allow-other-keys)
+  (declare (ignore initargs))
+  (setf (dataform-class-store obj)
+	(object-store (dataform-data obj))))
 
 (defmethod dataform-data-view ((obj dataform))
   (when (null (slot-value obj 'data-view))
@@ -181,5 +193,6 @@ submission behavior.")
   (:method ((obj dataform) data &rest args)
     (apply #'update-object-view-from-request data
 	   (find-view (dataform-form-view obj))
+	   :class-store (dataform-class-store obj)
 	   args)))
 
