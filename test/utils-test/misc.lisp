@@ -375,8 +375,8 @@
     (let ((ht (make-hash-table )))
       (setf (gethash 'foo ht) 1)
       (setf (gethash 'bar ht) 1)
-      (hash-keys ht))
-  (foo bar))
+      (sort (hash-keys ht) #'string-lessp :key #'symbol-name))
+  (bar foo))
 
 ;;; Test find-slot-dsd
 (deftest find-slot-dsd-1
