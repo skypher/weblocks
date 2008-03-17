@@ -93,7 +93,9 @@
 									  :depends-on ("choices"))
 								   (:file "textarea")
 								   (:file "paragraph")
-								   (:file "excerpt")))
+								   (:file "excerpt")
+								   (:file "image")
+								   (:file "url")))
 						     (:module
 						      parsers
 						      :components ((:file "common"))))
