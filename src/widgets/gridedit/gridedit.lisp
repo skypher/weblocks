@@ -129,6 +129,7 @@ grid."))
 (defmethod gridedit-create-new-item-widget ((grid gridedit))
   (make-instance 'dataform
 		 :data (make-instance (datagrid-data-class grid))
+		 :class-store (datagrid-class-store grid)
 		 :ui-state :form
 		 :on-cancel (lambda (obj)
 			      (declare (ignore obj))
@@ -155,6 +156,7 @@ value of 'gridedit-drilldown-type' and create its widget accordingly."))
 (defmethod gridedit-create-drilldown-widget ((grid gridedit) item)
   (make-instance 'dataform
 		 :data item
+		 :class-store (datagrid-class-store grid)
 		 :ui-state (if (eql (gridedit-drilldown-type grid) :edit)
 			       :form
 			       :data)
@@ -214,12 +216,12 @@ item - the integer id of the object to be deleted.")
 			     (mixin-obj (obtain-view-field-value field obj)))
 			(delete-mixin-objects (mixin-view-field-view field) mixin-obj)))
 		    view obj)
-		   (delete-persistent-object (class-store (class-name (class-of obj))) obj)))
+		   (delete-persistent-object (datagrid-class-store grid) obj)))
 	  (delete-mixin-objects (datagrid-view grid)
-				(find-persistent-object-by-id (class-store (datagrid-data-class grid))
+				(find-persistent-object-by-id (datagrid-class-store grid)
 							      (datagrid-data-class grid)
 							      item-id)))
-	(delete-persistent-object-by-id (class-store (datagrid-data-class grid))
+	(delete-persistent-object-by-id (datagrid-class-store grid)
 					(datagrid-data-class grid)
 					item-id))))
 

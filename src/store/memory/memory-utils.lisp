@@ -2,9 +2,27 @@
 ; Operations that support memory-backed stores
 (in-package :weblocks-memory)
 
-(export '(filter-objects-in-memory object-satisfies-search-p
+(export '(make-scratch-store objects-from-scratch-store
+	  filter-objects-in-memory object-satisfies-search-p
 	  order-objects-in-memory strictly-less-p equivalentp
 	  range-objects-in-memory))
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;; Scratch stores ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+(defun make-scratch-store (&optional list)
+  "Accepts an optional list of objects, and creates a memory store
+from them."
+  (let ((store (make-instance 'memory-store)))
+    (dolist (obj list store)
+      (persist-object store obj))))
+
+(defun objects-from-scratch-store (store)
+  "Accepts a memory store and returns a list of objects stored in
+it."
+  (loop for table being the hash-values in (memory-store-root-objects store)
+       append (loop for i being the hash-values in (persistent-objects-of-class-by-id table)
+		 collect i)))
 
 ;;;;;;;;;;;;;;
 ;;; Filter ;;;
