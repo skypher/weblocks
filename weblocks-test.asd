@@ -18,7 +18,8 @@
 		 (:file "weblocks"
 			:depends-on ("weblocks-test"))
 		 (:module utils-test
-			  :components ((:file "misc"))
+			  :components ((:file "misc")
+				       (:file "runtime-class"))
 			  :depends-on ("weblocks-test"))
 		 (:file "actions"
 			:depends-on ("weblocks-test"))
