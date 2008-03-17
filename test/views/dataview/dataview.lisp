@@ -118,3 +118,17 @@
        (:li :class "manager" (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))
      :postslots nil))
 
+;;; Test render-view (we'll test on data view)
+(deftest-html render-view-1
+    (render-view (defview nil ()
+		   hello world)
+		 :class-name 'render-view-test-class)
+  #.(data-header-template
+     nil
+     '((:li :class "hello" (:span :class "label text" "Hello:&nbsp;") (:span :class "value missing"
+								       "Not Specified"))
+       (:li :class "world" (:span :class "label text" "World:&nbsp;") (:span :class "value missing"
+								       "Not Specified")))
+     :postslots nil
+     :data-class-name "render-view-test-class"))
+

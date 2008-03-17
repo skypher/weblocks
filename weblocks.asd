@@ -19,7 +19,8 @@
 		:components (
 		 (:file "weblocks")
 		 (:module utils
-			  :components ((:file "misc"))
+			  :components ((:file "misc")
+				       (:file "runtime-class"))
 			  :depends-on ("weblocks"))
 		 (:file "page-template"
 			:depends-on ("weblocks" utils "application"))
