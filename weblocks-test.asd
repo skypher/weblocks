@@ -95,7 +95,9 @@
 										   (:file "radio")
 										   (:file "excerpt")
 										   (:file "paragraph")
-										   (:file "textarea"))))))
+										   (:file "textarea")
+										   (:file "image")
+										   (:file "url"))))))
 			  :depends-on ("weblocks-test" fixtures snippets))
 		 (:module widgets
 			  :components ((:file "widget-test-utils")
