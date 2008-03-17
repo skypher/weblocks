@@ -52,7 +52,8 @@ input is not valid.")
 	           form if :method isn't specified in keyword
 	           parameters when rendering the view. Possible values
 	           are :get (default) and :post.")
-   (default-action :initform nil
+   (default-action :initform (lambda (&rest args)
+			       (declare (ignore args)))
                    :initarg :default-action
 		   :accessor form-view-default-action
 		   :documentation "A default action that will be
