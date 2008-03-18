@@ -69,17 +69,19 @@ customize behavior)."))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))
       ; wrap action and pre/post action hooks in transaction
-      (let (tx-all-committed-p)
+      (let (tx-error-occurred-p)
 	(unwind-protect
-	     (progn
-	       (mapstores #'begin-transaction)
-	       (eval-hook :pre-action)
-	       (eval-action)
-	       (eval-hook :post-action)
-	       (mapstores #'commit-transaction)
-	       (setf tx-all-committed-p t))
-	  (unless tx-all-committed-p
-	    (mapstores #'rollback-transaction))))
+	     (handler-case (progn
+			     (mapstores #'begin-transaction)
+			     (eval-hook :pre-action)
+			     (eval-action)
+			     (eval-hook :post-action))
+	       (error (err) (progn
+			      (mapstores #'rollback-transaction)
+			      (setf tx-error-occurred-p t)
+			      (error err))))
+	  (unless tx-error-occurred-p
+	    (mapstores #'commit-transaction))))
       (when (and (not (ajax-request-p))
 		 (find *action-string* (get-parameters)
 		       :key #'car :test #'string-equal))
