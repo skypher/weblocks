@@ -183,6 +183,18 @@
 		    (:li :class "manager"
 		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim"))))))))
 
+(deftest render-navigation-widget-3
+    (with-request :get nil
+      (let ((nav (make-navigation "Test Navigation"))
+	    (*current-navigation-url* "/")
+	    (*weblocks-output-stream* (make-string-output-stream)))
+	(declare (special *current-navigation-url*
+			  *weblocks-output-stream*))
+	;; render widget
+	(render-widget nav)
+	(return-code)))
+  404)
+
 ;;; test current-pane-widget
 (deftest current-pane-widget-1
     (current-pane-widget
@@ -245,6 +257,18 @@
 	       'test1)
   ("test1" . "w1"))
 
+(deftest find-pane-5
+    (let ((nav (make-navigation "test navigation"
+				"test1" "w1"
+				"test2" "w2")))
+      (setf (navigation-on-find-pane nav)
+	    (lambda (nav name)
+	      (when (equalp name "test3")
+		"w3")))
+      (values (find-pane nav "test3")
+	      (find-pane nav "test4")))
+  ("test3" . "w3") nil)
+
 ;;; test reset-current-pane
 (deftest reset-current-pane-1
     (let ((nav (make-navigation "test navigation"
@@ -283,6 +307,17 @@
       (loop for i across (slot-value nav 'current-pane)
 	    collect (char-code i)))
   (229 228 246))
+
+(deftest apply-uri-to-navigation-4
+    (let ((site (create-site-layout)) nav1 nav2)
+      (setf nav1 (weblocks::find-navigation-widget site))
+      (setf (navigation-on-find-pane nav1)
+	    (lambda (nav name)
+	      (when (equalp name "test13")
+		"w3")))
+      (weblocks::apply-uri-to-navigation '("test13") nav1)
+      (slot-value nav1 'current-pane))
+  "test13")
 
 ;;; test obtain-uri-from-navigation
 (deftest obtain-uri-from-navigation-1
