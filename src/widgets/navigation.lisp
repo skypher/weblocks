@@ -1,12 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(navigation navigation-panes navigation-current-pane
-	  navigation-render-menu-p pane-name pane-widget current-pane
-	  *current-navigation-url* navigation-default-pane
-	  with-navigation-header render-navigation-body
-	  current-pane-widget init-navigation make-navigation
-	  find-pane reset-current-pane))
+(export '(navigation navigation-panes navigation-on-find-pane
+	  navigation-current-pane navigation-render-menu-p pane-name
+	  pane-widget current-pane *current-navigation-url*
+	  navigation-default-pane with-navigation-header
+	  render-navigation-body current-pane-widget init-navigation
+	  make-navigation find-pane reset-current-pane))
 
 (defwidget navigation (widget)
   ((name :initform nil
@@ -20,6 +20,17 @@
 	  widgets. The names will act as menu entries and attributized
 	  names will go into the URL. When a particular entry is
 	  clicked, its corresponding pane will be rendered.")
+   (on-find-pane :accessor navigation-on-find-pane
+		 :initform nil
+		 :initarg :on-find-pane
+		 :documentation "If bound to a function, and the url
+		 does not point to one of the panes in
+		 'navigation-panes', the function is called with two
+		 arguments (navigation object, and the pane name). If
+		 the function returns a widget, uses the widget to
+		 present the URL. If the function returns nil,
+		 assummes the pane does not exist. This can be used
+		 for wiki-style URLs.")
    (current-pane :accessor navigation-current-pane
 		 :initform nil
 		 :initarg :current-pane
@@ -119,14 +130,15 @@ determine its location in order to properly render paths in links.")
 	    (navigation-panes obj)))))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (when (current-pane-widget obj)
-    (let ((*current-navigation-url* (concatenate 'string
-						 *current-navigation-url*
-						 (string-downcase
-						  (url-encode (navigation-current-pane obj)))
-						 "/")))
-      (declare (special *current-navigation-url*))
-      (render-widget (current-pane-widget obj))))
+  (if (current-pane-widget obj)
+      (let ((*current-navigation-url* (concatenate 'string
+						   *current-navigation-url*
+						   (string-downcase
+						    (url-encode (navigation-current-pane obj)))
+						   "/")))
+	(declare (special *current-navigation-url*))
+	(render-widget (current-pane-widget obj)))
+      (setf (return-code) +http-not-found+))
   (apply #'with-navigation-header obj #'render-navigation-body args))
 
 (defun current-pane-widget (obj)
@@ -162,8 +174,13 @@ it along with 'args' to 'init-navigation'."
 (defun find-pane (obj name)
   "Returns a cons cell identifying the navigation pane if it exists,
 otherwise returns nil."
-  (find (attributize-name name)
-	(navigation-panes obj) :key #'pane-name :test #'equalp))
+  (or (find (attributize-name name)
+	    (navigation-panes obj) :key #'pane-name :test #'equalp)
+      (when (navigation-on-find-pane obj)
+	(let ((w (funcall (navigation-on-find-pane obj)
+			  obj name)))
+	  (when w
+	    (cons name w))))))
 
 (defun reset-current-pane (obj)
   "Sets the current pane to the first available pane in the list."
