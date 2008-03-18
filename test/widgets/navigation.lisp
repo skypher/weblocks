@@ -1,6 +1,16 @@
 
 (in-package :weblocks-test)
 
+;;; test pane-name
+(deftest pane-name-1
+    (pane-name (cons 1 2))
+  1)
+
+;;; test pane-widget
+(deftest pane-widget-1
+    (pane-widget (cons 1 2))
+  2)
+
 ;;; test navigation-default-pane
 (deftest navigation-default-pane-1
     (navigation-default-pane (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
@@ -206,34 +216,34 @@
   (("test1" . "w1") ("test-two" . "w2")))
 
 
-;;; test pane-exists-p
-(deftest pane-exists-p-1
-    (pane-exists-p (make-navigation "test navigation"
-				    "test1" "w1"
-				    "test2" "w2")
-		   "helloworld")
+;;; test find-pane
+(deftest find-pane-1
+    (find-pane (make-navigation "test navigation"
+				"test1" "w1"
+				"test2" "w2")
+	       "helloworld")
   nil)
 
-(deftest pane-exists-p-2
-    (pane-exists-p (make-navigation "test navigation"
-				    "test1" "w1"
-				    "Test-Two" "w2")
-		   "test-two")
-  t)
+(deftest find-pane-2
+    (find-pane (make-navigation "test navigation"
+				"test1" "w1"
+				"Test-Two" "w2")
+	       "test-two")
+  ("test-two" . "w2"))
 
-(deftest pane-exists-p-3
-    (pane-exists-p (make-navigation "test navigation"
-				    'test1 "w1"
-				    'test2 "w2")
-		   "test1")
-  t)
+(deftest find-pane-3
+    (find-pane (make-navigation "test navigation"
+				'test1 "w1"
+				'test2 "w2")
+	       "test1")
+  ("test1" . "w1"))
 
-(deftest pane-exists-p-4
-    (pane-exists-p (make-navigation "test navigation"
-				    'test1 "w1"
-				    'test2 "w2")
-		   'test1)
-  t)
+(deftest find-pane-4
+    (find-pane (make-navigation "test navigation"
+				'test1 "w1"
+				'test2 "w2")
+	       'test1)
+  ("test1" . "w1"))
 
 ;;; test reset-current-pane
 (deftest reset-current-pane-1
