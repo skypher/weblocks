@@ -1,11 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(navigation navigation-panes navigation-render-menu-p
-	  current-pane *current-navigation-url*
-	  navigation-default-pane with-navigation-header
-	  render-navigation-body current-pane-widget init-navigation
-	  make-navigation pane-exists-p reset-current-pane))
+(export '(navigation navigation-panes navigation-current-pane
+	  navigation-render-menu-p pane-name pane-widget current-pane
+	  *current-navigation-url* navigation-default-pane
+	  with-navigation-header render-navigation-body
+	  current-pane-widget init-navigation make-navigation
+	  find-pane reset-current-pane))
 
 (defwidget navigation (widget)
   ((name :initform nil
@@ -19,7 +20,8 @@
 	  widgets. The names will act as menu entries and attributized
 	  names will go into the URL. When a particular entry is
 	  clicked, its corresponding pane will be rendered.")
-   (current-pane :initform nil
+   (current-pane :accessor navigation-current-pane
+		 :initform nil
 		 :initarg :current-pane
 		 :documentation "A name that identifies currently
                  selected entry.")
@@ -41,42 +43,48 @@ cycle. This is a special variable modified by the navigation controls
 during rendering so that inner controls can determine their location
 in the application hierarchy.")
 
+(defun pane-name (pane)
+  "Given a pane, returns its name."
+  (car pane))
+
+(defun pane-widget (pane)
+  "Given a pane, returns a widget it represents."
+  (cdr pane))
+
 (defgeneric navigation-default-pane (obj)
   (:documentation
    "Must return the name of the default pane for the navigation
 object. The default implementation returns the first pane from
 'navigation-panes'. Specialize this function to specify how to pick
-default panes for your navigation object."))
-
-(defmethod navigation-default-pane ((obj navigation))
-  (caar (navigation-panes obj)))
+default panes for your navigation object.")
+  (:method ((obj navigation))
+    (pane-name (car (navigation-panes obj)))))
 
 ;;; During initialization, current pane will automatically be set to
 ;;; the first available pane in the list, unless specified otherwise.
 (defmethod initialize-instance :after ((obj navigation) &rest initargs &key &allow-other-keys)
-  (with-slots (panes current-pane) obj
-    (when (null current-pane)
-      (setf current-pane (navigation-default-pane obj)))))
+  (declare (ignore initargs))
+  (when (null (navigation-current-pane obj))
+    (setf (navigation-current-pane obj)
+	  (navigation-default-pane obj))))
 
 (defgeneric with-navigation-header (obj body-fn &rest args)
   (:documentation
    "Renders the header of the navigation widget. Unlike
 'with-widget-header', which in case of the navigation widget wraps the
 current pane as well as the navigation html, 'with-navigation-header'
-only wraps navigation html."))
-
-(defmethod with-navigation-header ((obj navigation) body-fn &rest args)
-  (when (navigation-render-menu-p obj)
-    (with-slots (name panes) obj
+only wraps navigation html.")
+  (:method ((obj navigation) body-fn &rest args)
+    (when (navigation-render-menu-p obj)
       (with-html
 	(:div :class "view menu"
 	      (with-extra-tags
-		(if (null panes)
+		(if (null (navigation-panes obj))
 		    (htm
 		     (:div :class "empty-navigation" "No navigation entries"))
 		    (htm
-		     (:h1 (if name
-			      (str (humanize-name name))
+		     (:h1 (if (widget-name obj)
+			      (str (humanize-name (widget-name obj)))
 			      (str "Navigation")))
 		     (:ul
 		      (apply body-fn obj args))))))))))
@@ -89,33 +97,33 @@ pane, as well as navigation html, 'render-navigation-body' only
 renders navigation HTML.
 
 This method uses '*current-navigation-url*' special variable to
-determine its location in order to properly render paths in links."))
-
-(defmethod render-navigation-body ((obj navigation) &rest args)
-  (with-slots (panes current-pane) obj
+determine its location in order to properly render paths in links.")
+  (:method ((obj navigation) &rest args)
+    (declare (ignore args))
     (with-html
-      (mapc (lambda (item)
-	      (let* ((item-selected-p (equalp (car item) current-pane))
-		     (item-class (when item-selected-p
+      (mapc (lambda (pane)
+	      (let* ((pane-name (pane-name pane))
+		     (pane-selected-p (equalp pane-name (navigation-current-pane obj)))
+		     (pane-class (when pane-selected-p
 				   "selected-item")))
 		(htm
-		 (:li :class item-class
-		      (if item-selected-p
-			  (htm (:span (str (humanize-name (car item)))))
+		 (:li :class pane-class
+		      (if pane-selected-p
+			  (htm (:span (str (humanize-name pane-name))))
 			  (htm (:a :href (concatenate 'string *current-navigation-url*
-						      (unless (equalp (car item)
+						      (unless (equalp pane-name
 								      (navigation-default-pane obj))
 							(string-downcase
-							 (url-encode (attributize-name (car item))))))
-				   (str (humanize-name (car item))))))))))
-	    panes))))
+							 (url-encode (attributize-name pane-name)))))
+				   (str (humanize-name pane-name)))))))))
+	    (navigation-panes obj)))))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
   (when (current-pane-widget obj)
     (let ((*current-navigation-url* (concatenate 'string
 						 *current-navigation-url*
 						 (string-downcase
-						  (url-encode (slot-value obj 'current-pane)))
+						  (url-encode (navigation-current-pane obj)))
 						 "/")))
       (declare (special *current-navigation-url*))
       (render-widget (current-pane-widget obj))))
@@ -124,10 +132,9 @@ determine its location in order to properly render paths in links."))
 (defun current-pane-widget (obj)
   "Accepts a navigation object and returns the widget that represents its
 currently selected pane."
-  (with-slots (panes current-pane) obj
-    (cdar (member current-pane panes :key #'car :test #'string-equal))))
+  (pane-widget (find-pane obj (navigation-current-pane obj))))
 
-(defun init-navigation (nav &rest args)
+(defun init-navigation (obj &rest args)
   "A helper function to create a navigation widget
 
 ex:
@@ -139,11 +146,11 @@ ex:
         for x in args
         for y in (cdr args)
      when (oddp count)
-     do (push-end `(,(attributize-name x) . ,y) (navigation-panes nav)))
-  (with-slots (current-pane) nav
-    (when (null current-pane)
-      (setf current-pane (caar (navigation-panes nav)))))
-  nav)
+     do (push-end `(,(attributize-name x) . ,y) (navigation-panes obj)))
+  (when (null (navigation-current-pane obj))
+    (setf (navigation-current-pane obj)
+	  (navigation-default-pane obj)))
+  obj)
 
 (defun make-navigation (name &rest args)
   "Instantiates 'navigation' widget via 'make-instance' and forwards
@@ -152,51 +159,47 @@ it along with 'args' to 'init-navigation'."
     (apply #'init-navigation nav args)
     nav))
 
-(defun pane-exists-p (navigation-object name)
-  "Given a navigation object and a name determines if there is a pane
-with the specified name."
-  (not (null (find (attributize-name name)
-		   (navigation-panes navigation-object) :key #'car :test #'equalp))))
+(defun find-pane (obj name)
+  "Returns a cons cell identifying the navigation pane if it exists,
+otherwise returns nil."
+  (find (attributize-name name)
+	(navigation-panes obj) :key #'pane-name :test #'equalp))
 
-(defun reset-current-pane (navigation-object)
+(defun reset-current-pane (obj)
   "Sets the current pane to the first available pane in the list."
-  (setf (slot-value navigation-object 'current-pane)
-	(caar (navigation-panes navigation-object))))
+  (setf (navigation-current-pane obj)
+	(navigation-default-pane obj)))
 
 (defmethod find-widget-by-path* (path (root navigation))
   (find-widget-by-path* (cdr path)
-			(cdar (member (car path)
-				      (navigation-panes root)
-				      :key #'car
-				      :test #'string-equal))))
+			(pane-widget (find-pane root (car path)))))
 
 ;;; Code that implements friendly URLs ;;;
-(defun apply-uri-to-navigation (tokens navigation-widget)
+(defun apply-uri-to-navigation (tokens obj)
   "Takes URI tokens and applies them one by one to navigation widgets
 in order to allow for friendly URLs. The URLs are basically intimately
 linked to navigation controls to simulate document resources on the
 server."
   (when (null tokens)
-    (reset-navigation-widgets navigation-widget)
+    (reset-navigation-widgets obj)
     (return-from apply-uri-to-navigation))
   (let ((first-token (url-decode (car tokens))))
-    (if (and navigation-widget (pane-exists-p navigation-widget first-token))
+    (if (and obj (find-pane obj first-token))
 	(progn
-	  (setf (slot-value navigation-widget 'current-pane) first-token)
+	  (setf (navigation-current-pane obj) first-token)
 	  (apply-uri-to-navigation (cdr tokens)
-				   (find-navigation-widget (current-pane-widget navigation-widget))))
+				   (find-navigation-widget (current-pane-widget obj))))
 	(setf (return-code) +http-not-found+))))
 
-(defun obtain-uri-from-navigation (navigation-widget)
+(defun obtain-uri-from-navigation (obj)
   "Walks the widget tree from the given navigation widget and builds a
 URI string."
-  (if navigation-widget
-      (with-slots (current-pane) navigation-widget
-	(format nil "/~A~A"
-		current-pane
-		(obtain-uri-from-navigation
-		 (find-navigation-widget
-		  (current-pane-widget navigation-widget)))))
+  (if obj
+      (format nil "/~A~A"
+	      (navigation-current-pane obj)
+	      (obtain-uri-from-navigation
+	       (find-navigation-widget
+		(current-pane-widget obj))))
       "/"))
 
 (defun find-navigation-widget (comp)
@@ -214,10 +217,10 @@ contained in 'comp' or its children."
 				       (otherwise nil)))
 				   (composite-widgets comp))))))
 
-(defun reset-navigation-widgets (nav)
-  "Resets all navigation widgets from 'nav' down, using
+(defun reset-navigation-widgets (obj)
+  "Resets all navigation widgets from 'obj' down, using
 'reset-current-pane'."
-  (unless (null nav)
-    (reset-current-pane nav)
-    (reset-navigation-widgets (find-navigation-widget (current-pane-widget nav)))))
+  (unless (null obj)
+    (reset-current-pane obj)
+    (reset-navigation-widgets (find-navigation-widget (current-pane-widget obj)))))
 
