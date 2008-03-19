@@ -30,7 +30,17 @@
 		 the function returns a widget, uses the widget to
 		 present the URL. If the function returns nil,
 		 assummes the pane does not exist. This can be used
-		 for wiki-style URLs.")
+		 for wiki-style URLs. Note, the returned widget will
+		 be cached in 'dynamic-pane-cache'. To turn off
+		 caching the widget, the function should return a
+		 second value :no-cache.")
+   (dynamic-pane-cache :accessor navigation-dynamic-pane-cache
+		       :initform nil
+		       :documentation "If a pane is generated
+		       dynamically via 'on-find-pane', it is cached in
+		       this slot. This is done to maintain the same
+		       instance of the generated widget accross
+		       non-ajax requests.")
    (current-pane :accessor navigation-current-pane
 		 :initform nil
 		 :initarg :current-pane
@@ -173,14 +183,23 @@ it along with 'args' to 'init-navigation'."
 
 (defun find-pane (obj name)
   "Returns a cons cell identifying the navigation pane if it exists,
-otherwise returns nil."
+otherwise returns nil. This function first looks through static panes,
+then through the cached dynamic pane if it exists, and finally calls
+'on-find-pane' if it's bound to a function."
   (or (find (attributize-name name)
 	    (navigation-panes obj) :key #'pane-name :test #'equalp)
+      (when (equalp (pane-name (navigation-dynamic-pane-cache obj))
+		    name)
+	(navigation-dynamic-pane-cache obj))
       (when (navigation-on-find-pane obj)
-	(let ((w (funcall (navigation-on-find-pane obj)
-			  obj name)))
+	(multiple-value-bind (w caching)
+	    (funcall (navigation-on-find-pane obj)
+		     obj name)
 	  (when w
-	    (cons name w))))))
+	    (if (eq caching :no-cache)
+		(cons name w)
+		(setf (navigation-dynamic-pane-cache obj)
+		      (cons name w))))))))
 
 (defun reset-current-pane (obj)
   "Sets the current pane to the first available pane in the list."
