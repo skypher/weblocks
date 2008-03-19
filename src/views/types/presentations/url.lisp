@@ -12,7 +12,7 @@
 	 'render-view-field-value'. The function is expected to render
 	 the body into the usual output stream. Its return value is
 	 ignored."))
-  (:documentation "Presents a url as an image."))
+  (:documentation "Presents text as a url."))
 
 (defmethod render-view-field-value (value (presentation url-presentation)
 				    field view widget obj &rest args
