@@ -160,23 +160,34 @@ instances of 'class-name' and order them with 'order-by'."
 	       :flatp t :caching nil :database store))
   #.(restore-sql-reader-syntax-state))
 
-(defmethod find-persistent-objects ((store database) class-name
-				    &key filter filter-view order-by range)
+(defmethod find-persistent-objects ((store database) class-name &key
+				    filter filter-view order-by range
+				    where &allow-other-keys)
   (declare (ignore filter filter-view))
-  (select class-name
-	  :order-by (order-by-expression class-name order-by)
-	  :offset (range-to-offset range)
-	  :limit (range-to-limit range)
-	  :where (class-order-by-join-where class-name order-by)
-	  :flatp t :caching nil :database store))
+  (let ((order-by-join (class-order-by-join-where class-name order-by)))
+    (select class-name
+	    :order-by (order-by-expression class-name order-by)
+	    :offset (range-to-offset range)
+	    :limit (range-to-limit range)
+	    :where (if (and order-by-join where)
+		       (sql-operation 'and order-by-join where)
+		       (or order-by-join where))
+	    :flatp t :caching nil :database store)))
 
 (defmethod count-persistent-objects ((store database) class-name
-				     &key filter filter-view)
+				     &key filter filter-view where
+				     &allow-other-keys)
   (declare (ignore filter filter-view))
   (let (count)
     #.(locally-enable-sql-reader-syntax) 
     (setf count (car (select [count [*]]
-			     :from (view-table (find-class class-name))
+			     :from (mapcar (lambda (table)
+					     (make-instance 'clsql-sys::sql-ident-table :name table))
+					   (adjoin (view-table (find-class class-name))
+						   (mapcar (lambda (ident)
+							     (slot-value ident 'clsql-sys::name))
+							   (clsql-sys::collect-table-refs where))))
+			     :where where
 			     :flatp t :caching nil :database store)))
     #.(restore-sql-reader-syntax-state)
     count))

@@ -75,8 +75,10 @@
   class name in a given store by its unique id. If the object isn't
   found, returns NIL."))
 
-(defgeneric find-persistent-objects (store class-name &key filter
-					   filter-view order-by range)
+(defgeneric find-persistent-objects (store class-name
+					   &key filter
+					   filter-view order-by range
+					   &allow-other-keys)
   (:documentation "Looks up and returns objects of appropriate
   'class-name' in the 'store' bound by the given keyword
   parameters.
@@ -96,11 +98,18 @@
   objects. The CAR of 'range' is the index of the initial
   object (inclusive) and CDR is the index past the last object. Note,
   the range should be applied after the objects have been filtered and
-  ordered if necessary."))
+  ordered if necessary.
 
-(defgeneric count-persistent-objects (store class-name &key filter filter-view)
+  Other implementation dependent keys may be defined by a given
+  store."))
+
+(defgeneric count-persistent-objects (store class-name &key filter filter-view
+					    &allow-other-keys)
   (:documentation "Returns the number of persistent objects stored in
   'store' of 'class-name', bound by the given keyword parameters. For
   documentation of keyword parameters, see
-  'find-persistent-objects'."))
+  'find-persistent-objects'.
+
+  Other implementation dependent keys may be defined by a given
+  store."))
 

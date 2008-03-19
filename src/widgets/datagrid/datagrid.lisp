@@ -53,7 +53,11 @@
 	     given search parameters, not the actual items
 	     themselves. If this slot is NIL (the default), the
 	     datagrid will operate on all persistent classes specified
-	     in 'data-class'.")
+	     in 'data-class'.
+
+             Alternatively, 'on-query' may be a list of
+             store-dependent keywords that will be passed to the
+             datastore. This may be a SQL 'where' clause, etc.")
    (sort :accessor datagrid-sort
 	 :initform nil
 	 :initarg :sort
@@ -207,42 +211,49 @@
 		 (class-name (datagrid-data-class obj)))))))
 
 (defun datagrid-data (grid)
-  "Returns the items in the grid. If 'datagrid-on-query' is not nil,
-calls the function designated by 'datagrid-on-query'. Otherwise, uses
-persistent store API."
+  "Returns the items in the grid. If 'datagrid-on-query' is a function
+designator, calls the function designated by
+'datagrid-on-query'. Otherwise, uses persistent store API."
   (multiple-value-bind (begin end)
       (when (datagrid-allow-pagination-p grid)
 	(pagination-page-item-range (datagrid-pagination-widget grid)))
-    (if (datagrid-on-query grid)
+    (if (function-designator-p (datagrid-on-query grid))
 	(funcall (datagrid-on-query grid)
 		 grid
 		 (datagrid-search grid) (datagrid-sort grid)
 		 (when (and begin end) (cons begin end)))
-	(find-persistent-objects (datagrid-class-store grid)
-				 (datagrid-data-class grid)
-				 :filter (datagrid-search grid)
-				 :filter-view (datagrid-view grid)
-				 :order-by (datagrid-sort grid)
-				 :range (when (and begin end) (cons begin end))))))
+	(apply #'find-persistent-objects
+	       (datagrid-class-store grid)
+	       (datagrid-data-class grid)
+	       :filter (datagrid-search grid)
+	       :filter-view (datagrid-view grid)
+	       :order-by (datagrid-sort grid)
+	       :range (when (and begin end) (cons begin end))
+	       (datagrid-on-query grid)))))
 
 (defun datagrid-data-count (grid &key totalp)
   "Returns the number of items in the grid. This function works
 similarly to datagrid-data in principle. Note, if totalp is set to
 true, 'datagrid-data-count' returns the the total number of items and
-ignores searching parameters."
-  (if (datagrid-on-query grid)
+ignores searching parameters (but not the on-query parameter, if it
+isn't a function)."
+  (if (function-designator-p (datagrid-on-query grid))
       (funcall (datagrid-on-query grid)
 	       grid
 	       (when (not totalp)
 		 (datagrid-search grid))
 	       nil nil :countp t)
       (if totalp
-	  (count-persistent-objects (datagrid-class-store grid)
-				    (datagrid-data-class grid))
-	  (count-persistent-objects (datagrid-class-store grid)
-				    (datagrid-data-class grid)
-				    :filter (datagrid-search grid)
-				    :filter-view (datagrid-view grid)))))
+	  (apply #'count-persistent-objects
+		 (datagrid-class-store grid)
+		 (datagrid-data-class grid)
+		 (datagrid-on-query grid))
+	  (apply #'count-persistent-objects
+		 (datagrid-class-store grid)
+		 (datagrid-data-class grid)
+		 :filter (datagrid-search grid)
+		 :filter-view (datagrid-view grid)
+		 (datagrid-on-query grid)))))
 
 (defgeneric datagrid-render-item-ops-bar (grid &rest args)
   (:documentation
@@ -302,7 +313,7 @@ items available)."))
     (with-html
       (:div :class "data-mining-bar"
 	    (if (and (datagrid-allow-searching-p obj)
-		     (if (datagrid-on-query obj)
+		     (if (function-designator-p (datagrid-on-query obj))
 			 t
 			 (supports-filter-p (datagrid-class-store obj))))
 		(apply #'datagrid-render-search-bar obj args)
