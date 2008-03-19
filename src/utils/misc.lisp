@@ -12,7 +12,8 @@
 	  string-invert-case ninsert add-get-param-to-url
 	  remove-parameter-from-uri asdf-system-directory
 	  make-isearch-regex hash-keys object-class-name
-	  append-custom-fields find-slot-dsd find-slot-esd drop-last))
+	  append-custom-fields find-slot-dsd find-slot-esd drop-last
+	  function-designator-p))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable
@@ -392,4 +393,11 @@ in 'class'."
 (defun drop-last (list)
   "Returns a copy of the list without the last element."
   (reverse (cdr (reverse list))))
+
+(defun function-designator-p (obj)
+  "Returns true if the object is a function designator."
+  (or (functionp obj)
+      (and (symbolp obj)
+	   (fboundp obj))
+      (typep obj 'funcallable-standard-object)))
 

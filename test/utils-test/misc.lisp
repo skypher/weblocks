@@ -401,3 +401,19 @@
     (drop-last nil)
   nil)
 
+;;; Test function-designator-p
+(deftest function-designator-p-1
+    (function-designator-p 'not-a-function)
+  nil)
+
+(deftest function-designator-p-2
+    (function-designator-p 'append)
+  t)
+
+(deftest function-designator-p-3
+    (function-designator-p (lambda ()))
+  t)
+
+(deftest function-designator-p-4
+    (function-designator-p (list))
+  nil)
