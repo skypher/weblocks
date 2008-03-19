@@ -262,12 +262,32 @@
 				"test1" "w1"
 				"test2" "w2")))
       (setf (navigation-on-find-pane nav)
-	    (lambda (nav name)
-	      (when (equalp name "test3")
-		"w3")))
+	    (let ((c 0))
+	      (lambda (nav name)
+		(when (and (equalp name "test3")
+			   (= c 0))
+		  (incf c)
+		  "w3"))))
       (values (find-pane nav "test3")
+	      (find-pane nav "test3")
 	      (find-pane nav "test4")))
-  ("test3" . "w3") nil)
+  ("test3" . "w3") ("test3" . "w3") nil)
+
+(deftest find-pane-6
+    (let ((nav (make-navigation "test navigation"
+				"test1" "w1"
+				"test2" "w2")))
+      (setf (navigation-on-find-pane nav)
+	    (let ((c 0))
+	      (lambda (nav name)
+		(when (and (equalp name "test3")
+			   (= c 0))
+		  (incf c)
+		  (values "w3" :no-cache)))))
+      (values (find-pane nav "test3")
+	      (find-pane nav "test3")
+	      (find-pane nav "test4")))
+  ("test3" . "w3") nil nil)
 
 ;;; test reset-current-pane
 (deftest reset-current-pane-1
