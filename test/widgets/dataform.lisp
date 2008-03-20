@@ -145,7 +145,8 @@
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "Name is a required field."))))))
+			 (:ul :class "field-validation-errors"
+			  (:li "Name is a required field."))))))
    ;; error fixed, submit clicked
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
@@ -244,7 +245,8 @@
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "Age must be an integer."))))))
+			 (:ul :class "field-validation-errors"
+			  (:li "Age must be an integer."))))))
    ;; age changed
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template
@@ -409,7 +411,8 @@
 	    :method "post"
 	    :preslots '((:div :class "validation-errors-summary"
 			 (:h2 :class "error-count" "There is 1 validation error:")
-			 (:ul (:li "Name is a required field."))))))
+			 (:ul :class "field-validation-errors"
+			  (:li "Name is a required field."))))))
    ;; click submit again
    (:div :class "widget dataform" :id "widget-123"
 	 #.(data-header-template

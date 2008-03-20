@@ -37,7 +37,7 @@
   (:div :class "validation-errors-summary"
 	(:h2 :class "error-count"
 	     "There is 1 validation error:")
-	(:ul
+	(:ul :class "non-field-validation-errors"
 	 (:li "Hello is a required field."))))
 
 (deftest-html render-validation-summary-2
@@ -48,9 +48,33 @@
   (:div :class "validation-errors-summary"
 	(:h2 :class "error-count"
 	     "There are 2 validation errors:")
-	(:ul
+	(:ul :class "non-field-validation-errors"
 	 (:li "Hello is a required field.")
 	 (:li "World is a required field."))))
+
+(deftest-html render-validation-summary-3
+    (render-validation-summary (make-instance 'form-view)
+			       *joe* nil
+			       (list (cons 'foo "Hello is a required field.")))
+  (:div :class "validation-errors-summary"
+	(:h2 :class "error-count"
+	     "There is 1 validation error:")
+	(:ul :class "field-validation-errors"
+	 (:li "Hello is a required field."))))
+
+(deftest-html render-validation-summary-4
+    (render-validation-summary (make-instance 'form-view)
+			       *joe* nil
+			       (list (cons nil "Hello is a required field.")
+				     (cons 'foo "World is a required field.")))
+  (:div :class "validation-errors-summary"
+	(:h2 :class "error-count"
+	     "There are 2 validation errors:")
+	(:ul :class "non-field-validation-errors"
+	 (:li "Hello is a required field."))
+	(:ul :class "field-validation-errors"
+	 (:li "World is a required field."))))
+
 
 (deftest-html render-validation-summary-3
     (render-validation-summary (make-instance 'form-view)

@@ -45,7 +45,8 @@ a
 .view .empty-navigation, .view ul li, .view fieldset ul li,
 .view table thead tr th,
 .view fieldset div.submit, .view div.submit,
-.long-form fieldset .validation-errors-summary h2.error-count
+.long-form fieldset .validation-errors-summary h2.error-count,
+.form fieldset .validation-errors-summary .non-field-validation-errors
 {
   border-top: 1px solid #fcfef6;
 }
@@ -54,7 +55,8 @@ a
 .view .empty-navigation, .view ul li, .view fieldset ul li,
 .view table thead tr th,
 .view fieldset div.submit, .view div.submit,
-.long-form fieldset .validation-errors-summary
+.long-form fieldset .validation-errors-summary,
+.form fieldset .validation-errors-summary .non-field-validation-errors
 {
   border-bottom: 1px solid #dbeac1;
 }

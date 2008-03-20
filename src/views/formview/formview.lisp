@@ -5,14 +5,14 @@
 	  *required-field-message* *invalid-input-message* form form-view
 	  form-view-error-summary-threshold form-view-use-ajax-p
 	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-persist-p
-	  form-view-buttons form-view-field-writer-mixin form-view-field
-	  form-view-field-parser form-view-field-satisfies
-	  form-view-field-writer form-view-field-required-p mixin-form
-	  mixin-form-view-field mixin-form-view-field-persist-p
-	  *max-raw-input-length* input-presentation-max-length form-presentation
-	  input input-presentation render-validation-summary
-	  render-form-view-buttons form-field-intermediate-value))
+	  form-view-default-action form-view-persist-p form-view-buttons
+	  form-view-field-writer-mixin form-view-field form-view-field-parser
+	  form-view-field-satisfies form-view-field-writer
+	  form-view-field-required-p mixin-form mixin-form-view-field
+	  mixin-form-view-field-persist-p *max-raw-input-length*
+	  input-presentation-max-length form-presentation input
+	  input-presentation render-validation-summary render-form-view-buttons
+	  form-field-intermediate-value))
 
 ;;; Default initialization parameters
 (defparameter *form-default-error-summary-threshold* 15
@@ -163,19 +163,31 @@ differently.")
   (:method ((view form-view) obj widget errors)
     (declare (ignore view obj))
     (when errors
-      (with-html
+      (let ((non-field-errors (find-all errors #'null :key #'car))
+	    (field-errors (find-all errors (compose #'not #'null) :key #'car)))
+	(with-html
 	  (:div :class "validation-errors-summary"
 		(:h2 :class "error-count"
 		     (let ((error-count (length errors)))
 		       (if (eql error-count 1)
 			   (str (format nil "There is 1 validation error:"))
 			   (str (format nil "There are ~S validation errors:" error-count)))))
-		(:ul
-		 (mapc (lambda (err)
-			 (with-html
-			     (:li
-			      (str (format nil "~A" (cdr err))))))
-		       errors)))))))
+		(when non-field-errors
+		  (htm
+		   (:ul :class "non-field-validation-errors"
+			(mapc (lambda (err)
+				(with-html
+				  (:li
+				   (str (format nil "~A" (cdr err))))))
+			      non-field-errors))))
+		(when field-errors
+		  (htm
+		   (:ul :class "field-validation-errors"
+			(mapc (lambda (err)
+				(with-html
+				  (:li
+				   (str (format nil "~A" (cdr err))))))
+			      field-errors))))))))))
 
 (defgeneric render-form-view-buttons (view obj widget &rest args)
   (:documentation
