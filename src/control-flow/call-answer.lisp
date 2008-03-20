@@ -69,7 +69,7 @@ continuation, recursively tries its parents."
   (let* ((parent (widget-parent widget))
 	 (place (member widget (composite-widgets parent))))
     (unless parent
-      (error "Attempted to replace widget ~S which has no parent!" widget)))
+      (error "Attempted to replace widget ~S which has no parent!" widget))
     (flet ((place-widget (value)
 	     (rplaca place value)
 	     (setf (composite-widgets parent)
