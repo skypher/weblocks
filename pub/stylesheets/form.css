@@ -11,26 +11,29 @@ form fieldset
   margin: 0;
 }
 
-.form fieldset .validation-errors-summary
+.form fieldset .validation-errors-summary .error-count,
+.form fieldset .validation-errors-summary .field-validation-errors
 {
   display: none;
 }
 
 /* For long forms, change display of validation summary back */
-.long-form fieldset .validation-errors-summary
+.long-form fieldset .validation-errors-summary .error-count,
+.long-form fieldset .validation-errors-summary .field-validation-errors
 {
   display: block;
 }
 
-.long-form fieldset .validation-errors-summary h2.error-count
+.form fieldset .validation-errors-summary h2.error-count,
+.form fieldset .validation-errors-summary ul li
 {
   color: red;
 }
 
-.long-form fieldset .validation-errors-summary ul li
+.form fieldset .validation-errors-summary ul li,
+.long-form fieldset .validation-errors-summary .non-field-validation-errors
 {
   font-style: italic;
-  color: red;
   border-top: none;
   border-bottom: none;
 }
