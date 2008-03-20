@@ -4,8 +4,8 @@
 (export '(find-view field-info field-info-field field-info-object
 	  field-info-path get-object-view-fields map-view-fields
 	  map-mixin-fields count-view-fields obtain-view-field-value
-	  render-object-view render-view render-object-view-impl
-	  attributize-presentation))
+	  render-object-view class-from-view render-view
+	  render-object-view-impl attributize-presentation))
 
 ;;; View rendering utils
 (defun find-view (view &optional (signal-error-p t))
@@ -177,17 +177,23 @@ type field-info."
 'render-object-view-impl'."
   (apply #'render-object-view-impl obj (find-view view) widget args))
 
+(defun class-from-view (view &optional (class-name (gensym)))
+  "A helper function that generates a class object from a view. The
+view fields are enumerated and a CLOS class with slots based on field
+names is generated."
+  (make-class
+   (mapcar (lambda (field-info)
+	     (view-field-slot-name (field-info-field field-info)))
+	   (get-object-view-fields nil view))
+   class-name))
+
 (defun render-view (view &rest args &key (class-name (gensym)) &allow-other-keys)
   "A helper function that inspects the view, creates a fitting object
 from it only the fly, and calls 'render-object-view'. The function
 returns the created object."
-  (flet ((slots-from-view (view)
-	   (mapcar (lambda (field-info)
-		     (view-field-slot-name (field-info-field field-info)))
-		   (get-object-view-fields nil view))))
-    (let ((obj (make-instance (make-class (slots-from-view view) class-name))))
-      (apply #'render-object-view obj view args)
-      obj)))
+  (let ((obj (make-instance (class-from-view view class-name))))
+    (apply #'render-object-view obj view args)
+    obj))
 
 (defgeneric render-object-view-impl (obj view widget &rest args)
   (:documentation "Renders 'obj' using 'view'.")
