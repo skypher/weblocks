@@ -68,6 +68,8 @@ continuation, recursively tries its parents."
 (defun/cc do-widget-aux (widget callee &optional (wrapper-fn #'identity))
   (let* ((parent (widget-parent widget))
 	 (place (member widget (composite-widgets parent))))
+    (unless parent
+      (error "Attempted to replace widget ~S which has no parent!" widget)))
     (flet ((place-widget (value)
 	     (rplaca place value)
 	     (setf (composite-widgets parent)
