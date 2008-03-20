@@ -106,6 +106,7 @@
 							     (:file "widget-mop"))
 						:depends-on ("widget-test-utils"))
 				       (:file "dataform")
+				       (:file "quickform")
 				       (:file "flash")
 				       (:module datagrid
 						:components ((:file "datagrid")
