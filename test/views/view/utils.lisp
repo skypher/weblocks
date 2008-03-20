@@ -129,3 +129,12 @@
     (attributize-presentation (make-instance 'form-presentation))
   "form")
 
+;;; Test class-from-view
+(deftest class-from-view-1
+    (mapcar #'slot-definition-name
+	    (class-direct-slots 
+	     (class-from-view (defview nil ()
+				foo bar baz)
+			      'class-from-view-test)))
+  (foo bar baz))
+
