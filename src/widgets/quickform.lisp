@@ -57,6 +57,8 @@ be generated from the view."
 						   (dataform-data obj))))
 				 (when answerp
 				   (answer obj response)))
+			       (setf (slot-value obj 'validation-errors) nil)
+			       (setf (slot-value obj 'intermediate-form-values) nil)
 			       (throw 'annihilate-dataform nil))
 		 :on-cancel (lambda (obj)
 			      (safe-funcall on-cancel obj)
