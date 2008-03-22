@@ -33,8 +33,8 @@ when user cancels out of the form.
 'satisfies' - an optional function called with two arguments (widget
 and data object) after the fields have been successfully parsed into
 the object. It is expected to return true if the object is valid, or
-nil as the first value and an association list of field names and
-error messages as the second value.
+nil as the first value and an association list of fields and error
+messages as the second value.
 
 'data' - an optional data object to be used. If the data object isn't
 provided, it will be generated from the view automatically.
