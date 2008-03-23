@@ -116,6 +116,8 @@
 					      :depends-on (widget))
 				       (:file "quickform"
 					      :depends-on (widget "dataform"))
+				       (:file "login"
+					      :depends-on (widget "quickform"))
 				       (:module datagrid
 					:components ((:file "datagrid"
 							    :depends-on ("filter" "sort" "select"
