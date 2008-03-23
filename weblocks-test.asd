@@ -107,6 +107,7 @@
 						:depends-on ("widget-test-utils"))
 				       (:file "dataform")
 				       (:file "quickform")
+				       (:file "login")
 				       (:file "flash")
 				       (:module datagrid
 						:components ((:file "datagrid")

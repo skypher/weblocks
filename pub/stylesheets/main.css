@@ -17,6 +17,11 @@ a
   _height: 0; /* IE specific hasLayout fix */
 }
 
+.view h1, .view fieldset h1
+{
+  background-color: #ecf8d7;
+}
+
 .view .extra-top-1
 {
   height: 7px;
