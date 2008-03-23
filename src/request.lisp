@@ -1,8 +1,11 @@
 
 (in-package :weblocks)
 
-(export '(refresh-request-p initial-request-p ajax-request-p
-	  pure-request-p))
+(export '(*json-content-type refresh-request-p initial-request-p
+	  ajax-request-p pure-request-p redirect))
+
+(defparameter *json-content-type* "application/json; charset=utf-8"
+  "A content type sent to the client to identify json data.")
 
 (defun refresh-request-p ()
   "Determines if a request is a result of the user invoking a browser
@@ -35,3 +38,14 @@ all other parameters. However, none of the callbacks (see
 etc."
   (string-equal (get-parameter "pure") "true"))
 
+(defun redirect (url)
+  "Sends a redirect response to the client. If 'redirect' is called on
+a regular request, sends appropriate HTTP headers. If it is called
+during an AJAX request, sends weblocks specific JSON interpreted as
+redirect on the client."
+  (if (ajax-request-p)
+      (progn
+	(setf (content-type) *json-content-type*)
+	(throw 'handler-done
+	  (format nil "{\"redirect\":\"~A\"}" url)))
+      (hunchentoot:redirect url)))

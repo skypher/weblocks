@@ -61,3 +61,18 @@
       (not (null (pure-request-p))))
   t)
 
+;;; test redirect
+(deftest redirect-1
+    (with-request :get nil
+      (catch 'handler-done
+	(redirect "/foo")
+	1))
+  nil)
+
+(deftest redirect-2
+    (with-request :get nil
+      (make-request-ajax)
+      (catch 'handler-done
+	(redirect "/foo")
+	1))
+  "{\"redirect\":\"/foo\"}")
