@@ -53,6 +53,14 @@ function onActionSuccess(transport) {
         json = transport.responseText.evalJSON(true);
     }
     
+    // See if there are redirects
+    var redirect = json['redirect'];
+    if(redirect)
+    {
+	window.location.href = redirect;
+	return;
+    }
+    
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {

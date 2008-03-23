@@ -4,6 +4,7 @@
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)
+  (:shadowing-import-from :weblocks #:redirect)
   (:shadow #:do-test #:do-tests #:continue-testing)
   (:export #:test-weblocks #:do-pending))
 

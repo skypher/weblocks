@@ -127,7 +127,7 @@ association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *on-ajax-complete-scripts*))
-  (setf (content-type) "application/json; charset=utf-8")
+  (setf (content-type) *json-content-type*)
   (format *weblocks-output-stream* "{\"widgets\":~A,\"on-load\":~A}"
 		(encode-json-alist-to-string
 		 (mapcar (lambda (w)
