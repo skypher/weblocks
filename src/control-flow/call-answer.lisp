@@ -71,7 +71,7 @@ continuation, recursively tries its parents."
     (unless parent
       (error "Attempted to replace widget ~S which has no parent!" widget))
     (unless place
-      (error "Widget ~S was not added to parent ~S properly - it cannot be found in parent."
+      (error "Widget ~S cannot be found in parent ~S."
 	     widget parent))
     (flet ((place-widget (value)
 	     (rplaca place value)
