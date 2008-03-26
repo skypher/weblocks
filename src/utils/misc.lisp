@@ -398,6 +398,6 @@ in 'class'."
   "Returns true if the object is a function designator."
   (or (functionp obj)
       (and (symbolp obj)
-	   (fboundp obj))
+	   (not (null (fboundp obj))))
       (typep obj 'funcallable-standard-object)))
 
