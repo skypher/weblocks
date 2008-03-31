@@ -5,6 +5,11 @@
   background: #d8eaf8 url(/pub/images/widget/menu/top_background.png) repeat-x;
 }
 
+.menu h1
+{
+  background: #d8eaf8;
+}
+
 .menu .extra-top-1
 {
   background: url(/pub/images/widget/menu/top_left.png) no-repeat top left;
