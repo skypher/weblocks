@@ -1,12 +1,23 @@
 
 (in-package :weblocks)
 
-(export '(start-weblocks stop-weblocks compute-public-files-path
-	  *public-files-path* server-type server-version))
+(export '(*last-session* start-weblocks stop-weblocks
+	  compute-public-files-path *public-files-path* server-type
+	  server-version active-sessions))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
   object. Otherwise, nil.")
+
+(defparameter *maintain-last-session* nil
+  "Determines whether *last-session* variable will be maintained at
+  each request. Note, this variable is automatically set to a
+  hunchentoot lock in debug mode and nil in release mode by
+  'start-weblocks'.")
+
+(defparameter *last-session* nil
+  "Bound to a session object associated with the last handled
+  request. Note, this variable is only updated in debug mode.")
 
 ;;; Tell hunchentoot to output in utf-8 and to try utf-8 on input by
 ;;; default (if no encoding information is provided by the client)
@@ -23,8 +34,10 @@
 client. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
   (if debug
-      (setf *render-debug-toolbar* t)
-      (setf *render-debug-toolbar* nil))
+      (setf *render-debug-toolbar* t
+	    *maintain-last-session* (hunchentoot-mp:make-lock "*maintain-last-session*"))
+      (setf *render-debug-toolbar* nil
+	    *maintain-last-session* nil))
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
@@ -40,6 +53,7 @@ stores declared via 'defstore'."
   "Stops weblocks. Closes all stores declared via 'defstore'."
   (if (not (null *weblocks-server*))
       (progn
+	(setf *last-session* nil)
 	(reset-sessions)
 	(stop-server *weblocks-server*)
 	(setf *weblocks-server* nil)))
@@ -84,4 +98,10 @@ rewriting in JavaScript code."
 
 (defun server-version ()
   hunchentoot::*hunchentoot-version*)
+
+(defun active-sessions ()
+  "Returns a list of currently active sessions."
+  (let (acc)
+    (do-sessions (s acc)
+      (push s acc))))
 
