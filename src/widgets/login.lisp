@@ -4,7 +4,8 @@
 (export '(do-login authenticatedp logout hash-password
 	  *default-login-title* *default-login-failure-error*
 	  *authentication-key* default-login-view email password login
-	  login-view login-on-login login-quickform))
+	  login-view login-on-login login-quickform authenticated-server-users
+	  anonymous-user-count print-user-stats))
 
 ;;; A wrapper function to quickly present a login dialog
 (defun/cc do-login (on-login &key (view 'default-login-view) (title *default-login-title*))
@@ -102,3 +103,23 @@ returned."
   (declare (ignore args))
   (render-widget (login-quickform obj)))
 
+(defun authenticated-server-users ()
+  "Returns authentication information found in each session on the
+server. Sessions without authentication information are ignored."
+  (remove nil
+	  (mapcar (lambda (session)
+		    (car (multiple-value-list (session-value *authentication-key* session))))
+		  (active-sessions))))
+
+(defun anonymous-user-count ()
+  "Returns the number of anonymous users on the server."
+  (- (length (active-sessions))
+     (length (authenticated-server-users))))
+
+(defun print-user-stats (&optional (stream t))
+  "Prints user statistics to an optionally specified stream. If the
+stream isn't specified, prints to standard output."
+  (format stream "Total Users On Server: ~A (Authenticated: ~A, Anonymous: ~A)~%" 
+	  (length (active-sessions))
+	  (length (authenticated-server-users))
+	  (anonymous-user-count)))
