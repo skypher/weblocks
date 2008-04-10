@@ -83,7 +83,7 @@ function onActionSuccess(transport) {
 }
 
 function onActionFailure() {
-    alert('Could not complete the request. This probably means your session has timed out. Please refresh the page and try again.');
+    alert('Oops, we could not complete your request because of an internal error.');
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
