@@ -23,7 +23,10 @@ page HTML (title, stylesheets, etc.)."
 	(combined-dependencies (append *application-public-dependencies*
 				       *page-public-dependencies*
 				       (when *render-debug-toolbar*
-					 (widget-public-dependencies-aux 'debug-toolbar)))))
+					 (widget-public-dependencies-aux 'debug-toolbar))
+				       (when *render-debug-toolbar*
+					 (public-files-relative-paths
+					  '(:script . "weblocks-debug"))))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
