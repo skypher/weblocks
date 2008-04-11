@@ -21,6 +21,7 @@
 <script src='/pub/scripts/shortcut.js' type='text/javascript'></script>~
 <script src='/pub/scripts/weblocks.js' type='text/javascript'></script>~
 <script src='/pub/scripts/dialog.js' type='text/javascript'></script>~
+~A~
 </head>~
 <body>~
 <div class='page-wrapper'>~
@@ -47,6 +48,9 @@
 			       "<link rel='stylesheet' type='text/css' href='/pub/stylesheets/~A.css' />" i)))
 	  (if render-debug-toolbar-p (format nil "~
 	       <link rel='stylesheet' type='text/css' href='/pub/stylesheets/debug-toolbar.css' />")
+	      "")
+	  (if render-debug-toolbar-p (format nil "~
+	       <script src='/pub/scripts/weblocks-debug.js' type='text/javascript'></script>")
 	      "")
 	  (format nil body)
 	  (if render-debug-toolbar-p (format nil "~
