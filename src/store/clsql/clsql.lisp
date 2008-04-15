@@ -59,7 +59,7 @@
 						  (symbol-name '#:-seq)))))
     (unless current-id
       ;; Create sequence if necessary
-      (unless (sequence-exists-p sequence-name :database store)
+      (unless (sequence-exists-p sequence-name :database store :owner :all)
 	(create-sequence sequence-name :database store))
       ;; Set the id to next sequence number
       (setf (object-id object)
