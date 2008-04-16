@@ -1,0 +1,65 @@
+2008-03-08  Evan Monroig  <evan.monroig@gmail.com>
+
+blog-v4
+	
+	* blog.asd (blog): add new file
+
+	* src/models.lisp (post-author-name, post-formatted-time): backend
+	functions
+
+	* src/layout.lisp (make-blog-widget): make a BLOG-WIDGET instead
+	of POST-WIDGET
+	(make-blog-widget): use new views for the post
+
+	* src/views.lisp (post-data-view): modify to display formatted
+	time, and user name instead of "User"
+	(post-short-view, post-full-view): new views for used the two
+	states POST-WIDGET
+
+	* src/widgets/post.lisp (post-widget): add ON-SELECT slot so that
+	BLOG-WIDGET can set a call-back
+	(post-action-select): return an action that selects POST-WIDGET
+	(render-widget-body): modify to add a link to see the full post
+	[and call the ON-SELECT function if defined]
+
+	* src/widgets/blog.lisp:
+	(blog-action-blog-mode, blog-make-post-widget, reset-blog)
+	(render-blog, initialize-instance, render-widget-body): new blog
+	widget
+
+	* src/specials.lisp (*blog-title*): blog title
+
+blog-v3
+	
+	* blog.asd (blog): updated for new files
+
+	* src/layout.lisp (make-blog-widget): create a composite widget
+	with a post widget and a link
+	(make-admin-page): add a link to MAKE-BLOG-WIDGET
+
+	* src/models.lisp (all-posts, post-by-id): backend functions
+
+	* src/widgets/post.lisp (post-widget): simple post widget
+	(render-widget-body): specialized method to render the post
+
+blog-v2
+	
+	* src/models.lisp (post-author-id, all-users): functions used by
+	the views
+
+	* src/views.lisp (post-form-view): override some fields - textarea
+	for the texts, and dropdown list for the author
+
+blog-v1:	
+	
+	* src/views.lisp (user-grid-view, user-data-view, user-form-view)
+	(post-grid-view, post-data-view, post-form-view): scaffolded views
+	for the gridedit interface
+
+	* src/init-session.lisp (init-user-session): call MAKE-ADMIN-PAGE
+
+	* src/layout.lisp (make-users-gridedit, make-posts-gridedit)
+	(make-admin-page): add simple gridedit interface for the two
+	models
+
+	* src/models.lisp (user, post): USER and POST models
