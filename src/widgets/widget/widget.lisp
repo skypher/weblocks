@@ -13,7 +13,7 @@
   "Generates a unique ID that can be used to identify a widget."
   (let ((new-widget-id (1+ (or (session-value 'last-widget-id) -1))))
     (setf (session-value 'last-widget-id) new-widget-id)
-    new-widget-id))
+    (format nil "~A" new-widget-id)))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
