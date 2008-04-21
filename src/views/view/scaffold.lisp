@@ -2,9 +2,10 @@
 (in-package :weblocks)
 
 (export '(scaffold scaffold-class-name scaffold-view-type
-	  scaffold-view-field-type generate-scaffold-view-field
-	  class-visible-slots class-visible-slots-impl
-	  inspect-typespec extract-view-property-from-type
+	  scaffold-view-field-type generate-scaffold-view
+	  generate-scaffold-view-field class-visible-slots
+	  class-visible-slots-impl inspect-typespec
+	  extract-view-property-from-type
 	  typespec->view-field-presentation))
 
 ;;; Scaffold class
@@ -46,12 +47,40 @@ symbol.")
 		  (symbol-name '#:-view-field))
      (symbol-package (class-name (class-of scaffold))))))
 
+(defmacro extract-view-property-from-type (property-name property-extraction-fn
+					   scaffold dsd)
+  "Helper macro to obtain view properties from typespecs."
+  (let ((extractedp (gensym))
+	(extraction (gensym)))
+    `(multiple-value-bind (,extractedp ,extraction)
+	 (multiple-value-call ,property-extraction-fn
+	   ,scaffold (inspect-typespec (slot-definition-type ,dsd)))
+       (when ,extractedp
+	 (list ,property-name ,extraction)))))
+
 ;;; Scaffold protocol
+(defgeneric generate-scaffold-view (scaffold-type object-class)
+  (:documentation "Generates and returns a scaffold view of a given
+scaffold type for a given object class. Scaffold views should examine
+the object class and provide a sensible default view for an object.")
+  (:method ((scaffold scaffold) object-class)
+    (make-instance (scaffold-view-type scaffold)
+		   :inherit-from nil
+		   :fields (mapcar
+			    (curry #'generate-scaffold-view-field scaffold object-class)
+			    (class-visible-slots object-class :readablep t)))))
+
 (defgeneric generate-scaffold-view-field (scaffold object-class direct-slot-definition)
   (:documentation "Generates a sensible view field from a direct slot
 definition. Specialize this function to generate different fields
 depending on a scaffold view type, object class, or slot
-definition."))
+definition.")
+  (:method ((scaffold scaffold) object-class dsd)
+    (apply #'make-instance (scaffold-view-field-type scaffold)
+	   :slot-name (slot-definition-name dsd)
+	   :label (humanize-name (slot-definition-name dsd))
+	   (extract-view-property-from-type :present-as #'typespec->view-field-presentation
+					    scaffold dsd))))
 
 ;;; Scaffold utilities
 (defun class-visible-slots (cls &key readablep writablep)
@@ -118,17 +147,6 @@ This function also implements certain useful logic. For example:
       (values typespec nil)))
 
 ;;; Type introspection protocol
-(defmacro extract-view-property-from-type (property-name property-extraction-fn
-					   scaffold dsd)
-  "Helper macro to obtain view properties from typespecs."
-  (let ((extractedp (gensym))
-	(extraction (gensym)))
-    `(multiple-value-bind (,extractedp ,extraction)
-	 (multiple-value-call ,property-extraction-fn
-	   ,scaffold (inspect-typespec (slot-definition-type ,dsd)))
-       (when ,extractedp
-	 (list ,property-name ,extraction)))))
-
 (defgeneric typespec->view-field-presentation (scaffold typespec args)
   (:documentation "Expects a scaffold type, a typespec and the
 typespec's arguments arguments (obtained via

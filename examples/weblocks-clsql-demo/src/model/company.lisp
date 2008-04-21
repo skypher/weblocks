@@ -27,8 +27,8 @@ available companies."
 	       :type boolean
 	       :accessor non-profit-p)))
 
-;;; Grid View
-(defview company-grid-view (:type grid :inherit-from '(:scaffold company))
+;;; Table View
+(defview company-table-view (:type table :inherit-from '(:scaffold company))
   (id :hidep t))
 
 ;;; Form View

@@ -16,11 +16,11 @@
 	    :accessor person-address
 	    :initarg :address)))
 
-;;; Grid View
-(defview person-grid-view (:type grid :inherit-from '(:scaffold person))
+;;; Table View
+(defview person-table-view (:type table :inherit-from '(:scaffold person))
   (id :hidep t)
   (address :type mixin
-	   :view '(grid address))
+	   :view '(table address))
   (street :hidep t)
   (city :hidep t))
 

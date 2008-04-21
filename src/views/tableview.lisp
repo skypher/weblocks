@@ -1,33 +1,21 @@
 
 (in-package :weblocks)
 
-(export '(*render-empty-sequence-string* table table-view
-	  table-view-default-summary table-view-empty-message
+(export '(table table-view table-scaffold table-view-default-summary
 	  table-view-header-row-prefix-fn
-	  table-view-header-row-suffix-fn table-view-row-prefix-fn
-	  table-view-row-suffix-fn table-view-field
+	  table-view-header-row-suffix-fn table-view-field
 	  with-table-view-header with-table-view-header-row
 	  render-table-view-header-row render-view-field-header
 	  render-view-field-header-value with-table-view-body-row
 	  render-table-view-body-row))
 
-;;; Some parameters
-(defparameter *render-empty-sequence-string* "No information available."
-  "The default string used by the table view to signify that there is
-no information available.")
-
 ;;; Table view
-(defclass table-view (view)
+(defclass table-view (sequence-view)
   ((default-summary :initform nil
                     :initarg :summary
                     :accessor table-view-default-summary
                     :documentation "A summary string to be used for
 	            the table if no :summary keyword is provided.")
-   (empty-message :initform *render-empty-sequence-string*
-		  :initarg :empty-message
-		  :accessor table-view-empty-message
-		  :documentation "See
-		  *render-empty-sequence-string*.")
    (header-row-prefix-fn :initform nil
 			 :initarg :header-row-prefix-fn
 			 :accessor table-view-header-row-prefix-fn
@@ -43,29 +31,23 @@ no information available.")
 	                 rendering the header row. The function should
 	                 expect the view object, the object being
 	                 rendered, and any additional arguments passed
-	                 to the view.")
-   (row-prefix-fn :initform nil
-		  :initarg :row-prefix-fn
-		  :accessor table-view-row-prefix-fn
-		  :documentation "A function called prior to rendering
-	          each table row. The function should expect the view
-	          object, the object being rendered, and any
-	          additional arguments passed to the view.")
-   (row-suffix-fn :initform nil
-		  :initarg :row-suffix-fn
-		  :accessor table-view-row-suffix-fn
-		  :documentation "A function called after rendering
-	          each table row. The function should expect the view
-	          object, the object being rendered, and any
-	          additional arguments passed to the view."))
+	                 to the view."))
   (:documentation "A view designed to present sequences of object in a
   table to the user."))
 
 ;;; Table view field
-(defclass table-view-field (inline-view-field)
+(defclass table-view-field (sequence-view-field)
   ((presentation :initform (make-instance 'text-presentation)))
   (:documentation "A field class representing a column in the table
   view."))
+
+;;; Make scaffolding system happy
+(defclass table-scaffold (sequence-scaffold)
+  ())
+
+;;; Mixins...
+(defmethod view-default-field-type ((view-type (eql 'table)) (field-type (eql 'mixin)))
+  'mixin-sequence)
 
 ;; Table heading
 (defmethod with-view-header ((view table-view) obj widget body-fn &rest args &key
@@ -75,7 +57,7 @@ no information available.")
   (let* ((object-name (object-class-name (car obj)))
 	 (header-class (format nil "view table ~A"
 			       (if (eql object-name 'null)
-				   "empty-table"
+				   "empty"
 				   (attributize-name object-name)))))
     (with-html
       (:div :class header-class
@@ -151,11 +133,11 @@ rendering.")
    "Used by table view to render body rows. Specialize this function
 to modify HTML around a given row's cells.")
   (:method ((view table-view) obj widget &rest args &key alternp &allow-other-keys)
-    (safe-apply (table-view-row-prefix-fn view) view obj args)
+    (safe-apply (sequence-view-row-prefix-fn view) view obj args)
     (with-html
       (:tr :class (if alternp "altern" nil)
 	   (apply #'render-table-view-body-row view obj widget args)))
-    (safe-apply (table-view-row-suffix-fn view) view obj args)))
+    (safe-apply (sequence-view-row-suffix-fn view) view obj args)))
 
 (defgeneric render-table-view-body-row (view obj widget &rest args)
   (:documentation
@@ -207,12 +189,3 @@ details.")
 		  args))
 	 args))
 
-(defmethod render-object-view-impl ((obj null) (view table-view) widget &rest args)
-  (apply #'with-view-header view obj widget
-	 (lambda (view obj &rest args)
-	   (declare (ignore obj args))
-	   (with-html
-	     (:p (if (view-caption view)
-		     (htm (:span :class "caption" (str (view-caption view)) ":&nbsp;")))
-		 (:span :class "message" (str (table-view-empty-message view))))))
-	 args))

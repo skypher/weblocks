@@ -37,15 +37,23 @@
 		      :foreign-key id
 		      :set nil))))
 
-;;; Grid View
-(defview employee-grid-view (:type grid :inherit-from '(:scaffold employee))
+;;; Table View
+(defview employee-table-view (:type table :inherit-from '(:scaffold employee))
   (id :hidep t)
   (address-id :hidep t)
   (address :type mixin
-	   :view 'address-grid-view)
+	   :view 'address-table-view)
   (company-id :hidep t)
   (company :reader (compose #'company-name #'employee-company)
 	   :order-by '(company name)))
+
+;;; Data view
+(defview employee-data-view (:type data :inherit-from '(:scaffold employee))
+  (id :hidep t)
+  (address :type mixin
+	   :view 'address-data-view)
+  (company-id :hidep t)
+  (company :reader (compose #'company-name #'employee-company)))
 
 ;;; Form View
 (defview employee-form-view (:type form :inherit-from '(:scaffold employee))

@@ -9,8 +9,8 @@
    (contract :accessor employee-contract
 	     :initarg :contract)))
 
-;;; Grid View
-(defview employee-grid-view (:type grid :inherit-from 'person-grid-view)
+;;; Table View
+(defview employee-table-view (:type table :inherit-from 'person-table-view)
   (company :reader (compose #'company-name #'employee-company)))
 
 ;;; Data View

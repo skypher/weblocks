@@ -1,0 +1,75 @@
+
+/* Body */
+.dataseq form.dataseq-form fieldset
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dataseq form.dataseq-form
+{
+  margin: 0;
+  padding: 0;
+}
+
+.dataseq form.dataseq-form
+{
+  margin-bottom: 1em;
+}
+
+/* Mining Bar */
+.dataseq .data-mining-bar
+{
+  position: relative;
+  margin-bottom: 0.25em;
+  height: 1em;
+}
+
+.dataseq > .data-mining-bar
+{
+  height: auto;
+  min-height: 1em;
+}
+
+.dataseq .data-mining-bar .total-items
+{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+/* Operations */
+.dataseq form .operations
+{
+  position: absolute;
+  right: 0;
+  margin-top: 0.25em;
+}
+
+.dataseq form.operations-form .operations input.submit,
+.dataseq form.dataseq-form .operations input.submit
+{
+  margin-left: 0.5em;
+}
+
+.dataseq form.operations-form,
+.dataseq form.operations-form fieldset
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Datagrid specific pagination styles */
+.dataseq div.pagination
+{
+  margin-top: -1em;
+}
+
+.dataseq div.pagination,
+.dataseq div.pagination form fieldset input
+{
+  font-size: x-small;
+}
+

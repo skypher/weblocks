@@ -40,10 +40,10 @@ single GRIDEDIT widget."
   (make-instance 'composite :widgets
 		 (list
 		  (make-instance 'gridedit
-				 :name 'employees-grid
-				 :data-class 'employee
-				 :view 'employee-grid-view
-				 :item-form-view 'employee-form-view))))
+				 :name 'employees-list
+				 :view 'employee-table-view
+				 :item-form-view 'employee-form-view
+				 :data-class 'employee))))
 
 (defun make-companies-page ()
   "Lays out the widgets for the companies page. It consists of a
@@ -53,6 +53,6 @@ single GRIDEDIT widget."
 		  (make-instance 'gridedit
 				 :name 'companies-grid
 				 :data-class 'company
-				 :view 'company-grid-view
+				 :view 'company-table-view
 				 :item-form-view 'company-form-view))))
 

@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(data data-view data-view-field
+(export '(data data-view data-view-field data-scaffold
 	  text-presentation highlight-regex-matches))
 
 ;;; Data view
@@ -13,6 +13,10 @@
 (defclass data-view-field (inline-view-field)
   ((presentation :initform (make-instance 'text-presentation)))
   (:documentation "A field class of the data view."))
+
+;;; Make scaffolding system happy
+(defclass data-scaffold (scaffold)
+  ())
 
 ;;; Presentation
 (defclass text-presentation ()

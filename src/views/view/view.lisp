@@ -9,9 +9,9 @@
 	  view-field-presentation mixin mixin-view-field
 	  mixin-view-field-view mixin-view-field-init-form
 	  with-view-header render-view-field render-view-field-value
-	  print-view-field-value generate-scaffold-view
-	  entity-class-name view-class-name view-default-field-type
-	  view-field-class-name presentation-class-name))
+	  print-view-field-value entity-class-name view-class-name
+	  view-default-field-type view-field-class-name
+	  presentation-class-name))
 
 ;;; Compiled views
 (defparameter *views* (make-hash-table)
@@ -159,11 +159,6 @@ Specialize this function to change the way a value is printed in
 views."))
 
 ;;; Declarative view definition protocol
-(defgeneric generate-scaffold-view (scaffold-type object-class)
-  (:documentation "Generates and returns a scaffold view of a given
-scaffold type for a given object class. Scaffold views should examine
-the object class and provide a sensible default view for an object."))
-
 (defun entity-class-name (entity-type suffix)
   "A helper function that generates a class name from an entity name
 and a suffix."

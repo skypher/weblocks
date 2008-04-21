@@ -55,7 +55,7 @@
        (gridedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :view (defview () (:type grid :inherit-from '(:scaffold employee))
+		       :view (defview () (:type table :inherit-from '(:scaffold employee))
 			       (name :label "Foo"))
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
@@ -151,7 +151,7 @@
        (gridedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
-		       :view (defview () (:type grid :inherit-from '(:scaffold employee))
+		       :view (defview () (:type table :inherit-from '(:scaffold employee))
 				 (name :label "Foo"))
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
@@ -185,7 +185,7 @@
 					   :allow-pagination-p nil)))
 	(weblocks::gridedit-add-item grid *bob*)
 	(weblocks::gridedit-add-item grid *employee1*)
-	(length (datagrid-data grid))))
+	(length (dataseq-data grid))))
   3)
 
 ;;; testing gridedit-delete-items
@@ -199,7 +199,7 @@
 	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*)))))
 	(do-request `(("yes" . "Yes")
 		      (,weblocks::*action-string* . "abc123")))
-	(mapcar #'first-name (datagrid-data grid))))
+	(mapcar #'first-name (dataseq-data grid))))
   ("Bob"))
 
 (deftest gridedit-delete-items-2
@@ -213,7 +213,7 @@
 						      (format nil "~A" (object-id *bob*)))))
 	(do-request `(("yes" . "Yes")
 		      (,weblocks::*action-string* . "abc123")))
-	(mapcar #'first-name (datagrid-data grid))))
+	(mapcar #'first-name (dataseq-data grid))))
   nil)
 
 (deftest gridedit-delete-items-3
@@ -231,7 +231,7 @@
   t)
 
 ;;; testing render-widget-body for gridedit
-(defclass rwbg-1-dummy-field (grid-view-field)
+(defclass rwbg-1-dummy-field (table-view-field)
   ((weblocks::label :initform "Test")
    (weblocks::reader :initform nil)
    (weblocks::allow-sorting-p :initform nil)))
@@ -269,7 +269,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -290,7 +290,7 @@
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -310,7 +310,7 @@
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -370,7 +370,7 @@
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -394,7 +394,7 @@
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -435,7 +435,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -454,7 +454,7 @@
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -477,7 +477,7 @@
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc129\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -486,7 +486,7 @@
     (:div :class "extra-top-3" "<!-- empty -->")
     (:fieldset
      (:div :class "datagrid-body"
-	   (:div :class "view table empty-table"
+	   (:div :class "view table empty"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
@@ -494,7 +494,7 @@
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);"))
      (:input :name "action" :type "hidden" :value "abc129"))
@@ -533,7 +533,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -559,7 +559,7 @@
 		 (:td :class "drilldown edit"
 		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Edit"))))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -579,7 +579,7 @@
 		 :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc131\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -645,7 +645,7 @@
 		(:div :class "extra-bottom-2" "<!-- empty -->")
 		(:div :class "extra-bottom-3" "<!-- empty -->")))
     (:form
-     :class "datagrid-form"
+     :class "dataseq-form"
      :action "/foo/bar"
      :method "get"
      :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -671,7 +671,7 @@
 		  (:td :class "drilldown edit"
 		   (:noscript (:div (:a :href "/foo/bar?action=abc141" "Edit"))))))
 	       :summary "Ordered by name, ascending."))
-      (:div :class "item-operations"
+      (:div :class "operations"
 	    (:input :name "add" :type "submit" :class "submit" :value "Add"
 							       :onclick "disableIrrelevantButtons(this);")
 	    (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -710,7 +710,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -736,7 +736,7 @@
 		 (:td :class "drilldown edit"
 		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Edit"))))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -756,7 +756,7 @@
 		 :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc131\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -808,7 +808,7 @@
 		 :onclick "initiateAction(\"abc138\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
     (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
     (:form
-     :class "datagrid-form"
+     :class "dataseq-form"
      :action "/foo/bar"
      :method "get"
      :onsubmit "initiateFormAction(\"abc139\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -834,7 +834,7 @@
 		  (:td :class "drilldown edit"
 		   (:noscript (:div (:a :href "/foo/bar?action=abc142" "Edit"))))))
 	       :summary "Ordered by name, ascending."))
-      (:div :class "item-operations"
+      (:div :class "operations"
 	    (:input :name "add" :type "submit" :class "submit" :value "Add"
 							       :onclick "disableIrrelevantButtons(this);")
 	    (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -867,7 +867,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -892,7 +892,7 @@
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown edit" "")))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -909,12 +909,12 @@
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
 					   :show-total-items-count-p nil
-					   :view (defview () (:type grid
+					   :view (defview () (:type table
 								    :inherit-from '(:scaffold employee))
 						   (test :allow-sorting-p nil
 							 :reader nil)))))
 	;; set items per page
-	(setf (pagination-items-per-page (datagrid-pagination-widget grid)) 1)
+	(setf (pagination-items-per-page (dataseq-pagination-widget grid)) 1)
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Add"
@@ -933,7 +933,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -954,7 +954,7 @@
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -976,7 +976,7 @@
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -1051,7 +1051,7 @@
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -1072,7 +1072,7 @@
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -1092,7 +1092,7 @@
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -1152,7 +1152,7 @@
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:form
-    :class "datagrid-form"
+    :class "dataseq-form"
     :action "/foo/bar"
     :method "get"
     :onsubmit "initiateFormAction(\"abc136\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
@@ -1176,7 +1176,7 @@
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
-     (:div :class "item-operations"
+     (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
 		   :onclick "disableIrrelevantButtons(this);")
 	   (:input :name "delete" :type "submit" :class "submit" :value "Delete"
@@ -1187,7 +1187,7 @@
     (:div :class "extra-bottom-3" "<!-- empty -->"))))
 
 ;;; testing render-item-ops-bar for gridedit
-(deftest-html gridedit-render-item-ops-bar-1
+(deftest-html dataseq-render-operations-gridedit-1
     (with-request :get nil
       (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'gridedit
@@ -1195,14 +1195,14 @@
 	(let ((*weblocks-output-stream* (make-string-output-stream)))
 	  (declare (special *weblocks-output-stream*))
 	  (render-widget-body grid))
-	(datagrid-render-item-ops-bar grid)))
-  (:div :class "item-operations"
+	(dataseq-render-operations grid)))
+  (:div :class "operations"
 	(:input :name "add" :type "submit" :class "submit" :value "Add"
 		:onclick "disableIrrelevantButtons(this);")
 	(:input :name "delete" :type "submit" :class "submit" :value "Delete"
 		:onclick "disableIrrelevantButtons(this);")))
 
-(deftest-html gridedit-render-item-ops-bar-2
+(deftest-html dataseq-render-operations-gridedit-2
     (with-request :get nil
       (persist-object *default-store* *joe*)
       (let ((grid (make-instance 'gridedit
@@ -1211,8 +1211,8 @@
 	(let ((*weblocks-output-stream* (make-string-output-stream)))
 	  (declare (special *weblocks-output-stream*))
 	  (render-widget-body grid))
-	(datagrid-render-item-ops-bar grid)))
-  (:div :class "item-operations"
+	(dataseq-render-operations grid)))
+  (:div :class "operations"
 	(:input :name "add" :type "submit" :class "submit" :value "Add"
 		:onclick "disableIrrelevantButtons(this);")))
 

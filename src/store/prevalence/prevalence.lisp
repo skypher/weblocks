@@ -23,12 +23,6 @@
 (defmethod clean-store ((store prevalence-system))
   (totally-destroy store))
 
-;;;;;;;;;;;;;;;;;;;
-;;; Information ;;;
-;;;;;;;;;;;;;;;;;;;
-(defmethod supports-filter-p ((store prevalence-system))
-  t)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -110,13 +104,11 @@
       obj)))
 
 (defmethod find-persistent-objects ((store prevalence-system) class-name
-				    &key filter filter-view order-by range)
+				    &key order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
-    (filter-objects-in-memory
-     (query store 'tx-find-persistent-objects-prevalence
-			  class-name)
-     filter filter-view)
+    (query store 'tx-find-persistent-objects-prevalence
+	   class-name)
     order-by)
    range))
 
@@ -128,8 +120,6 @@
 	 collect i))))
 
 (defmethod count-persistent-objects ((store prevalence-system) class-name
-				     &key filter filter-view)
-  (length (find-persistent-objects store class-name
-				   :filter filter
-				   :filter-view filter-view)))
+				     &key &allow-other-keys)
+  (length (find-persistent-objects store class-name)))
 

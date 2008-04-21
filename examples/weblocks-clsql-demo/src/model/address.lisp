@@ -17,13 +17,14 @@
 	  :accessor address-state
 	  :type string)))
 
-;;; Grid View
-(defview address-grid-view (:type grid :inherit-from '(:scaffold address))
+;;; Table View
+(defview address-table-view (:type table :inherit-from '(:scaffold address))
   (id :hidep t))
 
 ;;; Data View
-(defview address-data-view (:inherit-from '(:scaffold address))
-  (id :hidep t))
+(defview address-data-view (:type data :inherit-from '(:scaffold address))
+  (id :hidep t)
+  (address-id :hidep t))
 
 ;;; Form View
 (defview address-form-view (:type form :inherit-from '(:scaffold address))

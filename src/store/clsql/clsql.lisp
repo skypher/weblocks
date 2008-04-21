@@ -26,12 +26,6 @@
   (dolist (table (list-tables :database store))
     (delete-records :from table :database store)))
 
-;;;;;;;;;;;;;;;;;;;
-;;; Information ;;;
-;;;;;;;;;;;;;;;;;;;
-(defmethod supports-filter-p ((store database))
-  nil)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -161,9 +155,7 @@ instances of 'class-name' and order them with 'order-by'."
   #.(restore-sql-reader-syntax-state))
 
 (defmethod find-persistent-objects ((store database) class-name &key
-				    filter filter-view order-by range
-				    where &allow-other-keys)
-  (declare (ignore filter filter-view))
+				    order-by range where &allow-other-keys)
   (let ((order-by-join (class-order-by-join-where class-name order-by)))
     (select class-name
 	    :order-by (order-by-expression class-name order-by)
@@ -175,9 +167,8 @@ instances of 'class-name' and order them with 'order-by'."
 	    :flatp t :caching nil :database store)))
 
 (defmethod count-persistent-objects ((store database) class-name
-				     &key filter filter-view where
+				     &key where
 				     &allow-other-keys)
-  (declare (ignore filter filter-view))
   (let (count)
     #.(locally-enable-sql-reader-syntax) 
     (setf count (car (select [count [*]]

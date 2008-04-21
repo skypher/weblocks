@@ -43,7 +43,7 @@ single GRIDEDIT widget."
 				 :name 'employees-grid
 				 :drilldown-type :view
 				 :data-class 'employee
-				 :view 'employee-grid-view
+				 :view 'employee-table-view
 				 :item-data-view 'employee-data-view
 				 :item-form-view 'employee-form-view))))
 
@@ -55,6 +55,6 @@ single GRIDEDIT widget."
 		  (make-instance 'gridedit
 				 :name 'companies-grid
 				 :data-class 'company
-				 :view 'company-grid-view
+				 :view 'company-table-view
 				 :item-form-view 'company-form-view))))
 

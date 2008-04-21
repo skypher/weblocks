@@ -196,33 +196,6 @@ returned."
 				       :order-by (cons 'slot-2 :desc))))
   ((5 6) (7 4) (9 2)))
 
-(deftest-store find-persistent-objects-4
-    (if (supports-filter-p *default-store*)
-	(flet ((view-object (obj)
-		 (list (p-1-s-1 obj)
-		       (p-1-s-2 obj))))
-	  (persist-objects *default-store* (make-find-persistent-objects-test-fixtures))
-	  (mapcar #'view-object
-		  (find-persistent-objects *default-store* 'persistent-1
-					   :filter "1"
-					   :order-by (cons 'slot-2 :asc))))
-	'((11 0) (1 10)))
-  ((11 0) (1 10)))
-
-(deftest-store find-persistent-objects-5
-    (if (supports-filter-p *default-store*)
-	(flet ((view-object (obj)
-		 (list (p-1-s-1 obj)
-		       (p-1-s-2 obj))))
-	  (persist-objects *default-store* (make-find-persistent-objects-test-fixtures))
-	  (mapcar #'view-object
-		  (find-persistent-objects *default-store* 'persistent-1
-					   :filter "1"
-					   :order-by (cons 'slot-2 :asc)
-					   :range (cons 0 1))))
-	'((11 0)))
-  ((11 0)))
-
 ;;; test count-persistent-objects
 (deftest-store count-persistent-objects-1
     (progn

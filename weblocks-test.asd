@@ -64,8 +64,7 @@
 				       (:module dataview
 						:components ((:file "test-template")
 							     (:file "dataview"
-								    :depends-on ("test-template"))
-							     (:file "scaffold")))
+								    :depends-on ("test-template"))))
 				       (:module formview
 						:components ((:file "test-template")
 							     (:file "formview"
@@ -79,9 +78,10 @@
 				       (:module tableview
 						:components ((:file "test-template")
 							     (:file "tableview"
-								    :depends-on ("test-template"))
-							     (:file "scaffold"))
+								    :depends-on ("test-template")))
 						:depends-on (dataview))
+				       (:file "sequence-view"
+					      :depends-on (view))
 				       (:module types
 						:components ((:file "boolean")
 							     (:file "member")
@@ -109,9 +109,11 @@
 				       (:file "quickform")
 				       (:file "login")
 				       (:file "flash")
+				       (:file "datalist")
+				       (:module dataseq
+						:components ((:file "dataseq")))
 				       (:module datagrid
 						:components ((:file "datagrid")
-							     (:file "filter")
 							     (:file "sort")
 							     (:file "select")
 							     (:file "drilldown"))

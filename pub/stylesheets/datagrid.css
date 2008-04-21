@@ -1,5 +1,4 @@
 @import url(/pub/stylesheets/table.css);
-@import url(/pub/stylesheets/isearch.css);
 
 /* Body */
 .datagrid
@@ -7,19 +6,6 @@
   margin-bottom: 1em;
   position: relative;
   _height: 1%; /* IE 6 fix */
-}
-
-.datagrid form.datagrid-form fieldset
-{
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-
-.datagrid form.datagrid-form
-{
-  margin: 0;
-  padding: 0;
 }
 
 /* Sorting */
@@ -49,65 +35,6 @@
 {
   display: block;
   text-decoration: underline;
-}
-
-/* Filter */
-.datagrid-search-bar .extra-top-1, .datagrid-search-bar .extra-top-2,
-.datagrid-search-bar .extra-top-3, .datagrid-search-bar .extra-bottom-1,
-.datagrid-search-bar .extra-bottom-2, .datagrid-search-bar .extra-bottom-3,
-.datagrid-search-bar span.title
-{
-  display: none;
-}
-
-.datagrid .data-mining-bar
-{
-  position: relative;
-  margin-bottom: 0.25em;
-  text-align: right;
-  height: 1em;
-}
-
-.datagrid > .data-mining-bar
-{
-  height: auto;
-  min-height: 1em;
-}
-
-.datagrid-search-bar form, .datagrid-search-bar form fieldset
-{
-  display: inline;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.datagrid-search-bar form fieldset
-{
-  padding-left: 18px;
-  background: url(/pub/images/widget/datagrid/isearch.png) left bottom no-repeat;
-  vertical-align: bottom;
-}
-
-.datagrid-search-bar form fieldset input.search-bar
-{
-  margin: 0;
-}
-
-.datagrid-search-bar form fieldset input.submit
-{
-  margin: 0;
-  margin-left: 0.5em;
-}
-
-.datagrid-search-bar span.total-items
-{
-  margin: 0;
-  padding: 0;
-  padding-right: 0.5em;
-  display: -moz-inline-box;
-  display: inline-block;
-  vertical-align: bottom;
 }
 
 /* Selecting */
@@ -149,36 +76,6 @@ operations */
 .datagrid .datagrid-body .view.table
 {
   margin-bottom: 0;
-}
-
-.datagrid form.datagrid-form
-{
-  margin-bottom: 1em;
-}
-
-/* Operations */
-div.item-operations
-{
-  position: absolute;
-  right: 0;
-  margin-top: 0.25em;
-}
-
-div.item-operations input.submit
-{
-  margin-left: 0.5em;
-}
-
-/* Datagrid specific pagination styles */
-.datagrid div.pagination
-{
-  margin-top: -1em;
-}
-
-.datagrid div.pagination,
-.datagrid div.pagination form fieldset input
-{
-  font-size: x-small;
 }
 
 /* Flash */

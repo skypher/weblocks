@@ -19,6 +19,10 @@
     (singularize "carcasses")
   "carcass")
 
+(deftest singularize-3
+    (singularize "companies")
+  "company")
+
 ;;; test proper-number-form
 (deftest proper-number-form-1
     (proper-number-form 1 "item")
@@ -27,6 +31,10 @@
 (deftest proper-number-form-2
     (proper-number-form 2 "item")
   "items")
+
+(deftest proper-number-form-3
+    (proper-number-form 2 "company")
+  "companies")
 
 ;;; test vowelp
 (deftest vowelp-1
