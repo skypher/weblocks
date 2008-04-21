@@ -95,9 +95,10 @@ documentation for more details.")
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
-;;; We need to set up the value of datagrid-on-drilldown
+;;; We need to set up the value of dataseq-on-drilldown
 (defmethod initialize-instance :after ((obj gridedit) &rest initargs &key &allow-other-keys)
-  (setf (datagrid-on-drilldown obj)
+  (declare (ignore initargs))
+  (setf (dataseq-on-drilldown obj)
 	(cons 'edit #'gridedit-drilldown-action)))
 
 (defun gridedit-reset-state (grid)
@@ -106,13 +107,15 @@ documentation for more details.")
 in order to reset the state after the widget has done its job."
   (setf (gridedit-ui-state grid) nil)
   (setf (gridedit-item-widget grid) nil)
-  (setf (datagrid-drilled-down-item grid) nil))
+  (setf (dataseq-drilled-down-item grid) nil))
 
-(defmethod datagrid-render-item-ops-bar ((grid gridedit) &rest args)
+(defmethod dataseq-render-operations ((grid gridedit) &rest args)
+  (declare (ignore args))
   (when (null (gridedit-ui-state grid))
     (call-next-method)))
 
-(defmethod datagrid-render-pagination-widget ((grid gridedit) &rest args)
+(defmethod dataseq-render-pagination-widget ((grid gridedit) &rest args)
+  (declare (ignore args))
   (when (null (gridedit-ui-state grid))
     (call-next-method)))
 
@@ -128,8 +131,8 @@ grid."))
 
 (defmethod gridedit-create-new-item-widget ((grid gridedit))
   (make-instance 'dataform
-		 :data (make-instance (datagrid-data-class grid))
-		 :class-store (datagrid-class-store grid)
+		 :data (make-instance (dataseq-data-class grid))
+		 :class-store (dataseq-class-store grid)
 		 :ui-state :form
 		 :on-cancel (lambda (obj)
 			      (declare (ignore obj))
@@ -156,13 +159,13 @@ value of 'gridedit-drilldown-type' and create its widget accordingly."))
 (defmethod gridedit-create-drilldown-widget ((grid gridedit) item)
   (make-instance 'dataform
 		 :data item
-		 :class-store (datagrid-class-store grid)
+		 :class-store (dataseq-class-store grid)
 		 :ui-state (if (eql (gridedit-drilldown-type grid) :edit)
 			       :form
 			       :data)
 		 :on-success (lambda (obj)
 			       (declare (ignore obj))
-			       (flash-message (datagrid-flash grid) "Item Modified.")
+			       (flash-message (dataseq-flash grid) "Item Modified.")
 			       (if (eql (gridedit-drilldown-type grid) :edit)
 				   (gridedit-reset-state grid)
 				   (mark-dirty grid)))
@@ -187,7 +190,7 @@ standard behavior for adding items to a sequence."))
   (when (gridedit-on-add-item grid)
     (funcall (gridedit-on-add-item grid) grid item))
   ; dataform persists this item for us, no need to do it again
-  (flash-message (datagrid-flash grid) "Item added."))
+  (flash-message (dataseq-flash grid) "Item added."))
 
 ;;; This file needs to be loaded with CMU because CMUCL doesn't
 ;;; compile it properly. Bytecompiler, however, works.
@@ -216,13 +219,13 @@ item - the integer id of the object to be deleted.")
 			     (mixin-obj (obtain-view-field-value field obj)))
 			(delete-mixin-objects (mixin-view-field-view field) mixin-obj)))
 		    view obj)
-		   (delete-persistent-object (datagrid-class-store grid) obj)))
-	  (delete-mixin-objects (datagrid-view grid)
-				(find-persistent-object-by-id (datagrid-class-store grid)
-							      (datagrid-data-class grid)
+		   (delete-persistent-object (dataseq-class-store grid) obj)))
+	  (delete-mixin-objects (dataseq-view grid)
+				(find-persistent-object-by-id (dataseq-class-store grid)
+							      (dataseq-data-class grid)
 							      item-id)))
-	(delete-persistent-object-by-id (datagrid-class-store grid)
-					(datagrid-data-class grid)
+	(delete-persistent-object-by-id (dataseq-class-store grid)
+					(dataseq-data-class grid)
 					item-id))))
 
 #|
@@ -246,28 +249,33 @@ attempts to drill down on a given item."
 	(gridedit-create-drilldown-widget grid item))
   (setf (gridedit-ui-state grid) :drilldown))
 
+;;; Updating operations
+(defun gridedit-update-operations (obj)
+  (setf (dataseq-item-ops obj)
+	(remove 'delete (dataseq-item-ops obj)
+		:key #'car :test #'string-equal))
+  (setf (dataseq-common-ops obj)
+	(remove 'add (dataseq-item-ops obj)
+		:key #'car :test #'string-equal))
+  (when (and (gridedit-allow-delete-p obj)
+	     (> (dataseq-data-count obj) 0)
+	     (dataseq-allow-select-p obj))
+    (pushnew (cons 'delete #'gridedit-delete-items)
+	     (dataseq-item-ops obj)
+	     :key #'car))
+  (when (gridedit-allow-add-p obj)
+    (pushnew `(add . ,(lambda (&rest args)
+			      (declare (ignore args))
+			      (setf (gridedit-item-widget obj) (gridedit-create-new-item-widget obj))
+			      (setf (gridedit-ui-state obj) :add)))
+	     (dataseq-common-ops obj)
+	     :key #'car)))
+
 ;;; Renders the body of the gridedit. Essentially, just calls
 ;;; datagrid's render method, except that proper controls (add item,
 ;;; delete item, etc.) are added or removed depending on the settings
 (defmethod render-widget-body ((obj gridedit) &rest args)
-  (setf (datagrid-item-ops obj)
-	(remove-if (lambda (i)
-		     (or (string-equal i 'add)
-			 (string-equal i 'delete)))
-		   (datagrid-item-ops obj)
-		   :key #'car))
-  (when (and (gridedit-allow-delete-p obj)
-	     (> (datagrid-data-count obj :totalp t) 0)
-	     (datagrid-allow-select-p obj))
-    (pushnew (cons 'delete #'gridedit-delete-items)
-	     (datagrid-item-ops obj)
-	     :key #'car))
-  (when (gridedit-allow-add-p obj)
-    (pushnew `(add . ,(lambda (&rest args)
-			      (setf (gridedit-item-widget obj) (gridedit-create-new-item-widget obj))
-			      (setf (gridedit-ui-state obj) :add)))
-	     (datagrid-item-ops obj)
-	     :key #'car))
+  (gridedit-update-operations obj)
   (apply #'call-next-method obj args)
   (case (gridedit-ui-state obj)
     (:add (render-widget (gridedit-item-widget obj)))

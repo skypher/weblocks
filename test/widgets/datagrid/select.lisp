@@ -16,63 +16,10 @@
       (:a :href "/foo/bar?action=abc124"
 	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
 
-;;; test datagrid-item-selected-p
-(deftest datagrid-item-selected-p-1
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . (1 2 3)))))
-	(not (null (datagrid-item-selected-p grid 1)))))
-  t)
-
-(deftest datagrid-item-selected-p-2
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . (1 2 3)))))
-	(not (null (datagrid-item-selected-p grid 4)))))
-  nil)
-
-;;; test datagrid-select-item
-(deftest datagrid-select-item-1
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . ()))))
-	(datagrid-select-item grid 2)
-	(not (null (datagrid-item-selected-p grid 2)))))
-  t)
-
-;;; test datagrid-clear-selection
-(deftest datagrid-clear-selection-1
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . (1 2 3)))))
-	(datagrid-clear-selection grid)
-	(not (null (datagrid-item-selected-p grid 2)))))
-  nil)
-
-;;; test datagrid-selection-empty-p
-(deftest datagrid-selection-empty-p-1
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee
-				 :selection '(:none . (1 2 3)))))
-	(datagrid-selection-empty-p grid)))
-  nil)
-
-(deftest datagrid-selection-empty-p-2
-    (with-request :get nil
-      (let ((grid (make-instance 'datagrid
-				 :data-class 'employee)))
-	(datagrid-selection-empty-p grid)))
-  t)
-
 ;;; test datagrid-render-view-field-select
 (deftest-html datagrid-render-view-field-select-1
     (with-request :get nil
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :view view
 				  :sort '(name . :asc)))
@@ -85,7 +32,7 @@
 
 (deftest-html datagrid-render-view-field-select-2
     (with-request :get nil
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :selection '(:none . (1))
 				  :view view
@@ -100,7 +47,7 @@
 ;;; test datagrid-render-view-field-header-select-1
 (deftest-html datagrid-render-view-field-header-select-1
     (with-request :get nil
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :selection '(:none . (1))
 				  :view view
@@ -125,28 +72,27 @@
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; select all
-	(do-request `((,weblocks::*action-string* . "abc124")))
+	(do-request `((,weblocks::*action-string* . "abc123")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; select none
-	(do-request `((,weblocks::*action-string* . "abc131")))
+	(do-request `((,weblocks::*action-string* . "abc129")))
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; initial
    (:div :class "data-mining-bar"
-	 #.(searchbar-template "I1" "I2" "I3" "abc123")
-   (:p :class "datagrid-select-bar"
-      (:strong "Select: ")
-      (:a :href "/foo/bar?action=abc124"
-	  :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;"
-	  "All")
-      ", "
-      (:a :href "/foo/bar?action=abc125"
-	  :onclick "initiateAction(\"abc125\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc123"
+		 :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
+		 "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc124"
+		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
-   (:form :class "datagrid-form"
+   (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc126\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc125\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -154,8 +100,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc127" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
+		      (:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "t")))
@@ -167,26 +113,25 @@
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
-	   (:input :name "action" :type "hidden" :value "abc126"))
+	   (:input :name "action" :type "hidden" :value "abc125"))
 	  (:div :class "extra-bottom-1" "<!-- empty -->")
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; select all clicked
    (:div :class "data-mining-bar"
-	 #.(searchbar-template "I1" "I2" "I3" "abc129")
-   (:p :class "datagrid-select-bar"
-      (:strong "Select: ")
-      (:a :href "/foo/bar?action=abc130"
-	  :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;"
-	  "All")
-      ", "
-      (:a :href "/foo/bar?action=abc131"
-	  :onclick "initiateAction(\"abc131\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc128"
+		 :onclick "initiateAction(\"abc128\", \"weblocks-session=1%3ATEST\"); return false;"
+		 "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc129"
+		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
-   (:form :class "datagrid-form"
+   (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc132\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc130\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -194,8 +139,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc133" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc134" "Manager"))))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
+		      (:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "t" :checked "checked")))
@@ -207,26 +152,25 @@
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
-	   (:input :name "action" :type "hidden" :value "abc132"))
+	   (:input :name "action" :type "hidden" :value "abc130"))
 	  (:div :class "extra-bottom-1" "<!-- empty -->")
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; select none clicked
    (:div :class "data-mining-bar"
-	 #.(searchbar-template "I1" "I2" "I3" "abc135")
-   (:p :class "datagrid-select-bar"
-      (:strong "Select: ")
-      (:a :href "/foo/bar?action=abc136"
-	  :onclick "initiateAction(\"abc136\", \"weblocks-session=1%3ATEST\"); return false;"
-	  "All")
-      ", "
-      (:a :href "/foo/bar?action=abc137"
-	  :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
+	 (:p :class "datagrid-select-bar"
+	     (:strong "Select: ")
+	     (:a :href "/foo/bar?action=abc133"
+		 :onclick "initiateAction(\"abc133\", \"weblocks-session=1%3ATEST\"); return false;"
+		 "All")
+	     ", "
+	     (:a :href "/foo/bar?action=abc134"
+		 :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
-   (:form :class "datagrid-form"
+   (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
-	  :onsubmit "initiateFormAction(\"abc138\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+	  :onsubmit "initiateFormAction(\"abc135\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
 	  (:div :class "extra-top-1" "<!-- empty -->")
 	  (:div :class "extra-top-2" "<!-- empty -->")
 	  (:div :class "extra-top-3" "<!-- empty -->")
@@ -234,8 +178,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc139" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc140" "Manager"))))
+		      (:th :class "name sort-asc" (:span #.(link-action-template "abc136" "Name")))
+		      (:th :class "manager" (:span #.(link-action-template "abc137" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "t")))
@@ -247,7 +191,7 @@
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
-	   (:input :name "action" :type "hidden" :value "abc138"))
+	   (:input :name "action" :type "hidden" :value "abc135"))
 	  (:div :class "extra-bottom-1" "<!-- empty -->")
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))))

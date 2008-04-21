@@ -26,19 +26,6 @@
   font-weight: normal;
 }
 
-div.empty-table p
-{
-  padding-left: 0.5em;
-  margin: 0;
-}
-
-div.empty-table p span.caption
-{
-  color: #29364F;
-  font-weight: bold;
-  font-family: Garamond, New York, serif;
-}
-
 .view table tbody tr td
 {
   border-bottom: 1px solid #dbeac1;

@@ -6,40 +6,11 @@
     (weblocks::datagrid-drilldown-style 'some-slot)
   "drilldown some-slot")
 
-;;; test datagrid-drilldown-slot-p
-(deftest datagrid-drilldown-slot-p-1
-    (with-request :get nil
-      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
-							  :data-class 'employee
-							  :on-drilldown
-							  (cons 'details
-								(lambda (&rest args)
-								  nil)))
-					   'view))
-  nil)
-
-(deftest datagrid-drilldown-slot-p-2
-    (with-request :get nil
-      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid :data-class 'employee)
-					   'view))
-  nil)
-
-(deftest datagrid-drilldown-slot-p-3
-    (with-request :get nil
-      (weblocks::datagrid-drilldown-slot-p (make-instance 'datagrid
-							  :data-class 'employee
-							  :on-drilldown
-							  (cons 'details
-								(lambda (&rest args)
-								  nil)))
-					   'details))
-  t)
-
 ;;; test datagrid-render-view-field-drilldown
 (deftest-html datagrid-render-view-field-drilldown-1
     (with-request :get nil
       (make-action (lambda (&rest args) nil))
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)
@@ -57,7 +28,7 @@
 (deftest-html datagrid-render-view-field-header-drilldown-1
     (with-request :get nil
       (make-action (lambda (&rest args) nil))
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)
@@ -73,7 +44,7 @@
 ;;; test datagrid-with-table-view-body-row
 (deftest-html datagrid-with-table-view-body-row-1
     (with-request :get nil
-      (let* ((view (defview () (:type grid :inherit-from '(:scaffold employee))))
+      (let* ((view (defview () (:type table :inherit-from '(:scaffold employee))))
 	     (grid (make-instance 'datagrid :data-class 'employee
 				  :on-drilldown (cons 'details
 						      (lambda (&rest args)
@@ -102,7 +73,8 @@
 	      (*on-ajax-complete-scripts* nil))
 	  (declare (special *on-ajax-complete-scripts*))
 	  ;; render datagrid
-	  (render-datagrid-table-body grid)
+	  (dataseq-update-sort-column grid)
+	  (render-dataseq-body grid)
 	  ;; sort by name (should be descending)
 	  (do-request `((,weblocks::*action-string* . "abc126")))
 	  ;; output result
@@ -146,11 +118,12 @@
 				   :on-drilldown
 				   (cons 'edit (lambda (grid item)
 						 (setf res
-						       (null (datagrid-drilled-down-item grid)))))))
+						       (null (dataseq-drilled-down-item grid)))))))
 	      (*on-ajax-complete-scripts* nil))
 	  (declare (special *on-ajax-complete-scripts*))
 	  ;; render datagrid
-	  (render-datagrid-table-body grid)
+	  (dataseq-update-sort-column grid)
+	  (render-dataseq-body grid)
 	  ;; sort by name (should be descending)
 	  (do-request `((,weblocks::*action-string* . "abc126")))
 	  ;; output result
@@ -194,11 +167,12 @@
 				   :on-drilldown
 				   (cons 'edit (lambda (grid item)
 						 (setf res
-						       (first-name (datagrid-drilled-down-item grid)))))))
+						       (first-name (dataseq-drilled-down-item grid)))))))
 	      (*on-ajax-complete-scripts* nil))
 	  (declare (special *on-ajax-complete-scripts*))
 	  ;; render datagrid
-	  (render-datagrid-table-body grid)
+	  (dataseq-update-sort-column grid)
+	  (render-dataseq-body grid)
 	  ;; sort by name (should be descending)
 	  (do-request `((,weblocks::*action-string* . "abc126")))
 	  ;; output result

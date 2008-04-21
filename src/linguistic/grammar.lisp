@@ -6,17 +6,18 @@
 
 (defun pluralize (word)
   "Pluralizes word. Converts 'thing' to 'things'."
-  (if (string-equal word "is")
-      (return-from pluralize "are"))
-  (if (string-ends-with word "s")
-      (concatenate 'string word "es")
-      (concatenate 'string word "s")))
+  (cond
+    ((string-equal word "is") "are")
+    ((string-ends-with word "s") (concatenate 'string word "es"))
+    ((string-ends-with word "y") (concatenate 'string (substring word 0 (1- (length word))) "ies"))
+    (t (concatenate 'string word "s"))))
 
 (defun singularize (word)
   "Singularizes word. Converts 'things' to 'thing'."
   (if (string-equal word "are")
       (return-from singularize "is"))
   (cond
+    ((string-ends-with word "ies") (concatenate 'string (substring word 0 (- (length word) 3)) "y"))
     ((string-ends-with word "es") (substring word 0 (- (length word) 2)))
     ((string-ends-with word "s") (substring word 0 (- (length word) 1)))
     (t word)))

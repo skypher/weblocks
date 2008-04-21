@@ -14,11 +14,11 @@
 specified items from the sequence. The 'items' parameter is similar to
 datagrid's 'selection' slot. Specialize this function to modify
 standard behavior for deleting items from a sequence."
-  (when (datagrid-selection-empty-p items)
-    (flash-message (datagrid-flash grid) "Please select items to delete.")
+  (when (dataseq-selection-empty-p items)
+    (flash-message (dataseq-flash grid) "Please select items to delete.")
     (mark-dirty grid)
     (return-from gridedit-delete-items))
-  (let ((initial-items-count (datagrid-data-count grid :totalp t))
+  (let ((initial-items-count (dataseq-data-count grid))
 	deleted-items-count)
     (if (gridedit-on-delete-items grid)
 	(funcall (gridedit-on-delete-items grid) grid items)
@@ -35,9 +35,9 @@ standard behavior for deleting items from a sequence."
 	    ;; (:all ...)
 	    (:none (dolist (item (cdr items))
 		     (gridedit-delete-item grid (parse-integer item)))))))
-    (setf deleted-items-count (- initial-items-count (datagrid-data-count grid :totalp t)))
+    (setf deleted-items-count (- initial-items-count (dataseq-data-count grid)))
     (mark-dirty grid)
-    (flash-message (datagrid-flash grid)
+    (flash-message (dataseq-flash grid)
 		   (format nil "~A ~A deleted."
 			   deleted-items-count
 			   (proper-number-form deleted-items-count "item")))))

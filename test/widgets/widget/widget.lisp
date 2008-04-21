@@ -43,8 +43,8 @@
        (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
   ; note, pagination and dataform are there because for gridedit and
   ; datagrid widget-public-dependencies is specialized
-  ("stylesheets/dataform.css" "stylesheets/pagination.css" "stylesheets/datagrid.css"
-			      "scripts/datagrid.js"))
+  ("stylesheets/dataform.css" "stylesheets/pagination.css" "stylesheets/dataseq.css"
+			      "stylesheets/datagrid.css" "scripts/datagrid.js"))
 
 (deftest widget-public-dependencies-3
     (with-request :get nil
@@ -90,7 +90,7 @@
     (with-request :get nil
       (widget-css-classes (make-instance 'gridedit
 					 :data-class 'employee)))
-  "widget datagrid gridedit")
+  "widget dataseq datagrid gridedit")
 
 ;;; test with-widget-header
 (deftest-html with-widget-header-1

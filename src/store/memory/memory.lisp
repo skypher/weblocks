@@ -37,12 +37,6 @@
 (defmethod clean-store ((store memory-store))
   nil)
 
-;;;;;;;;;;;;;;;;;;;
-;;; Information ;;;
-;;;;;;;;;;;;;;;;;;;
-(defmethod supports-filter-p ((store memory-store))
-  t)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -114,12 +108,10 @@
       obj)))
 
 (defmethod find-persistent-objects ((store memory-store) object-class
-				    &key filter filter-view order-by range)
+				    &key order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
-    (filter-objects-in-memory
-     (find-persistent-objects-aux store object-class)
-     filter filter-view)
+    (find-persistent-objects-aux store object-class)
     order-by)
    range))
 
@@ -131,8 +123,6 @@
 	 collect i))))
 
 (defmethod count-persistent-objects ((store memory-store) class-name
-				     &key filter filter-view)
-  (length (find-persistent-objects store class-name
-				   :filter filter
-				   :filter-view filter-view)))
+				     &key &allow-other-keys)
+  (length (find-persistent-objects store class-name)))
 

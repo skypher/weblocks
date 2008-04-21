@@ -46,7 +46,7 @@ a
   padding-left: 0.4em;
 }
 
-.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view h1, .view fieldset h1, .table table caption, div.empty p,
 .view .empty-navigation, .view ul li, .view fieldset ul li,
 .view table thead tr th,
 .view fieldset div.submit, .view div.submit,
@@ -56,7 +56,7 @@ a
   border-top: 1px solid #fcfef6;
 }
 
-.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view h1, .view fieldset h1, .table table caption, div.empty p,
 .view .empty-navigation, .view ul li, .view fieldset ul li,
 .view table thead tr th,
 .view fieldset div.submit, .view div.submit,
@@ -66,7 +66,7 @@ a
   border-bottom: 1px solid #dbeac1;
 }
 
-.view h1, .view fieldset h1, .table table caption, .empty-table p,
+.view h1, .view fieldset h1, .table table caption, div.empty p,
 .view .empty-navigation, .view ul, .view fieldset ul, .table table,
 .view fieldset div.submit, .view div.submit,
 .long-form fieldset .validation-errors-summary h2.error-count
@@ -220,5 +220,19 @@ p.text
 .view ul li p.text
 {
   margin-left: 0.5em;
+}
+
+/* No elements */
+div.empty p
+{
+  padding-left: 0.5em;
+  margin: 0;
+}
+
+div.empty p span.caption
+{
+  color: #29364F;
+  font-weight: bold;
+  font-family: Garamond, New York, serif;
 }
 

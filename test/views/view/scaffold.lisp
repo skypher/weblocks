@@ -3,22 +3,22 @@
 
 ;;; Test scaffold-class-name
 (deftest scaffold-class-name-1
-    (scaffold-class-name 'data)
-  data-scaffold)
+    (scaffold-class-name 'form)
+  form-scaffold)
 
 ;;; Test scaffold-view-type
 (deftest scaffold-view-type-1
     (multiple-value-bind (res temp)
-	(scaffold-view-type (make-instance 'data-scaffold))
+	(scaffold-view-type (make-instance 'form-scaffold))
       res)
-  data-view)
+  form-view)
 
 ;;; Test scaffold-view-field-type
 (deftest scaffold-view-field-type-1
     (multiple-value-bind (res temp)
-	(scaffold-view-field-type (make-instance 'data-scaffold))
+	(scaffold-view-field-type (make-instance 'form-scaffold))
       res)
-  data-view-field)
+  form-view-field)
 
 ;;; Test class-visible-slots
 (deftest class-visible-slots-1
@@ -57,4 +57,19 @@
 (deftest typespec->view-field-presentation-1
     (typespec->view-field-presentation 'foo 'bar nil)
   nil)
+
+;;; Test default generate-scaffold-view
+(deftest generate-scaffold-view-1
+    (object-class-name
+     (generate-scaffold-view (make-instance 'data-scaffold)
+			     (find-class 'employee)))
+  data-view)
+
+;;; Test default generate-scaffold-view
+(deftest generate-scaffold-view-field-1
+    (object-class-name
+     (generate-scaffold-view-field (make-instance 'data-scaffold)
+				   (find-class 'employee)
+				   (find-slot-dsd 'employee 'name)))
+  data-view-field)
 

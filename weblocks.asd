@@ -54,11 +54,8 @@
 								    :depends-on ("view" "utils"))
 							     (:file "presentation"
 								    :depends-on ("view" "compiler"))))
-				       (:module dataview
-						:components ((:file "dataview")
-							     (:file "scaffold"
-								    :depends-on ("dataview")))
-						:depends-on (view))
+				       (:file "dataview"
+					      :depends-on (view))
 				       (:module formview
 						:components ((:file "formview")
 							     (:file "helpers")
@@ -72,11 +69,10 @@
 								    :depends-on ("formview" "parser"
 											    "validation")))
 						:depends-on (view))
-				       (:module tableview
-						:components ((:file "tableview")
-							     (:file "scaffold"
-								    :depends-on ("tableview")))
-						:depends-on (view dataview))
+				       (:file "sequence-view"
+					      :depends-on (view))
+				       (:file "tableview"
+					      :depends-on (view dataview "sequence-view"))
 				       (:module
 					types
 					:components ((:file "us-states")
@@ -118,27 +114,26 @@
 					      :depends-on (widget "dataform"))
 				       (:file "login"
 					      :depends-on (widget "quickform"))
-				       (:module datagrid
-					:components ((:file "datagrid"
-							    :depends-on ("filter" "sort" "select"
-										  "drilldown"
-										  "gridview"
-										  #-cmu "item-ops-action"))
-							     #-cmu (:file "item-ops-action")
-							     (:file "filter")
-							     (:file "sort"
-								    :depends-on ("gridview"))
-							     (:file "select"
-								    :depends-on ("gridview"))
-							     (:file "drilldown"
-								    :depends-on ("gridview"))
-						             (:file "gridview"))
+				       (:module dataseq
+						:components ((:file "dataseq")
+							     #-cmu (:file "operations-action"))
 						:depends-on (widget "flash"))
+				       (:module datagrid
+						:components ((:file "datagrid")
+							     (:file "sort"
+								    :depends-on ("datagrid"))
+							     (:file "select"
+								    :depends-on ("datagrid"))
+							     (:file "drilldown"
+								    :depends-on ("datagrid")))
+						:depends-on (widget "dataseq"))
 				       (:module gridedit
 					:components ((:file "gridedit"
 							    :depends-on (#-cmu "delete-action"))
 						     #-cmu (:file "delete-action"))
 						:depends-on (datagrid "dataform"))
+				       (:file "datalist"
+					      :depends-on (widget "dataseq"))
 				       (:file "pagination"
 					      :depends-on (widget "flash"))
 				       (:file "composite"
