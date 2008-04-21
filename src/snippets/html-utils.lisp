@@ -248,7 +248,7 @@ with the item as a single argument."
   (if seq
       (flet ((render-items ()
 	       "Renders the items of the list."
-	       (loop for i being the elements of seq
+	       (loop for i in seq
 		  do (with-html
 		       (safe-funcall item-prefix-fn i)
 		       (:li
