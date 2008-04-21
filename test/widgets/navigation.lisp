@@ -301,59 +301,65 @@
 
 ;;; test apply-uri-to-navigation
 (deftest apply-uri-to-navigation-1
-    (let ((site (create-site-layout)) nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (values (slot-value nav1 'current-pane)
-	      (slot-value nav2 'current-pane)))
+    (with-request :get nil
+      (let ((site (create-site-layout)) nav1 nav2)
+	(setf nav1 (weblocks::find-navigation-widget site))
+	(weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
+	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+	(values (slot-value nav1 'current-pane)
+		(slot-value nav2 'current-pane))))
   "test2"
   "test6")
 
 (deftest apply-uri-to-navigation-2
-    (let ((site (create-site-layout)) nav1)
-      (with-request :get nil
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
-	(return-code)))
+    (with-request :get nil
+      (let ((site (create-site-layout)) nav1)
+	(with-request :get nil
+	  (setf nav1 (weblocks::find-navigation-widget site))
+	  (weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
+	  (return-code))))
   404)
 
 (deftest apply-uri-to-navigation-3
-    (let* ((international-string (url-decode "%C3%A5%C3%A4%C3%B6"))
-	   (nav (make-navigation "test-nav-1"
-				 "test1" (make-instance 'composite)
-				 international-string (make-instance 'composite))))
-      (weblocks::apply-uri-to-navigation (list (url-encode international-string)) nav)
-      (loop for i across (slot-value nav 'current-pane)
-	    collect (char-code i)))
+    (with-request :get nil
+      (let* ((international-string (url-decode "%C3%A5%C3%A4%C3%B6"))
+	     (nav (make-navigation "test-nav-1"
+				   "test1" (make-instance 'composite)
+				   international-string (make-instance 'composite))))
+	(weblocks::apply-uri-to-navigation (list (url-encode international-string)) nav)
+	(loop for i across (slot-value nav 'current-pane)
+	   collect (char-code i))))
   (229 228 246))
 
 (deftest apply-uri-to-navigation-4
-    (let ((site (create-site-layout)) nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (setf (navigation-on-find-pane nav1)
-	    (lambda (nav name)
-	      (when (equalp name "test13")
-		"w3")))
-      (weblocks::apply-uri-to-navigation '("test13") nav1)
-      (slot-value nav1 'current-pane))
+    (with-request :get nil
+      (let ((site (create-site-layout)) nav1 nav2)
+	(setf nav1 (weblocks::find-navigation-widget site))
+	(setf (navigation-on-find-pane nav1)
+	      (lambda (nav name)
+		(when (equalp name "test13")
+		  "w3")))
+	(weblocks::apply-uri-to-navigation '("test13") nav1)
+	(slot-value nav1 'current-pane)))
   "test13")
 
 ;;; test obtain-uri-from-navigation
 (deftest obtain-uri-from-navigation-1
-    (let* ((site (create-site-layout))
-	   (nav (weblocks::find-navigation-widget site)))
-      (weblocks::apply-uri-to-navigation '("test2" "test6") nav)
-      (weblocks::obtain-uri-from-navigation nav))
+    (with-request :get nil
+      (let* ((site (create-site-layout))
+	     (nav (weblocks::find-navigation-widget site)))
+	(weblocks::apply-uri-to-navigation '("test2" "test6") nav)
+	(weblocks::obtain-uri-from-navigation nav)))
   "/test2/test6/")
 
 ;;; test find-navigation-widget
 (deftest find-navigation-widget-1
-    (let ((site (create-site-layout))
-	  nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (values (widget-name nav1) (widget-name nav2)))
+    (with-request :get nil
+      (let ((site (create-site-layout))
+	    nav1 nav2)
+	(setf nav1 (weblocks::find-navigation-widget site))
+	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+	(values (widget-name nav1) (widget-name nav2))))
   "test-nav-1"
   "test-nav-2")
 
@@ -363,15 +369,16 @@
 
 ;;; test reset-navigation-widgets
 (deftest reset-navigation-widgets-1
-    (let ((site (create-site-layout))
-	  nav1 nav2)
-      (setf nav1 (weblocks::find-navigation-widget site))
-      (setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-      (setf (slot-value nav1 'current-pane) "test2")
-      (setf (slot-value nav2 'current-pane) "test4")
-      (weblocks::reset-navigation-widgets nav1)
-      (values (slot-value nav1 'current-pane)
-	      (slot-value nav2 'current-pane)))
+    (with-request :get nil
+      (let ((site (create-site-layout))
+	    nav1 nav2)
+	(setf nav1 (weblocks::find-navigation-widget site))
+	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+	(setf (slot-value nav1 'current-pane) "test2")
+	(setf (slot-value nav2 'current-pane) "test4")
+	(weblocks::reset-navigation-widgets nav1)
+	(values (slot-value nav1 'current-pane)
+		(slot-value nav2 'current-pane))))
   "test1"
   "test3")
 

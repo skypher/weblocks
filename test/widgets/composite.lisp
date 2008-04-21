@@ -3,22 +3,24 @@
 
 ;;; test setting composite widget to single widget on init
 (deftest init-composite-single-1
-    (let ((c (make-instance 'composite :widgets "foo")))
-      (composite-widgets c))
+    (with-request :get nil
+      (let ((c (make-instance 'composite :widgets "foo")))
+	(composite-widgets c)))
   ("foo"))
 
 ;;; test proper setting of widget parent on adding to composite
 (deftest composite-add-widget-1
-    (progn
+    (with-request :get nil
       ;; make sure this doesn't signal error
       (make-instance 'composite :widgets "foo")
       nil)
   nil)
 
 (deftest composite-add-widget-2
-    (let* ((w (make-instance 'composite))
-	   (c (make-instance 'composite :widgets w)))
-      (eq (widget-parent w) c))
+    (with-request :get nil
+      (let* ((w (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w)))
+	(eq (widget-parent w) c)))
   t)
 
 (deftest composite-add-widget-3
@@ -31,14 +33,15 @@
   t)
 
 (deftest composite-add-widget-4
-    (let* ((w1 (make-instance 'composite))
-	   (w2 (make-instance 'composite))
-	   (c (make-instance 'composite :widgets w1)))
-      (assert (not (null (widget-parent w1))))
-      (assert (null (widget-parent w2)))
-      (setf (composite-widgets c) w2)
-      (assert (null (widget-parent w1)))
-      (assert (not (null (widget-parent w2)))))
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+	     (w2 (make-instance 'composite))
+	     (c (make-instance 'composite :widgets w1)))
+	(assert (not (null (widget-parent w1))))
+	(assert (null (widget-parent w2)))
+	(setf (composite-widgets c) w2)
+	(assert (null (widget-parent w1)))
+	(assert (not (null (widget-parent w2))))))
   nil)
 
 ;;; testing render for composite widget
