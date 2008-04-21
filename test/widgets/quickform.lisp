@@ -2,10 +2,11 @@
 (in-package :weblocks-test)
 
 (deftest test-quickform-1
-    (typep 
-     (make-quickform (defview nil ()
-		       test))
-     'quickform)
+    (with-request :get nil
+      (typep 
+       (make-quickform (defview nil ()
+			 test))
+       'quickform))
   t)
 
 (deftest-html test-quickform-2

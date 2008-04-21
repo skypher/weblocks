@@ -32,15 +32,16 @@
   2)
 
 (deftest call/answer-2
-    (let ((w1 (make-instance 'composite))
-	  w2)
-      (with-call/cc
-	(weblocks::call w1
-			(lambda (callee)
-			  (setf w2 callee))))
-      (values
-       (eq w1 w2)
-       (not (null (widget-continuation w1)))))
+    (with-request :get nil
+      (let ((w1 (make-instance 'composite))
+	    w2)
+	(with-call/cc
+	  (weblocks::call w1
+			  (lambda (callee)
+			    (setf w2 callee))))
+	(values
+	 (eq w1 w2)
+	 (not (null (widget-continuation w1))))))
   t t)
 
 ;;; test do-widget
@@ -127,16 +128,17 @@
 
 ;;; test do-page
 (deftest do-page-1
-    (let ((w (make-instance 'composite)))
-      (with-request :get nil
-	(setf (root-composite) (make-instance 'composite))
-	(with-call/cc
-	  (do-page w))
-	(values (eq (car (composite-widgets
-			  (root-composite)))
-		    w)
-		(progn (answer w)
-		       (null (composite-widgets (root-composite)))))))
+    (with-request :get nil
+      (let ((w (make-instance 'composite)))
+	(with-request :get nil
+	  (setf (root-composite) (make-instance 'composite))
+	  (with-call/cc
+	    (do-page w))
+	  (values (eq (car (composite-widgets
+			    (root-composite)))
+		      w)
+		  (progn (answer w)
+			 (null (composite-widgets (root-composite))))))))
   t t)
 
 ;;; test do-modal
@@ -154,12 +156,13 @@
 		    (:div (:div :class "widget function" "foo"))))))
 
 (deftest do-modal-2
-    (let ((w (make-instance 'composite)))
-      (with-request :get nil
-	(setf (root-composite) (make-instance 'composite))
-	(with-call/cc
-	  (do-modal "Some Title" w))
-	(answer w)
-	(null (composite-widgets (root-composite)))))
+    (with-request :get nil
+      (let ((w (make-instance 'composite)))
+	(with-request :get nil
+	  (setf (root-composite) (make-instance 'composite))
+	  (with-call/cc
+	    (do-modal "Some Title" w))
+	  (answer w)
+	  (null (composite-widgets (root-composite))))))
   t)
 
