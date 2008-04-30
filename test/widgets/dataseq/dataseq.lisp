@@ -321,6 +321,7 @@
     (with-request :get nil
       (let ((obj (make-instance 'dataseq
 				:data-class 'employee
+				:allow-select-p t
 				:item-ops (list (cons 'hello #'identity)
 						(cons 'world #'identity)))))
 	(dataseq-render-operations obj)))

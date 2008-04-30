@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(datalist-item-view datalist datalist-ordered-p))
+(export '(datalist datalist-item-data-view datalist-ordered-p
+	  datalist-render-item))
 
 (defparameter *datalist-selection-attempt-error-message* "Datalist does not support item selection."
   "This message will be presented to the programmer if there is an
@@ -9,16 +10,17 @@ attempt to set 'allow-select-p' on a datalist to true. See
 documentation for 'allow-select-p' on the datalist for more details.")
 
 (defwidget datalist (dataseq)
-  ((item-view :initform nil
-	      :initarg :item-view
-	      :accessor datalist-item-view
-	      :documentation "An item view used by the datalist to
-	      render each data item. Note, because datalist renders
-	      independent items in a list, it does not use sequence
-	      view for rendering. However, sequence view is used to
-	      determine sorting preferences, etc. For this reason,
-	      datalist uses dataseq-view that it inherits from
-	      dataseq, as well as datalist-item-view.")
+  ((item-data-view :initform nil
+		   :initarg :item-data-view
+		   :accessor datalist-item-data-view
+		   :documentation "An item view used by the datalist
+	           to render each data item. Note, because datalist
+	           renders independent items in a list, it does not
+	           use sequence view for rendering. However, sequence
+	           view is used to determine sorting preferences,
+	           etc. For this reason, datalist uses dataseq-view
+	           that it inherits from dataseq, as well as
+	           datalist-item-data-view.")
    (orderedp :initform t
 	     :initarg :orderedp
 	     :accessor datalist-ordered-p
@@ -45,8 +47,8 @@ documentation for 'allow-select-p' on the datalist for more details.")
 
 ;;; Ensure scaffold item view is selected if no view is provided
 ;;; explicitly by the user
-(defmethod datalist-item-view ((obj datalist))
-  (or (slot-value obj 'item-view)
+(defmethod datalist-item-data-view ((obj datalist))
+  (or (slot-value obj 'item-data-view)
       (find-view
        (list 'data
 	     (if (symbolp (dataseq-data-class obj))
@@ -150,39 +152,40 @@ removes the drilldown operation, and then adds it again if necessary."
 	       (dataseq-item-ops obj)
 	       :key #'car))))
 
+(defgeneric datalist-render-item (obj item args)
+  (:documentation "Renders a given item of a datalist object.")
+  (:method ((obj datalist) item args)
+    (flet ((render-operations ()
+	     (with-html
+	       (:div :class "operations"
+		     (:div :class "submit"
+			   (mapc (lambda (op)
+				   (render-link (lambda (&rest args)
+						  (declare (ignore args))
+						  (funcall (cdr op) obj
+							   (cons :none (list (format nil "~A"
+										     (object-id item))))))
+						(humanize-name (car op))
+						:class "operation")
+				   (with-html "&nbsp;"))
+				 (dataseq-item-ops obj)))))))
+      (apply #'render-object-view
+	     item (datalist-item-data-view obj)
+	     :widget obj
+	     :fields-suffix-fn (lambda (&rest args)
+				 (declare (ignore args))
+				 (when (and (dataseq-allow-operations-p obj)
+					    (dataseq-item-ops obj))
+				   (render-operations)))
+	     args))))
+
 (defmethod render-dataseq-body ((obj datalist) &rest args)
   (datalist-update-opretaions obj)
   (with-html
     (:div :class "datalist-body"
 	  (render-list (dataseq-data obj)
 		       :orderedp (datalist-ordered-p obj)
-		       :render-fn (lambda (item)
-				    (flet ((render-operations ()
-					     (with-html
-					       (:div :class "operations"
-						     (:div :class "submit"
-							   (mapc
-							    (lambda (op)
-							      (render-link
-							       (lambda (&rest args)
-								 (declare (ignore args))
-								 (funcall (cdr op) obj
-									  (cons :none
-										(list
-										 (object-id item)))))
-							       (humanize-name (car op))
-							       :class "operation")
-							      (with-html "&nbsp;"))
-							    (dataseq-item-ops obj)))))))
-				      (apply #'render-object-view
-					     item (datalist-item-view obj)
-					     :widget obj
-					     :fields-suffix-fn (lambda (&rest args)
-								 (declare (ignore args))
-								 (when (and (dataseq-allow-operations-p obj)
-									    (dataseq-item-ops obj))
-								   (render-operations)))
-					     args)))
+		       :render-fn (curry-after (curry #'datalist-render-item obj) args)
 		       :empty-message (sequence-view-empty-message (find-view (dataseq-view obj)))
 		       :empty-caption (view-caption (find-view (dataseq-view obj)))
 		       :item-prefix-fn (lambda (item)
@@ -196,6 +199,3 @@ removes the drilldown operation, and then adds it again if necessary."
 						     (find-view (dataseq-view obj))
 						     item args))))))
 
-;;; Operations
-(defmethod dataseq-render-operations ((obj datalist) &rest args)
-  (apply #'call-next-method obj :render-item-ops-p nil args))

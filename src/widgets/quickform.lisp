@@ -14,7 +14,7 @@
 
 (defun make-quickform (view &key on-success on-cancel satisfies
 		       data (answerp t) (class 'quickform)
-		       (data-class-name (gensym)))
+		       (data-class-name (gensym)) class-store)
   "Returns an instance of a dataform widget configured to quickly an
 easily present forms. The advantage of using 'make-quickform' over
 simply calling 'render-view' is that the widget produced by
@@ -66,6 +66,7 @@ be generated from the view."
 				(answer obj))
 			      (throw 'annihilate-dataform nil))
 		 :form-view view
+		 :class-store class-store
 		 :satisfies satisfies))
 
 (defmethod dataform-submit-action ((obj quickform) data &rest args)

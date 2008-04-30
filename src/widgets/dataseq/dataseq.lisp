@@ -374,8 +374,7 @@ for :desc and vica versa)."
 
 ;;; Rendering API
 (defgeneric dataseq-render-operations (obj &rest args
-					   &key render-item-ops-p render-common-ops-p
-					   &allow-other-keys)
+					   &key &allow-other-keys)
   (:documentation
    "This function is responsible for rendering the operations for the
 widget deriving from dataseq. Specialize this function to provide
@@ -388,9 +387,7 @@ Note, this function should take special care to respect
 dataseq-wrap-body-in-form-p because its return value determines
 whether the item ops should render their own form or they're already
 wrapped by a form of the widget. ")
-  (:method ((obj dataseq) &rest args
-	    &key (render-item-ops-p t) (render-common-ops-p t)
-	    &allow-other-keys)
+  (:method ((obj dataseq) &rest args)
     (declare (ignore args))
     (flet ((render-operations ()
 	     (with-html
@@ -398,8 +395,9 @@ wrapped by a form of the widget. ")
 		     (mapc (lambda (op)
 			     (render-button (car op)))
 			   (append
-			    (when render-common-ops-p (dataseq-common-ops obj))
-			    (when render-item-ops-p (dataseq-item-ops obj))))))))
+			    (dataseq-common-ops obj)
+			    (when (dataseq-allow-select-p obj)
+			      (dataseq-item-ops obj))))))))
       (if (dataseq-wrap-body-in-form-p obj)
 	  (render-operations)
 	  (with-html-form (:get (make-action (curry #'dataseq-operations-action obj))
