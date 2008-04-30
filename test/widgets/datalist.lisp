@@ -21,10 +21,10 @@
   t)
 
 ;;; Ensure scaffold item view is created
-(deftest datalist-item-view-1
+(deftest datalist-item-data-view-1
     (with-request :get nil
       (let ((list (make-instance 'datalist :data-class 'employee)))
-	(not (null (datalist-item-view list)))))
+	(not (null (datalist-item-data-view list)))))
   t)
 
 ;;; Test datalist-render-sort-dropdown

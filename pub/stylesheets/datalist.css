@@ -135,7 +135,7 @@
   list-style-type: none;
 }
 
-.datalist .view
+.datalist .datalist-body .view
 {
   width: 100%;
 }
@@ -147,14 +147,14 @@
 
 /* IE6 and IE7 fix for gaps between list items Note, once we set
    element to inline, we need to reset inner elements to block */
-.datalist ol li,
-.datalist ul li
+.datalist .datalist-body ol li,
+.datalist .datalist-body ul li
 { 
   display: inline;
 }
 
-.datalist ol li li,
-.datalist ul li li
+.datalist .datalist-body ol li li,
+.datalist .datalist-body ul li li
 { 
   display: block;
 }

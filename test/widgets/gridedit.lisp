@@ -1,11 +1,11 @@
 
 (in-package :weblocks-test)
 
-;;; testing gridedit-create-new-item-widget
-(deftest-html gridedit-create-new-item-widget-1
+;;; testing create-new-item-widget-gridedit
+(deftest-html create-new-item-widget-gridedit-1
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget
+       (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee))))
   (:div :class "widget dataform" :id "widget-123"
@@ -24,10 +24,10 @@
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	   :method "post")))
 
-(deftest-html gridedit-create-new-item-widget-2
+(deftest-html create-new-item-widget-gridedit-2
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget
+       (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
@@ -49,10 +49,10 @@
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	   :method "post")))
 
-(deftest-html gridedit-create-new-item-widget-3
+(deftest-html create-new-item-widget-gridedit-3
     (with-request :get nil
       (render-widget
-       (gridedit-create-new-item-widget
+       (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
 		       :view (defview () (:type table :inherit-from '(:scaffold employee))
@@ -77,10 +77,10 @@
 	   :method "post")))
 
 ;;; testing gridedit-create-drilldown-widget
-(deftest-html gridedit-create-drilldown-widget-1
+(deftest-html create-drilldown-widget-gridedit-1
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
+       (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee)
 					 *joe*)))
   (:div :class "widget dataform" :id "widget-123"
@@ -100,10 +100,10 @@
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
 
-(deftest-html gridedit-create-drilldown-widget-2
+(deftest-html create-drilldown-widget-gridedit-2
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
+       (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee
 								  :drilldown-type :view)
 					 *joe*)))
@@ -118,10 +118,10 @@
 		   ,(link-action-template "abc123" "Modify" :class "modify") (str "&nbsp;")
 		   ,(link-action-template "abc124" "Close" :class "close"))))))
 
-(deftest-html gridedit-create-drilldown-widget-3
+(deftest-html create-drilldown-widget-gridedit-3
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget
+       (dataedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
@@ -145,10 +145,10 @@
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
 
-(deftest-html gridedit-create-drilldown-widget-4
+(deftest-html create-drilldown-widget-gridedit-4
     (with-request :get nil
       (render-widget
-       (gridedit-create-drilldown-widget
+       (dataedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
 		       :view (defview () (:type table :inherit-from '(:scaffold employee))
@@ -173,62 +173,6 @@
 	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
-
-;;; testing gridedit-add-item
-(deftest gridedit-add-item-1
-    (with-request :get nil
-      (persist-object *default-store* *joe*)
-      (let ((grid (make-instance 'gridedit :data (list *joe*)
-					   :data-class 'employee
-					   :on-add-item (lambda (grid item)
-							  (persist-object *default-store* item))
-					   :allow-pagination-p nil)))
-	(weblocks::gridedit-add-item grid *bob*)
-	(weblocks::gridedit-add-item grid *employee1*)
-	(length (dataseq-data grid))))
-  3)
-
-;;; testing gridedit-delete-items
-(deftest gridedit-delete-items-1
-    (with-request :get nil
-      (persist-objects *default-store* (list *joe* *bob*))
-      (make-request-ajax)
-      (let ((grid (make-instance 'gridedit
-				 :data-class 'employee
-				 :allow-pagination-p nil)))
-	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*)))))
-	(do-request `(("yes" . "Yes")
-		      (,weblocks::*action-string* . "abc123")))
-	(mapcar #'first-name (dataseq-data grid))))
-  ("Bob"))
-
-(deftest gridedit-delete-items-2
-    (with-request :get nil
-      (persist-objects *default-store* (list *joe* *bob*))
-      (make-request-ajax)
-      (let ((grid (make-instance 'gridedit
-				 :data-class 'employee
-				 :allow-pagination-p nil)))
-	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*))
-						      (format nil "~A" (object-id *bob*)))))
-	(do-request `(("yes" . "Yes")
-		      (,weblocks::*action-string* . "abc123")))
-	(mapcar #'first-name (dataseq-data grid))))
-  nil)
-
-(deftest gridedit-delete-items-3
-    (with-request :get nil
-      (persist-objects *default-store* (list *joe* *bob*))
-      (make-request-ajax)
-      (let ((grid (make-instance 'gridedit
-				 :data-class 'employee
-				 :allow-pagination-p nil)))
-	(setf (widget-rendered-p grid) t)
-	(gridedit-delete-items grid (cons :none (list (format nil "~A" (object-id *joe*)))))
-	(do-request `(("yes" . "Yes")
-		      (,weblocks::*action-string* . "abc123")))
-	(not (null (widget-dirty-p grid)))))
-  t)
 
 ;;; testing render-widget-body for gridedit
 (defclass rwbg-1-dummy-field (table-view-field)
@@ -365,7 +309,7 @@
 	 (:ul :class "messages"
 	      (:li
 	       (:div :class "widget string"
-		     (:p "Item added."))))
+		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -472,7 +416,7 @@
 	 (:ul :class "messages"
 	      (:li
 	       (:div :class "widget string"
-		     (:p "1 item deleted."))))
+		     (:p "Deleted 1 Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -546,7 +490,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "drilldown edit" ""))
+		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
 		     :style "cursor: expression(\"hand\");"
@@ -556,8 +500,8 @@
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "drilldown edit"
-		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Edit"))))))
+		 (:td :class "drilldown modify"
+		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Modify"))))))
 	      :summary "Ordered by name, ascending."))
      (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -592,7 +536,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
-		(:th :class "drilldown edit" ""))
+		(:th :class "drilldown modify" ""))
 	      '((:tr :class "drilled-down"
 		     :onclick "initiateActionOnEmptySelection(\"abc134\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
@@ -603,8 +547,8 @@
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "drilldown edit"
-		  (:noscript (:div (:a :href "/foo/bar?action=abc134" "Edit"))))))
+		 (:td :class "drilldown modify"
+		  (:noscript (:div (:a :href "/foo/bar?action=abc134" "Modify"))))))
 	      :summary "Ordered by name, ascending."))
      (:input :name "action" :type "hidden" :value "abc131"))
     (:div :class "extra-bottom-1" "<!-- empty -->")
@@ -640,7 +584,7 @@
 		(:div :class "extra-top-1" "<!-- empty -->")
 		(:div :class "extra-top-2" "<!-- empty -->")
 		(:div :class "extra-top-3" "<!-- empty -->")
-		(:ul :class "messages" (:li (:div :class "widget string" (:p "Item Modified."))))
+		(:ul :class "messages" (:li (:div :class "widget string" (:p "Modified Employee."))))
 		(:div :class "extra-bottom-1" "<!-- empty -->")
 		(:div :class "extra-bottom-2" "<!-- empty -->")
 		(:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -658,7 +602,7 @@
 	       '((:th :class "select" "")
 		 (:th :class "name sort-asc" (:span #.(link-action-template "abc139" "Name")))
 		 (:th :class "manager" (:span #.(link-action-template "abc140" "Manager")))
-		 (:th :class "drilldown edit" ""))
+		 (:th :class "drilldown modify" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc141\", \"weblocks-session=1%3ATEST\");"
 		  :onmouseover "this.style.cursor = \"pointer\";"
 		  :style "cursor: expression(\"hand\");"
@@ -668,8 +612,8 @@
 		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		  (:td :class "name" (:span :class "value" "Jill"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
-		  (:td :class "drilldown edit"
-		   (:noscript (:div (:a :href "/foo/bar?action=abc141" "Edit"))))))
+		  (:td :class "drilldown modify"
+		   (:noscript (:div (:a :href "/foo/bar?action=abc141" "Modify"))))))
 	       :summary "Ordered by name, ascending."))
       (:div :class "operations"
 	    (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -723,7 +667,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "drilldown edit" ""))
+		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
 		     :style "cursor: expression(\"hand\");"
@@ -733,8 +677,8 @@
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "drilldown edit"
-		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Edit"))))))
+		 (:td :class "drilldown modify"
+		  (:noscript (:div (:a :href "/foo/bar?action=abc128" "Modify"))))))
 	      :summary "Ordered by name, ascending."))
      (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -769,7 +713,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
-		(:th :class "drilldown edit" ""))
+		(:th :class "drilldown modify" ""))
 	      '((:tr :class "drilled-down"
 		     :onclick "initiateActionOnEmptySelection(\"abc134\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
@@ -780,8 +724,8 @@
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "drilldown edit"
-		  (:noscript (:div (:a :href "/foo/bar?action=abc134" "Edit"))))))
+		 (:td :class "drilldown modify"
+		  (:noscript (:div (:a :href "/foo/bar?action=abc134" "Modify"))))))
 	      :summary "Ordered by name, ascending."))
      (:input :name "action" :type "hidden" :value "abc131"))
     (:div :class "extra-bottom-1" "<!-- empty -->")
@@ -821,7 +765,7 @@
 	       '((:th :class "select" "")
 		 (:th :class "name sort-asc" (:span #.(link-action-template "abc140" "Name")))
 		 (:th :class "manager" (:span #.(link-action-template "abc141" "Manager")))
-		 (:th :class "drilldown edit" ""))
+		 (:th :class "drilldown modify" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc142\", \"weblocks-session=1%3ATEST\");"
 		  :onmouseover "this.style.cursor = \"pointer\";"
 		  :style "cursor: expression(\"hand\");"
@@ -831,8 +775,8 @@
 		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		  (:td :class "name" (:span :class "value" "Joe"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
-		  (:td :class "drilldown edit"
-		   (:noscript (:div (:a :href "/foo/bar?action=abc142" "Edit"))))))
+		  (:td :class "drilldown modify"
+		   (:noscript (:div (:a :href "/foo/bar?action=abc142" "Modify"))))))
 	       :summary "Ordered by name, ascending."))
       (:div :class "operations"
 	    (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -880,7 +824,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "drilldown edit" ""))
+		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
 		     :style "cursor: expression(\"hand\");"
@@ -890,7 +834,7 @@
 		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
-		 (:td :class "drilldown edit" "")))
+		 (:td :class "drilldown modify" "")))
 	      :summary "Ordered by name, ascending."))
      (:div :class "operations"
 	   (:input :name "add" :type "submit" :class "submit" :value "Add"
@@ -1147,7 +1091,7 @@
 	 (:ul :class "messages"
 	      (:li
 	       (:div :class "widget string"
-		     (:p "Item added."))))
+		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
 	 (:div :class "extra-bottom-3" "<!-- empty -->")))

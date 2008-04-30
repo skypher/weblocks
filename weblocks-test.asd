@@ -110,8 +110,12 @@
 				       (:file "login")
 				       (:file "flash")
 				       (:file "datalist")
+				       (:file "listedit")
 				       (:module dataseq
 						:components ((:file "dataseq")))
+				       (:module dataedit
+						:components ((:file "dataedit")
+							     (:file "delete-action")))
 				       (:module datagrid
 						:components ((:file "datagrid")
 							     (:file "sort")

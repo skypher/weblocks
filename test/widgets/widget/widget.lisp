@@ -90,7 +90,7 @@
     (with-request :get nil
       (widget-css-classes (make-instance 'gridedit
 					 :data-class 'employee)))
-  "widget dataseq datagrid gridedit")
+  "widget dataseq datagrid dataedit-mixin gridedit")
 
 ;;; test with-widget-header
 (deftest-html with-widget-header-1

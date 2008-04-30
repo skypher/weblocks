@@ -127,11 +127,15 @@
 							     (:file "drilldown"
 								    :depends-on ("datagrid")))
 						:depends-on (widget "dataseq"))
-				       (:module gridedit
-					:components ((:file "gridedit"
-							    :depends-on (#-cmu "delete-action"))
-						     #-cmu (:file "delete-action"))
-						:depends-on (datagrid "dataform"))
+				       (:module dataedit
+						:components ((:file "dataedit"
+								    :depends-on (#-cmu "delete-action"))
+							     #-cmu (:file "delete-action"))
+						:depends-on (widget))
+				       (:file "gridedit"
+					      :depends-on (datagrid dataedit "dataform"))
+				       (:file "listedit"
+					      :depends-on (datalist dataedit "dataform" "quickform"))
 				       (:file "datalist"
 					      :depends-on (widget "dataseq"))
 				       (:file "pagination"
