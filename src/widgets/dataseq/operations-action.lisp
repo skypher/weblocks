@@ -12,7 +12,7 @@
   (dataseq-clear-selection obj)
   (loop for i in (request-parameters)
      when (string-starts-with (car i) "item-")
-     do (dataseq-select-item obj (substring (car i) 5)))
+     do (dataseq-select-item obj (parse-integer (substring (car i) 5))))
   (loop for i in (append
 		  (dataseq-item-ops obj)
 		  (dataseq-common-ops obj))
