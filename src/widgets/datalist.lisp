@@ -163,8 +163,7 @@ removes the drilldown operation, and then adds it again if necessary."
 				   (render-link (lambda (&rest args)
 						  (declare (ignore args))
 						  (funcall (cdr op) obj
-							   (cons :none (list (format nil "~A"
-										     (object-id item))))))
+							   (cons :none (list (object-id item)))))
 						(humanize-name (car op))
 						:class "operation")
 				   (with-html "&nbsp;"))
