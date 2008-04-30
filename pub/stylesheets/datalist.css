@@ -159,3 +159,9 @@
   display: block;
 }
 
+/* Remove view headers in the body */
+.datalist .datalist-body .view h1
+{
+  display: none;
+}
+
