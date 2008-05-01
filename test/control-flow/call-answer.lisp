@@ -149,7 +149,7 @@
 	(do-modal "Some Title" (lambda (&rest args)
 				 (with-html "foo"))))
       (render-widget (root-composite)))
-  (:div :class "widget composite" :id "widget-123"
+  (:div :class "widget composite" :id "id-123"
 	(:div :class "widget function"
 	      (:div :class "modal"
 		    (:h1 (:span "Some Title"))

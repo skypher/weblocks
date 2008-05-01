@@ -13,7 +13,7 @@
   (htm
    (:div :class "data-mining-bar"
 	 (:span :class "total-items" "(Total of 1 Employee)"))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:div :class "datalist-body"
 	 (:ol
 	  (:li

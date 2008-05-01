@@ -25,7 +25,7 @@
 		      ("submit" . "Submit")))
 	(render-widget quickform)))
   (htm
-   (:div :class "widget dataform quickform" :id "widget-123"
+   (:div :class "widget dataform quickform" :id "id-123"
 	 #.(form-header-template
 	    "abc123"
 	    '((:li :class "test"
@@ -35,7 +35,7 @@
 		(:input :type "text" :name "test" :maxlength "40"))))
 	    :method "post"
 	    :data-class-name "test-quickform-class-1"))
-   (:div :class "widget dataform quickform" :id "widget-123"
+   (:div :class "widget dataform quickform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "test"

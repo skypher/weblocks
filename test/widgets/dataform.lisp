@@ -26,14 +26,14 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; click modify
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
@@ -49,14 +49,14 @@
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; change name to Bob and click cancel
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc125"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; click modify
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc126"
 	    '((:li :class "name"
@@ -72,7 +72,7 @@
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; change name to Bob and click submit
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc127"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Bob"))
@@ -102,14 +102,14 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
 	      (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
 	       (:span :class "value" "Jim")))))
    ;; modify clicked
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
@@ -125,7 +125,7 @@
 		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
 	    :method "post"))
    ;; manager changed to Bill and name to changed error, submit clicked
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name item-not-validated"
@@ -148,7 +148,7 @@
 			 (:ul :class "field-validation-errors"
 			  (:li "Name is a required field."))))))
    ;; error fixed, submit clicked
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc126"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Ivan"))
@@ -188,7 +188,7 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -198,7 +198,7 @@
 	      (:li :class "age" (:span :class "label text" "Age:&nbsp;")
 	       (:span :class "value" "30")))))
    ;; modify clicked
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
@@ -219,7 +219,7 @@
 			      (:em :class "required-slot" "(required)&nbsp;")))
 		(:input :type "text" :name "age" :value "30" :maxlength "3"))))
 	    :method "post"))
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name"
@@ -248,7 +248,7 @@
 			 (:ul :class "field-validation-errors"
 			  (:li "Age must be an integer."))))))
    ;; age changed
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc126"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -298,7 +298,7 @@
 	(with-html (:div (str a)))))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -321,7 +321,7 @@
 	(render-widget edit-joe)))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -361,7 +361,7 @@
 	(assert (eq (slot-value new-joe 'address) *work-address*))))
   (htm
    ;; initial state
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc123"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -369,7 +369,7 @@
 	      (:li :class "address" (:span :class "label text" "Address:&nbsp;")
 	       (:span :class "value" "Address")))))
    ;; click modify
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "name"
@@ -388,7 +388,7 @@
 			 (:option :value "*work-address*" "Address")))))
 	    :method "post"))
    ;; click submit
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc125"
 	    '((:li :class "name item-not-validated"
@@ -414,7 +414,7 @@
 			 (:ul :class "field-validation-errors"
 			  (:li "Name is a required field."))))))
    ;; click submit again
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc126"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;")

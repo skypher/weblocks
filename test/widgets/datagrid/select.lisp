@@ -88,7 +88,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -127,7 +127,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc129"
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -166,7 +166,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc134"
 		 :onclick "initiateAction(\"abc134\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"

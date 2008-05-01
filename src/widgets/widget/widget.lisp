@@ -9,12 +9,6 @@
 	  mark-dirty widget-dirty-p find-widget-by-path*
 	  find-widget-by-path))
 
-(defun generate-widget-id ()
-  "Generates a unique ID that can be used to identify a widget."
-  (let ((new-widget-id (1+ (or (session-value 'last-widget-id) -1))))
-    (setf (session-value 'last-widget-id) new-widget-id)
-    (format nil "~A" new-widget-id)))
-
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
 defclass, except adds 'widget-class' metaclass specification and
@@ -25,11 +19,11 @@ inherits from 'widget' if no direct superclasses are provided."
 
 (defclass widget ()
   ((name :accessor widget-name
-	 :initform (generate-widget-id)
+	 :initform (gen-id)
 	 :initarg :name
 	 :documentation "A name of the widget used in rendering CSS
 	 classes. If the name is not provided it will be generated
-	 automatically with 'generate-widget-id'.")
+	 automatically with 'gen-id'.")
    (propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty

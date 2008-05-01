@@ -54,8 +54,8 @@
 		  (composite-widgets comp))
 	(render-widget comp)))
   (htm
-   (:div :class "widget composite" :id "widget-123"
-	 (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget composite" :id "id-123"
+	 (:div :class "widget dataform" :id "id-123"
 	       #.(data-header-template
 		  "abc123"
 		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -63,7 +63,7 @@
 		    (:li :class "manager"
 		     (:span :class "label text" "Manager:&nbsp;")
 		     (:span :class "value" "Jim")))))
-	 (:div :class "widget dataform" :id "widget-123"
+	 (:div :class "widget dataform" :id "id-123"
 	       #.(data-header-template
 		  "abc124"
 		  '((:li :class "street"
