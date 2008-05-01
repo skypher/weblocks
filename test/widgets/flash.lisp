@@ -75,8 +75,8 @@ widget."
 	(render-widget-body w)
 	(evaluate-flash-hooks)
 	*on-ajax-complete-scripts*))
-  ("new Function(\"new Effect.BlindUp('widget-123');\")"
-   "new Function(\"$('widget-123').show();\")"))
+  ("new Function(\"new Effect.BlindUp('id-123');\")"
+   "new Function(\"$('id-123').show();\")"))
 
 ;; After refresh, state shouldn't be reset
 (deftest render-widget-body-flash-5
@@ -126,7 +126,7 @@ widget."
     (with-request :get nil
       (let ((w (make-instance 'flash)))
 	(with-widget-header w (lambda (&rest args) nil))))
-  (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->"))
+  (:div :class "widget flash" :id "id-123" "<!-- empty flash -->"))
 
 ;; test flash-message
 (deftest flash-message-1

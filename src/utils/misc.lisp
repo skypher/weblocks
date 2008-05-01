@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(humanize-name attributize-name insert-after insert-at
+(export '(gen-id humanize-name attributize-name insert-after insert-at
 	  slot-value-by-path safe-apply safe-funcall request-parameter
 	  request-parameters string-whitespace-p render-extra-tags
 	  with-extra-tags alist->plist intersperse
@@ -14,6 +14,13 @@
 	  make-isearch-regex hash-keys object-class-name
 	  append-custom-fields find-slot-dsd find-slot-esd drop-last
 	  function-designator-p))
+
+(defun gen-id ()
+  "Generates an ID unique accross the session. The generated ID can be
+used to create IDs for html elements, widgets, etc."
+  (let ((new-widget-id (1+ (or (session-value 'last-unique-id) -1))))
+    (setf (session-value 'last-unique-id) new-widget-id)
+    (format nil "~A" new-widget-id)))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable

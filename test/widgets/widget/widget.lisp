@@ -100,7 +100,7 @@
 	  (with-html (:p "test")))
 	:widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
 	:widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	(:p "hello")
 	(:p "test")
 	(:p "world")))
@@ -164,7 +164,7 @@
 (deftest-html render-widget-1
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*)))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -300,7 +300,7 @@
 	  (render-widget w)
 	  (setf (slot-value w 'weblocks::ui-state) :form)
 	  (widget-name (car weblocks::*dirty-widgets*)))))
-  "widget-123")
+  "id-123")
 
 (deftest setf-slot-value-using-class-2
     (with-request :get nil

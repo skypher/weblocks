@@ -38,7 +38,7 @@
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -77,7 +77,7 @@
 	;; render datagrid
 	(render-widget-body grid)))
   (htm
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -119,7 +119,7 @@
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ; Page 1
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -140,12 +140,12 @@
 	  (:div :class "extra-bottom-1" "<!-- empty -->")
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget pagination" :id "widget-123"
+   (:div :class "widget pagination" :id "id-123"
 	 #.(pagination-page-info-template 1 2) "&nbsp;"
 	 #.(link-action-template "abc126" "Next >" :class "next-page")
 	 #.(pagination-goto-form-template "abc127" :page-one-p t))
    ; Page 2
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form :class "dataseq-form"
 	  :action "/foo/bar"
 	  :method "get"
@@ -166,7 +166,7 @@
 	  (:div :class "extra-bottom-1" "<!-- empty -->")
 	  (:div :class "extra-bottom-2" "<!-- empty -->")
 	  (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget pagination" :id "widget-123"
+   (:div :class "widget pagination" :id "id-123"
 	 #.(link-action-template "abc131" "< Previous" :class "previous-page")
 	 "&nbsp;" #.(pagination-page-info-template 2 3) "&nbsp;"
 	 #.(link-action-template "abc132" "Next >" :class "next-page")

@@ -8,7 +8,7 @@
        (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee))))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -33,7 +33,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Foo"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -60,7 +60,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -83,7 +83,7 @@
        (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee)
 					 *joe*)))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -107,7 +107,7 @@
 								  :data-class 'employee
 								  :drilldown-type :view)
 					 *joe*)))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -128,7 +128,7 @@
 					 (name :label "Foo"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -157,7 +157,7 @@
 					 (name :label "Bar"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "widget-123"
+  (:div :class "widget dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -211,7 +211,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -252,7 +252,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc129"
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -277,7 +277,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -301,7 +301,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc135"
 		 :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123"
+   (:div :class "widget flash" :id "id-123"
 	 (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
@@ -377,7 +377,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -408,7 +408,7 @@
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
    ;; "Delete" clicked
-   (:div :class "widget flash" :id "widget-123"
+   (:div :class "widget flash" :id "id-123"
 	 (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")
@@ -475,7 +475,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -521,7 +521,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc130"
 		 :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -554,7 +554,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "widget-123"
+    (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
@@ -579,7 +579,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc137"
 		 :onclick "initiateAction(\"abc137\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-    (:div :class "widget flash" :id "widget-123"
+    (:div :class "widget flash" :id "id-123"
 	  (:div :class "view"
 		(:div :class "extra-top-1" "<!-- empty -->")
 		(:div :class "extra-top-2" "<!-- empty -->")
@@ -652,7 +652,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -698,7 +698,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc130"
 		 :onclick "initiateAction(\"abc130\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -731,7 +731,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "widget-123"
+    (:div :class "widget dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc135"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -750,7 +750,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc138"
 		 :onclick "initiateAction(\"abc138\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-    (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+    (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
     (:form
      :class "dataseq-form"
      :action "/foo/bar"
@@ -809,7 +809,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -875,7 +875,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -907,7 +907,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget pagination" :id "widget-123"
+   (:div :class "widget pagination" :id "id-123"
 	 #.(pagination-page-info-template 1 1))
    ;; "Add Employee" clicked
    (:div :class "data-mining-bar"
@@ -918,7 +918,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc129"
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -945,7 +945,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -993,7 +993,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -1034,7 +1034,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc129"
 		 :onclick "initiateAction(\"abc129\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123" "<!-- empty flash -->")
+   (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -1059,7 +1059,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "widget-123"
+   (:div :class "widget dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -1083,7 +1083,7 @@
 	     ", "
 	     (:a :href "/foo/bar?action=abc135"
 		 :onclick "initiateAction(\"abc135\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
-   (:div :class "widget flash" :id "widget-123"
+   (:div :class "widget flash" :id "id-123"
 	 (:div :class "view"
 	 (:div :class "extra-top-1" "<!-- empty -->")
 	 (:div :class "extra-top-2" "<!-- empty -->")

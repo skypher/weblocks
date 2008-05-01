@@ -116,7 +116,7 @@
 	(render-widget nav)))
   (htm
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "widget-123"
+	 (:div :class "widget dataform" :id "id-123"
 	       #.(data-header-template
 		  "abc123"
 		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -134,7 +134,7 @@
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "widget-123"
+	 (:div :class "widget dataform" :id "id-123"
 	       (:div :class "view data education-history"
 		     (:div :class "extra-top-1" "<!-- empty -->")
 		     (:div :class "extra-top-2" "<!-- empty -->")
@@ -175,7 +175,7 @@
 	(render-widget nav)))
   (htm
    (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "widget-123"
+	 (:div :class "widget dataform" :id "id-123"
 	       #.(data-header-template
 		  "abc123"
 		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")

@@ -85,7 +85,7 @@ showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
       (do-dialog "Some Title" (lambda (k)
 				(with-html (:p "some widget"))))
       (render-widget (root-composite)))
-  (:div :class "widget composite" :id "widget-123"
+  (:div :class "widget composite" :id "id-123"
 	(:div :class "widget function"
 	      (:div :class "modal"
 		    (:h1 (:span "Some Title"))

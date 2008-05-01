@@ -34,7 +34,7 @@
 	(values (null (session-value "debug-reset-sessions")) result1 result2)))
   t
   #.(with-request-template "~
-<div class='widget dataform' id='widget-123'>~
+<div class='widget dataform' id='id-123'>~
 <div class='view data employee'>~
 <div class='extra-top-1'><!-- empty --></div>~
 <div class='extra-top-2'><!-- empty --></div>~
@@ -56,7 +56,7 @@
       :widget-stylesheets '("dataform")
       :title "Hello - Bar")
   #.(format nil "{\"widgets\":~
-{\"widget-123\":~
+{\"id-123\":~
 \"<form class='view form employee' action='' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3ATEST\\\"); ~
                 return false;'>~
@@ -472,7 +472,7 @@ onclick='disableIrrelevantButtons(this);' />~
 {~
 \"widgets\":~
 {~
-\"widget-123\":\"\",~
+\"id-123\":\"\",~
 \"foo-bar\":\"\",~
 null:\"<p>test</p>\"~
 },~
