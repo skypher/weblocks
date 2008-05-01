@@ -123,6 +123,25 @@
   #.(form-header-template "abc123"
      '()))
 
+(deftest-html form-view-with-view-header-2
+    (with-request :get nil
+      (with-view-header (make-instance 'form-view
+				       :default-action (lambda (&rest args)
+							 (declare (ignore args)))
+				       :focusp t)
+	*joe* nil
+	(lambda (&rest args)
+	  (declare (ignore args)))))
+  (htm
+   #.(form-header-template "abc123"
+			   '()
+			   :form-id "id-123")
+   #.(format nil "<script type='text/javascript'>
+// <![CDATA[
+$('id-123').focusFirstElement();
+// ]]>
+</script>")))
+
 ;;; Test form view render-view-field
 (deftest-html render-view-field-1
     (render-view-field (make-instance 'form-view-field
