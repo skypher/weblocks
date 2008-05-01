@@ -11,8 +11,10 @@
 								       :class "submit cancel" :value "Cancel"
 							:onclick "disableIrrelevantButtons(this);"))))
 			     (uri "/foo/bar") enctype (use-ajax-p t)
-			     (data-class-name "employee"))
-  `(:form :class ,(format nil "view form ~A" data-class-name)
+			     (data-class-name "employee")
+			     form-id)
+  `(:form :id ,form-id
+	  :class ,(format nil "view form ~A" data-class-name)
 	  :action ,uri :method ,method :enctype ,enctype
 	  ,@(when use-ajax-p
 		  `(:onsubmit ,(format nil "initiateFormAction(\"~A\", ~

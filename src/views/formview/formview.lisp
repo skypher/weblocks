@@ -5,14 +5,14 @@
 	  *required-field-message* *invalid-input-message* form form-view
 	  form-view-error-summary-threshold form-view-use-ajax-p
 	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-persist-p form-view-buttons
-	  form-view-field-writer-mixin form-view-field form-view-field-parser
-	  form-view-field-satisfies form-view-field-writer
-	  form-view-field-required-p mixin-form mixin-form-view-field
-	  mixin-form-view-field-persist-p *max-raw-input-length*
-	  input-presentation-max-length form-presentation input
-	  input-presentation render-validation-summary render-form-view-buttons
-	  form-field-intermediate-value))
+	  form-view-default-action form-view-persist-p form-view-focus-p
+	  form-view-buttons form-view-field-writer-mixin form-view-field
+	  form-view-field-parser form-view-field-satisfies
+	  form-view-field-writer form-view-field-required-p mixin-form
+	  mixin-form-view-field mixin-form-view-field-persist-p
+	  *max-raw-input-length* input-presentation-max-length form-presentation
+	  input input-presentation render-validation-summary
+	  render-form-view-buttons form-field-intermediate-value))
 
 ;;; Default initialization parameters
 (defparameter *form-default-error-summary-threshold* 15
@@ -71,6 +71,12 @@ input is not valid.")
 	     :documentation "Specifies whether the object should be
 	     persisted via 'persist-object' on successful
 	     deserealization of the form.")
+   (focusp :initform nil
+	   :initarg :focusp
+	   :accessor form-view-focus-p
+	   :documentation "If set to true, renders appropriate
+	   JavaScript to focus on the first element of the form once
+	   the form is loaded. This slot is set to false by default.")
    (buttons :initform (list :submit :cancel)
 	    :initarg :buttons
 	    :accessor form-view-buttons
@@ -234,12 +240,16 @@ differently.
 			     (fields-suffix-fn (view-fields-default-suffix-fn view))
 			     validation-errors
 			     &allow-other-keys)
-  (let ((header-class (format nil "view form ~A"
+  (declare (special *on-ajax-complete-scripts*))
+  (let ((form-id (gen-id))
+	(header-class (format nil "view form ~A"
 			      (attributize-name (object-class-name obj)))))
     (when (>= (count-view-fields view)
 	      (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
-    (with-html-form (method action :class header-class
+    (with-html-form (method action
+			    :id (when (form-view-focus-p view) form-id)
+			    :class header-class
 			    :enctype (form-view-default-enctype view)
 			    :use-ajax-p (form-view-use-ajax-p view))
       (:h1 (fmt (view-caption view)
@@ -249,7 +259,15 @@ differently.
       (safe-apply fields-prefix-fn view obj args)
       (:ul (apply body-fn view obj args))
       (safe-apply fields-suffix-fn view obj args)
-      (apply #'render-form-view-buttons view obj widget args))))
+      (apply #'render-form-view-buttons view obj widget args))
+    (when (form-view-focus-p view)
+      (let ((focus-script (format nil "$('~A').focusFirstElement();" form-id)))
+	(if (ajax-request-p)
+	    (push (format nil "new Function(~A)"
+			  (encode-json-to-string focus-script))
+		  *on-ajax-complete-scripts*)
+	    (with-javascript
+	      focus-script))))))
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget presentation value obj 
