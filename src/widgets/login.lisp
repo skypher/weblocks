@@ -36,7 +36,8 @@ returned."
 
 (defview default-login-view (:type form :persistp nil
 			     :buttons '((:submit . "Login") :cancel)
-			     :caption "Login")
+			     :caption "Login"
+			     :focusp t)
   (email :requiredp t)
   (password :requiredp t
 	    :present-as password
