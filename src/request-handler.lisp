@@ -107,7 +107,7 @@ customize behavior)."))
 	    ; set page title if it isn't already set
 	    (when (and (null *current-page-description*)
 		       (last *uri-tokens*))
-	      (setf *current-page-description* (humanize-name (last-item *uri-tokens*))))
+	      (setf *current-page-description* (humanize-name (url-decode (last-item *uri-tokens*)))))
 	    ; render page will wrap the HTML already rendered to
 	    ; *weblocks-output-stream* with necessary boilerplate HTML
 	    (render-page)))
