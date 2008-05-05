@@ -383,8 +383,9 @@ in 'class'."
 	   for dsd in (class-direct-slots class)
 	   when (eq (slot-definition-name dsd) slot-name)
 	   do (return dsd))
-	(car (mapcar (curry-after #'find-slot-dsd slot-name)
-		     (class-direct-superclasses class))))))
+	(find-if (compose #'not #'null)
+		 (mapcar (curry-after #'find-slot-dsd slot-name)
+			 (class-direct-superclasses class))))))
 
 (defun find-slot-esd (class slot-name)
   "Returns an effective-slot-definition object of a slot with

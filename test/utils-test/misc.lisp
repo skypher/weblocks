@@ -383,6 +383,19 @@
     (slot-definition-name (find-slot-dsd 'employee 'name))
   name)
 
+(defclass find-slot-dsd-test-a ()
+  ((find-slot-dsd-test-a :accessor find-slot-dsd-test-a)))
+
+(defclass find-slot-dsd-test-b ()
+  ((find-slot-dsd-test-b :accessor find-slot-dsd-test-b)))
+
+(defclass find-slot-dsd-test-c (find-slot-dsd-test-a find-slot-dsd-test-b)
+  ())
+
+(deftest find-slot-dsd-2
+    (slot-definition-name (find-slot-dsd 'find-slot-dsd-test-c 'find-slot-dsd-test-b))
+  find-slot-dsd-test-b)
+
 ;;; Test find-slot-esd
 (deftest find-slot-esd-1
     (slot-definition-name (find-slot-esd 'employee 'name))
