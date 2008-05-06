@@ -94,28 +94,30 @@ function getActionUrl(actionCode, sessionString, isPure) {
     return url;
 }
 
-function initiateAction(actionCode, sessionString) {
+function initiateActionWithArgs(actionCode, sessionString, args, method) {
+    if (!method) method = 'get';
     new Ajax.Request(getActionUrl(actionCode, sessionString),
-		     {
-			 method: 'get',
-			 onSuccess: onActionSuccess,
-			 onFailure: onActionFailure
-		     });
+                     {
+                         method: method,
+                         onSuccess: onActionSuccess,
+                         onFailure: onActionFailure,
+                         parameters: args
+                     });
+
+}
+
+/* convenicence/compatibility function */
+function initiateAction(actionCode, sessionString) {
+    initiateActionWithArgs(actionCode, sessionString);
 }
 
 function initiateFormAction(actionCode, form, sessionString) {
     // Hidden "action" field should not be serialized on AJAX
     var serializedForm = form.serialize(true);
     delete(serializedForm['action']);
-    
-    new Ajax.Request(getActionUrl(actionCode, sessionString),
-		     {
-			 method: form.method,
-			 onSuccess: onActionSuccess,
-			 onFailure: onActionFailure,
-			 parameters: serializedForm
-		     });
-}
+
+    initiateActionWithArgs(actionCode, sessionString, serializedForm, form.method);
+} 
 
 function disableIrrelevantButtons(currentButton) {
     $(currentButton.form).getInputs('submit').each(function(obj)
