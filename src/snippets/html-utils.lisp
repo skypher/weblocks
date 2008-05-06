@@ -15,21 +15,23 @@
   "The name of the control responsible for cancellation of form
   submission.")
 
-(defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t)) &body body)
+(defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t)
+                          (submit-fn "initiateFormAction(\"~A\", $(this), \"~A\")")) &body body)
   "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
   (let ((action-code (gensym)))
     `(let ((,action-code (function-or-action->action ,action)))
        (with-html
-	 (:form :id ,id :class ,class :action (string-right-trim "/" *current-navigation-url*)
-		:method (attributize-name ,method-type) :enctype ,enctype
-		:onsubmit (when ,use-ajax-p
-			    (format nil "initiateFormAction(\"~A\", $(this), \"~A\"); return false;"
-				    (url-encode (or ,action-code ""))
-				    (session-name-string-pair)))
-		(with-extra-tags
-		  (htm (:fieldset
-			,@body
-			(:input :name *action-string* :type "hidden" :value ,action-code)))))))))
+         (:form :id ,id :class ,class :action (string-right-trim "/" *current-navigation-url*)
+                :method (attributize-name ,method-type) :enctype ,enctype
+                :onsubmit (when ,use-ajax-p
+                            (format nil "~A; return false;"
+                                    (format nil ,submit-fn
+                                            (url-encode (or ,action-code ""))
+                                            (session-name-string-pair))))
+                (with-extra-tags
+                  (htm (:fieldset
+                        ,@body
+                        (:input :name *action-string* :type "hidden" :value ,action-code)))))))))
 
 (defun render-link (action name &key (ajaxp t) id class)
   "Renders an action into an href link. If 'ajaxp' is true (the
