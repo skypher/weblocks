@@ -19,7 +19,11 @@
 	  negate-sort-direction humanize-sort-direction
 	  dataseq-render-operations dataseq-render-mining-bar
 	  render-dataseq-body dataseq-wrap-body-in-form-p
-	  render-total-items-message))
+	  render-total-items-message
+	  dataseq-data-form-class))
+
+(defmethod dataseq-data-form-class (obj)
+  (dataseq-data-class obj))
 
 (defwidget dataseq ()
   (;; View information

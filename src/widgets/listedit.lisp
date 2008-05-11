@@ -10,7 +10,7 @@
 
 (defmethod dataedit-create-new-item-widget ((obj listedit))
   (make-quickform (dataedit-item-form-view obj)
-		  :data (make-instance (dataseq-data-class obj))
+		  :data (make-instance (dataseq-data-form-class obj))
 		  :class-store (dataseq-class-store obj)
 		  :on-success (lambda (w item)
 				(declare (ignore w))

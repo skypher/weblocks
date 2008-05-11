@@ -1,11 +1,8 @@
 (in-package :cl-user)
 
 (defpackage #:weblocks-elephant
-  (:use :cl :metabang.utilities :weblocks :weblocks-memory)
-  (:import-from :elephant #:store-controller #:controller-start-transaction
-		#:controller-abort-transaction #:controller-commit-transaction
-		#:*store-controller*)
-  (:shadowing-import-from :metabang.utilities #:size)
+  (:use :cl :weblocks :weblocks-memory :elephant)
+  (:shadowing-import-from :weblocks #:open-store #:close-store)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
 
@@ -16,8 +13,14 @@
 (defclass elephant-store ()
   ((elephant-store :accessor elephant-store :initarg :store)))
 
-(defmethod object-id ((obj elephant::persistent))
-  (elephant::oid obj))
+(defmethod class-id-slot-name ((class persistent-metaclass))
+  'elephant::oid)
+
+(defmethod object-id ((obj persistent))
+  (handler-case 
+      (elephant::oid obj)
+    (error ()
+      (error "Object oid unbound for persistent instance: ~A" obj))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
@@ -40,12 +43,28 @@
 		       (elephant:controller-root
 			(elephant-store store))))
 
+(defmethod class-store ((class persistent-metaclass))
+  "This works if you only have one elephant store open"
+  (if (subtypep *default-store* 'elephant-store)
+      *default-store*
+      (progn
+	(mapstores (lambda (store)
+		     (when (subtypep store 'elephant-store)
+		       (return-from class-store store))))
+	(error "No valid elephant store available for instance of persistent class ~A" class))))
+		 
 
-;;;;;;;;;;;;;;;;;;;
-;;; Information ;;;
-;;;;;;;;;;;;;;;;;;;
-(defmethod supports-filter-p ((store elephant-store))
-  nil)
+;;;;;;;;;;;;;;;;;;;;;
+;;; For scaffolds ;;;
+;;;;;;;;;;;;;;;;;;;;;
+
+(defmethod class-visible-slots-impl ((class (eql (find-class 'persistent))) &key readablep writablep)
+  (declare (ignore readablep writablep))
+  (remove-if (lambda (dsd)
+	       (or (eq (weblocks::slot-definition-name dsd) 'elephant::oid)
+		   (eq (weblocks::slot-definition-name dsd) 'elephant::spec)))
+	     (call-next-method)))
+	       
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Transactions ;;;
@@ -71,24 +90,22 @@
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defmethod persist-object ((store elephant-store) (object elephant:persistent))
+  object)
+
 (defmethod persist-object ((store elephant-store) object)
-  (declare (ignore object))
-  nil)
-;  (elephant:add-to-root (elephant::oid object) object
-;;			(elephant-store store)))
+  (error "Cannot persist non-persistent objects to elephant stores: ~A" object))
 
 (defmethod delete-persistent-object ((store elephant-store) object)
-  (elephant:drop-pobject object)
-  (elephant:remove-from-root (elephant::oid object) 
-			     (elephant-store store)))
+  (break)
+  (elephant:drop-pobject object))
 
 (defmethod delete-persistent-object-by-id ((store elephant-store) class-name object-id)
   (declare (ignore class-name))
+  (break)
   (elephant:drop-pobject 
    (elephant::controller-recreate-instance (elephant-store store)
-					   object-id))
-  (elephant:remove-from-root object-id
-			     (elephant-store store)))
+					   object-id)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Querying persistent objects ;;;
@@ -126,4 +143,7 @@
   (length (find-persistent-objects store class-name
 				   :filter filter
 				   :filter-view filter-view)))
+
+(defmethod supports-filter-p ((store elephant-store))
+  nil)
 

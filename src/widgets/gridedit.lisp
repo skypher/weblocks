@@ -20,7 +20,7 @@
 
 (defmethod dataedit-create-new-item-widget ((grid gridedit))
     (make-instance 'dataform
-     :data (make-instance (dataseq-data-class grid))
+     :data (make-instance (dataseq-data-form-class grid))
      :class-store (dataseq-class-store grid)
      :ui-state :form
      :on-cancel (lambda (obj)

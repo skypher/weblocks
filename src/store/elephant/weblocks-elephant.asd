@@ -12,6 +12,7 @@
   :licence "LLGPL"
   :description "A weblocks backend for elephant."
   :depends-on (:moptilities :elephant :weblocks :weblocks-memory)
-  :components ((:file "elephant")))
+  :components ((:file "elephant")
+	       (:file "proxy")))
 
 
