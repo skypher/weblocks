@@ -6,7 +6,8 @@
   ((base-class :accessor base-class :initarg :base :allocation :class)))
 
 (defun return-proxy-classname (classname)
-  (aif (gethash classname *proxies*) it
+  (if (gethash classname *proxies*) 
+      (gethash classname *proxies*)
     (let* ((persistent-class (find-class classname))
 	   (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
 	   (visible-slot-defs (class-visible-slots-impl persistent-class))
