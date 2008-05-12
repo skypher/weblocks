@@ -11,7 +11,7 @@
 (defvar *current-ele-txn* nil)
 
 (defclass elephant-store ()
-  ((elephant-store :accessor elephant-store :initarg :store)))
+  ((elephant-controller :accessor elephant-controller :initarg :controller)))
 
 (defmethod class-id-slot-name ((class persistent-metaclass))
   'elephant::oid)
@@ -27,13 +27,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod open-store ((store-type (eql :elephant)) &rest args &key spec &allow-other-keys)
   (setf *default-store*
-	(make-instance 'elephant-store 
-		       :store (setf *store-controller* (elephant:open-store spec :recover t)))))
+	(make-instance 'elephant-store
+		       :controller (setf *store-controller* (elephant:open-store spec :recover t)))))
 
 (defmethod close-store ((store elephant-store))
   (when (eq *default-store* store)
     (setf *default-store* nil))
-  (elephant:close-store (elephant-store store)))
+  (elephant:close-store (elephant-controller store)))
 
 (defmethod clean-store ((store elephant-store))
   ;; Drop everything from the root
@@ -41,7 +41,7 @@
 			 (declare (ignore k v))
 			 (elephant:remove-current-kv))
 		       (elephant:controller-root
-			(elephant-store store))))
+			(elephant-controller store))))
 
 (defmethod class-store ((class persistent-metaclass))
   "This works if you only have one elephant store open"
@@ -74,16 +74,16 @@
   (if *current-ele-txn* *current-ele-txn*
       (setf *current-ele-txn* 
 	    (elephant::controller-start-transaction 
-	     (elephant-store store)))))
+	     (elephant-controller store)))))
 
 (defmethod commit-transaction ((store elephant-store))
   (assert *current-ele-txn*)
-  (controller-commit-transaction (elephant-store store) *current-ele-txn*)
+  (controller-commit-transaction (elephant-controller store) *current-ele-txn*)
   (setf *current-ele-txn* nil))
 
 (defmethod rollback-transaction ((store elephant-store))
   (assert *current-ele-txn*)
-  (controller-abort-transaction (elephant-store store) *current-ele-txn*)
+  (controller-abort-transaction (elephant-controller store) *current-ele-txn*)
   (setf *current-ele-txn* nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -98,14 +98,15 @@
 
 (defmethod delete-persistent-object ((store elephant-store) object)
   (break)
-  (elephant:drop-pobject object))
+  (when object
+    (elephant:drop-pobject object)))
 
 (defmethod delete-persistent-object-by-id ((store elephant-store) class-name object-id)
   (declare (ignore class-name))
-  (break)
-  (elephant:drop-pobject 
-   (elephant::controller-recreate-instance (elephant-store store)
-					   object-id)))
+  (when object-id
+    (elephant:drop-pobject 
+     (elephant::controller-recreate-instance (elephant-controller store)
+					     object-id))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Querying persistent objects ;;;
@@ -113,7 +114,7 @@
 
 (defmethod find-persistent-object-by-id ((store elephant-store) class-name object-id)
   (declare (ignore class-name))
-  (elephant:get-from-root object-id :sc (elephant-store store)))
+  (elephant::controller-recreate-instance (elephant-controller store) object-id))
 
 (defmethod find-persistent-objects ((store elephant-store) class-name
 				    &key filter filter-view order-by range)
@@ -123,7 +124,7 @@
   ;; - 
   (declare (ignore filter filter-view))
   (range-objects-in-memory
-;;     (let ((*store-controller* (elephant-store store)))
+;;     (let ((*store-controller* (elephant-controller store)))
 ;;       (declare (special *store-controller*))
 ;;       (if (and (consp order-by) (has-index class-name (car order-by)))
 ;;	   (elephant::map-inverted-index class-name (car order-by)
