@@ -1,0 +1,9 @@
+
+Running the demo should be easy!
+
+1. Configure elephant and ensure that the test suite runs.
+2. Check in conf/stores.lisp to choose a different store spec if 
+   you don't have Elephant configured to work with the Berkeley DB
+3. Load WEBLOCKS-ELEPHANT-DEMO into the Lisp environment.
+4. Run the (WEBLOCKS-ELEPHANT-DEMO:START-WEBLOCKS-ELEPHANT-DEMO) command.
+
