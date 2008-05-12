@@ -3,6 +3,7 @@
 (defpackage #:weblocks-elephant
   (:use :cl :weblocks :weblocks-memory :elephant)
   (:shadowing-import-from :weblocks #:open-store #:close-store)
+  (:export #:defpclass #:*current-ele-txn*)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
 
@@ -11,7 +12,9 @@
 (defvar *current-ele-txn* nil)
 
 (defclass elephant-store ()
-  ((elephant-controller :accessor elephant-controller :initarg :controller)))
+  ((controller :accessor elephant-controller :initarg :controller)
+   (lock :accessor elephant-lock :initarg :lock :initform (hunchentoot-mp:make-lock (gensym)))
+   (transactions :accessor elephant-txns :initform nil)))
 
 (defmethod class-id-slot-name ((class persistent-metaclass))
   'elephant::oid)
@@ -33,7 +36,9 @@
 (defmethod close-store ((store elephant-store))
   (when (eq *default-store* store)
     (setf *default-store* nil))
-  (elephant:close-store (elephant-controller store)))
+  (elephant:close-store (elephant-controller store))
+  (when (eq (elephant-controller store) *store-controller*)
+    (setf *store-controller* nil)))
 
 (defmethod clean-store ((store elephant-store))
   ;; Drop everything from the root
@@ -70,21 +75,47 @@
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
 (defmethod begin-transaction ((store elephant-store))
-  ;; NOTE: No support for composable transactions here or multiple BDB stores
-  (if *current-ele-txn* *current-ele-txn*
-      (setf *current-ele-txn* 
-	    (elephant::controller-start-transaction 
-	     (elephant-controller store)))))
+  ;; NOTE: No support for nested transactions here or multiple BDB stores
+  (let ((current-txn (get-txn store)))
+    (if current-txn current-txn
+	(set-txn store (controller-start-transaction (elephant-controller store))))))
 
 (defmethod commit-transaction ((store elephant-store))
-  (assert *current-ele-txn*)
-  (controller-commit-transaction (elephant-controller store) *current-ele-txn*)
-  (setf *current-ele-txn* nil))
+  (let ((current-txn (get-txn store)))
+    (assert current-txn)
+    (controller-commit-transaction (elephant-controller store) current-txn)
+    (clear-txn store)))
 
 (defmethod rollback-transaction ((store elephant-store))
-  (assert *current-ele-txn*)
-  (controller-abort-transaction (elephant-controller store) *current-ele-txn*)
-  (setf *current-ele-txn* nil))
+  (let ((current-txn (get-txn store)))
+    (assert current-txn)
+    (controller-abort-transaction (elephant-controller store) current-txn)
+    (clear-txn store)))
+
+;; per-store / per-thread transactions
+
+(defstruct txn-rec thread txn)
+
+(defun get-txn (store)
+  (hunchentoot-mp:with-lock ((elephant-lock store)) 
+    (txn-rec-txn (get-txn-rec store))))
+
+(defun get-txn-rec (store)
+  (let* ((thread hunchentoot-mp:*current-process*)
+	 (rec (find thread (elephant-txns store)
+		    :key #'txn-rec-thread)))
+    (if rec rec
+	(let ((newrec (make-txn-rec :thread thread)))
+	  (push newrec (elephant-txns store))
+	  newrec))))
+
+(defun set-txn (store txn)
+  (hunchentoot-mp:with-lock ((elephant-lock store)) 
+    (setf (txn-rec-txn (get-txn-rec store)) txn)))
+
+(defun clear-txn (store)
+  (hunchentoot-mp:with-lock ((elephant-lock store)) 
+    (set-txn store nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
