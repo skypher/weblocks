@@ -142,7 +142,7 @@
   (elephant::controller-recreate-instance (elephant-controller store) object-id))
 
 (defmethod find-persistent-objects ((store elephant-store) class-name
-				    &key filter filter-view order-by range)
+				    &key order-by range &allow-other-keys)
 ;; Short term: walk class or appropriate index; construct a filter function
 ;; - optimize order by if using an index
 ;; - only construct objects when in-range, unless filter and not on index fn
@@ -154,8 +154,6 @@
 ;;	   (elephant::map-inverted-index class-name (car order-by)
 ;;					 :from-end (when (eq (cdr order-by) :desc) t)
 ;;					 :collect t)
-  (when (or filter filter-view)
-    (warn "Elephant does not support filter functions at present"))
   (range-objects-in-memory
    (order-objects-in-memory
     (elephant::get-instances-by-class class-name)
@@ -169,10 +167,6 @@
 	    'elephant::indexed-effective-slot-definition))
 
 (defmethod count-persistent-objects ((store elephant-store) class-name
-				     &key filter filter-view)
-  (length (find-persistent-objects store class-name
-				   :filter filter
-				   :filter-view filter-view)))
+				     &key &allow-other-keys)
+  (length (find-persistent-objects store class-name)))
 
-(defmethod supports-filter-p ((store elephant-store))
-  nil)
