@@ -1,10 +1,14 @@
 
 (in-package :weblocks)
 
-(export '(request-hook *request-hook*))
+(export '(request-hook *request-hook* eval-dynamic-hooks))
 
 (defclass request-hooks ()
-  ((pre-action :accessor pre-action-hook
+  ((dynamic-action :accessor dynamic-action-hook
+		   :initform nil
+		   :documentation "A set of functions that establish
+                dynamic state around a body function in the action context")
+   (pre-action :accessor pre-action-hook
 	       :initform nil
 	       :documentation "A list of callback functions of no
 	       arguments called before user action is evaluated.")
@@ -12,6 +16,10 @@
 		:initform nil
 		:documentation "A list of callback functions of no
 	        arguments called after user action is evaluated.")
+   (dynamic-render :accessor dynamic-render-hook
+		   :initform nil
+		   :documentation "A set of functions that establish
+                dynamic state around a body function in the render context")
    (pre-render :accessor pre-render-hook
 	       :initform nil
 	       :documentation "A list of callback functions of no
@@ -50,13 +58,16 @@ lifetime of the entire application. A :session hook is destroyed along
 with the session. A :request hook is only valid for the request.
 
 location - the location of the hook. Can be set
-to :pre-action, :post-action, :pre-render, and :post-render.
+to :dynamic-action :pre-action, :post-action, 
+   :dynamic-render :pre-render, and :post-render.
 
 The macro returns a place that can be used to push a callback function
 of no arguments."
   (ecase location
+    (:dynamic-action `(dynamic-action-hook (hook-by-scope ,scope)))
     (:pre-action `(pre-action-hook (hook-by-scope ,scope)))
     (:post-action `(post-action-hook (hook-by-scope ,scope)))
+    (:dynamic-render `(dynamic-render-hook (hook-by-scope ,scope)))
     (:pre-render `(pre-render-hook (hook-by-scope ,scope)))
     (:post-render `(post-render-hook (hook-by-scope ,scope)))))
 
@@ -66,4 +77,38 @@ of no arguments."
      (mapc #'funcall (request-hook :application ,location))
      (mapc #'funcall (request-hook :session ,location))
      (mapc #'funcall (request-hook :request ,location))))
+
+(defmacro with-dynamic-hooks ((type) &rest body)
+  "Performs nested calls of all the hooks of type, the innermost call is
+   a closure over the body expression.  Dynamic action hooks take one
+   argument, which is a list of dynamic hooks.  In the inner context, they
+   apply the first element of the list to the rest
+
+   An example of a dynamic hook:
+  
+   (defun transaction-hook (inner-fns)
+     (with-transaction ()
+       (unless (null inner-fns)
+         (funcall (first inner-fns) (rest inner-fns)))))"
+  (with-gensyms (null-list)
+    `(eval-dynamic-hooks 
+      (append (request-hook :application ,type)
+	      (request-hook :session ,type)
+	      (request-hook :request ,type)
+	      (list (lambda (,null-list) 
+		      (assert (null ,null-list))
+		      ,@body))))))
+
+(defun eval-dynamic-hooks (var)
+  "A helper function that makes it easier to write dynamic hooks.
+
+   (defun my-hook (hooks)
+     (with-my-context ()
+        (eval-dynamic-hooks hooks)))
+  "
+  (let ((list (etypecase var 
+		(symbol (symbol-value var))
+		(list var))))
+    (unless (null list)
+      (funcall (first list) (rest list)))))
 

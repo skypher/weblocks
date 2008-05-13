@@ -266,7 +266,8 @@ onclick='disableIrrelevantButtons(this);' />~
 
 (deftest handle-client-request-9
     (with-request :get nil
-      (let (weblocks::*webapp-name* result1)
+      (let ((weblocks::*render-debug-toolbar* nil)
+            weblocks::*webapp-name* result1)
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
@@ -381,7 +382,7 @@ onclick='disableIrrelevantButtons(this);' />~
     (decf *res*)))
 
 (deftest handle-client-request-13
-    (with-request :get '(("action" . "abc123"))
+    (with-request :post '(("action" . "abc123"))
       (let ((weblocks::*render-debug-toolbar* nil)
 	    weblocks::*webapp-name* (*res* 0))
 	;; set up mini application

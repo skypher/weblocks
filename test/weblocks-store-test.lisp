@@ -68,19 +68,11 @@ returned."
 #+weblocks-store-test-ele
 (progn
   (defpclass persistent-1 ()
-    ((id :initform nil
-	 :db-kind :key
-	 :db-constraints (:not-null :unique)
-	 :type integer)
-     (slot-1 :initarg :slot-1 :accessor p-1-s-1 :type integer)
+    ((slot-1 :initarg :slot-1 :accessor p-1-s-1 :type integer)
      (slot-2 :initarg :slot-2 :accessor p-1-s-2 :type integer)))
 
   (defpclass persistent-2 ()
-    ((id :initform nil
-	 :db-kind :key
-	 :db-constraints (:not-null :unique)
-	 :type integer)
-     (slot-1 :initarg :slot-1 :accessor p-2-s-1 :type integer)
+    ((slot-1 :initarg :slot-1 :accessor p-2-s-1 :type integer)
      (slot-2 :initarg :slot-2 :accessor p-2-s-2 :type integer))))
 
 ;;; test persist-object

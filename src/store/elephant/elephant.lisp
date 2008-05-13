@@ -3,18 +3,14 @@
 (defpackage #:weblocks-elephant
   (:use :cl :weblocks :weblocks-memory :elephant)
   (:shadowing-import-from :weblocks #:open-store #:close-store)
-  (:export #:defpclass #:*current-ele-txn*)
+  (:export #:defpclass)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
 
 (in-package :weblocks-elephant)
 
-(defvar *current-ele-txn* nil)
-
 (defclass elephant-store ()
-  ((controller :accessor elephant-controller :initarg :controller)
-   (lock :accessor elephant-lock :initarg :lock :initform (hunchentoot-mp:make-lock (gensym)))
-   (transactions :accessor elephant-txns :initform nil)))
+  ((controller :accessor elephant-controller :initarg :controller)))
 
 (defmethod class-id-slot-name ((class persistent-metaclass))
   'elephant::oid)
@@ -28,7 +24,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defmethod open-store ((store-type (eql :elephant)) &rest args &key spec &allow-other-keys)
+  (setup-elephant-transaction-hooks)
   (setf *default-store*
 	(make-instance 'elephant-store
 		       :controller (setf *store-controller* (elephant:open-store spec :recover t)))))
@@ -38,7 +36,8 @@
     (setf *default-store* nil))
   (elephant:close-store (elephant-controller store))
   (when (eq (elephant-controller store) *store-controller*)
-    (setf *store-controller* nil)))
+    (setf *store-controller* nil))
+  (remove-elephant-transaction-hooks))
 
 (defmethod clean-store ((store elephant-store))
   ;; Drop everything from the root
@@ -57,7 +56,6 @@
 		     (when (subtypep store 'elephant-store)
 		       (return-from class-store store))))
 	(error "No valid elephant store available for instance of persistent class ~A" class))))
-		 
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; For scaffolds ;;;
@@ -70,52 +68,49 @@
 		   (eq (weblocks::slot-definition-name dsd) 'elephant::spec)))
 	     (call-next-method)))
 	       
-
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
+
 (defmethod begin-transaction ((store elephant-store))
-  ;; NOTE: No support for nested transactions here or multiple BDB stores
-  (let ((current-txn (get-txn store)))
-    (if current-txn current-txn
-	(set-txn store (controller-start-transaction (elephant-controller store))))))
+  t)
 
 (defmethod commit-transaction ((store elephant-store))
-  (let ((current-txn (get-txn store)))
-    (assert current-txn)
-    (controller-commit-transaction (elephant-controller store) current-txn)
-    (clear-txn store)))
+  t)
 
 (defmethod rollback-transaction ((store elephant-store))
-  (let ((current-txn (get-txn store)))
-    (assert current-txn)
-    (controller-abort-transaction (elephant-controller store) current-txn)
-    (clear-txn store)))
+  t)
 
-;; per-store / per-thread transactions
+(defun elephant-transaction-hook (hooks)
+  "This dynamic hook wraps an elephant transaction macro around the body hooks.
+   This allows us to gain the benefits of the stable transaction system in elephant"
+  (let ((valid-sc (get-valid-sc)))
+    (if valid-sc
+	(ensure-transaction (:store-controller valid-sc)
+	  (eval-dynamic-hooks hooks))
+	(eval-dynamic-hooks hooks))))
 
-(defstruct txn-rec thread txn)
+(defun get-valid-sc ()
+  "This function provides some reasonable defaults for elephant.  Namely, that
+   the default transaction is either the default store or the current store controller.
+   Care must be taken when using multiple elephant stores with weblocks.  The 
+   consequences are as yet undefined."
+  (cond ((subtypep (type-of *default-store*) 'elephant-store)
+	 (elephant-controller *default-store*))
+	((not (null *store-controller*))
+	 *store-controller*)))
 
-(defun get-txn (store)
-  (hunchentoot-mp:with-lock ((elephant-lock store)) 
-    (txn-rec-txn (get-txn-rec store))))
+(defun setup-elephant-transaction-hooks ()
+  "Ensure that the elephant transaction hook is registered on action and rendering code"
+  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-action))
+  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-render)))
 
-(defun get-txn-rec (store)
-  (let* ((thread hunchentoot-mp:*current-process*)
-	 (rec (find thread (elephant-txns store)
-		    :key #'txn-rec-thread)))
-    (if rec rec
-	(let ((newrec (make-txn-rec :thread thread)))
-	  (push newrec (elephant-txns store))
-	  newrec))))
-
-(defun set-txn (store txn)
-  (hunchentoot-mp:with-lock ((elephant-lock store)) 
-    (setf (txn-rec-txn (get-txn-rec store)) txn)))
-
-(defun clear-txn (store)
-  (hunchentoot-mp:with-lock ((elephant-lock store)) 
-    (set-txn store nil)))
+(defun remove-elephant-transaction-hooks ()
+  "Remove the elephant-specific transaction hooks"
+  (symbol-macrolet ((action-list (request-hook :application :dynamic-action))
+		    (render-list (request-hook :application :dynamic-render)))
+    (setf action-list (delete 'elephant-transaction-hook action-list))
+    (setf render-list (delete 'elephant-transaction-hook render-list))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
@@ -128,7 +123,6 @@
   (error "Cannot persist non-persistent objects to elephant stores: ~A" object))
 
 (defmethod delete-persistent-object ((store elephant-store) object)
-  (break)
   (when object
     (elephant:drop-pobject object)))
 
@@ -149,24 +143,28 @@
 
 (defmethod find-persistent-objects ((store elephant-store) class-name
 				    &key filter filter-view order-by range)
-  ;; Use query system?
-  ;; Short term: walk class or appropriate index; construct a filter function
-  ;; - only construct objects when in-range, unless filter and not on index fn
-  ;; - 
-  (declare (ignore filter filter-view))
-  (range-objects-in-memory
+;; Short term: walk class or appropriate index; construct a filter function
+;; - optimize order by if using an index
+;; - only construct objects when in-range, unless filter and not on index fn
+;; - support filtering
+;; Long term: use and support query system on objects?
 ;;     (let ((*store-controller* (elephant-controller store)))
 ;;       (declare (special *store-controller*))
 ;;       (if (and (consp order-by) (has-index class-name (car order-by)))
 ;;	   (elephant::map-inverted-index class-name (car order-by)
 ;;					 :from-end (when (eq (cdr order-by) :desc) t)
 ;;					 :collect t)
-	   (order-objects-in-memory
-	    (elephant::get-instances-by-class class-name)
-	    order-by)
-     range))
+  (when (or filter filter-view)
+    (warn "Elephant does not support filter functions at present"))
+  (range-objects-in-memory
+   (order-objects-in-memory
+    (elephant::get-instances-by-class class-name)
+    order-by)
+   range))
 
 (defun has-index (class-ref slot)
+  "Test whether a given class has an index on its slot.  This helps us
+   optimize find-persistent-objects"
   (subtypep (type-of (mopu:get-slot-definition class-ref slot)) 
 	    'elephant::indexed-effective-slot-definition))
 
@@ -178,4 +176,3 @@
 
 (defmethod supports-filter-p ((store elephant-store))
   nil)
-
