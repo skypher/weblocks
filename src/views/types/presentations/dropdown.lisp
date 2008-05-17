@@ -20,7 +20,7 @@
   (declare (ignore args))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-dropdown (attributize-name (view-field-slot-name field))
+    (render-dropdown (view-field-slot-name field)
 		     (obtain-presentation-choices presentation obj)
 		     :welcome-name (if value
 				       (if (form-view-field-required-p field)
