@@ -67,7 +67,7 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
    (make-pathname :directory '(:relative "pub"))
    (asdf-system-directory asdf-system-name)))
 
-(defparameter *public-files-path*
+(defvar *public-files-path*
   (compute-public-files-path :weblocks)
   "Must be set to a directory on the filesystem that contains public
 files that should be available via the webserver (images, stylesheets,
