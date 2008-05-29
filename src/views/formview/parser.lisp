@@ -7,11 +7,14 @@
 
 ;;; Parser
 (defclass parser ()
-  ((error-message :initform "a valid value"
+  ((error-message :initform "This value must be valid"
 		  :accessor parser-error-message
 		  :initarg :error-message
-		  :documentation "The error part of the message. See
-		  *invalid-input-message* for details.")))
+		  :documentation "A default error message. If subclasses
+override 'parser-error-message', it is still recommended that they allow
+callers to override the error message using the ':error-message'
+initarg. See the implementation of 'integer-parser' for an example of
+this.")))
 
 ;;; Parsing protocol
 (defgeneric parse-view-field-value (parser value obj view field &rest args)

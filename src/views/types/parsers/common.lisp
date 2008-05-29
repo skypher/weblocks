@@ -29,7 +29,7 @@
   (with-slots (error-message) parser
     (or error-message
 	(concatenate 'string
-		     "an integer"
+		     "This value must be an integer"
 		     (when (integer-parser-min parser)
 		       (format nil " greater than ~A" (- (integer-parser-min parser) 1)))
 		     (when (and (integer-parser-min parser)
@@ -114,7 +114,7 @@ on 'symbol' and 'keyword'."
 (defmethod parser-error-message ((parser object-id-parser))
   (with-slots (error-message) parser
     (or error-message
-	(format nil "a valid ~A"
+	(format nil "This value must be a valid ~A"
 		(string-downcase
 		 (humanize-name
 		  (object-id-parser-class-name parser)))))))

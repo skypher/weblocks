@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*form-default-error-summary-threshold*
-	  *required-field-message* *invalid-input-message* form form-view
+	  *required-field-message* form form-view
 	  form-view-error-summary-threshold form-view-use-ajax-p
 	  form-view-default-method form-view-default-enctype
 	  form-view-default-action form-view-persist-p form-view-focus-p
@@ -25,10 +25,6 @@ default value used to initialize 'error-summary-threshold' slot of
   "This message will be passed to 'format' along with the humanized
 name of the field to inform users that the field is required.")
 
-(defparameter *invalid-input-message* "~A must be ~A."
-  "This message will be passed to 'format' along with the humanized
-name of the field and humanized typespec to inform users that their
-input is not valid.")
 
 ;;; Form view
 (defclass form-view (view)
