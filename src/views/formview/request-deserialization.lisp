@@ -54,12 +54,8 @@ Specialize this function to parse given objects differently.")
 						  errors)
 					    (push (cons field-info nil) results))
 					(push (cons field-info parsed-value) results))
-				    (push (cons field
-						(format nil *invalid-input-message*
-							(humanize-name
-							 (view-field-label field))
-							(parser-error-message
-							 (form-view-field-parser field))))
+				    (push (cons field (parser-error-message
+						       (form-view-field-parser field)))
 					  errors))))))
 			view obj args)
 		 (if errors

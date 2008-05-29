@@ -5,17 +5,17 @@
 (deftest integer-parser-error-message-1
     (parser-error-message (make-instance 'integer-parser
 					 :min 10))
-  "an integer greater than 9")
+  "This value must be an integer greater than 9")
 
 (deftest integer-parser-error-message-2
     (parser-error-message (make-instance 'integer-parser
 					 :max 10))
-  "an integer less than 11")
+  "This value must be an integer less than 11")
 
 (deftest integer-parser-error-message-3
     (parser-error-message (make-instance 'integer-parser
 					 :min 3 :max 10))
-  "an integer greater than 2 and less than 11")
+  "This value must be an integer greater than 2 and less than 11")
 
 (deftest integer-parser-error-message-4
     (parser-error-message (make-instance 'integer-parser

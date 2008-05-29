@@ -165,7 +165,9 @@
 						  age)
 				     :form-view (defview () (:type form
 								   :inherit-from '(:scaffold employee))
-						  (age :parse-as integer :requiredp t
+						  (age :parse-as (integer
+								  :error-message "Age must be an integer.")
+						       :requiredp t
 						       :present-as (input :max-length 3))))))
 	;; initial state
 	(render-widget edit-joe)

@@ -61,5 +61,5 @@
 					     :satisfies #'evenp)
 			      (find-view '(form employee))
 			      1)
-  nil "a valid value")
+  nil "This value must be valid")
 
