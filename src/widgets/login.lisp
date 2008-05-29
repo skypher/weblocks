@@ -15,7 +15,9 @@
   "Returns nil if the current user is not authenticated. If the user
 is authenticated, authentication information stored in the session is
 returned."
-  (car (multiple-value-list (session-value *authentication-key*))))
+  (multiple-value-bind (success auth-info)
+      (session-value *authentication-key*)
+    (when success (cdr auth-info))))
 
 (defun logout ()
   "Removes any authentication information from the session."
