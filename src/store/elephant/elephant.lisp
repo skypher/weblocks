@@ -1,8 +1,9 @@
 (in-package :cl-user)
 
 (defpackage #:weblocks-elephant
-  (:use :cl :weblocks :weblocks-memory :elephant)
+  (:use :cl :weblocks :weblocks-memory :elephant :metatilities :metabang.moptilities)
   (:shadowing-import-from :weblocks #:open-store #:close-store)
+  (:shadowing-import-from :elephant #:find-item #:insert-item #:add-index)
   (:export #:defpclass)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
@@ -10,7 +11,12 @@
 (in-package :weblocks-elephant)
 
 (defclass elephant-store ()
-  ((controller :accessor elephant-controller :initarg :controller)))
+  ((controller :accessor elephant-controller :initarg :controller)
+   (stdidx :accessor elephant-stdobj-index)))
+
+(defmethod initialize-instance :after ((store elephant-store) &rest args)
+  (declare (ignore args))
+  (ensure-standard-object-index store))
 
 (defmethod class-id-slot-name ((class persistent-metaclass))
   'elephant::oid)
@@ -41,11 +47,11 @@
 
 (defmethod clean-store ((store elephant-store))
   ;; Drop everything from the root
-  (elephant::map-btree (lambda (k v)
-			 (declare (ignore k v))
-			 (elephant:remove-current-kv))
-		       (elephant:controller-root
-			(elephant-controller store))))
+  (map-btree (lambda (k v)
+	       (declare (ignore k v))
+	       (elephant:remove-current-kv))
+	     (elephant:controller-root
+	      (elephant-controller store))))
 
 (defmethod class-store ((class persistent-metaclass))
   "This works if you only have one elephant store open"
@@ -102,8 +108,8 @@
 
 (defun setup-elephant-transaction-hooks ()
   "Ensure that the elephant transaction hook is registered on action and rendering code"
-  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-action))
-  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-render)))
+  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-action)))
+;;  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-render)))
 
 (defun remove-elephant-transaction-hooks ()
   "Remove the elephant-specific transaction hooks"
@@ -116,57 +122,182 @@
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmethod persist-object ((store elephant-store) (object elephant:persistent))
+(defmethod persist-object ((store elephant-store) (object elephant:persistent-object))
   object)
 
-(defmethod persist-object ((store elephant-store) object)
-  (error "Cannot persist non-persistent objects to elephant stores: ~A" object))
-
-(defmethod delete-persistent-object ((store elephant-store) object)
+(defmethod delete-persistent-object ((store elephant-store) (object elephant:persistent-object))
   (when object
-    (elephant:drop-pobject object)))
+    (elephant:drop-instance object)))
 
 (defmethod delete-persistent-object-by-id ((store elephant-store) class-name object-id)
-  (declare (ignore class-name))
-  (when object-id
-    (elephant:drop-pobject 
-     (elephant::controller-recreate-instance (elephant-controller store)
-					     object-id))))
+   (if (subtypep class-name 'persistent-object)
+      (when (and object-id (subtypep class-name 'persistent-object))
+	(elephant:drop-instance
+	 (elephant::controller-recreate-instance (elephant-controller store)
+						 object-id)))
+      (delete-persistent-standard-object-by-id store class-name object-id)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Querying persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defmacro with-store-controller (store &body body)
+  `(let ((*store-controller* (elephant-controller ,store)))
+     (declare (special *store-controller*))
+     ,@body))
+
 (defmethod find-persistent-object-by-id ((store elephant-store) class-name object-id)
   (declare (ignore class-name))
-  (elephant::controller-recreate-instance (elephant-controller store) object-id))
+  (with-store-controller store
+    (elephant::controller-recreate-instance (elephant-controller store) object-id)))
+
+(defmacro with-ranged-collector ((var range) &body body)
+  (with-gensyms (results accumulator value)
+    `(let ((,results nil))
+       (labels ((,accumulator (,value)
+		  (push (elephant::controller-recreate-instance 
+			 *store-controller* ,value)
+			,results)))
+	 (let ((,var (make-ranged-collector #',accumulator ,range)))
+	   (catch 'finish-map
+	     ,@body)))
+       ,results)))
 
 (defmethod find-persistent-objects ((store elephant-store) class-name
 				    &key order-by range &allow-other-keys)
-;; Short term: walk class or appropriate index; construct a filter function
-;; - optimize order by if using an index
-;; - only construct objects when in-range, unless filter and not on index fn
-;; - support filtering
-;; Long term: use and support query system on objects?
-;;     (let ((*store-controller* (elephant-controller store)))
-;;       (declare (special *store-controller*))
-;;       (if (and (consp order-by) (has-index class-name (car order-by)))
-;;	   (elephant::map-inverted-index class-name (car order-by)
-;;					 :from-end (when (eq (cdr order-by) :desc) t)
-;;					 :collect t)
-  (range-objects-in-memory
-   (order-objects-in-memory
-    (elephant::get-instances-by-class class-name)
-    order-by)
-   range))
+  "This implements a reasonably efficient form of the core weblocks query
+   functionality for paged displays of objects.  More sophisticated stuff
+   can be done via the on-query facility."
+  (if (subtypep class-name 'persistent-object)
+      (with-store-controller store
+	(catch 'finish-map
+	  (cond ((and (consp order-by) (has-index class-name (car order-by)))
+		 (if range
+		     (with-ranged-collector (rcollector range)
+		       (map-inverted-index 
+			(lambda (key oid)
+			  (declare (ignore key))
+			  (funcall rcollector oid))
+			class-name (car order-by)
+			:from-end (when (eq (cdr order-by) :desc) t)
+			:oids t))
+		     (map-inverted-index 
+		      #'elephant::identity2
+		      class-name (car order-by)
+		      :from-end (when (eq (cdr order-by) :desc) t)
+		      :collect t)))
+		((consp order-by)
+		 (range-objects-in-memory
+		  (order-objects-in-memory
+		   (get-instances-by-class class-name)
+		   order-by)
+		  range))
+		(range
+		 (with-ranged-collector (collector range)
+		   (map-class collector class-name :oids t)))
+		(t
+		 (get-instances-by-class class-name)))))
+      (find-persistent-standard-objects store class-name :order-by order-by :range range)))
+
+(defmethod count-persistent-objects ((store elephant-store) class-name
+				     &key &allow-other-keys)
+  "A reasonably fast method for counting class instances"
+  (if (subtypep class-name 'persistent-object)
+      (with-store-controller store
+	(let ((count 0))
+	  (flet ((counter (x)
+		   (declare (ignore x))
+		   (incf count)))
+	    (map-class #'counter class-name :oids t))
+	  count))
+      (count-persistent-objects store class-name)))
+
+(defun make-ranged-collector (collector range)
+  (let ((offset 0)
+	(start (car range))
+	(end (cdr range)))
+    (labels ((range-mapper (oid)
+	       (cond ((>= offset end)
+		      (throw 'finish-map nil))
+		     ((>= offset start)
+		      (funcall collector oid)
+		      (incf offset))
+		     (t (incf offset)))))
+      #'range-mapper)))
 
 (defun has-index (class-ref slot)
   "Test whether a given class has an index on its slot.  This helps us
    optimize find-persistent-objects"
-  (subtypep (type-of (mopu:get-slot-definition class-ref slot)) 
-	    'elephant::indexed-effective-slot-definition))
+  (elephant::indexed-p (get-slot-definition class-ref slot)))
 
-(defmethod count-persistent-objects ((store elephant-store) class-name
-				     &key &allow-other-keys)
-  (length (find-persistent-objects store class-name)))
 
+;; ========================================================================
+;;  Support for persisting standard classes
+;; ========================================================================
+
+(defun ensure-standard-object-index (store)
+  (setf (elephant-stdobj-index store)
+	(aif (get-from-root 'stdobj-index :sc (elephant-controller store))
+		       it
+		       (make-standard-object-index store))))
+
+(defun make-standard-object-index (store)
+  (let ((bt (make-indexed-btree (elephant-controller store))))
+    (add-index bt
+	       :index-name 'class 
+	       :key-form '(lambda (idx pk v)
+			   (declare (ignore idx pk))
+			   (values t (class-of v))))
+    bt))
+
+(defmethod persist-object ((store elephant-store) object)
+  (aif (object-id object)
+       (setf (get-value it (elephant-stdobj-index store))
+	     object)
+       (error "No object ID with which to persist ~A" object)))
+	  
+(defmethod delete-persistent-object ((store elephant-store) object)
+  (if (and object (object-id object))
+      (remove-kv (object-id object) (elephant-stdobj-index store))
+      (error "Object ~A is null or has no object-id" object)))
+
+(defun delete-persistent-standard-object-by-id (store class-name object-id)
+  (declare (ignore class-name))
+  (aif (and object-id (get-value object-id (elephant-stdobj-index store)))
+       (delete-persistent-object store it)
+       (error "No standard object with ID ~A found in store ~A" object-id store)))
+
+;; =================================================================
+;;  Searching for standard classes (not very efficient)
+;; =================================================================
+
+(defun find-persistent-standard-object-by-id (store class-name object-id)
+  (declare (ignore class-name))
+  (with-store-controller store
+    (get-value object-id (elephant-stdobj-index store))))
+
+
+(defun find-persistent-standard-objects (store class-name &key order-by range)
+  "This implements a slow version of lookup"
+  (range-objects-in-memory
+   (order-objects-in-memory
+    (with-store-controller store
+      (map-index (lambda (k v pk) 
+		   (declare (ignore k pk))
+		   v)
+		 (get-index (elephant-stdobj-index store) 'class)
+		 :value class-name
+		 :collect t))
+    order-by)
+   range))
+	
+
+(defun count-persistent-standard-objects (store class-name)
+  "Count class instances"
+  (let ((count 0))
+    (map-index (lambda (k v pk) 
+		 (declare (ignore k v pk))
+		 (incf count))
+	       (get-index (elephant-stdobj-index store) 'class)
+	       :value class-name)))

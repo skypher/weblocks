@@ -11,7 +11,7 @@
   :author "Ian Eslick"
   :licence "LLGPL"
   :description "A weblocks backend for elephant."
-  :depends-on (:moptilities :elephant :weblocks :weblocks-memory)
+  :depends-on (:moptilities :metatilities :elephant :weblocks :weblocks-memory)
   :components ((:file "elephant")
 	       (:file "proxy")))
 

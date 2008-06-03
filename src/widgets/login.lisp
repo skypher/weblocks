@@ -85,6 +85,7 @@ returned."
 	(make-quickform (login-view obj)
 			:on-success (lambda (w o)
 				      (declare (ignore w o))
+				      (break)
 				      (answer obj (authenticatedp)))
 			:on-cancel (lambda (w)
 				     (declare (ignore w))
