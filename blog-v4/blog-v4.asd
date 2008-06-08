@@ -4,13 +4,13 @@
 
 (in-package :blog-asd)
 
-(defsystem blog
-    :name "blog"
+(defsystem blog-v4
+    :name "blog-v4"
     :version "0.0.1"
     :maintainer ""
     :author ""
     :licence ""
-    :description "blog"
+    :description "blog-v4"
     :depends-on (:weblocks)
     :components ((:file "blog")
 		 (:module conf
