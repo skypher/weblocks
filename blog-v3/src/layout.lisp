@@ -4,7 +4,7 @@
   (make-instance 'gridedit
 		 :name 'users-grid
 		 :data-class 'user
-		 :view 'user-grid-view
+		 :view 'user-table-view
 		 :widget-prefix-fn (lambda (&rest args)
 				     (declare (ignore args))
 				     (with-html (:h1 "Users")))
@@ -18,7 +18,7 @@
 		 :widget-prefix-fn (lambda (&rest args)
 				     (declare (ignore args))
 				     (with-html (:h1 "Posts")))
-		 :view 'post-grid-view
+		 :view 'post-table-view
 		 :item-data-view 'post-data-view
 		 :item-form-view 'post-form-view))
 

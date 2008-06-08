@@ -66,7 +66,7 @@
   (make-instance 'gridedit
 		 :name 'users-grid
 		 :data-class 'user
-		 :view 'user-grid-view
+		 :view 'user-table-view
 		 :widget-prefix-fn (lambda (&rest args)
 				     (declare (ignore args))
 				     (with-html (:h1 "Users")))
@@ -80,7 +80,7 @@
 		 :widget-prefix-fn (lambda (&rest args)
 				     (declare (ignore args))
 				     (with-html (:h1 "Posts")))
-		 :view 'post-grid-view
+		 :view 'post-table-view
 		 :item-data-view 'post-data-view
 		 :item-form-view 'post-form-view))
 
@@ -122,11 +122,11 @@
 ;;; src/views.lisp
 (in-package :blog)
 
-(defview user-grid-view (:type grid :inherit-from '(:scaffold user)))
+(defview user-table-view (:type table :inherit-from '(:scaffold user)))
 (defview user-data-view (:type data :inherit-from '(:scaffold user)))
 (defview user-form-view (:type form :inherit-from '(:scaffold user)))
 
-(defview post-grid-view (:type grid :inherit-from '(:scaffold post)))
+(defview post-table-view (:type table :inherit-from '(:scaffold post)))
 (defview post-data-view (:type data :inherit-from '(:scaffold post)))
 (defview post-form-view (:type form :inherit-from '(:scaffold post)))
 
@@ -175,7 +175,7 @@
 ;;;;   of each widget disappears.
 ;;;;   
 ;;;; - The scaffold defines fields from all slots for which there is a
-;;;;   slot reader when in data/grid view, and all fields for which
+;;;;   slot reader when in data/table view, and all fields for which
 ;;;;   there is a slot writer when in form view.  So the ID slots are
 ;;;;   not shown but all other slots are shown.
 ;;;;
@@ -188,8 +188,8 @@
 ;;;; ChangeLog
 blog-v1:	
 	
-	* src/views.lisp (user-grid-view, user-data-view, user-form-view)
-	(post-grid-view, post-data-view, post-form-view): scaffolded views
+	* src/views.lisp (user-table-view, user-data-view, user-form-view)
+	(post-table-view, post-data-view, post-form-view): scaffolded views
 	for the gridedit interface
 
 	* src/init-session.lisp (init-user-session): call MAKE-ADMIN-PAGE
