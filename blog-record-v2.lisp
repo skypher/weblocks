@@ -88,8 +88,8 @@ blog-v2
 
 blog-v1:	
 	
-	* src/views.lisp (user-grid-view, user-data-view, user-form-view)
-	(post-grid-view, post-data-view, post-form-view): scaffolded views
+	* src/views.lisp (user-table-view, user-data-view, user-form-view)
+	(post-table-view, post-data-view, post-form-view): scaffolded views
 	for the gridedit interface
 
 	* src/init-session.lisp (init-user-session): call MAKE-ADMIN-PAGE
