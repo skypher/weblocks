@@ -5,5 +5,5 @@
 ;;; default.
 (defstore *blog-store* :prevalence
   (merge-pathnames (make-pathname :directory '(:relative "data"))
-		   (asdf-system-directory :blog)))
+		   (asdf-system-directory :blog-v3)))
 
