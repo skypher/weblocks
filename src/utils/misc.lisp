@@ -15,12 +15,12 @@
 	  append-custom-fields find-slot-dsd find-slot-esd drop-last
 	  function-designator-p))
 
-(defun gen-id ()
+(defun gen-id (&optional (prefix ""))
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (session-value 'last-unique-id) -1))))
     (setf (session-value 'last-unique-id) new-widget-id)
-    (format nil "~A" new-widget-id)))
+    (format nil "~A~A" prefix new-widget-id)))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable
