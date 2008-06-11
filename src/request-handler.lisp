@@ -141,13 +141,12 @@ association list. This function is normally called by
   (if (eq (request-method) :post)
       (let (tx-error-occurred-p)
 	(unwind-protect
-	     (handler-case (progn
-			     (mapstores #'begin-transaction)
-			     (eval-dynamic-hooks hooks))
-	       (error (err) (progn
-			      (mapstores #'rollback-transaction)
-			      (setf tx-error-occurred-p t)
-			      (error err))))
+	     (handler-bind ((error #'(lambda (error)
+				       (declare (ignore error))
+				       (mapstores #'rollback-transaction)
+				       (setf tx-error-occurred-p t))))
+	       (mapstores #'begin-transaction)
+	       (eval-dynamic-hooks hooks))
 	  (unless tx-error-occurred-p
 	    (mapstores #'commit-transaction))))
       (eval-dynamic-hooks hooks)))
