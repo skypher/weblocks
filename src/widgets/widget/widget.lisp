@@ -156,9 +156,8 @@ that will be applied before and after the body is rendered.")
   (:method (obj body-fn &rest args
 	    &key widget-prefix-fn widget-suffix-fn
 	    &allow-other-keys)
-    (let* ((obj-name (attributize-name (widget-name obj))) ; obj-name may be null in functions
-	   (widget-id (when (and obj-name (not (string-equal obj-name "")))
-			(attributize-name obj-name))))
+    (let* ((obj-name (widget-dom-id obj)) ; obj-name may be null in functions
+	   (widget-id (when (not (string-equal obj-name "")) obj-name)))
       (with-html
 	(:div :class (widget-css-classes obj)
 	      :id widget-id
@@ -226,6 +225,18 @@ be present for all widgets."))
 
 (defmethod widget-name ((obj string))
   nil)
+
+(defgeneric widget-dom-id (obj)
+  (:documentation "Provides a consistent interface to identifying widgets
+by their DOM id.")
+  (:method ((obj widget))
+    (attributize-name (widget-name obj)))
+  (:method ((obj symbol))
+    "")
+  (:method ((obj function))
+    "")
+  (:method ((obj string))
+    ""))
 
 (defmethod widget-prefix-fn (obj)
   nil)
