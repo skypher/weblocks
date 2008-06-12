@@ -180,7 +180,7 @@ the request."
 			 (setf (slot-value *session* 'hunchentoot::session-string) "test")
 			 ,@body)
 	 (setf (symbol-function 'weblocks::make-action) make-action-orig)
-	 (setf (symbol-function 'weblocks::generate-widget-id) generate-widget-id-orig)
+	 (setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
 	 (weblocks::close-stores)))))
 
 (defun do-request (parameters)
