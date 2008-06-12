@@ -1,13 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name widget-propagate-dirty
-	  widget-rendered-p widget-continuation widget-parent
-	  widget-prefix-fn widget-suffix-fn
-	  widget-public-dependencies with-widget-header
-	  render-widget-body widget-css-classes render-widget
-	  mark-dirty widget-dirty-p find-widget-by-path*
-	  find-widget-by-path))
+(export '(defwidget widget widget-name widget-dom-id
+          widget-propagate-dirty widget-rendered-p widget-continuation
+          widget-parent widget-prefix-fn widget-suffix-fn
+          widget-public-dependencies with-widget-header
+          render-widget-body widget-css-classes render-widget mark-dirty
+          widget-dirty-p find-widget-by-path* find-widget-by-path))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
