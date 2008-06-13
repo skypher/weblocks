@@ -96,12 +96,14 @@ documentation for more details.")
 drilldown of a dataedit item. Specialize this method to provide ways
 to edit items in the dataedit widget."))
 
-(defun dataedit-drilldown-action (obj item)
-  "This callback function will be called by the dataedit when the user
-attempts to drill down on a given item."
-  (setf (dataedit-item-widget obj)
-	(dataedit-create-drilldown-widget obj item))
-  (setf (dataedit-ui-state obj) :drilldown))
+(defgeneric dataedit-drilldown-action (obj item)
+  (:documentation
+   "This callback function will be called by the dataedit when the user
+attempts to drill down on a given item.")
+  (:method ((obj dataedit-mixin) item)
+    (setf (dataedit-item-widget obj)
+	  (dataedit-create-drilldown-widget obj item))
+    (setf (dataedit-ui-state obj) :drilldown)))
 
 ;;; New Item
 (defgeneric dataedit-create-new-item-widget (obj)
