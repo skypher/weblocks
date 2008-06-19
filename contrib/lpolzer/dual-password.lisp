@@ -51,8 +51,8 @@
 (defmethod parse-view-field-value ((parser dual-password-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
-  (let* ((val1 (hunchentoot:parameter (format nil "~A-1" (string-downcase (view-field-slot-name field)))))
-         (val2 (hunchentoot:parameter (format nil "~A-2" (string-downcase (view-field-slot-name field)))))
+  (let* ((val1 (hunchentoot:parameter (format nil "~A-weblocks-1" (string-downcase (view-field-slot-name field)))))
+         (val2 (hunchentoot:parameter (format nil "~A-weblocks-2" (string-downcase (view-field-slot-name field)))))
          (present-p (and val1 val2 (text-input-present-p val1) (text-input-present-p val2)))
          (valid-p (and present-p (equal val1 val2)))
          ; XXX min-length < length < max-length
