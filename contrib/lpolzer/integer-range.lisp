@@ -1,6 +1,3 @@
-;;; NB:
-;;; needs request-parameter-for-presentation.diff applied to Weblocks
-
 (in-package :weblocks)
 
 (export '(integer-range-presentation integer-range-parser))
