@@ -256,16 +256,18 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
   (declare (special *uri-tokens*))
   (apply #'concatenate 'string "/" (intersperse *uri-tokens* "/")))
 
-(defun string-remove-left (str suffix &key ignore-case-p)
-  "If string 'str' starts with 'suffix', remove 'suffix' from the
+(defun string-remove-left (str prefix &key ignore-case-p)
+  "If string 'str' starts with 'prefix', remove 'prefix' from the
 start of 'str'."
-  (when (string-starts-with str suffix :ignore-case-p ignore-case-p)
-    (subseq str (length suffix))))
+  (when (string-starts-with str prefix
+			    :test (if ignore-case-p #'char-equal #'char=))
+    (subseq str (length prefix))))
 
 (defun string-remove-right (str suffix &key ignore-case-p)
   "If string 'str' ends with 'suffix', remove 'suffix' from the end of
 'str'."
-  (when (string-ends-with str suffix :ignore-case-p ignore-case-p)
+  (when (string-ends-with str suffix
+			  :test (if ignore-case-p #'char-equal #'char=))
     (subseq str 0 (- (length str)
 		     (length suffix)))))
 
