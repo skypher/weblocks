@@ -38,6 +38,36 @@
 					     (find-view '(form employee))))))
   nil)
 
+(deftest update-object-view-from-request-5
+    (with-request :get '(("name" . "foo") ("manager" . "bar"))
+      (let ((obj (copy-template *joe*)))
+	(multiple-value-bind (result errors)
+	    (update-object-view-from-request obj
+					     (defview () (:type form
+								:inherit-from '(:scaffold employee)
+								:persistp nil
+								:satisfies (lambda (&key name manager)
+									     (if (string-equal name manager)
+										 t
+										 (values nil "abcd"))))))
+	  (values result (cdr (first errors))))))
+  nil "abcd")
+
+(deftest update-object-view-from-request-6
+    (with-request :get '(("name" . "foo") ("manager" . "foo"))
+      (let ((obj (copy-template *joe*)))
+	(multiple-value-bind (result errors)
+	    (update-object-view-from-request obj
+					     (defview () (:type form
+								:inherit-from '(:scaffold employee)
+								:persistp nil
+								:satisfies (lambda (&key name manager)
+									     (if (string-equal name manager)
+										 t
+										 (values nil "abcd"))))))
+	  (values result (cdr (first errors))))))
+  t nil)
+
 ;;; Test request-parameters-for-object-view
 (deftest request-parameters-for-object-view-1
     (with-request :get '(("name" . "blah"))

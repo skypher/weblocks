@@ -5,7 +5,7 @@
 	  *required-field-message* form form-view
 	  form-view-error-summary-threshold form-view-use-ajax-p
 	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-persist-p form-view-focus-p
+	  form-view-default-action form-view-persist-p form-view-focus-p form-view-satisfies
 	  form-view-buttons form-view-field-writer-mixin form-view-field
 	  form-view-field-parser form-view-field-satisfies
 	  form-view-field-writer form-view-field-required-p mixin-form
@@ -82,7 +82,16 @@ name of the field to inform users that the field is required.")
 	    and :cancel keywords. Each item of the list may be a cons
 	    pair, in which case CAR of the pair should be a keyword,
 	    and CDR of the pair should be a string that will be
-	    presented to the user via value of the button."))
+	    presented to the user via value of the button.")
+   (satisfies :initform nil
+	      :initarg :satisfies
+	      :accessor form-view-satisfies
+	      :documentation "A function or a list of functions that
+perform validation on the entire view (possibly combining multiple fields).
+The function should expect keyword arguments corresponding to view slot
+names, each keyword argument corresponds to one of the parsed values.
+The function should either return t if the form validates properly, or
+values nil error-message if it does not."))
   (:documentation "A view designed to interact with the user via input
   forms."))
 

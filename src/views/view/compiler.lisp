@@ -81,15 +81,16 @@
 		 (lambda ()
 		   ,initform)))))
 
-(defmacro defview-anon ((&rest args &key (type 'data) inherit-from &allow-other-keys) &rest fields)
+(defmacro defview-anon ((&rest args &key (type 'data) inherit-from satisfies &allow-other-keys) &rest fields)
   "A macro used to easily define anonymous user interface views in a
 declarative manner."
   (let ((view (gensym)))
     `(let (,view)
        (setf ,view (funcall #'make-instance (view-class-name ',type)
 			    :fields ,(compile-view-fields type fields)
+			    ,@(when satisfies (list :satisfies `(ensure-list ,satisfies)))
 			    ,@(quote-property-list-arguments
-			       (remove-keyword-parameters args :type :inherit-from))))
+			       (remove-keyword-parameters args :type :inherit-from :satisfies))))
        ,(when inherit-from
 	  (let ((inherit-from (second
 			       (quote-property-list-arguments
