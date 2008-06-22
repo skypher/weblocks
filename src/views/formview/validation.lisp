@@ -3,14 +3,37 @@
 
 (export '(validate-object-form-view validate-form-view-field))
 
+(let ((keyword-package (find-package :keyword)))
+  (defun symbol-to-keyword (symbol)
+    (intern (symbol-name symbol) keyword-package)))
+
+(defun run-view-validators (validators fields-values)
+  "Applies all of the functions in the 'validators' list to
+the 'fields-values' arglist. Returns either t if all functions
+returned t, or nil and an association list of nils and error
+messages if any of the functions failed."
+  (let ((validates t)
+	errors)
+    (dolist (validator-function validators)
+      (multiple-value-bind (validatesp error)
+	  (apply validator-function fields-values)
+	(unless validatesp
+	  (setf validates nil)
+	  (push-end (cons nil error) errors))))
+    (if validates
+	t
+	(values nil errors))))
+
 (defgeneric validate-object-form-view (object view parsed-values)
   (:documentation "Called by the framework during form deserialization
 to validate a form view. Default implementation validates each field
-by calling 'validate'form-view-field'.
+by calling 'validate-form-view-field', then if individual field validation
+succeeds, applies view-global validators.
 
 If this function succeeds validating the form it returns
 true. Otherwise returns nil as the first value, and an association
-list of fields and errors as the second value.
+list of either fields and errors or nils and errors (for non-field-related
+validation errors) as the second value.
 
 'object' - the object the form is being deserialized into.
 'view' - form view object being deserialized.
@@ -18,20 +41,27 @@ list of fields and errors as the second value.
 parsed values.")
   (:method (object (view form-view) parsed-values)
     (let ((validates t)
-	  errors)
+	  errors
+	  fields-values)
       (dolist (info-value-pair parsed-values)
 	(destructuring-bind (field-info . parsed-value)
 	    info-value-pair
 	  (multiple-value-bind (validatesp error)
 	      (let ((field (field-info-field field-info))
 		    (object (field-info-object field-info)))
+		(push parsed-value fields-values)
+		(push (symbol-to-keyword (view-field-slot-name field)) fields-values)
 		(validate-form-view-field (view-field-slot-name field)
 					  object field view parsed-value))
 	    (unless validatesp
 	      (setf validates nil)
 	      (push-end (cons (field-info-field field-info) error) errors)))))
+      ;; We proceed to view-level validation only if individual fields were
+      ;; successfully validated.
       (if validates
-	  t
+	  (if (form-view-satisfies view)
+	      (run-view-validators (form-view-satisfies view) fields-values)
+	      t)
 	  (values nil errors)))))
 
 (defgeneric validate-form-view-field (slot-name object field view parsed-value)

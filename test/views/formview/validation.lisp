@@ -63,3 +63,26 @@
 			      1)
   nil "This value must be valid")
 
+(deftest validate-form-view-field-5
+    (validate-form-view-field 'manager *joe*
+			      (make-instance 'form-view-field
+					     :slot-name 'manager
+					     :satisfies (lambda (field)
+							  (values nil "error message")))
+			      (find-view '(form employee))
+			      1)
+  nil "error message")
+
+(deftest validate-form-view-field-6
+    (validate-form-view-field 'manager *joe*
+			      (make-instance 'form-view-field
+					     :slot-name 'manager
+					     :satisfies (list
+							 #'oddp
+							 (lambda (field)
+							   (values nil "error message 1"))
+							 (lambda (field)
+							   (values nil "error message 2"))))
+			      (find-view '(form employee))
+			      1)
+  nil "error message 1")
