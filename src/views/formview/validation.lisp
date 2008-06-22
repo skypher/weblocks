@@ -56,13 +56,16 @@ value. Default implementation obtains the error message by calling
     (let* ((slot-esd (find-slot-esd (class-of object) slot-name))
 	   (slot-type (if slot-esd
 			  (slot-definition-type slot-esd)
-			  t)))
-      (or (every (compose #'not #'null)
-		 (mapcar (curry-after #'funcall parsed-value)
-			 (remove nil
-				 (cons (unless (slot-boundp field 'writer)
-					 (lambda (value)
-					   (typep value slot-type)))
-				       (ensure-list (form-view-field-satisfies field))))))
-	  (values nil (parser-error-message (form-view-field-parser field)))))))
-
+			  t))
+	   (validators (remove nil
+			       (cons (unless (slot-boundp field 'writer)
+				       (lambda (value)
+					 (typep value slot-type)))
+				     (ensure-list (form-view-field-satisfies field))))))
+      (loop
+	 for validator in validators
+	 do (multiple-value-bind (result error) (funcall validator parsed-value)
+	      (unless result
+		(return (values nil (or error
+					(parser-error-message (form-view-field-parser field)))))))
+	 finally (return t)))))

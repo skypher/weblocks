@@ -109,9 +109,11 @@ name of the field to inform users that the field is required.")
    (satisfies :initform nil
 	      :initarg :satisfies
 	      :accessor form-view-field-satisfies
-	      :documentation "A predicate, or a list of predicates,
-	      that set constraints for parsed values during
-	      validation.")
+	      :documentation "A predicate, or a list of predicates, that
+	      set constraints for parsed values during validation. A
+	      predicate may return multiple values, in which case the
+	      second value is used as the error message instead of the
+	      default one supplied by the parser.")
    (requiredp :initform nil
 	      :initarg :requiredp
 	      :accessor form-view-field-required-p
