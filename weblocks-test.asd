@@ -21,6 +21,8 @@
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
 			  :depends-on ("weblocks-test"))
+		 (:file "dependencies"
+			:depends-on ("weblocks-test" utils-test))
 		 (:file "actions"
 			:depends-on ("weblocks-test"))
 		 (:file "request-hooks"

@@ -150,7 +150,7 @@ values nil error-message if it does not."))
   'mixin-form)
 
 ;;; Presentation
-(defclass form-presentation ()
+(defclass form-presentation (presentation)
   ()
   (:documentation "A base class for all presentations that output form
   constructs. All form presentations should derive from this class in
@@ -247,26 +247,32 @@ differently.
 			     (fields-suffix-fn (view-fields-default-suffix-fn view))
 			     validation-errors
 			     &allow-other-keys)
-  (declare (special *on-ajax-complete-scripts*))
+  (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
   (let ((form-id (gen-id))
 	(header-class (format nil "view form ~A"
 			      (attributize-name (object-class-name obj)))))
     (when (>= (count-view-fields view)
 	      (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
-    (with-html-form (method action
-			    :id (when (form-view-focus-p view) form-id)
-			    :class header-class
-			    :enctype (form-view-default-enctype view)
-			    :use-ajax-p (form-view-use-ajax-p view))
-      (:h1 (fmt (view-caption view)
-		(humanize-name (object-class-name obj))))
-      (render-validation-summary view obj widget validation-errors)
-      (:h2 :class "form-fields-title" "Form fields:")
-      (safe-apply fields-prefix-fn view obj args)
-      (:ul (apply body-fn view obj args))
-      (safe-apply fields-suffix-fn view obj args)
-      (apply #'render-form-view-buttons view obj widget args))
+    (let ((form-body
+	   (let ((*weblocks-output-stream* (make-string-output-stream)))
+	     (with-html
+	       (:h1 (fmt (view-caption view)
+			 (humanize-name (object-class-name obj))))
+	       (render-validation-summary view obj widget validation-errors)
+	       (:h2 :class "form-fields-title" "Form fields:")
+	       (safe-apply fields-prefix-fn view obj args)
+	       (:ul (apply body-fn view obj args))
+	       (safe-apply fields-suffix-fn view obj args)
+	       (apply #'render-form-view-buttons view obj widget args)
+	       (get-output-stream-string *weblocks-output-stream*)))))
+      (with-html-form (method action
+			      :id (when (form-view-focus-p view) form-id)
+			      :class header-class
+			      :enctype (form-view-default-enctype view)
+			      :extra-submit-code (render-form-submit-dependencies *form-submit-dependencies*)
+			      :use-ajax-p (form-view-use-ajax-p view))
+	(write-string form-body *weblocks-output-stream*)))
     (when (form-view-focus-p view)
       (let ((focus-script (format nil "$('~A').focusFirstElement();" form-id)))
 	(if (ajax-request-p)

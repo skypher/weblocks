@@ -362,13 +362,14 @@
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by address, descending."))))
 
-;;; test specialization of widget-public-dependencies
-(deftest datagrid-widget-public-dependencies-1
+;;; test specialization of dependencies
+(deftest datagrid-dependencies-1
     (with-request :get nil
       (not (null
-	    (member "stylesheets/pagination.css"
-		    (widget-public-dependencies (make-instance 'datagrid :data-class 'employee))
-		    :key (curry #'format nil "~A")
+	    (member "/pub/stylesheets/pagination.css"
+		    (dependencies (make-instance 'datagrid :data-class 'employee))
+		    :key (lambda (e)
+			   (format nil "~A" (dependency-url e)))
 		    :test #'string-equal))))
   t)
 

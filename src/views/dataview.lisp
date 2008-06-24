@@ -19,7 +19,7 @@
   ())
 
 ;;; Presentation
-(defclass text-presentation ()
+(defclass text-presentation (presentation)
   ()
   (:documentation "A default presentation that renders values as
   text."))

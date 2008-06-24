@@ -35,11 +35,13 @@
 ;;; test with-page
 (deftest-html with-page-1
     (let ((weblocks::*render-debug-toolbar* nil)
-	  (weblocks::*page-public-dependencies* (list "stylesheets/foo.css"
-						      "stylesheets/bar.css"))
+	  (weblocks::*page-dependencies* (mapcar (curry #'apply
+							(curry-after #'make-local-dependency :do-not-probe t))
+						 '((:stylesheet "foo")
+						   (:stylesheet "bar"))))
 	  (weblocks::*webapp-name* 'some-name)
 	  (*current-page-description* "Some Page"))
-      (declare (special weblocks::*page-public-dependencies*
+      (declare (special weblocks::*page-dependencies*
 			*current-page-description* weblocks::*webapp-name*))
       (with-html
 	(:div "test"))

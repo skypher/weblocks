@@ -4,32 +4,32 @@
 ;;; test defwebapp
 (deftest defwebapp-1
     (let (weblocks::*webapp-name*
-	  weblocks::*application-public-dependencies*
+	  weblocks::*application-dependencies*
 	  *webapp-description*)
       (declare (special weblocks::*webapp-name*
-			weblocks::*application-public-dependencies*
+			weblocks::*application-dependencies*
 			*webapp-description*))
       (defwebapp 'hello :description "foo bar")
       (values weblocks::*webapp-name*
-	      (mapcar (curry #'format nil "~A") weblocks::*application-public-dependencies*)
+	      (mapcar (curry #'format nil "~A") (mapcar #'dependency-url weblocks::*application-dependencies*))
 	      *webapp-description*))
   hello
-  ("stylesheets/layout.css"
-   "stylesheets/main.css"
-   "stylesheets/dialog.css"
-   "scripts/prototype.js"
-   "scripts/scriptaculous.js"
-   "scripts/shortcut.js"
-   "scripts/weblocks.js"
-   "scripts/dialog.js")
+  ("/pub/stylesheets/layout.css"
+   "/pub/stylesheets/main.css"
+   "/pub/stylesheets/dialog.css"
+   "/pub/scripts/prototype.js"
+   "/pub/scripts/scriptaculous.js"
+   "/pub/scripts/shortcut.js"
+   "/pub/scripts/weblocks.js"
+   "/pub/scripts/dialog.js")
   "foo bar")
 
 (deftest defwebapp-2
     (let (weblocks::*webapp-name*
-	  weblocks::*application-public-dependencies*
+	  weblocks::*application-dependencies*
 	  (*webapp-description* "foo bar"))
       (declare (special weblocks::*webapp-name*
-			weblocks::*application-public-dependencies*
+			weblocks::*application-dependencies*
 			*webapp-description*))
       (defwebapp 'hello)
       *webapp-description*)

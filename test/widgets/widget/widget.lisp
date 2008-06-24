@@ -6,49 +6,49 @@
     (macroexpand-1
      '(defwidget foo (bar)
        ((slot1 :initarg :slot1) (slot2 :initform nil))))
-  (defclass foo (bar)
-    ((slot1 :initarg :slot1)
-     (slot2 :initform nil))
-    (:metaclass widget-class))
+  (progn
+    (defclass foo (bar)
+      ((slot1 :initarg :slot1)
+       (slot2 :initform nil))
+      (:metaclass widget-class))
+    (defmethod per-class-dependencies append ((weblocks::obj foo))
+       (declare (ignore weblocks::obj))
+       (weblocks::dependencies-by-symbol (quote foo))))
   t)
 
 (deftest defwidget-2
     (macroexpand-1
      '(defwidget foo ()
        ((slot1 :initarg :slot1) (slot2 :initform nil))))
-  (defclass foo (widget)
-    ((slot1 :initarg :slot1)
-     (slot2 :initform nil))
-    (:metaclass widget-class))
+  (progn
+    (defclass foo (widget)
+      ((slot1 :initarg :slot1)
+       (slot2 :initform nil))
+      (:metaclass widget-class))
+    (defmethod per-class-dependencies append ((weblocks::obj foo))
+      (declare (ignore weblocks::obj))
+      (weblocks::dependencies-by-symbol (quote foo))))
   t)
 
-;;; test widget-public-dependencies-aux
-(deftest widget-public-dependencies-aux-1
-    (weblocks::widget-public-dependencies-aux 'non-existant-widget-name)
-  nil)
 
-(deftest widget-public-dependencies-aux-2
-    (format nil "~A" (weblocks::widget-public-dependencies-aux 'navigation))
-  "(stylesheets/navigation.css)")
+;;; test widget-dependencies
+(deftest widget-dependencies-1
+    (format nil "~A" (mapcar #'dependency-url (dependencies (make-instance 'navigation))))
+  "(/pub/stylesheets/navigation.css)")
 
-;;; test widget-public-dependencies
-(deftest widget-public-dependencies-1
-    (format nil "~A" (widget-public-dependencies (make-instance 'navigation)))
-  "(stylesheets/navigation.css)")
-
-(deftest widget-public-dependencies-2
+(deftest widget-dependencies-2
     (with-request :get nil
       (mapcar
        (curry #'format nil "~A")
-       (widget-public-dependencies (make-instance 'gridedit :data-class 'employee))))
+       (mapcar #'dependency-url (dependencies (make-instance 'gridedit :data-class 'employee)))))
   ; note, pagination and dataform are there because for gridedit and
-  ; datagrid widget-public-dependencies is specialized
-  ("stylesheets/dataform.css" "stylesheets/pagination.css" "stylesheets/dataseq.css"
-			      "stylesheets/datagrid.css" "scripts/datagrid.js"))
+  ; datagrid widget-dependencies is specialized
+  ("/pub/stylesheets/dataform.css" "/pub/stylesheets/pagination.css" "/pub/stylesheets/datagrid.css"
+				   "/pub/scripts/datagrid.js" "/pub/stylesheets/dataseq.css"))
 
-(deftest widget-public-dependencies-3
+(deftest widget-dependencies-3
     (with-request :get nil
-      (widget-public-dependencies 'test))
+      (dependencies 'test))
   nil)
 
 ;;; test render-widget-body
@@ -194,8 +194,8 @@
       (declare (special *weblocks-output-stream*))
       (with-request :get nil
 	(render-widget (make-instance 'dataform :data *joe*))
-	(format nil "~A" weblocks::*page-public-dependencies*)))
-  "(stylesheets/dataform.css)")
+	(format nil "~A" (mapcar #'dependency-url weblocks::*page-dependencies*))))
+  "(/pub/stylesheets/dataform.css)")
 
 (deftest render-widget-5
     (with-request :get nil

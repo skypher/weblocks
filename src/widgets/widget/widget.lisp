@@ -4,7 +4,7 @@
 (export '(defwidget widget widget-name widget-dom-id
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-prefix-fn widget-suffix-fn
-          widget-public-dependencies with-widget-header
+          with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
           widget-dirty-p find-widget-by-path* find-widget-by-path))
 
@@ -12,9 +12,13 @@
   "A macro used to define new widget classes. Behaves exactly as
 defclass, except adds 'widget-class' metaclass specification and
 inherits from 'widget' if no direct superclasses are provided."
-  `(defclass ,name ,(or direct-superclasses '(widget))
+  `(progn
+     (defclass ,name ,(or direct-superclasses '(widget))
        ,@body
-       (:metaclass widget-class)))
+       (:metaclass widget-class))
+     (defmethod per-class-dependencies append ((obj ,name))
+       (declare (ignore obj))
+       (dependencies-by-symbol (quote ,name)))))
 
 (defclass widget ()
   ((name :accessor widget-name
@@ -90,57 +94,6 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-parent) (obj val)
   (declare (ignore obj val))
   nil)
-
-(defgeneric widget-public-dependencies (obj)
-  (:documentation
-   "Whenever a widget is rendered by weblocks in a non-AJAX request,
-this function is called to determine which stylesheets and javascript
-files the widget depends on. These dependencies are then included into
-the header of the containing page.
-
-The function must return a list of dependencies. Each member of the
-list must be the virtual path to the file (see convinience functions
-'public-file-relative-path' and 'public-files-relative-paths'). The
-extension (currently only \".css\" and \".js\") will be used by
-weblocks to determine how to include the dependency into the page
-header.
-
-The default implementation uses the following protocol to determine if
-a widget has dependencies. It looks under
-*public-files-path*/scripts/[attributized-widget-class-name].js and
-*public-files-path*/stylesheets/[attributized-widget-class-name].css. If
-it finds the aforementioned files, it returns them as
-dependencies. This way the developer can simply place relevant files
-in the appropriate location and not worry about specializing this
-function most of the time.
-
-'widget-public-dependencies' also returns widgets for the superclasses
-of 'obj', because it's intuitive to assume that a widget will use the
-stylesheets of its superclasses."))
-
-(defmethod widget-public-dependencies (obj)
-  (reverse
-   (remove nil
-	   (flatten
-	    (loop for i in (superclasses obj :proper? nil)
-	       until (string-equal (class-name i) 'standard-object)
-	       collect (widget-public-dependencies-aux (class-name i)))))))
-
-(defmethod widget-public-dependencies ((obj symbol))
-  (widget-public-dependencies-aux obj))
-
-(defun widget-public-dependencies-aux (widget-class-name)
-  "A utility function used to help 'widget-public-dependencies'
-implement its functionality. Determines widget dependencies for a
-particular class name."
-  (let (dependencies
-	(attributized-widget-class-name (attributize-name widget-class-name)))
-    (loop for type in '(:stylesheet :script)
-       do (when (probe-file (merge-pathnames
-			     (public-file-relative-path type attributized-widget-class-name)
-			     *public-files-path*))
-	    (push (public-file-relative-path type attributized-widget-class-name) dependencies)))
-    (remove nil dependencies)))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn
@@ -248,13 +201,12 @@ by their DOM id.")
 header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
 
-Additionally, calls 'widget-public-dependencies' and adds the returned
-items to *page-public-dependencies*. This is later used by Weblocks to
-declare stylesheets and javascript links in the page header."
-  (declare (special *page-public-dependencies*))
-  (setf *page-public-dependencies*
-	(append *page-public-dependencies*
-		(widget-public-dependencies obj)))
+Additionally, calls 'dependencies' and adds the returned items to
+*page-dependencies*. This is later used by Weblocks to declare
+stylesheets and javascript links in the page header."
+  (declare (special *page-dependencies*))
+  (setf *page-dependencies*
+	(append *page-dependencies* (dependencies obj)))
   (if inlinep
       (funcall #'render-widget-body obj)
       (apply #'with-widget-header obj #'render-widget-body

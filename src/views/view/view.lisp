@@ -11,11 +11,16 @@
 	  with-view-header render-view-field render-view-field-value
 	  print-view-field-value entity-class-name view-class-name
 	  view-default-field-type view-field-class-name
-	  presentation-class-name))
+	  presentation-class-name *form-submit-dependencies*))
 
 ;;; Compiled views
 (defparameter *views* (make-hash-table)
   "A hashtable that stores view instances keyed by their name.")
+
+(defvar *form-submit-dependencies* nil
+  "Dynamic javascript dependencies -- code that form elements need to
+  run before form submission, and that therefore needs to be placed in
+  the onsubmit handler of the entire form.")
 
 ;;; View description
 (defclass view ()
@@ -199,3 +204,19 @@ returns the symbol.")
   (:method (presentation-type)
     (entity-class-name presentation-type '#:-presentation)))
 
+;; Views by default only report their fields' dependencies. This
+;; method shouldn't really be an append method: for subclasses of view
+;; we might get multiple field dependencies. It's here for the sake of
+;; consistency, otherwise we would have to define a separate
+;; view-dependencies method with a different combination.
+(defmethod dependencies append ((view view))
+  (mapappend #'dependencies (view-fields view)))
+
+;; as for now, plain view-fields have no dependencies, but this could change
+(defmethod dependencies append ((field view-field))
+  ())
+
+;; dependencies of an inline-view-field are really dependencies of the
+;; presentation it contains
+(defmethod dependencies append ((field inline-view-field))
+  (dependencies (view-field-presentation field)))

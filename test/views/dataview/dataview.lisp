@@ -111,7 +111,7 @@
 
 ;;; Test data view render-object-view
 (deftest-html data-view-render-object-view-1
-    (render-object-view *joe* '(data employee))
+    (with-request :get nil (render-object-view *joe* '(data employee)))
   #.(data-header-template
      nil
      '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -120,9 +120,11 @@
 
 ;;; Test render-view (we'll test on data view)
 (deftest-html render-view-1
-    (render-view (defview nil ()
-		   hello world)
-		 :class-name 'render-view-test-class)
+    (let (weblocks::*page-dependencies*)
+      (declare (special weblocks::*page-dependencies*))
+      (render-view (defview nil ()
+		     hello world)
+		   :class-name 'render-view-test-class))
   #.(data-header-template
      nil
      '((:li :class "hello" (:span :class "label text" "Hello:&nbsp;") (:span :class "value missing"

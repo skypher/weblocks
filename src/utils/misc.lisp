@@ -237,8 +237,8 @@ in 'args'. Each argument must be a cons cell where car is
 either :stylesheet or :script and cdr is a name of the file.
 
 Useful when generating a list of dependencies for widgets and/or the
-application (see 'widget-public-dependencies' and
-*application-public-dependencies*.)
+application (see the 'dependencies' generic function and
+*application-dependencies*.)
 
 Ex:
 \(get-public-files-paths '(:stylesheet . \"navigation\")
