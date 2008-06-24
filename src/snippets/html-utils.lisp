@@ -15,7 +15,7 @@
   "The name of the control responsible for cancellation of form
   submission.")
 
-(defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t)
+(defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t) extra-submit-code
                           (submit-fn "initiateFormAction(\"~A\", $(this), \"~A\")")) &body body)
   "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
   (let ((action-code (gensym)))
@@ -24,7 +24,8 @@
          (:form :id ,id :class ,class :action (string-right-trim "/" *current-navigation-url*)
                 :method (attributize-name ,method-type) :enctype ,enctype
                 :onsubmit (when ,use-ajax-p
-                            (format nil "~A; return false;"
+                            (format nil "~@[~A~]~A; return false;"
+				    ,extra-submit-code
                                     (format nil ,submit-fn
                                             (url-encode (or ,action-code ""))
                                             (session-name-string-pair))))
