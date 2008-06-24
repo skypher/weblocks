@@ -68,13 +68,10 @@ inserted into the page to redraw the dialog."
 			 (setf (current-dialog) (make-dialog :title title
 							     :widget new-callee
 							     :css-class css-class))
-			 (push (format nil "new Function(~A)"
-				       (encode-json-to-string
-					(show-dialog-js title new-callee css-class)))
+			 (push (json-function (show-dialog-js title new-callee css-class))
 			       *on-ajax-complete-scripts*)))
 	(setf (current-dialog) nil)
-	(push (format nil "new Function(~A)"
-		      (encode-json-to-string "removeDialog();"))
+	(push (json-function (ps (remove-dialog)))
 	      *on-ajax-complete-scripts*))
       (do-modal title callee :css-class css-class)))
 
