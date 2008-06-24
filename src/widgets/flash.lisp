@@ -36,11 +36,11 @@
 	  (when (and (ajax-request-p)
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
-		(push (format nil "new Function(\"new Effect.Pulsate('~A', { pulses: 3, duration: 0.5 } );\")"
-			      (attributize-name (widget-name obj)))
+		(push (json-function
+		       (ps* `(new (*effect.*pulsate ,(attributize-name (widget-name obj))
+						    (create :pulses 3 :duration 0.5)))))
 		      *on-ajax-complete-scripts*)
-		(push (format nil "new Function(\"new Effect.BlindUp('~A');\")"
-			      (attributize-name (widget-name obj)))
+		(push (json-function (ps* `(new (*effect.*blind-up ,(attributize-name (widget-name obj))))))
 		      *on-ajax-complete-scripts*))))
 	(request-hook :session :post-action))
   (push (lambda ()
@@ -88,7 +88,6 @@ messages that need to be shown for AJAX effects."
 		      (mapc (lambda (msg)
 			      (htm (:li (apply #'render-widget msg args))))
 			    messages))))))
-      (push (format nil "new Function(\"$('~A').show();\")"
-		    (attributize-name (widget-name obj)))
+      (push (json-function (ps* `(.show ($ ,(attributize-name (widget-name obj))))))
 	    *on-ajax-complete-scripts*))))
 

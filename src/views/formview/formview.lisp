@@ -274,11 +274,9 @@ differently.
 			      :use-ajax-p (form-view-use-ajax-p view))
 	(write-string form-body *weblocks-output-stream*)))
     (when (form-view-focus-p view)
-      (let ((focus-script (format nil "$('~A').focusFirstElement();" form-id)))
+      (let ((focus-script (ps* `(.focus-first-element ($ ,form-id)))))
 	(if (ajax-request-p)
-	    (push (format nil "new Function(~A)"
-			  (encode-json-to-string focus-script))
-		  *on-ajax-complete-scripts*)
+	    (push (json-function focus-script) *on-ajax-complete-scripts*)
 	    (with-javascript
 	      focus-script))))))
 

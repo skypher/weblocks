@@ -305,3 +305,7 @@ in addition."
 	    (htm (:span :class "caption" (str caption) ":&nbsp;")))
 	(:span :class "message" (str message)))))
 
+(defun json-function (code)
+  "Take a code string and encapsulate it in a new Function object,
+JSON-encoding it."
+  (format nil "new Function(~A)" (encode-json-to-string code)))

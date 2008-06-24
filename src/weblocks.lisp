@@ -1,6 +1,6 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function
 			  #:standard-class #:typep #:subtypep)
