@@ -22,6 +22,8 @@
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
 			  :depends-on ("weblocks"))
+		 (:file "dependencies"
+			:depends-on ("weblocks" "server" utils))
 		 (:file "page-template"
 			:depends-on ("weblocks" utils "application"))
 		 (:file "actions"
@@ -96,7 +98,7 @@
 						      parsers
 						      :components ((:file "common"))))
 					:depends-on (view formview dataview)))
-			  :depends-on ("weblocks" utils snippets))
+			  :depends-on ("weblocks" "dependencies" utils snippets))
 		 (:module store
 			  :components ((:file "store-api")
 				       (:file "store-utils"))
@@ -144,7 +146,7 @@
 					      :depends-on (widget))
 				       (:file "navigation"
 					      :depends-on ("composite" widget)))
-			  :depends-on (snippets views utils "actions" "server" "request"
+			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
 						"request-hooks" linguistic store))
 		 (:module control-flow
 			  :components ((:file "call-answer")

@@ -42,6 +42,11 @@ stores declared via 'defstore'."
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
   (open-stores)
+  (when *render-debug-toolbar*
+    (setf *application-dependencies*
+	  (append *application-dependencies*
+		  (dependencies "debug-toolbar")
+		  (list (make-local-dependency :script "weblocks-debug")))))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server*

@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*webapp-description* *application-public-dependencies* defwebapp))
+(export '(*webapp-description* *application-dependencies* defwebapp))
 
 (defvar *webapp-name* nil
   "The name of the web application (also see 'defwebapp'). Please
@@ -13,12 +13,12 @@ displayed to the user. See 'page-title' for details.")
 description will be used for the composition of the page title
 displayed to the user. See 'page-title' for details.")
 
-(defvar *application-public-dependencies* nil
+(defvar *application-dependencies* nil
   "A list of dependencies on scripts and/or stylesheets that will
 persist throughout the whole application. See documentation for
-'widget-public-dependencies' for more details.")
+'dependency' or the 'dependencies' generic function for more details.")
 
-(defun defwebapp (name &key description)
+(defun defwebapp (name &key description dependencies)
   "Sets the application name (the *webapp-name* variable). 'name'
 must be a symbol. This symbol will later be used to find a
 package that defined 'init-user-session' - a function responsible
@@ -39,7 +39,7 @@ description (unless description is nil), and the value will later be
 used by 'page-title' to generate the page titles.
 
 By default 'defwebapp' adds the following resources to
-*application-public-dependencies*:
+*application-dependencies*:
 
 Stylesheets: layout.css, main.css
 Scripts: prototype.js, weblocks.js, scriptaculous.js"
@@ -47,15 +47,15 @@ Scripts: prototype.js, weblocks.js, scriptaculous.js"
   (setf *webapp-name* name)
   (when description
     (setf *webapp-description* description))
-  (setf *application-public-dependencies*
-	(public-files-relative-paths
-	 '(:stylesheet . "layout")
-	 '(:stylesheet . "main")
-	 '(:stylesheet . "dialog")
-	 '(:script . "prototype")
-	 '(:script . "scriptaculous")
-	 '(:script . "shortcut")
-	 '(:script . "weblocks")
-	 '(:script . "dialog"))))
-
+  (setf *application-dependencies*
+	(append (mapcar (curry #'apply #'make-local-dependency)
+			'((:stylesheet "layout")
+			  (:stylesheet "main")
+			  (:stylesheet "dialog")
+			  (:script "prototype")
+			  (:script "scriptaculous")
+			  (:script "shortcut")
+			  (:script "weblocks")
+			  (:script "dialog")))
+		dependencies)))
 

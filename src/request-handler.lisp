@@ -64,10 +64,10 @@ customize behavior)."))
     (let ((*weblocks-output-stream* (make-string-output-stream))
 	  (*uri-tokens* (tokenize-uri (request-uri)))
 	  (*current-navigation-url* "/") *dirty-widgets*
-	  *on-ajax-complete-scripts* *page-public-dependencies*
+	  *on-ajax-complete-scripts* *page-dependencies*
 	  *current-page-description*)
       (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
-			*on-ajax-complete-scripts* *uri-tokens* *page-public-dependencies*
+			*on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
 			*current-page-description*))
       (when (pure-request-p)
 	(throw 'handler-done (eval-action)))

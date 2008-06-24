@@ -18,34 +18,16 @@ the HTML already rendered to *weblocks-output-stream* with boilerplate
 page HTML (title, stylesheets, etc.)."
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
-  (declare (special *page-public-dependencies*))
+  (declare (special *page-dependencies* *application-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
-	(combined-dependencies (append *application-public-dependencies*
-				       *page-public-dependencies*
-				       (when *render-debug-toolbar*
-					 (widget-public-dependencies-aux 'debug-toolbar))
-				       (when *render-debug-toolbar*
-					 (public-files-relative-paths
-					  '(:script . "weblocks-debug"))))))
+	(all-dependencies (compact-dependencies (append *application-dependencies*
+							*page-dependencies*))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
 	      (:meta :http-equiv "Content-type" :content *default-content-type*)
 	      (:title (str (page-title)))
-	      ; render stylesheets
-	      (loop for i in (remove-duplicates combined-dependencies
-						:test #'equalp :from-end t)
-		 when (equalp (pathname-type i) "css")
-		 do (htm (:link :rel "stylesheet" :type "text/css"
-				:href (puri:uri (merge-pathnames i (make-pathname :directory
-										  '(:absolute "pub")))))))
-	      ; render scripts
-	      ; empty quote in script tags are a fix for w3m
-	      (loop for i in combined-dependencies
-		 when (equalp (pathname-type i) "js")
-		 do (htm (:script :src (puri:uri (merge-pathnames i (make-pathname :directory
-										   '(:absolute "pub"))))
-				  :type "text/javascript" ""))))
+	      (mapc #'render-dependency-in-page-head all-dependencies))
 	     (:body
 	      (render-page-body rendered-html)
 	      (when *render-debug-toolbar*

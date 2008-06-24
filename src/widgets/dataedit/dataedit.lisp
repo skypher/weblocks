@@ -171,7 +171,6 @@ in order to reset the state after the item widget has done its job."
 	     :key #'car)))
 
 ;;; Depend on dataform
-(defmethod widget-public-dependencies ((obj dataedit-mixin))
-  (append (list (public-file-relative-path :stylesheet "dataform"))
-	  (call-next-method)))
+(defmethod dependencies append ((obj dataedit-mixin))
+  (list (make-local-dependency :stylesheet "dataform")))
 

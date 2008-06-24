@@ -100,6 +100,13 @@ onclick='disableIrrelevantButtons(this);' />~
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
 	(defwebapp 'hello)
+	;; note: we need to add debug dependencies manually
+	;; here. Normally they would get added by start-weblocks, but
+	;; we're not calling start-weblocks here
+	(setf *application-dependencies*
+	      (append *application-dependencies*
+		      (dependencies "debug-toolbar")
+		      (list (make-local-dependency :script "weblocks-debug"))))
 	(setf (slot-value *request* 'hunchentoot::uri) "/foo/bar")
 	(defun init-user-session (comp)
 	  (setf (composite-widgets comp) (list (lambda () nil))))

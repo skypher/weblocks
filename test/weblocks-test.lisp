@@ -153,9 +153,9 @@ the request."
 	    (*session-cookie-name* "weblocks-session")
 	    (*uri-tokens* '("foo" "bar"))
 	    (*current-navigation-url* "/foo/bar/")
-	    weblocks::*page-public-dependencies* *session*
+	    weblocks::*page-dependencies* *session*
 	    *on-ajax-complete-scripts*)
-       (declare (special *uri-tokens* weblocks::*page-public-dependencies* *session*
+       (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
 			 *on-ajax-complete-scripts*))
        (unwind-protect (progn
 			 (weblocks::open-stores)
