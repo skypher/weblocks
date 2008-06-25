@@ -37,10 +37,10 @@
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
 		(push (json-function
-		       (ps* `(new (*effect.*pulsate ,(attributize-name (widget-name obj))
+		       (ps* `(new (*effect.*pulsate ,(dom-id obj)
 						    (create :pulses 3 :duration 0.5)))))
 		      *on-ajax-complete-scripts*)
-		(push (json-function (ps* `(new (*effect.*blind-up ,(attributize-name (widget-name obj))))))
+		(push (json-function (ps* `(new (*effect.*blind-up ,(dom-id obj)))))
 		      *on-ajax-complete-scripts*))))
 	(request-hook :session :post-action))
   (push (lambda ()
@@ -88,6 +88,6 @@ messages that need to be shown for AJAX effects."
 		      (mapc (lambda (msg)
 			      (htm (:li (apply #'render-widget msg args))))
 			    messages))))))
-      (push (json-function (ps* `(.show ($ ,(attributize-name (widget-name obj))))))
+      (push (json-function (ps* `(.show ($ ,(dom-id obj)))))
 	    *on-ajax-complete-scripts*))))
 

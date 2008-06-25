@@ -24,6 +24,8 @@
 			  :depends-on ("weblocks"))
 		 (:file "dependencies"
 			:depends-on ("weblocks" "server" utils))
+		 (:file "dom-object"
+			:depends-on ("weblocks" utils))
 		 (:file "page-template"
 			:depends-on ("weblocks" utils "application"))
 		 (:file "actions"
@@ -41,7 +43,7 @@
 				       (:file "isearch"
 					      :depends-on ("html-utils"))
 				       (:file "html-utils"))
-			  :depends-on ("weblocks" "request" "server" "actions"))
+			  :depends-on ("weblocks" "request" "server" "actions" "dom-object"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
@@ -147,7 +149,7 @@
 				       (:file "navigation"
 					      :depends-on ("composite" widget)))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
-						"request-hooks" linguistic store))
+						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
 			  :components ((:file "call-answer")
 				       (:file "dialog"

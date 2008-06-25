@@ -9,11 +9,7 @@
 	  make-navigation find-pane reset-current-pane))
 
 (defwidget navigation (widget)
-  ((name :initform nil
-	 :documentation "A navigation widget doesn't have a random
-	 name assigned to automatically because the name is also
-	 displayed to the user.")
-   (panes :accessor navigation-panes
+  ((panes :accessor navigation-panes
 	  :initform nil
 	  :initarg :panes
 	  :documentation "An association list of names and
@@ -87,7 +83,11 @@ default panes for your navigation object.")
   (declare (ignore initargs))
   (when (null (navigation-current-pane obj))
     (setf (navigation-current-pane obj)
-	  (navigation-default-pane obj))))
+	  (navigation-default-pane obj)))
+  ;; A navigation widget doesn't have a random name assigned to
+  ;; automatically because the name is also displayed to the user.
+  (unless (slot-boundp obj 'dom-id)
+    (setf (slot-value obj 'dom-id) nil)))
 
 (defgeneric with-navigation-header (obj body-fn &rest args)
   (:documentation

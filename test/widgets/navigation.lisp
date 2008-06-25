@@ -45,7 +45,7 @@
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
 (deftest-html with-navigation-header-2
-    (with-navigation-header (make-instance 'navigation :panes `(("Test One" . nil)))
+    (with-navigation-header (make-instance 'navigation :panes `(("Test One" . nil)) :dom-id nil)
       (lambda (x &rest args)
 	(with-html (:div "test"))))
   (:div :class "view menu"
