@@ -128,8 +128,7 @@ association list. This function is normally called by
 		(encode-json-alist-to-string
 		 (mapcar (lambda (w)
 			   (cons
-			    (when (widget-name w)
-			      (attributize-name (widget-name w)))
+			    (dom-id w)
 			    (progn
 			      (render-widget w :inlinep t)
 			      (get-output-stream-string *weblocks-output-stream*))))

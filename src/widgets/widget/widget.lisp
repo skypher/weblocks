@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name widget-dom-id
+(export '(defwidget widget widget-name
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
@@ -20,14 +20,8 @@ inherits from 'widget' if no direct superclasses are provided."
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))))
 
-(defclass widget ()
-  ((name :accessor widget-name
-	 :initform (gen-id)
-	 :initarg :name
-	 :documentation "A name of the widget used in rendering CSS
-	 classes. If the name is not provided it will be generated
-	 automatically with 'gen-id'.")
-   (propagate-dirty :accessor widget-propagate-dirty
+(defclass widget (dom-object-mixin)
+  ((propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
 		    :documentation "A list of widget paths (see
@@ -78,6 +72,25 @@ inherits from 'widget' if no direct superclasses are provided."
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
+;; Process the :name initarg and set the dom-id accordingly. Note that
+;; it is possible to pass :name nil, which simply means that objects
+;; will render without id in generated HTML.
+(defmethod initialize-instance :after ((obj widget) &key name &allow-other-keys)
+  (when name (setf (dom-id obj) name)))
+
+(defgeneric widget-name (obj)
+  (:documentation "An interface to the DOM id of a widget. Provides
+  access to the underlying implementation, can return either a symbol, a
+  string, or nil.")
+  (:method ((obj widget)) (ensure-dom-id obj))
+  (:method ((obj symbol)) obj)
+  (:method ((obj function)) nil)
+  (:method ((obj string)) nil))
+
+(defmethod (setf widget-name) (name (obj widget))
+  (setf (dom-id obj) name))
+
+
 ;;; Define widget-rendered-p for objects that don't derive from
 ;;; 'widget'
 (defmethod widget-rendered-p (obj)
@@ -108,14 +121,12 @@ that will be applied before and after the body is rendered.")
   (:method (obj body-fn &rest args
 	    &key widget-prefix-fn widget-suffix-fn
 	    &allow-other-keys)
-    (let* ((obj-name (widget-dom-id obj)) ; obj-name may be null in functions
-	   (widget-id (when (not (string-equal obj-name "")) obj-name)))
-      (with-html
-	(:div :class (widget-css-classes obj)
-	      :id widget-id
-	      (safe-apply widget-prefix-fn obj args)
-	      (apply body-fn obj args)
-	      (safe-apply widget-suffix-fn obj args))))))
+    (with-html
+      (:div :class (dom-classes obj)
+	    :id (dom-id obj)
+	    (safe-apply widget-prefix-fn obj args)
+	    (apply body-fn obj args)
+	    (safe-apply widget-suffix-fn obj args)))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
@@ -144,51 +155,6 @@ Another implementation allows rendering strings."))
 (defmethod render-widget-body ((obj string) &rest args &key id class &allow-other-keys)
   (with-html
     (:p :id id :class class (str obj))))
-
-(defgeneric widget-css-classes (widget)
-  (:documentation "Returns a string that represents applicable CSS
-classes for 'widget'. Normally includes the class name and the names
-of its subclasses. It is safe to assume that the class 'widget' will
-be present for all widgets."))
-
-(defmethod widget-css-classes ((obj widget))
-  (apply #'concatenate 'string
-	 (intersperse
-	  (mapcar (compose #'attributize-name #'class-name)
-		  (reverse
-		   (loop for i in (superclasses obj :proper? nil)
-		      until (string-equal (class-name i) 'standard-object)
-		      collect i))) " ")))
-
-(defmethod widget-css-classes ((obj symbol))
-  (format nil "widget function ~A" (attributize-name obj)))
-
-(defmethod widget-css-classes ((obj function))
-  "widget function")
-
-(defmethod widget-css-classes ((obj string))
-  "widget string")
-
-(defmethod widget-name ((obj symbol))
-  obj)
-
-(defmethod widget-name ((obj function))
-  nil)
-
-(defmethod widget-name ((obj string))
-  nil)
-
-(defgeneric widget-dom-id (obj)
-  (:documentation "Provides a consistent interface to identifying widgets
-by their DOM id.")
-  (:method ((obj widget))
-    (attributize-name (widget-name obj)))
-  (:method ((obj symbol))
-    "")
-  (:method ((obj function))
-    "")
-  (:method ((obj string))
-    ""))
 
 (defmethod widget-prefix-fn (obj)
   nil)
@@ -287,5 +253,5 @@ widget object, in which case it is simply returned.
 
 (defmethod print-object ((obj widget) stream)
   (print-unreadable-object (obj stream :type t)
-    (format stream "~s" (slot-value obj 'name))))
+    (format stream "~s" (ensure-dom-id obj))))
 

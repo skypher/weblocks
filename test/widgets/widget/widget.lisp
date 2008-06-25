@@ -73,22 +73,22 @@
     (render-widget-body 'dummy-symbol-function)
   (:p "test"))
 
-;;; test widget-css-classes
-(deftest widget-css-classes-1
-    (widget-css-classes #'identity)
+;;; test dom-classes
+(deftest dom-classes-1
+    (dom-classes #'identity)
   "widget function")
 
-(deftest widget-css-classes-2
-    (widget-css-classes 'identity)
+(deftest dom-classes-2
+    (dom-classes 'identity)
   "widget function identity")
 
-(deftest widget-css-classes-3
-    (widget-css-classes "test")
+(deftest dom-classes-3
+    (dom-classes "test")
   "widget string")
 
-(deftest widget-css-classes-4
+(deftest dom-classes-4
     (with-request :get nil
-      (widget-css-classes (make-instance 'gridedit
+      (dom-classes (make-instance 'gridedit
 					 :data-class 'employee)))
   "widget dataseq datagrid dataedit-mixin gridedit")
 
@@ -338,7 +338,7 @@
 ;;; test customized widget printing
 (deftest widget-printing-1
     (progv '(*package*) (list (find-package :weblocks-test))
-      (format nil "~s" (make-instance 'weblocks::navigation)))
+      (format nil "~s" (make-instance 'weblocks::navigation :dom-id nil)))
   "#<NAVIGATION NIL>")
 
 (deftest widget-printing-2
@@ -346,3 +346,15 @@
       (format nil "~s" (make-instance 'weblocks::dataform :name 'users)))
   "#<DATAFORM USERS>")
 
+;; note that navigation is a special case which DOES NOT autogenerate ids
+(deftest widget-printing-3
+    (with-request :get nil
+      (progv '(*package*) (list (find-package :weblocks-test))
+	(format nil "~s" (make-instance 'weblocks::navigation))))
+  "#<NAVIGATION NIL>")
+
+(deftest widget-printing-4
+    (with-request :get nil
+      (progv '(*package*) (list (find-package :weblocks-test))
+	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-123"))))
+  "#<NAVIGATION \"id-123\">")
