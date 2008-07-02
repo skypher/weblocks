@@ -4,7 +4,8 @@
 (defvar *view-proxies* (make-hash-table))
 
 (defclass persistent-proxy ()
-  ((base-class :accessor base-class :initarg :base :allocation :class)))
+  ((base-class :accessor base-class :initarg :base :allocation :class)
+   (proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
 
 (defun return-proxy-classname (classname)
   (if (gethash classname *proxies*) 
@@ -54,6 +55,7 @@
 	classname)))
 
 (defmethod weblocks::class-from-view :around (view &optional class-name)
+  "Part of the quickview / dataform method for creating anonymous instances"
   (if (subtypep class-name 'persistent)
       (find-class (return-proxy-classname class-name))
       (call-next-method)))
@@ -61,13 +63,16 @@
 (defmethod persist-object ((store elephant-store) (object persistent-proxy))
   "Catch when weblocks tries to persist a proxy object and create an instance
    of the persistent-object"
-  (let ((instance (make-instance (base-class object))))
-    (loop for slot in (weblocks::class-slots (class-of object)) do
-	  (let ((slotname (weblocks::slot-definition-name slot)))
-	    (unless (eq slotname 'base-class)
-	      (setf (slot-value instance slotname)
-		    (slot-value object slotname)))))
-    instance))
+  (if (proxy-oid object)
+      (elephant::controller-recreate-instance *store-controller* (proxy-oid object))
+      (let ((instance (make-instance (base-class object))))
+	(loop for slot in (weblocks::class-slots (class-of object)) do
+	     (let ((slotname (weblocks::slot-definition-name slot)))
+	       (unless (or (eq slotname 'base-class)
+			   (eq slotname 'proxy-oid))
+		 (setf (slot-value instance slotname)
+		       (slot-value object slotname)))))
+	instance)))
 
 (defmethod object-class-name ((obj persistent-proxy))
   (base-class obj))
