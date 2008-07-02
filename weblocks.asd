@@ -35,7 +35,7 @@
 		 (:file "request-handler"
 			:depends-on (utils "weblocks" "page-template" "debug-mode"
 					   "actions" "request-hooks" "application"
-					   "request" store))
+					   "request" "dependencies" store))
 		 (:module snippets
 			  :components ((:file "suggest")
 				       (:file "isearch"

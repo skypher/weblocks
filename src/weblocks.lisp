@@ -27,15 +27,17 @@ state."))
 and available to code executed within a request as a special
 variable. All html should be rendered to this stream.")
 
-(defparameter *render-debug-toolbar* nil
-  "A global flag that defines whether the debug toolbar should be
-  rendered. Normally set to true when weblocks is started in debug
-  mode.")
-
 (defparameter *dirty-widgets* nil
   "Contains a list of dirty widgets at the current point in rendering
   cycle. This is a special variable modified by the actions that
   change state of widgets.")
+
+(defvar *autostarting-webapps* nil
+  "A list of webapps to start when start-weblocks is called")
+
+(defvar *active-webapps* nil
+  "A list of running applications.  Applications are only available
+   after they have been started.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."
@@ -54,7 +56,7 @@ having to worry about special characters in JavaScript code."
 (defmacro root-composite ()
   "Expands to code that can be used as a place to access to the root
 composite."
-  `(session-value 'root-composite))
+  `(webapp-session-value 'root-composite))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

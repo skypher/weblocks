@@ -12,7 +12,7 @@ dialog."
   "Expands to code that signifies a place that contains information
 about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
-  `(session-value 'dialog-contents))
+  `(webapp-session-value 'dialog-contents))
 
 (defun show-dialog-js (title widget css-class &optional escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with

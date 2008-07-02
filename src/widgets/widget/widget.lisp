@@ -202,11 +202,11 @@ header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
 
 Additionally, calls 'dependencies' and adds the returned items to
-*page-dependencies*. This is later used by Weblocks to declare
+*page-public-dependencies*. This is later used by Weblocks to declare
 stylesheets and javascript links in the page header."
-  (declare (special *page-dependencies*))
-  (setf *page-dependencies*
-	(append *page-dependencies* (dependencies obj)))
+  (declare (special *page-public-dependencies*))
+  (setf *page-public-dependencies*
+	(append *page-public-dependencies* (dependencies obj)))
   (if inlinep
       (funcall #'render-widget-body obj)
       (apply #'with-widget-header obj #'render-widget-body
@@ -282,7 +282,7 @@ widget object, in which case it is simply returned.
 (defmethod find-widget-by-path* (path (root (eql nil)))
   nil)
 
-(defun find-widget-by-path (path &optional (root (session-value 'root-composite)))
+(defun find-widget-by-path (path &optional (root (webapp-session-value 'root-composite)))
   (find-widget-by-path* path root))
 
 (defmethod print-object ((obj widget) stream)

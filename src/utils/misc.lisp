@@ -211,7 +211,10 @@ ex:
 \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
   (remove-if (curry #'string-equal "")
-	     (cl-ppcre:split "[/\\\\]" (cl-ppcre:regex-replace "\\?.*" uri ""))))
+	     (cl-ppcre:split "[/\\\\]" 
+			     (cl-ppcre:regex-replace "\\?.*" 
+						     (subseq uri (length (webapp-prefix)))
+						     ""))))
 
 (defun public-file-relative-path (type filename)
   "Constructs a relative path to a public file from the \"/pub\" directory.
@@ -254,7 +257,7 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 \(request-uri-path)
 => \"/foo/bar\""
   (declare (special *uri-tokens*))
-  (apply #'concatenate 'string "/" (intersperse *uri-tokens* "/")))
+  (apply #'concatenate 'string (webapp-prefix) "/" (intersperse *uri-tokens* "/")))
 
 (defun string-remove-left (str prefix &key ignore-case-p)
   "If string 'str' starts with 'prefix', remove 'prefix' from the

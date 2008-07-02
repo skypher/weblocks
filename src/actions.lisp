@@ -41,7 +41,7 @@ don't provide a hard to guess code ('generate-action-code' is used by
 default), the user will be vulnerable to an attack where a malicious
 attacker can attempt to guess a dangerour action id and send the user
 a link to it. Only use guessable action codes for GET actions."
-  (setf (session-value action-code) action-fn)
+  (setf (webapp-session-value action-code) action-fn)
   action-code)
 
 (defun function-or-action->action (function-or-action)
@@ -52,7 +52,8 @@ it does not, signals an error."
   (if (functionp function-or-action)
       (make-action function-or-action)
       (multiple-value-bind (res presentp)
-	  (session-value function-or-action)
+	  (webapp-session-value function-or-action)
+	(declare (ignore res))
 	(if presentp
 	    function-or-action
 	    (error "The value '~A' is not an existing action." function-or-action)))))
@@ -87,7 +88,7 @@ raises an assertion."
   (let ((action-name (get-request-action-name))
 	request-action)
     (when action-name
-      (setf request-action (session-value action-name))
+      (setf request-action (webapp-session-value action-name))
       (assert request-action (request-action)
 	      (concatenate 'string "Cannot find action: " action-name))
       request-action)))

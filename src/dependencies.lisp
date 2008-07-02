@@ -8,7 +8,7 @@
 	  render-dependency-in-page-body-bottom render-dependency-in-form-submit
 	  render-dependency-in-ajax-response
 	  make-local-dependency per-class-dependencies dependencies
-	  compact-dependencies))
+	  compact-dependencies build-local-dependencies))
 
 ;; Dependencies.
 ;;
@@ -32,6 +32,8 @@
 ;; for their new widget and that method will simply return one dependency.
 ;;
 ;; --Jan Rychter <jan@rychter.com>
+
+(defparameter *page-public-dependencies* nil)
 
 (defclass dependency ()
   ()
@@ -160,13 +162,21 @@ file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (when (or do-not-probe (probe-file (merge-pathnames (public-file-relative-path type file-name)
 						      *public-files-path*)))
-    (let ((full-path (merge-pathnames (public-file-relative-path type file-name)
-				      (make-pathname :directory '(:absolute "pub")))))
+    (let ((full-path 
+;;	   (concatenate 'string (webapp-prefix) "/"
+	   (merge-pathnames (public-file-relative-path type file-name)
+			    (make-pathname :directory '(:absolute "pub")))))
       (ecase type
 	(:stylesheet (make-instance 'stylesheet-dependency
 				    :url full-path :media media))
 	(:script (make-instance 'script-dependency :url full-path))))))
 
+(defun build-local-dependencies (dep-list)
+  (loop for dep in dep-list collect
+    (unless (subtypep (type-of dep) 'dependency)
+      (assert (and (consp dep) (member (first dep) '(:stylesheet :script))))
+      (destructuring-bind (type file-name) dep
+	(make-local-dependency type file-name)))))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines

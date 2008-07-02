@@ -14,11 +14,11 @@ if there is an action involved (even if the user hits refresh)."
   (declare (special *uri-tokens*))
   (and
    (null (get-request-action))
-   (equalp *uri-tokens* (session-value 'last-request-uri))))
+   (equalp *uri-tokens* (webapp-session-value 'last-request-uri))))
 
 (defun initial-request-p ()
   "Returns true if the request is the first request for the session."
-  (equalp (session-value 'last-request-uri) :none))
+  (equalp (webapp-session-value 'last-request-uri) :none))
 
 (defun ajax-request-p ()
   "Detects if the current request was initiated via AJAX by looking
