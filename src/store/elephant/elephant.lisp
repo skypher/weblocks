@@ -32,6 +32,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod open-store ((store-type (eql :elephant)) &rest args &key spec &allow-other-keys)
+  (declare (ignore args))
   (setup-elephant-transaction-hooks)
   (setf *default-store*
 	(make-instance 'elephant-store

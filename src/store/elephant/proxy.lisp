@@ -1,6 +1,7 @@
 (in-package :weblocks-elephant)
 
 (defvar *proxies* (make-hash-table))
+(defvar *view-proxies* (make-hash-table))
 
 (defclass persistent-proxy ()
   ((base-class :accessor base-class :initarg :base :allocation :class)))
@@ -51,6 +52,11 @@
     (if (subtypep classname 'persistent)
 	(return-proxy-classname classname)
 	classname)))
+
+(defmethod weblocks::class-from-view :around (view &optional class-name)
+  (if (subtypep class-name 'persistent)
+      (find-class (return-proxy-classname class-name))
+      (call-next-method)))
 
 (defmethod persist-object ((store elephant-store) (object persistent-proxy))
   "Catch when weblocks tries to persist a proxy object and create an instance
