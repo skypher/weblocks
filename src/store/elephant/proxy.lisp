@@ -72,6 +72,7 @@
 			   (eq slotname 'proxy-oid))
 		 (setf (slot-value instance slotname)
 		       (slot-value object slotname)))))
+	(setf (proxy-oid object) (elephant::oid instance))
 	instance)))
 
 (defmethod object-class-name ((obj persistent-proxy))
