@@ -193,5 +193,5 @@ instances of 'class-name' and order them with 'order-by'."
 		(package-name
 		 (symbol-package
 		  (c2mop:slot-definition-name dsd)))
-		"clsql" :ignore-case-p t))
+		"clsql" :test #'char-equal))
 	     (call-next-method)))
