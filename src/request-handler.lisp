@@ -2,19 +2,18 @@
 (in-package :weblocks)
 
 (export '(handle-client-request *on-ajax-complete-scripts*
-	  *uri-tokens* *current-page-description*))
+	  *uri-tokens* *current-navigation-url* *current-page-description*))
 
 (defgeneric handle-client-request (app)
   (:documentation
    "This method handles each request as it comes in from the
 server. It is a hunchentoot handler and has access to all hunchentoot
 dynamic variables. The default implementation executes a user
-action (if any), prepares the navigation controls using
-'apply-uri-to-navigation', and renders the main composite wrapped in
-HTML provided by 'render-page'. If the request is an AJAX request,
-only the dirty widgets are rendered into a JSON data structure. It
-also invokes user supplied 'init-user-session' on the first request
-that has no session setup.
+action (if any) and renders the main composite wrapped in HTML
+provided by 'render-page'. If the request is an AJAX request, only the
+dirty widgets are rendered into a JSON data structure. It also invokes
+user supplied 'init-user-session' on the first request that has no
+session setup.
 
 'handle-client-request' immediately returns '+http-not-found+' if it
 sees a mime type on the script name (it doesn't handle what could be
@@ -66,13 +65,13 @@ customize behavior)."))
 	    (*uri-tokens* (tokenize-uri (request-uri)))
 	    (*current-navigation-url* "/") *dirty-widgets*
 	    *on-ajax-complete-scripts* *page-public-dependencies*
-	    *current-page-description*)
+	    *current-page-description* *uri-tokens-fully-consumed*)
 	(declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-public-dependencies*
-			  *current-page-description*))
+			  *current-page-description* *uri-tokens-fully-consumed*))
 	(when (pure-request-p)
 	  (throw 'handler-done (eval-action)))
-
+	;; a default dynamic-action hook function wraps get operations in a transaction
 	(with-dynamic-hooks (:dynamic-action)
 	  (eval-hook :pre-action)
 	  (eval-action)
@@ -84,15 +83,8 @@ customize behavior)."))
 	(with-dynamic-hooks (:dynamic-render)
 	  (eval-hook :pre-render)
 	  (if (ajax-request-p)
+	      (render-dirty-widgets)
 	      (progn
-		(setf *current-navigation-url*
-		      (obtain-uri-from-navigation
-		       (find-navigation-widget
-			(root-composite))))
-		(render-dirty-widgets))
-	      (progn
-		(apply-uri-to-navigation *uri-tokens*
-					 (find-navigation-widget (root-composite)))
 		; we need to render widgets before the boilerplate HTML
 		; that wraps them in order to collect a list of script and
 		; stylesheet dependencies.
@@ -100,10 +92,14 @@ customize behavior)."))
 		; set page title if it isn't already set
 		(when (and (null *current-page-description*)
 			   (last *uri-tokens*))
-		  (setf *current-page-description* (humanize-name (last-item *uri-tokens*))))
+		  (setf *current-page-description* 
+			(humanize-name (url-decode (last-item *uri-tokens*)))))
 		; render page will wrap the HTML already rendered to
 		; *weblocks-output-stream* with necessary boilerplate HTML
-		(render-page app)))
+		(render-page app)
+		;; make sure all tokens were consumed
+		(when (and (not *uri-tokens-fully-consumed*) *uri-tokens*)
+		  (setf (return-code) +http-not-found+))))
 	  (eval-hook :post-render))
 	(unless (ajax-request-p)
 	  (setf (webapp-session-value 'last-request-uri) *uri-tokens*))
