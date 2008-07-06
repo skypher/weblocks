@@ -44,7 +44,7 @@ name and the names of its subclasses. It is safe to assume that all
 widgets will have a CSS class of 'widget'."))
 
 (defmethod dom-classes ((obj dom-object-mixin))
-  (format nil "~A~@[~A~]"
+  (format nil "~A~@[ ~A~]"
 	  (apply #'concatenate 'string
 		 (intersperse
 		  (mapcar (compose #'attributize-name #'class-name)
