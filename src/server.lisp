@@ -85,19 +85,22 @@ The function serves all started applications"
       (let* ((script-name (script-name request))
 	     (app-prefix (webapp-prefix app))
 	     (app-pub-prefix (concatenate 'string app-prefix "/pub/")))
-	(log-message :debug "App Dispatch '~A' '~A' '~A'" script-name app-prefix app-pub-prefix)
+	(log-message :debug "Application dispatch for '~A'" script-name)
 	(cond
 	  ((is-prefix-of script-name app-pub-prefix)
+	   (log-message :debug "Dispatching to public file")
 	   (return-from weblocks-dispatcher
 	     (funcall (create-folder-dispatcher-and-handler 
 		       app-pub-prefix 
 		       (or (weblocks-webapp-public-app-path app) *public-files-path*))
 		      request)))
 	  ((is-prefix-of script-name app-prefix)
+	   (log-message :debug "Dispatching to application ~A with prefix '~A'" 
+			app app-prefix)
 	   (return-from weblocks-dispatcher 
 	     #'(lambda ()
 		 (handle-client-request app)))))))
-    (log-message :debug "App Not Found ~A" (script-name request))))
+    (log-message :debug "Application dispatch failed for '~A'" (script-name request))))
 
 ;; install weblocks-dispatcher
 

@@ -21,7 +21,7 @@
   (let ((action-code (gensym)))
     `(let ((,action-code (function-or-action->action ,action)))
        (with-html
-         (:form :id ,id :class ,class :action (string-right-trim "/" *current-navigation-url*)
+         (:form :id ,id :class ,class :action (request-uri-path)
                 :method (attributize-name ,method-type) :enctype ,enctype
                 :onsubmit (when ,use-ajax-p
                             (format nil "~@[~A~]~A; return false;"
@@ -96,13 +96,13 @@ being rendered.
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
 		     :value "t" :checked "checked"))
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		     :value "t")))))
+		     :value "f")))))
 
 (defparameter *dropdown-welcome-message* "[Select ~A]"
   "A welcome message used by dropdowns as the first entry.")
 
 (defun render-dropdown (name selections &key id class selected-value
-			welcome-name autosubmitp)
+			welcome-name multiple autosubmitp)
   "Renders a dropdown HTML element (select).
 
 'name' - the name of html control. The name is attributized before
@@ -126,6 +126,8 @@ selected. A single string can also be provided.
 'welcome-name' is a cons cell, car will be treated as the welcome name
 and cdr will be returned as value in case it's selected.
 
+'multiple' - determines whether multiple selections are allowed
+
 'autosubmitp' - determines if the dropdown automatically submits
 itself on selection. Note, if the parent form uses ajax, the dropdown
 will submit an ajax request. Otherwise, a regular request will be
@@ -139,6 +141,7 @@ submitted."
 	     :name (attributize-name name)
 	     :onchange (when autosubmitp
 			 "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }")
+	     :multiple (when multiple "on" "off")
 	     (mapc (lambda (i)
 		     (if (member (format nil "~A" (or (cdr i) (car i)))
 				 (ensure-list selected-value)
