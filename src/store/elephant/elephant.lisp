@@ -116,8 +116,8 @@
   "Remove the elephant-specific transaction hooks"
   (symbol-macrolet ((action-list (request-hook :application :dynamic-action))
 		    (render-list (request-hook :application :dynamic-render)))
-    (setf action-list (delete 'elephant-transaction-hook action-list))))
-;;    (setf render-list (delete 'elephant-transaction-hook render-list))))
+    (setf action-list (delete 'elephant-transaction-hook action-list))
+    (setf render-list (delete 'elephant-transaction-hook render-list))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
