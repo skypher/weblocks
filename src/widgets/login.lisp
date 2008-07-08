@@ -16,7 +16,7 @@
 is authenticated, authentication information stored in the session is
 returned."
   (multiple-value-bind (success auth-info)
-      (session-value *authentication-key*)
+      (webapp-session-value *authentication-key*)
     (when success (cdr auth-info))))
 
 (defun logout ()
