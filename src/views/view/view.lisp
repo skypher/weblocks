@@ -14,7 +14,7 @@
 	  presentation-class-name *form-submit-dependencies*))
 
 ;;; Compiled views
-(defparameter *views* (make-hash-table)
+(defvar *views* (make-hash-table)
   "A hashtable that stores view instances keyed by their name.")
 
 (defvar *form-submit-dependencies* nil
