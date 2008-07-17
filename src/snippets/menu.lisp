@@ -7,7 +7,7 @@
   "A default message shown by 'render-menu' if no entries are
   available.")
 
-(defun render-menu (options &key selected-uri header
+(defun render-menu (options &key selected-pane header
 		    (empty-message *menu-empty-message*))
   "Renders a menu snippet based on given options and selected
 option. An option may be a dotted pair of a label and URL to link to,
@@ -33,7 +33,7 @@ option isn't specified, first option is rendered as selected."
 					(attributize-name option))))
 			  (let* ((label (car option))
 				 (uri (cdr option))
-				 (pane-selected-p (equalp uri selected-uri))
+				 (pane-selected-p (equalp (car option) selected-pane))
 				 (pane-class (when pane-selected-p
 					       "selected-item"))
 				 (uri-prefix *current-navigation-url*))

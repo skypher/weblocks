@@ -22,14 +22,16 @@
 					"/"
 					(compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))))
 			 (selector-mixin-panes obj))
-		 :selected-uri "baz"
+		 :selected-pane (selector-mixin-current-pane-name obj)
 		 :header (if (widget-name obj)
 			      (humanize-name (widget-name obj))
 			      "Navigation")
 		 :empty-message "No navigation entries")))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (call-next-method)
+  (with-html 
+    (:div :class "navigation-body"
+	  (call-next-method)))
   (apply #'render-navigation-menu obj args))
 
 (defmethod widget-public-dependencies ((obj navigation))
