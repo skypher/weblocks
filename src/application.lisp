@@ -277,10 +277,10 @@ called (primarily for backward compatibility"
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
   (concatenate 'string (webapp-prefix app) uri))
 
-(defun webapp-session-value (symbol)
+(defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
   (declare (special *current-webapp*))
-  (let ((webapp-session (session-value *current-webapp*)))
+  (let ((webapp-session (session-value *current-webapp* session)))
     (when webapp-session
       (gethash symbol webapp-session))))
 
