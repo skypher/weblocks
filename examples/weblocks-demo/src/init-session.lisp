@@ -6,10 +6,10 @@
     :description "A web application based on Weblocks")
 
 ;; Application dependencies
-(setf *application-public-dependencies*
+(setf *application-dependencies*
       (append (public-files-relative-paths
 	       '(:stylesheet . "suggest"))
-	      *application-public-dependencies*))
+	      *application-dependencies*))
 
 ;; Define callback function to initialize new sessions. The function
 ;; initializes a sandbox store for the new user and sets up a
