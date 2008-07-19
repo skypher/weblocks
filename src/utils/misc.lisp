@@ -13,7 +13,7 @@
 	  remove-parameter-from-uri asdf-system-directory
 	  make-isearch-regex hash-keys object-class-name
 	  append-custom-fields find-slot-dsd find-slot-esd drop-last
-	  function-designator-p))
+	  function-designator-p list-starts-with safe-subseq))
 
 (defun gen-id (&optional (prefix ""))
   "Generates an ID unique accross the session. The generated ID can be
@@ -98,15 +98,15 @@ path - a list of slot names"
 	(slot-value-by-path value path-rest)
 	value)))
 
-(defmacro safe-apply (fn &rest args)
+(defun safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
-  `(when ,fn
-       (apply ,fn ,@args)))
+  (when fn
+    (apply #'apply fn args)))
 
-(defmacro safe-funcall (fn &rest args)
+(defun safe-funcall (fn &rest args)
   "Funcall 'fn' if it isn't nil. Otherwise return nil."
-  `(when ,fn
-       (funcall ,fn ,@args)))
+  (when fn
+    (apply #'funcall fn args)))
 
 (defun request-parameter (name)
   "Get parameter 'name' from the request. If the request was
@@ -413,4 +413,21 @@ in 'class'."
       (and (symbolp obj)
 	   (not (null (fboundp obj))))
       (typep obj 'funcallable-standard-object)))
+
+(defun list-starts-with (list elements &key (test 'eq))
+  "Determines if a list starts with the given elements."
+  (let ((elements (ensure-list elements)))
+    (if elements
+	(when (funcall test (car list) (car elements))
+	  (list-starts-with (cdr list) (cdr elements)))
+	t)))
+
+(defun safe-subseq (sequence start &optional end)
+  "A safe alternative to subseq that automatically adjust indices."
+  (let ((length (length sequence)))
+    (when (> start length)
+      (setf start length))
+    (when (and end (> end length))
+      (setf end length))
+    (subseq sequence start end)))
 
