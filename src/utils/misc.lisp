@@ -98,15 +98,15 @@ path - a list of slot names"
 	(slot-value-by-path value path-rest)
 	value)))
 
-(defmacro safe-apply (fn &rest args)
+(defun safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
-  `(when ,fn
-       (apply ,fn ,@args)))
+  (when fn
+    (apply #'apply fn args)))
 
-(defmacro safe-funcall (fn &rest args)
+(defun safe-funcall (fn &rest args)
   "Funcall 'fn' if it isn't nil. Otherwise return nil."
-  `(when ,fn
-       (funcall ,fn ,@args)))
+  (when fn
+    (apply #'funcall fn args)))
 
 (defun request-parameter (name)
   "Get parameter 'name' from the request. If the request was
