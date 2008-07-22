@@ -90,13 +90,19 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-name) (name (obj widget))
   (setf (dom-id obj) name))
 
+;;; Don't allow setting a parent for widget that already has one
+;;; (unless it's setting parent to nil)
+(defmethod (setf widget-parent) (val (obj widget))
+  (if (and val (widget-parent obj))
+      (error "Widget ~a already has a parent." obj)
+      (setf (slot-value obj 'parent) val)))
 
 ;;; Define widget-rendered-p for objects that don't derive from
 ;;; 'widget'
 (defmethod widget-rendered-p (obj)
   nil)
 
-(defmethod (setf widget-rendered-p) (obj val)
+(defmethod (setf widget-rendered-p) (val obj)
   nil)
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
@@ -162,7 +168,7 @@ Another implementation allows rendering strings."))
 (defmethod widget-suffix-fn (obj)
   nil)
 
-(defun render-widget (obj &key inlinep)
+(defmethod render-widget (obj &key inlinep)
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.

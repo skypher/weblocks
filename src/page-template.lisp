@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(render-page-body page-title))
+(export '(render-page-body render-page-headers page-title))
 
 ;;
 ;; Compute the webapp page title
@@ -30,7 +30,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   "Default page rendering template and protocol"
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
-  (declare (special *page-dependencies*))
+  (declare (special *page-public-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(all-dependencies (compact-dependencies (append (webapp-application-dependencies)
 							*page-public-dependencies*))))
