@@ -181,8 +181,8 @@ called (primarily for backward compatibility"
 (defmethod initialize-webapp :before ((app weblocks-webapp))
   "Ensure that all registered stores are open"
   (unless weblocks::*weblocks-server*
-    (start-weblocks)
-    (open-stores)))
+    (start-weblocks))
+  (open-stores))
 
 (defmethod initialize-webapp :after ((app weblocks-webapp))
   "Setup per-webapp debugging support for toolbar rendering"

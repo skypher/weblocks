@@ -38,7 +38,7 @@ stores declared via 'defstore'."
     (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server*
 	  (apply #'start-server :port port
-		 (remove-keyword-parameter keys :port)))
+		 (remove-keyword-parameters keys :port :debug)))
     (dolist (class *autostarting-webapps*)
       (unless (get-webapps-for-class class)
 	(start-webapp class :debug debug)))))
