@@ -57,12 +57,15 @@ it does not, signals an error."
   (if (functionp function-or-action)
       (make-action function-or-action)
       (multiple-value-bind (res presentp)
-	  (or (webapp-permanent-action function-or-action)
-	      (webapp-session-value function-or-action))
+	  (webapp-permanent-action function-or-action)
 	(declare (ignore res))
-	(if presentp
-	    function-or-action
-	    (error "The value '~A' is not an existing action." function-or-action)))))
+	(if presentp function-or-action
+	    (multiple-value-bind (res presentp)
+		(webapp-session-value function-or-action)
+	      (declare (ignore res))
+	      (if presentp
+		  function-or-action
+		  (error "The value '~A' is not an existing action." function-or-action)))))))
 
 (defun make-action-url (action-code)
   "Accepts action code and returns a URL that can be used to render
