@@ -4,10 +4,15 @@
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp 
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name webapp-description webapp-prefix
-	  running-webapp make-webapp-uri reset-webapp-session webapp-session-value))
+	  running-webapp make-webapp-uri reset-webapp-session webapp-session-value
+	  define-permanent-action define-permanent-action/cc 
+	  remove-webapp-permanent-action))
 
 (defvar *registered-webapps* nil
   "A list of applications that the system knows about")
+
+(defvar *webapp-permanent-actions*
+  (make-hash-table))
 
 (defclass weblocks-webapp ()
   ((name :accessor weblocks-webapp-name :initarg :name :initform nil :type string)
@@ -295,3 +300,65 @@ called (primarily for backward compatibility"
     (setf (gethash symbol webapp-session) value)))
 
 
+;;
+;; Permanent actions
+;;
+
+;; NOTES: Should lock-protect this table since users may add actions at runtime
+
+(defun webapp-permanent-action (action)
+  "Returns the action function associated with this symbol in the current webapp"
+  (declare (special *current-webapp*))
+  (when *current-webapp*
+    (let ((action-table (webapp-permanent-actions *current-webapp*)))
+      (when action-table
+	(gethash (if (symbolp action) (symbol-name action) action)
+		 action-table)))))
+
+(defun webapp-permanent-actions (webapp)
+  (gethash (if (symbolp webapp) webapp
+	       (type-of webapp))
+	   *webapp-permanent-actions*))
+
+(defun add-webapp-permanent-action (webapp-name action-name function-or-name)
+  "Remove an action from a webapp.  action-name should be a string, or it
+   will be converted to one (to work with the macro).  function-or-name is
+   a symbol or a function object (valid object for funcall)"
+  (assert (symbolp webapp-name))
+  (assert (or (symbolp action-name) (stringp action-name)))
+  (macrolet ((action-table (appname)
+	       `(gethash ,appname *webapp-permanent-actions*)))
+    (unless (action-table webapp-name)
+      (setf (action-table webapp-name) (make-hash-table :test 'equal)))
+    (setf (gethash (if (symbolp action-name)
+		       (string-downcase (symbol-name action-name))
+		       (string-downcase action-name))
+		   (action-table webapp-name)) 
+	  function-or-name)))
+      
+(defun remove-webapp-permanent-action (webapp-name action-name)
+  "Remove a permanent action from a webapp"
+  (macrolet ((action-table (appname)
+	       `(gethash ,appname *webapp-permanent-actions*)))
+    (let ((table (action-table webapp-name)))
+      (when table
+	(remhash action-name table)))))
+
+(defmacro define-permanent-action (name webapp-class action-params &body body)
+  "Adds a permanent action to the class's set of permanent actions"
+  (assert (and (find-class webapp-class)
+	       (subtypep webapp-class 'weblocks-webapp)))
+  `(eval-when (:compile-toplevel)
+     (add-webapp-permanent-action ',webapp-class ',name 
+				  (lambda ,action-params
+				    ,@body))))
+
+(defmacro define-permanent-action/cc (name webapp-class action-params &body body)
+  "Adds a permanent action to the class's set of permanent actions"
+  (assert (and (find-class webapp-class)
+	       (subtypep webapp-class 'weblocks-webapp)))
+  `(eval-when (:compile-toplevel)
+     (add-webapp-permanent-action ',webapp-class ',name 
+				  (lambda/cc ,action-params
+				    ,@body))))
+			    

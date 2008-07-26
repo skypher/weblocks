@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler* make-action-url make-action))
+(export '(*expired-action-handler* *page-not-found-handler* make-action-url make-action))
 
 (defparameter *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a zero argument function. The
@@ -9,6 +9,11 @@ function gets called when the user tries to invoke an expired
 action (due to a session timeout). The function should determine the
 behavior in this situation (e.g. redirect, signal an error, etc.)
 Default function redirects to the root of the application.")
+
+(defparameter *page-not-found-handler* 'default-page-not-found-handler
+  "Must be bound to a function taking zero arguments and determines 
+   what action to take.  The default handler simply sets the 
+   +http-not-found+ return code")
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
@@ -52,7 +57,8 @@ it does not, signals an error."
   (if (functionp function-or-action)
       (make-action function-or-action)
       (multiple-value-bind (res presentp)
-	  (webapp-session-value function-or-action)
+	  (or (webapp-permanent-action function-or-action)
+	      (webapp-session-value function-or-action))
 	(declare (ignore res))
 	(if presentp
 	    function-or-action
@@ -88,10 +94,12 @@ raises an assertion."
   (let ((action-name (get-request-action-name))
 	request-action)
     (when action-name
-      (setf request-action (webapp-session-value action-name))
-      (assert request-action (request-action)
-	      (concatenate 'string "Cannot find action: " action-name))
-      request-action)))
+      (let ((permanent-action (webapp-permanent-action action-name))
+	    (session-action (webapp-session-value action-name)))
+	(setf request-action (or permanent-action session-action))
+	(assert request-action (request-action)
+		(concatenate 'string "Cannot find action: " action-name))
+	request-action))))
 
 (defun eval-action ()
   "Evaluates the action that came with the request."
@@ -103,3 +111,5 @@ root and sets a query parameter 'timeout' to true, so that the home
 page may display a relevant message, if necessary."
   (redirect "/?timeout=t"))
 
+(defun default-page-not-found-handler ()
+  (setf (return-code) +http-not-found+))

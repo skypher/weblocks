@@ -166,14 +166,22 @@
        ,results)))
 
 (defmethod find-persistent-objects ((store elephant-store) class-name
-				    &key order-by range &allow-other-keys)
+				    &key order-by range filter-fn &allow-other-keys)
   "This implements a reasonably efficient form of the core weblocks query
    functionality for paged displays of objects.  More sophisticated stuff
    can be done via the on-query facility."
   (if (subtypep class-name 'persistent-object)
       (with-store-controller store
 	(catch 'finish-map
-	  (cond ((and (consp order-by) (has-index class-name (car order-by)))
+	  (cond (filter-fn
+		 (range-objects-in-memory
+		  (order-objects-in-memory
+		   (filter-objects-in-memory
+		    (get-instances-by-class class-name)
+		    filter-fn)
+		   order-by)
+		  range))
+		((and (consp order-by) (has-index class-name (car order-by)))
 		 (if range
 		     (with-ranged-collector (rcollector range)
 		       (map-inverted-index 
@@ -201,15 +209,25 @@
 		 (get-instances-by-class class-name)))))
       (find-persistent-standard-objects store class-name :order-by order-by :range range)))
 
+(defun filter-objects-in-memory (objects fn &aux results)
+  (labels ((filter-if (object)
+	     (unless (funcall fn object)
+	       (push object results))))
+    (mapc #'filter-if objects)
+    (nreverse results)))
+
 (defmethod count-persistent-objects ((store elephant-store) class-name
-				     &key &allow-other-keys)
+				     &key filter-fn &allow-other-keys)
   "A reasonably fast method for counting class instances"
   (if (subtypep class-name 'persistent-object)
       (with-store-controller store
 	(let ((count 0))
 	  (flet ((counter (x)
-		   (declare (ignore x))
-		   (incf count)))
+		   (unless (and filter-fn 
+				(funcall filter-fn 
+					 (elephant::controller-recreate-instance 
+					  *store-controller* x)))
+		     (incf count))))
 	    (map-class #'counter class-name :oids t))
 	  count))
       (count-persistent-objects store class-name)))
