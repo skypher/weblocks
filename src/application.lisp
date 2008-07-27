@@ -348,17 +348,14 @@ called (primarily for backward compatibility"
   "Adds a permanent action to the class's set of permanent actions"
   (assert (and (find-class webapp-class)
 	       (subtypep webapp-class 'weblocks-webapp)))
-  `(eval-when (:compile-toplevel)
-     (add-webapp-permanent-action ',webapp-class ',name 
-				  (lambda ,action-params
-				    ,@body))))
+  `(add-webapp-permanent-action ',webapp-class ',name
+				(lambda ,action-params
+				  ,@body)))
 
 (defmacro define-permanent-action/cc (name webapp-class action-params &body body)
   "Adds a permanent action to the class's set of permanent actions"
   (assert (and (find-class webapp-class)
 	       (subtypep webapp-class 'weblocks-webapp)))
-  `(eval-when (:compile-toplevel)
-     (add-webapp-permanent-action ',webapp-class ',name 
-				  (lambda/cc ,action-params
-				    ,@body))))
-			    
+  `(add-webapp-permanent-action ',webapp-class ',name
+				(lambda/cc ,action-params
+				  ,@body)))
