@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler* *page-not-found-handler* make-action-url make-action))
+(export '(*expired-action-handler* expired-action-handler page-not-found-handler make-action-url make-action))
 
 (defparameter *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a zero argument function. The
@@ -10,10 +10,28 @@ action (due to a session timeout). The function should determine the
 behavior in this situation (e.g. redirect, signal an error, etc.)
 Default function redirects to the root of the application.")
 
-(defparameter *page-not-found-handler* 'default-page-not-found-handler
-  "Must be bound to a function taking zero arguments and determines 
-   what action to take.  The default handler simply sets the 
+(defgeneric expired-action-handler (app)
+  (:documentation "Webapp specific protocol now used in action 
+   handler.  This method provides backwards compatability")
+  (:method ((app t))
+    (declare (ignore app))
+    (funcall *expired-action-handler*)))
+
+(defun default-expired-action-handler ()
+  "Default value of *expired-action-handler*. Redirects to application
+root and sets a query parameter 'timeout' to true, so that the home
+page may display a relevant message, if necessary."
+  (redirect "/?timeout=t"))
+
+
+(defgeneric page-not-found-handler (app)
+  (:documentation "This function is called when the current widget 
+   heirarchy fails to parse a URL.  The default behavior simply sets the 
    +http-not-found+ return code")
+  (:method ((app t))
+    (declare (ignore app))
+    (setf (return-code) +http-not-found+)))
+
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
@@ -108,11 +126,3 @@ raises an assertion."
   "Evaluates the action that came with the request."
   (safe-apply (get-request-action) (alist->plist (request-parameters))))
 
-(defun default-expired-action-handler ()
-  "Default value of *expired-action-handler*. Redirects to application
-root and sets a query parameter 'timeout' to true, so that the home
-page may display a relevant message, if necessary."
-  (redirect "/?timeout=t"))
-
-(defun default-page-not-found-handler ()
-  (setf (return-code) +http-not-found+))
