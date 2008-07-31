@@ -107,7 +107,68 @@ declarative manner."
 
 (defmacro defview (name (&rest args &key &allow-other-keys) &rest fields)
   "A macro used to easily define user interface views in a declarative
-manner."
+manner.
+
+ (defview (NAME [:type TYPE] [:inherit-from INHERIT-FROM]
+                [:satisfies SATISFIES] VIEW-KWARGS...)
+   [FIELD-NAME
+    | (FIELD-NAME [:type FIELD-TYPE] [:initform INITFORM]
+		  [:present-as PRESENT-AS] [:parse-as PARSE-AS]
+		  FIELD-KWARGS...)]...)
+
+In the above form, these metasyntactic variables have the following values:
+
+    NAME
+	When non-nil, an unevaluated unique symbol identifying the
+	view to other parts of the system that require a view,
+	resolving it using `find-view'.
+    TYPE
+	An unevaluated designator for the class of the resulting
+	view (determined by `view-class-name'), and half the
+	designator for the class of this view's fields (determined by
+	`view-field-class-name' applied to `view-default-field-type').
+	Defaults to `data'.
+    INHERIT-FROM
+	A designator for `view' slot `inherit-from'.  Forms
+	like (:scaffold DATA-CLASS) will replace :scaffold with TYPE.
+	See `find-view' for further transformation.
+    SATISFIES
+	A designator for `form-view' slot `satisfies'.
+    VIEW-KWARGS
+	Other arguments passed directly to `make-instance' for the
+	resulting view, quoting subject to
+	`view-argument-quoting-strategy'.
+
+INHERIT-FROM and SATISFIES are evaluated.
+
+    FIELD-NAME
+	An unevaluated designator for `view-field' slot `slot-name'.
+    FIELD-TYPE
+	A designator for the class of the field, in combination with
+	TYPE, as explained above for TYPE.
+    FIELD-KWARGS
+	Other arguments passed directly to `make-instance' for the
+	resulting view field, quoting subject to
+	`view-argument-quoting-strategy'.
+
+However, FIELD-KWARGS keywords present in
+`*custom-view-field-argument-compilers*' are not included in the
+`make-instance' call; see that variable for how those are transformed.
+The built-in custom view fields are as follows:
+
+    INITFORM
+	A form for `mixin-view-field' slot `initform' (which is
+	really an initfunction).
+    PRESENT-AS
+	A designator for `view-field' slot `presentation'.  The symbol
+	or CAR is mapped to a class name through
+	`presentation-class-name', and the CDR, a series of keyword
+	arguments, is passed to `make-instance' on said class, subject
+	to `view-argument-quoting-strategy'.
+    PARSE-AS
+	A designator for `form-view-field' slot `parser'.  Otherwise
+	similar to PRESENT-AS, but mapping class names using
+	`parser-class-name'."
   (if name
       `(setf (gethash ',name *views*)
 	     (defview-anon ,args ,@fields))
