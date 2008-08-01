@@ -57,9 +57,15 @@
   ((media :accessor stylesheet-media :initarg :media :initform nil))
   (:documentation "A CSS stylesheet dependency"))
 
+(defmethod print-object ((obj stylesheet-dependency) stream)
+  (format stream "#<~A '~A'>" 'stylesheet-dependency (slot-value obj 'url)))
+
 (defclass script-dependency (dependency url-dependency-mixin)
   ()
   (:documentation "A JavaScript file dependency"))
+
+(defmethod print-object ((obj script-dependency) stream)
+  (format stream "#<~A '~A'>" 'script-dependency (slot-value obj 'url)))
 
 (defclass javascript-code-dependency (dependency)
  ((code :accessor javascript-code :initarg :code
@@ -173,10 +179,11 @@ returns a dependency object."
 
 (defun build-local-dependencies (dep-list)
   (loop for dep in dep-list collect
-    (unless (subtypep (type-of dep) 'dependency)
-      (assert (and (consp dep) (member (first dep) '(:stylesheet :script))))
-      (destructuring-bind (type file-name) dep
-	(make-local-dependency type file-name)))))
+    (if (subtypep (type-of dep) 'dependency) dep ;; should either return obj or loudly fail
+	(progn 
+	  (assert (and (consp dep) (member (first dep) '(:stylesheet :script))))
+	  (destructuring-bind (type file-name) dep
+	    (make-local-dependency type file-name))))))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines

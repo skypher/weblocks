@@ -120,16 +120,16 @@ association list. This function is normally called by
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *on-ajax-complete-scripts*))
   (setf (content-type) *json-content-type*)
-  (format *weblocks-output-stream* "{\"widgets\":~A,\"on-load\":~A}"
-		(encode-json-alist-to-string
-		 (mapcar (lambda (w)
-			   (cons
-			    (dom-id w)
-			    (progn
-			      (render-widget w :inlinep t)
-			      (get-output-stream-string *weblocks-output-stream*))))
-			 *dirty-widgets*))
-		(encode-json-to-string *on-ajax-complete-scripts*)))
+  (let ((widget-alist (mapcar (lambda (w)
+				(cons
+				 (dom-id w)
+				 (progn
+				   (render-widget w :inlinep t)
+				   (get-output-stream-string *weblocks-output-stream*))))
+			      *dirty-widgets*)))
+    (format *weblocks-output-stream* "{\"widgets\":~A,\"on-load\":~A}"
+	    (encode-json-to-string widget-alist)
+	    (encode-json-to-string *on-ajax-complete-scripts*))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
