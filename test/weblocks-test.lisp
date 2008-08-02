@@ -18,7 +18,7 @@ changes are rolled back after the tests are done. Note, the steps that
 this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
   `(let ((app-name weblocks::*webapp-name*)
-	 (*form-error-summary-threshold* 15)
+	 (*print-case* :upcase)		;needed by some comparison output
 	 interference-methods result)
      ;; hide application
      (setf weblocks::*webapp-name* nil)
