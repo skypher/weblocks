@@ -11,6 +11,7 @@
 	  dataseq-common-ops dataseq-allow-pagination-p
 	  dataseq-pagination-widget dataseq-show-total-items-count-p
 	  dataseq-flash dataseq-data dataseq-data-count
+	  dataseq-persistent-query-function
 	  dataseq-render-pagination-widget dataseq-selection-empty-p
 	  dataseq-clear-selection dataseq-item-selected-p
 	  dataseq-select-item dataseq-update-sort-column
@@ -252,6 +253,22 @@ function designator, calls the function designated by
 	     (dataseq-class-store obj)
 	     (dataseq-data-class obj)
 	     (dataseq-on-query obj))))
+
+(defun dataseq-persistent-query-function (on-query-list)
+  "Returns a function suitable for slot `on-query' on `dataseq' that
+will call the persistent store API with the given on-query-list."
+  (lambda (widget sorting pagination &key countp)
+    (if countp
+	(apply #'count-persistent-objects
+	       (dataseq-class-store widget)
+	       (dataseq-data-class widget)
+	       on-query-list)
+	(apply #'find-persistent-objects
+	       (dataseq-class-store widget)
+	       (dataseq-data-class widget)
+	       :order-by sorting
+	       :range pagination
+	       on-query-list))))
 
 ;;; Pagination management
 (defgeneric dataseq-render-pagination-widget (obj &rest args)

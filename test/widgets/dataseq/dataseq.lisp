@@ -115,6 +115,39 @@
 					 :data-class 'employee)))
   0)
 
+;;; test dataseq-persistent-query-function
+
+(deftest dataseq-persistent-query-function-1
+    (with-request :get nil
+      (persist-objects *default-store* (list *employee2* *employee1*
+					     *employee3* *employee4*))
+      (mapcar (curry-after #'slot-value 'age)
+	      (dataseq-data (make-instance 'dataseq
+					   :sort '(age . :desc)
+					   :on-query (dataseq-persistent-query-function nil)
+					   :data-class 'employee))))
+  (54 53 52 51))
+
+(deftest dataseq-persistent-query-function-2
+    (with-request :get nil
+      (persist-objects *default-store* (list *employee1*
+					     *employee3* *employee4*))
+      (mapcar (curry-after #'slot-value 'age)
+	      (dataseq-data (make-instance 'dataseq
+					   :sort '(age . :asc)
+					   :on-query (dataseq-persistent-query-function nil)
+					   :data-class 'employee))))
+  (51 53 54))
+
+(deftest dataseq-persistent-query-function-3
+    (with-request :get nil
+      (persist-objects *default-store* (list *employee1*
+					     *employee3* *employee4*))
+      (dataseq-data-count (make-instance 'dataseq
+					 :on-query (dataseq-persistent-query-function nil)
+					 :data-class 'employee)))
+  3)
+
 ;;; test dataseq-update-sort-column
 (deftest dataseq-update-sort-column-1
     (with-request :get nil
