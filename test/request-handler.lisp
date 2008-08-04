@@ -11,27 +11,35 @@
 	res))
   nil)
 
+(defwebapp hcr-hello-webapp
+  :init-user-session hcr-init-user-session)
+(defmethod initialize-instance :after ((self hcr-hello-webapp) &key &allow-other-keys)
+  (setf (weblocks::weblocks-webapp-name self) "HCR Hello"))
+
 (deftest handle-client-request-1
-    (with-request :get nil
-      (let (weblocks::*webapp-name* result1 result2 result3
-				    (weblocks::*render-debug-toolbar* nil))
-	;; set up our mini-application with one dataform widget
-	(declare (special weblocks::*webapp-name*))
-	(defwebapp 'hello)
-	(setf (slot-value *request* 'hunchentoot::uri) "/foo/bar")
-	(defun init-user-session (comp)
-	  (push (make-instance 'dataform :data *joe*) (composite-widgets comp)))
-	;; handle the first request (make sure data is drawn)
-	(setf result1 (handle-client-request))
-	;; unbind init-user-session to make sure root-composite persists
-	(fmakunbound 'init-user-session)
-	;; fake user clicking on "modify"
-	(setf (slot-value *request* 'get-parameters) `((,weblocks::*action-string* . "abc123")))
-	;; handle another request, this time AJAX (make sure form is drawn)
-	(setf (slot-value *request* 'hunchentoot::headers-in)
-	    (cons '("X-Requested-With" . "blah") (slot-value *request* 'hunchentoot::headers-in)))
-	(setf result2 (handle-client-request))
-	(values (null (session-value "debug-reset-sessions")) result1 result2)))
+    (with-webapp (:class-name 'hcr-hello-webapp)
+      (with-request :get nil
+	(let (result1 result2 result3
+	      (app (weblocks::current-webapp)))
+	  ;; set up our mini-application with one dataform widget
+	  (defun hcr-init-user-session (comp)
+	    (push (make-instance 'dataform :data *joe*)
+		  (composite-widgets comp)))
+	  (setf (slot-value *request* 'hunchentoot::uri) "/hcr-hello-webapp/foo/bar")
+	  ;; handle the first request (make sure data is drawn)
+	  (setf result1 (handle-client-request app))
+	  ;; unbind init-user-session to make sure root-composite persists
+	  (fmakunbound 'hcr1-init-user-session)
+	  ;; fake user clicking on "modify"
+	  (setf (slot-value *request* 'get-parameters)
+		`((,weblocks::*action-string* . "abc123")))
+	  ;; handle another request, this time AJAX (make sure form is drawn)
+	  (setf (slot-value *request* 'hunchentoot::headers-in)
+		(cons '("X-Requested-With" . "blah")
+		      (slot-value *request* 'hunchentoot::headers-in)))
+	  (setf result2 (handle-client-request app))
+	  (values (null (webapp-session-value "debug-reset-sessions"))
+		  result1 result2))))
   t
   #.(with-request-template "~
 <div class='widget dataform' id='id-123'>~
@@ -45,7 +53,7 @@
 <li class='manager'><span class='label text'>Manager:&nbsp;</span><span class='value'>Jim</span></li>~
 </ul>~
 <div class='submit'><a class='modify' ~
-                       href='/foo/bar?action=abc123' ~
+                       href='/hcr-hello-webapp/foo/bar?action=abc123' ~
                        onclick='initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); ~
                        return false;'>Modify</a></div>~
 <div class='extra-bottom-1'><!-- empty --></div>~
@@ -54,10 +62,10 @@
 </div>~
 </div>"
       :widget-stylesheets '("dataform")
-      :title "Hello - Bar")
+      :title "HCR Hello - Bar")
   #.(format nil "{\"widgets\":~
 {\"id-123\":~
-\"<form class='view form employee' action='' method='post' ~
+\"<form class='view form employee' action='/hcr-hello-webapp/foo/bar' method='post' ~
       onsubmit='initiateFormAction(\\\"abc124\\\", $(this), \\\"weblocks-session=1%3ATEST\\\"); ~
                 return false;'>~
 <div class='extra-top-1'><!-- empty --></div>~
@@ -99,7 +107,6 @@ onclick='disableIrrelevantButtons(this);' />~
 				    (weblocks::*render-debug-toolbar* t))
 	;; set up our mini-application with one dataform widget
 	(declare (special weblocks::*webapp-name*))
-	(defwebapp 'hello)
 	;; note: we need to add debug dependencies manually
 	;; here. Normally they would get added by start-weblocks, but
 	;; we're not calling start-weblocks here
@@ -108,11 +115,11 @@ onclick='disableIrrelevantButtons(this);' />~
 		      (dependencies "debug-toolbar")
 		      (list (make-local-dependency :script "weblocks-debug"))))
 	(setf (slot-value *request* 'hunchentoot::uri) "/foo/bar")
-	(defun init-user-session (comp)
+	(defun hcr-init-user-session (comp)
 	  (setf (composite-widgets comp) (list (lambda () nil))))
 	;; handle the first request (make sure data is drawn)
 	(setf result1 (handle-client-request))
-	(fmakunbound 'init-user-session)
+	(fmakunbound 'hcr-init-user-session)
 	(values result1 (not (null (session-value "debug-reset-sessions"))))))
   #.(with-request-template
 	    "~

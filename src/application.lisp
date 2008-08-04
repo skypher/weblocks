@@ -112,7 +112,7 @@ called (primarily for backward compatibility"
 				nil
 				(compute-public-files-path 
 				 (intern (package-name ,*package*) :keyword))))
-	 :init-user-session ,init-user-session
+	 :init-user-session ',init-user-session
 	 :prefix ,prefix
 	 :application-dependencies 
 	 (append ,(when (not ignore-default-dependencies)
@@ -287,8 +287,10 @@ called (primarily for backward compatibility"
   "Get a session value from the currently running webapp"
   (declare (special *current-webapp*))
   (let ((webapp-session (session-value *current-webapp* session)))
-    (when webapp-session
-      (gethash symbol webapp-session))))
+    (cond (webapp-session
+	   (gethash symbol webapp-session))
+	  (*current-webapp* (values nil nil))
+	  (t nil))))
 
 (defun (setf webapp-session-value) (value symbol)
   "Set a session value for the currently runnin webapp"

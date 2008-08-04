@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(*json-content-type refresh-request-p initial-request-p
-	  ajax-request-p pure-request-p redirect))
+	  ajax-request-p pure-request-p redirect
+	  compose-uri-tokens-to-url))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
   "A content type sent to the client to identify json data.")
@@ -49,3 +50,12 @@ redirect on the client."
 	(throw 'handler-done
 	  (format nil "{\"redirect\":\"~A\"}" url)))
       (hunchentoot:redirect url)))
+
+ (defun compose-uri-tokens-to-url (tokens)
+   "Encodes and concatenates uri tokens into a url string. Note that
+ the string will not contain separator slashes at the beginning or
+ end."
+   (string-downcase 
+    (apply #'concatenate 'string
+ 	  (intersperse
+ 	   (mapcar #'url-encode (ensure-list tokens)) "/"))))
