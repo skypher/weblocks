@@ -36,9 +36,9 @@
 
 (defun session-request-hooks ()
   "A request hook object used in the session scope."
-  (if (session-value 'request-hooks)
-      (session-value 'request-hooks)
-      (setf (session-value 'request-hooks)
+  (if (webapp-session-value 'request-hooks)
+      (webapp-session-value 'request-hooks)
+      (setf (webapp-session-value 'request-hooks)
 	    (make-instance 'request-hooks))))
 
 (defmacro hook-by-scope (scope)

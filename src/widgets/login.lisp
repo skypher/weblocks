@@ -15,13 +15,13 @@
   "Returns nil if the current user is not authenticated. If the user
 is authenticated, authentication information stored in the session is
 returned."
-  (multiple-value-bind (success auth-info)
-      (session-value *authentication-key*)
-    (when success (cdr auth-info))))
+  (multiple-value-bind (auth-info success)
+      (webapp-session-value *authentication-key*)
+    (when success auth-info)))
 
 (defun logout ()
   "Removes any authentication information from the session."
-  (setf (session-value *authentication-key*) nil))
+  (setf (webapp-session-value *authentication-key*) nil))
 
 (defun hash-password (password)
   "Returns a one way hash of a plain-text password."
@@ -96,7 +96,7 @@ returned."
 				     (multiple-value-bind (success error)
 					 (funcall (login-on-login obj) obj o)
 				       (if success
-					   (setf (session-value *authentication-key*) success)
+					   (setf (webapp-session-value *authentication-key*) success)
 					   (values nil
 						   (list
 						    (cons nil (or error *default-login-failure-error*)))))))
@@ -111,7 +111,7 @@ returned."
 server. Sessions without authentication information are ignored."
   (remove nil
 	  (mapcar (lambda (session)
-		    (car (multiple-value-list (session-value *authentication-key* session))))
+		    (car (multiple-value-list (webapp-session-value *authentication-key* session))))
 		  (active-sessions))))
 
 (defun anonymous-user-count ()

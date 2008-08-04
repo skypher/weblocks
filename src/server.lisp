@@ -2,8 +2,9 @@
 (in-package :weblocks)
 
 (export '(*last-session* start-weblocks stop-weblocks
-	  compute-public-files-path *public-files-path* server-type
-	  server-version active-sessions))
+	  compute-public-files-path server-type
+	  server-version active-sessions 
+	  set-weblocks-default-public-files-path weblocks-default-public-files-path))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -33,36 +34,24 @@
 ':debug' keyword to true in order for stacktraces to be shown to the
 client. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
-  (if debug
-      (setf *render-debug-toolbar* t
-	    *maintain-last-session* (hunchentoot-mp:make-lock "*maintain-last-session*"))
-      (setf *render-debug-toolbar* nil
-	    *maintain-last-session* nil))
-  (when debug
-    (setf *show-lisp-errors-p* t)
-    (setf *show-lisp-backtraces-p* t))
-  (open-stores)
-  (when *render-debug-toolbar*
-    (setf *application-dependencies*
-	  (append *application-dependencies*
-		  (dependencies "debug-toolbar")
-		  (list (make-local-dependency :script "weblocks-debug")))))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server*
 	  (apply #'start-server :port port
-		 (remove-keyword-parameter
-		  (remove-keyword-parameter keys :port) :debug)))))
+		 (remove-keyword-parameters keys :port :debug)))
+    (dolist (class *autostarting-webapps*)
+      (unless (get-webapps-for-class class)
+	(start-webapp class :debug debug)))))
 
 (defun stop-weblocks ()
   "Stops weblocks. Closes all stores declared via 'defstore'."
-  (if (not (null *weblocks-server*))
-      (progn
-	(setf *last-session* nil)
-	(reset-sessions)
-	(stop-server *weblocks-server*)
-	(setf *weblocks-server* nil)))
-  (close-stores))
+  (when (not (null *weblocks-server*))
+    (dolist (app *active-webapps*)
+      (stop-webapp (weblocks-webapp-name app)))
+    (setf *last-session* nil)
+    (reset-sessions)
+    (stop-server *weblocks-server*)
+    (setf *weblocks-server* nil)))
 
 (defun compute-public-files-path (asdf-system-name)
   "Computes the directory of public files. The function uses the
@@ -79,12 +68,61 @@ files that should be available via the webserver (images, stylesheets,
 javascript files, etc.) Modify this directory to set the location of
 your files. Points to the weblocks' 'pub' directory by default.")
 
-(setf *dispatch-table*
-      (append (list (lambda (request)
+(defun set-weblocks-default-public-files-path (path)
+  (setf *public-files-path* path))
+
+(defun weblocks-default-public-files-path ()
+  *public-files-path*)
+
+(defun weblocks-dispatcher (request)
+  "Dispatcher function suitable for inclusion into hunchentooth dispatch table.
+The function serves all started applications"
+  (flet ((is-prefix-of (string prefix)
+	   (let ((mismatch (mismatch string prefix)))
+	     (or (null mismatch)
+		 (>= mismatch (length prefix))))))
+    (dolist (app *active-webapps*)
+      (let* ((script-name (script-name request))
+	     (app-prefix (webapp-prefix app))
+	     (app-pub-prefix (concatenate 'string app-prefix "/pub/")))
+	(log-message :debug "Application dispatch for '~A'" script-name)
+	(cond
+	  ((is-prefix-of script-name app-pub-prefix)
+	   (log-message :debug "Dispatching to public file")
+	   (return-from weblocks-dispatcher
+	     (funcall (create-folder-dispatcher-and-handler 
+		       app-pub-prefix 
+		       (or (weblocks-webapp-public-app-path app) *public-files-path*))
+		      request)))
+	  ((is-prefix-of script-name app-prefix)
+	   (log-message :debug "Dispatching to application ~A with prefix '~A'" 
+			app app-prefix)
+	   (return-from weblocks-dispatcher 
+	     #'(lambda ()
+		 (handle-client-request app)))))))
+    (log-message :debug "Application dispatch failed for '~A'" (script-name request))))
+
+;; install weblocks-dispatcher
+
+(eval-when (:load-toplevel)
+  (progn
+    (let ((pos (position 'weblocks-dispatcher *dispatch-table*)))
+      (if pos
+	  (rplaca (nthcdr (1- pos) *dispatch-table*)
+		  #'(lambda (request)
 		      (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
-			       request))
-		    (create-prefix-dispatcher "/" 'handle-client-request))
-	      *dispatch-table*))
+			       request)))
+	  (setf *dispatch-table*
+		(append 
+		 (list 
+		  ;; CSS files that are served from webapp specific directories have dependencies
+		  ;; on images in "/pub". I am not sure how to dynamically adjusts references in
+		  ;; CSS files.
+		  #'(lambda (request)
+		    (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
+			     request))
+		  'weblocks-dispatcher)
+		 *dispatch-table*))))))
 
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This
@@ -109,4 +147,5 @@ rewriting in JavaScript code."
   (let (acc)
     (do-sessions (s acc)
       (push s acc))))
+
 

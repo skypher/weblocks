@@ -33,7 +33,8 @@
   (:documentation "Allows specifying custom widget properties."))
 
 (defmethod direct-slot-definition-class ((class widget-class) &rest initargs) 
-   (find-class 'widget-direct-slot-definition))
+  (declare (ignore initargs))
+  (find-class 'widget-direct-slot-definition))
 
 ;;; Copy slot options over to runtime definition of the slot
 (defclass widget-effective-slot-definition
@@ -42,9 +43,11 @@
   (:documentation "Allows specifying custom widget properties."))
 
 (defmethod effective-slot-definition-class ((class widget-class) &rest initargs)
+  (declare (ignore initargs))
   (find-class 'widget-effective-slot-definition))
 
 (defmethod compute-effective-slot-definition ((class widget-class) slot-name dslotds)
+  (declare (ignore slot-name))
   (let ((result (call-next-method)))
     (loop for dsd in dslotds
 	 when (typep dsd 'widget-direct-slot-definition)

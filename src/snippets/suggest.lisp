@@ -58,6 +58,7 @@ the client. Accepts a list of results.
 		(format nil "'~A'"
 			(make-action
 			 (lambda (&rest keys)
+			   (declare (ignore keys))
 			   (funcall format-fn (funcall resultset (request-parameter a-input-name)))))))
 	    (session-name-string-pair))))))
 

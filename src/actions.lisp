@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler* make-action-url make-action))
+(export '(*expired-action-handler* expired-action-handler page-not-found-handler make-action-url make-action))
 
 (defparameter *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a zero argument function. The
@@ -9,6 +9,29 @@ function gets called when the user tries to invoke an expired
 action (due to a session timeout). The function should determine the
 behavior in this situation (e.g. redirect, signal an error, etc.)
 Default function redirects to the root of the application.")
+
+(defgeneric expired-action-handler (app)
+  (:documentation "Webapp specific protocol now used in action 
+   handler.  This method provides backwards compatability")
+  (:method ((app t))
+    (declare (ignore app))
+    (funcall *expired-action-handler*)))
+
+(defun default-expired-action-handler ()
+  "Default value of *expired-action-handler*. Redirects to application
+root and sets a query parameter 'timeout' to true, so that the home
+page may display a relevant message, if necessary."
+  (redirect "/?timeout=t"))
+
+
+(defgeneric page-not-found-handler (app)
+  (:documentation "This function is called when the current widget 
+   heirarchy fails to parse a URL.  The default behavior simply sets the 
+   +http-not-found+ return code")
+  (:method ((app t))
+    (declare (ignore app))
+    (setf (return-code) +http-not-found+)))
+
 
 (defparameter *action-string* "action"
   "A string used to pass actions from a client to the server. See
@@ -41,7 +64,7 @@ don't provide a hard to guess code ('generate-action-code' is used by
 default), the user will be vulnerable to an attack where a malicious
 attacker can attempt to guess a dangerour action id and send the user
 a link to it. Only use guessable action codes for GET actions."
-  (setf (session-value action-code) action-fn)
+  (setf (webapp-session-value action-code) action-fn)
   action-code)
 
 (defun function-or-action->action (function-or-action)
@@ -52,10 +75,15 @@ it does not, signals an error."
   (if (functionp function-or-action)
       (make-action function-or-action)
       (multiple-value-bind (res presentp)
-	  (session-value function-or-action)
-	(if presentp
-	    function-or-action
-	    (error "The value '~A' is not an existing action." function-or-action)))))
+	  (webapp-permanent-action function-or-action)
+	(declare (ignore res))
+	(if presentp function-or-action
+	    (multiple-value-bind (res presentp)
+		(webapp-session-value function-or-action)
+	      (declare (ignore res))
+	      (if presentp
+		  function-or-action
+		  (error "The value '~A' is not an existing action." function-or-action)))))))
 
 (defun make-action-url (action-code)
   "Accepts action code and returns a URL that can be used to render
@@ -87,18 +115,14 @@ raises an assertion."
   (let ((action-name (get-request-action-name))
 	request-action)
     (when action-name
-      (setf request-action (session-value action-name))
-      (assert request-action (request-action)
-	      (concatenate 'string "Cannot find action: " action-name))
-      request-action)))
+      (let ((permanent-action (webapp-permanent-action action-name))
+	    (session-action (webapp-session-value action-name)))
+	(setf request-action (or permanent-action session-action))
+	(assert request-action (request-action)
+		(concatenate 'string "Cannot find action: " action-name))
+	request-action))))
 
 (defun eval-action ()
   "Evaluates the action that came with the request."
   (safe-apply (get-request-action) (alist->plist (request-parameters))))
-
-(defun default-expired-action-handler ()
-  "Default value of *expired-action-handler*. Redirects to application
-root and sets a query parameter 'timeout' to true, so that the home
-page may display a relevant message, if necessary."
-  (redirect "/?timeout=t"))
 

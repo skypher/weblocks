@@ -8,7 +8,7 @@
 	  render-dependency-in-page-body-bottom render-dependency-in-form-submit
 	  render-dependency-in-ajax-response
 	  make-local-dependency per-class-dependencies dependencies
-	  compact-dependencies))
+	  compact-dependencies build-local-dependencies))
 
 ;; Dependencies.
 ;;
@@ -33,6 +33,8 @@
 ;;
 ;; --Jan Rychter <jan@rychter.com>
 
+(defparameter *page-public-dependencies* nil)
+
 (defclass dependency ()
   ()
   (:documentation "Models a dependency of a particular renderable
@@ -55,9 +57,15 @@
   ((media :accessor stylesheet-media :initarg :media :initform nil))
   (:documentation "A CSS stylesheet dependency"))
 
+(defmethod print-object ((obj stylesheet-dependency) stream)
+  (format stream "#<~A '~A'>" 'stylesheet-dependency (slot-value obj 'url)))
+
 (defclass script-dependency (dependency url-dependency-mixin)
   ()
   (:documentation "A JavaScript file dependency"))
+
+(defmethod print-object ((obj script-dependency) stream)
+  (format stream "#<~A '~A'>" 'script-dependency (slot-value obj 'url)))
 
 (defclass javascript-code-dependency (dependency)
  ((code :accessor javascript-code :initarg :code
@@ -160,13 +168,22 @@ file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (when (or do-not-probe (probe-file (merge-pathnames (public-file-relative-path type file-name)
 						      *public-files-path*)))
-    (let ((full-path (merge-pathnames (public-file-relative-path type file-name)
-				      (make-pathname :directory '(:absolute "pub")))))
+    (let ((full-path 
+;;	   (concatenate 'string (webapp-prefix) "/"
+	   (merge-pathnames (public-file-relative-path type file-name)
+			    (make-pathname :directory '(:absolute "pub")))))
       (ecase type
 	(:stylesheet (make-instance 'stylesheet-dependency
 				    :url full-path :media media))
 	(:script (make-instance 'script-dependency :url full-path))))))
 
+(defun build-local-dependencies (dep-list)
+  (loop for dep in dep-list collect
+    (if (subtypep (type-of dep) 'dependency) dep ;; should either return obj or loudly fail
+	(progn 
+	  (assert (and (consp dep) (member (first dep) '(:stylesheet :script))))
+	  (destructuring-bind (type file-name) dep
+	    (make-local-dependency type file-name))))))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines
