@@ -1,15 +1,14 @@
 
 (in-package :weblocks-test)
 
+
+
 ;;; test page-title
 (deftest page-title-1
-    (let ((*current-page-description* "current-page-desc")
-	  (*webapp-description* "webapp-desc")
-	  (weblocks::*webapp-name* "webapp-name"))
-      (declare (special *current-page-description*
-			*webapp-description*
-			weblocks::*webapp-name*))
-      (page-title))
+    (with-webapp (:description "webapp-desc" :name "Webapp Name")
+      (let ((*current-page-description* "current-page-desc"))
+	(declare (special *current-page-description*))
+	(page-title (weblocks::current-webapp))))
   "Webapp Name - current-page-desc")
 
 (deftest page-title-2
