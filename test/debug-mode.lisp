@@ -16,6 +16,6 @@
     (with-request :get nil
       (weblocks::initialize-debug-actions)
       (apply #'values (mapcar (lambda (str)
-				(not (null (session-value str))))
+				(not (null (webapp-session-value str))))
 			      '("debug-reset-sessions"))))
   t)
