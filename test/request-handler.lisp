@@ -146,14 +146,15 @@ onclick='disableIrrelevantButtons(this);' />~
 					 "test2" (lambda (&rest args)
 						   (with-html (:div "hi2")))))))
 	  ;; set the URI
-	  (setf (slot-value *request* 'hunchentoot::uri) "/test2?action=blah")
+	  (setf (slot-value *request* 'hunchentoot::uri) "/hcr-hello-webapp/test2?action=blah")
 	  ;; handle the request
 	  (setf result (handle-client-request app))
 	  (fmakunbound 'hcr-init-user-session)
 	  result)))
   #.(with-request-template
 	    "~
-<div class='widget navigation' id='test-nav'>~
+<div class='selector-mixin widget dispatcher selector navigation' id='test-nav'>~
+<div class='navigation-body'>~
 <div class='widget function'>~
 <div>hi2</div>~
 </div>~
@@ -163,12 +164,13 @@ onclick='disableIrrelevantButtons(this);' />~
 <div class='extra-top-3'><!-- empty --></div>~
 <h1>Test Nav</h1>~
 <ul>~
-<li><a href='/'>Test1</a></li>~
+<li><a href='/hcr-hello-webapp/'>Test1</a></li>~
 <li class='selected-item'><span>Test2</span></li>~
 </ul>~
 <div class='extra-bottom-1'><!-- empty --></div>~
 <div class='extra-bottom-2'><!-- empty --></div>~
 <div class='extra-bottom-3'><!-- empty --></div>~
+</div>~
 </div>~
 </div>"
       :widget-stylesheets '("navigation")
