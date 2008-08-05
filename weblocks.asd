@@ -42,8 +42,10 @@
 			  :components ((:file "suggest")
 				       (:file "isearch"
 					      :depends-on ("html-utils"))
-				       (:file "html-utils"))
-			  :depends-on ("weblocks" "request" "server" "actions" "dom-object"))
+				       (:file "html-utils")
+				       (:file "menu"))
+			  :depends-on (utils "weblocks" "request" "server"
+				       "actions" "dom-object"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
