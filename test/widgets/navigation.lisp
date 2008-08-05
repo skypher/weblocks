@@ -18,18 +18,19 @@
 
 ;;; test initialize-instance for navigation
 (deftest initialize-navigation-1
-    (selector-mixin-current-pane-name
+    (weblocks::selector-mixin-current-pane-name
      (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
   "Test One")
 
 (deftest initialize-navigation-2
-    (selector-mixin-current-pane-name
+    (weblocks::selector-mixin-current-pane-name
      (make-instance 'navigation
 		    :panes `(("Test One" . nil) ("Test Two" . nil))
 		    :current-pane-name "Test Two"))
   "Test Two")
 
 ;;; test with-navigation-header
+
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
@@ -101,26 +102,31 @@
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
-    (with-request :get nil
+    (with-webapp ()
       (let ((nav (make-navigation "Test Navigation"
 				  "Test1" (make-instance 'dataform :data *joe*)
-				  "Test2" (make-instance 'dataform :data *some-college*)))
-	    (*current-navigation-url* "/"))
+				  "Test2" (make-instance 'dataform :data *some-college*))))
 	(declare (special *current-navigation-url*))
-	;; render widget
-	(render-widget nav)
-	;; switch to test2 and render
-	(weblocks::apply-uri-to-navigation '("test2") nav)
-	(render-widget nav)))
+	(with-request :get nil :uri "/"
+	  (setf *current-navigation-url* "/")
+	  (render-widget nav))
+	(with-request :get nil :uri "/test2"
+	  (setf *current-navigation-url* "/test2")
+	  (render-widget nav))))
   (htm
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc123"
-		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
-		     (:span :class "value" "Joe"))
-		    (:li :class "manager"
-		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+   (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget dataform" :id "id-123"
+		     #.(data-header-template
+			"abc123"
+			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
+			   (:span :class "value" "Joe"))
+			  (:li :class "manager"
+			   (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))
+			:postslots `((:div :class "submit"
+					   ,(link-action-template "abc123" "Modify"
+								  :class "modify"
+								  :uri "/"))))))
 	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
@@ -131,26 +137,28 @@
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       (:div :class "view data education-history"
-		     (:div :class "extra-top-1" "<!-- empty -->")
-		     (:div :class "extra-top-2" "<!-- empty -->")
-		     (:div :class "extra-top-3" "<!-- empty -->")
-		     (:h1 (:span :class "action" "Viewing:&nbsp;")
-			  (:span :class "object" "Education History"))
-		     (:ul
-		      (:li :class "university"
-			   (:span :class "label text" "University:&nbsp;")
-			   (:span :class "value" "Bene Gesserit University"))
-		      (:li :class "graduation-year"
-			   (:span :class "label text" "Graduation Year:&nbsp;")
-			   (:span :class "value" "2000")))
-		     (:div :class "submit" #.(link-action-template "abc124" "Modify"
-								   :class "modify"))
-		     (:div :class "extra-bottom-1" "<!-- empty -->")
-		     (:div :class "extra-bottom-2" "<!-- empty -->")
-		     (:div :class "extra-bottom-3" "<!-- empty -->")))
+   (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget dataform" :id "id-123"
+		     (:div :class "view data education-history"
+			   (:div :class "extra-top-1" "<!-- empty -->")
+			   (:div :class "extra-top-2" "<!-- empty -->")
+			   (:div :class "extra-top-3" "<!-- empty -->")
+			   (:h1 (:span :class "action" "Viewing:&nbsp;")
+				(:span :class "object" "Education History"))
+			   (:ul
+			    (:li :class "university"
+				 (:span :class "label text" "University:&nbsp;")
+				 (:span :class "value" "Bene Gesserit University"))
+			    (:li :class "graduation-year"
+				 (:span :class "label text" "Graduation Year:&nbsp;")
+				 (:span :class "value" "2000")))
+			   (:div :class "submit" #.(link-action-template "abc123" "Modify"
+									 :class "modify"
+									 :uri "/test2"))
+			   (:div :class "extra-bottom-1" "<!-- empty -->")
+			   (:div :class "extra-bottom-2" "<!-- empty -->")
+			   (:div :class "extra-bottom-3" "<!-- empty -->"))))
 	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
