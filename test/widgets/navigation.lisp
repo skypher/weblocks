@@ -234,34 +234,48 @@
   (("test1" . "w1") ("test-two" . "w2")))
 
 
-;;; test find-pane
+;;; test selector-mixin-find-pane-by-name
+
+(defun destructure-pane (pane)
+  (let ((info (car pane)))
+    (cons (list :name (pane-info-name info) :uri-tokens (pane-info-uri-tokens info)
+		:label (pane-info-label info))
+	  (cdr pane))))
+
 (deftest find-pane-1
-    (find-pane (make-navigation "test navigation"
-				"test1" "w1"
-				"test2" "w2")
-	       "helloworld")
+    (selector-mixin-find-pane-by-name
+     (make-navigation "test navigation"
+		      "test1" "w1"
+		      "test2" "w2")
+		"helloworld")
   nil)
 
 (deftest find-pane-2
-    (find-pane (make-navigation "test navigation"
-				"test1" "w1"
-				"Test-Two" "w2")
-	       "test-two")
-  ("test-two" . "w2"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       "test1" "w1"
+		       "Test-Two" "w2")
+      "test-two"))
+  ((:name "test-two" :uri-tokens ("test-two") :label "Test Two") . "w2"))
 
 (deftest find-pane-3
-    (find-pane (make-navigation "test navigation"
-				'test1 "w1"
-				'test2 "w2")
-	       "test1")
-  ("test1" . "w1"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       'test1 "w1"
+		       'test2 "w2")
+      "test1"))
+  ((:name "test1" :uri-tokens ("test1") :label "Test1") . "w1"))
 
 (deftest find-pane-4
-    (find-pane (make-navigation "test navigation"
-				'test1 "w1"
-				'test2 "w2")
-	       'test1)
-  ("test1" . "w1"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       'test1 "w1"
+		       'test2 "w2")
+      "test1"))
+  ((:name "test1" :uri-tokens ("test1") :label "Test1") . "w1"))
 
 (deftest find-pane-5
     (let ((nav (make-navigation "test navigation"
