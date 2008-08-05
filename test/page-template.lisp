@@ -12,23 +12,17 @@
   "Webapp Name - current-page-desc")
 
 (deftest page-title-2
-    (let ((*current-page-description* nil)
-	  (*webapp-description* "webapp-desc")
-	  (weblocks::*webapp-name* "webapp-name"))
-      (declare (special *current-page-description*
-			*webapp-description*
-			weblocks::*webapp-name*))
-      (page-title))
+    (with-webapp (:name "Webapp Name" :description "webapp-desc")
+      (let ((*current-page-description* nil))
+	(declare (special *current-page-description*))
+	(page-title (weblocks::current-webapp))))
   "Webapp Name - webapp-desc")
 
 (deftest page-title-3
-    (let ((*current-page-description* nil)
-	  (*webapp-description* nil)
-	  (weblocks::*webapp-name* "webapp-name"))
-      (declare (special *current-page-description*
-			*webapp-description*
-			weblocks::*webapp-name*))
-      (page-title))
+    (with-webapp (:name "Webapp Name")
+      (let ((*current-page-description* nil))
+	(declare (special *current-page-description*))
+	(page-title (weblocks::current-webapp))))
   "Webapp Name")
 
 ;;; test with-page
