@@ -41,6 +41,10 @@
       (setf (webapp-session-value 'request-hooks)
 	    (make-instance 'request-hooks))))
 
+(defvar *request-hook*)
+(setf (documentation '*request-hook* 'variable)
+      "A request hook object used in the request scope.")
+
 (defmacro hook-by-scope (scope)
   "Returns a place which contains the hook object for the specified
 scope."
