@@ -238,7 +238,7 @@ onclick='disableIrrelevantButtons(this);' />~
 
 (deftest handle-client-request-7
     (with-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get nil
+      (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let ((res 0))
 	  (declare (special *request-hook*))
 	  ;; start the session
