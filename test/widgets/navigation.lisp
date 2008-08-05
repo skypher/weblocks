@@ -18,17 +18,15 @@
 
 ;;; test initialize-instance for navigation
 (deftest initialize-navigation-1
-    (slot-value
-     (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil)))
-     'current-pane)
+    (selector-mixin-current-pane-name
+     (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
   "Test One")
 
 (deftest initialize-navigation-2
-    (slot-value
+    (selector-mixin-current-pane-name
      (make-instance 'navigation
 		    :panes `(("Test One" . nil) ("Test Two" . nil))
-		    :current-pane "Test Two")
-     'current-pane)
+		    :current-pane-name "Test Two"))
   "Test Two")
 
 ;;; test with-navigation-header
