@@ -156,7 +156,8 @@ webapp in my context."
   (declare (ignore full class-name))
   `(call-with-webapp (lambda () ,@body) ,@initargs))
 
-(defun call-with-request-in-webapp-context (thunk method parameters)
+(defun call-with-request-in-webapp-context (thunk method parameters
+					    &key (uri nil uri?))
   "Helper for `call-with-request'."
   (let ((parameters-slot (ecase method
 			   (:get 'get-parameters)
@@ -196,21 +197,36 @@ webapp in my context."
 			(setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
 			(setf (slot-value *session* 'hunchentoot::session-id) 1)
 			(setf (slot-value *session* 'hunchentoot::session-string) "test")
+			(when uri?
+			  (setf (slot-value *request* 'hunchentoot::uri) uri))
 			(funcall thunk))
 	(setf (symbol-function 'weblocks::make-action) make-action-orig)
 	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
 	(weblocks::close-stores)))))
 
-(defun call-with-request (thunk method parameters)
+(defun call-with-request (&rest args)
   "Helper for `with-request''s expansion."
   (if (and (boundp 'weblocks::*current-webapp*)
 	   (let ((app-type (class-name (class-of (weblocks::current-webapp)))))
 	     (or (eq 'weblocks-webapp app-type)
 		 (equalp "WEBLOCKS-TEST"
 			 (package-name (symbol-package app-type))))))
-      (call-with-request-in-webapp-context thunk method parameters)
+      (apply #'call-with-request-in-webapp-context args)
       (with-webapp ()
-	(call-with-request-in-webapp-context thunk method parameters))))
+	(apply #'call-with-request-in-webapp-context args))))
+
+(defun span-keyword-params (implicit-progn)
+  "Take the plist from the front of IMPLICIT-PROGN, and answer it and
+the remaining forms.  Note that there must be at least one non-plist
+form, because we want to always maintain \"returns value of last
+form\" semantics to reduce any confusion caused by this syntax.
+
+Anyway, if you want to force interpretation of a keyword in
+IMPLICIT-PROGN as a prognable form, just quote it."
+  (loop for forms on implicit-progn by #'cddr
+     while (typep forms '(cons keyword (cons t cons)))
+     append (subseq forms 0 2) into plist
+     finally (return (values plist forms))))
 
 (defmacro with-request (method parameters &body body)
   "A helper macro for test cases across web requests. The macro
@@ -220,8 +236,13 @@ context.
 'method' - A method with which the request was initiated (:get
 or :post)
 'parameters' - An association list of parameters sent along with
-the request."
-  `(call-with-request (lambda () ,@body) ,method ,parameters))
+the request.
+
+Other parameters given as keywords on the front of BODY:
+
+URI - Set the Hunchentoot request URI to this."
+  (multiple-value-bind (kwargs body) (span-keyword-params body)
+    `(call-with-request (lambda () ,@body) ,method ,parameters ,@kwargs)))
 
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."
