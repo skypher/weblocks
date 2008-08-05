@@ -6,13 +6,12 @@
 
 ;;; test defwebapp
 (deftest defwebapp-1
-    (let ((weblocks::*current-webapp* (weblocks::find-app 'hello-webapp)))
-      (declare (special weblocks::*current-webapp))
+    (with-webapp (:class-name 'hello-webapp)
       (values (webapp-name)
 	      (mapcar (curry #'format nil "~A")
 		      (mapcar #'dependency-url (webapp-application-dependencies)))
 	      (webapp-description)))
-  hello-webapp
+  "hello-webapp"
   ("/pub/stylesheets/layout.css"
    "/pub/stylesheets/main.css"
    "/pub/stylesheets/dialog.css"
