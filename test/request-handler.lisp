@@ -240,12 +240,10 @@ onclick='disableIrrelevantButtons(this);' />~
     (with-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let ((res 0))
-	  (declare (special *request-hook*))
 	  ;; start the session
 	  (start-session)
 	  ;; set up our mini-application
 	  (defun hcr-init-user-session (comp)
-	    (declare (special *request-hook*))
 	    (push (lambda ()
 		    (incf res))
 		  (request-hook :request :pre-action))
@@ -262,8 +260,8 @@ onclick='disableIrrelevantButtons(this);' />~
 (deftest handle-client-request-8
     (with-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
+	  :uri "/hcr-hello-webapp/"
 	(let ((res 0))
-	  (declare (special *request-hook*))
 	  ;; start the session
 	  (start-session)
 	  ;; action
@@ -271,7 +269,6 @@ onclick='disableIrrelevantButtons(this);' />~
 			 (incf res)))
 	  ;; set up our mini-application
 	  (defun hcr-init-user-session (comp)
-	    (declare (special *request-hook))
 	    (push (lambda ()
 		    (incf res))
 		  (request-hook :request :pre-action))
@@ -279,15 +276,16 @@ onclick='disableIrrelevantButtons(this);' />~
 		    (incf res))
 		  (request-hook :request :post-render)))
 	  ;; do the test
-	  (ignore-errors
+	  (catch 'handler-done
 	    (handle-client-request (weblocks::current-webapp)))
 	  ;; tear down the application
+	  (fmakunbound 'hcr-init-user-session)
 	  res)))
   1)
 
 (deftest handle-client-request-9
     (with-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get nil
+      (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let (result1)
 	  ;; set up our mini-application with one dataform widget
 	  (defun hcr-init-user-session (comp)
@@ -296,12 +294,12 @@ onclick='disableIrrelevantButtons(this);' />~
 			  (declare (special *current-page-description*))
 			  (setf *current-page-description* "Some Page")))))
 	  ;; handle the first request (make sure data is drawn)
-	  (setf result1 (handle-client-request))
+	  (setf result1 (handle-client-request (weblocks::current-webapp)))
 	  (fmakunbound 'hcr-init-user-session)
 	  result1)))
   #.(with-request-template
 	"<div class='widget function'></div>"
-      :title "Hello - Some Page"))
+      :title "HCR Hello - Some Page"))
 
 (deftest handle-client-request-10
     (with-request :get '(("action" . "abc123"))
