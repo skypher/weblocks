@@ -72,8 +72,9 @@ of selector-mixin with car being of type pane-info) that has specified
 			    (pane-info-name 
 			     (selector-mixin-canonicalize-pane-info pane-info)))
 		     :test #'equalp)))
-    (cons (selector-mixin-canonicalize-pane-info (car pane))
-	  (cdr pane))))
+    (and pane
+	 (cons (selector-mixin-canonicalize-pane-info (car pane))
+	       (cdr pane)))))
 
 (defun selector-mixin-find-pane-by-tokens (obj tokens)
   "Returns a canonicalized pane (cons pair as defined by 'panes' slot
