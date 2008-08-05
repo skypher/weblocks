@@ -248,7 +248,7 @@ widget object, in which case it is simply returned.
 (defmethod find-widget-by-path* (path (root (eql nil)))
   nil)
 
-(defun find-widget-by-path (path &optional (root (session-value 'root-composite)))
+(defun find-widget-by-path (path &optional (root (root-composite)))
   (find-widget-by-path* path root))
 
 (defmethod print-object ((obj widget) stream)
