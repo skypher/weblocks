@@ -282,7 +282,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	  (ignore-errors
 	    (handle-client-request (weblocks::current-webapp)))
 	  ;; tear down the application
-	  res))
+	  res)))
   1)
 
 (deftest handle-client-request-9
@@ -328,7 +328,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	(catch 'hunchentoot::handler-done
 	  (handle-client-request (weblocks::current-webapp)))
 	;; result
-	(values (string-downcase (header-out "Location")) res))))
+	(values (string-downcase (header-out "Location")) res)))
   "http://nil/?weblocks-session=1%3atest" 2)
 
 (deftest handle-client-request-11
