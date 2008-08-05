@@ -190,21 +190,25 @@ onclick='disableIrrelevantButtons(this);' />~
 
 (deftest handle-client-request-5
     (with-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get nil
-	(let ((res 0)
-	      *on-pre-request* *on-post-request*)
+      (with-request :get nil :uri "/hcr-hello-webapp/"
+	(let* ((res 0) (inc-res (lambda () (incf res)))
+	       pushed-pre pushed-post)
 	  ;; set up our mini-application
 	  (defun hcr-init-user-session (comp) nil)
 	  ;; start the session
 	  (start-session)
 	  ;; do the test
-	  (push (lambda ()
-		  (incf res))
-		(request-hook :application :pre-action))
-	  (push (lambda ()
-		  (incf res))
-		(request-hook :application :post-action))
-	  (handle-client-request (weblocks::current-webapp))
+	  (unwind-protect
+	       (progn
+		 (push inc-res (request-hook :application :pre-action))
+		 (setf pushed-pre t)
+		 (push inc-res (request-hook :application :post-action))
+		 (setf pushed-post t)
+		 (handle-client-request (weblocks::current-webapp)))
+	    (when pushed-post
+	      (pop (request-hook :application :post-action)))
+	    (when pushed-pre
+	      (pop (request-hook :application :pre-action))))
 	  ;; tear down the application
 	  (fmakunbound 'hcr-init-user-session)
 	  res)))
