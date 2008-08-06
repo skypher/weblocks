@@ -176,7 +176,7 @@ called (primarily for backward compatibility"
 	(sort (pushnew app *active-webapps*)
 	      #'string>
 	      :key #'weblocks-webapp-prefix))
-  (when (> 1 (count "" (mapcar #'weblocks-webapp-prefix *active-webapps* ) :test #'equal))
+  (when (> (count "" (mapcar #'weblocks-webapp-prefix *active-webapps*) :test #'equal) 1)
     (error "Cannot have two defaults dispatchers with prefix \"\"")))
 
 (defgeneric initialize-webapp (app)
