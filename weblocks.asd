@@ -147,8 +147,14 @@
 					      :depends-on (widget "flash"))
 				       (:file "composite"
 					      :depends-on (widget))
+				       (:file "dispatcher"
+					      :depends-on (widget))
+				       (:file "selector-mixin"
+					      :depends-on (widget))
+				       (:file "selector"
+					      :depends-on ("selector-mixin" widget))
 				       (:file "navigation"
-					      :depends-on ("composite" widget)))
+					      :depends-on ("composite" "selector" widget)))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
