@@ -40,6 +40,7 @@
 					   "request" "dependencies" store))
 		 (:module snippets
 			  :components ((:file "suggest")
+				       (:file "menu")
 				       (:file "isearch"
 					      :depends-on ("html-utils"))
 				       (:file "html-utils"))
