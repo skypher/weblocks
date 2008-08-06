@@ -30,10 +30,10 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   "Default page rendering template and protocol"
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
-  (declare (special *page-public-dependencies*))
+  (declare (special *page-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(all-dependencies (compact-dependencies (append (webapp-application-dependencies)
-							*page-public-dependencies*))))
+							*page-dependencies*))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head

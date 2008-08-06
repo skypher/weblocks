@@ -33,8 +33,6 @@
 ;;
 ;; --Jan Rychter <jan@rychter.com>
 
-(defparameter *page-public-dependencies* nil)
-
 (defclass dependency ()
   ()
   (:documentation "Models a dependency of a particular renderable
