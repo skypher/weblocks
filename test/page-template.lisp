@@ -47,7 +47,7 @@
    (fmt "~%")
    (:html :xmlns "http://www.w3.org/1999/xhtml"
     (:head
-     (:title "Some Name - Some Page")
+     (:title "some-name - Some Page")
      (:meta :http-equiv "Content-type" :content "text/html; charset=utf-8")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/layout.css")
      (:link :rel "stylesheet" :type "text/css" :href "/pub/stylesheets/main.css")
