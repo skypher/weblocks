@@ -1,19 +1,17 @@
 
 (in-package :weblocks-test)
 
+(defwebapp hello-webapp
+  :description "foo bar")
+
 ;;; test defwebapp
 (deftest defwebapp-1
-    (let (weblocks::*webapp-name*
-	  weblocks::*application-dependencies*
-	  *webapp-description*)
-      (declare (special weblocks::*webapp-name*
-			weblocks::*application-dependencies*
-			*webapp-description*))
-      (defwebapp 'hello :description "foo bar")
-      (values weblocks::*webapp-name*
-	      (mapcar (curry #'format nil "~A") (mapcar #'dependency-url weblocks::*application-dependencies*))
-	      *webapp-description*))
-  hello
+    (with-webapp (:class-name 'hello-webapp)
+      (values (webapp-name)
+	      (mapcar (curry #'format nil "~A")
+		      (mapcar #'dependency-url (webapp-application-dependencies)))
+	      (webapp-description)))
+  "hello-webapp"
   ("/pub/stylesheets/layout.css"
    "/pub/stylesheets/main.css"
    "/pub/stylesheets/dialog.css"
@@ -23,15 +21,3 @@
    "/pub/scripts/weblocks.js"
    "/pub/scripts/dialog.js")
   "foo bar")
-
-(deftest defwebapp-2
-    (let (weblocks::*webapp-name*
-	  weblocks::*application-dependencies*
-	  (*webapp-description* "foo bar"))
-      (declare (special weblocks::*webapp-name*
-			weblocks::*application-dependencies*
-			*webapp-description*))
-      (defwebapp 'hello)
-      *webapp-description*)
-  "foo bar")
-

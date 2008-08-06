@@ -12,16 +12,15 @@
 
 (defmacro with-test-environment (&body body)
   "This macro takes steps to clear the environment for the unit
-tests. For example, if an application is defined that may interfere
-with the unit tests, this function removes the application. All
+tests. For example, if testing in the context of an application, it
+may interfere with the unit tests, so we remove the application. All
 changes are rolled back after the tests are done. Note, the steps that
 this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
-  `(let ((app-name weblocks::*webapp-name*)
+  `(let ((weblocks::*current-webapp* nil) ;hide application
 	 (*print-case* :upcase)		;needed by some comparison output
 	 interference-methods result)
-     ;; hide application
-     (setf weblocks::*webapp-name* nil)
+     (declare (special weblocks::*current-webapp*))
      ;; remove before/after methods from render-page-body
      (mapcar (lambda (m)
 	       (let ((qualifiers (method-qualifiers m)))
@@ -32,8 +31,6 @@ the test suite without loading an application."
 	     (generic-function-methods #'render-page-body))
      ;; insert the body
      (setf result (progn ,@body))
-     ;; reinstate the application
-     (setf weblocks::*webapp-name* app-name)
      ;; reinstate render-page-body before/after methods
      (loop for m in interference-methods
 	do (add-method #'render-page-body m))
@@ -130,6 +127,108 @@ and then compares the string to the expected result."
 (defparameter *dummy-action* "abc"
   "A dummy action code for unit tests.")
 
+(defun call-with-webapp (thunk &rest initargs &key full class-name &allow-other-keys)
+  "Helper for `with-webapp''s expansion."
+  (remf initargs :full)
+  (remf initargs :class-name)
+  (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
+		     initargs))
+	 (weblocks::*current-webapp* app))
+     (declare (special weblocks::*current-webapp*))
+     (cond (full
+	    (assert class-name (class-name)
+		    "A specific webapp must be defined for `with-webapp's :full parameter")
+	    (start-webapp class-name)
+	    (unwind-protect (funcall thunk)
+	      (stop-webapp class-name)))
+	   (t (funcall thunk)))))
+
+(defmacro with-webapp ((&rest initargs &key full class-name &allow-other-keys) &body body)
+  "A helper macro (and marker) for test cases calling functions that
+only work with a current webapp, in which BODY is evaluated in the
+context of a temporary `weblocks-webapp'.  INITARGS are passed through
+to `make-instance'.
+
+If FULL is given, I will also start the webapp within BODY's context;
+if CLASS-NAME is given, I will ignore other INITARGS and either find
+or start a webapp with the class CLASS-NAME, setting it as the current
+webapp in my context."
+  (declare (ignore full class-name))
+  `(call-with-webapp (lambda () ,@body) ,@initargs))
+
+(defun call-with-request-in-webapp-context (thunk method parameters
+					    &key (uri nil uri?))
+  "Helper for `call-with-request'."
+  (let ((parameters-slot (ecase method
+			   (:get 'get-parameters)
+			   (:post 'post-parameters))))
+    (let* ((*request* (make-instance 'unittest-request))
+	   (*server* (make-instance 'unittest-server))
+	   (hunchentoot::*remote-host* "localhost")
+	   (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
+	   (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+	   (make-action-orig #'weblocks::make-action)
+	   (generate-widget-id-orig #'weblocks::gen-id)
+	   (dummy-action-count 123)
+	   (*session-cookie-name* "weblocks-session")
+	   (*uri-tokens* '("foo" "bar"))
+	   weblocks::*page-dependencies* *session*
+	   *on-ajax-complete-scripts*)
+      (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
+			*on-ajax-complete-scripts*))
+      (unwind-protect (progn
+			(weblocks::open-stores)
+			(start-session)
+			(setf (symbol-function 'weblocks::make-action)
+			      (lambda (action-fn &optional action-code)
+				(if action-code
+				    (funcall make-action-orig action-fn action-code)
+				    (let ((result (funcall make-action-orig action-fn
+							   (format nil "~A~D"
+								   *dummy-action*
+								   dummy-action-count))))
+				      (incf dummy-action-count)
+				      result))))
+			(setf (symbol-function 'weblocks::gen-id)
+			      (lambda ()
+				"id-123"))
+			(setf (slot-value *request* 'method) method)
+			(setf (slot-value *request* parameters-slot) parameters)
+			(setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
+			(setf (slot-value *session* 'hunchentoot::session-id) 1)
+			(setf (slot-value *session* 'hunchentoot::session-string) "test")
+			(when uri?
+			  (setf (slot-value *request* 'hunchentoot::uri) uri
+				*uri-tokens* (weblocks::tokenize-uri uri)))
+			(funcall thunk))
+	(setf (symbol-function 'weblocks::make-action) make-action-orig)
+	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
+	(weblocks::close-stores)))))
+
+(defun call-with-request (&rest args)
+  "Helper for `with-request''s expansion."
+  (if (and (boundp 'weblocks::*current-webapp*)
+	   (let ((app-type (class-name (class-of (weblocks::current-webapp)))))
+	     (or (eq 'weblocks-webapp app-type)
+		 (equalp "WEBLOCKS-TEST"
+			 (package-name (symbol-package app-type))))))
+      (apply #'call-with-request-in-webapp-context args)
+      (with-webapp ()
+	(apply #'call-with-request-in-webapp-context args))))
+
+(defun span-keyword-params (implicit-progn)
+  "Take the plist from the front of IMPLICIT-PROGN, and answer it and
+the remaining forms.  Note that there must be at least one non-plist
+form, because we want to always maintain \"returns value of last
+form\" semantics to reduce any confusion caused by this syntax.
+
+Anyway, if you want to force interpretation of a keyword in
+IMPLICIT-PROGN as a prognable form, just quote it."
+  (loop for forms on implicit-progn by #'cddr
+     while (typep forms '(cons keyword (cons t cons)))
+     append (subseq forms 0 2) into plist
+     finally (return (values plist forms))))
+
 (defmacro with-request (method parameters &body body)
   "A helper macro for test cases across web requests. The macro
 sets up a request and a session, and executes code within their
@@ -138,50 +237,13 @@ context.
 'method' - A method with which the request was initiated (:get
 or :post)
 'parameters' - An association list of parameters sent along with
-the request."
-  (let ((parameters-slot (ecase method
-			   (:get 'get-parameters)
-			   (:post 'post-parameters))))
-    `(let* ((*request* (make-instance 'unittest-request))
-	    (*server* (make-instance 'unittest-server))
-	    (hunchentoot::*remote-host* "localhost")
-	    (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
-	    (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-	    (make-action-orig #'weblocks::make-action)
-	    (generate-widget-id-orig #'weblocks::gen-id)
-	    (dummy-action-count 123)
-	    (*session-cookie-name* "weblocks-session")
-	    (*uri-tokens* '("foo" "bar"))
-	    (*current-navigation-url* "/foo/bar/")
-	    weblocks::*page-dependencies* *session*
-	    *on-ajax-complete-scripts*)
-       (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
-			 *on-ajax-complete-scripts*))
-       (unwind-protect (progn
-			 (weblocks::open-stores)
-			 (start-session)
-			 (setf (symbol-function 'weblocks::make-action)
-			       (lambda (action-fn &optional action-code)
-				 (if action-code
-				   (funcall make-action-orig action-fn action-code)
-				   (let ((result (funcall make-action-orig action-fn
-							  (format nil "~A~D"
-								  *dummy-action*
-								  dummy-action-count))))
-				     (incf dummy-action-count)
-				     result))))
-			 (setf (symbol-function 'weblocks::gen-id)
-			       (lambda ()
-				 "id-123"))
-			 (setf (slot-value *request* 'method) ,method)
-			 (setf (slot-value *request* ',parameters-slot) ,parameters)
-			 (setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
-			 (setf (slot-value *session* 'hunchentoot::session-id) 1)
-			 (setf (slot-value *session* 'hunchentoot::session-string) "test")
-			 ,@body)
-	 (setf (symbol-function 'weblocks::make-action) make-action-orig)
-	 (setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
-	 (weblocks::close-stores)))))
+the request.
+
+Other parameters given as keywords on the front of BODY:
+
+URI - Set the Hunchentoot request URI to this."
+  (multiple-value-bind (kwargs body) (span-keyword-params body)
+    `(call-with-request (lambda () ,@body) ,method ,parameters ,@kwargs)))
 
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."

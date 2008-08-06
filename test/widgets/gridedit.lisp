@@ -229,7 +229,7 @@
 		(:th "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
@@ -269,7 +269,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -329,12 +329,12 @@
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-3" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -394,7 +394,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -497,7 +497,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -544,7 +544,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -609,7 +609,7 @@
 		  (:td :class "select"
 		   :onclick "stopPropagation(event);"
 		   :style "cursor: default;"
-		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		   (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		  (:td :class "name" (:span :class "value" "Jill"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
 		  (:td :class "drilldown modify"
@@ -674,7 +674,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -721,7 +721,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -772,7 +772,7 @@
 		  (:td :class "select"
 		   :onclick "stopPropagation(event);"
 		   :style "cursor: default;"
-		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		   (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		  (:td :class "name" (:span :class "value" "Joe"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
 		  (:td :class "drilldown modify"
@@ -831,7 +831,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify" "")))
@@ -893,7 +893,7 @@
 		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
@@ -936,7 +936,7 @@
 		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
@@ -1011,7 +1011,7 @@
 		(:th "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
@@ -1051,7 +1051,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -1111,12 +1111,12 @@
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-3" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))

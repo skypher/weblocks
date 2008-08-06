@@ -113,8 +113,6 @@ tokens."
   (declare (special *current-navigation-url*))
   (multiple-value-bind (widget consumed-tokens path)
       (dispatcher-get-widget obj path nil)
-    (cond
-      ((and widget path) (find-widget-by-path* path widget))
-      (widget widget)
-      (t nil))))
+    (declare (ignore consumed-tokens))
+    (find-widget-by-path* path widget)))
 

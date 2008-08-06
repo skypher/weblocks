@@ -249,7 +249,7 @@
 (deftest mark-dirty-5
     (with-request :get nil
       (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(setf (session-value 'weblocks::root-composite) (create-site-layout))	
+	(setf (root-composite) (create-site-layout))	
 	(let* ((weblocks::*dirty-widgets* nil)
 	       (path '((root-inner test-nav-1 test2 test2-leaf)))
 	       (w (make-instance 'composite :name "test"
