@@ -3,30 +3,33 @@
 
 ;;; test pane-name
 (deftest pane-name-1
-    (pane-name (cons 1 2))
+    (pane-info-name (make-pane-info :name 1 :label 2))
   1)
 
-;;; test pane-widget
-(deftest pane-widget-1
-    (pane-widget (cons 1 2))
-  2)
+;;; test selector-mixin-default-pane
+(deftest selector-mixin-default-pane-1
+    (selector-mixin-default-pane
+     (make-instance 'navigation
+		    :panes `(("Test One" . nil) ("Test Two" . nil))))
+  ("Test One" . nil))
 
-;;; test navigation-default-pane
-(deftest navigation-default-pane-1
-    (navigation-default-pane (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
-  "Test One")
-
-;;; test initialize-instance for navigation
+;;; test lazy initialization for navigation
 (deftest initialize-navigation-1
-    (weblocks::selector-mixin-current-pane-name
-     (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
-  "Test One")
+    (let (initial-current
+	  (nav (make-instance 'navigation
+		 :panes `(("Test One" . nil) ("Test Two" . nil)))))
+      (setf initial-current
+	    (selector-mixin-current-pane-name nav))
+      (selector-on-dispatch nav '())
+      (values initial-current
+	      (selector-mixin-current-pane-name nav)))
+  nil "Test One")
 
 (deftest initialize-navigation-2
-    (weblocks::selector-mixin-current-pane-name
+    (selector-mixin-current-pane-name
      (make-instance 'navigation
-		    :panes `(("Test One" . nil) ("Test Two" . nil))
-		    :current-pane-name "Test Two"))
+       :panes `(("Test One" . nil) ("Test Two" . nil))
+       :current-pane-name "Test Two"))
   "Test Two")
 
 ;;; test with-navigation-header
