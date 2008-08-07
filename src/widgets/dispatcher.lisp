@@ -35,7 +35,7 @@
    (cache :accessor dispatcher-cache
 	  :initform nil
 	  :documentation "If a widget is generated dynamically via
-	  'on-dispatch', and :no-cache isn't returned as the third
+	  'on-dispatch', and :no-cache isn't returned as the fourth
 	  value, the widget is cached in this slot. This is done to
 	  maintain the same instance of the generated widget accross
 	  non-ajax requests. This slot contains nil (if no widget is
