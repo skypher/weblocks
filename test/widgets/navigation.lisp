@@ -366,15 +366,6 @@
 	(car (dispatcher-cache nav1))))
   ("test13"))
 
-;;; test obtain-uri-from-navigation
-(deftest obtain-uri-from-navigation-1
-    (with-request :get nil
-      (let* ((site (create-site-layout))
-	     (nav (weblocks::find-navigation-widget site)))
-	(weblocks::apply-uri-to-navigation '("test2" "test6") nav)
-	(weblocks::obtain-uri-from-navigation nav)))
-  "/test2/test6/")
-
 ;;; test find-navigation-widget
 (deftest find-navigation-widget-1
     (with-request :get nil
