@@ -338,13 +338,20 @@
   "test2"
   "test6")
 
+(defwebapp autn-webapp
+  :init-user-session autn-init-user-session)
+
 (deftest apply-uri-to-navigation-2
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1)
-	(with-request :get nil
-	  (setf nav1 (weblocks::find-navigation-widget site))
-	  (weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
-	  (return-code))))
+    (with-webapp (:class-name 'autn-webapp)
+      (with-request :get nil :uri "/test2/test69"
+	(let ((site (create-site-layout)) nav1)
+	  (defun autn-init-user-session (root) nil)
+	  (unwind-protect
+	       (progn
+		 (catch 'handler-done
+		   (handle-client-request (weblocks::current-webapp)))
+		 (return-code))
+	    (fmakunbound 'init-user-session)))))
   404)
 
 (deftest apply-uri-to-navigation-3
