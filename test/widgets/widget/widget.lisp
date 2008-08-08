@@ -323,7 +323,7 @@
 
 (deftest find-widget-by-path-3
     (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))
+      (setf (root-composite) (create-site-layout))
       (let ((res (find-widget-by-path '(root-inner test-nav-1 test2 test2-leaf))))
 	(values (widget-name res)
 		(type-of res))))
