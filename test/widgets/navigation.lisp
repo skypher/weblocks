@@ -355,13 +355,17 @@
   404)
 
 (deftest apply-uri-to-navigation-3
-    (with-request :get nil
-      (let* ((international-string (url-decode "%C3%A5%C3%A4%C3%B6"))
+    (with-request :get nil :uri (url-encode #0=(url-decode "%C3%A5%C3%A4%C3%B6"))
+      (let* ((international-string #0#)
 	     (nav (make-navigation "test-nav-1"
 				   "test1" (make-instance 'composite)
 				   international-string (make-instance 'composite))))
-	(weblocks::apply-uri-to-navigation (list (url-encode international-string)) nav)
-	(loop for i across (slot-value nav 'current-pane)
+	(print *uri-tokens*)
+	(setf (root-composite)
+	      (make-instance 'composite :widgets (list nav)))
+	(catch 'handler-done
+	  (handle-client-request (weblocks::current-webapp)))
+	(loop for i across (selector-mixin-current-pane-name nav)
 	   collect (char-code i))))
   (229 228 246))
 
