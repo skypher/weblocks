@@ -173,24 +173,40 @@
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))))
 
+(defwidget nomenu-navigation (navigation)
+  ((render-menu-p :initform t :accessor navigation-render-menu-p))
+  (:documentation "Allows menu to be disabled.  For `render-navigation-widget-2'."))
+
+(defmethod render-navigation-menu ((self nomenu-navigation) &rest args)
+  (declare (ignore args))
+  (when (navigation-render-menu-p self)
+    (call-next-method)))
+
 (deftest-html render-navigation-widget-2
-    (with-request :get nil
-      (let ((nav (make-navigation "Test Navigation"
-				  "Test1" (make-instance 'dataform :data *joe*)))
+    (with-request :get nil :uri "/"
+      (let ((nav (init-navigation
+		  (make-instance 'nomenu-navigation :name "Test Navigation")
+		  "Test1" (make-instance 'dataform :data *joe*)))
 	    (*current-navigation-url* "/"))
 	(declare (special *current-navigation-url*))
 	(setf (navigation-render-menu-p nav) nil)
 	;; render widget
 	(render-widget nav)))
   (htm
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc123"
-		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
-		     (:span :class "value" "Joe"))
-		    (:li :class "manager"
-		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim"))))))))
+   (:div :class "selector-mixin widget dispatcher selector navigation nomenu-navigation"
+	 :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget dataform" :id "id-123"
+		     #.(data-header-template
+			"abc123"
+			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
+			   (:span :class "value" "Joe"))
+			  (:li :class "manager"
+			   (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))
+			:postslots `((:div :class "submit"
+					   ,(link-action-template "abc123" "Modify"
+								  :class "modify"
+								  :uri "/")))))))))
 
 (deftest render-navigation-widget-3
     (with-request :get nil
