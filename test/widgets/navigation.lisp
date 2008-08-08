@@ -370,16 +370,17 @@
   (229 228 246))
 
 (deftest apply-uri-to-navigation-4
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf (navigation-on-find-pane nav1)
+    (with-request :get nil :uri "/test13"
+      (let* ((site (create-site-layout))
+	     (nav1 (find-navigation-widget site)))
+	(setf (root-composite) site)
+	(setf (dispatcher-on-dispatch nav1)
 	      (lambda (nav name)
-		(when (equalp name "test13")
-		  "w3")))
-	(weblocks::apply-uri-to-navigation '("test13") nav1)
-	(slot-value nav1 'current-pane)))
-  "test13")
+		(when (equalp name '("test13"))
+		  (values "w3" name '()))))
+	(weblocks::dispatcher-get-widget nav1 '("test13"))
+	(car (dispatcher-cache nav1))))
+  ("test13"))
 
 ;;; test obtain-uri-from-navigation
 (deftest obtain-uri-from-navigation-1
