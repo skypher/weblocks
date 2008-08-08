@@ -6,7 +6,15 @@
 
 (defvar *uri-tokens*)
 (setf (documentation '*uri-tokens* 'variable)
-      "URL-decoded list of the path elements in the current request URI.")
+      "URL-decoded list of the path elements in the current request
+URI, minus elements in `*current-navigation-url*.  See `dispatcher'
+for detailed semantics.")
+
+(defvar *current-navigation-url*)
+(setf (documentation '*current-navigation-url* 'variable)
+      "Bound while rendering widgets to the URL so far consumed by
+`dispatcher's that are parents of the widget being rendered.  See
+`dispatcher' for detailed semantics.")
 
 (defgeneric handle-client-request (app)
   (:documentation
