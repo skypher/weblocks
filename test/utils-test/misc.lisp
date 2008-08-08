@@ -228,10 +228,8 @@
   "/foo/bar")
 
 (deftest request-uri-path-2
-    (with-webapp ()
-      (let (*uri-tokens*)
-	(declare (special *uri-tokens*))
-	(request-uri-path)))
+    (with-request :get nil :uri "/"
+      (request-uri-path))
   "/")
 
 ;;; test string-remove-left

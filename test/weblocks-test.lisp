@@ -198,8 +198,10 @@ webapp in my context."
 			(setf (slot-value *session* 'hunchentoot::session-id) 1)
 			(setf (slot-value *session* 'hunchentoot::session-string) "test")
 			(when uri?
-			  (setf (slot-value *request* 'hunchentoot::uri) uri
-				*uri-tokens* (weblocks::tokenize-uri uri)))
+			  (setf *uri-tokens* (weblocks::tokenize-uri uri)))
+			(setf (slot-value *request* 'hunchentoot::uri)
+			      (or uri (concatenate 'string "/"
+						   (compose-uri-tokens-to-url *uri-tokens*))))
 			(funcall thunk))
 	(setf (symbol-function 'weblocks::make-action) make-action-orig)
 	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
