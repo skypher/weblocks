@@ -28,7 +28,7 @@
 	     (value (first-name *joe*)))
 	(render-view-field field view grid presentation value *joe*)))
   (:td :class "select"
-       (:div (:input :name "item-1" :type "checkbox" :value "t"))))
+       (:div (:input :name "item-1" :type "checkbox" :value "f"))))
 
 (deftest-html datagrid-render-view-field-select-2
     (with-request :get nil
