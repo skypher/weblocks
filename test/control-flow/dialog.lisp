@@ -53,7 +53,7 @@
 
 (deftest-html update-dialog-on-request-3
     (with-request :get nil
-      (setf (session-value 'weblocks::last-request-uri) *uri-tokens*)
+      (setf (webapp-session-value 'weblocks::last-request-uri) *uri-tokens*)
       (setf (weblocks::current-dialog)
 	    (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
 							  (with-html (:p "bar")))
