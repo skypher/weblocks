@@ -108,13 +108,12 @@
     (with-webapp ()
       (let ((nav (make-navigation "Test Navigation"
 				  "Test1" (make-instance 'dataform :data *joe*)
-				  "Test2" (make-instance 'dataform :data *some-college*))))
+				  "Test2" (make-instance 'dataform :data *some-college*)))
+	    (*current-navigation-url* "/")) ;per handle-client-request
 	(declare (special *current-navigation-url*))
 	(with-request :get nil :uri "/"
-	  (setf *current-navigation-url* "/")
 	  (render-widget nav))
 	(with-request :get nil :uri "/test2"
-	  (setf *current-navigation-url* "/test2")
 	  (render-widget nav))))
   (htm
    (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
