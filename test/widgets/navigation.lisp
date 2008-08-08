@@ -378,10 +378,6 @@
   "test-nav-1"
   "test-nav-2")
 
-(deftest find-navigation-widget-2
-    (weblocks::find-navigation-widget nil)
-  nil)
-
 ;;; test reset-navigation-widgets
 (deftest reset-navigation-widgets-1
     (with-request :get nil
