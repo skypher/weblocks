@@ -222,7 +222,7 @@
 
 ;;; test init-navigation
 (deftest init-navigation-1
-    (navigation-panes
+    (selector-mixin-panes
      (init-navigation (make-instance 'navigation)
 		      'test1 "w1"
 		      "Test-Two" "w2"))
@@ -230,7 +230,7 @@
 
 ;;; test make-navigation
 (deftest make-navigation-1
-    (navigation-panes
+    (selector-mixin-panes
      (make-navigation "test navigation"
 		      'test1 "w1"
 		      "Test-Two" "w2"))
