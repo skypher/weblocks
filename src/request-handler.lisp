@@ -4,6 +4,10 @@
 (export '(handle-client-request *on-ajax-complete-scripts*
 	  *uri-tokens* *current-navigation-url* *current-page-description*))
 
+(defvar *uri-tokens*)
+(setf (documentation '*uri-tokens* 'variable)
+      "URL-decoded list of the path elements in the current request URI.")
+
 (defgeneric handle-client-request (app)
   (:documentation
    "This method handles each request as it comes in from the
@@ -92,7 +96,7 @@ customize behavior)."))
 		(when (and (null *current-page-description*)
 			   (last *uri-tokens*))
 		  (setf *current-page-description* 
-			(humanize-name (url-decode (last-item *uri-tokens*)))))
+			(humanize-name (last-item *uri-tokens*))))
 		; render page will wrap the HTML already rendered to
 		; *weblocks-output-stream* with necessary boilerplate HTML
 		(render-page app)

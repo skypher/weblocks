@@ -210,11 +210,12 @@ instead of 'delimeter'.
 ex:
 \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
-  (remove-if (curry #'string-equal "")
-	     (cl-ppcre:split "[/\\\\]" 
-			     (cl-ppcre:regex-replace "\\?.*" 
-						     (subseq uri (length (webapp-prefix)))
-						     ""))))
+  (loop for token in (cl-ppcre:split "[/\\\\]" 
+				     (cl-ppcre:regex-replace "\\?.*" 
+							     (subseq uri (length (webapp-prefix)))
+							     ""))
+     unless (string-equal "" token)
+     collect (url-decode token)))
 
 (defun public-file-relative-path (type filename)
   "Constructs a relative path to a public file from the \"/pub\" directory.
