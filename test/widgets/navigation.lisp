@@ -312,15 +312,29 @@
 	       '(("test3") ("test3") ("test4")))))
   "w3" nil nil)
 
+(defun find-navigation-widget (widgets)
+  (setf widgets (ensure-list widgets))
+  (flet ((navigation? (widget) (typep widget 'navigation)))
+    (and widgets
+	 (or (find-if #'navigation? widgets)
+	     (find-navigation-widget
+	      (mapappend #'composite-widgets widgets))))))
+
 ;;; test apply-uri-to-navigation
 (deftest apply-uri-to-navigation-1
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-	(values (slot-value nav1 'current-pane)
-		(slot-value nav2 'current-pane))))
+    (with-request :get nil :uri "/test2/test6"
+      (setf (root-composite) (create-site-layout))
+      (let* ((nav1 (find-navigation-widget (root-composite)))
+	     (nav1-before-rendering (selector-mixin-current-pane-name nav1)))
+	(handle-client-request (weblocks::current-webapp))
+	(let ((nav2 (find-navigation-widget
+		     (cdr (selector-mixin-find-pane-by-name
+			   nav1
+			   (selector-mixin-current-pane-name nav1))))))
+	  (values nav1-before-rendering
+		  (selector-mixin-current-pane-name nav1)
+		  (selector-mixin-current-pane-name nav2)))))
+  nil
   "test2"
   "test6")
 
