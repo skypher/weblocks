@@ -371,8 +371,9 @@
     (with-request :get nil
       (let ((site (create-site-layout))
 	    nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+	(setf nav1 (find-navigation-widget site))
+	(setf nav2 (find-navigation-widget
+		    (cdr (selector-mixin-default-pane nav1))))
 	(values (widget-name nav1) (widget-name nav2))))
   "test-nav-1"
   "test-nav-2")
