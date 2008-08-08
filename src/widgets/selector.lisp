@@ -23,7 +23,7 @@
     (let* ((pane (if tokens
 		     (selector-mixin-find-pane-by-tokens obj tokens)
 		     (selector-mixin-canonicalize-pane (selector-mixin-default-pane obj))))
-	   (pane-tokens (ensure-list (pane-info-uri-tokens (car pane)))))
+	   (pane-tokens (and pane (ensure-list (pane-info-uri-tokens (car pane))))))
       (if pane
 	  (progn
 	    (setf (selector-mixin-current-pane-name obj)
