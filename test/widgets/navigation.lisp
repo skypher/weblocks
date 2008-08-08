@@ -383,13 +383,14 @@
     (with-request :get nil
       (let ((site (create-site-layout))
 	    nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-	(setf (slot-value nav1 'current-pane) "test2")
-	(setf (slot-value nav2 'current-pane) "test4")
-	(weblocks::reset-navigation-widgets nav1)
-	(values (slot-value nav1 'current-pane)
-		(slot-value nav2 'current-pane))))
+	(setf nav1 (find-navigation-widget site))
+	(setf nav2 (find-navigation-widget
+		    (selector-on-dispatch nav1 '())))
+	(setf (selector-mixin-current-pane-name nav1) "test2")
+	(setf (selector-mixin-current-pane-name nav2) "test4")
+	;(weblocks::reset-navigation-widgets nav1) is gone
+	(values (selector-mixin-current-pane-name nav1)
+		(selector-mixin-current-pane-name nav2))))
   "test1"
   "test3")
 
