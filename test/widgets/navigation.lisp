@@ -204,22 +204,6 @@
 	(return-code)))
   404)
 
-;;; test current-pane-widget
-(deftest current-pane-widget-1
-    (current-pane-widget
-     (make-navigation "Test Navigation"
-		      "test1" "w1"
-		      "test2" "w2"))
-  "w1")
-
-(deftest current-pane-widget-2
-    (let ((nav (make-navigation "Test Navigation"
-				"test1" "w1"
-				"test2" "w2")))
-      (setf (slot-value nav 'current-pane) "test2")
-      (current-pane-widget nav))
-  "w2")
-
 ;;; test init-navigation
 (deftest init-navigation-1
     (selector-mixin-panes
