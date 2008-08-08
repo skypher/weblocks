@@ -258,7 +258,8 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 \(request-uri-path)
 => \"/foo/bar\""
   (declare (special *uri-tokens*))
-  (apply #'concatenate 'string (webapp-prefix) "/" (intersperse *uri-tokens* "/")))
+  (apply #'concatenate 'string (webapp-prefix)
+	 "/" (intersperse (mapcar #'url-encode *uri-tokens*) "/")))
 
 (defun string-remove-left (str prefix &key ignore-case-p)
   "If string 'str' starts with 'prefix', remove 'prefix' from the
