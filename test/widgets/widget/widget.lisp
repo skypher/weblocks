@@ -346,15 +346,15 @@
       (format nil "~s" (make-instance 'weblocks::dataform :name 'users)))
   "#<DATAFORM USERS>")
 
-;; note that navigation is a special case which DOES NOT autogenerate ids
+;; navigation is no longer a special case which DOES NOT autogenerate ids
 (deftest widget-printing-3
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
 	(format nil "~s" (make-instance 'weblocks::navigation))))
-  "#<NAVIGATION NIL>")
+  "#<NAVIGATION \"id-123\">")
 
 (deftest widget-printing-4
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
-	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-123"))))
-  "#<NAVIGATION \"id-123\">")
+	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
+  "#<NAVIGATION \"id-234\">")
