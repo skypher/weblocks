@@ -335,6 +335,16 @@
       (find-widget-by-path '(doesnt exist)))
   nil)
 
+(deftest find-widget-by-path-5
+    (with-request :get nil :uri "/test2"
+      (setf (root-composite) (create-site-layout))
+      (catch 'handler-done
+	(handle-client-request (weblocks::current-webapp)))
+      (let ((test2 (find-widget-by-path '(root-inner test-nav-1 test2))))
+	(values (widget-name test2)
+		(type-of test2))))
+  "test2" composite)
+
 ;;; test customized widget printing
 (deftest widget-printing-1
     (progv '(*package*) (list (find-package :weblocks-test))

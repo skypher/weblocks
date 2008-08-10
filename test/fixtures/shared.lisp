@@ -78,6 +78,7 @@
 								"test4" (lambda (&rest args) nil))))
 				     "test2" (make-instance
 					      'composite
+					      :dom-id "test2"
 					      :widgets
 					      (list
 					       (make-instance 'composite :name 'test2-leaf)

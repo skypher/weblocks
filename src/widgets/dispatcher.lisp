@@ -119,7 +119,8 @@ tokens."
 (defmethod find-widget-by-path* (path (obj dispatcher))
   (declare (special *current-navigation-url*))
   (multiple-value-bind (widget consumed-tokens path)
-      (dispatcher-get-widget obj path nil)
+      (dispatcher-get-widget obj path
+			     (not (dispatcher-widgets-ephemeral-p obj)))
     (declare (ignore consumed-tokens))
     (find-widget-by-path* path widget)))
 
