@@ -67,7 +67,7 @@ false otherwise."
       (and (null match-tokens)
 	   (null uri-tokens))))
 
-(defun dispatcher-get-widget (obj tokens &optional (make-if-missing-p t))
+(defun dispatcher-get-widget (obj tokens &optional (make-if-missing-p t) (mutate-cache t))
   "Looks up and returns the widget in the cache based on the
 tokens. If the widget is not in the cache and make-if-missing is
 t (the default), calls on-dispatch to make a new one. Returns three
@@ -84,13 +84,11 @@ tokens."
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
 	    (funcall (dispatcher-on-dispatch obj) obj tokens)
 	  (when widget
-	    ;; reset the parent of the old cached widget
-	    (when (cdr (dispatcher-cache obj))
-	      (setf (widget-parent (cdr (dispatcher-cache obj))) nil))
-	    ;; clear the cache
-	    (setf (dispatcher-cache obj) nil)
-	    ;; if cache isn't turned off, cache the new widget
-	    (when (not (eq caching :no-cache))
+	    (when (and mutate-cache (not (eq caching :no-cache)))
+	      ;; reset the parent of the old cached widget
+	      (when (cdr (dispatcher-cache obj))
+		(setf (widget-parent (cdr (dispatcher-cache obj))) nil))
+	      ;; replace cache with new widget
 	      (setf (dispatcher-cache obj)
 		    (cons consumed-tokens widget)))
 	    ;; set the dispatcher as parent of the new widget
@@ -120,7 +118,7 @@ tokens."
   (declare (special *current-navigation-url*))
   (multiple-value-bind (widget consumed-tokens path)
       (dispatcher-get-widget obj path
-			     (not (dispatcher-widgets-ephemeral-p obj)))
+			     (not (dispatcher-widgets-ephemeral-p obj)) nil)
     (declare (ignore consumed-tokens))
     (find-widget-by-path* path widget)))
 
