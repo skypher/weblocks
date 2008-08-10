@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(dispatcher dispatcher-on-dispatch dispatcher-cache
-	  uri-tokens-start-with))
+	  dispatcher-widgets-ephemeral-p uri-tokens-start-with))
 
 (defwidget dispatcher (widget)
   ((on-dispatch :accessor dispatcher-on-dispatch
@@ -41,7 +41,14 @@
 	  non-ajax requests. This slot contains nil (if no widget is
 	  cached), or a cons pair with car containing a list of tokens
 	  used to generate the widget, and cdr contains the widget
-	  object. "))
+	  object. ")
+   (widgets-ephemeral-p :accessor dispatcher-widgets-ephemeral-p
+			:initform t
+			:documentation "Whether widgets should be
+			considered to exist for certain only if in the
+			`dispatcher-cache'.  When non-nil (the
+			default), `find-widget-by-path*' will only
+			follow paths through the cached widget."))
   (:documentation "The dispatcher widget can be used to map a sequence
   of URL tokens to a widget corresponding to those tokens. It can be
   used to implement any dispatch strategy of choice. Note, this
