@@ -22,3 +22,8 @@ arguments."
   "Access to a sandbox store in the session."
   `(hunchentoot:session-value 'sandbox-store))
 
+;; Define our application
+(defwebapp weblocks-demo
+    :description "A web application based on Weblocks"
+    :dependencies '((:stylesheet "suggest")))
+

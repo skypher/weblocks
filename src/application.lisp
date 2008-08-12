@@ -58,8 +58,8 @@ layout and dependencies running on the same server."))
 		     ignore-default-dependencies
 		     dependencies 
 		     public-app-path
-		     (init-user-session (find-symbol (symbol-name '#:init-user-session)
-						     (symbol-package name)))
+		     (init-user-session `(find-symbol (symbol-name '#:init-user-session)
+						      (symbol-package ',name)))
 		     (autostart t))
   "This macro defines the key parameters for a stand alone web application.  
 It defines both a class with name 'name' and registers an instance of that class.
@@ -96,8 +96,10 @@ initform for this argument assumes that a /pub directory exists relative to
 the system which has a name matching the current package.  This may be a bogus
 assumption, so best to assign this parameter explicitly.
 
-:init-user-session - This is a symbol that is used to find a function to initialize
-new user sessions.
+:init-user-session - A function object that is used to initialize new
+user sessions. If it is not passed, a function named
+'init-user-session' is looked up in the package where the web
+application name symbol is defined.
 
 :autostart - Whether this webapp is started automatically when start-weblocks is
 called (primarily for backward compatibility"
@@ -112,7 +114,8 @@ called (primarily for backward compatibility"
 				nil
 				(compute-public-files-path 
 				 (intern (package-name ,*package*) :keyword))))
-	 :init-user-session ',init-user-session
+	 :init-user-session (or ,init-user-session
+				(error (format nil "Cannot initialize application ~A because no init-user-session function is found." ',name)))
 	 :prefix ,prefix
 	 :application-dependencies 
 	 (append ,(when (not ignore-default-dependencies)

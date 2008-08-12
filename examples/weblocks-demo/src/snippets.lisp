@@ -10,7 +10,7 @@
 	  (with-extra-tags))))
 
 ;;; Footer
-(defmethod render-page-body :after (rendered-html)
+(defmethod render-page-body :after ((app weblocks-demo) rendered-html)
   (with-html
       (:div :class "footer"
 	    (:p :id "system-info"
