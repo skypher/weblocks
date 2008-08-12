@@ -106,10 +106,12 @@ The function serves all started applications"
 		 (handle-client-request app)))))))
     (log-message :debug "Application dispatch failed for '~A'" (script-name request))))
 
-;; No default handler (to avoid showing hunchentoot page)
+;; Redirect to default app if all other handlers fail
 (setf hunchentoot:*default-handler*
       (lambda ()
-	(setf (return-code) +http-not-found+)))
+	(unless (get-webapp 'weblocks-default nil)
+	  (start-webapp 'weblocks-default))
+	(redirect "/weblocks-default")))
 
 ;; install weblocks-dispatcher
 

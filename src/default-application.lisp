@@ -3,8 +3,8 @@
 
 (defwebapp weblocks-default 
     :description "A default welcome application for weblocks"
-    :init-user-session init-user-session
-    :prefix ""
+    :init-user-session 'init-user-session
+    :prefix "/weblocks-default"
     :autostart nil)
 
 (defmethod render-page-body :after ((app weblocks-default) rendered-html)
