@@ -87,6 +87,8 @@ The function serves all started applications"
 	     (app-pub-prefix (concatenate 'string app-prefix "/pub/")))
 	(log-message :debug "Application dispatch for '~A'" script-name)
 	(cond
+	  ;; TODO: adding /pub dispatcher should probably not be part
+	  ;; of weblocks core, but part of the application
 	  ((is-prefix-of script-name app-pub-prefix)
 	   (log-message :debug "Dispatching to public file")
 	   (return-from weblocks-dispatcher
@@ -94,13 +96,20 @@ The function serves all started applications"
 		       app-pub-prefix 
 		       (or (weblocks-webapp-public-app-path app) *public-files-path*))
 		      request)))
-	  ((is-prefix-of script-name app-prefix)
+	  ((list-starts-with (tokenize-uri script-name nil)
+			     (tokenize-uri app-prefix nil)
+			     :test #'string=)
 	   (log-message :debug "Dispatching to application ~A with prefix '~A'" 
 			app app-prefix)
 	   (return-from weblocks-dispatcher 
 	     #'(lambda ()
 		 (handle-client-request app)))))))
     (log-message :debug "Application dispatch failed for '~A'" (script-name request))))
+
+;; No default handler (to avoid showing hunchentoot page)
+(setf hunchentoot:*default-handler*
+      (lambda ()
+	(setf (return-code) +http-not-found+)))
 
 ;; install weblocks-dispatcher
 
@@ -115,9 +124,13 @@ The function serves all started applications"
 	  (setf *dispatch-table*
 		(append 
 		 (list 
-		  ;; CSS files that are served from webapp specific directories have dependencies
-		  ;; on images in "/pub". I am not sure how to dynamically adjusts references in
-		  ;; CSS files.
+		  ;; CSS files that are served from webapp specific
+		  ;; directories have dependencies on images in
+		  ;; "/pub". I am not sure how to dynamically adjusts
+		  ;; references in CSS files.
+		  ;; TODO: there probably shouldn't be a global "/pub"
+		  ;; directory for weblocks, only application specific
+		  ;; ones
 		  #'(lambda (request)
 		    (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
 			     request))

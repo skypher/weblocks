@@ -204,7 +204,7 @@ instead of 'delimeter'.
         do (setf i (remove-keyword-parameter i argument))
         finally (return i)))
 
-(defun tokenize-uri (uri)
+(defun tokenize-uri (uri &optional (remove-app-prefix t) app)
   "Tokenizes a URI into a list of elements.
 
 ex:
@@ -212,7 +212,13 @@ ex:
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
   (loop for token in (cl-ppcre:split "[/\\\\]" 
 				     (cl-ppcre:regex-replace "\\?.*" 
-							     (subseq uri (length (webapp-prefix)))
+							     (if remove-app-prefix
+								 (subseq uri (length
+									      (webapp-prefix
+									       (if app
+										   app
+										   (current-webapp)))))
+								 uri)
 							     ""))
      unless (string-equal "" token)
      collect (url-decode token)))
