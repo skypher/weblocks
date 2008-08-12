@@ -34,9 +34,8 @@
 	  (call-next-method)))
   (apply #'render-navigation-menu obj args))
 
-(defmethod widget-public-dependencies ((obj navigation))
-  (append (list (public-file-relative-path :stylesheet "menu"))
-	  (call-next-method)))
+(defmethod per-class-dependencies append ((obj navigation))
+  (list (make-local-dependency :stylesheet "menu")))
 
 (defun init-navigation (obj &rest args)
   "A helper function to create a navigation widget
