@@ -31,6 +31,8 @@ option isn't specified, first option is rendered as selected."
 			    (setf option
 				  (cons (humanize-name option)
 					(attributize-name option))))
+			  (unless selected-pane
+			    (setf selected-pane (car option)))
 			  (let* ((label (car option))
 				 (uri (cdr option))
 				 (pane-selected-p (equalp (car option) selected-pane))
@@ -41,10 +43,12 @@ option isn't specified, first option is rendered as selected."
 			     (:li :class pane-class
 				  (if pane-selected-p
 				      (htm (:span (str label)))
-				      (htm (:a :href (concatenate 'string
-								  (string-right-trim "/" uri-prefix)
-								  "/"
-								  (string-left-trim "/" uri))
+				      (htm (:a :href (make-webapp-uri
+						      (string-left-trim
+						       "/" (concatenate 'string
+									(string-right-trim "/" uri-prefix)
+									"/"
+									(string-left-trim "/" uri))))
 					       (str label))))))))
 			options))))))))
 

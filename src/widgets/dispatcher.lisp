@@ -83,6 +83,9 @@ tokens."
       (when make-if-missing-p
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
 	    (funcall (dispatcher-on-dispatch obj) obj tokens)
+	  (unless widget
+	    ;; clear the cache
+	    (setf (dispatcher-cache obj) nil))	 
 	  (when widget
 	    (when (and mutate-cache (not (eq caching :no-cache)))
 	      ;; reset the parent of the old cached widget

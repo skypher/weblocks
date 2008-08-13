@@ -338,7 +338,7 @@
   "test6")
 
 (defwebapp autn-webapp
-  :init-user-session autn-init-user-session)
+  :init-user-session 'autn-init-user-session)
 
 (deftest apply-uri-to-navigation-2
     (with-webapp (:class-name 'autn-webapp)

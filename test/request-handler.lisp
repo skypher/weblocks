@@ -12,7 +12,7 @@
   nil)
 
 (defwebapp hcr-hello-webapp
-  :init-user-session hcr-init-user-session)
+  :init-user-session 'hcr-init-user-session)
 (defmethod initialize-instance :after ((self hcr-hello-webapp) &key &allow-other-keys)
   (setf (weblocks::weblocks-webapp-name self) "HCR Hello"))
 
@@ -101,7 +101,7 @@ onclick='disableIrrelevantButtons(this);' />~
 \"on-load\":null}"))
 
 (defwebapp hcr2-hello-webapp
-  :init-user-session hcr2-init-user-session
+  :init-user-session 'hcr2-init-user-session
   :dependencies '((:script "weblocks-debug")))
 
 ;;; make sure debug toolbar is rendered when appropriate

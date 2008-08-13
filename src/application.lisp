@@ -284,7 +284,12 @@ called (primarily for backward compatibility"
   (symbol-function (weblocks-webapp-init-user-session app)))
 
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
-  (concatenate 'string (webapp-prefix app) uri))
+  (concatenate 'string
+	       (webapp-prefix app)
+	       (when (and (not (empty-p uri))
+			  (not (string-starts-with uri "/")))
+		 "/")
+	       uri))
 
 (defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
