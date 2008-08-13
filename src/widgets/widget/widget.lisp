@@ -76,7 +76,7 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; it is possible to pass :name nil, which simply means that objects
 ;; will render without id in generated HTML.
 (defmethod initialize-instance :after ((obj widget) &key name &allow-other-keys)
-  (when name (setf (dom-id obj) name)))
+  (when name (setf (dom-object-mixin-dom-id obj) name)))
 
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
@@ -88,7 +88,7 @@ inherits from 'widget' if no direct superclasses are provided."
   (:method ((obj string)) nil))
 
 (defmethod (setf widget-name) (name (obj widget))
-  (setf (dom-id obj) name))
+  (setf (dom-object-mixin-dom-id obj) name))
 
 
 ;;; Define widget-rendered-p for objects that don't derive from

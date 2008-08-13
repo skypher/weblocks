@@ -3,14 +3,14 @@
 (export '(dom-object-mixin dom-id dom-class dom-classes))
 
 (defclass dom-object-mixin ()
-  ((dom-id :accessor dom-id
+  ((dom-id :accessor dom-object-mixin-dom-id
 	   :initarg :dom-id
 	   :documentation "The DOM id of an object. Can be a symbol, a
 	   string or nil. When accessed through the 'dom-id' accessor,
 	   will always become a string. Use ensure-dom-id or
 	   widget-name (for widgets) to access its underlying
 	   implementation.")
-   (dom-class :accessor dom-class :initform nil :initarg :dom-class
+   (dom-class :accessor dom-object-mixin-dom-class :initform nil :initarg :dom-class
 	      :documentation "The DOM class (CSS class) of an
 	      object. Set this to a string if you'd like to add an
 	      additional CSS class to the ones generated from the class
@@ -56,7 +56,7 @@ widgets will have a CSS class of 'widget'."))
 			      until (string-equal (class-name i) 'standard-object)
 			      collect i)))
 		  " "))
-	  (dom-class obj)))
+	  (dom-object-mixin-dom-class obj)))
 
 (defmethod dom-classes ((obj symbol))
   (format nil "widget function ~A" (attributize-name obj)))
