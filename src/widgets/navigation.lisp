@@ -17,10 +17,7 @@
     (render-menu (mapcar (lambda (orig-pane)
 			   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
 			     (cons (pane-info-label pane)
-				   (make-webapp-uri 
-				    (if (eq (selector-mixin-default-pane obj) orig-pane)
-					"/"
-					(compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))))
+				   (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
 			 (selector-mixin-panes obj))
 		 :selected-pane (selector-mixin-current-pane-name obj)
 		 :header (if (widget-name obj)
