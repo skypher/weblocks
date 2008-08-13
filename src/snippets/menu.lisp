@@ -31,6 +31,8 @@ option isn't specified, first option is rendered as selected."
 			    (setf option
 				  (cons (humanize-name option)
 					(attributize-name option))))
+			  (unless selected-pane
+			    (setf selected-pane (car option)))
 			  (let* ((label (car option))
 				 (uri (cdr option))
 				 (pane-selected-p (equalp (car option) selected-pane))
