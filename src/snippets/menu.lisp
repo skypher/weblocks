@@ -41,10 +41,12 @@ option isn't specified, first option is rendered as selected."
 			     (:li :class pane-class
 				  (if pane-selected-p
 				      (htm (:span (str label)))
-				      (htm (:a :href (concatenate 'string
-								  (string-right-trim "/" uri-prefix)
-								  "/"
-								  (string-left-trim "/" uri))
+				      (htm (:a :href (make-webapp-uri
+						      (string-left-trim
+						       "/" (concatenate 'string
+									(string-right-trim "/" uri-prefix)
+									"/"
+									(string-left-trim "/" uri))))
 					       (str label))))))))
 			options))))))))
 
