@@ -176,12 +176,15 @@ returns a dependency object."
 	(:script (make-instance 'script-dependency :url full-path))))))
 
 (defun build-local-dependencies (dep-list)
+  "Utility function: convert a list of either dependency objects or an
+alist of dependencies into a list of dependency objects. Used mostly
+when statically specyfing application dependencies, where alists are
+more convenient."
   (loop for dep in dep-list collect
-    (if (subtypep (type-of dep) 'dependency) dep ;; should either return obj or loudly fail
-	(progn 
-	  (assert (and (consp dep) (member (first dep) '(:stylesheet :script))))
-	  (destructuring-bind (type file-name) dep
-	    (make-local-dependency type file-name))))))
+       (if (consp dep)
+	   (destructuring-bind (type file-name) dep
+	     (make-local-dependency type file-name))
+	   dep)))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines
