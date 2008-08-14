@@ -159,23 +159,27 @@ when new dependencies appeared in AJAX page updates.")
 
 ;; Dependency gathering
 
-(defun make-local-dependency (type file-name &key do-not-probe media)
+(defun make-local-dependency (type file-name &key do-not-probe media (webapp (current-webapp)))
   "Make a local (e.g. residing on the same web server) dependency of
 type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
-  (when (or do-not-probe (probe-file (merge-pathnames (public-file-relative-path type file-name)
-						      *public-files-path*)))
-    (let ((full-path 
-;;	   (concatenate 'string (webapp-prefix) "/"
-	   (merge-pathnames (public-file-relative-path type file-name)
-			    (make-pathname :directory '(:absolute "pub")))))
-      (ecase type
-	(:stylesheet (make-instance 'stylesheet-dependency
-				    :url full-path :media media))
-	(:script (make-instance 'script-dependency :url full-path))))))
+  (let ((physical-path (compute-webapp-public-files-path webapp))
+	(virtual-path (compute-webapp-public-files-uri-prefix webapp)))
+    (when (or do-not-probe (probe-file
+			    (merge-pathnames
+			     (public-file-relative-path type file-name)
+			     physical-path)))
+      (let ((full-path 
+	     (merge-pathnames (public-file-relative-path type file-name)
+			      virtual-path)))
+	(ecase type
+	  (:stylesheet (make-instance 'stylesheet-dependency
+				      :url full-path :media media))
+	  (:script (make-instance 'script-dependency :url full-path)))))))
 
 (defun build-local-dependencies (dep-list)
+  "Given a list of dependencies, converts them to virtual locations."
   (loop for dep in dep-list collect
     (if (subtypep (type-of dep) 'dependency) dep ;; should either return obj or loudly fail
 	(progn 

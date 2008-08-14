@@ -166,7 +166,7 @@
 					      :depends-on ("call-answer")))
 			  :depends-on ("weblocks" "widgets" "request-handler" "snippets"))
 		 (:file "server"
-			:depends-on ("weblocks" utils store))
+			:depends-on ("weblocks" "debug-mode" utils store))
 		 (:file "request"
 			:depends-on ("weblocks" "actions"))
 		 (:file "application"

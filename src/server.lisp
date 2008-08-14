@@ -3,8 +3,7 @@
 
 (export '(*last-session* start-weblocks stop-weblocks
 	  compute-public-files-path server-type
-	  server-version active-sessions 
-	  set-weblocks-default-public-files-path weblocks-default-public-files-path))
+	  server-version active-sessions))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -34,6 +33,9 @@
 ':debug' keyword to true in order for stacktraces to be shown to the
 client. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
+  (if debug
+      (enable-global-debugging)
+      (disable-global-debugging))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* "weblocks-session")
     (setf *weblocks-server*
@@ -47,95 +49,73 @@ stores declared via 'defstore'."
   "Stops weblocks. Closes all stores declared via 'defstore'."
   (when (not (null *weblocks-server*))
     (dolist (app *active-webapps*)
-      (stop-webapp (weblocks-webapp-name app)))
-    (setf *last-session* nil)
-    (reset-sessions)
-    (stop-server *weblocks-server*)
-    (setf *weblocks-server* nil)))
+      (stop-webapp (weblocks-webapp-name app)))))
 
-(defun compute-public-files-path (asdf-system-name)
+(defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
   "Computes the directory of public files. The function uses the
 following protocol: it finds the canonical path of the '.asd' file of
 the system specified by 'asdf-system-name', and goes into 'pub'."
   (merge-pathnames
-   (make-pathname :directory '(:relative "pub"))
+   (make-pathname :directory `(:relative ,suffix))
    (asdf-system-directory asdf-system-name)))
-
-(defvar *public-files-path*
-  (compute-public-files-path :weblocks)
-  "Must be set to a directory on the filesystem that contains public
-files that should be available via the webserver (images, stylesheets,
-javascript files, etc.) Modify this directory to set the location of
-your files. Points to the weblocks' 'pub' directory by default.")
-
-(defun set-weblocks-default-public-files-path (path)
-  (setf *public-files-path* path))
-
-(defun weblocks-default-public-files-path ()
-  *public-files-path*)
 
 (defun weblocks-dispatcher (request)
   "Dispatcher function suitable for inclusion into hunchentooth dispatch table.
 The function serves all started applications"
-  (flet ((is-prefix-of (string prefix)
-	   (let ((mismatch (mismatch string prefix)))
-	     (or (null mismatch)
-		 (>= mismatch (length prefix))))))
-    (dolist (app *active-webapps*)
-      (let* ((script-name (script-name request))
-	     (app-prefix (webapp-prefix app))
-	     (app-pub-prefix (concatenate 'string app-prefix "/pub/")))
-	(log-message :debug "Application dispatch for '~A'" script-name)
-	(cond
-	  ;; TODO: adding /pub dispatcher should probably not be part
-	  ;; of weblocks core, but part of the application
-	  ((is-prefix-of script-name app-pub-prefix)
-	   (log-message :debug "Dispatching to public file")
-	   (return-from weblocks-dispatcher
-	     (funcall (create-folder-dispatcher-and-handler 
-		       app-pub-prefix 
-		       (or (weblocks-webapp-public-app-path app) *public-files-path*))
-		      request)))
-	  ((list-starts-with (tokenize-uri script-name nil)
-			     (tokenize-uri app-prefix nil)
-			     :test #'string=)
-	   (log-message :debug "Dispatching to application ~A with prefix '~A'" 
-			app app-prefix)
-	   (return-from weblocks-dispatcher 
-	     #'(lambda ()
-		 (handle-client-request app)))))))
-    (log-message :debug "Application dispatch failed for '~A'" (script-name request))))
+  (dolist (app *active-webapps*)
+    (let* ((script-name (script-name request))
+	   (app-prefix (webapp-prefix app))
+	   (app-pub-prefix (compute-webapp-public-files-uri-prefix app)))
+      (log-message :debug "Application dispatch for '~A'" script-name)
+      (cond
+	((list-starts-with (tokenize-uri script-name nil)
+			   (tokenize-uri app-pub-prefix nil)
+			   :test #'string=)
+	 (log-message :debug "Dispatching to public file")
+	 (return-from weblocks-dispatcher
+	   (funcall (create-folder-dispatcher-and-handler 
+		     (concatenate 'string app-pub-prefix)
+		     (compute-webapp-public-files-path app))
+		    request)))
+	((list-starts-with (tokenize-uri script-name nil)
+			   (tokenize-uri app-prefix nil)
+			   :test #'string=)
+	 (log-message :debug "Dispatching to application ~A with prefix '~A'" 
+		      app app-prefix)
+	 (return-from weblocks-dispatcher 
+	   #'(lambda ()
+	       (handle-client-request app)))))))
+  (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
 (setf hunchentoot:*default-handler*
       (lambda ()
-	(unless (get-webapp 'weblocks-default nil)
-	  (start-webapp 'weblocks-default))
-	(redirect "/weblocks-default")))
+	(if (null (tokenize-uri (script-name) nil))
+	    (progn
+	      (unless (get-webapp 'weblocks-default nil)
+		(start-webapp 'weblocks-default))
+	      (redirect "/weblocks-default"))
+	    (setf (return-code) +http-not-found+))))
 
 ;; install weblocks-dispatcher
 
 (eval-when (:load-toplevel)
   (progn
-    (let ((pos (position 'weblocks-dispatcher *dispatch-table*)))
+    (let ((pos (position 'weblocks-dispatcher *dispatch-table*))
+	  (public-files-path (compute-public-files-path :weblocks)))
       (if pos
 	  (rplaca (nthcdr (1- pos) *dispatch-table*)
 		  #'(lambda (request)
-		      (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
+		      (funcall (create-folder-dispatcher-and-handler "/pub/" public-files-path)
 			       request)))
 	  (setf *dispatch-table*
 		(append 
-		 (list 
-		  ;; CSS files that are served from webapp specific
-		  ;; directories have dependencies on images in
-		  ;; "/pub". I am not sure how to dynamically adjusts
-		  ;; references in CSS files.
-		  ;; TODO: there probably shouldn't be a global "/pub"
-		  ;; directory for weblocks, only application specific
-		  ;; ones
+		 (list
+		  ;;; Default CSS files use /pub, ideally we shouldn't
+		  ;;; expose this through weblocks directly.
 		  #'(lambda (request)
-		    (funcall (create-folder-dispatcher-and-handler "/pub/" *public-files-path*)
-			     request))
+		      (funcall (create-folder-dispatcher-and-handler "/pub/" public-files-path)
+			       request))
 		  'weblocks-dispatcher)
 		 *dispatch-table*))))))
 
