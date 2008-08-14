@@ -426,7 +426,7 @@ in 'class'."
   (let ((elements (ensure-list elements)))
     (if elements
 	(when (funcall test (car list) (car elements))
-	  (list-starts-with (cdr list) (cdr elements)))
+	  (list-starts-with (cdr list) (cdr elements) :test test))
 	t)))
 
 (defun safe-subseq (sequence start &optional end)

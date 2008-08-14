@@ -33,7 +33,11 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   (declare (special *page-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(all-dependencies (compact-dependencies (append (webapp-application-dependencies)
-							*page-dependencies*))))
+							*page-dependencies*
+							(when (weblocks-webapp-debug app)
+							  (build-local-dependencies
+							   '((:script "weblocks-debug")
+							     (:stylesheet "debug-toolbar"))))))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
