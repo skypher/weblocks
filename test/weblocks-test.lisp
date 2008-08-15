@@ -60,7 +60,7 @@ test environment. See 'with-test-environment'."
   (flet ((replace-error (str)
 	   (cl-ppcre:regex-replace-all
 	    "Actual value: #<(UNDEFINED-FUNCTION|(?:[A-Z0-9-]+-)ERROR).*?>."
-	    str "Actual value: #<\1 (error codes)>")))
+	    str "Actual value: #<\\1 (error codes)>")))
     (string= (replace-error new-string) (replace-error old-string))))
 
 (defun do-entry-with-recovery (entry rt-do-entry stream)
