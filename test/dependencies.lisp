@@ -1,7 +1,8 @@
 (in-package :weblocks-test)
 
 (deftest dependencies-by-symbol-1
-    (remove nil (weblocks::dependencies-by-symbol 'non-existent-widget-name))
+    (with-webapp ()
+      (remove nil (weblocks::dependencies-by-symbol 'non-existent-widget-name)))
   nil)
 
 (deftest dependencies-by-symbol-2
@@ -11,7 +12,8 @@
 
 
 (deftest make-local-dependency-1
-    (make-local-dependency :stylesheet "non-existing-file-name")
+    (with-webapp ()
+      (make-local-dependency :stylesheet "non-existing-file-name"))
   nil)
 
 (deftest make-local-dependency-2
@@ -101,11 +103,13 @@
 
 
 (deftest dependencies-1
-    (dependencies 'some-symbol)
+    (with-webapp ()
+      (dependencies 'some-symbol))
   nil)
 
 (deftest dependencies-2
-    (dependencies "some-string")
+    (with-webapp ()
+      (dependencies "some-string"))
   nil)
 
 (deftest dependencies-3
@@ -117,10 +121,11 @@
   nil)
 
 (deftest dependencies-5
-    (apply #'dependencies-equalp
-	   (append
-	    (dependencies "main")
-	    (list (make-local-dependency :stylesheet "main"))))
+    (with-webapp ()
+      (apply #'dependencies-equalp
+	     (append
+	      (dependencies "main")
+	      (list (make-local-dependency :stylesheet "main")))))
   t)
 
 (deftest dependencies-6
