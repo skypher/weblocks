@@ -56,19 +56,35 @@ test environment. See 'with-test-environment'."
 		     (return t)
 		  finally (return nil)))))))
 
+(defun test-string= (new-string old-string)
+  (flet ((replace-error (str)
+	   (cl-ppcre:regex-replace-all
+	    "Actual value: #<(UNDEFINED-FUNCTION|(?:[A-Z0-9-]+-)ERROR).*?>."
+	    str "Actual value: #<\1 (error codes)>")))
+    (string= (replace-error new-string) (replace-error old-string))))
+
 (defun do-entry-with-recovery (entry rt-do-entry stream)
-  (let ((test (rt::name entry)) results)
-    (flet ((test ()
+  (let ((test (rt::name entry)) results original-string reported-original)
+    (flet ((test (stream)
 	     (setf results
 		   (multiple-value-list (funcall rt-do-entry entry stream))))
 	   (success? () (not (rtest::pend entry))))
-      (test)
+      (setf original-string (with-output-to-string (o) (test o)))
       (unless (success?)
 	(loop for (label . recovery) in *recovery-strategies*
-	      do (funcall recovery #'test)
+	      for new-string = (with-output-to-string (o)
+				  (funcall recovery (curry #'test o)))
 	      if (success?)
-	      do (format t "Recovered ~S with strategy ~S~%" test label)
-		 (return)))
+	      do (format stream "~A~%Recovered ~S with strategy ~S~%"
+			 new-string test label)
+		 (return)
+	      if (not (test-string= original-string new-string))
+	      do (format stream "~%Altered output of ~S with strategy ~S:~%~A~%~
+				 versus original output:~%~A"
+			 test label new-string original-string)
+		 (setf reported-original t)))
+      (unless reported-original
+	(princ original-string stream))
       (values-list results))))
 
 (defun do-tests ()
