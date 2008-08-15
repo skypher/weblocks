@@ -10,6 +10,36 @@
 
 (in-package :weblocks-test)
 
+(defvar *recovery-strategies*
+  `((with-plain-webapp . ,(lambda (thunk)
+			    (with-webapp () (funcall thunk))))
+    (with-simple-request . ,(lambda (thunk)
+			      (with-request :get nil (funcall thunk)))))
+  "Alist of strategies to try in turn when a test fails in `do-test'.
+  Each cdr is passed a thunk that will perform the test and determine
+  whether it succeeded.  If one succeeds, the car is used as a label
+  for the successful patched test when reporting it.")
+
+(defun call-with-test-environment (thunk)
+  "Helper for `with-test-environment'."
+  (let ((weblocks::*current-webapp* nil) ;hide application
+	(*print-case* :upcase)	     ;needed by some comparison output
+	interference-methods)
+    (declare (special weblocks::*current-webapp*))
+    ;; remove before/after methods from render-page-body
+    (mapcar (lambda (m)
+	      (let ((qualifiers (method-qualifiers m)))
+		(when (or (find :before qualifiers)
+			  (find :after qualifiers))
+		  (remove-method #'render-page-body m)
+		  (push m interference-methods))))
+	    (generic-function-methods #'render-page-body))
+    ;; do the body
+    (unwind-protect (funcall thunk)
+    ;; reinstate render-page-body before/after methods
+      (loop for m in interference-methods
+	    do (add-method #'render-page-body m)))))
+
 (defmacro with-test-environment (&body body)
   "This macro takes steps to clear the environment for the unit
 tests. For example, if testing in the context of an application, it
@@ -17,36 +47,48 @@ may interfere with the unit tests, so we remove the application. All
 changes are rolled back after the tests are done. Note, the steps that
 this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
-  `(let ((weblocks::*current-webapp* nil) ;hide application
-	 (*print-case* :upcase)		;needed by some comparison output
-	 interference-methods result)
-     (declare (special weblocks::*current-webapp*))
-     ;; remove before/after methods from render-page-body
-     (mapcar (lambda (m)
-	       (let ((qualifiers (method-qualifiers m)))
-		 (when (or (find :before qualifiers)
-			   (find :after qualifiers))
-		   (remove-method #'render-page-body m)
-		   (push m interference-methods))))
-	     (generic-function-methods #'render-page-body))
-     ;; insert the body
-     (setf result (progn ,@body))
-     ;; reinstate render-page-body before/after methods
-     (loop for m in interference-methods
-	do (add-method #'render-page-body m))
-     result))
+  `(call-with-test-environment (lambda () . ,body)))
 
-(defun do-test ()
+(defun do-test (&optional (test *test*))
   "Shadows rt's 'do-test'. This function calls rt's do test in a clean
 test environment. See 'with-test-environment'."
   (with-test-environment
-      (rtest::do-test)))
+    (let ((entry (rt::get-entry test)))
+      (flet ((test () (rtest::do-test test))
+	     (success? () (not (rtest::pend entry))))
+	(or (progn (test) (success?))
+	    (loop for (label . recovery) in *recovery-strategies*
+		  do (funcall recovery #'test)
+		  if (success?)
+		  do (format t "Recovered ~S with strategy ~S~%" test label)
+		     (return t)
+		  finally (return nil)))))))
+
+(defun do-entry-with-recovery (entry rt-do-entry stream)
+  (let ((test (rt::name entry)) results)
+    (flet ((test ()
+	     (setf results
+		   (multiple-value-list (funcall rt-do-entry entry stream))))
+	   (success? () (not (rtest::pend entry))))
+      (test)
+      (unless (success?)
+	(loop for (label . recovery) in *recovery-strategies*
+	      do (funcall recovery #'test)
+	      if (success?)
+	      do (format t "Recovered ~S with strategy ~S~%" test label)
+		 (return)))
+      (values-list results))))
 
 (defun do-tests ()
   "Shadows rt's 'do-tests'. This function calls rt's do-tests in a
 clean test environment. See 'with-test-environment'."
-  (with-test-environment
-      (rtest::do-tests)))
+  (let ((rt-do-entry #'rt::do-entry))
+    (flet ((do-entry (entry &optional (s *standard-output*))
+	     (do-entry-with-recovery entry rt-do-entry s)))
+      (setf (fdefinition 'rt::do-entry) #'do-entry)
+      (unwind-protect (with-test-environment
+			(rtest::do-tests))
+	(setf (fdefinition 'rt::do-entry) rt-do-entry)))))
 
 (defun test-weblocks ()
   "Call this function to run all unit tests defined in 'weblocks-test'
