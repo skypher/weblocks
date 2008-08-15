@@ -252,18 +252,19 @@ webapp in my context."
       (with-webapp ()
 	(apply #'call-with-request-in-webapp-context args))))
 
-(defun span-keyword-params (implicit-progn)
-  "Take the plist from the front of IMPLICIT-PROGN, and answer it and
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun span-keyword-params (implicit-progn)
+    "Take the plist from the front of IMPLICIT-PROGN, and answer it and
 the remaining forms.  Note that there must be at least one non-plist
 form, because we want to always maintain \"returns value of last
 form\" semantics to reduce any confusion caused by this syntax.
 
 Anyway, if you want to force interpretation of a keyword in
 IMPLICIT-PROGN as a prognable form, just quote it."
-  (loop for forms on implicit-progn by #'cddr
-     while (typep forms '(cons keyword (cons t cons)))
-     append (subseq forms 0 2) into plist
-     finally (return (values plist forms))))
+    (loop for forms on implicit-progn by #'cddr
+       while (typep forms '(cons keyword (cons t cons)))
+       append (subseq forms 0 2) into plist
+       finally (return (values plist forms)))))
 
 (defmacro with-request (method parameters &body body)
   "A helper macro for test cases across web requests. The macro
