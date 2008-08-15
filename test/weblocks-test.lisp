@@ -10,15 +10,7 @@
 
 (in-package :weblocks-test)
 
-(defvar *recovery-strategies*
-  `((with-plain-webapp . ,(lambda (thunk)
-			    (with-webapp () (funcall thunk))))
-    (with-simple-request . ,(lambda (thunk)
-			      (with-request :get nil (funcall thunk)))))
-  "Alist of strategies to try in turn when a test fails in `do-test'.
-  Each cdr is passed a thunk that will perform the test and determine
-  whether it succeeded.  If one succeeds, the car is used as a label
-  for the successful patched test when reporting it.")
+(declaim (special *recovery-strategies*))
 
 (defun call-with-test-environment (thunk)
   "Helper for `with-test-environment'."
@@ -300,3 +292,13 @@ URI - Set the Hunchentoot request URI to this."
   "Adds appropriate headers to a request so it is considered to be an
 AJAX request."
   (push '("X-Requested-With" . "test") (slot-value *request* 'headers-in)))
+
+(defvar *recovery-strategies*
+  `((with-plain-webapp . ,(lambda (thunk)
+			    (with-webapp () (funcall thunk))))
+    (with-simple-request . ,(lambda (thunk)
+			      (with-request :get nil (funcall thunk)))))
+  "Alist of strategies to try in turn when a test fails in `do-test'.
+  Each cdr is passed a thunk that will perform the test and determine
+  whether it succeeded.  If one succeeds, the car is used as a label
+  for the successful patched test when reporting it.")
