@@ -164,8 +164,8 @@ when new dependencies appeared in AJAX page updates.")
 type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
-  (let ((physical-path (compute-webapp-public-files-path webapp))
-	(virtual-path (compute-webapp-public-files-uri-prefix webapp)))
+  (let ((physical-path (weblocks-webapp-public-files-path webapp))
+	(virtual-path (weblocks-webapp-public-files-uri-prefix webapp)))
     (when (or do-not-probe (probe-file
 			    (merge-pathnames
 			     (public-file-relative-path type file-name)
