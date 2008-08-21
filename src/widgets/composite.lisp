@@ -23,23 +23,39 @@
   (setf (slot-value obj 'widgets) nil)
   (setf (composite-widgets obj) widgets))
 
-(defmethod (setf composite-widgets) (new-value (widget composite))
+(defmethod make-widget-place-writer ((composite composite) (child widget))
+  "Return a function encapsulating the list where the child is in the car
+   of the first element."
+  (let ((place (member child (composite-widgets composite))))
+    (unless place
+      (error "Widget ~S cannot be found in parent ~S."
+	     child composite))
+    (lambda (&optional callee)
+      (format t "Placing callee ~A into ~A" callee place)
+      (if callee
+	  (progn (rplaca place callee)
+		 (setf (widget-parent callee) composite)
+		 (mark-dirty composite))
+	  (car place)))))
+
+(defmethod (setf composite-widgets) (new-value (composite composite))
   ;; We're no longer a parent of widgets we hold
-  (loop for i in (ensure-list (slot-value widget 'widgets))
-     do (setf (widget-parent i) nil))
-  (let ((widgets (if (or (consp new-value)
-			 (null new-value))
-		     new-value
-		     (list new-value))))
+  (loop for widget in (ensure-list (slot-value composite 'widgets))
+     do (setf (widget-parent widget) nil))
+  (let ((new-widgets (if (or (consp new-value)
+			     (null new-value))
+			 new-value
+			 (list new-value))))
     ;; But we're a part of new widgets we're passed
-    (loop for i in widgets
-       do (if (widget-parent i)
-	      (error "Widget ~a already has a parent." i)
-	      (setf (widget-parent i) widget)))
-    (setf (slot-value widget 'widgets)
-	  widgets)))
+    (loop for widget in new-widgets
+       do (if (widget-parent widget)
+	      (error "Widget ~a already has a parent." widget)
+	      (setf (widget-parent widget) composite)))
+    (setf (slot-value composite 'widgets)
+	  new-widgets)))
 
 (defmethod render-widget-body ((obj composite) &rest args)
+  (declare (ignore args))
   (mapc (lambda (w)
 	  (render-widget w))
 	(composite-widgets obj)))
