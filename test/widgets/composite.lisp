@@ -25,14 +25,14 @@
 
 ;;; Make sure parents are switched properly
 (addtest composite-add-widget-parent-switching
-    (let* ((w1 (make-instance 'composite))
-	   (w2 (make-instance 'composite))
-	   (c (make-instance 'composite :widgets w1)))
-      (ensure (widget-parent w1))
-      (ensure-null (widget-parent w2))
-      (setf (composite-widgets c) w2)
-      (ensure-null (widget-parent w1))
-      (ensure (widget-parent w2))))
+  (let* ((w1 (make-instance 'composite))
+	 (w2 (make-instance 'composite))
+	 (c (make-instance 'composite :widgets w1)))
+    (ensure (widget-parent w1))
+    (ensure-null (widget-parent w2))
+    (setf (composite-widgets c) w2)
+    (ensure-null (widget-parent w1))
+    (ensure (widget-parent w2))))
 
 ;;; testing render for composite widget
 (addtest render-composite
