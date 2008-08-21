@@ -30,6 +30,8 @@
 			:depends-on ("weblocks" utils "application"))
 		 (:file "actions"
 			:depends-on ("weblocks" utils))
+		 (:file "log-actions"
+			:depends-on ("weblocks"))
 		 (:file "debug-mode"
 			:depends-on ("weblocks" "actions"))
 		 (:file "request-hooks"

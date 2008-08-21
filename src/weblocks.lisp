@@ -5,7 +5,7 @@
 			  #:standard-generic-function #:ensure-generic-function
 			  #:standard-class #:typep #:subtypep)
   (:shadowing-import-from :fare-matcher #:match)
-  (:shadow #:redirect)
+  (:shadow #:redirect #:errors)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of web
 application development. It achieves its goals by standardizing on

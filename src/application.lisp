@@ -252,6 +252,10 @@ called (primarily for backward compatibility"
 ;; These procedures are relative to the current request's selected webapp
 ;;
 
+(defvar *current-webapp*)
+(setf (documentation '*uri-tokens* 'variable)
+      "A currently active web application.")
+
 (defun current-webapp ()
   "Returns the currently invoked instance of a web application."
   (declare (special *current-webapp*))

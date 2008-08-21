@@ -1,6 +1,6 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rtest :c2mop :cl-who :hunchentoot :metatilities :moptilities)
+  (:use :cl :weblocks :rtest :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)
@@ -223,9 +223,10 @@ webapp in my context."
 	   (*session-cookie-name* "weblocks-session")
 	   (*uri-tokens* '("foo" "bar"))
 	   weblocks::*page-dependencies* *session*
-	   *on-ajax-complete-scripts*)
+	   *on-ajax-complete-scripts*
+	   weblocks::*rendered-actions*)
       (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
-			*on-ajax-complete-scripts*))
+			*on-ajax-complete-scripts* weblocks::*rendered-actions*))
       (unwind-protect (progn
 			(weblocks::open-stores)
 			(start-session)
@@ -304,6 +305,19 @@ URI - Set the Hunchentoot request URI to this."
 				(:get 'get-parameters)
 				(:post 'post-parameters))) parameters)
   (weblocks::eval-action))
+
+(defun do-request-and-render-dirty (parameters)
+  "Calls `do-request' and then renders dirty widgets."
+  (do-request parameters)
+  (weblocks::render-dirty-widgets))
+
+(defun do-action (action-name &rest args)
+  "A friendlier interface for do-request-and-render-dirty."
+  (do-request-and-render-dirty
+    (cons (cons weblocks::*action-string* action-name)
+	  (loop
+	     for i on args by #'cddr
+	     collect (cons (car i) (cadr i))))))
 
 (defun make-request-ajax ()
   "Adds appropriate headers to a request so it is considered to be an

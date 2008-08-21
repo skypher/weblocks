@@ -32,7 +32,8 @@
                 (with-extra-tags
                   (htm (:fieldset
                         ,@body
-                        (:input :name *action-string* :type "hidden" :value ,action-code)))))))))
+                        (:input :name *action-string* :type "hidden" :value ,action-code))))))
+       (log-form ,action-code :id ,id :class ,class))))
 
 (defun render-link (action name &key (ajaxp t) id class)
   "Renders an action into an href link. If 'ajaxp' is true (the
@@ -57,7 +58,8 @@ by default).
 	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
-	  (str name)))))
+	  (str name)))
+    (log-link name action-code :id id :class class)))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
   "Renders a button in a form.

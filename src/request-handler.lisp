@@ -16,6 +16,11 @@ for detailed semantics.")
 `dispatcher's that are parents of the widget being rendered.  See
 `dispatcher' for detailed semantics.")
 
+(defvar *on-ajax-complete-scripts*)
+(setf (documentation '*on-ajax-complete-scripts* 'variable)
+      "A list of client-side scripts to be sent over to the browser at
+      the end of ajax request execution.")
+
 (defgeneric handle-client-request (app)
   (:documentation
    "This method handles each request as it comes in from the

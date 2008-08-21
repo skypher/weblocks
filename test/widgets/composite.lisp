@@ -1,74 +1,51 @@
 
 (in-package :weblocks-test)
 
+;;; test suite for composite widgets
+(deftestsuite composite-suite (weblocks-suite)
+  ())
+
 ;;; test setting composite widget to single widget on init
-(deftest init-composite-single-1
-    (with-request :get nil
-      (let ((c (make-instance 'composite :widgets "foo")))
-	(composite-widgets c)))
-  ("foo"))
+(addtest init-composite-single
+  (ensure-same (composite-widgets (make-instance 'composite :widgets "foo"))
+	       (list "foo")))
 
 ;;; test proper setting of widget parent on adding to composite
-(deftest composite-add-widget-1
-    (with-request :get nil
-      ;; make sure this doesn't signal error
-      (make-instance 'composite :widgets "foo")
-      nil)
-  nil)
+(addtest composite-add-widget-parent
+  (let* ((w (make-instance 'composite))
+	 (c (make-instance 'composite :widgets w)))
+    (ensure-same (widget-parent w) c)))
 
-(deftest composite-add-widget-2
-    (with-request :get nil
-      (let* ((w (make-instance 'composite))
-	     (c (make-instance 'composite :widgets w)))
-	(eq (widget-parent w) c)))
-  t)
+;;; widget can't be in multiple composites
+(addtest composite-add-widget-multiple
+  (let ((w (make-instance 'composite)))
+    (make-instance 'composite :widgets w)
+    (ensure-error
+      (make-instance 'composite :widgets w))))
 
-(deftest composite-add-widget-3
-    (multiple-value-bind (res err)
-	(ignore-errors
-	  (let ((w (make-instance 'composite)))
-	    (make-instance 'composite :widgets w)
-	    (make-instance 'composite :widgets w)))
-      (not (null err)))
-  t)
-
-(deftest composite-add-widget-4
-    (with-request :get nil
-      (let* ((w1 (make-instance 'composite))
-	     (w2 (make-instance 'composite))
-	     (c (make-instance 'composite :widgets w1)))
-	(assert (not (null (widget-parent w1))))
-	(assert (null (widget-parent w2)))
-	(setf (composite-widgets c) w2)
-	(assert (null (widget-parent w1)))
-	(assert (not (null (widget-parent w2))))))
-  nil)
+;;; Make sure parents are switched properly
+(addtest composite-add-widget-parent-switching
+    (let* ((w1 (make-instance 'composite))
+	   (w2 (make-instance 'composite))
+	   (c (make-instance 'composite :widgets w1)))
+      (ensure (widget-parent w1))
+      (ensure-null (widget-parent w2))
+      (setf (composite-widgets c) w2)
+      (ensure-null (widget-parent w1))
+      (ensure (widget-parent w2))))
 
 ;;; testing render for composite widget
-(deftest-html render-composite-1
-    (with-request :get nil
-      (let ((comp (make-instance 'composite)))
-	(push-end (make-instance 'dataform :data *joe*)
-		  (composite-widgets comp))
-	(push-end (make-instance 'dataform :data *home-address*)
-		  (composite-widgets comp))
-	(render-widget comp)))
-  (htm
-   (:div :class "widget composite" :id "id-123"
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc123"
-		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
-		     (:span :class "value" "Joe"))
-		    (:li :class "manager"
-		     (:span :class "label text" "Manager:&nbsp;")
-		     (:span :class "value" "Jim")))))
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc124"
-		  '((:li :class "street"
-		     (:span :class "label text" "Street:&nbsp;") (:span :class "value" "100 Broadway"))
-		    (:li :class "city"
-		     (:span :class "label text" "City:&nbsp;") (:span :class "value" "New York")))
-		  :data-class-name "address")))))
+(addtest render-composite
+  (let (a-rendered
+	b-rendered
+	(comp (make-instance 'composite)))
+    (push-end (lambda ()
+		(setf a-rendered t))
+	      (composite-widgets comp))
+    (push-end (lambda ()
+		(setf b-rendered t))
+	      (composite-widgets comp))
+    (render-widget comp)
+    (ensure a-rendered)
+    (ensure b-rendered)))
 

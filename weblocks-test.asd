@@ -11,52 +11,56 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
-  :depends-on (:weblocks :weblocks-store-test :rt :closer-mop :metatilities)
+  :depends-on (:weblocks :weblocks-store-test :rt :lift :closer-mop :metatilities)
   :components ((:module test
 		:components (
 		 (:file "weblocks-test")
+		 (:module "test-code"
+			  :components ((:file "query-actions")
+				       (:file "weblocks-suite"))
+			  :depends-on ("weblocks-test"))
 		 (:file "weblocks"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:module utils-test
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
-			  :depends-on ("weblocks-test"))
+			  :depends-on ("test-code"))
 		 (:file "dependencies"
-			:depends-on ("weblocks-test" utils-test))
+			:depends-on ("test-code" utils-test))
 		 (:file "actions"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "request-hooks"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "request-handler-utils"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "request-handler"
-			:depends-on ("weblocks-test" "request-handler-utils" fixtures))
+			:depends-on ("test-code" "request-handler-utils" fixtures))
 		 (:file "debug-mode"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "server"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "request"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "application"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:file "page-template"
-			:depends-on ("weblocks-test"))
+			:depends-on ("test-code"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
-			  :depends-on ("weblocks-test"))
+			  :depends-on ("test-code"))
 		 (:module fixtures
 			  :components ((:file "shared"))
-			  :depends-on ("weblocks-test"))
+			  :depends-on ("test-code"))
 		 (:module store
 			  :components ((:file "store-utils"))
-			  :depends-on ("weblocks-test"))
+			  :depends-on ("test-code"))
 		 (:module snippets
 			  :components ((:file "suggest")
 				       (:file "isearch")
 				       (:file "html-utils-helper")
 				       (:file "html-utils"
 					      :depends-on ("html-utils-helper")))
-			  :depends-on ("weblocks-test" fixtures))
+			  :depends-on ("test-code" fixtures))
 		 (:module views
 			  :components ((:module view
 						:components ((:file "view")
@@ -100,7 +104,7 @@
 										   (:file "textarea")
 										   (:file "image")
 										   (:file "url"))))))
-			  :depends-on ("weblocks-test" fixtures snippets))
+			  :depends-on ("test-code" fixtures snippets))
 		 (:module widgets
 			  :components ((:file "widget-test-utils")
 				       (:module widget
@@ -132,11 +136,11 @@
 				       (:file "pagination"
 					      :depends-on ("pagination-utils"))
 				       (:file "composite"))
-			  :depends-on ("weblocks-test" fixtures views))
+			  :depends-on ("test-code" fixtures views))
 		 (:module control-flow
 			  :components ((:file "call-answer")
 				       (:file "dialog")
 				       (:file "workflow"))
-			  :depends-on ("weblocks-test" snippets))))))
+			  :depends-on ("test-code" snippets))))))
 
 

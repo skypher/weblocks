@@ -3,6 +3,10 @@
 
 (export '(render-page-body render-page-headers page-title))
 
+(defvar *page-dependencies*)
+(setf (documentation '*page-dependencies* 'variable)
+      "A list of dependencies of the currently rendered page.")
+
 ;;
 ;; Compute the webapp page title
 ;;
