@@ -20,7 +20,8 @@
   (make-hash-table))
 
 (defclass weblocks-webapp ()
-  ((name :accessor weblocks-webapp-name :initarg :name :initform nil :type string)
+  ((name :accessor weblocks-webapp-name :initarg :name :initform nil
+	 :type (or symbol string))
    (description :accessor weblocks-webapp-description :initarg :description 
 		:initform nil :type (or null string)
 		:documentation "The name of the application.  This slot will be used 
