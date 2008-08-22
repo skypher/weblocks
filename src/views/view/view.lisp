@@ -178,10 +178,7 @@ and a suffix."
 			      (symbol-package
 			       (class-name (class-of (current-webapp))))))
 	(find-own-symbol entity-symbol '#:weblocks)
-	(find-if-not (let ((keyword-pkg (find-package 'keyword)))
-		       (lambda (sym)
-			 (eq keyword-pkg (symbol-package sym))))
-		     (find-all-symbols entity-symbol))
+	(find-if-not #'keywordp (find-all-symbols entity-symbol))
 	(error "Class ~A cannot be found." entity-symbol))))
 
 (defgeneric view-class-name (view-type)
