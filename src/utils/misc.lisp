@@ -299,9 +299,8 @@ item before passing it to 'predicate'."
 (defun symbol-status (symbol)
   "Returns a status of 'symbol' in its package (internal, external,
 etc.)"
-  (multiple-value-bind (sym status)
-      (find-symbol (symbol-name symbol) (symbol-package symbol))
-    status))
+  (nth-value 1 (find-symbol (symbol-name symbol)
+			    (symbol-package symbol))))
 
 ;;; String helpers
 (defun string-invert-case (str)
@@ -437,4 +436,11 @@ in 'class'."
     (when (and end (> end length))
       (setf end length))
     (subseq sequence start end)))
+
+(defun find-own-symbol (name &optional (package nil packagep))
+  "Like `find-symbol', but reject symbols not really in PACKAGE."
+  (multiple-value-bind (sym status)
+      (if packagep (find-symbol name package) (find-symbol name))
+    (and (member status '(:internal :external))
+	 (values sym status))))
 
