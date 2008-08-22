@@ -168,12 +168,20 @@ views."))
   "A helper function that generates a class name from an entity name
 and a suffix."
   (declare (optimize safety))
-  (assert (not (keywordp entity-type)))
-  (let ((package (symbol-package entity-type))
-	(entity-symbol (concatenate 'string (symbol-name entity-type)
+  (check-type entity-type (not keyword))
+  (let ((entity-symbol (concatenate 'string (symbol-name entity-type)
 				    (symbol-name suffix))))
-    (or (find-symbol entity-symbol package)
-	(car (find-all-symbols entity-symbol))
+    (or (find-own-symbol entity-symbol
+			 (symbol-package entity-type))
+	(and (boundp '*current-webapp*)
+	     (find-own-symbol entity-symbol
+			      (symbol-package
+			       (class-name (class-of (current-webapp))))))
+	(find-own-symbol entity-symbol '#:weblocks)
+	(find-if-not (let ((keyword-pkg (find-package 'keyword)))
+		       (lambda (sym)
+			 (eq keyword-pkg (symbol-package sym))))
+		     (find-all-symbols entity-symbol))
 	(error "Class ~A cannot be found." entity-symbol))))
 
 (defgeneric view-class-name (view-type)

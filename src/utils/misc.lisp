@@ -438,3 +438,9 @@ in 'class'."
       (setf end length))
     (subseq sequence start end)))
 
+(defun find-own-symbol (name &optional (package nil packagep))
+  "Like `find-symbol', but reject symbols not really in PACKAGE."
+  (multiple-value-bind (sym status)
+      (if packagep (find-symbol name package) (find-symbol name))
+    (and (member status '(:internal :external)) sym)))
+
