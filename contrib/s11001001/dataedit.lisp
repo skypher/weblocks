@@ -2,6 +2,8 @@
 
 (in-package #:weblocks-s11)
 
+(export '(dataedit-dataform-mixin-initargs))
+
 (defun dataedit-dataform-mixin-initargs (dataedit &optional (item nil item?))
   "Answer initargs appropriate for passing to a `dataform-mixin' to
 talk back to DATAEDIT when appropriate.  If ITEM, this is a form for

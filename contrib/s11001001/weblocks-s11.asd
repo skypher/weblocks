@@ -9,6 +9,7 @@
   :licence "LLGPL"
   :depends-on ("arnesi" "weblocks")
   :components ((:file "package")
-	       (:file "dataedit" :depends-on ("package"))))
+	       (:file "dataedit" :depends-on ("package"))
+	       (:file "presentations" :depends-on ("package"))))
 
 ;;; weblocks-s11.asd ends here
