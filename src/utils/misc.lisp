@@ -299,9 +299,8 @@ item before passing it to 'predicate'."
 (defun symbol-status (symbol)
   "Returns a status of 'symbol' in its package (internal, external,
 etc.)"
-  (multiple-value-bind (sym status)
-      (find-symbol (symbol-name symbol) (symbol-package symbol))
-    status))
+  (nth-value 1 (find-symbol (symbol-name symbol)
+			    (symbol-package symbol))))
 
 ;;; String helpers
 (defun string-invert-case (str)
