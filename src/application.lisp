@@ -56,6 +56,7 @@
                          composite widget at the root of the application. 'init-user-session' is 
                          responsible for adding initial widgets to this composite.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil))
+  (:metaclass webapp-class)
   (:documentation 
 "A class that encapsulates a unique web application and all relevant rnesources.
 A webapp is a unique set of dependencies and information that can be enabled or
@@ -121,15 +122,13 @@ application name symbol is defined.
 :autostart - Whether this webapp is started automatically when start-weblocks is
 called (primarily for backward compatibility"
   `(progn
-     (defclass ,name ,(append subclasses (list 'weblocks-webapp))
+     (defclass ,name (,@subclasses weblocks-webapp)
        ,slots
+       (:autostart ,autostart)
        (:default-initargs
 	. ,(remove-keyword-parameters
-	    initargs :subclasses :slots :autostart)))
-     (pushnew ',name *registered-webapps*)
-     (when ,autostart
-       (pushnew ',name *autostarting-webapps*))
-     t))
+	    initargs :subclasses :slots :autostart))
+       (:metaclass webapp-class))))
 
 (defmethod initialize-instance :after
     ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
