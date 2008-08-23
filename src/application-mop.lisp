@@ -18,6 +18,5 @@
   (declare (ignore slots))
   (let ((name (class-name self)))
     (pushnew name (symbol-value '*registered-webapps*))
-    (format t "~%AUTOSTART: ~S~%" autostart)
     (when autostart
       (pushnew name (symbol-value '*autostarting-webapps*)))))
