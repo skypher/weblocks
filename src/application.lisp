@@ -45,7 +45,7 @@
               as a subtree of the URI space at this site.  This does not support 
               webapp dispatch on virtual hosts, browser types, etc.")
    (application-dependencies :accessor weblocks-webapp-application-dependencies 
-			     :initarg :application-dependencies :initform nil :type list
+			     :initarg :dependencies :initform nil :type list
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
