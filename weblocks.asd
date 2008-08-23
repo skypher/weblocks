@@ -171,8 +171,10 @@
 			:depends-on ("weblocks" "debug-mode" utils store))
 		 (:file "request"
 			:depends-on ("weblocks" "actions"))
-		 (:file "application"
+		 (:file "application-mop"
 			:depends-on ("weblocks"))
+		 (:file "application"
+			:depends-on ("weblocks" "application-mop"))
 		 (:file "default-application"
 			:depends-on ("server" "weblocks" utils "request-handler")))))
   :in-order-to ((asdf:test-op (load-op "weblocks-test"))
