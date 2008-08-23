@@ -20,7 +20,7 @@
   (make-hash-table))
 
 (defclass weblocks-webapp ()
-  ((name :accessor weblocks-webapp-name :initarg :name :initform nil
+  ((name :accessor weblocks-webapp-name :initarg :name
 	 :type (or symbol string))
    (description :accessor weblocks-webapp-description :initarg :description 
 		:initform nil :type (or null string)
@@ -33,14 +33,14 @@
 		      for public files. The final value is computed
 		      with 'compute-webapp-public-files-path'.")
    (public-files-uri-prefix :accessor weblocks-webapp-public-files-uri-prefix
-			    :initform nil
+			    :initform "pub"
 			    :initarg :public-files-uri-prefix
 			    :documentation "The uri prefix for public
 			    files. By default, this slot is
 			    initialized to 'pub'. The final uri prefix
 			    for application public files is computed
 			    by 'compute-webapp-public-files-uri-prefix'.")
-   (prefix :accessor weblocks-webapp-prefix :initarg :prefix :initform "" :type string
+   (prefix :accessor weblocks-webapp-prefix :initarg :prefix :type string
 	   :documentation "The default dispatch will allow a webapp to be invoked 
               as a subtree of the URI space at this site.  This does not support 
               webapp dispatch on virtual hosts, browser types, etc.")
@@ -50,7 +50,7 @@
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
-		      :initform nil :type symbol
+		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
                          composite widget at the root of the application. 'init-user-session' is 
@@ -67,18 +67,10 @@ instance, have different sites (e.g. mobile vs. desktop) with vastly different
 layout and dependencies running on the same server."))
 
 
-(defmacro defwebapp (name &key 
-		     subclasses 
+(defmacro defwebapp (name &rest initargs &key 
+		     subclasses
 		     slots
-		     description 
-		     (prefix (concatenate 'string "/" (attributize-name name)))
-		     ignore-default-dependencies
-		     dependencies 
-		     public-files-path
-		     (public-files-uri-prefix "pub")
-		     (init-user-session `(find-symbol (symbol-name '#:init-user-session)
-						      (symbol-package ',name)))
-		     (autostart t))
+		     (autostart t) &allow-other-keys)
   "This macro defines the key parameters for a stand alone web application.  
 It defines both a class with name 'name' and registers an instance of that class.
 It also instantiates a defvar with an instance of this class.  This is intended
@@ -89,6 +81,9 @@ can.  It's not likely to be needed much
 
 :slots - webapps are class so slots are a list of definitions just as in defclass,
 but as slots are likely to be rare on webapps, we make this a keyword argument.
+
+All of the following, when present, are passed through as additional
+initargs:
 
 :name - instantiates a username (and the default title for) a webapp.  use this
 name to get and delete this webapp.  Multiple instances of a webapp class can
@@ -128,29 +123,43 @@ called (primarily for backward compatibility"
   `(progn
      (defclass ,name ,(append subclasses (list 'weblocks-webapp))
        ,slots
-       (:default-initargs 
-	:name ',name
-	 :description ,description 
-	 :public-files-path ,public-files-path
-	 :public-files-uri-prefix ,public-files-uri-prefix
-	 :init-user-session (or ,init-user-session
-				(error (format nil "Cannot initialize application ~A because no init-user-session function is found." ',name)))
-	 :prefix ,prefix
-	 :application-dependencies 
-	 (append ',(when (not ignore-default-dependencies)
-			 '((:stylesheet "layout")
-			   (:stylesheet "main")
-			   (:stylesheet "dialog")
-			   (:script "prototype")
-			   (:script "scriptaculous")
-			   (:script "shortcut")
-			   (:script "weblocks")
-			   (:script "dialog")))
-		 ,dependencies)))
+       (:default-initargs
+	. ,(remove-keyword-parameters
+	    initargs :subclasses :slots :autostart)))
      (pushnew ',name *registered-webapps*)
      (when ,autostart
        (pushnew ',name *autostarting-webapps*))
      t))
+
+(defmethod initialize-instance :after
+    ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
+  "Add some defaults to my slots.  In particular, unless
+IGNORE-DEFAULT-DEPENDENCIES, prepend the default Weblocks dependencies
+to my `application-dependencies' slot."
+  (macrolet ((slot-default (name initform)
+	       `(unless (slot-boundp self ',name)
+		  (setf (slot-value self ',name) ,initform))))
+    (let ((class-name (class-name (class-of self))))
+      (slot-default name class-name)
+      (slot-default init-user-session
+		    (or (find-symbol (symbol-name 'init-user-session)
+				     (symbol-package class-name))
+			(error "Cannot initialize application ~A because ~
+				no init-user-session function is found."
+			       (weblocks-webapp-name self))))
+      (slot-default prefix
+		    (concatenate 'string "/" (attributize-name class-name))))
+    (unless ignore-default-dependencies
+      (setf (weblocks-webapp-application-dependencies self)
+	    (append '((:stylesheet "layout")
+		      (:stylesheet "main")
+		      (:stylesheet "dialog")
+		      (:script "prototype")
+		      (:script "scriptaculous")
+		      (:script "shortcut")
+		      (:script "weblocks")
+		      (:script "dialog"))
+		    (weblocks-webapp-application-dependencies self))))))
 
 (defun get-webapp (name &optional (error-p t))
   "Get a running web application"
