@@ -124,7 +124,7 @@ called (primarily for backward compatibility"
   `(progn
      (defclass ,name (,@subclasses weblocks-webapp)
        ,slots
-       (:autostart ,autostart)
+       (:autostart . ,autostart)
        (:default-initargs
 	. ,(remove-keyword-parameters
 	    initargs :subclasses :slots :autostart))
