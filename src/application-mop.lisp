@@ -16,7 +16,7 @@
 (defmethod shared-initialize :after
     ((self webapp-class) slots &key autostart &allow-other-keys)
   (declare (ignore slots))
-  (let ((name (class-name (class-of self))))
+  (let ((name (class-name self)))
     (pushnew name (symbol-value '*registered-webapps*))
     (when autostart
       (pushnew name (symbol-value '*autostarting-webapps*)))))
