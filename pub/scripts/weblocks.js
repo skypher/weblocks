@@ -94,9 +94,10 @@ function getActionUrl(actionCode, sessionString, isPure) {
     return url;
 }
 
-function initiateActionWithArgs(actionCode, sessionString, args, method) {
+function initiateActionWithArgs(actionCode, sessionString, args, method, url) {
     if (!method) method = 'get';
-    new Ajax.Request(getActionUrl(actionCode, sessionString),
+    if (!url) url = getActionUrl(actionCode, sessionString);
+    new Ajax.Request(url,
                      {
                          method: method,
                          onSuccess: onActionSuccess,

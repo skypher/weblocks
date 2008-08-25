@@ -90,6 +90,13 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-name) (name (obj widget))
   (setf (dom-id obj) name))
 
+(defgeneric valid-widget-p (widget)
+  (:documentation "Returns t when widget is a valid, renderable widget;
+   this includes strings, function, etc.")
+  (:method ((obj widget)) t)
+  (:method ((obj symbol)) t)
+  (:method ((obj function)) t)
+  (:method ((obj string)) t))
 
 ;;; Define widget-rendered-p for objects that don't derive from
 ;;; 'widget'

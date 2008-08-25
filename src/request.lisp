@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*json-content-type refresh-request-p initial-request-p
-	  ajax-request-p pure-request-p redirect
+	  ajax-request-p pure-request-p redirect post-action-redirect
 	  compose-uri-tokens-to-url))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
@@ -50,6 +50,16 @@ redirect on the client."
 	(throw 'handler-done
 	  (format nil "{\"redirect\":\"~A\"}" url)))
       (hunchentoot:redirect url)))
+
+(defun post-action-redirect (url)
+  "A common pattern is to have an action redirect after taking some action.  
+   Typically an action is wrapped in a transaction which will abort if the 
+   redirect happens during the action execution (due to the throw to 
+   'handler-done, a non-local exit).  This pushes a redirect to the url
+   argument onto the post-action hook so it occurs after the action transaction
+   but before rendering"
+  (push (lambda () (redirect url))
+	(request-hook :request :post-action)))
 
 (defun compose-uri-tokens-to-url (tokens)
   "Encodes and concatenates uri tokens into a url string. Note that

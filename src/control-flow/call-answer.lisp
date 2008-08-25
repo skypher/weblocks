@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(do-widget do-page do-modal answer make-widget-place-writer))
+(export '(do-widget do-page do-modal answer make-widget-place-writer 
+          set-widget-parent))
 
 ;;; Specialize widget-continuation
 (defmethod widget-continuation ((widget function))
@@ -28,10 +29,9 @@ function, continuation is curried as a first parameter and the result
 is returned. Otherwise, continuation isn't saved."
   (let/cc k
     (setf (widget-continuation callee) k)
-    (when op
-      (funcall op (if (functionp callee)
-		      (curry callee k)
-		      callee)))
+    (safe-funcall op (if (functionp callee)
+			 (curry callee k)
+			 callee))
     t))
 
 (defun answer (continuation &optional result)
@@ -50,7 +50,20 @@ continuation, recursively tries its parents."
      it returns the current widget at the place.  If called with one 
      argument, it writes the place with argument.  Any widget that 
      supports flows must implement this function.  Part of the contract 
-     is that the fn sets the parent slot of the callee to the container."))
+     is that the fn sets the parent slot of the callee to the container.
+     The other part is that the widget is dirty after the write via
+     a direct call to make-dirty, or to a write to a widget slot.
+     The implementor of this function should create an error if the
+     place is no longer valid or the callee is null"))
+
+(defun set-widget-parent (widget parent)
+  "Little helper function for writing make-widget-place-writer methods"
+  (let ((old-parent (widget-parent widget)))
+    (if old-parent
+	(error "Widget ~A already has parent ~A; cannot write parent" 
+	       widget old-parent)
+	(setf (widget-parent widget) parent))
+    widget))
 
 ;; Places 'callee' in the place of 'widget', saves the continuation,
 ;; and returns from the delimited computation. When 'callee' answers,

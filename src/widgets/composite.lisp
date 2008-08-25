@@ -23,20 +23,30 @@
   (setf (slot-value obj 'widgets) nil)
   (setf (composite-widgets obj) widgets))
 
-(defmethod make-widget-place-writer ((composite composite) (child widget))
+(defmethod make-widget-place-writer ((composite composite) child)
   "Return a function encapsulating the list where the child is in the car
    of the first element."
   (let ((place (member child (composite-widgets composite))))
     (unless place
       (error "Widget ~S cannot be found in parent ~S."
 	     child composite))
-    (lambda (&optional callee)
-      (format t "Placing callee ~A into ~A" callee place)
-      (if callee
-	  (progn (rplaca place callee)
-		 (setf (widget-parent callee) composite)
-		 (mark-dirty composite))
-	  (car place)))))
+    (lambda (&optional (callee nil callee-supplied-p))
+      (assert (cons-in-list-p place (composite-widgets composite)))
+      (cond ((and callee-supplied-p (valid-widget-p callee))
+	     (rplaca place callee)
+	     (setf (widget-parent callee) composite)
+	     (mark-dirty composite))
+	    (callee-supplied-p
+	     (error "Attempted to write invalid widget ~A to composite ~A" 
+		    callee composite))
+	    (t (car place))))))
+
+(defun cons-in-list-p (cell list)
+  "Simple test that the cell is still part of list to validate the place
+   stored in the closure"
+  (cond ((null list) nil)
+	((eq list cell) t)
+	(t (cons-in-list-p cell (cdr list)))))
 
 (defmethod (setf composite-widgets) (new-value (composite composite))
   ;; We're no longer a parent of widgets we hold
@@ -48,9 +58,8 @@
 			 (list new-value))))
     ;; But we're a part of new widgets we're passed
     (loop for widget in new-widgets
-       do (if (widget-parent widget)
-	      (error "Widget ~a already has a parent." widget)
-	      (setf (widget-parent widget) composite)))
+       do (set-widget-parent widget composite))
+    ;; Record the widgets
     (setf (slot-value composite 'widgets)
 	  new-widgets)))
 

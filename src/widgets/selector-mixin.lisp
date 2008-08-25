@@ -93,3 +93,20 @@ specified uri tokens if such a pane exists. Otherwise, returns nil."
     (if (and pane (cdr path))
 	(find-widget-by-path* (cdr path) pane)
 	pane)))
+
+(defmethod make-widget-place-writer ((selector selector-mixin) child)
+  (let ((place (find child (selector-mixin-panes selector) :key #'cdr)))
+    (unless place
+      (error "Widget ~S cannot be found in parent selector-mixin ~S."
+	     child selector))
+    (lambda (&optional (callee nil callee-supplied-p))
+      (assert (find place (selector-mixin-panes selector)))
+      (cond ((and callee-supplied-p (valid-widget-p callee))
+	     (rplacd place callee)
+	     (setf (widget-parent callee) selector)
+	     (mark-dirty selector))
+	    (callee-supplied-p
+	     (error "Attempted to write invalid widget ~A to selector-mixin ~A" 
+		    callee selector))
+	    (t (cdr place))))))
+
