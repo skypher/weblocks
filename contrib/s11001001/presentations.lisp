@@ -33,6 +33,6 @@
 	 (float
 	  (and float-start
 	       (ignore-errors (arnesi:parse-float value :start float-start)))))
-    (values (or (not present?) float) present? float)))
+    (values (or (not present?) float) present? (round (* 100 float)))))
 
 ;;; presentations.lisp ends here
