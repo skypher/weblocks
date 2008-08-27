@@ -58,7 +58,7 @@
 			 (list new-value))))
     ;; But we're a part of new widgets we're passed
     (loop for widget in new-widgets
-       do (set-widget-parent widget composite))
+       do (adopt-widget composite widget))
     ;; Record the widgets
     (setf (slot-value composite 'widgets)
 	  new-widgets)))

@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(do-widget do-page do-modal answer make-widget-place-writer 
-          set-widget-parent))
+          adopt-widget))
 
 ;;; Specialize widget-continuation
 (defmethod widget-continuation ((widget function))
@@ -56,14 +56,15 @@ continuation, recursively tries its parents."
      The implementor of this function should create an error if the
      place is no longer valid or the callee is null"))
 
-(defun set-widget-parent (widget parent)
-  "Little helper function for writing make-widget-place-writer methods"
+(defun adopt-widget (parent widget)
+  "Like (setf (widget-parent WIDGET) PARENT), but signal an error when
+WIDGET already has a parent (even if it's PARENT)."
   (let ((old-parent (widget-parent widget)))
     (if old-parent
 	(error "Widget ~A already has parent ~A; cannot write parent" 
 	       widget old-parent)
-	(setf (widget-parent widget) parent))
-    widget))
+	(setf (widget-parent widget) parent)))
+  (values))
 
 ;; Places 'callee' in the place of 'widget', saves the continuation,
 ;; and returns from the delimited computation. When 'callee' answers,
