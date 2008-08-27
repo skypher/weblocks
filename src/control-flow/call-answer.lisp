@@ -44,18 +44,6 @@ continuation, recursively tries its parents."
       (when (widget-parent continuation)
 	(answer (widget-parent continuation) result))))
 
-(defgeneric make-widget-place-writer (container widget)
-  (:documentation "Returns a function that encapsulates the place
-     where widget is stored.  When fn is called with no arguments 
-     it returns the current widget at the place.  If called with one 
-     argument, it writes the place with argument.  Any widget that 
-     supports flows must implement this function.  Part of the contract 
-     is that the fn sets the parent slot of the callee to the container.
-     The other part is that the widget is dirty after the write via
-     a direct call to make-dirty, or to a write to a widget slot.
-     The implementor of this function should create an error if the
-     place is no longer valid or the callee is null"))
-
 (defun adopt-widget (parent widget)
   "Like (setf (widget-parent WIDGET) PARENT), but signal an error when
 WIDGET already has a parent (even if it's PARENT)."

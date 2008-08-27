@@ -115,6 +115,21 @@ inherits from 'widget' if no direct superclasses are provided."
   (declare (ignore obj val))
   nil)
 
+(defgeneric make-widget-place-writer (container widget)
+  (:documentation "Returns a function accepting (&optional ARG) that
+   encapsulates the place where widget is stored, behaving like this:
+
+      When ARG not given, return the current contained widget.
+      Otherwise, put ARG in the place, set ARG's parent to CONTAINER,
+      and dirty CONTAINER.  Signal an error if this place is no longer
+      valid or ARG is null.
+
+   Any widget that supports flows must implement this function.  Part
+   of the contract is that the fn sets the parent slot of the callee
+   to the container.  The other part is that the widget is dirty after
+   the write via a direct call to make-dirty, or to a write to a
+   widget slot."))
+
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn
 				    &allow-other-keys)
