@@ -67,10 +67,10 @@ WIDGET already has a parent (even if it's PARENT)."
       (do-widget-aux widget callee wrapper-fn)))
 
 (defun/cc do-widget-aux (widget callee &optional (wrapper-fn #'identity))
-  (let* ((parent (widget-parent widget))
+  (let* ((parent (or (widget-parent widget)
+		     (error "Attempted to replace widget ~S which has no parent!"
+			    widget)))
 	 (place-writer (make-widget-place-writer parent widget)))
-    (unless parent
-      (error "Attempted to replace widget ~S which has no parent!" widget))
     (prog1
 	(call callee
 	      (lambda (new-callee)
