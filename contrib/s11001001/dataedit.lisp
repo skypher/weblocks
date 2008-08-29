@@ -2,12 +2,12 @@
 
 (in-package #:weblocks-s11)
 
-(export '(dataedit-dataform-mixin-initargs))
+(export '(dataedit-editor-initargs))
 
-(defun dataedit-dataform-mixin-initargs (dataedit &optional (item nil item?))
-  "Answer initargs appropriate for passing to a `dataform-mixin' to
-talk back to DATAEDIT when appropriate.  If ITEM, this is a form for
-an existing instance."
+(defun dataedit-editor-initargs (dataedit &optional (item nil item?))
+  "Answer initargs appropriate for passing to a `data-editor' to talk
+back to DATAEDIT when appropriate.  If ITEM, this is a form for an
+existing instance."
   (list :data (if item?
 		  item
 		  (make-instance (dataseq-data-form-class dataedit)))
