@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(update-object-view-from-request
-	  request-parameters-for-object-view))
+	  request-parameters-for-object-view
+          request-parameter-for-presentation))
 
 (defgeneric update-object-view-from-request (obj view &rest args
 						 &key class-store
@@ -38,7 +39,8 @@ Specialize this function to parse given objects differently.")
 			  (let* ((field (field-info-field field-info))
 				 (obj (field-info-object field-info))
 				 (field-key (attributize-name (view-field-slot-name field)))
-				 (field-value (request-parameter field-key)))
+				 (field-value (request-parameter-for-presentation field-key
+                                                                                  (view-field-presentation field))))
 			    (when (typep (view-field-presentation field) 'form-presentation)
 			      (multiple-value-bind (parsedp presentp parsed-value)
 				  (apply #'parse-view-field-value (form-view-field-parser field)
@@ -137,7 +139,14 @@ request.
 	     (when (typep (view-field-presentation field) 'form-presentation)
 	       (let* ((slot-name (view-field-slot-name field))
 		      (slot-key (attributize-name slot-name))
-		      (request-slot-value (request-parameter slot-key)))
+		      (request-slot-value (request-parameter-for-presentation
+					   slot-key (view-field-presentation field))))
 		 (cons field request-slot-value)))))
 	 (find-view view) nil args))
 
+(defgeneric request-parameter-for-presentation (name presentation)
+  (:documentation "Answer HTTP request parameter NAME, but
+  preprocessed for PRESENTATION.")
+  (:method (name presentation)
+    (declare (ignore presentation))
+    (request-parameter name)))
