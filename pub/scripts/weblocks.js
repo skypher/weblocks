@@ -55,29 +55,36 @@ function onActionSuccess(transport) {
     
     // See if there are redirects
     var redirect = json['redirect'];
-    if(redirect)
+    if (redirect)
     {
 	window.location.href = redirect;
 	return;
     }
     
+    execJsonCalls(json['before-load']);
+
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
     for(var i in dirtyWidgets) {
 	var widget = $(i);
 	if(widget) {
+            //console.log("updating widget %s", i);
 	    updateElementBody(widget, dirtyWidgets[i]);
 	}
     }
 
-    // Perform a series of specialized operations
-    var onLoadCalls = json['on-load'];
-    if(onLoadCalls) {
-	onLoadCalls.each(function(item)
+    execJsonCalls(json['on-load']);
+}
+
+function execJsonCalls (calls) {
+    if(calls) {
+	calls.each(function(item)
 			 {
 			     try {
-				 item.evalJSON().call();
-			     } catch(e) {}
+                                 item.evalScripts();
+			     } catch(e) {
+                                 //console.log("Error evaluating AJAX script %o: %s", item, e);
+                             }
 			 });
     }
 }
@@ -106,7 +113,7 @@ function initiateActionWithArgs(actionCode, sessionString, args, method) {
 
 }
 
-/* convenicence/compatibility function */
+/* convenience/compatibility function */
 function initiateAction(actionCode, sessionString) {
     initiateActionWithArgs(actionCode, sessionString);
 }
@@ -181,5 +188,25 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
     $(inputId).replace(suggestHTML);
     
     declareSuggest(inputId, choicesId, suggestOptions);
+}
+
+function include_css(css_file) {
+  var html_doc = document.getElementsByTagName('head').item(0);
+  var css = document.createElement('link');
+  css.setAttribute('rel', 'stylesheet');
+  css.setAttribute('type', 'text/css');
+  css.setAttribute('href', css_file);
+  html_doc.appendChild(css);
+  return false;
+}
+
+function include_dom(script_filename) {
+  var html_doc = document.getElementsByTagName('head').item(0);
+  var js = document.createElement('script');
+  js.setAttribute('language', 'javascript');
+  js.setAttribute('type', 'text/javascript');
+  js.setAttribute('src', script_filename);
+  html_doc.appendChild(js);
+  return false;
 }
 

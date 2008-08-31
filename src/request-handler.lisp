@@ -1,7 +1,8 @@
 
 (in-package :weblocks)
 
-(export '(handle-client-request *on-ajax-complete-scripts*
+(export '(handle-client-request
+          *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	  *uri-tokens* *current-navigation-url* *current-page-description*))
 
 (defvar *uri-tokens*)
@@ -15,6 +16,11 @@ for detailed semantics.")
       "Bound while rendering widgets to the URL so far consumed by
 `dispatcher's that are parents of the widget being rendered.  See
 `dispatcher' for detailed semantics.")
+
+(defvar *before-ajax-complete-scripts*)
+(setf (documentation '*before-ajax-complete-scripts* 'variable)
+      "A list of client-side scripts to be sent over to the browser at
+      the end of ajax request execution.  TODO when executed?")
 
 (defvar *on-ajax-complete-scripts*)
 (setf (documentation '*on-ajax-complete-scripts* 'variable)
@@ -80,8 +86,9 @@ customize behavior)."))
       (let ((*weblocks-output-stream* (make-string-output-stream))
 	    (*uri-tokens* (tokenize-uri (request-uri)))
 	    (*current-navigation-url* "/") *dirty-widgets*
-	    *on-ajax-complete-scripts* *page-dependencies*
-	    *current-page-description* *uri-tokens-fully-consumed*)
+	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
+	    *page-dependencies* *current-page-description*
+	    *uri-tokens-fully-consumed*)
 	(declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
 			  *current-page-description* *uri-tokens-fully-consumed*))
@@ -134,7 +141,7 @@ customize behavior)."))
 association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
   (declare (special *dirty-widgets* *weblocks-output-stream*
-		    *on-ajax-complete-scripts*))
+		    *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
   (setf (content-type) *json-content-type*)
   (let ((widget-alist (mapcar (lambda (w)
 				(cons
@@ -143,9 +150,10 @@ association list. This function is normally called by
 				   (render-widget w :inlinep t)
 				   (get-output-stream-string *weblocks-output-stream*))))
 			      *dirty-widgets*)))
-    (format *weblocks-output-stream* "{\"widgets\":~A,\"on-load\":~A}"
+    (format *weblocks-output-stream* "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
 	    (encode-json-to-string widget-alist)
-	    (encode-json-to-string *on-ajax-complete-scripts*))))
+	    (encode-json-to-string (nreverse *before-ajax-complete-scripts*))
+	    (encode-json-to-string (nreverse *on-ajax-complete-scripts*)))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 

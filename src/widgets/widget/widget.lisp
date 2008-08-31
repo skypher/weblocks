@@ -6,7 +6,8 @@
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
-          widget-dirty-p find-widget-by-path* find-widget-by-path))
+          widget-dirty-p find-widget-by-path* find-widget-by-path
+          *current-widget*))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
@@ -162,7 +163,7 @@ Another implementation allows rendering strings."))
 (defmethod widget-suffix-fn (obj)
   nil)
 
-(defun render-widget (obj &key inlinep)
+(defun render-widget (obj &key inlinep &allow-other-keys)
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
@@ -171,8 +172,18 @@ Additionally, calls 'dependencies' and adds the returned items to
 *page-dependencies*. This is later used by Weblocks to declare
 stylesheets and javascript links in the page header."
   (declare (special *page-dependencies*))
-  (setf *page-dependencies*
-	(append *page-dependencies* (dependencies obj)))
+  (if (ajax-request-p)
+    (dolist (dep (dependencies obj))
+      (let ((file (puri:uri (merge-pathnames dep
+					     (make-pathname :directory '(:absolute "pub"))))))
+	(send-script (cond
+		       ((equalp (pathname-type dep) "js")
+			(format nil "include_dom('~A');" file))
+		       ((equalp (pathname-type dep) "css")
+			(format nil "include_css('~A');" file)))
+		     :before-load)))
+    (setf *page-dependencies*
+	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
       (funcall #'render-widget-body obj)
       (apply #'with-widget-header obj #'render-widget-body
