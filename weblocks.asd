@@ -116,8 +116,10 @@
 							     (:file "widget-mop")))
 				       (:file "flash"
 					      :depends-on (widget))
-				       (:file "dataform"
+				       (:file "data-editor"
 					      :depends-on (widget))
+				       (:file "dataform"
+					      :depends-on (widget "data-editor"))
 				       (:file "quickform"
 					      :depends-on (widget "dataform"))
 				       (:file "login"
