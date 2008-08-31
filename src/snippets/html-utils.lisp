@@ -5,8 +5,9 @@
 	  render-link render-button render-form-and-button
 	  render-checkbox render-dropdown render-autodropdown
 	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-password render-textarea
-	  render-list scriptonly noscript render-message))
+	  render-close-button render-input-field render-password
+          render-textarea render-list scriptonly noscript render-message
+          send-script))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -85,7 +86,7 @@ cut to quickly render a sumbit button."
 			  :id form-id :class form-class)
     (render-button name :value value :id button-id :class button-class)))
 
-(defun render-checkbox (name checkedp &key id (class "checkbox"))
+(defun render-checkbox (name checkedp &key id (class "checkbox") onclick)
   "Renders a checkbox in a form.
 
 'name' - name of the html control. The name is attributized before
@@ -96,9 +97,9 @@ being rendered.
   (with-html
     (if checkedp
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		     :value "t" :checked "checked"))
+		     :value "t" :checked "checked" :onclick onclick))
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		     :value "f")))))
+		     :value "f" :onclick onclick)))))
 
 (defparameter *dropdown-welcome-message* "[Select ~A]"
   "A welcome message used by dropdowns as the first entry.")
@@ -216,18 +217,35 @@ used instead of the default 'Close'."
     (:span :class "close-button"
 	   (render-link close-action (humanize-name button-string)))))
 
-;;; render password implementation
-(defun render-password (name value &key id (class "password") maxlength)
+(defun render-input-field (type name value &key id class maxlength style)
+  (with-html
+    (:input :type type :name (attributize-name name) :id id
+	    :value value :maxlength maxlength :class class
+            :style style)))
+
+(defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
+                        visibility-option-p)
     "Renders a password in a form.
 'name' - name of the html control. The name is attributized before being rendered.
 'value' - a value on html control.
 'id' - id of the html control. Default is nil.
  maxlength - maximum lentgh of the field
 'class' - a class used for styling. By default, \"password\"."
-  (with-html
-    (:input :type "password" :name (attributize-name name) :id id
-	    :value value :maxlength maxlength :class class)))
-
+  (render-input-field "password" name value
+                      :id id :class class :maxlength maxlength
+                      :style style)
+  (when visibility-option-p
+    (send-script (ps:ps*
+                   `(defun toggle-password-visibility (field)
+                      (let ((it ($ field)))
+                        (if (== (slot-value it 'type) "password")
+                          (setf (slot-value it 'type) "text")
+                          (setf (slot-value it 'type) "password"))))))
+    (with-html
+      (:label
+        (render-checkbox (gen-id) nil
+                         :onclick (format nil "togglePasswordVisibility(\"~A\")" id))
+        (esc "Show password")))))
 
 (defun render-textarea (name value rows cols &key id class)
   "Renders a textarea in a form.
@@ -303,6 +321,17 @@ in addition."
        (:noscript
 	 ,@body))))
 
+(defun send-script (script &optional (place :after-load))
+  (if (ajax-request-p)
+    (let ((json (format nil "<script type='text/javascript'>~%//<![CDATA[~%~A~%// ]]>~%</script>" script)))
+    ;(let ((json (format nil "new Function(~A)" (encode-json-to-string script))))
+      (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+      (case place
+        (:before-load (push json *before-ajax-complete-scripts*))
+        (:after-load (push json *on-ajax-complete-scripts*))))
+    (with-javascript
+      script)))
+
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
   (with-html
@@ -314,3 +343,4 @@ in addition."
   "Take a code string and encapsulate it in a new Function object,
 JSON-encoding it."
   (format nil "new Function(~A)" (encode-json-to-string code)))
+
