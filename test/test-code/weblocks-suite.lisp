@@ -4,7 +4,8 @@
 ;;; A suite that sets up an application environment
 (deftestsuite application-suite ()
   ()
-  (:dynamic-variables (weblocks::*current-webapp* (make-instance 'weblocks::weblocks-webapp)))
+  (:dynamic-variables (weblocks::*current-webapp*
+		       (make-instance 'weblocks::weblocks-webapp :prefix "")))
   (:setup 
    (setf (weblocks::weblocks-webapp-init-user-session weblocks::*current-webapp*)
 	 (lambda (&rest args)
@@ -28,7 +29,8 @@
 		      (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
 		      (weblocks::*dirty-widgets* nil)
 		      (*weblocks-output-stream* (make-string-output-stream))
-		      *uri-tokens* *on-ajax-complete-scripts* 
+		      *uri-tokens* *on-ajax-complete-scripts*
+		      *before-ajax-complete-scripts*
 		      weblocks::*page-dependencies*)
   (:setup (setf (slot-value *request* 'method) :get)))
 
