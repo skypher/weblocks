@@ -256,3 +256,14 @@ returns the created object."
      presentation))
    "-presentation"))
 
+(defmethod print-object ((obj field-info) stream)
+  (flet ((field-key (field-info &aux (field (field-info-field field-info)))
+                    (cons (view-field-slot-name field) (awhen (field-info-parent-info field-info)
+                                                              (view-field-slot-name (field-info-field IT))))))
+    (print-unreadable-object (obj stream :type t :identity t)
+      (format stream "~S" (field-key obj)))))
+
+(defmethod print-object ((obj view-field) stream)
+  (print-unreadable-object (obj stream :type t :identity t)
+    (format stream "~S" (view-field-slot-name obj))))
+
