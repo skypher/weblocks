@@ -1,7 +1,7 @@
 
 (defpackage #:weblocks-test
   (:use :cl :weblocks :rtest :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
-	:anaphora)
+	:anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)

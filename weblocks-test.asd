@@ -12,7 +12,7 @@
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
   :depends-on (:weblocks :weblocks-store-test :rt :lift :closer-mop :metatilities
-	       :anaphora)
+	       :anaphora :f-underscore)
   :components ((:module test
 		:components (
 		 (:file "weblocks-test")
