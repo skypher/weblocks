@@ -130,3 +130,22 @@ See `%ensure-nodiff' for available keyword args."
   `(%ensure-same-html
     (multiple-value-list ,form) (multiple-value-list ,values)
     ',form . ,key-args))
+
+;;;; HTML comparison (what `deftest-html' does)
+
+(defun call-with-fake-output (thunk)
+  "Rebind `*weblocks-output-stream*' and others necessary, call THUNK,
+restore the old context, and answer the string of whatever was written
+to it in the meantime."
+  (let (*weblocks-output-stream* (*test-widget-id* 1000))
+    (with-output-to-string (*weblocks-output-stream*)
+      (funcall thunk))))
+
+(defmacro ensure-html-output (form cl-whovian &rest ensure-same-html-args)
+  "As with `ensure-same-html', but capture the output during FORM
+instead, comparing it to CL-WHO-formatted CL-WHOVIAN.  Remaining args
+are passed to `ensure-same-html'."
+  `(ensure-same-html
+    (call-with-fake-output (f0 ,form))
+    (with-html-output-to-string (,(gensym "S")) ,cl-whovian)
+     . ,ensure-same-html-args))
