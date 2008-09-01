@@ -176,11 +176,19 @@
   :test puri:uri=))
 
 
-(deftest-html render-dependency-in-page-head-1
-    (render-dependency-in-page-head (make-instance 'script-dependency :url "http://boing.com/abc.js"))
-  (:script :src "http://boing.com/abc.js" :type "text/javascript" ""))
+;; (deftest-html render-dependency-in-page-head-1
+;;     (render-dependency-in-page-head (make-instance 'script-dependency :url "http://boing.com/abc.js"))
+;;   (:script :src "http://boing.com/abc.js" :type "text/javascript" ""))
+(addtest render-dependency-in-page-head-1
+  (ensure-html-output
+   (render-dependency-in-page-head
+    (make-instance 'script-dependency :url "http://boing.com/abc.js"))
+   (:script :src "http://boing.com/abc.js" :type "text/javascript" "")))
 
-(deftest-html render-dependency-in-page-head-2
-    (render-dependency-in-page-head (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css"))
-  (:link :rel "stylesheet" :type "text/css" :href "http://boing.com/abc.css"))
+
+(addtest render-dependency-in-page-head-2
+  (ensure-html-output
+   (render-dependency-in-page-head
+    (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css"))
+   (:link :rel "stylesheet" :type "text/css" :href "http://boing.com/abc.css")))
 
