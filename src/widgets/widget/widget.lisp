@@ -174,10 +174,11 @@ stylesheets and javascript links in the page header."
   (declare (special *page-dependencies*))
   (if (ajax-request-p)
     (dolist (dep (dependencies obj))
-      (send-script (format nil (typecase dep
-                                 (stylesheet-dependency "include_dom('~A');")
-                                 (script-dependency "include_css('~A');"))
-	                       (make-webapp-uri (dependency-url dep)))))
+      (send-script
+	(ps* `(,(typecase dep
+                  (stylesheet-dependency 'include_dom)
+                  (script-dependency 'include_css))
+               ,(make-webapp-uri (puri:render-uri (dependency-url dep) nil))))))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
