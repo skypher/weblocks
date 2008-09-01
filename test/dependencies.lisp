@@ -103,14 +103,14 @@
   (ensure-null (dependencies (make-instance 'widget :name "abc123"))))
 
 (addtest dependencies-5
-  (ensure-same (dependencies "main")
+  (ensure-same (values-list (dependencies "main"))
 	       (make-local-dependency :stylesheet "main")
 	       :test dependencies-equalp))
 
 (addtest dependencies-6
   (ensure-same (values-list (mapcar #'dependency-url
 				    (dependencies (make-instance 'navigation))))
-	       (puri:uri "/pub/stylesheets/navigation.css)")
+	       (puri:uri "/pub/stylesheets/navigation.css")
 	       :test puri:uri=))
 
 
