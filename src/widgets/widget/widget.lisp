@@ -176,8 +176,8 @@ stylesheets and javascript links in the page header."
     (dolist (dep (dependencies obj))
       (send-script
 	(ps* `(,(typecase dep
-                  (stylesheet-dependency 'include_dom)
-                  (script-dependency 'include_css))
+                  (stylesheet-dependency 'include_css)
+                  (script-dependency 'include_dom))
                ,(make-webapp-uri (puri:render-uri (dependency-url dep) nil))))))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
