@@ -152,8 +152,8 @@ association list. This function is normally called by
 			      *dirty-widgets*)))
     (format *weblocks-output-stream* "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
 	    (encode-json-to-string widget-alist)
-	    (encode-json-to-string (nreverse *before-ajax-complete-scripts*))
-	    (encode-json-to-string (nreverse *on-ajax-complete-scripts*)))))
+	    (encode-json-to-string *before-ajax-complete-scripts*)
+	    (encode-json-to-string *on-ajax-complete-scripts*))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
