@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(render-page-body render-page-headers page-title))
+(export '(render-page render-page-body render-page-headers page-title))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
