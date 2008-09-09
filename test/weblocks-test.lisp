@@ -130,8 +130,9 @@ clean test environment. See 'with-test-environment'."
   "Call this function to run all unit tests defined in 'weblocks-test'
 package. This function tests weblocks in a clean environment. See
 'with-test-environment' for more details."
-  (do-tests)
-  (run-tests :suite 'weblocks-suite))
+  ;; XXX better results combination
+  (values (run-tests :suite 'weblocks-suite)
+	  (run-tests :suite 'weblocks-store-test::store-suite)))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
