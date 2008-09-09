@@ -85,7 +85,9 @@
 (addtest per-class-dependencies-4
   (ensure-same (values-list (remove nil (per-class-dependencies
 					 (make-instance 'navigation))))
-	       (make-local-dependency :stylesheet "navigation")
+	       (values-list
+		(mapcar (curry #'make-local-dependency :stylesheet)
+			'("menu" "navigation")))
 	       :test dependencies-equalp))
 
 
@@ -110,7 +112,9 @@
 (addtest dependencies-6
   (ensure-same (values-list (mapcar #'dependency-url
 				    (dependencies (make-instance 'navigation))))
-	       (puri:uri "/pub/stylesheets/navigation.css")
+	       (values
+		 (puri:uri "/pub/stylesheets/menu.css")
+		 (puri:uri "/pub/stylesheets/navigation.css"))
 	       :test puri:uri=))
 
 
