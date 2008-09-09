@@ -6,8 +6,8 @@
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)
   (:shadowing-import-from :weblocks #:redirect)
-  (:shadow #:do-test #:do-tests #:continue-testing)
-  (:export #:test-weblocks #:do-pending))
+  (:shadow #:do-test #:do-tests #:deftest)
+  (:export #:test-weblocks))
 
 (in-package :weblocks-test)
 
@@ -103,18 +103,8 @@ clean test environment. See 'with-test-environment'."
   "Call this function to run all unit tests defined in 'weblocks-test'
 package. This function tests weblocks in a clean environment. See
 'with-test-environment' for more details."
-  (do-tests))
-
-(defun continue-testing ()
-  "Shadows rt's 'continue-testing'. This function calls rt's
-continue-testing in a clean test environment. See
-'with-test-environment'."
-  (with-test-environment
-      (rtest::continue-testing)))
-
-(defun do-pending ()
-  "An alias for 'continue-testing'."
-  (continue-testing))
+  (do-tests)
+  (run-tests :suite 'weblocks-suite))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
