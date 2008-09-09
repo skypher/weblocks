@@ -42,6 +42,33 @@ this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
   `(call-with-test-environment (lambda () . ,body)))
 
+(defmacro set-sensible-suite ()
+  "Set up a sensible testsuite to use as the testsuite for addtest
+forms that may not have a suite defined in-file, in the file in which
+I am expanded.  Likely to work only at toplevel."
+  (let ((inner-part
+	 `(let ((last-set-suite lift::*current-testsuite-name*))
+	    (unless (string-contains-p
+		     (symbol-name last-set-suite) (pathname-name file))
+	      (setf lift::*current-testsuite-name* 'weblocks-suite)))))
+    `(progn
+       (eval-when (:compile-toplevel)
+	 (let ((file *compile-file-pathname*))
+	   ,inner-part))
+       (eval-when (:load-toplevel :execute)
+	 (let ((file *load-truename*))
+	   ,inner-part)))))
+
+(defmacro deftest (name form &rest values)
+  "Define a test in an appropriate testsuite called NAME, ensuring
+that FORM's values and the literal VALUES are equal."
+  `(progn
+     (set-sensible-suite)
+     (addtest ,name
+       (ensure-same ,form ,(if (typep values '(cons t null))
+			       `',(first values)
+			       `(values . ,(mapcar (f_ `',_) values)))))))
+
 (defun do-test (&optional (test *test*))
   "Shadows rt's 'do-test'. This function calls rt's do test in a clean
 test environment. See 'with-test-environment'."
