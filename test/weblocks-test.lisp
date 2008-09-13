@@ -191,7 +191,7 @@ and then compares the string to the expected result."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
-		     initargs))
+		     (append initargs '(:prefix ""))))
 	 (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (cond (full
