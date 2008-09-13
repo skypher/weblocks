@@ -34,21 +34,24 @@ option isn't specified, first option is rendered as selected."
 			  (unless selected-pane
 			    (setf selected-pane (car option)))
 			  (let* ((label (car option))
-				 (uri (cdr option))
+				 (target (cdr option))
 				 (pane-selected-p (equalp (car option) selected-pane))
 				 (pane-class (when pane-selected-p
-					       "selected-item"))
-				 (uri-prefix *current-navigation-url*))
+					       "selected-item")))
 			    (htm
 			     (:li :class pane-class
-				  (if pane-selected-p
-				      (htm (:span (str label)))
-				      (htm (:a :href (make-webapp-uri
-						      (string-left-trim
-						       "/" (concatenate 'string
-									(string-right-trim "/" uri-prefix)
-									"/"
-									(string-left-trim "/" uri))))
-					       (str label))))))))
+                                  (etypecase target
+                                    (string
+                                      (if pane-selected-p
+                                        (htm (:span (str label)))
+                                        (htm (:a :href (make-webapp-uri
+                                                         (string-left-trim
+                                                           "/" (concatenate 'string
+                                                                            (string-right-trim "/" *current-navigation-url*)
+                                                                            "/"
+                                                                            (string-left-trim "/" target))))
+                                                 (str label)))))
+                                    (function
+                                      (render-link target label)))))))
 			options))))))))
 
