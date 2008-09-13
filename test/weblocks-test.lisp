@@ -145,8 +145,10 @@ package. This function tests weblocks in a clean environment. See
   "A helper macro for creating html test cases. The macro writes
 code that temporarily binds the output stream to a string stream
 and then compares the string to the expected result."
-  `(addtest ,name
-     (ensure-html-output ,form ,value)))
+  `(progn
+     (set-sensible-suite)
+     (addtest ,name
+       (ensure-html-output ,form ,value))))
 
 ;;; faking hunchentoot's requests
 (defclass unittest-request ()
