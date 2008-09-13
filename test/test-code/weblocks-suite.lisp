@@ -1,6 +1,12 @@
 
 (in-package :weblocks-test)
 
+;;; A suite that forces `*print-case*' to be `:upcase', needed in some
+;;; comparison contexts
+(deftestsuite print-upcase-suite ()
+  ()
+  (:dynamic-variables (*print-case* :upcase)))
+
 ;;; A suite that sets up an application environment
 (deftestsuite application-suite ()
   ()
