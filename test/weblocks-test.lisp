@@ -48,8 +48,9 @@ forms that may not have a suite defined in-file, in the file in which
 I am expanded.  Likely to work only at toplevel."
   (let ((inner-part
 	 `(let ((last-set-suite lift::*current-testsuite-name*))
-	    (unless (string-contains-p
-		     (symbol-name last-set-suite) (pathname-name file))
+	    (unless (and file
+			 (string-contains-p
+			  (symbol-name last-set-suite) (pathname-name file)))
 	      (setf lift::*current-testsuite-name* 'weblocks-suite)))))
     `(progn
        (eval-when (:compile-toplevel)
