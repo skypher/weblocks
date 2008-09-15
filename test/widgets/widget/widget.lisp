@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widgets/widget/widget-suite (weblocks-suite print-upcase-suite)
+  ())
+
 ;;; test defwidget
 (deftest defwidget-1
     (macroexpand-1
@@ -32,9 +35,13 @@
 
 
 ;;; test widget-dependencies
-(deftest widget-dependencies-1
-    (format nil "~A" (mapcar #'dependency-url (dependencies (make-instance 'navigation))))
-  "(/pub/stylesheets/navigation.css)")
+(addtest widget-dependencies-1
+  (ensure-same (values-list
+		(mapcar #'dependency-url
+			(dependencies (make-instance 'navigation))))
+	       (values (puri:uri "/pub/stylesheets/menu.css")
+		       (puri:uri "/pub/stylesheets/navigation.css"))
+	       :test puri:uri=))
 
 (deftest widget-dependencies-2
     (with-request :get nil
@@ -100,7 +107,7 @@
 	  (with-html (:p "test")))
 	:widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
 	:widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	(:p "hello")
 	(:p "test")
 	(:p "world")))
@@ -164,7 +171,7 @@
 (deftest-html render-widget-1
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -175,7 +182,7 @@
 (deftest-html render-widget-2
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
-  (:div :class "widget dataform" :id "test-widget"
+  (:div :class "widget data-editor dataform" :id "test-widget"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))

@@ -118,7 +118,7 @@
   (htm
    (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     #.(data-header-template
 			"abc123"
 			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -141,7 +141,7 @@
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     (:div :class "view data education-history"
 			   (:div :class "extra-top-1" "<!-- empty -->")
 			   (:div :class "extra-top-2" "<!-- empty -->")
@@ -195,7 +195,7 @@
    (:div :class "selector-mixin widget dispatcher selector navigation nomenu-navigation"
 	 :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     #.(data-header-template
 			"abc123"
 			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")

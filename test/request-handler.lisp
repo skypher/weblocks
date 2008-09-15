@@ -473,6 +473,7 @@ onclick='disableIrrelevantButtons(this);' />~
 \"foo-bar\":\"\",~
 null:\"<p>test</p>\"~
 },~
+\"before-load\":null,~
 \"on-load\":[\"testjs\"]~
 }"))
 
