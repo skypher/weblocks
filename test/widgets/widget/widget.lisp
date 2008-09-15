@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widgets/widget/widget-suite (weblocks-suite print-upcase-suite)
+  ())
+
 ;;; test defwidget
 (deftest defwidget-1
     (macroexpand-1
