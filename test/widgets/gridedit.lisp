@@ -8,7 +8,7 @@
        (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -33,7 +33,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Foo"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -60,7 +60,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -83,7 +83,7 @@
        (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee)
 					 *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -107,7 +107,7 @@
 								  :data-class 'employee
 								  :drilldown-type :view)
 					 *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -128,7 +128,7 @@
 					 (name :label "Foo"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -157,7 +157,7 @@
 					 (name :label "Bar"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -277,7 +277,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -554,7 +554,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "id-123"
+    (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
@@ -731,7 +731,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "id-123"
+    (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc135"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -945,7 +945,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -1059,7 +1059,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"

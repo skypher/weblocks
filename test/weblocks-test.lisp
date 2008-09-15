@@ -1,12 +1,13 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rtest :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities)
+  (:use :cl :weblocks :rtest :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+	:anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)
   (:shadowing-import-from :weblocks #:redirect)
-  (:shadow #:do-test #:do-tests #:continue-testing)
-  (:export #:test-weblocks #:do-pending))
+  (:shadow #:do-test #:do-tests #:deftest)
+  (:export #:test-weblocks))
 
 (in-package :weblocks-test)
 
@@ -40,6 +41,34 @@ changes are rolled back after the tests are done. Note, the steps that
 this macro takes may not be sufficient. If some tests fail, try to run
 the test suite without loading an application."
   `(call-with-test-environment (lambda () . ,body)))
+
+(defmacro set-sensible-suite ()
+  "Set up a sensible testsuite to use as the testsuite for addtest
+forms that may not have a suite defined in-file, in the file in which
+I am expanded.  Likely to work only at toplevel."
+  (let ((inner-part
+	 `(let ((last-set-suite lift::*current-testsuite-name*))
+	    (unless (and file
+			 (string-contains-p
+			  (symbol-name last-set-suite) (pathname-name file)))
+	      (setf lift::*current-testsuite-name* 'weblocks-suite)))))
+    `(progn
+       (eval-when (:compile-toplevel)
+	 (let ((file *compile-file-pathname*))
+	   ,inner-part))
+       (eval-when (:load-toplevel :execute)
+	 (let ((file *load-truename*))
+	   ,inner-part)))))
+
+(defmacro deftest (name form &rest values)
+  "Define a test in an appropriate testsuite called NAME, ensuring
+that FORM's values and the literal VALUES are equal."
+  `(progn
+     (set-sensible-suite)
+     (addtest ,name
+       (ensure-same ,form ,(if (typep values '(cons t null))
+			       `',(first values)
+			       `(values . ,(mapcar (f_ `',_) values)))))))
 
 (defun do-test (&optional (test *test*))
   "Shadows rt's 'do-test'. This function calls rt's do test in a clean
@@ -102,18 +131,9 @@ clean test environment. See 'with-test-environment'."
   "Call this function to run all unit tests defined in 'weblocks-test'
 package. This function tests weblocks in a clean environment. See
 'with-test-environment' for more details."
-  (do-tests))
-
-(defun continue-testing ()
-  "Shadows rt's 'continue-testing'. This function calls rt's
-continue-testing in a clean test environment. See
-'with-test-environment'."
-  (with-test-environment
-      (rtest::continue-testing)))
-
-(defun do-pending ()
-  "An alias for 'continue-testing'."
-  (continue-testing))
+  ;; XXX better results combination
+  (values (run-tests :suite 'weblocks-suite)
+	  (run-tests :suite 'weblocks-store-test::store-suite)))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
@@ -126,20 +146,10 @@ continue-testing in a clean test environment. See
   "A helper macro for creating html test cases. The macro writes
 code that temporarily binds the output stream to a string stream
 and then compares the string to the expected result."
-  (let ((expected-result (eval
-			  `(with-html-output-to-string (s)
-			     ,value))))
-    `(deftest ,name
-	 (let ((stream-bak *weblocks-output-stream*)
-	       (*test-widget-id* 1000)
-	       result)
-	   (declare (special *test-widget-id*))
-	   (setf *weblocks-output-stream* (make-string-output-stream))
-	   ,form
-	   (setf result (get-output-stream-string *weblocks-output-stream*))
-	   (setf *weblocks-output-stream* stream-bak)
-	   result)
-       ,expected-result)))
+  `(progn
+     (set-sensible-suite)
+     (addtest ,name
+       (ensure-html-output ,form ,value))))
 
 ;;; faking hunchentoot's requests
 (defclass unittest-request ()
@@ -182,7 +192,7 @@ and then compares the string to the expected result."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
-		     initargs))
+		     (append initargs '(:prefix ""))))
 	 (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (cond (full

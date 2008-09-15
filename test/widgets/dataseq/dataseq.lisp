@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widgets/dataseq/dataseq-suite (weblocks-suite)
+  ())
+
 ;;; test dataseq initialize-instance
 (deftest dataseq-initialize-instance-1
     (with-request :get nil
@@ -19,13 +22,13 @@
   t)
 
 ;;; test dataseq-data
-(deftest dataseq-data-1
-    (with-request :get nil
-      (persist-objects *default-store* (list *joe* *bob*))
-      (mapcar #'first-name
-	      (dataseq-data (make-instance 'dataseq
-					   :data-class 'employee))))
-  ("Joe" "Bob"))
+(addtest dataseq-data-1
+  (persist-objects *default-store* (list *joe* *bob*))
+  (ensure-same (mapcar #'first-name
+		       (dataseq-data (make-instance 'dataseq
+						    :data-class 'employee)))
+	       '("Joe" "Bob")
+	       :test set-equal-equal))
 
 (deftest dataseq-data-2
     (with-request :get nil
