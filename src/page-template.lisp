@@ -16,10 +16,12 @@
    application name, application description, and current navigation state."
   (declare (special *current-page-description*))
   (let ((webapp-description (webapp-description)))
-    (apply #'concatenate 'string (webapp-name)
+    (apply #'format nil "~A~A~A"
+	   (webapp-name)
 	   (cond
 	     (*current-page-description* (list " - " *current-page-description*))
-	     (webapp-description (list " - " webapp-description))))))
+	     (webapp-description (list " - " webapp-description))
+	     (t '("" ""))))))
 
 ;;
 ;; Render the current page
