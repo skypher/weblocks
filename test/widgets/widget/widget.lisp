@@ -32,9 +32,13 @@
 
 
 ;;; test widget-dependencies
-(deftest widget-dependencies-1
-    (format nil "~A" (mapcar #'dependency-url (dependencies (make-instance 'navigation))))
-  "(/pub/stylesheets/navigation.css)")
+(addtest widget-dependencies-1
+  (ensure-same (values-list
+		(mapcar #'dependency-url
+			(dependencies (make-instance 'navigation))))
+	       (values (puri:uri "/pub/stylesheets/menu.css")
+		       (puri:uri "/pub/stylesheets/navigation.css"))
+	       :test puri:uri=))
 
 (deftest widget-dependencies-2
     (with-request :get nil
