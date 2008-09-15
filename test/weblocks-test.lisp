@@ -1,12 +1,11 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :rtest :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+  (:use :cl :weblocks :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
 	:anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function #:standard-class
 			  #:typep #:subtypep)
   (:shadowing-import-from :weblocks #:redirect)
-  (:shadow #:do-test #:do-tests #:deftest)
   (:export #:test-weblocks))
 
 (in-package :weblocks-test)
@@ -69,63 +68,6 @@ that FORM's values and the literal VALUES are equal."
        (ensure-same ,form ,(if (typep values '(cons t null))
 			       `',(first values)
 			       `(values . ,(mapcar (f_ `',_) values)))))))
-
-(defun do-test (&optional (test *test*))
-  "Shadows rt's 'do-test'. This function calls rt's do test in a clean
-test environment. See 'with-test-environment'."
-  (with-test-environment
-    (let ((entry (rt::get-entry test)))
-      (flet ((test () (rtest::do-test test))
-	     (success? () (not (rtest::pend entry))))
-	(or (progn (test) (success?))
-	    (loop for (label . recovery) in *recovery-strategies*
-		  do (funcall recovery #'test)
-		  if (success?)
-		  do (format t "Recovered ~S with strategy ~S~%" test label)
-		     (return t)
-		  finally (return nil)))))))
-
-(defun test-string= (new-string old-string)
-  (flet ((replace-error (str)
-	   (cl-ppcre:regex-replace-all
-	    "Actual value: #<(UNDEFINED-FUNCTION|(?:[A-Z0-9-]+-)ERROR).*?>."
-	    str "Actual value: #<\\1 (error codes)>")))
-    (string= (replace-error new-string) (replace-error old-string))))
-
-(defun do-entry-with-recovery (entry rt-do-entry stream)
-  (let ((test (rt::name entry)) results original-string reported-original)
-    (flet ((test (stream)
-	     (setf results
-		   (multiple-value-list (funcall rt-do-entry entry stream))))
-	   (success? () (not (rtest::pend entry))))
-      (setf original-string (with-output-to-string (o) (test o)))
-      (unless (success?)
-	(loop for (label . recovery) in *recovery-strategies*
-	      for new-string = (with-output-to-string (o)
-				  (funcall recovery (curry #'test o)))
-	      if (success?)
-	      do (format stream "~A~%Recovered ~S with strategy ~S~%"
-			 new-string test label)
-		 (return)
-	      if (not (test-string= original-string new-string))
-	      do (format stream "~%Altered output of ~S with strategy ~S:~%~A~%~
-				 versus original output:~%~A"
-			 test label new-string original-string)
-		 (setf reported-original t)))
-      (unless reported-original
-	(princ original-string stream))
-      (values-list results))))
-
-(defun do-tests ()
-  "Shadows rt's 'do-tests'. This function calls rt's do-tests in a
-clean test environment. See 'with-test-environment'."
-  (let ((rt-do-entry #'rt::do-entry))
-    (flet ((do-entry (entry &optional (s *standard-output*))
-	     (do-entry-with-recovery entry rt-do-entry s)))
-      (setf (fdefinition 'rt::do-entry) #'do-entry)
-      (unwind-protect (with-test-environment
-			(rtest::do-tests))
-	(setf (fdefinition 'rt::do-entry) rt-do-entry)))))
 
 (defun test-weblocks ()
   "Call this function to run all unit tests defined in 'weblocks-test'
