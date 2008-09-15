@@ -19,7 +19,8 @@
 		 (:module "test-code"
 			  :components ((:file "query-actions")
 				       (:file "weblocks-suite")
-				       (:file "ensure-diff"))
+				       (:file "ensure-diff")
+				       (:file "utils"))
 			  :depends-on ("weblocks-test"))
 		 (:file "weblocks"
 			:depends-on ("test-code"))
