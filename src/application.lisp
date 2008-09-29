@@ -158,7 +158,11 @@ to my `application-dependencies' slot."
 		      (:script "shortcut")
 		      (:script "weblocks")
 		      (:script "dialog"))
-		    (weblocks-webapp-application-dependencies self))))))
+		    (weblocks-webapp-application-dependencies self)))))
+  (let ((pfp (weblocks-webapp-public-files-path self)))
+    (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
+      (warn "~S ~S includes a nondirectory component; this can break file probing"
+	    'public-files-path pfp))))
 
 (defun get-webapp (name &optional (error-p t))
   "Get a running web application"
