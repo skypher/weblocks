@@ -303,7 +303,10 @@ to my `application-dependencies' slot."
 
 (defun webapp-init-user-session (&optional (app (current-webapp)))
   "Returns the init function for the user session."
-  (symbol-function (weblocks-webapp-init-user-session app)))
+  (let ((init (weblocks-webapp-init-user-session app)))
+    (etypecase init
+      (function init)
+      (symbol (symbol-function init)))))
 
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
   (concatenate 'string
