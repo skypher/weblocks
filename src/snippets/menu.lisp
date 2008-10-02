@@ -39,7 +39,7 @@ option isn't specified, first option is rendered as selected."
 				 (pane-class (when pane-selected-p
 					       "selected-item")))
 			    (htm
-			     (:li :class pane-class
+			      (:li :id (attributize-name (conc header "-" label)) :class pane-class
                                   (etypecase target
                                     (string
                                       (if pane-selected-p
