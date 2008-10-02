@@ -18,6 +18,7 @@ option isn't specified, first option is rendered as selected."
   (declare (special *current-navigation-url*))
   (with-html
     (:div :class "view menu"
+	  :id (attributize-name header)
 	  (with-extra-tags
 	    (when header
 	      (htm (:h1 (str header))))
