@@ -4,8 +4,8 @@
 (export '(pane-info pane-info-p make-pane-info pane-info-name
 	  pane-info-uri-tokens pane-info-label selector-mixin
 	  selector-mixin-panes selector-mixin-current-pane-name
-          selector-mixin-current-pane-name
-          selector-mixin-current-pane-widget
+	  selector-mixin-current-pane
+	  selector-mixin-current-pane-widget
 	  selector-mixin-default-pane
 	  selector-mixin-canonicalize-pane-info
 	  selector-mixin-canonicalize-pane
