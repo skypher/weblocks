@@ -4,6 +4,8 @@
 (export '(pane-info pane-info-p make-pane-info pane-info-name
 	  pane-info-uri-tokens pane-info-label selector-mixin
 	  selector-mixin-panes selector-mixin-current-pane-name
+          selector-mixin-current-pane-name
+          selector-mixin-current-pane-widget
 	  selector-mixin-default-pane
 	  selector-mixin-canonicalize-pane-info
 	  selector-mixin-canonicalize-pane
@@ -42,6 +44,21 @@
 tokens are specified. Default implementation returns the first pane.")
   (:method ((obj selector-mixin))
     (car (selector-mixin-panes obj))))
+
+(defgeneric selector-mixin-current-pane (obj)
+  (:documentation "Returns a default pane to select in case no uri
+tokens are specified. Default implementation returns the first pane.")
+  (:method ((obj selector-mixin))
+    (find (selector-mixin-current-pane-name obj)
+          (selector-mixin-panes obj)
+          :key (compose #'selector-mixin-canonicalize-pane-info #'car)
+          :test #'equalp)))
+
+(defgeneric selector-mixin-current-pane-widget (obj)
+  (:documentation "Returns a default pane to select in case no uri
+tokens are specified. Default implementation returns the first pane.")
+  (:method ((obj selector-mixin))
+    (cdr (selector-mixin-current-pane obj))))
 
 (defun selector-mixin-canonicalize-pane-info (pane-info)
   "Returns a 'canonical' representation of a pane info - a pane-info
