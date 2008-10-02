@@ -15,8 +15,8 @@
 		    'string (server-type) " " (server-version)))
 	      " (" (str (concatenate 'string (lisp-implementation-type) " "
 				     (lisp-implementation-version))) ")")
-	  (:img :src (make-webapp-uri "/pub/images/footer/valid-xhtml11.png") :alt "This site has valid XHTML 1.1.")
-	  (:img :src (make-webapp-uri "/pub/images/footer/valid-css.png") :alt "This site has valid CSS."))))
+	  (:img :src (make-webapp-public-file-uri "images/footer/valid-xhtml11.png") :alt "This site has valid XHTML 1.1.")
+	  (:img :src (make-webapp-public-file-uri "images/footer/valid-css.png") :alt "This site has valid CSS."))))
 
 (defun init-user-session (comp)
   (setf (composite-widgets comp)

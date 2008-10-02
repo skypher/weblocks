@@ -316,6 +316,15 @@ to my `application-dependencies' slot."
 		 "/")
 	       uri))
 
+(defun make-webapp-public-file-uri (uri &optional (app (current-webapp)))
+  (make-webapp-uri
+    (concatenate 'string
+                 (weblocks-webapp-public-files-uri-prefix app)
+                 (when (and (not (empty-p uri))
+                            (not (string-starts-with uri "/")))
+                   "/")
+                 uri)))
+
 (defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
   (declare (special *current-webapp*))
