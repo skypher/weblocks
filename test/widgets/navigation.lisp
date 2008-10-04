@@ -34,6 +34,7 @@
 
 ;;; test with-navigation-header
 
+#|defunct
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
@@ -102,6 +103,7 @@
   (htm
    (:li :class "selected-item" (:span "Foo"))
    (:li (:a :href "/foo/bar/%c3%a5%c3%a4%c3%b6" #.(humanize-name (url-decode "%C3%A5%C3%A4%C3%B6"))))))
+end defunct|#
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
