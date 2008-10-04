@@ -166,7 +166,7 @@
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "/" "Test1"))
+	       (:ul (:li (:a :href "/test1" "Test1"))
 		    (:li :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
