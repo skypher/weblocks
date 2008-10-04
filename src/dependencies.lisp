@@ -241,7 +241,7 @@ represent a class."
   ;; from user-defined append methods and 2. traverse the class tree and
   ;; gather all class-related dependencies. This :around method collects
   ;; everything and removes empty dependencies.
-  (:method :around (obj) (remove nil (append (call-next-method) (per-class-dependencies obj))))
+  (:method :around (obj) (nreverse (remove nil (append (call-next-method) (per-class-dependencies obj)))))
 
   ;; No dependencies by default
   (:method append (obj) ())

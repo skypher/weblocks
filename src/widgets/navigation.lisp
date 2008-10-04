@@ -39,7 +39,7 @@
 
 ex:
 
-\(init-navigation
+\(init-navigation (make-instance 'my-navigation)
    \"test1\" (make-instance ...)
    \"test2\" (make-instance ...)"
   (loop
@@ -52,7 +52,13 @@ ex:
 
 (defun make-navigation (name &rest args)
   "Instantiates 'navigation' widget via 'make-instance' and forwards
-it along with 'args' to 'init-navigation'."
+it along with 'args' to 'init-navigation'.
+
+ex:
+
+\(make-navigation
+   \"test1\" (make-instance ...)
+   \"test2\" (make-instance ...)"
   (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
