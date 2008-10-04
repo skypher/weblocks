@@ -257,10 +257,10 @@
 	    '((:th :class "name" "Name")
 	      (:th :class "manager sort-asc" (:span #.(link-action-template "abc123" "Manager"))))
 	    '((:tr
-	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
-	       (:td :class "name" (:span :class "value" "Bob"))
+	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by manager, ascending.")))
 
@@ -278,10 +278,10 @@
 	      '((:th :class "name" "Name")
 		(:th :class "manager" "Manager"))
 	      '((:tr
-		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "name" (:span :class "value" "Bob"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
-		 (:td :class "name" (:span :class "value" "Bob"))
+		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim")))))))
 
 (deftest-html render-datagrid-table-body-4
@@ -339,11 +339,11 @@
 	      (:th :class "address sort-asc" (:span #.(link-action-template "abc124" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
 	    '((:tr
-	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
-	       (:td :class "name" (:span :class "value" "Bob"))
+	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by address, ascending."))
@@ -353,11 +353,11 @@
 	      (:th :class "address sort-desc" (:span #.(link-action-template "abc127" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
-	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
-	       (:td :class "name" (:span :class "value" "Bob"))
+	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by address, descending."))))
