@@ -309,6 +309,8 @@ to my `application-dependencies' slot."
       (symbol (symbol-function init)))))
 
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
+  "Makes a URI for a weblocks application (by concatenating the app
+prefix and the provided uri)."
   (concatenate 'string
 	       (webapp-prefix app)
 	       (when (and (not (empty-p uri))
@@ -317,6 +319,9 @@ to my `application-dependencies' slot."
 	       uri))
 
 (defun make-webapp-public-file-uri (uri &optional (app (current-webapp)))
+  "Makes a URI for a public file for a weblocks application (by
+concatenating the app prefix, the public folder prefix, and the
+provider URI)."
   (make-webapp-uri
     (concatenate 'string
                  (weblocks-webapp-public-files-uri-prefix app)
