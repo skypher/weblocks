@@ -312,7 +312,7 @@ to my `application-dependencies' slot."
   "Makes a URI for a weblocks application (by concatenating the app
 prefix and the provided uri)."
   (concatenate 'string
-	       (webapp-prefix app)
+               "/" (string-trim "/" (webapp-prefix app))
 	       (when (and (not (empty-p uri))
 			  (not (string-starts-with uri "/")))
 		 "/")
@@ -324,7 +324,8 @@ concatenating the app prefix, the public folder prefix, and the
 provider URI)."
   (make-webapp-uri
     (concatenate 'string
-                 (weblocks-webapp-public-files-uri-prefix app)
+                 (string-right-trim "/"
+                                    (weblocks-webapp-public-files-uri-prefix app))
                  (when (and (not (empty-p uri))
                             (not (string-starts-with uri "/")))
                    "/")
@@ -435,8 +436,7 @@ that directory is returned.")
   public-files-uri-prefix of a webapp.")
   (:method (app)
     (concatenate 'string
-		 (string-right-trim "/" (webapp-prefix app))
-		 "/"
+                 "/" (string-trim "/" (webapp-prefix app)) "/"
 		 (string-trim "/" (weblocks-webapp-public-files-uri-prefix app))
 		 "/")))
 

@@ -213,11 +213,12 @@ ex:
   (loop for token in (cl-ppcre:split "[/\\\\]" 
 				     (cl-ppcre:regex-replace "\\?.*" 
 							     (if remove-app-prefix
-								 (subseq uri (length
-									      (webapp-prefix
-									       (if app
-										   app
-										   (current-webapp)))))
+								 (subseq uri
+                                                                         (1+ (length
+                                                                              (webapp-prefix
+                                                                               (if app
+                                                                                   app
+                                                                                   (current-webapp))))))
 								 uri)
 							     ""))
      unless (string-equal "" token)

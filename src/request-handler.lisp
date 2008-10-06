@@ -127,7 +127,8 @@ customize behavior)."))
 		; *weblocks-output-stream* with necessary boilerplate HTML
 		(render-page app)
 		;; make sure all tokens were consumed
-		(when (and (not *uri-tokens-fully-consumed*) *uri-tokens*)
+		(unless (or *uri-tokens-fully-consumed*
+                            (null *uri-tokens*))
 		  (page-not-found-handler app)))))
 	(eval-hook :post-render)
 	(unless (ajax-request-p)
