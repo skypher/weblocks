@@ -8,7 +8,7 @@
 
 #+cffi
 (progn
-  (cffi:defcfun (c-tmpnam "tmpnam") :string
+  (cffi:defcfun ("tmpnam" c-tmpnam) :string
     (result :pointer))
   (defun simple-tmpnam ()
     (c-tmpnam (cffi:null-pointer))))
