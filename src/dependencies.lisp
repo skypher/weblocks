@@ -165,7 +165,8 @@ type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (let ((physical-path (compute-webapp-public-files-path webapp))
-	(virtual-path (compute-webapp-public-files-uri-prefix webapp)))
+	(virtual-path (maybe-add-trailing-slash
+                        (compute-webapp-public-files-uri-prefix webapp))))
     (when (or do-not-probe (probe-file
 			    (merge-pathnames
 			     (public-file-relative-path type file-name)
@@ -173,6 +174,8 @@ returns a dependency object."
       (let ((full-path 
 	     (merge-pathnames (public-file-relative-path type file-name)
 			      virtual-path)))
+        ;(format t "relative: ~S, virtual: ~S -> full: ~S~%"
+        ;        (public-file-relative-path type file-name) virtual-path full-path)
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url full-path :media media))
