@@ -5,8 +5,9 @@
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name
 	  webapp-description weblocks-webapp-public-files-path
-	  weblocks-webapp-public-files-uri-prefix webapp-prefix
-	  running-webapp make-webapp-uri reset-webapp-session
+	  webapp-public-files-uri-prefix webapp-prefix
+	  running-webapp make-webapp-uri make-webapp-public-file-uri
+          reset-webapp-session
 	  webapp-session-value define-permanent-action
 	  define-permanent-action/cc remove-webapp-permanent-action
 	  compute-webapp-public-files-path
@@ -32,7 +33,7 @@
 		      :documentation "The filesystem directory path
 		      for public files. The final value is computed
 		      with 'compute-webapp-public-files-path'.")
-   (public-files-uri-prefix :accessor weblocks-webapp-public-files-uri-prefix
+   (public-files-uri-prefix :reader weblocks-webapp-public-files-uri-prefix
 			    :initform "pub"
 			    :initarg :public-files-uri-prefix
 			    :documentation "The uri prefix for public
@@ -40,7 +41,7 @@
 			    initialized to 'pub'. The final uri prefix
 			    for application public files is computed
 			    by 'compute-webapp-public-files-uri-prefix'.")
-   (prefix :accessor weblocks-webapp-prefix :initarg :prefix :type string
+   (prefix :reader weblocks-webapp-prefix :initarg :prefix :type string
 	   :documentation "The default dispatch will allow a webapp to be invoked 
               as a subtree of the URI space at this site.  This does not support 
               webapp dispatch on virtual hosts, browser types, etc.")
@@ -67,6 +68,23 @@ not see the prefix parameter in URLs that are provided to it.  You can, for
 instance, have different sites (e.g. mobile vs. desktop) with vastly different 
 layout and dependencies running on the same server."))
 
+;; we use a "transform on write" approach for two reasons:
+;;
+;; 1. sane values in slots all the time (except when someone messes around
+;;    with SLOT-VALUE)
+;;
+;; 2. increased performance
+;;
+(defmethod (setf weblocks-webapp-prefix) (prefix (app weblocks-webapp))
+  "Set the prefix of the webapp. Ensures normalization."
+  (unless (string= prefix "/") ;; XXX multiple slashes?
+    (setf (slot-value app 'prefix) (strip-trailing-slashes prefix))))
+(defmethod (setf weblocks-webapp-public-files-uri-prefix) (prefix (app weblocks-webapp))
+  "Set the public files URI prefix of the webapp. Ensures normalization."
+  (setf (slot-value app 'public-files-uri-prefix) (strip-trailing-slashes prefix)))
+
+(defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
+  (weblocks-webapp-public-files-uri-prefix app))
 
 (defmacro defwebapp (name &rest initargs &key 
 		     subclasses
@@ -138,6 +156,13 @@ to my `application-dependencies' slot."
   (macrolet ((slot-default (name initform)
 	       `(unless (slot-boundp self ',name)
 		  (setf (slot-value self ',name) ,initform))))
+    ;; special handling for prefix slots since initargs
+    ;; bypass the normalizing axr
+    (when (slot-boundp self 'prefix)
+      (setf (weblocks-webapp-prefix self) (slot-value self 'prefix)))
+    (when (slot-boundp self 'public-files-uri-prefix)
+      (setf (weblocks-webapp-public-files-uri-prefix self)
+            (slot-value self 'public-files-uri-prefix)))
     (let ((class-name (class-name (class-of self))))
       (slot-default name class-name)
       (slot-default init-user-session
@@ -147,7 +172,7 @@ to my `application-dependencies' slot."
 				no init-user-session function is found."
 			       (weblocks-webapp-name self))))
       (slot-default prefix
-		    (concatenate 'string "/" (attributize-name class-name))))
+                      (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
       (setf (weblocks-webapp-application-dependencies self)
 	    (append '((:stylesheet "layout")
@@ -311,25 +336,16 @@ to my `application-dependencies' slot."
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
   "Makes a URI for a weblocks application (by concatenating the app
 prefix and the provided uri)."
-  (concatenate 'string
-               "/" (string-trim "/" (webapp-prefix app))
-	       (when (and (not (empty-p uri))
-			  (not (string-starts-with uri "/")))
-		 "/")
-	       uri))
+  (remove-spurious-slashes
+    (concatenate 'string "/" (webapp-prefix app) "/" uri)))
 
 (defun make-webapp-public-file-uri (uri &optional (app (current-webapp)))
   "Makes a URI for a public file for a weblocks application (by
 concatenating the app prefix, the public folder prefix, and the
 provider URI)."
   (make-webapp-uri
-    (concatenate 'string
-                 (string-right-trim "/"
-                                    (weblocks-webapp-public-files-uri-prefix app))
-                 (when (and (not (empty-p uri))
-                            (not (string-starts-with uri "/")))
-                   "/")
-                 uri)))
+    (concatenate 'string (weblocks-webapp-public-files-uri-prefix app) "/" uri)
+    app))
 
 (defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
@@ -435,10 +451,9 @@ that directory is returned.")
   app. Default implementation concatenates webapp-prefix with the
   public-files-uri-prefix of a webapp.")
   (:method (app)
-    (concatenate 'string
-                 "/" (string-trim "/" (webapp-prefix app)) "/"
-		 (string-trim "/" (weblocks-webapp-public-files-uri-prefix app))
-		 "/")))
+    (make-webapp-uri
+      (weblocks-webapp-public-files-uri-prefix app)
+      app)))
 
 (defun compute-webapp-public-files-uri-prefix-util (&optional (app (current-webapp)))
   "A wrapper around 'compute-webapp-public-files-uri-prefix' that
