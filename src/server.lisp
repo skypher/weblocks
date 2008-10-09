@@ -74,7 +74,7 @@ The function serves all started applications"
 	 (log-message :debug "Dispatching to public file")
 	 (return-from weblocks-dispatcher
 	   (funcall (create-folder-dispatcher-and-handler 
-		     (concatenate 'string app-pub-prefix)
+		     (maybe-add-trailing-slash app-pub-prefix)
 		     (compute-webapp-public-files-path app))
 		    request)))
 	((list-starts-with (tokenize-uri script-name nil)
