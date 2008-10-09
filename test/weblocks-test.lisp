@@ -1,10 +1,10 @@
 
 (defpackage #:weblocks-test
   (:use :cl :weblocks :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
-	:anaphora :f-underscore)
+        :anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-			  #:standard-generic-function #:ensure-generic-function #:standard-class
-			  #:typep #:subtypep)
+                          #:standard-generic-function #:ensure-generic-function #:standard-class
+                          #:typep #:subtypep)
   (:shadowing-import-from :weblocks #:redirect)
   (:export #:test-weblocks))
 
@@ -134,16 +134,19 @@ and then compares the string to the expected result."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
-		     (append initargs '(:prefix ""))))
+                     (if (not class-name)
+                        (append initargs '(:prefix ""))
+                        initargs)))
 	 (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
-     (cond (full
-	    (assert class-name (class-name)
-		    "A specific webapp must be defined for `with-webapp's :full parameter")
-	    (start-webapp class-name)
-	    (unwind-protect (funcall thunk)
-	      (stop-webapp class-name)))
-	   (t (funcall thunk)))))
+     (if full
+       (progn
+         (assert class-name (class-name)
+                 "A specific webapp must be defined for `with-webapp's :full parameter")
+         (start-webapp class-name)
+         (unwind-protect (funcall thunk)
+           (stop-webapp class-name)))
+       (funcall thunk))))
 
 (defmacro with-webapp ((&rest initargs &key full class-name &allow-other-keys) &body body)
   "A helper macro (and marker) for test cases calling functions that
@@ -155,6 +158,9 @@ If FULL is given, I will also start the webapp within BODY's context;
 if CLASS-NAME is given, I will ignore other INITARGS and either find
 or start a webapp with the class CLASS-NAME, setting it as the current
 webapp in my context."
+  ;; We just pass FULL and CLASS-NAME through as part of the
+  ;; rest list. They are mentioned explicitly in the lambda list
+  ;; for documentation purposes.
   (declare (ignore full class-name))
   `(call-with-webapp (lambda () ,@body) ,@initargs))
 
