@@ -204,25 +204,23 @@ instead of 'delimeter'.
         do (setf i (remove-keyword-parameter i argument))
         finally (return i)))
 
-(defun tokenize-uri (uri &optional (remove-app-prefix t) app)
-  "Tokenizes a URI into a list of elements.
+(defun tokenize-uri (uri &optional (remove-app-prefix t) (app (current-webapp)))
+  "Tokenizes an URI into a list of elements.
 
 ex:
 \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
   (loop for token in (cl-ppcre:split "[/\\\\]" 
-				     (cl-ppcre:regex-replace "\\?.*" 
+				     (cl-ppcre:regex-replace "\\?.*"
 							     (if remove-app-prefix
 								 (subseq uri
-                                                                         (1+ (length
-                                                                              (webapp-prefix
-                                                                               (if app
-                                                                                   app
-                                                                                   (current-webapp))))))
+                                                                         (length
+                                                                           (webapp-prefix
+                                                                             app)))
 								 uri)
 							     ""))
      unless (string-equal "" token)
-     collect (url-decode token)))
+       collect (url-decode token)))
 
 (defun public-file-relative-path (type filename)
   "Constructs a relative path to a public file from the \"/pub\" directory.
