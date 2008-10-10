@@ -204,7 +204,8 @@ instead of 'delimeter'.
         do (setf i (remove-keyword-parameter i argument))
         finally (return i)))
 
-(defun tokenize-uri (uri &optional (remove-app-prefix t) (app (current-webapp)))
+(defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
+                                                                (current-webapp))))
   "Tokenizes an URI into a list of elements.
 
 ex:
