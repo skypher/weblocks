@@ -64,16 +64,13 @@
   (with-html
     (:div :class "submit"
 	  (render-link (make-action
-			(argfree-lambda
-			  (setf (slot-value obj 'ui-state) :form)))
+			(f_% (setf (slot-value obj 'ui-state) :form)))
 		       "Modify"
 		       :class "modify")
 	  (when (and (dataform-allow-close-p obj)
 		     (dataform-on-close obj))
 	    (str "&nbsp;")
 	    (render-link (make-action
-			  (argfree-lambda
-			    (funcall (dataform-on-close obj)
-				     obj)))
+			  (f_% (funcall (dataform-on-close obj) obj)))
 			 "Close"
 			 :class "close")))))

@@ -444,11 +444,6 @@ in 'class'."
     (and (member status '(:internal :external))
 	 (values sym status))))
 
-(defmacro argfree-lambda (&body forms)
-  "`lambda', but accept and ignore any arguments."
-  (with-unique-names (args)
-    `(lambda (&rest ,args) (declare (ignore ,args)) . ,forms)))
-
 ;;; working with those pesky slashes
 (defun remove-spurious-slashes (str)
   "Condense multiple consecutively occuring slashes in STR

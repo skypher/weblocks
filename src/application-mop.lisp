@@ -20,3 +20,4 @@
     (pushnew name (symbol-value '*registered-webapps*))
     (when autostart
       (pushnew name (symbol-value '*autostarting-webapps*)))))
+
