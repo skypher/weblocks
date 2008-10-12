@@ -56,7 +56,8 @@
                          same package as 'name'. This function will accept a single parameter - a 
                          composite widget at the root of the application. 'init-user-session' is 
                          responsible for adding initial widgets to this composite.")
-   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil))
+   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil
+	  :documentation "Turns on indentation of HTML for easier visual inspection."))
   (:metaclass webapp-class)
   (:documentation 
 "A class that encapsulates a unique web application and all relevant rnesources.

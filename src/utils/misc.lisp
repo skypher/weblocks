@@ -150,7 +150,7 @@ number of extra tags to render.
 Ex:
 \(render-extra-tags \"extra-\" 2) =>
 \"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
-  (with-html-output (*weblocks-output-stream*)
+  (with-html-output (*weblocks-output-stream* nil :indent (weblocks-webapp-debug (current-webapp)))
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "<!-- empty -->")))))
