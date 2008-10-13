@@ -3,7 +3,7 @@
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-	  *uri-tokens* *current-navigation-url* *current-page-description*))
+          *uri-tokens* *current-navigation-url* *current-page-description*))
 
 (defvar *uri-tokens*)
 (setf (documentation '*uri-tokens* 'variable)

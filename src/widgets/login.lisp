@@ -70,7 +70,14 @@ returned."
 	     error message. Otherwise, *default-login-failure-error*
 	     will be used. Note, the object passed to the specified
 	     function is generated from the view provided in the
-	     'login-view' slot.")
+	     'login-view' slot.  By default, it has email and
+	     password slots.  The password is hashed using md5 by
+	     the publically accessible hash-password function. This
+	     should not be considered particularily secure, as it is
+	     not salted.  If real security is desired, override the
+	     login-view to provide your own password handling,
+	     probably by passing it unchanged to the on-login
+	     function for serious processing there.")
    (quickform :accessor login-quickform
 	      :initform nil
 	      :initarg :quickform

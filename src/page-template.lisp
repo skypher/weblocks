@@ -44,7 +44,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 							  (build-local-dependencies
 							   '((:script "weblocks-debug")
 							     (:stylesheet "debug-toolbar"))))))))
-    (with-html-output (*weblocks-output-stream* nil :prologue t)
+    (with-html-output (*weblocks-output-stream* nil :prologue t :indent (weblocks-webapp-debug (current-webapp)))
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
 	      (:title (str (page-title app)))
