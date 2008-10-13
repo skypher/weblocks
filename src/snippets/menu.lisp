@@ -42,7 +42,7 @@ menu and each menu item generated with `unattributized-name'."
 				 (pane-class (when pane-selected-p
 					       "selected-item")))
 			    (htm
-			      (:li :id (unattributized-name (conc container-id "-" label)
+			      (:li :id (unattributized-name (format nil "~A-~A" container-id label)
 							    'menu-item)
 				   :class pane-class
                                   (etypecase target
