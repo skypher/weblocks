@@ -69,13 +69,19 @@ that FORM's values and the literal VALUES are equal."
 			       `',(first values)
 			       `(values . ,(mapcar (f_ `',_) values)))))))
 
-(defun test-weblocks ()
+(defun test-weblocks (&optional (verbose t))
   "Call this function to run all unit tests defined in 'weblocks-test'
 package. This function tests weblocks in a clean environment. See
-'with-test-environment' for more details."
+'with-test-environment' for more details.
+
+Pass NIL as the optional arg to just return the results instead of
+DESCRIBE-ing them."
   ;; XXX better results combination
-  (values (run-tests :suite 'weblocks-suite)
-	  (run-tests :suite 'weblocks-store-test::store-suite)))
+  (let ((results (list (run-tests :suite 'weblocks-suite)
+		       (run-tests :suite 'weblocks-store-test::store-suite))))
+    (when verbose
+      (mapc #'describe results))
+    (values-list results)))
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")

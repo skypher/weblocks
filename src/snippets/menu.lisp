@@ -18,6 +18,7 @@ option isn't specified, first option is rendered as selected."
   (declare (special *current-navigation-url*))
   (with-html
     (:div :class "view menu"
+	  :id (unattributized-name header 'menu)
 	  (with-extra-tags
 	    (when header
 	      (htm (:h1 (str header))))
@@ -39,7 +40,8 @@ option isn't specified, first option is rendered as selected."
 				 (pane-class (when pane-selected-p
 					       "selected-item")))
 			    (htm
-			      (:li :id (attributize-name (conc header "-" label)) :class pane-class
+			      (:li :id (unattributized-name (conc header "-" label) 'menu-item)
+				   :class pane-class
                                   (etypecase target
                                     (string
                                       (if pane-selected-p
