@@ -23,6 +23,7 @@
 		 :header (if (widget-name obj)
 			      (humanize-name (widget-name obj))
 			      "Navigation")
+		 :container-id (ensure-dom-id obj)
 		 :empty-message "No navigation entries")))
 
 (defmethod render-widget-body ((obj navigation) &rest args)

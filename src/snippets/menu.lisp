@@ -7,17 +7,20 @@
   "A default message shown by 'render-menu' if no entries are
   available.")
 
-(defun render-menu (options &key selected-pane header
+(defun render-menu (options &key selected-pane header (container-id (gen-id))
 		    (empty-message *menu-empty-message*))
   "Renders a menu snippet based on given options and selected
 option. An option may be a dotted pair of a label and URL to link to,
 or a name (which will be converted to a label and a URL via
 humanize-name and attributize-name, respectively). The selected-uri
 will be compared to an option's URL tokens via equalp. If the selected
-option isn't specified, first option is rendered as selected."
+option isn't specified, first option is rendered as selected.  If
+CONTAINER-ID is provided, it is used as the basis of DOM IDs for the
+menu and each menu item generated with `unattributized-name'."
   (declare (special *current-navigation-url*))
   (with-html
     (:div :class "view menu"
+	  :id (unattributized-name container-id 'menu)
 	  (with-extra-tags
 	    (when header
 	      (htm (:h1 (str header))))
@@ -39,7 +42,9 @@ option isn't specified, first option is rendered as selected."
 				 (pane-class (when pane-selected-p
 					       "selected-item")))
 			    (htm
-			      (:li :id (attributize-name (conc header "-" label)) :class pane-class
+			      (:li :id (unattributized-name (conc container-id "-" label)
+							    'menu-item)
+				   :class pane-class
                                   (etypecase target
                                     (string
                                       (if pane-selected-p

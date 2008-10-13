@@ -50,6 +50,16 @@ Ex:
   (:method ((name integer))
     (format nil "~A" name)))
 
+(defun unattributized-name (name &optional (type-marker 'uname))
+  "Call `attributize-name' with NAME and modify the result to be a
+variant that is still usable in all cases where `attributize-name'
+results can be used, but is extremely unlikely to ever be returned by
+`attributize-name'.
+
+TYPE-MARKER is just a label for human discernment of the different
+users of this function."
+  (format nil "~:@(~A~)-~A" type-marker (attributize-name name)))
+
 (defun list->assoc (lst &key (map #'identity))
   "Nondestructively convert a list of elements to an association
 list If an element of a list is a cons cell, it is left as
