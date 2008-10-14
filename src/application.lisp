@@ -192,7 +192,8 @@ to my `application-dependencies' slot."
 
 (defun get-webapp (name &optional (error-p t))
   "Get a running web application"
-  (let ((app (find (attributize-name name) *active-webapps* 
+  (let ((app (find (if (symbolp name) (attributize-name name) name)
+		   *active-webapps*
 		   :key #'weblocks-webapp-name :test #'equal)))
     (if app app
 	(when error-p
