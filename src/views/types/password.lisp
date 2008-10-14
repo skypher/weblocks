@@ -3,7 +3,7 @@
 
 (export '(*max-password-length* password password-presentation))
 
-(defparameter *max-password-length* 10
+(defparameter *max-password-length* 12
   "Default maximum for the length of the password field")
 
 (defclass password-presentation (text-presentation input-presentation)

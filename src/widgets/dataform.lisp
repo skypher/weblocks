@@ -1,26 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(dataform dataform-data dataform-class-store
-	  dataform-data-view dataform-form-view dataform-on-cancel
-	  dataform-on-success dataform-allow-close-p dataform-on-close
+(export '(dataform dataform-data-view dataform-form-view
 	  render-dataform render-dataform-data render-dataform-form
 	  annihilate-dataform dataform-submit-action))
 
-(defwidget dataform (widget)
-  ((data :accessor dataform-data
-	 :initform nil
-	 :initarg :data
-	 :documentation "Data object rendered and modified by
-	 this widget.")
-   (class-store :accessor dataform-class-store
-		:initform nil
-		:initarg :class-store
-		:documentation "A store that will be used for
-		persisting the data object. If this slot isn't
-		specified, the value is obtained by calling
-		class-store on the data class.")
-   (data-view :accessor dataform-data-view
+(defwidget dataform (data-editor)
+  ((data-view :accessor dataform-data-view
 	      :initform nil
 	      :initarg :data-view
 	      :documentation "View object used to render 'data' object
@@ -46,32 +32,7 @@
 			     values and validation fails, these values
 			     are stored in this variable so the form
 			     isn't lost while the user fixes
-			     errors.")
-   (on-cancel :accessor dataform-on-cancel
-	      :initform nil
-	      :initarg :on-cancel
-	      :documentation "An optional callback function with one
-	      argument (the dataform widget). Called when the user
-	      presses a cancel button.")
-   (on-success :accessor dataform-on-success
-	       :initform nil
-	       :initarg :on-success
-	       :documentation "An optional callback function with one
-	       argument (the dataform widget). Called when the user
-	       successfully submitted data that passed through the
-	       validation stage.")
-   (allow-close-p :accessor dataform-allow-close-p
-		  :initform t
-		  :initarg :allow-close-p
-		  :documentation "If set to true (the default), and
-		  'on-close' isn't nil, renders a close button.")
-   (on-close :accessor dataform-on-close
-	     :initform nil
-	     :initarg :on-close
-	     :documentation "An optional callback function with one
-	     argument (the dataform widget). Called when the user
-	     clicks on the close button. Note that the close button is
-	     only rendered if 'allow-close-p' is true."))
+			     errors."))
   (:documentation
    "A class that represents a dataform widget. By default this widget
 renders the data object with a data view along with a 'modify'
@@ -79,11 +40,6 @@ link. If the user clicks on the link, the widget's state is updated
 and it renders into a form via a form view. If a user then submits the
 form, the data object is updated from the form (see
 dataform-submit-action)."))
-
-(defmethod initialize-instance :after ((obj dataform) &rest initargs &key &allow-other-keys)
-  (declare (ignore initargs))
-  (setf (dataform-class-store obj)
-	(object-store (dataform-data obj))))
 
 (defmethod dataform-data-view ((obj dataform))
   (when (null (slot-value obj 'data-view))
@@ -125,24 +81,7 @@ customize data behavior.")
     (apply #'render-object-view data view
 	   :fields-suffix-fn (lambda (&rest args)
 			       (declare (ignore args))
-			       (with-html
-				 (:div :class "submit"
-				       (render-link (make-action
-						     (lambda (&rest args)
-						       (declare (ignore args))
-						       (setf (slot-value obj 'ui-state) :form)))
-						    "Modify"
-						    :class "modify")
-				       (when (and (dataform-allow-close-p obj)
-						  (dataform-on-close obj))
-					 (str "&nbsp;")
-					 (render-link (make-action
-						       (lambda (&rest args)
-							 (declare (ignore args))
-							 (funcall (dataform-on-close obj)
-								  obj)))
-						      "Close"
-						      :class "close")))))
+			       (render-dataform-data-buttons obj data))
 	   :widget obj
 	   args)))
 

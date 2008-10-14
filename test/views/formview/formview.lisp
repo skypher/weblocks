@@ -76,7 +76,7 @@
 	 (:li "World is a required field."))))
 
 
-(deftest-html render-validation-summary-3
+(deftest-html render-validation-summary-5
     (render-validation-summary (make-instance 'form-view)
 			       *joe* nil
 			       nil)

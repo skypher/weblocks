@@ -1,6 +1,6 @@
 body
 {
-  background: url(/pub/images/page/background.png);
+  background: url(/weblocks-default/pub/images/page/background.png);
   text-align: center;
 }
 
@@ -23,7 +23,7 @@ div.page-wrapper
 .dialog .dialog-extra-top-1
 {
   height: 5px;
-  background: url(/pub/images/page/top_left.png) no-repeat top left;
+  background: url(/weblocks-default/pub/images/page/top_left.png) no-repeat top left;
   overflow: hidden;
 }
 
@@ -32,7 +32,7 @@ div.page-wrapper
 {
   height: 5px;
   margin-top: -5px;
-  background: url(/pub/images/page/top_right.png) no-repeat top right;
+  background: url(/weblocks-default/pub/images/page/top_right.png) no-repeat top right;
   overflow: hidden;
 }
 
@@ -43,7 +43,7 @@ div.page-wrapper
   margin-top: -5px;
   margin-left: 5px;
   margin-right: 5px;
-  background: url(/pub/images/page/hor_border.png) repeat-x top;
+  background: url(/weblocks-default/pub/images/page/hor_border.png) repeat-x top;
   overflow: hidden;
 }
 
@@ -69,7 +69,6 @@ div#root
 div#main-menu
 {
   position: relative;
-  width: 100%;
 }
 
 div#main-menu div.composite
@@ -87,7 +86,7 @@ div#main-menu div.menu
 .dialog .dialog-extra-bottom-1
 {
   height: 5px;
-  background: url(/pub/images/page/bottom_left.png) no-repeat top left;
+  background: url(/weblocks-default/pub/images/page/bottom_left.png) no-repeat top left;
   overflow: hidden;
 }
 
@@ -96,7 +95,7 @@ div#main-menu div.menu
 {
   height: 5px;
   margin-top: -5px;
-  background: url(/pub/images/page/bottom_right.png) no-repeat top right;
+  background: url(/weblocks-default/pub/images/page/bottom_right.png) no-repeat top right;
   overflow: hidden;
 }
 
@@ -107,14 +106,14 @@ div#main-menu div.menu
   margin-top: -5px;
   margin-left: 5px;
   margin-right: 5px;
-  background: url(/pub/images/page/hor_border_bottom.png) repeat-x top;
+  background: url(/weblocks-default/pub/images/page/hor_border_bottom.png) repeat-x top;
   overflow: hidden;
 }
 
 .header
 {
   height: 52px;
-  background: url(/pub/images/header/background.png) repeat-x;
+  background: url(/weblocks-default/pub/images/header/background.png) repeat-x;
   margin-top: -5px;
   margin-bottom: 1em;
 }
@@ -122,7 +121,7 @@ div#main-menu div.menu
 .header .extra-top-1
 {
   height: 5px;
-  background: url(/pub/images/header/top_left.png) no-repeat top left;
+  background: url(/weblocks-default/pub/images/header/top_left.png) no-repeat top left;
   overflow: hidden;
 }
 
@@ -130,7 +129,7 @@ div#main-menu div.menu
 {
   height: 5px;
   margin-top: -5px;
-  background: url(/pub/images/header/top_right.png) no-repeat top right;
+  background: url(/weblocks-default/pub/images/header/top_right.png) no-repeat top right;
   overflow: hidden;
 }
 
@@ -138,13 +137,13 @@ div#main-menu div.menu
 {
   height: 42px;
   margin-left: 5px;
-  background: url(/pub/images/header/logo.png) no-repeat center left;
+  background: url(/weblocks-default/pub/images/header/logo.png) no-repeat center left;
 }
 
 .header .extra-bottom-1
 {
   height: 5px;
-  background: url(/pub/images/header/bottom_left.png) no-repeat top left;
+  background: url(/weblocks-default/pub/images/header/bottom_left.png) no-repeat top left;
   overflow: hidden;
 }
 
@@ -152,7 +151,7 @@ div#main-menu div.menu
 {
   height: 5px;
   margin-top: -5px;
-  background: url(/pub/images/header/bottom_right.png) no-repeat top right;
+  background: url(/weblocks-default/pub/images/header/bottom_right.png) no-repeat top right;
   overflow: hidden;
 }
 

@@ -1,7 +1,11 @@
 
 (in-package :weblocks)
 
-(export '(render-page-body render-page-headers page-title))
+(export '(render-page render-page-body render-page-headers page-title))
+
+(defvar *page-dependencies*)
+(setf (documentation '*page-dependencies* 'variable)
+      "A list of dependencies of the currently rendered page.")
 
 ;;
 ;; Compute the webapp page title
@@ -12,10 +16,12 @@
    application name, application description, and current navigation state."
   (declare (special *current-page-description*))
   (let ((webapp-description (webapp-description)))
-    (apply #'concatenate 'string (webapp-name)
+    (apply #'format nil "~A~A~A"
+	   (webapp-name)
 	   (cond
 	     (*current-page-description* (list " - " *current-page-description*))
-	     (webapp-description (list " - " webapp-description))))))
+	     (webapp-description (list " - " webapp-description))
+	     (t '("" ""))))))
 
 ;;
 ;; Render the current page
@@ -33,8 +39,12 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   (declare (special *page-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(all-dependencies (compact-dependencies (append (webapp-application-dependencies)
-							*page-dependencies*))))
-    (with-html-output (*weblocks-output-stream* nil :prologue t)
+							*page-dependencies*
+							(when (weblocks-webapp-debug app)
+							  (build-local-dependencies
+							   '((:script "weblocks-debug")
+							     (:stylesheet "debug-toolbar"))))))))
+    (with-html-output (*weblocks-output-stream* nil :prologue t :indent (weblocks-webapp-debug (current-webapp)))
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
 	      (:title (str (page-title app)))

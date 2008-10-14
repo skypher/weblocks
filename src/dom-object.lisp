@@ -3,8 +3,7 @@
 (export '(dom-object-mixin dom-id dom-class dom-classes))
 
 (defclass dom-object-mixin ()
-  ((dom-id :accessor dom-id
-	   :initarg :dom-id
+  ((dom-id :initarg :dom-id
 	   :documentation "The DOM id of an object. Can be a symbol, a
 	   string or nil. When accessed through the 'dom-id' accessor,
 	   will always become a string. Use ensure-dom-id or
@@ -36,6 +35,11 @@ by their DOM id. Returns a string or nil if the object is to have no id.")
   (:method ((obj symbol)) nil)
   (:method ((obj function)) nil)
   (:method ((obj string)) nil))
+
+(defgeneric (setf dom-id) (id obj)
+  (:method (id (obj dom-object-mixin))
+    (with-slots (dom-id) obj
+      (setf dom-id id))))
 
 (defgeneric dom-classes (obj)
   (:documentation "Returns a string that represents all applicable CSS

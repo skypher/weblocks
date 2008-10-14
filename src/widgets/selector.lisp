@@ -4,7 +4,8 @@
 (export '(selector selector-on-dispatch))
 
 (defwidget selector (dispatcher selector-mixin)
-  ((on-dispatch :initform 'selector-on-dispatch))
+  ((on-dispatch :initform 'selector-on-dispatch)
+   (widgets-ephemeral-p :initform nil))
   (:documentation "A selector is a convinience widget based on the
   dispatcher widget and selector-mixin interface. It allows setting a
   list of widgets declaratively. Every time the selector is rendered,
@@ -23,7 +24,7 @@
     (let* ((pane (if tokens
 		     (selector-mixin-find-pane-by-tokens obj tokens)
 		     (selector-mixin-canonicalize-pane (selector-mixin-default-pane obj))))
-	   (pane-tokens (ensure-list (pane-info-uri-tokens (car pane)))))
+	   (pane-tokens (and pane (ensure-list (pane-info-uri-tokens (car pane))))))
       (if pane
 	  (progn
 	    (setf (selector-mixin-current-pane-name obj)
@@ -35,3 +36,5 @@
 	    (setf (selector-mixin-current-pane-name obj) nil)
 	    nil)))))
 
+(defmethod find-widget-by-path* (path (self selector))
+  (call-next-method (mapcar #'attributize-name path) self))

@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widgets/widget/widget-suite (weblocks-suite print-upcase-suite)
+  ())
+
 ;;; test defwidget
 (deftest defwidget-1
     (macroexpand-1
@@ -32,9 +35,13 @@
 
 
 ;;; test widget-dependencies
-(deftest widget-dependencies-1
-    (format nil "~A" (mapcar #'dependency-url (dependencies (make-instance 'navigation))))
-  "(/pub/stylesheets/navigation.css)")
+(addtest widget-dependencies-1
+  (ensure-same (values-list
+		(mapcar #'dependency-url
+			(dependencies (make-instance 'navigation))))
+	       (values (puri:uri "/pub/stylesheets/menu.css")
+		       (puri:uri "/pub/stylesheets/navigation.css"))
+	       :test puri:uri=))
 
 (deftest widget-dependencies-2
     (with-request :get nil
@@ -100,7 +107,7 @@
 	  (with-html (:p "test")))
 	:widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
 	:widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	(:p "hello")
 	(:p "test")
 	(:p "world")))
@@ -164,7 +171,7 @@
 (deftest-html render-widget-1
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -175,7 +182,7 @@
 (deftest-html render-widget-2
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
-  (:div :class "widget dataform" :id "test-widget"
+  (:div :class "widget data-editor dataform" :id "test-widget"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -249,7 +256,7 @@
 (deftest mark-dirty-5
     (with-request :get nil
       (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(setf (session-value 'weblocks::root-composite) (create-site-layout))	
+	(setf (root-composite) (create-site-layout))	
 	(let* ((weblocks::*dirty-widgets* nil)
 	       (path '((root-inner test-nav-1 test2 test2-leaf)))
 	       (w (make-instance 'composite :name "test"
@@ -323,7 +330,7 @@
 
 (deftest find-widget-by-path-3
     (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))
+      (setf (root-composite) (create-site-layout))
       (let ((res (find-widget-by-path '(root-inner test-nav-1 test2 test2-leaf))))
 	(values (widget-name res)
 		(type-of res))))
@@ -334,6 +341,16 @@
       (setf (session-value 'weblocks::root-composite) (create-site-layout))
       (find-widget-by-path '(doesnt exist)))
   nil)
+
+(deftest find-widget-by-path-5
+    (with-request :get nil :uri "/test2"
+      (setf (root-composite) (create-site-layout))
+      (catch 'handler-done
+	(handle-client-request (weblocks::current-webapp)))
+      (let ((test2 (find-widget-by-path '(root-inner test-nav-1 test2))))
+	(values (widget-name test2)
+		(type-of test2))))
+  "test2" composite)
 
 ;;; test customized widget printing
 (deftest widget-printing-1
@@ -346,15 +363,15 @@
       (format nil "~s" (make-instance 'weblocks::dataform :name 'users)))
   "#<DATAFORM USERS>")
 
-;; note that navigation is a special case which DOES NOT autogenerate ids
+;; navigation is no longer a special case which DOES NOT autogenerate ids
 (deftest widget-printing-3
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
 	(format nil "~s" (make-instance 'weblocks::navigation))))
-  "#<NAVIGATION NIL>")
+  "#<NAVIGATION \"id-123\">")
 
 (deftest widget-printing-4
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
-	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-123"))))
-  "#<NAVIGATION \"id-123\">")
+	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
+  "#<NAVIGATION \"id-234\">")

@@ -6,10 +6,9 @@
 
 ;;; Dropdown
 (defclass dropdown-presentation (form-presentation choices-presentation-mixin)
-  ((welcome-name :initform nil
-		 :initarg :welcome-name
+  ((welcome-name :initarg :welcome-name
 		 :accessor dropdown-presentation-welcome-name
-		 :documentation "If not null, uses this value to
+		 :documentation "If bound, uses this value to
 		 present a welcome message in the form of [Select
 		 Welcome-Name] as the first choice. By default uses
 		 the view field label.")))
@@ -25,8 +24,9 @@
 		     :welcome-name (if value
 				       (if (form-view-field-required-p field)
 					   nil "None")
-				       (or (dropdown-presentation-welcome-name presentation)
-					   (view-field-label field)))
+                                      (if (slot-boundp presentation 'welcome-name) 
+                                        (dropdown-presentation-welcome-name presentation)
+                                        (view-field-label field)))
 		     :selected-value (if intermediate-value-p
 					 intermediate-value
 					 (when value

@@ -6,7 +6,8 @@
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
-          widget-dirty-p find-widget-by-path* find-widget-by-path))
+          widget-dirty-p find-widget-by-path* find-widget-by-path
+          *current-widget*))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
@@ -162,17 +163,27 @@ Another implementation allows rendering strings."))
 (defmethod widget-suffix-fn (obj)
   nil)
 
-(defun render-widget (obj &key inlinep)
+(defgeneric render-widget (obj &key inlinep &allow-other-keys)
+  (:documentation
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
 
 Additionally, calls 'dependencies' and adds the returned items to
 *page-dependencies*. This is later used by Weblocks to declare
-stylesheets and javascript links in the page header."
+stylesheets and javascript links in the page header."))
+
+(defmethod render-widget (obj &key inlinep &allow-other-keys)
   (declare (special *page-dependencies*))
-  (setf *page-dependencies*
-	(append *page-dependencies* (dependencies obj)))
+  (if (ajax-request-p)
+    (dolist (dep (dependencies obj))
+      (send-script
+	(ps* `(,(typecase dep
+                  (stylesheet-dependency 'include_css)
+                  (script-dependency 'include_dom))
+               ,(make-webapp-uri (puri:render-uri (dependency-url dep) nil))))))
+    (setf *page-dependencies*
+	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
       (funcall #'render-widget-body obj)
       (apply #'with-widget-header obj #'render-widget-body
@@ -248,7 +259,7 @@ widget object, in which case it is simply returned.
 (defmethod find-widget-by-path* (path (root (eql nil)))
   nil)
 
-(defun find-widget-by-path (path &optional (root (session-value 'root-composite)))
+(defun find-widget-by-path (path &optional (root (root-composite)))
   (find-widget-by-path* path root))
 
 (defmethod print-object ((obj widget) stream)

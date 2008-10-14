@@ -195,7 +195,7 @@
 ;;; test render-checkbox
 (deftest-html render-checkbox-1
     (render-checkbox 'foo nil)
-  (:input :name "foo" :type "checkbox" :class "checkbox" :value "t"))
+  (:input :name "foo" :type "checkbox" :class "checkbox" :value "f"))
 
 (deftest-html render-checkbox-2
     (render-checkbox 'foo t :id "bar" :class "baz")

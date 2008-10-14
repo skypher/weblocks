@@ -1,11 +1,11 @@
 
 (in-package :weblocks)
 
-(export '(composite composite-widgets))
+(export '(composite composite-widgets *override-parent-p*))
 
 (defwidget composite (widget)
   ((widgets :accessor composite-widgets
-	    :initform nil
+            :initform nil
 	    :initarg :widgets
 	    :documentation "A list of widgets that are contained in
             this composite widget. For convinience, one can assign a
@@ -17,27 +17,34 @@
   on the composite, it invokes 'render-widget' on each widget in the
   list."))
 
+
 (defmethod initialize-instance :after ((obj composite) &rest initargs &key widgets &allow-other-keys)
   (declare (ignore initargs))
   ;; We need this to properly initialize values
   (setf (slot-value obj 'widgets) nil)
   (setf (composite-widgets obj) widgets))
 
-(defmethod (setf composite-widgets) (new-value (widget composite))
-  ;; We're no longer a parent of widgets we hold
-  (loop for i in (ensure-list (slot-value widget 'widgets))
-     do (setf (widget-parent i) nil))
-  (let ((widgets (if (or (consp new-value)
-			 (null new-value))
-		     new-value
-		     (list new-value))))
-    ;; But we're a part of new widgets we're passed
-    (loop for i in widgets
-       do (if (widget-parent i)
-	      (error "Widget ~a already has a parent." i)
-	      (setf (widget-parent i) widget)))
-    (setf (slot-value widget 'widgets)
-	  widgets)))
+(defparameter *override-parent-p* nil
+  "Allow parent overriding in (SETF COMPOSITE-WIDGETS).")
+
+(defmethod (setf composite-widgets) (new-value (comp composite))
+  "Assign new children to the composite and update their parents.
+Signals an error if one of the children already has a parent
+unless *OVERRIDE-PARENT-P* is set."
+  ;; we're no longer a parent of widgets we hold
+  (symbol-macrolet ((children (slot-value comp 'widgets)))
+    (mapcar
+      (lambda (child)
+        (setf (widget-parent child) nil))
+      (ensure-list children))
+    ;; but we're a parent of new widgets we're passed
+    (let ((new-widgets (ensure-list new-value)))
+      (mapcar (lambda (child)
+                (if (and (widget-parent child) (not *override-parent-p*))
+                  (error "Widget ~A already has a parent." child)
+                  (setf (widget-parent child) comp)))
+              new-widgets)
+      (setf children new-widgets))))
 
 (defmethod render-widget-body ((obj composite) &rest args)
   (mapc (lambda (w)

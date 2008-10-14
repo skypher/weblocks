@@ -8,7 +8,7 @@
        (dataedit-create-new-item-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -33,7 +33,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Foo"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -60,7 +60,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
 					       :requiredp t))))))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -83,7 +83,7 @@
        (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee)
 					 *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -107,7 +107,7 @@
 								  :data-class 'employee
 								  :drilldown-type :view)
 					 *joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
 	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -128,7 +128,7 @@
 					 (name :label "Foo"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -157,7 +157,7 @@
 					 (name :label "Bar"
 					       :requiredp t)))
 	*joe*)))
-  (:div :class "widget dataform" :id "id-123"
+  (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
@@ -229,7 +229,7 @@
 		(:th "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
@@ -269,7 +269,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -277,7 +277,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -329,12 +329,12 @@
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-3" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -394,7 +394,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -497,7 +497,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -544,7 +544,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -554,7 +554,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "id-123"
+    (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
@@ -609,7 +609,7 @@
 		  (:td :class "select"
 		   :onclick "stopPropagation(event);"
 		   :style "cursor: default;"
-		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		   (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		  (:td :class "name" (:span :class "value" "Jill"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
 		  (:td :class "drilldown modify"
@@ -674,7 +674,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -721,7 +721,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify"
@@ -731,7 +731,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-    (:div :class "widget dataform" :id "id-123"
+    (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(data-header-template
 	    "abc135"
 	    '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
@@ -772,7 +772,7 @@
 		  (:td :class "select"
 		   :onclick "stopPropagation(event);"
 		   :style "cursor: default;"
-		   (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		   (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		  (:td :class "name" (:span :class "value" "Joe"))
 		  (:td :class "manager" (:span :class "value" "Jim"))
 		  (:td :class "drilldown modify"
@@ -831,7 +831,7 @@
 		 (:td :class "select"
 		      :onclick "stopPropagation(event);"
 		      :style "cursor: default;"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "drilldown modify" "")))
@@ -893,7 +893,7 @@
 		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
@@ -936,7 +936,7 @@
 		(:th :class "test" "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td :class "test" (:span :class "value missing" "Not Specified"))))
@@ -945,7 +945,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -1011,7 +1011,7 @@
 		(:th "Test"))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))
 		 (:td (:span :class "value missing" "Not Specified"))))
@@ -1051,7 +1051,7 @@
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))
@@ -1059,7 +1059,7 @@
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
     (:div :class "extra-bottom-3" "<!-- empty -->"))
-   (:div :class "widget dataform" :id "id-123"
+   (:div :class "widget data-editor dataform" :id "id-123"
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
@@ -1111,12 +1111,12 @@
 		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
-		  (:div (:input :name "item-3" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-3" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Jill"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
 		 (:td :class "select"
-		  (:div (:input :name "item-1" :type "checkbox" :value "t")))
+		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim"))))
 	      :summary "Ordered by name, ascending."))

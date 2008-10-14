@@ -9,7 +9,7 @@
 
 (deftest authenticatedp-2
     (with-request :get nil
-      (setf (session-value *authentication-key*) 123)
+      (setf (webapp-session-value *authentication-key*) 123)
       (authenticatedp))
   123)
 

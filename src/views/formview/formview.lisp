@@ -235,7 +235,7 @@ differently.
 (defmethod view-caption ((view form-view))
   (if (slot-value view 'caption)
       (slot-value view 'caption)
-      (with-html-output-to-string (out)
+      (with-html-output-to-string (out nil :indent (weblocks-webapp-debug (current-webapp)))
 	(:span :class "action" "Modifying:&nbsp;")
 	(:span :class "object" "~A"))))
 
@@ -274,11 +274,7 @@ differently.
 			      :use-ajax-p (form-view-use-ajax-p view))
 	(write-string form-body *weblocks-output-stream*)))
     (when (form-view-focus-p view)
-      (let ((focus-script (ps* `(.focus-first-element ($ ,form-id)))))
-	(if (ajax-request-p)
-	    (push (json-function focus-script) *on-ajax-complete-scripts*)
-	    (with-javascript
-	      focus-script))))))
+        (send-script (ps* `(.focus-first-element ($ ,form-id)))))))
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget presentation value obj 

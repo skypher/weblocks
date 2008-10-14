@@ -201,7 +201,8 @@
 
 ;;; test tokenize-uri
 (deftest tokenize-uri-1
-    (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7")
+    (with-webapp ()
+      (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7"))
   ("hello" "world" "blah" "test" "world"))
 
 ;;; test public-file-relative-path
@@ -227,8 +228,7 @@
   "/foo/bar")
 
 (deftest request-uri-path-2
-    (let (*uri-tokens*)
-      (declare (special *uri-tokens*))
+    (with-request :get nil :uri "/"
       (request-uri-path))
   "/")
 

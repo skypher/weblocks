@@ -68,11 +68,9 @@ inserted into the page to redraw the dialog."
 			 (setf (current-dialog) (make-dialog :title title
 							     :widget new-callee
 							     :css-class css-class))
-			 (push (json-function (show-dialog-js title new-callee css-class))
-			       *on-ajax-complete-scripts*)))
+                         (send-script (show-dialog-js title new-callee css-class))))
 	(setf (current-dialog) nil)
-	(push (json-function (ps (remove-dialog)))
-	      *on-ajax-complete-scripts*))
+	(send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
 (defun render-choices-get (msg choices k)

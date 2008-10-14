@@ -3,35 +3,38 @@
 
 ;;; test pane-name
 (deftest pane-name-1
-    (pane-name (cons 1 2))
+    (pane-info-name (make-pane-info :name 1 :label 2))
   1)
 
-;;; test pane-widget
-(deftest pane-widget-1
-    (pane-widget (cons 1 2))
-  2)
+;;; test selector-mixin-default-pane
+(deftest selector-mixin-default-pane-1
+    (selector-mixin-default-pane
+     (make-instance 'navigation
+		    :panes `(("Test One" . nil) ("Test Two" . nil))))
+  ("Test One" . nil))
 
-;;; test navigation-default-pane
-(deftest navigation-default-pane-1
-    (navigation-default-pane (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil))))
-  "Test One")
-
-;;; test initialize-instance for navigation
+;;; test lazy initialization for navigation
 (deftest initialize-navigation-1
-    (slot-value
-     (make-instance 'navigation :panes `(("Test One" . nil) ("Test Two" . nil)))
-     'current-pane)
-  "Test One")
+    (let (initial-current
+	  (nav (make-instance 'navigation
+		 :panes `(("Test One" . nil) ("Test Two" . nil)))))
+      (setf initial-current
+	    (selector-mixin-current-pane-name nav))
+      (selector-on-dispatch nav '())
+      (values initial-current
+	      (selector-mixin-current-pane-name nav)))
+  nil "Test One")
 
 (deftest initialize-navigation-2
-    (slot-value
+    (selector-mixin-current-pane-name
      (make-instance 'navigation
-		    :panes `(("Test One" . nil) ("Test Two" . nil))
-		    :current-pane "Test Two")
-     'current-pane)
+       :panes `(("Test One" . nil) ("Test Two" . nil))
+       :current-pane-name "Test Two"))
   "Test Two")
 
 ;;; test with-navigation-header
+
+#|defunct
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
@@ -100,29 +103,34 @@
   (htm
    (:li :class "selected-item" (:span "Foo"))
    (:li (:a :href "/foo/bar/%c3%a5%c3%a4%c3%b6" #.(humanize-name (url-decode "%C3%A5%C3%A4%C3%B6"))))))
+end defunct|#
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
-    (with-request :get nil
+    (with-webapp ()
       (let ((nav (make-navigation "Test Navigation"
 				  "Test1" (make-instance 'dataform :data *joe*)
 				  "Test2" (make-instance 'dataform :data *some-college*)))
-	    (*current-navigation-url* "/"))
+	    (*current-navigation-url* "/")) ;per handle-client-request
 	(declare (special *current-navigation-url*))
-	;; render widget
-	(render-widget nav)
-	;; switch to test2 and render
-	(weblocks::apply-uri-to-navigation '("test2") nav)
-	(render-widget nav)))
+	(with-request :get nil :uri "/"
+	  (render-widget nav))
+	(with-request :get nil :uri "/test2"
+	  (render-widget nav))))
   (htm
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc123"
-		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
-		     (:span :class "value" "Joe"))
-		    (:li :class "manager"
-		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
+   (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget data-editor dataform" :id "id-123"
+		     #.(data-header-template
+			"abc123"
+			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
+			   (:span :class "value" "Joe"))
+			  (:li :class "manager"
+			   (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))
+			:postslots `((:div :class "submit"
+					   ,(link-action-template "abc123" "Modify"
+								  :class "modify"
+								  :uri "/"))))))
 	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
@@ -133,55 +141,73 @@
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       (:div :class "view data education-history"
-		     (:div :class "extra-top-1" "<!-- empty -->")
-		     (:div :class "extra-top-2" "<!-- empty -->")
-		     (:div :class "extra-top-3" "<!-- empty -->")
-		     (:h1 (:span :class "action" "Viewing:&nbsp;")
-			  (:span :class "object" "Education History"))
-		     (:ul
-		      (:li :class "university"
-			   (:span :class "label text" "University:&nbsp;")
-			   (:span :class "value" "Bene Gesserit University"))
-		      (:li :class "graduation-year"
-			   (:span :class "label text" "Graduation Year:&nbsp;")
-			   (:span :class "value" "2000")))
-		     (:div :class "submit" #.(link-action-template "abc124" "Modify"
-								   :class "modify"))
-		     (:div :class "extra-bottom-1" "<!-- empty -->")
-		     (:div :class "extra-bottom-2" "<!-- empty -->")
-		     (:div :class "extra-bottom-3" "<!-- empty -->")))
+   (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget data-editor dataform" :id "id-123"
+		     (:div :class "view data education-history"
+			   (:div :class "extra-top-1" "<!-- empty -->")
+			   (:div :class "extra-top-2" "<!-- empty -->")
+			   (:div :class "extra-top-3" "<!-- empty -->")
+			   (:h1 (:span :class "action" "Viewing:&nbsp;")
+				(:span :class "object" "Education History"))
+			   (:ul
+			    (:li :class "university"
+				 (:span :class "label text" "University:&nbsp;")
+				 (:span :class "value" "Bene Gesserit University"))
+			    (:li :class "graduation-year"
+				 (:span :class "label text" "Graduation Year:&nbsp;")
+				 (:span :class "value" "2000")))
+			   (:div :class "submit" #.(link-action-template "abc123" "Modify"
+									 :class "modify"
+									 :uri "/test2"))
+			   (:div :class "extra-bottom-1" "<!-- empty -->")
+			   (:div :class "extra-bottom-2" "<!-- empty -->")
+			   (:div :class "extra-bottom-3" "<!-- empty -->"))))
 	 (:div :class "view menu"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "/" "Test1"))
+	       (:ul (:li (:a :href "/test1" "Test1"))
 		    (:li :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))))
 
+(defwidget nomenu-navigation (navigation)
+  ((render-menu-p :initform t :accessor navigation-render-menu-p))
+  (:documentation "Allows menu to be disabled.  For `render-navigation-widget-2'."))
+
+(defmethod render-navigation-menu ((self nomenu-navigation) &rest args)
+  (declare (ignore args))
+  (when (navigation-render-menu-p self)
+    (call-next-method)))
+
 (deftest-html render-navigation-widget-2
-    (with-request :get nil
-      (let ((nav (make-navigation "Test Navigation"
-				  "Test1" (make-instance 'dataform :data *joe*)))
+    (with-request :get nil :uri "/"
+      (let ((nav (init-navigation
+		  (make-instance 'nomenu-navigation :name "Test Navigation")
+		  "Test1" (make-instance 'dataform :data *joe*)))
 	    (*current-navigation-url* "/"))
 	(declare (special *current-navigation-url*))
 	(setf (navigation-render-menu-p nav) nil)
 	;; render widget
 	(render-widget nav)))
   (htm
-   (:div :class "widget navigation" :id "test-navigation"
-	 (:div :class "widget dataform" :id "id-123"
-	       #.(data-header-template
-		  "abc123"
-		  '((:li :class "name" (:span :class "label text" "Name:&nbsp;")
-		     (:span :class "value" "Joe"))
-		    (:li :class "manager"
-		     (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim"))))))))
+   (:div :class "selector-mixin widget dispatcher selector navigation nomenu-navigation"
+	 :id "test-navigation"
+	 (:div :class "navigation-body"
+	       (:div :class "widget data-editor dataform" :id "id-123"
+		     #.(data-header-template
+			"abc123"
+			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
+			   (:span :class "value" "Joe"))
+			  (:li :class "manager"
+			   (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))
+			:postslots `((:div :class "submit"
+					   ,(link-action-template "abc123" "Modify"
+								  :class "modify"
+								  :uri "/")))))))))
 
 (deftest render-navigation-widget-3
     (with-request :get nil
@@ -195,25 +221,9 @@
 	(return-code)))
   404)
 
-;;; test current-pane-widget
-(deftest current-pane-widget-1
-    (current-pane-widget
-     (make-navigation "Test Navigation"
-		      "test1" "w1"
-		      "test2" "w2"))
-  "w1")
-
-(deftest current-pane-widget-2
-    (let ((nav (make-navigation "Test Navigation"
-				"test1" "w1"
-				"test2" "w2")))
-      (setf (slot-value nav 'current-pane) "test2")
-      (current-pane-widget nav))
-  "w2")
-
 ;;; test init-navigation
 (deftest init-navigation-1
-    (navigation-panes
+    (selector-mixin-panes
      (init-navigation (make-instance 'navigation)
 		      'test1 "w1"
 		      "Test-Two" "w2"))
@@ -221,164 +231,183 @@
 
 ;;; test make-navigation
 (deftest make-navigation-1
-    (navigation-panes
+    (selector-mixin-panes
      (make-navigation "test navigation"
 		      'test1 "w1"
 		      "Test-Two" "w2"))
   (("test1" . "w1") ("test-two" . "w2")))
 
 
-;;; test find-pane
+;;; test selector-mixin-find-pane-by-name
+
+(defun destructure-pane (pane)
+  (let ((info (car pane)))
+    (cons (list :name (pane-info-name info) :uri-tokens (pane-info-uri-tokens info)
+		:label (pane-info-label info))
+	  (cdr pane))))
+
 (deftest find-pane-1
-    (find-pane (make-navigation "test navigation"
-				"test1" "w1"
-				"test2" "w2")
-	       "helloworld")
+    (selector-mixin-find-pane-by-name
+     (make-navigation "test navigation"
+		      "test1" "w1"
+		      "test2" "w2")
+		"helloworld")
   nil)
 
 (deftest find-pane-2
-    (find-pane (make-navigation "test navigation"
-				"test1" "w1"
-				"Test-Two" "w2")
-	       "test-two")
-  ("test-two" . "w2"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       "test1" "w1"
+		       "Test-Two" "w2")
+      "test-two"))
+  ((:name "test-two" :uri-tokens ("test-two") :label "Test Two") . "w2"))
 
 (deftest find-pane-3
-    (find-pane (make-navigation "test navigation"
-				'test1 "w1"
-				'test2 "w2")
-	       "test1")
-  ("test1" . "w1"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       'test1 "w1"
+		       'test2 "w2")
+      "test1"))
+  ((:name "test1" :uri-tokens ("test1") :label "Test1") . "w1"))
 
 (deftest find-pane-4
-    (find-pane (make-navigation "test navigation"
-				'test1 "w1"
-				'test2 "w2")
-	       'test1)
-  ("test1" . "w1"))
+    (destructure-pane
+     (selector-mixin-find-pane-by-name
+      (make-navigation "test navigation"
+		       'test1 "w1"
+		       'test2 "w2")
+      "test1"))
+  ((:name "test1" :uri-tokens ("test1") :label "Test1") . "w1"))
 
 (deftest find-pane-5
     (let ((nav (make-navigation "test navigation"
 				"test1" "w1"
 				"test2" "w2")))
-      (setf (navigation-on-find-pane nav)
+      (setf (dispatcher-on-dispatch nav)
 	    (let ((c 0))
 	      (lambda (nav name)
-		(when (and (equalp name "test3")
+		(when (and (equalp name '("test3"))
 			   (= c 0))
 		  (incf c)
-		  "w3"))))
-      (values (find-pane nav "test3")
-	      (find-pane nav "test3")
-	      (find-pane nav "test4")))
-  ("test3" . "w3") ("test3" . "w3") nil)
+		  (values "w3" name '())))))
+      (values-list
+       (mapcar (curry #'weblocks::dispatcher-get-widget nav)
+	       '(("test3") ("test3") ("test4")))))
+  "w3" "w3" nil)
 
 (deftest find-pane-6
     (let ((nav (make-navigation "test navigation"
 				"test1" "w1"
 				"test2" "w2")))
-      (setf (navigation-on-find-pane nav)
+      (setf (dispatcher-on-dispatch nav)
 	    (let ((c 0))
 	      (lambda (nav name)
-		(when (and (equalp name "test3")
+		(when (and (equalp name '("test3"))
 			   (= c 0))
 		  (incf c)
-		  (values "w3" :no-cache)))))
-      (values (find-pane nav "test3")
-	      (find-pane nav "test3")
-	      (find-pane nav "test4")))
-  ("test3" . "w3") nil nil)
+		  (values "w3" name '() :no-cache)))))
+      (values-list
+       (mapcar (curry #'weblocks::dispatcher-get-widget nav)
+	       '(("test3") ("test3") ("test4")))))
+  "w3" nil nil)
 
-;;; test reset-current-pane
-(deftest reset-current-pane-1
-    (let ((nav (make-navigation "test navigation"
-				'test1 "w1"
-				'test2 "w2")))
-      (setf (slot-value nav 'current-pane) "test2")
-      (reset-current-pane nav)
-      (slot-value nav 'current-pane))
-  "test1")
+(defun find-navigation-widget (widgets)
+  (setf widgets (ensure-list widgets))
+  (flet ((navigation? (widget) (typep widget 'navigation)))
+    (and widgets
+	 (or (find-if #'navigation? widgets)
+	     (find-navigation-widget
+	      (mapappend #'composite-widgets widgets))))))
 
 ;;; test apply-uri-to-navigation
 (deftest apply-uri-to-navigation-1
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(weblocks::apply-uri-to-navigation '("test2" "test6") nav1)
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-	(values (slot-value nav1 'current-pane)
-		(slot-value nav2 'current-pane))))
+    (with-request :get nil :uri "/test2/test6"
+      (setf (root-composite) (create-site-layout))
+      (let* ((nav1 (find-navigation-widget (root-composite)))
+	     (nav1-before-rendering (selector-mixin-current-pane-name nav1)))
+	(handle-client-request (weblocks::current-webapp))
+	(let ((nav2 (find-navigation-widget
+		     (cdr (selector-mixin-find-pane-by-name
+			   nav1
+			   (selector-mixin-current-pane-name nav1))))))
+	  (values nav1-before-rendering
+		  (selector-mixin-current-pane-name nav1)
+		  (selector-mixin-current-pane-name nav2)))))
+  nil
   "test2"
   "test6")
 
+(defwebapp autn-webapp
+  :init-user-session 'autn-init-user-session)
+
 (deftest apply-uri-to-navigation-2
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1)
-	(with-request :get nil
-	  (setf nav1 (weblocks::find-navigation-widget site))
-	  (weblocks::apply-uri-to-navigation '("test2" "test69") nav1)
-	  (return-code))))
+    (with-webapp (:class-name 'autn-webapp)
+      (with-request :get nil :uri "/test2/test69"
+	(let ((site (create-site-layout)) nav1)
+	  (defun autn-init-user-session (root) nil)
+	  (unwind-protect
+	       (progn
+		 (catch 'handler-done
+		   (handle-client-request (weblocks::current-webapp)))
+		 (return-code))
+	    (fmakunbound 'init-user-session)))))
   404)
 
 (deftest apply-uri-to-navigation-3
-    (with-request :get nil
-      (let* ((international-string (url-decode "%C3%A5%C3%A4%C3%B6"))
+    (with-request :get nil :uri (url-encode #0=(url-decode "%C3%A5%C3%A4%C3%B6"))
+      (let* ((international-string #0#)
 	     (nav (make-navigation "test-nav-1"
 				   "test1" (make-instance 'composite)
 				   international-string (make-instance 'composite))))
-	(weblocks::apply-uri-to-navigation (list (url-encode international-string)) nav)
-	(loop for i across (slot-value nav 'current-pane)
+	(print *uri-tokens*)
+	(setf (root-composite)
+	      (make-instance 'composite :widgets (list nav)))
+	(catch 'handler-done
+	  (handle-client-request (weblocks::current-webapp)))
+	(loop for i across (selector-mixin-current-pane-name nav)
 	   collect (char-code i))))
   (229 228 246))
 
 (deftest apply-uri-to-navigation-4
-    (with-request :get nil
-      (let ((site (create-site-layout)) nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf (navigation-on-find-pane nav1)
-	      (lambda (nav name)
-		(when (equalp name "test13")
-		  "w3")))
-	(weblocks::apply-uri-to-navigation '("test13") nav1)
-	(slot-value nav1 'current-pane)))
-  "test13")
-
-;;; test obtain-uri-from-navigation
-(deftest obtain-uri-from-navigation-1
-    (with-request :get nil
+    (with-request :get nil :uri "/test13"
       (let* ((site (create-site-layout))
-	     (nav (weblocks::find-navigation-widget site)))
-	(weblocks::apply-uri-to-navigation '("test2" "test6") nav)
-	(weblocks::obtain-uri-from-navigation nav)))
-  "/test2/test6/")
+	     (nav1 (find-navigation-widget site)))
+	(setf (root-composite) site)
+	(setf (dispatcher-on-dispatch nav1)
+	      (lambda (nav name)
+		(when (equalp name '("test13"))
+		  (values "w3" name '()))))
+	(weblocks::dispatcher-get-widget nav1 '("test13"))
+	(car (dispatcher-cache nav1))))
+  ("test13"))
 
 ;;; test find-navigation-widget
 (deftest find-navigation-widget-1
     (with-request :get nil
       (let ((site (create-site-layout))
 	    nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
+	(setf nav1 (find-navigation-widget site))
+	(setf nav2 (find-navigation-widget
+		    (cdr (selector-mixin-default-pane nav1))))
 	(values (widget-name nav1) (widget-name nav2))))
   "test-nav-1"
   "test-nav-2")
-
-(deftest find-navigation-widget-2
-    (weblocks::find-navigation-widget nil)
-  nil)
 
 ;;; test reset-navigation-widgets
 (deftest reset-navigation-widgets-1
     (with-request :get nil
       (let ((site (create-site-layout))
 	    nav1 nav2)
-	(setf nav1 (weblocks::find-navigation-widget site))
-	(setf nav2 (weblocks::find-navigation-widget (current-pane-widget nav1)))
-	(setf (slot-value nav1 'current-pane) "test2")
-	(setf (slot-value nav2 'current-pane) "test4")
-	(weblocks::reset-navigation-widgets nav1)
-	(values (slot-value nav1 'current-pane)
-		(slot-value nav2 'current-pane))))
+	(setf nav1 (find-navigation-widget site))
+	(setf nav2 (find-navigation-widget
+		    (selector-on-dispatch nav1 '())))
+	(setf (selector-mixin-current-pane-name nav1) "test2")
+	(setf (selector-mixin-current-pane-name nav2) "test4")
+	;(weblocks::reset-navigation-widgets nav1) is gone
+	(values (selector-mixin-current-pane-name nav1)
+		(selector-mixin-current-pane-name nav2))))
   "test1"
   "test3")
 

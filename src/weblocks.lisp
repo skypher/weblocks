@@ -1,11 +1,13 @@
 ;;; Code shared accross the entire weblocks framework
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript)
+  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
+        :anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
 			  #:standard-generic-function #:ensure-generic-function
 			  #:standard-class #:typep #:subtypep)
+  (:shadowing-import-from :f-underscore #:f #:_)
   (:shadowing-import-from :fare-matcher #:match)
-  (:shadow #:redirect)
+  (:shadow #:redirect #:errors)
   (:documentation
    "Weblocks is a Common Lisp framework that eases the pain of web
 application development. It achieves its goals by standardizing on
@@ -39,9 +41,33 @@ variable. All html should be rendered to this stream.")
   "A list of running applications.  Applications are only available
    after they have been started.")
 
+(defun cl-escape-string (maybe-string)
+  "Force quoting of special characters by cl-who for with-html."
+  ;(format t "cl-escape-string: ~s~%" (describe maybe-string))
+  (cond
+    ((stringp maybe-string)
+     (cl-who:escape-string-minimal-plus-quotes maybe-string))
+    (t maybe-string)))
+
+(defmethod convert-tag-to-string-list (tag (attr-list list) body body-fn)
+  "The method convert-tag-to-string-list is a hook into cl-who's
+  output system; here we use it to automatically escape special
+  characters."
+  ;(format *standard-output* "non-cl-who tag: ~s, attr-list ~s.~%" tag attr-list)
+  (call-next-method
+    tag
+    (loop for inner-attr-list in attr-list
+        collect
+        (progn
+          (cons
+            (car inner-attr-list)
+            (cons 'cl-escape-string (list (cdr inner-attr-list))))))
+    body
+    body-fn))
+
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."
-  `(with-html-output (*weblocks-output-stream* nil :indent nil)
+  `(with-html-output (*weblocks-output-stream* nil :indent (weblocks-webapp-debug (current-webapp)))
      ,@body))
 
 (defmacro with-javascript (source &rest args)

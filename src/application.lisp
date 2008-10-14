@@ -1,12 +1,18 @@
 
 (in-package :weblocks)
 
-(export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp 
+(export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
-	  webapp-application-dependencies webapp-name webapp-description webapp-prefix
-	  running-webapp make-webapp-uri reset-webapp-session webapp-session-value
-	  define-permanent-action define-permanent-action/cc 
-	  remove-webapp-permanent-action))
+	  webapp-application-dependencies webapp-name
+	  webapp-description weblocks-webapp-public-files-path
+	  webapp-public-files-uri-prefix webapp-prefix
+	  running-webapp make-webapp-uri make-webapp-public-file-uri
+          reset-webapp-session
+	  webapp-session-value define-permanent-action
+	  define-permanent-action/cc remove-webapp-permanent-action
+	  compute-webapp-public-files-path
+	  compute-webapp-public-files-uri-prefix
+	  compute-webapp-public-files-uri-prefix-util))
 
 (defvar *registered-webapps* nil
   "A list of applications that the system knows about")
@@ -15,32 +21,46 @@
   (make-hash-table))
 
 (defclass weblocks-webapp ()
-  ((name :accessor weblocks-webapp-name :initarg :name :initform nil :type string)
+  ((name :accessor weblocks-webapp-name :initarg :name
+	 :type (or symbol string))
    (description :accessor weblocks-webapp-description :initarg :description 
 		:initform nil :type (or null string)
 		:documentation "The name of the application.  This slot will be used 
                    by 'page-title' to generate the default title for each page.")
-   (public-files-path :accessor weblocks-webapp-public-app-path :initarg :public-app-path 
-		    :initform nil 
-		    :documentation "The directory path for public files")
-   (prefix :accessor weblocks-webapp-prefix :initarg :prefix :initform "" :type string
+   (public-files-path :initarg :public-files-path 
+		      :accessor weblocks-webapp-public-files-path
+		      :initform nil
+		      :documentation "The filesystem directory path
+		      for public files. The final value is computed
+		      with 'compute-webapp-public-files-path'.")
+   (public-files-uri-prefix :reader weblocks-webapp-public-files-uri-prefix
+			    :initform "pub"
+			    :initarg :public-files-uri-prefix
+			    :documentation "The uri prefix for public
+			    files. By default, this slot is
+			    initialized to 'pub'. The final uri prefix
+			    for application public files is computed
+			    by 'compute-webapp-public-files-uri-prefix'.")
+   (prefix :reader weblocks-webapp-prefix :initarg :prefix :type string
 	   :documentation "The default dispatch will allow a webapp to be invoked 
               as a subtree of the URI space at this site.  This does not support 
               webapp dispatch on virtual hosts, browser types, etc.")
    (application-dependencies :accessor weblocks-webapp-application-dependencies 
-			     :initarg :application-dependencies :initform nil :type list
+			     :initarg :dependencies :initform nil :type list
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
-		      :initform nil :type symbol
+		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
                          composite widget at the root of the application. 'init-user-session' is 
                          responsible for adding initial widgets to this composite.")
-   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil))
+   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil
+	  :documentation "Turns on indentation of HTML for easier visual inspection."))
+  (:metaclass webapp-class)
   (:documentation 
-"A class that encapsulates a unique web application and all relevant resources.
+"A class that encapsulates a unique web application and all relevant rnesources.
 A webapp is a unique set of dependencies and information that can be enabled or
 disabled independently of others.  Multiple webapps can be active concurrently 
 and incoming connections are dispatched to the root of the webapp according to a 
@@ -49,18 +69,28 @@ not see the prefix parameter in URLs that are provided to it.  You can, for
 instance, have different sites (e.g. mobile vs. desktop) with vastly different 
 layout and dependencies running on the same server."))
 
+;; we use a "transform on write" approach for two reasons:
+;;
+;; 1. sane values in slots all the time (except when someone messes around
+;;    with SLOT-VALUE)
+;;
+;; 2. increased performance
+;;
+(defmethod (setf weblocks-webapp-prefix) (prefix (app weblocks-webapp))
+  "Set the prefix of the webapp. Ensures normalization."
+  (unless (string= prefix "/") ;; XXX multiple slashes?
+    (setf (slot-value app 'prefix) (strip-trailing-slashes prefix))))
+(defmethod (setf weblocks-webapp-public-files-uri-prefix) (prefix (app weblocks-webapp))
+  "Set the public files URI prefix of the webapp. Ensures normalization."
+  (setf (slot-value app 'public-files-uri-prefix) (strip-trailing-slashes prefix)))
 
-(defmacro defwebapp (name &key 
-		     subclasses 
+(defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
+  (weblocks-webapp-public-files-uri-prefix app))
+
+(defmacro defwebapp (name &rest initargs &key 
+		     subclasses
 		     slots
-		     description 
-		     (prefix (concatenate 'string "/" (attributize-name name)))
-		     ignore-default-dependencies
-		     dependencies 
-		     public-app-path
-		     (init-user-session (find-symbol (symbol-name '#:init-user-session)
-						     (symbol-package name)))
-		     (autostart t))
+		     (autostart t) &allow-other-keys)
   "This macro defines the key parameters for a stand alone web application.  
 It defines both a class with name 'name' and registers an instance of that class.
 It also instantiates a defvar with an instance of this class.  This is intended
@@ -71,6 +101,9 @@ can.  It's not likely to be needed much
 
 :slots - webapps are class so slots are a list of definitions just as in defclass,
 but as slots are likely to be rare on webapps, we make this a keyword argument.
+
+All of the following, when present, are passed through as additional
+initargs:
 
 :name - instantiates a username (and the default title for) a webapp.  use this
 name to get and delete this webapp.  Multiple instances of a webapp class can
@@ -87,60 +120,88 @@ the dependencies list.  By default 'defwebapp' adds the following resources:
 :dependencies - is a list of dependencies to append to the default dependencies
 list of the application.
 
-:public-app-path - The pathname for the public files for this application.
-The URL will be relative to the object prefix.  So a path of /home/user/webapp/my-pub 
-would result in a URL http://mysite.com/mypub-prefix/pub/scripts/wow.js to map to
-/home/user/webapp/my-pub/scripts/wow.js.  Alternatively you can choose to accept
-the global default by assigning nil or :system-default to this slot.  The default
-initform for this argument assumes that a /pub directory exists relative to
-the system which has a name matching the current package.  This may be a bogus
-assumption, so best to assign this parameter explicitly.
+:public-files-path - a physical path to the directory which contains
+public files for the application. The virtual uri for public files
+will be mapped to this physical path by a Hunchentoot handler. If the
+static files are server by a different web server, this value may be
+set to nil.
 
-:init-user-session - This is a symbol that is used to find a function to initialize
-new user sessions.
+:public-files-uri-prefix - a prefix for the virtual uri of public
+files (default is 'pub'). Final uri prefix for public files is
+computed with 'compute-webapp-public-files-uri-prefix'. Note, the uri
+computed by 'compute-webapp-public-files-uri-prefix' is used to
+generate dependencies and to set up a Hunchentoot handler to map from
+the uri to the path specified by public-files-path.
+
+:init-user-session - A function object that is used to initialize new
+user sessions. If it is not passed, a function named
+'init-user-session' is looked up in the package where the web
+application name symbol is defined.
 
 :autostart - Whether this webapp is started automatically when start-weblocks is
 called (primarily for backward compatibility"
   `(progn
-     (defclass ,name ,(append subclasses (list 'weblocks-webapp))
+     (defclass ,name (,@subclasses weblocks-webapp)
        ,slots
-       (:default-initargs 
-	:name (attributize-name ',name)
-	 :description ,description 
-	 :public-app-path (let ((path ,public-app-path))
-			    (if (or (null path) (eq path :system-default))
-				nil
-				(compute-public-files-path 
-				 (intern (package-name ,*package*) :keyword))))
-	 :init-user-session ,init-user-session
-	 :prefix ,prefix
-	 :application-dependencies 
-	 (append ,(when (not ignore-default-dependencies)
-			`(build-local-dependencies
-			 '((:stylesheet "layout")
-			   (:stylesheet "main")
-			   (:stylesheet "dialog")
-			   (:script "prototype")
-			   (:script "scriptaculous")
-			   (:script "shortcut")
-			   (:script "weblocks")
-			   (:script "dialog"))))
-		 (build-local-dependencies ,dependencies))))
-     (pushnew ',name *registered-webapps*)
-     (when ,autostart
-       (pushnew ',name *autostarting-webapps*))
-     t))
+       (:autostart . ,autostart)
+       (:default-initargs
+	. ,(remove-keyword-parameters
+	    initargs :subclasses :slots :autostart))
+       (:metaclass webapp-class))))
+
+(defmethod initialize-instance :after
+    ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
+  "Add some defaults to my slots.  In particular, unless
+IGNORE-DEFAULT-DEPENDENCIES, prepend the default Weblocks dependencies
+to my `application-dependencies' slot."
+  (macrolet ((slot-default (name initform)
+	       `(unless (slot-boundp self ',name)
+		  (setf (slot-value self ',name) ,initform))))
+    ;; special handling for prefix slots since initargs
+    ;; bypass the normalizing axr
+    (when (slot-boundp self 'prefix)
+      (setf (weblocks-webapp-prefix self) (slot-value self 'prefix)))
+    (when (slot-boundp self 'public-files-uri-prefix)
+      (setf (weblocks-webapp-public-files-uri-prefix self)
+            (slot-value self 'public-files-uri-prefix)))
+    (let ((class-name (class-name (class-of self))))
+      (slot-default name (attributize-name class-name))
+      (slot-default init-user-session
+		    (or (find-symbol (symbol-name 'init-user-session)
+				     (symbol-package class-name))
+			(error "Cannot initialize application ~A because ~
+				no init-user-session function is found."
+			       (weblocks-webapp-name self))))
+      (slot-default prefix
+                      (concatenate 'string "/" (attributize-name class-name))))
+    (unless ignore-default-dependencies
+      (setf (weblocks-webapp-application-dependencies self)
+	    (append '((:stylesheet "layout")
+		      (:stylesheet "main")
+		      (:stylesheet "dialog")
+		      (:script "prototype")
+		      (:script "scriptaculous")
+		      (:script "shortcut")
+		      (:script "weblocks")
+		      (:script "dialog"))
+		    (weblocks-webapp-application-dependencies self)))))
+  (let ((pfp (weblocks-webapp-public-files-path self)))
+    (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
+      (warn "~S ~S includes a nondirectory component; this can break file probing"
+	    'public-files-path pfp))))
 
 (defun get-webapp (name &optional (error-p t))
   "Get a running web application"
-  (let ((app (find (attributize-name name) *active-webapps* 
+  (let ((app (find (if (symbolp name) (attributize-name name) name)
+		   *active-webapps*
 		   :key #'weblocks-webapp-name :test #'equal)))
     (if app app
 	(when error-p
 	  (error "Argument ~a is not a running weblocks application." name)))))
 
 (defun get-webapps-for-class (name)
-  (let ((class (or (find-class name nil) (find-class (intern name :keyword) nil))))
+  (let ((class (or (and (symbolp name) (find-class name nil))
+		   (find-class (intern (attributize-name name) :keyword) nil))))
     (when class
       (loop for app in *active-webapps* 
 	 when (eq (class-of app) class)
@@ -152,22 +213,22 @@ called (primarily for backward compatibility"
   (unless (find-class name nil)
     (error "~a is not a valid weblocks application class." name)))
 
-(defun start-webapp (class &rest initargs &key name &allow-other-keys)
+(defun start-webapp (class &rest initargs
+		     &key (name (attributize-name class)) &allow-other-keys)
   "Starts the web application"
   (check-webapp class)
-  (unless name 
-    (setq name (attributize-name class)))
   (let ((app (get-webapp name nil)))
     (when app
       (warn "An instance of ~A with name ~A is already running, ignoring start request"
 	    class name)
       (return-from start-webapp))
-    (setq app (apply #'make-instance class 
-		     (append (list :name name)
-			     (remove-keyword-parameter initargs :name))))
-    (initialize-webapp app)
-    (enable-webapp app)
-    app))
+    ;; only pass name when truly given
+    (setq app (apply #'make-instance class initargs))
+    (let ((*default-webapp* app))
+      (declare (special *default-webapp*))
+      (initialize-webapp app)
+      (enable-webapp app)
+      app)))
 
 (defun enable-webapp (app)
   "Make sure the app with the \"\" prefix is always the last one and that there
@@ -189,25 +250,6 @@ called (primarily for backward compatibility"
     (start-weblocks))
   (open-stores))
 
-(defmethod initialize-webapp :after ((app weblocks-webapp))
-  "Setup per-webapp debugging support for toolbar rendering"
-  (flet ((compute-debug-dependencies ()
-	   (append (list (make-local-dependency :script "weblocks-debug"))
-		   (dependencies "debug-toolbar"))))
-    (cond ((weblocks-webapp-debug app)
-	   (enable-global-debugging)
-	   (setf (weblocks-webapp-application-dependencies app)
-		 (compact-dependencies 
-		  (append 
-		   (weblocks-webapp-application-dependencies app)
-		   (compute-debug-dependencies)))))
-	  (t
-	   (let ((debug-deps (compute-debug-dependencies)))
-	     (setf (weblocks-webapp-application-dependencies app)
-		   (remove-if (lambda (dep)
-				(member dep debug-deps :test #'dependencies-equalp))
-			      (weblocks-webapp-application-dependencies app))))))))
-
 (defun stop-webapp (name)
   "Stops the web application"
   (let ((app (find-app name)))
@@ -223,7 +265,10 @@ called (primarily for backward compatibility"
   "When all webapps are shut down, close any open stores and stop the weblocks server"
   (when (null *active-webapps*)
     (close-stores)
-    (stop-weblocks)))
+    (setf *last-session* nil)
+    (reset-sessions)
+    (stop-server *weblocks-server*)
+    (setf *weblocks-server* nil)))
 
 (defun find-app (name)
   (let ((app (get-webapp name nil))
@@ -245,6 +290,10 @@ called (primarily for backward compatibility"
 ;; These procedures are relative to the current request's selected webapp
 ;;
 
+(defvar *current-webapp*)
+(setf (documentation '*uri-tokens* 'variable)
+      "A currently active web application.")
+
 (defun current-webapp ()
   "Returns the currently invoked instance of a web application."
   (declare (special *current-webapp*))
@@ -258,7 +307,8 @@ called (primarily for backward compatibility"
   "Returns a list of dependencies on scripts and/or stylesheets that
    will persist throughout the whole application. See documentation for
    'widget-application-dependencies' for more details."
-  (weblocks-webapp-application-dependencies app))
+  (build-local-dependencies
+   (weblocks-webapp-application-dependencies app)))
 
 (defun webapp-name (&optional (app (current-webapp)))
   "Returns the name of the web application (also see 'defwebapp'). Please
@@ -278,17 +328,33 @@ called (primarily for backward compatibility"
 
 (defun webapp-init-user-session (&optional (app (current-webapp)))
   "Returns the init function for the user session."
-  (symbol-function (weblocks-webapp-init-user-session app)))
+  (let ((init (weblocks-webapp-init-user-session app)))
+    (etypecase init
+      (function init)
+      (symbol (symbol-function init)))))
 
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
-  (concatenate 'string (webapp-prefix app) uri))
+  "Makes a URI for a weblocks application (by concatenating the app
+prefix and the provided uri)."
+  (remove-spurious-slashes
+    (concatenate 'string "/" (webapp-prefix app) "/" uri)))
+
+(defun make-webapp-public-file-uri (uri &optional (app (current-webapp)))
+  "Makes a URI for a public file for a weblocks application (by
+concatenating the app prefix, the public folder prefix, and the
+provider URI)."
+  (make-webapp-uri
+    (concatenate 'string (weblocks-webapp-public-files-uri-prefix app) "/" uri)
+    app))
 
 (defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
   (declare (special *current-webapp*))
   (let ((webapp-session (session-value *current-webapp* session)))
-    (when webapp-session
-      (gethash symbol webapp-session))))
+    (cond (webapp-session
+	   (gethash symbol webapp-session))
+	  (*current-webapp* (values nil nil))
+	  (t nil))))
 
 (defun (setf webapp-session-value) (value symbol)
   "Set a session value for the currently runnin webapp"
@@ -359,3 +425,37 @@ called (primarily for backward compatibility"
   `(add-webapp-permanent-action ',webapp-class ',name
 				(lambda/cc ,action-params
 				  ,@body)))
+
+(defgeneric compute-webapp-public-files-path (app)
+  (:documentation "If 'weblocks-webapp-public-files-path' is
+nil (default), tries a number of strategies to determine a default
+location of public files. First, an asdf system with the name of the
+application ('weblocks-webapp-name') is searched for. If found, a
+directory 'pub' is searched for in the parent directory of the asdf
+file. If found, this directory is returned as the physical
+value. Otherwise, 'weblocks.asd' is found, and the 'pub' folder in
+that directory is returned.")
+  (:method (app)
+    (if (weblocks-webapp-public-files-path app)
+	(weblocks-webapp-public-files-path app)
+	(let ((path (ignore-errors
+		      (compute-public-files-path
+		       (attributize-name
+			(weblocks-webapp-name app))))))
+	  (if (and path (probe-file path))
+	      path
+	      (compute-public-files-path :weblocks))))))
+
+(defgeneric compute-webapp-public-files-uri-prefix (app)
+  (:documentation "Computes a virtual uri for public files of an
+  app. Default implementation concatenates webapp-prefix with the
+  public-files-uri-prefix of a webapp.")
+  (:method (app)
+    (make-webapp-uri
+      (weblocks-webapp-public-files-uri-prefix app)
+      app)))
+
+(defun compute-webapp-public-files-uri-prefix-util (&optional (app (current-webapp)))
+  "A wrapper around 'compute-webapp-public-files-uri-prefix' that
+  handles current app."
+  (compute-webapp-public-files-uri-prefix app))

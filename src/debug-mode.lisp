@@ -26,7 +26,7 @@ present the user with a toolbar that aids development."
     (:div :class "debug-toolbar"
 	  (:a :href (make-action-url "debug-reset-sessions")
 	      :title "Reset Sessions"
-	      (:img :src (make-webapp-uri "/pub/images/reset.png")
+	      (:img :src (make-webapp-public-file-uri "pub/images/reset.png")
 		    :alt "Reset Sessions")))))
 
 (defun initialize-debug-actions ()

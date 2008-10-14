@@ -50,6 +50,16 @@ Ex:
   (:method ((name integer))
     (format nil "~A" name)))
 
+(defun unattributized-name (name &optional (type-marker 'uname))
+  "Call `attributize-name' with NAME and modify the result to be a
+variant that is still usable in all cases where `attributize-name'
+results can be used, but is extremely unlikely to ever be returned by
+`attributize-name'.
+
+TYPE-MARKER is just a label for human discernment of the different
+users of this function."
+  (format nil "~:@(~A~)-~A" type-marker (attributize-name name)))
+
 (defun list->assoc (lst &key (map #'identity))
   "Nondestructively convert a list of elements to an association
 list If an element of a list is a cons cell, it is left as
@@ -140,7 +150,7 @@ number of extra tags to render.
 Ex:
 \(render-extra-tags \"extra-\" 2) =>
 \"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
-  (with-html-output (*weblocks-output-stream*)
+  (with-html-output (*weblocks-output-stream* nil :indent (weblocks-webapp-debug (current-webapp)))
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "<!-- empty -->")))))
@@ -204,17 +214,24 @@ instead of 'delimeter'.
         do (setf i (remove-keyword-parameter i argument))
         finally (return i)))
 
-(defun tokenize-uri (uri)
-  "Tokenizes a URI into a list of elements.
+(defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
+                                                                (current-webapp))))
+  "Tokenizes an URI into a list of elements.
 
 ex:
 \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
-  (remove-if (curry #'string-equal "")
-	     (cl-ppcre:split "[/\\\\]" 
-			     (cl-ppcre:regex-replace "\\?.*" 
-						     (subseq uri (length (webapp-prefix)))
-						     ""))))
+  (loop for token in (cl-ppcre:split "[/\\\\]" 
+				     (cl-ppcre:regex-replace "\\?.*"
+							     (if remove-app-prefix
+								 (subseq uri
+                                                                         (length
+                                                                           (webapp-prefix
+                                                                             app)))
+								 uri)
+							     ""))
+     unless (string-equal "" token)
+       collect (url-decode token)))
 
 (defun public-file-relative-path (type filename)
   "Constructs a relative path to a public file from the \"/pub\" directory.
@@ -257,7 +274,7 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 \(request-uri-path)
 => \"/foo/bar\""
   (declare (special *uri-tokens*))
-  (apply #'concatenate 'string (webapp-prefix) "/" (intersperse *uri-tokens* "/")))
+  (identity (cl-ppcre:regex-replace "/?(?:\\?.*)$" (request-uri) "")))
 
 (defun string-remove-left (str prefix &key ignore-case-p)
   "If string 'str' starts with 'prefix', remove 'prefix' from the
@@ -292,9 +309,8 @@ item before passing it to 'predicate'."
 (defun symbol-status (symbol)
   "Returns a status of 'symbol' in its package (internal, external,
 etc.)"
-  (multiple-value-bind (sym status)
-      (find-symbol (symbol-name symbol) (symbol-package symbol))
-    status))
+  (nth-value 1 (find-symbol (symbol-name symbol)
+			    (symbol-package symbol))))
 
 ;;; String helpers
 (defun string-invert-case (str)
@@ -419,7 +435,7 @@ in 'class'."
   (let ((elements (ensure-list elements)))
     (if elements
 	(when (funcall test (car list) (car elements))
-	  (list-starts-with (cdr list) (cdr elements)))
+	  (list-starts-with (cdr list) (cdr elements) :test test))
 	t)))
 
 (defun safe-subseq (sequence start &optional end)
@@ -430,4 +446,46 @@ in 'class'."
     (when (and end (> end length))
       (setf end length))
     (subseq sequence start end)))
+
+(defun find-own-symbol (name &optional (package nil packagep))
+  "Like `find-symbol', but reject symbols not really in PACKAGE."
+  (multiple-value-bind (sym status)
+      (if packagep (find-symbol name package) (find-symbol name))
+    (and (member status '(:internal :external))
+	 (values sym status))))
+
+;;; working with those pesky slashes
+(defun remove-spurious-slashes (str)
+  "Condense multiple consecutively occuring slashes in STR
+into a single slash.
+
+ex:
+
+(remove-spurious-slashes \"/ab/////c///\")
+=> \"/ab/c/\""
+  (with-output-to-string (s)
+    (loop for c across str
+          with last-char
+          unless (and (eql c #\/) (eql last-char #\/))
+            do (princ c s)
+          do (setf last-char c))
+    s))
+
+(defun strip-trailing-slashes (str)
+  "Relentlessly strip all trailing slashes from STR.
+A string solely consisting of slashes is no special case.
+
+Returns the number of stripped slashes as second value."
+  ;; we just count them and return an appropriate subsequence
+  (let ((n 0))
+    (loop for c across (reverse str)
+          while (eql c #\/)
+          do (incf n))
+    (values (subseq str 0 (- (length str) n)) n)))
+
+(defun maybe-add-trailing-slash (s)
+  "Supply a trailing slash if needed."
+  (if (equal (subseq s (1- (length s))) "/")
+    s
+    (concatenate 'string s "/")))
 

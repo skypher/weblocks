@@ -28,7 +28,7 @@
 	     (value (first-name *joe*)))
 	(render-view-field field view grid presentation value *joe*)))
   (:td :class "select"
-       (:div (:input :name "item-1" :type "checkbox" :value "t"))))
+       (:div (:input :name "item-1" :type "checkbox" :value "f"))))
 
 (deftest-html datagrid-render-view-field-select-2
     (with-request :get nil
@@ -104,12 +104,12 @@
 		      (:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
-			(:div (:input :name "item-2" :type "checkbox" :value "t")))
+			(:div (:input :name "item-2" :type "checkbox" :value "f")))
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
 		      (:tr :class "altern"
 		       (:td :class "select"
-			(:div (:input :name "item-1" :type "checkbox" :value "t")))
+			(:div (:input :name "item-1" :type "checkbox" :value "f")))
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
@@ -182,12 +182,12 @@
 		      (:th :class "manager" (:span #.(link-action-template "abc137" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
-			(:div (:input :name "item-2" :type "checkbox" :value "t")))
+			(:div (:input :name "item-2" :type "checkbox" :value "f")))
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
 		      (:tr :class "altern"
 		       (:td :class "select"
-			(:div (:input :name "item-1" :type "checkbox" :value "t")))
+			(:div (:input :name "item-1" :type "checkbox" :value "f")))
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
 		    :summary "Ordered by name, ascending."))
