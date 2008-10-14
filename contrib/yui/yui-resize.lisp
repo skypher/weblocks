@@ -11,6 +11,7 @@
   (apply body-fn widget args))
 
 (defmethod render-widget-body ((widget yui-resize) &rest args)
+  (declare (ignore args))
   (if (resize-panel widget) 
     (progn 
       (send-script

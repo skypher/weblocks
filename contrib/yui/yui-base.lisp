@@ -63,6 +63,7 @@
         (append (yui-component-config obj) config)))
 
 (defmethod render-widget-body ((widget yui-widget) &rest args)
+  (declare (ignore args))
   (send-script
     (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
             (setf (global-variable ,(yui-widget-variable widget))
