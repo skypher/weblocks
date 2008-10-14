@@ -44,6 +44,7 @@
 	  object. ")
    (widgets-ephemeral-p :accessor dispatcher-widgets-ephemeral-p
 			:initform t
+			:initarg :widgets-ephemeral-p
 			:documentation "Whether widgets should be
 			considered to exist for certain only if in the
 			`dispatcher-cache'.  When non-nil (the
