@@ -165,7 +165,7 @@ to my `application-dependencies' slot."
       (setf (weblocks-webapp-public-files-uri-prefix self)
             (slot-value self 'public-files-uri-prefix)))
     (let ((class-name (class-name (class-of self))))
-      (slot-default name class-name)
+      (slot-default name (attributize-name class-name))
       (slot-default init-user-session
 		    (or (find-symbol (symbol-name 'init-user-session)
 				     (symbol-package class-name))
@@ -213,19 +213,17 @@ to my `application-dependencies' slot."
   (unless (find-class name nil)
     (error "~a is not a valid weblocks application class." name)))
 
-(defun start-webapp (class &rest initargs &key name &allow-other-keys)
+(defun start-webapp (class &rest initargs
+		     &key (name (attributize-name class)) &allow-other-keys)
   "Starts the web application"
   (check-webapp class)
-  (unless name 
-    (setq name (attributize-name class)))
   (let ((app (get-webapp name nil)))
     (when app
       (warn "An instance of ~A with name ~A is already running, ignoring start request"
 	    class name)
       (return-from start-webapp))
-    (setq app (apply #'make-instance class
-		     (append (list :name name)
-			     (remove-keyword-parameter initargs :name))))
+    ;; only pass name when truly given
+    (setq app (apply #'make-instance class initargs))
     (let ((*default-webapp* app))
       (declare (special *default-webapp*))
       (initialize-webapp app)
