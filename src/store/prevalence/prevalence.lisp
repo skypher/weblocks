@@ -103,12 +103,16 @@
 	(gethash object-id (persistent-objects-of-class-by-id objects))
       obj)))
 
-(defmethod find-persistent-objects ((store prevalence-system) class-name
-				    &key order-by range)
+(defmethod find-persistent-objects ((store prevalence-system) class-name 
+				    &key (filter nil) order-by range)
+;  (break "~A ~A ~A" filter order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
-    (query store 'tx-find-persistent-objects-prevalence
-	   class-name)
+    (let ((seq (query store 'tx-find-persistent-objects-prevalence class-name)))
+      (if (and seq
+               (functionp filter))
+          (remove-if-not filter seq)
+          seq))
     order-by)
    range))
 
