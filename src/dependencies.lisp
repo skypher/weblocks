@@ -7,6 +7,7 @@
 	  render-dependency-in-page-head render-dependency-in-page-body-top
 	  render-dependency-in-page-body-bottom render-dependency-in-form-submit
 	  render-dependency-in-ajax-response
+          render-form-submit-dependencies
 	  make-local-dependency per-class-dependencies dependencies
 	  compact-dependencies build-local-dependencies))
 
