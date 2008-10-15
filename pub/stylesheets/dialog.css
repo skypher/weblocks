@@ -29,7 +29,7 @@
   position: fixed;
   _position: absolute; /* Degrade to this in IE for now */
   z-index: 725;
-  width: 40em;
+  width: 10em;
 }
 
 .dialog-body
