@@ -24,6 +24,7 @@
 ;;; Add a callback function that resets the flash widget after
 ;;; rendering. On ajax calls the BlindUp effect is added.
 (defmethod initialize-instance :after ((obj flash) &rest initargs)
+  (declare (ignore initargs))
   (push (lambda ()
 	  (when (and (flash-messages obj)
 		     (not (refresh-request-p))
