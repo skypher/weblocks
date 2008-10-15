@@ -11,16 +11,20 @@
 	  dataseq-common-ops dataseq-allow-pagination-p
 	  dataseq-pagination-widget dataseq-show-total-items-count-p
 	  dataseq-flash dataseq-data dataseq-data-count
-	  dataseq-persistent-query-function
-	  dataseq-render-pagination-widget dataseq-selection-empty-p
+	  dataseq-render-pagination-widget
+	  dataseq-render-pagination-widget-default
+          dataseq-selection-empty-p
 	  dataseq-clear-selection dataseq-item-selected-p
 	  dataseq-select-item dataseq-update-sort-column
 	  dataseq-field-sortable-p get-field-info-sort-path
 	  dataseq-sort-path dataseq-sort-direction dataseq-sort-slot
 	  negate-sort-direction humanize-sort-direction
-	  dataseq-render-operations dataseq-render-mining-bar
+	  dataseq-render-operations
+          dataseq-render-operations-default
+          dataseq-render-mining-bar
 	  render-dataseq-body dataseq-wrap-body-in-form-p
 	  render-total-items-message
+          dataseq-operations-action
 	  dataseq-data-form-class))
 
 (defmethod dataseq-data-form-class (obj)
@@ -187,7 +191,12 @@
 	  :initarg :flash
 	  :documentation "A flash widget provided by the dataseq to
 	  display relevant information to the user (errors, item
-	  modification information, etc.)"))
+	  modification information, etc.)")
+   ;; Post rendering information
+   (rendered-data-sequence :reader dataseq-rendered-data-sequence
+                           :initform nil
+                           :type sequence
+                           :documentation "A sequence of items currently rendered."))
   (:documentation "A base class for widgets that are designed to
   present a sequence of data items. This class provides functionality
   for data binding; sorting, selecting, and drilling down on items;
@@ -247,8 +256,8 @@ function designator, calls the function designated by
 (defun dataseq-data-count (obj)
   "Returns the number of items in the sequence."
   (if (function-designator-p (dataseq-on-query obj))
-      (funcall (dataseq-on-query obj)
-	       obj nil nil :countp t)
+      (length (funcall (dataseq-on-query obj)
+	       obj nil nil :countp t))
       (apply #'count-persistent-objects
 	     (dataseq-class-store obj)
 	     (dataseq-data-class obj)
@@ -275,6 +284,13 @@ will call the persistent store API with the given on-query-list."
   (:documentation
    "This function is responsible for rendering the pagination widget
 for the dataseq.")
+  (:method ((obj dataseq) &rest args)
+    (apply #'dataseq-render-pagination-widget-default obj args)))
+
+
+(defgeneric dataseq-render-pagination-widget-default (obj &rest args)
+  (:documentation
+   "This function renders the default the pagination widget for the dataseq.")
   (:method ((obj dataseq) &rest args)
     (declare (ignore args))
     (render-widget (dataseq-pagination-widget obj))))
@@ -398,15 +414,24 @@ for :desc and vica versa)."
   (:documentation
    "This function is responsible for rendering the operations for the
 widget deriving from dataseq. Specialize this function to provide
-custom operations rendering. Default implementation renders item-ops
-and common-ops as buttons. Note, default implementation renders item
-operations if render-item-ops-p argument is set to true (default), and
-common operations if render-common-ops-p is set to true (default).
+custom operations rendering. Default implementation is implemented by
+'dataseq-render-operations-default' function.
 
 Note, this function should take special care to respect
 dataseq-wrap-body-in-form-p because its return value determines
 whether the item ops should render their own form or they're already
 wrapped by a form of the widget. ")
+  (:method ((obj dataseq) &rest args)
+    (apply #'dataseq-render-operations-default obj args)))
+
+
+(defgeneric dataseq-render-operations-default (obj &rest args
+                                                    &key &allow-other-keys)
+  (:documentation
+   "The default implementation of operation rendering.  It renders item-ops
+and common-ops as buttons. Note, it renders item operations if
+render-item-ops-p argument is set to true (default), and common operations
+if render-common-ops-p is set to true (default).")
   (:method ((obj dataseq) &rest args)
     (declare (ignore args))
     (flet ((render-operations ()
