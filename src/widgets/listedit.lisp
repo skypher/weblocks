@@ -18,6 +18,7 @@
 				(flash-message (dataseq-flash obj)
 					       (format nil "Added ~A."
 						       (humanize-name (dataseq-data-class obj))))
+                                (safe-funcall (dataedit-on-add-item-completed obj) obj item)
 				(dataedit-reset-state obj))
 		  :on-cancel (lambda (w)
 			       (declare (ignore w))
