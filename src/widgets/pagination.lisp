@@ -65,6 +65,7 @@
   break up large amount of data into pages."))
 
 (defmethod initialize-instance :after ((obj pagination) &rest initargs)
+  (declare (ignore initargs))
   ; Mark error flag for reset on action
   (push (lambda ()
 	  (when (and (slot-value obj 'last-request-error-p)
@@ -81,6 +82,7 @@
 (defmethod (setf pagination-items-per-page) :around (value (obj pagination))
   (multiple-value-bind (begin end)
       (pagination-page-item-range obj)
+    (declare (ignore end))
     (call-next-method)
     (setf (pagination-current-page obj)
 	  (max 1 (ceiling begin value)))))
@@ -91,6 +93,7 @@ managed by a given pagination widget."
   (multiple-value-bind (page-count remainder)
       (ceiling (pagination-total-items pagination)
 	       (pagination-items-per-page pagination))
+    (declare (ignore remainder))
     page-count))
 
 (defgeneric pagination-render-total-item-count (obj &rest args)
@@ -99,6 +102,7 @@ managed by a given pagination widget."
 items if 'show-total-items' is set to true."))
 
 (defmethod pagination-render-total-item-count ((obj pagination) &rest args)
+  (declare (ignore args))
   (when (pagination-show-total-items-p obj)
     (with-html (:span :class "total-items"
 		      " (Total of " 
@@ -106,13 +110,15 @@ items if 'show-total-items' is set to true."))
 		      (str (proper-number-form (pagination-total-items obj) "Item"))
 		      ")"))))
 
-(defmethod render-widget-body ((obj pagination) &rest args)
-  (declare (special *request-hook*))
+(defmethod render-widget-body ((obj pagination) &rest args) 
+  (declare (ignore args)
+           (special *request-hook*))
   (when (> (pagination-page-count obj) 0)
     (with-html
       ; 'Previous' link
       (when (> (pagination-current-page obj) 1)
 	(render-link (lambda (&rest args)
+                       (declare (ignore args))
 		       (when (> (pagination-current-page obj) 1)
 			 (decf (pagination-current-page obj))
 			 (pagination-call-on-change obj)))
@@ -131,6 +137,7 @@ items if 'show-total-items' is set to true."))
 	       (pagination-page-count obj))
 	(str "&nbsp;")
 	(render-link (lambda (&rest args)
+                       (declare (ignore args))
 		       (when (< (pagination-current-page obj)
 				(pagination-page-count obj))
 			 (incf (pagination-current-page obj))
