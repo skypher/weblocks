@@ -4,6 +4,8 @@
 (export '(*default-cascade-delete-mixins-p* dataedit-mixin
 	  dataedit-on-add-item dataedit-allow-add-p
 	  dataedit-on-delete-items dataedit-cascade-delete-mixins-p
+	  dataedit-on-add-item-completed dataedit-on-delete-items-completed
+          dataedit-item-widget-data
 	  dataedit-allow-delete-p dataedit-item-data-view
 	  dataedit-item-form-view dataedit-ui-state
 	  dataedit-item-widget dataedit-create-drilldown-widget
@@ -24,6 +26,12 @@ documentation for more details.")
 		an item is added. The function should accept two
 		arguments (the widget object and a new item), and
 		should take appropriate action.")
+   (on-add-item-completed :accessor dataedit-on-add-item-completed
+                          :initform nil
+                          :initarg :on-add-item-completed
+                          :documentation "A function called by the widget when
+		an the add action is complete. The function should
+		accept two arguments (the widget object and a new item).")
    (allow-add-p :accessor dataedit-allow-add-p
 		:initform t
 		:initarg :allow-add-p
@@ -39,6 +47,14 @@ documentation for more details.")
 		    a value that has semantics similar to dataseq's
 		    'selection' slot). If the function is missing, the
 		    should be deleted via store API.")
+   (on-delete-items-completed :accessor dataedit-on-delete-items-completed
+                              :initform nil
+                              :initarg :on-delete-items-completed
+                              :documentation "A function called by the widget
+		    when the deletion of items has complted. The function
+		    should accept two arguments (the widget object and
+		    a value that has semantics similar to dataseq's
+		    'selection' slot). ")
    (cascade-delete-mixins-p :accessor dataedit-cascade-delete-mixins-p
 			    :initform *default-cascade-delete-mixins-p*
 			    :initarg :cascade-delete-mixins-p
@@ -46,7 +62,7 @@ documentation for more details.")
                             objects will be deleted from the store
                             when the parent object is deleted. By
                             default set to
-                            *default-cascade-delete-mixins-p*.")
+                            '*default-cascade-delete-mixins-p*'.")
    (allow-delete-p :accessor dataedit-allow-delete-p
 		   :initform t
 		   :initarg :allow-delete-p
@@ -143,9 +159,9 @@ in order to reset the state after the item widget has done its job."
 (defun dataedit-add-items-flow (obj sel)
   "Initializes the flow for adding items to the dataedit."
   (declare (ignore sel))
-  (setf (dataedit-ui-state obj) :add)
   (setf (dataedit-item-widget obj)
-	(dataedit-create-new-item-widget obj)))
+	(dataedit-create-new-item-widget obj))
+  (setf (dataedit-ui-state obj) :add))
 
 (defun dataedit-update-operations (obj &key
 				   (delete-fn #'dataedit-delete-items-flow)
@@ -174,3 +190,8 @@ in order to reset the state after the item widget has done its job."
 (defmethod dependencies append ((obj dataedit-mixin))
   (list (make-local-dependency :stylesheet "dataform")))
 
+
+(defgeneric dataedit-item-widget-data (w)
+  (:documentation "Returns the item held by the dataedit-item-widget.")
+  (:method ((w dataform))
+    (dataform-data w)))
