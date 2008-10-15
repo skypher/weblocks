@@ -3,7 +3,7 @@
 
 (export '(*last-session* start-weblocks stop-weblocks
 	  compute-public-files-path server-type
-	  server-version active-sessions))
+          session-name-string-pair))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -27,20 +27,21 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key debug (port 8080)
+(defun start-weblocks (&rest keys &key debug (port 8080) (cookie-name "weblocks-session") 
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to the
-client. Other keys are passed to 'hunchentoot:start-server'. Opens all
+client. Set ':cookie-name' keyword when you want to change the name of the
+cookie. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
   (if debug
       (enable-global-debugging)
       (disable-global-debugging))
   (when (null *weblocks-server*)
-    (setf *session-cookie-name* "weblocks-session")
+    (setf *session-cookie-name* cookie-name)
     (setf *weblocks-server*
 	  (apply #'start-server :port port
-		 (remove-keyword-parameters keys :port :debug)))
+		 (remove-keyword-parameters keys :port :debug :cookie-name)))
     (dolist (class *autostarting-webapps*)
       (unless (get-webapps-for-class class)
 	(start-webapp class :debug debug)))))
@@ -49,7 +50,11 @@ stores declared via 'defstore'."
   "Stops weblocks. Closes all stores declared via 'defstore'."
   (when (not (null *weblocks-server*))
     (dolist (app *active-webapps*)
-      (stop-webapp (weblocks-webapp-name app)))))
+      (stop-webapp (weblocks-webapp-name app)))
+    (setf *last-session* nil)
+    (reset-sessions)
+    (when (not (null *weblocks-server*)) (stop-server *weblocks-server*))
+    (setf *weblocks-server* nil)))
 
 (defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
   "Computes the directory of public files. The function uses the
