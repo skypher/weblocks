@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(composite composite-widgets *override-parent-p*))
+(export '(composite composite-widgets))
 
 (defwidget composite (widget)
   ((widgets :accessor composite-widgets
@@ -24,9 +24,6 @@
   (setf (slot-value obj 'widgets) nil)
   (setf (composite-widgets obj) widgets))
 
-(defparameter *override-parent-p* nil
-  "Allow parent overriding in (SETF COMPOSITE-WIDGETS).")
-
 (defmethod (setf composite-widgets) (new-value (comp composite))
   "Assign new children to the composite and update their parents.
 Signals an error if one of the children already has a parent
@@ -40,9 +37,7 @@ unless *OVERRIDE-PARENT-P* is set."
     ;; but we're a parent of new widgets we're passed
     (let ((new-widgets (ensure-list new-value)))
       (mapcar (lambda (child)
-                (if (and (widget-parent child) (not *override-parent-p*))
-                  (error "Widget ~A already has a parent." child)
-                  (setf (widget-parent child) comp)))
+                (setf (widget-parent child) comp))
               new-widgets)
       (setf children new-widgets))))
 
