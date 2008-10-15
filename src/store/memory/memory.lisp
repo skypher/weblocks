@@ -1,6 +1,8 @@
 
 (in-package :weblocks-memory)
 
+(export '(memory-store))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,11 +109,17 @@
 	(gethash object-id (persistent-objects-of-class-by-id objects))
       obj)))
 
-(defmethod find-persistent-objects ((store memory-store) object-class
-				    &key order-by range)
+(defmethod find-persistent-objects ((store memory-store) class-name
+				    &key (filter nil) order-by range)
+
+;  (break "~A ~A ~A" filter order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
-    (find-persistent-objects-aux store object-class)
+    (let ((seq (find-persistent-objects-aux store class-name)))
+      (if (and seq
+               (functionp filter))
+          (remove-if-not filter seq)
+          seq))
     order-by)
    range))
 
