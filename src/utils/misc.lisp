@@ -461,6 +461,20 @@ into a single slash.
 
 ex:
 
+(defun find-own-symbol (name &optional (package nil packagep))
+  "Like `find-symbol', but reject symbols not really in PACKAGE."
+  (multiple-value-bind (sym status)
+      (if packagep (find-symbol name package) (find-symbol name))
+    (and (member status '(:internal :external))
+	 (values sym status))))
+
+;;; working with those pesky slashes
+(defun remove-spurious-slashes (str)
+  "Condense multiple consecutively occuring slashes in STR
+into a single slash.
+
+ex:
+
 (remove-spurious-slashes \"/ab/////c///\")
 => \"/ab/c/\""
   (with-output-to-string (s)
