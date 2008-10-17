@@ -30,6 +30,7 @@
   (remhash object-name (memory-store-root-objects store)))
 
 (defmethod open-store ((store-type (eql :memory)) &rest args)
+  (declare (ignore args))
   (setf *default-store* (make-instance 'memory-store)))
 
 (defmethod close-store ((store memory-store))
