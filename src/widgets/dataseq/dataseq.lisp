@@ -9,6 +9,7 @@
 	  dataseq-autoset-drilled-down-item-p
 	  dataseq-allow-operations-p dataseq-item-ops
 	  dataseq-common-ops dataseq-allow-pagination-p
+	  dataseq-persistent-query-function
 	  dataseq-pagination-widget dataseq-show-total-items-count-p
 	  dataseq-flash dataseq-data dataseq-data-count
 	  dataseq-render-pagination-widget
@@ -256,8 +257,8 @@ function designator, calls the function designated by
 (defun dataseq-data-count (obj)
   "Returns the number of items in the sequence."
   (if (function-designator-p (dataseq-on-query obj))
-      (length (funcall (dataseq-on-query obj)
-	       obj nil nil :countp t))
+      (funcall (dataseq-on-query obj)
+	       obj nil nil :countp t)
       (apply #'count-persistent-objects
 	     (dataseq-class-store obj)
 	     (dataseq-data-class obj)
