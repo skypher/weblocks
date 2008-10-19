@@ -43,15 +43,16 @@
 		       (puri:uri "/pub/stylesheets/navigation.css"))
 	       :test puri:uri=))
 
-(deftest widget-dependencies-2
-    (with-request :get nil
-      (mapcar
-       (curry #'format nil "~A")
-       (mapcar #'dependency-url (dependencies (make-instance 'gridedit :data-class 'employee)))))
-  ; note, pagination and dataform are there because for gridedit and
-  ; datagrid widget-dependencies is specialized
-  ("/pub/stylesheets/dataform.css" "/pub/stylesheets/pagination.css" "/pub/stylesheets/datagrid.css"
-				   "/pub/scripts/datagrid.js" "/pub/stylesheets/dataseq.css"))
+(addtest widget-dependencies-2
+  (ensure-same
+   (mapcar #'dependency-url
+	   (dependencies (make-instance 'gridedit :data-class 'employee)))
+   ;; note, pagination and dataform are there because for gridedit and
+   ;; datagrid widget-dependencies is specialized
+   '(#U"/pub/stylesheets/dataform.css" #U"/pub/stylesheets/pagination.css"
+     #U"/pub/stylesheets/datagrid.css" #U"/pub/scripts/datagrid.js"
+     #U"/pub/stylesheets/dataseq.css")
+   :test set-equal-uri=))
 
 (deftest widget-dependencies-3
     (with-request :get nil
