@@ -150,7 +150,7 @@ number of extra tags to render.
 Ex:
 \(render-extra-tags \"extra-\" 2) =>
 \"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
-  (with-html-output (*weblocks-output-stream* nil :indent (weblocks-webapp-debug (current-webapp)))
+  (with-html-output (*weblocks-output-stream*)
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
        do (htm (:div :class attr "<!-- empty -->")))))
@@ -446,20 +446,6 @@ in 'class'."
     (when (and end (> end length))
       (setf end length))
     (subseq sequence start end)))
-
-(defun find-own-symbol (name &optional (package nil packagep))
-  "Like `find-symbol', but reject symbols not really in PACKAGE."
-  (multiple-value-bind (sym status)
-      (if packagep (find-symbol name package) (find-symbol name))
-    (and (member status '(:internal :external))
-	 (values sym status))))
-
-;;; working with those pesky slashes
-(defun remove-spurious-slashes (str)
-  "Condense multiple consecutively occuring slashes in STR
-into a single slash.
-
-ex:
 
 (defun find-own-symbol (name &optional (package nil packagep))
   "Like `find-symbol', but reject symbols not really in PACKAGE."

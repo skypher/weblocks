@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*last-session* start-weblocks stop-weblocks
-	  compute-public-files-path server-type
+	  compute-public-files-path server-type server-version
           session-name-string-pair))
 
 (defvar *weblocks-server* nil

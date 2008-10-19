@@ -235,7 +235,7 @@ differently.
 (defmethod view-caption ((view form-view))
   (if (slot-value view 'caption)
       (slot-value view 'caption)
-      (with-html-output-to-string (out nil :indent (weblocks-webapp-debug (current-webapp)))
+      (with-html-output-to-string (out)
 	(:span :class "action" "Modifying:&nbsp;")
 	(:span :class "object" "~A"))))
 

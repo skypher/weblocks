@@ -85,10 +85,9 @@ inserted into the page to redraw the dialog."
 	  (call callee (lambda (new-callee)
 			 (setf (current-dialog) (make-dialog :title title
 							     :widget new-callee
-                                                             :close close
-                                                             :css-class css-class))
-			 (push (json-function (show-dialog-js title new-callee css-class close))
-			       *on-ajax-complete-scripts*)))
+							     :close close
+							     :css-class css-class))
+                         (send-script (show-dialog-js title new-callee css-class close))))
 	(setf (current-dialog) nil)
 	(send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))

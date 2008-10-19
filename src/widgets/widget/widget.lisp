@@ -184,7 +184,7 @@ Additionally, calls 'dependencies' and adds the returned items to
 *page-dependencies*. This is later used by Weblocks to declare
 stylesheets and javascript links in the page header."))
 
-(defmethod render-widget (obj &key inlinep &allow-other-keys)
+(defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
   (declare (special *page-dependencies*))
   (if (ajax-request-p)
     (dolist (dep (dependencies obj))

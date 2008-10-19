@@ -56,8 +56,9 @@
                          same package as 'name'. This function will accept a single parameter - a 
                          composite widget at the root of the application. 'init-user-session' is 
                          responsible for adding initial widgets to this composite.")
-   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil
-	  :documentation "Turns on indentation of HTML for easier visual inspection."))
+   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
+   (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p
+		  :documentation "Turns on indentation of HTML for easier visual inspection."))
   (:metaclass webapp-class)
   (:documentation 
 "A class that encapsulates a unique web application and all relevant rnesources.
@@ -164,6 +165,7 @@ to my `application-dependencies' slot."
     (when (slot-boundp self 'public-files-uri-prefix)
       (setf (weblocks-webapp-public-files-uri-prefix self)
             (slot-value self 'public-files-uri-prefix)))
+    (slot-default html-indent-p (weblocks-webapp-debug self))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session

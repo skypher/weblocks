@@ -28,7 +28,7 @@
 (defmethod view-caption ((view data-view))
   (if (slot-value view 'caption)
       (slot-value view 'caption)
-      (with-html-output-to-string (out nil :indent (weblocks-webapp-debug (current-webapp)))
+      (with-html-output-to-string (out)
 	(:span :class "action" "Viewing:&nbsp;")
 	(:span :class "object" "~A"))))
 

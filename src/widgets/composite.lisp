@@ -42,6 +42,7 @@ unless *OVERRIDE-PARENT-P* is set."
       (setf children new-widgets))))
 
 (defmethod render-widget-body ((obj composite) &rest args)
+  (declare (ignore args))
   (mapc (lambda (w)
 	  (render-widget w))
 	(composite-widgets obj)))
