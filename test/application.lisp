@@ -1,24 +1,26 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite .application-suite (weblocks-suite)
+  ())
+
 (defwebapp hello-webapp)
 
 ;;; test defwebapp
 (addtest defwebapp-simple
   (with-webapp (:class-name 'hello-webapp)
     (ensure-same (webapp-name) "hello-webapp" :test string-equal)
-    (ensure-same (mapcar (curry #'format nil "~A")
-			 (mapcar #'dependency-url (webapp-application-dependencies)))
-		 '("/pub/stylesheets/layout.css"
-		   "/pub/stylesheets/main.css"
-		   "/pub/stylesheets/dialog.css"
-		   "/pub/scripts/prototype.js"
-		   "/pub/scripts/scriptaculous.js"
-		   "/pub/scripts/shortcut.js"
-		   "/pub/scripts/weblocks.js"
-		   "/pub/scripts/dialog.js")
-		 :test set-equal-equal)
-    (ensure-same (webapp-description) "foo bar")))
+    (ensure-same (mapcar #'dependency-url (webapp-application-dependencies))
+		 '(#U"/hello-webapp/pub/stylesheets/layout.css"
+		   #U"/hello-webapp/pub/stylesheets/main.css"
+		   #U"/hello-webapp/pub/stylesheets/dialog.css"
+		   #U"/hello-webapp/pub/scripts/prototype.js"
+		   #U"/hello-webapp/pub/scripts/scriptaculous.js"
+		   #U"/hello-webapp/pub/scripts/shortcut.js"
+		   #U"/hello-webapp/pub/scripts/weblocks.js"
+		   #U"/hello-webapp/pub/scripts/dialog.js")
+		 :test set-equal-uri=)
+    (ensure-null (webapp-description))))
 
 
 (defwebapp hello2-webapp
