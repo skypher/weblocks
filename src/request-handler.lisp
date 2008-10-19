@@ -94,7 +94,8 @@ customize behavior)."))
 	    (*current-navigation-url* "/") *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	    *page-dependencies* *current-page-description*
-	    *uri-tokens-fully-consumed*)
+	    *uri-tokens-fully-consumed*
+	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 	(declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
 			  *current-page-description* *uri-tokens-fully-consumed*))

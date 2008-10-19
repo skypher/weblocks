@@ -11,7 +11,8 @@
 (deftestsuite application-suite ()
   ()
   (:dynamic-variables (weblocks::*current-webapp*
-		       (make-instance 'weblocks::weblocks-webapp :prefix "")))
+		       (make-instance 'weblocks::weblocks-webapp :prefix ""
+				      :html-indent-p nil)))
   (:setup 
    (setf (weblocks::weblocks-webapp-init-user-session weblocks::*current-webapp*)
 	 (lambda (&rest args)

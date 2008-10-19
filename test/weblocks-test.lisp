@@ -140,9 +140,8 @@ and then compares the string to the expected result."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
-                     (if (not class-name)
-                        (append initargs '(:prefix ""))
-                        initargs)))
+		     `(,@initargs ,@(and (not class-name) '(:prefix ""))
+		       :html-indent-p nil)))
 	 (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (if full

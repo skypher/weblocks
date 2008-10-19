@@ -67,7 +67,7 @@ variable. All html should be rendered to this stream.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."
-  `(with-html-output (*weblocks-output-stream* nil :indent (weblocks-webapp-debug (current-webapp)))
+  `(with-html-output (*weblocks-output-stream* nil)
      ,@body))
 
 (defmacro with-javascript (source &rest args)
