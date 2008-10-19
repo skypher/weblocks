@@ -77,6 +77,14 @@ The function serves all started applications"
 			   (tokenize-uri app-pub-prefix nil)
 			   :test #'string=)
 	 (log-message :debug "Dispatching to public file")
+         ;; set caching parameters for static files
+         ;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
+         (if (weblocks-webapp-debug app)
+           (no-cache)
+           (let ((cache-time (weblocks-webapp-public-files-cache-time app)))
+             (check-type cache-time integer)
+             (setf (header-out "Expires") (rfc-1123-date (+ (get-universal-time) cache-time)))
+             (setf (header-out "Cache-Control") (format nil "max-age=~D" (max 0 cache-time)))))
 	 (return-from weblocks-dispatcher
 	   (funcall (create-folder-dispatcher-and-handler 
 		     (maybe-add-trailing-slash app-pub-prefix)

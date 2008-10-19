@@ -41,6 +41,12 @@
 			    initialized to 'pub'. The final uri prefix
 			    for application public files is computed
 			    by 'compute-webapp-public-files-uri-prefix'.")
+   (public-files-cache-time :accessor weblocks-webapp-public-files-cache-time
+                            :initform 3600
+                            :initarg :public-files-cache-time
+                            :type integer
+                            :documentation "HTTP cache time for public files in seconds.
+                            Caching is automatically disabled in debug mode.")
    (prefix :reader weblocks-webapp-prefix :initarg :prefix :type string
 	   :documentation "The default dispatch will allow a webapp to be invoked 
               as a subtree of the URI space at this site.  This does not support 
@@ -133,6 +139,9 @@ computed with 'compute-webapp-public-files-uri-prefix'. Note, the uri
 computed by 'compute-webapp-public-files-uri-prefix' is used to
 generate dependencies and to set up a Hunchentoot handler to map from
 the uri to the path specified by public-files-path.
+
+:public-files-cache-time - make the client cache public files for N
+seconds (default 3600). Caching is disabled in debug mode.
 
 :init-user-session - A function object that is used to initialize new
 user sessions. If it is not passed, a function named
