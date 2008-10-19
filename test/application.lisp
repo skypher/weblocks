@@ -63,6 +63,9 @@
 
 (addtest defwebapp-pub-prefix-2
   (with-webapp (:class-name 'hello7-webapp)
-    (ensure-same (webapp-public-files-uri-prefix) "/foo/pub")
+    (ensure-same (webapp-prefix) "/foo")
+    (ensure-same (webapp-public-files-uri-prefix) "/pub")
+    (ensure-same (compute-webapp-public-files-uri-prefix
+		  (weblocks::current-webapp)) "/foo/pub")
     (ensure-same (make-webapp-public-file-uri "foo.css") "/foo/pub/foo.css")))
 
