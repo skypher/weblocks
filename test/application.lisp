@@ -71,3 +71,8 @@
 		  (weblocks::current-webapp)) "/foo/pub")
     (ensure-same (make-webapp-public-file-uri "foo.css") "/foo/pub/foo.css")))
 
+(addtest session-value
+  (with-webapp ()
+    (setf (webapp-session-value 'foo) 'bar)
+    (ensure-same (webapp-session-value 'foo) 'bar)))
+

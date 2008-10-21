@@ -361,7 +361,7 @@ provider URI)."
 (defun webapp-session-value (symbol &optional (session *session*))
   "Get a session value from the currently running webapp"
   (declare (special *current-webapp*))
-  (let ((webapp-session (session-value *current-webapp* session)))
+  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)) session)))
     (cond (webapp-session
 	   (gethash symbol webapp-session))
 	  (*current-webapp* (values nil nil))
@@ -370,10 +370,10 @@ provider URI)."
 (defun (setf webapp-session-value) (value symbol)
   "Set a session value for the currently runnin webapp"
   (declare (special *current-webapp*))
-  (let ((webapp-session (session-value *current-webapp*)))
+  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)))))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test 'equal)
-	    (session-value *current-webapp*) webapp-session))
+	    (session-value (class-name (class-of *current-webapp*))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
 
