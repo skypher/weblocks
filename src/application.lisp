@@ -12,7 +12,8 @@
 	  define-permanent-action/cc remove-webapp-permanent-action
 	  compute-webapp-public-files-path
 	  compute-webapp-public-files-uri-prefix
-	  compute-webapp-public-files-uri-prefix-util))
+	  compute-webapp-public-files-uri-prefix-util
+          current-webapp))
 
 (defvar *registered-webapps* nil
   "A list of applications that the system knows about")
