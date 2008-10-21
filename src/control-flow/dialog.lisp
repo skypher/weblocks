@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(do-dialog do-choice do-confirmation do-information))
+(export '(do-dialog do-choice do-confirmation do-information current-dialog))
 
 (defstruct dialog
   "A structure that stores information about a currently displayed
