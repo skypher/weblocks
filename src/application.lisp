@@ -63,7 +63,7 @@
                          composite widget at the root of the application. 'init-user-session' is 
                          responsible for adding initial widgets to this composite.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
-   (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p
+   (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))
   (:metaclass webapp-class)
   (:documentation 
