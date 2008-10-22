@@ -59,7 +59,9 @@ by default).
 	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
-	  (str name)))
+	  (etypecase name
+	    (string (htm (str name)))
+	    (function (funcall name)))))
     (log-link name action-code :id id :class class)))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
