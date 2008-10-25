@@ -80,7 +80,9 @@ The function serves all started applications"
          (return-from weblocks-dispatcher
                       (funcall (create-folder-dispatcher-and-handler 
                                  "/weblocks-common/pub/"
-                                 (compute-public-files-path :weblocks))
+                                 (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
+                                      it
+                                      #p"./pub")) ; as a last fallback
                                request)))
         ((list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri app-pub-prefix nil)
