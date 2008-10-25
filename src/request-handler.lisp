@@ -78,13 +78,13 @@ customize behavior)."))
 	  (when (weblocks-webapp-debug app)
 	    (initialize-debug-actions))
 	  (setf (root-composite) root-composite)
-          (handler-case
-              (funcall (webapp-init-user-session) root-composite)
-            (error (c)
-              ;; we don't want a half-finished session
-              (setf (root-composite) nil)
-              (reset-webapp-session)
-              (error c)))
+          (handler-bind
+            ;; we don't want a half-finished session
+            ((error (lambda (c)
+                      (setf (root-composite) nil)
+                      (reset-webapp-session)
+                      (error c))))
+            (funcall (webapp-init-user-session) root-composite))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
 	(when (cookie-in *session-cookie-name*)
 	  (redirect (remove-session-from-uri (request-uri)))))
