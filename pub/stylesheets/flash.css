@@ -2,17 +2,17 @@
 .flash .view
 {
   width: 100%;
-  background: #f8e9d8 url(/weblocks-default/pub/images/widget/flash/top_background.png) repeat-x;
+  background: #f8e9d8 url(/weblocks-common/pub/images/widget/flash/top_background.png) repeat-x;
 }
 
 .flash .view .extra-top-1
 {
-  background: url(/weblocks-default/pub/images/widget/flash/top_left.png) no-repeat top left;
+  background: url(/weblocks-common/pub/images/widget/flash/top_left.png) no-repeat top left;
 }
 
 .flash .view .extra-top-2
 {
-  background: url(/weblocks-default/pub/images/widget/flash/top_right.png) no-repeat top right;
+  background: url(/weblocks-common/pub/images/widget/flash/top_right.png) no-repeat top right;
   border-bottom-color: #ead8c2;
 }
 
@@ -35,7 +35,7 @@
   border-top-color: #fef9f6;
   border-bottom-color: #ead8c2;
   list-style-image: none;
-  background: url(/weblocks-default/pub/images/widget/flash/flag.png) no-repeat top left;
+  background: url(/weblocks-common/pub/images/widget/flash/flag.png) no-repeat top left;
 }
 
 /* Fake min-height for IE 6 */
@@ -46,17 +46,17 @@
 
 .flash .view .extra-bottom-1
 {
-  background: url(/weblocks-default/pub/images/widget/flash/bottom_background.png) repeat-x top;
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_background.png) repeat-x top;
   border-top-color: #fef9f6; 
 }
 
 .flash .view .extra-bottom-2
 {
-  background: url(/weblocks-default/pub/images/widget/flash/bottom_left.png) no-repeat top left;
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_left.png) no-repeat top left;
 }
 
 .flash .view .extra-bottom-3
 {
-  background: url(/weblocks-default/pub/images/widget/flash/bottom_right.png) no-repeat top right;
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_right.png) no-repeat top right;
 }
 

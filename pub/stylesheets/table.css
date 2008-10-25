@@ -30,7 +30,7 @@
 {
   border-bottom: 1px solid #dbeac1;
   padding-top: 1px;
-  background-image: url(/weblocks-default/pub/images/widget/table_border_top.png);
+  background-image: url(/weblocks-common/pub/images/widget/table_border_top.png);
   background-repeat: repeat-x;
   background-position: top;
 }

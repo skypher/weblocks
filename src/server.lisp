@@ -74,6 +74,15 @@ The function serves all started applications"
       (log-message :debug "Application dispatch for '~A'" script-name)
       (cond
 	((list-starts-with (tokenize-uri script-name nil)
+			   (tokenize-uri "/weblocks-common" nil)
+			   :test #'string=)
+	 (log-message :debug "Dispatching to common public file")
+         (return-from weblocks-dispatcher
+                      (funcall (create-folder-dispatcher-and-handler 
+                                 "/weblocks-common/pub/"
+                                 (compute-public-files-path :weblocks))
+                               request)))
+        ((list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri app-pub-prefix nil)
 			   :test #'string=)
 	 (log-message :debug "Dispatching to public file")
