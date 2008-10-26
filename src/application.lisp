@@ -48,10 +48,19 @@
                             :type integer
                             :documentation "HTTP cache time for public files in seconds.
                             Caching is automatically disabled in debug mode.")
+   (hostnames :reader weblocks-webapp-hostnames :type list
+         :initarg :hostnames :initform nil
+         :documentation "The hostnames (a list of strings) reserved for this webapp.
+         See section 14.32 of RFC 2616.
+         
+         Example: '(\"foo.com\" \"www.foo.com\" \"shoo.bar.org\")
+         
+         If NIL (the default), don't care about the hostname at all.
+         
+         TODO: support regex matching or wildcards here.")
    (prefix :reader weblocks-webapp-prefix :initarg :prefix :type string
-	   :documentation "The default dispatch will allow a webapp to be invoked 
-              as a subtree of the URI space at this site.  This does not support 
-              webapp dispatch on virtual hosts, browser types, etc.")
+	   :documentation "The subtree of the URI space at this site that belongs to
+           the webapp.")
    (application-dependencies :accessor weblocks-webapp-application-dependencies 
 			     :initarg :dependencies :initform nil :type list
 			     :documentation "The public dependencies for all pages rendered by this 
@@ -333,6 +342,15 @@ to my `application-dependencies' slot."
    description will be used for the composition of the page title
    displayed to the user. See 'page-title' for details."
   (weblocks-webapp-description app))
+
+(defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
+  "Does APP serve requests for HOSTNAME?"
+  (or (null (webapp-hostnames app))
+      (member hostname (webapp-hostnames app) :test #'equalp)))
+
+(defun webapp-hostnames (&optional (app (current-webapp)))
+  "Returns the hostnames this application will serve requests for."
+  (weblocks-webapp-hostnames app))
 
 (defun webapp-prefix (&optional (app (current-webapp)))
   "Returns the URL prefix of the application."
