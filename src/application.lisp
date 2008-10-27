@@ -456,27 +456,30 @@ provider URI)."
 				(lambda/cc ,action-params
 				  ,@body)))
 
-(defgeneric compute-webapp-public-files-path (app)
-  (:documentation "If 'weblocks-webapp-public-files-path' is
-nil (default), tries a number of strategies to determine a default
-location of public files. First, an asdf system with the name of the
-application ('weblocks-webapp-name') is searched for. If found, a
-directory 'pub' is searched for in the parent directory of the asdf
-file. If found, this directory is returned as the physical
-value. Otherwise, 'weblocks.asd' is found, and the 'pub' folder in
-that directory is returned.")
-  (:method (app)
-    (if (weblocks-webapp-public-files-path app)
-	(weblocks-webapp-public-files-path app)
-	(let ((path (ignore-errors
-		      (compute-public-files-path
-		       (attributize-name
-			(weblocks-webapp-name app))))))
-	  (if (and path (probe-file path))
-	      path
-              (progn
-                (warn "Couldn't determine application's public files folder, using standard Weblocks files.")
-                (compute-public-files-path :weblocks)))))))
+(let (warned)
+  (defgeneric compute-webapp-public-files-path (app)
+    (:documentation "If 'weblocks-webapp-public-files-path' is
+  nil (default), tries a number of strategies to determine a default
+  location of public files. First, an asdf system with the name of the
+  application ('weblocks-webapp-name') is searched for. If found, a
+  directory 'pub' is searched for in the parent directory of the asdf
+  file. If found, this directory is returned as the physical
+  value. Otherwise, 'weblocks.asd' is found, and the 'pub' folder in
+  that directory is returned.")
+    (:method (app)
+      (if (weblocks-webapp-public-files-path app)
+          (weblocks-webapp-public-files-path app)
+          (let ((path (ignore-errors
+                        (compute-public-files-path
+                         (attributize-name
+                          (weblocks-webapp-name app))))))
+            (if (and path (probe-file path))
+                path
+                (progn
+                  (and (weblocks-webapp-debug app) (not warned)
+                    (setf warned t)
+                    (warn "Couldn't determine application's public files folder, using standard Weblocks files."))
+                  (compute-public-files-path :weblocks))))))))
 
 (defgeneric compute-webapp-public-files-uri-prefix (app)
   (:documentation "Computes a virtual uri for public files of an
