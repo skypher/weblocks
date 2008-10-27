@@ -474,7 +474,9 @@ that directory is returned.")
 			(weblocks-webapp-name app))))))
 	  (if (and path (probe-file path))
 	      path
-	      (compute-public-files-path :weblocks))))))
+              (progn
+                (warn "Couldn't determine application's public files folder, using standard Weblocks files.")
+                (compute-public-files-path :weblocks)))))))
 
 (defgeneric compute-webapp-public-files-uri-prefix (app)
   (:documentation "Computes a virtual uri for public files of an
