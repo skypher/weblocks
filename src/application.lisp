@@ -346,7 +346,9 @@ to my `application-dependencies' slot."
 (defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
   "Does APP serve requests for HOSTNAME?"
   (or (null (webapp-hostnames app))
-      (member hostname (webapp-hostnames app) :test #'equalp)))
+      (member (car (cl-ppcre:split ":" hostname))
+              (webapp-hostnames app)
+              :test #'equalp)))
 
 (defun webapp-hostnames (&optional (app (current-webapp)))
   "Returns the hostnames this application will serve requests for."
