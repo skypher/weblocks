@@ -70,6 +70,11 @@ variable. All html should be rendered to this stream.")
   `(with-html-output (*weblocks-output-stream* nil)
      ,@body))
 
+(defmacro with-html-to-string (&body body)
+  "A wrapper around cl-who with-html-output-to-string macro."
+  `(with-html-output-to-string (*weblocks-output-stream* nil)
+     ,@body))
+
 (defmacro with-javascript (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
