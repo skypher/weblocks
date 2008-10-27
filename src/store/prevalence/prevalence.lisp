@@ -137,3 +137,7 @@ requires all objects to have the given value in the given slot."
 (defmethod count-persistent-objects ((store prevalence-system) class-name
 				     &key &allow-other-keys)
   (length (find-persistent-objects store class-name)))
+
+(defun make-persistent-instance (store class &rest initargs)
+  (persist-object store (apply #'make-instance class initargs)))
+
