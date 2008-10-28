@@ -251,15 +251,22 @@ to my `application-dependencies' slot."
       (enable-webapp app)
       app)))
 
+(defun sort-webapps (webapps) 
+  (let* ((webapps-sorted-by-prefix (sort webapps #'string> :key #'weblocks-webapp-prefix))
+         (webapps-sorted-by-hostname-and-prefix (stable-sort
+                                                  webapps-sorted-by-prefix
+                                                  (lambda (x y)
+                                                    (and x (null y)))
+                                                  :key #'weblocks-webapp-hostnames)))
+    webapps-sorted-by-hostname-and-prefix))
+
 (defun enable-webapp (app)
   "Make sure the app with the \"\" prefix is always the last one and that there
    is only one!"
-  (setf *active-webapps*
-	(sort (pushnew app *active-webapps*)
-	      #'string>
-	      :key #'weblocks-webapp-prefix))
-  (when (> (count "" (mapcar #'weblocks-webapp-prefix *active-webapps*) :test #'equal) 1)
-    (error "Cannot have two defaults dispatchers with prefix \"\"")))
+   (let ((webapps (sort-webapps (remove-duplicates (cons app *active-webapps*)))))
+     (if (> (count "" (mapcar #'weblocks-webapp-prefix *active-webapps*) :test #'equal) 1)
+       (error "Cannot have two defaults dispatchers with prefix \"\"")
+       (setf *active-webapps* webapps))))
 
 (defgeneric initialize-webapp (app)
   (:documentation "A protocol for performing any special initialization on the creation of a webapp object.")

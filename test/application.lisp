@@ -76,3 +76,27 @@
     (setf (webapp-session-value 'foo) 'bar)
     (ensure-same (webapp-session-value 'foo) 'bar)))
 
+(defwebapp host-1
+           :hostnames '("foo.com")
+           :prefix "/foo")
+
+(defwebapp host-2
+           :hostnames '("foo.com")
+           :prefix "/")
+
+(defwebapp host-3
+           :hostnames nil
+           :prefix "/foo")
+
+(defwebapp host-4
+           :hostnames nil
+           :prefix "/")
+
+(addtest webapp-order
+  (let ((host-1 (make-instance 'host-1))
+        (host-2 (make-instance 'host-2))
+        (host-3 (make-instance 'host-3))
+        (host-4 (make-instance 'host-4)))
+  (ensure-same (list host-1 host-2 host-3 host-4)
+               (weblocks::sort-webapps (list host-4 host-2 host-1 host-3)))))
+
