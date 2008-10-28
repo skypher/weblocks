@@ -143,7 +143,7 @@ character, nil otherwise."
   (loop for c across str
      always (whitespacep c)))
 
-(defun render-extra-tags (tag-class count)
+(defmethod render-extra-tags (tag-class count)
   "Renders extra tags to get around CSS limitations. 'tag-class'
 is a string that specifies the class name and 'count' is the
 number of extra tags to render.
