@@ -3,6 +3,7 @@
   (:use :cl :metabang.utilities :cl-prevalence :weblocks :weblocks-memory)
   (:shadowing-import-from :metabang.utilities #:size)
   (:shadowing-import-from :cl-prevalence #:id)
+  (:export make-persistent-instance)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
 
