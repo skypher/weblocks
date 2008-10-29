@@ -212,6 +212,7 @@
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
+   (str (with-javascript-to-string "$('id-123').show();"))
    (:form
     :class "dataseq-form"
     :action "/foo/bar"

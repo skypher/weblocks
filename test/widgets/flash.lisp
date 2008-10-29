@@ -30,7 +30,9 @@ widget."
 		     (:p "Foo"))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
-	 (:div :class "extra-bottom-3" "<!-- empty -->"))))
+	 (:div :class "extra-bottom-3" "<!-- empty -->")
+         (str (with-javascript-to-string "$('id-123').show();"))
+         )))
 
 (deftest render-widget-body-flash-2
     (with-request :get nil
@@ -75,8 +77,10 @@ widget."
 	(render-widget-body w)
 	(evaluate-flash-hooks)
 	*on-ajax-complete-scripts*))
-  ("new Function(\"new Effect.BlindUp('id-123');\")"
-   "new Function(\"$('id-123').show();\")"))
+  (mapcar (lambda (x)
+              (with-javascript-to-string x))
+          ("new Function(\"new Effect.BlindUp('id-123');\")"
+           "new Function(\"$('id-123').show();\")")))
 
 ;; After refresh, state shouldn't be reset
 (deftest render-widget-body-flash-5
