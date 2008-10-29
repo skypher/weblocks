@@ -131,13 +131,13 @@ end defunct|#
 					   ,(link-action-template "abc123" "Modify"
 								  :class "modify"
 								  :uri "/"))))))
-	 (:div :class "view menu"
+	 (:div :class "view menu" :id "MENU-test-navigation"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li :class "selected-item" (:span "Test1"))
-		    (:li (:a :href "/test2" "Test2")))
+	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" :class "selected-item" (:span "Test1"))
+		    (:li :id "MENU-ITEM-test-navigation-test2" (:a :href "/test2" "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -163,13 +163,13 @@ end defunct|#
 			   (:div :class "extra-bottom-1" "<!-- empty -->")
 			   (:div :class "extra-bottom-2" "<!-- empty -->")
 			   (:div :class "extra-bottom-3" "<!-- empty -->"))))
-	 (:div :class "view menu"
+	 (:div :class "view menu" :id "MENU-test-navigation"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "/test1" "Test1"))
-		    (:li :class "selected-item" (:span "Test2")))
+	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" (:a :href "/test1" "Test1"))
+		    (:li :id "MENU-ITEM-test-navigation-test2" :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))))
