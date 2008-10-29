@@ -21,8 +21,8 @@ state."))
 (do-external-symbols (s (find-package :cont))
   (export (list s)))
 
-(export '(*weblocks-output-stream* with-html reset-sessions str
-	  with-javascript root-composite))
+(export '(*weblocks-output-stream* with-html with-html-to-string
+          reset-sessions str with-javascript with-javascript-to-string root-composite))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -75,14 +75,22 @@ variable. All html should be rendered to this stream.")
   `(with-html-output-to-string (*weblocks-output-stream* nil)
      ,@body))
 
+(defun %js (source &rest args)
+  "Helper function for WITH-JAVASCRIPT macros."
+  `(:script :type "text/javascript"
+            (fmt "~%// <![CDATA[~%")
+            (str (format nil ,source ,@args))
+            (fmt "~%// ]]>~%")))
+
 (defmacro with-javascript (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
-  `(with-html
-     (:script :type "text/javascript"
-	      (fmt "~%// <![CDATA[~%")
-	      (fmt ,source ,@args)
-	      (fmt "~%// ]]>~%"))))
+  `(with-html ,(apply #'%js source args)))
+
+(defmacro with-javascript-to-string (source &rest args)
+  "Places 'source' between script and CDATA elements. Used to avoid
+having to worry about special characters in JavaScript code."
+  `(with-html-to-string ,(apply #'%js source args)))
 
 (defmacro root-composite ()
   "Expands to code that can be used as a place to access to the root
