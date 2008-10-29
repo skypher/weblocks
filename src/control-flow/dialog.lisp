@@ -14,7 +14,7 @@ about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
   `(webapp-session-value 'dialog-contents))
 
-(defun show-dialog-js (title widget css-class &optional close escape-script-tags-p)
+(defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
 the widget inside."
   (flet ((escape-script-tags (source)
@@ -65,7 +65,7 @@ inserted into the page to redraw the dialog."
 	  "Event.observe(window, 'load', function() {~%~
              ~A~%~
         });"
-	(show-dialog-js (dialog-title current-dialog)
+	(make-dialog-js (dialog-title current-dialog)
 			(dialog-widget current-dialog)
 			(dialog-css-class current-dialog)
 			(dialog-close current-dialog)
@@ -87,7 +87,7 @@ inserted into the page to redraw the dialog."
 							     :widget new-callee
 							     :close close
 							     :css-class css-class))
-                         (send-script (show-dialog-js title new-callee css-class close))))
+                         (send-script (make-dialog-js title new-callee css-class close))))
 	(setf (current-dialog) nil)
 	(send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))

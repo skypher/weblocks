@@ -69,6 +69,16 @@ that FORM's values and the literal VALUES are equal."
 			       `',(first values)
 			       `(values . ,(mapcar (f_ `',_) values)))))))
 
+(defmacro defjstest (name form value)
+  "Define a test in an appropriate testsuite called NAME, ensuring
+that FORM's values and the literal VALUES are equal."
+  `(progn
+     (set-sensible-suite)
+     (addtest ,name
+       (ensure-same ,form ,(if (atom value)
+                             `(with-javascript-to-string ,value)
+                             `(mapcar (lambda (x) (with-javascript-to-string x)) ',value))))))
+
 (defun test-weblocks (&optional (verbose t))
   "Call this function to run all unit tests defined in 'weblocks-test'
 package. This function tests weblocks in a clean environment. See
