@@ -396,6 +396,7 @@ end defunct|#
   "test-nav-2")
 
 ;;; test reset-navigation-widgets
+#+(or) ; function no longer existent
 (deftest reset-navigation-widgets-1
     (with-request :get nil
       (let ((site (create-site-layout))

@@ -77,6 +77,7 @@
     (ensure-same (slot-value (dataform-data dataform) 'age) 18)))
 
 ;;; make sure on-cancel/on-success/on-close callbacks work as expected
+#+(or)
 (addtest render-dataform-callbacks
   (let* (on-cancel-called-p
 	 on-success-called-p
