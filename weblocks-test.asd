@@ -120,7 +120,7 @@
 				       (:file "flash")
 				       (:file "datalist")
 				       (:file "listedit")
-				       (:module dataseq
+				       #+(or)(:module dataseq
 						:components ((:file "dataseq")))
 				       (:module dataedit
 						:components ((:file "dataedit")
