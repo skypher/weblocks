@@ -1,7 +1,7 @@
 
 (defpackage #:{APPNAME}
   (:use :cl :weblocks
-        :f-underscore)
+        :f-underscore :anaphora)
   (:documentation
    "A web application based on Weblocks."))
 
