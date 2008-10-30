@@ -135,9 +135,8 @@ requires all objects to have the given value in the given slot."
       (loop for i being the hash-values in (persistent-objects-of-class-by-id objects)
 	 collect i))))
 
-(defmethod count-persistent-objects ((store prevalence-system) class-name
-				     &key &allow-other-keys)
-  (length (find-persistent-objects store class-name)))
+(defmethod count-persistent-objects ((store prevalence-system) class-name &rest args)
+  (length (apply #'find-persistent-objects store class-name args)))
 
 (defun make-persistent-instance (store class &rest initargs)
   (persist-object store (apply #'make-instance class initargs)))

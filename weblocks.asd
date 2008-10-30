@@ -90,7 +90,8 @@
 						     (:file "password")
 						     (:module
 						      presentations
-						      :components ((:file "choices")
+						      :components ((:file "hidden")
+                                                                   (:file "choices")
 								   (:file "radio"
 									  :depends-on ("choices"))
 								   (:file "dropdown"
