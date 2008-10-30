@@ -241,6 +241,7 @@
 	       (:td :class "manager" (:span :class "value" "Jim"))))
 	    :summary "Ordered by name, descending."))))
 
+#+(or) ;; non-sensical, manager's the same...
 (deftest-html render-datagrid-table-body-2
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
@@ -278,10 +279,10 @@
 	      '((:th :class "name" "Name")
 		(:th :class "manager" "Manager"))
 	      '((:tr
-		 (:td :class "name" (:span :class "value" "Bob"))
+		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim")))
 		(:tr :class "altern"
-		 (:td :class "name" (:span :class "value" "Joe"))
+		 (:td :class "name" (:span :class "value" "Bob"))
 		 (:td :class "manager" (:span :class "value" "Jim")))))))
 
 (deftest-html render-datagrid-table-body-4
@@ -324,19 +325,19 @@
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
 				 :data-class 'employee
-				 :sort '(address . :asc)
+				 :sort '(name . :asc)
 				 :view (defview () (:type table)
 					 name address manager))))
 	;; render datagrid
 	(render-dataseq-body grid)
 	;; sort by name (should be descending)
-	(do-request `((,weblocks::*action-string* . "abc124")))
+	(do-request `((,weblocks::*action-string* . "abc123")))
 	(render-dataseq-body grid)))
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "address sort-asc" (:span #.(link-action-template "abc124" "Address")))
+	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
+	      (:th :class "address" (:span #.(link-action-template "abc124" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
@@ -346,21 +347,21 @@
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
-	    :summary "Ordered by address, ascending."))
+	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name" (:span #.(link-action-template "abc126" "Name")))
-	      (:th :class "address sort-desc" (:span #.(link-action-template "abc127" "Address")))
+	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc126" "Name")))
+	      (:th :class "address" (:span #.(link-action-template "abc127" "Address")))
 	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
-	       (:td :class "name" (:span :class "value" "Bob"))
+	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
 	      (:tr :class "altern"
-	       (:td :class "name" (:span :class "value" "Joe"))
+	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "address" (:span :class "value" "Address"))
 	       (:td :class "manager" (:span :class "value" "Jim"))))
-	    :summary "Ordered by address, descending."))))
+	    :summary "Ordered by name, descending."))))
 
 ;;; test specialization of dependencies
 (deftest datagrid-dependencies-1

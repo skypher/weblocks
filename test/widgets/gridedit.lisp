@@ -212,7 +212,6 @@
 	     (:a :href "/foo/bar?action=abc124"
 		 :onclick "initiateAction(\"abc124\", \"weblocks-session=1%3ATEST\"); return false;" "None")))
    (:div :class "widget flash" :id "id-123" "<!-- empty flash -->")
-   (str (with-javascript-to-string "$('id-123').show();"))
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -313,7 +312,8 @@
 		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
-	 (:div :class "extra-bottom-3" "<!-- empty -->")))
+	 (:div :class "extra-bottom-3" "<!-- empty -->"))
+         (str (with-javascript-to-string "$('id-123').show();")))
    (:form
     :class "dataseq-form"
     :action "/foo/bar"
@@ -588,7 +588,8 @@
 		(:ul :class "messages" (:li (:div :class "widget string" (:p "Modified Employee."))))
 		(:div :class "extra-bottom-1" "<!-- empty -->")
 		(:div :class "extra-bottom-2" "<!-- empty -->")
-		(:div :class "extra-bottom-3" "<!-- empty -->")))
+		(:div :class "extra-bottom-3" "<!-- empty -->"))
+          (str (with-javascript-to-string "$('id-123').show();")))
     (:form
      :class "dataseq-form"
      :action "/foo/bar"
@@ -1095,7 +1096,8 @@
 		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
-	 (:div :class "extra-bottom-3" "<!-- empty -->")))
+	 (:div :class "extra-bottom-3" "<!-- empty -->"))
+         (str (with-javascript-to-string "$('id-123').show();")))
    (:form
     :class "dataseq-form"
     :action "/foo/bar"

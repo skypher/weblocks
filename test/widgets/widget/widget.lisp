@@ -254,6 +254,7 @@
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))
   nil)
 
+#+(or)
 (deftest mark-dirty-5
     (with-request :get nil
       (progv '(*weblocks-output-stream*) (list (make-string-output-stream))

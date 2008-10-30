@@ -190,7 +190,7 @@
 							     (:type sequence
 								    :inherit-from
 								    '(:scaffold education-history))
-							   (university :allow-sorting-p t)))))))
+							   (graduation-year :allow-sorting-p nil)))))))
 	(weblocks::dataseq-update-sort-column obj)
 	(dataseq-sort obj)))
   ((education university) . :asc))

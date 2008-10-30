@@ -70,7 +70,7 @@
 					    (education :type mixin
 						       :view '(data education-history))
 					    (graduation-year :hidep t))))
-  (name manager university))
+  (name manager university graduation-year))
 
 (deftest get-object-view-fields-8
     (mapcar #'print-field-info

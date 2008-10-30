@@ -119,7 +119,7 @@
 	         operation (i.e. 'details', 'edit', etc.) and the cdr
 	         of the cell should contain a function of two
 	         arguments (widget obj and item object). If this slot
-	         isn't set to nill and 'allow-drilldown-p' is true,
+	         isn't set to nil and 'allow-drilldown-p' is true,
 	         dataseq provides the UI to drill down into items.")
    (drilled-down-item :accessor dataseq-drilled-down-item
 		      :initform nil

@@ -10,6 +10,7 @@
 			      nil *joe*)
   (:input :type "password" :name "password" :id "0" :maxlength "12" :class "password"))
 
+#+(or) ;; This doesn't work. Sometimes the id is 0 and sometimes it is 1.
 (deftest-html password-render-view-field-value-2
     (render-view-field-value  nil (make-instance 'password-presentation)
 			      (make-instance 'form-view-field
