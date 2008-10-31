@@ -4,8 +4,11 @@
 ;;; A suite that forces `*print-case*' to be `:upcase', needed in some
 ;;; comparison contexts
 (deftestsuite print-upcase-suite ()
-  ()
-  (:dynamic-variables (*print-case* :upcase)))
+  ())
+
+(defmethod lift-test :around ((suite print-upcase-suite) name)
+  (let ((*print-case* :upcase))
+    (call-next-method)))
 
 ;;; A suite that sets up an application environment
 (deftestsuite application-suite ()
