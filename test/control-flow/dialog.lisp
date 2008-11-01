@@ -21,44 +21,47 @@
 (addtest make-dialog-js-1
   (ensure-same
     (with-request :get nil
-      (weblocks::make-dialog-js "Some Title"
-                                (lambda ()
-                                  (with-html (:p "]]>")))
-                                "some-class" nil))
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "]]>")))
+                                  "some-class" nil)))
     `(progn
-       (setf ID-123 "<div class='widget function'><p>]]></p></div>")
-       (setf ID-123 nil)
-       (weblocks::show-dialog "Some Title" ID-123 "some-class" ID-123))))
+       (setf id-123 "<div class='widget function'><p>]]></p></div>")
+       (setf id-123 nil)
+       (weblocks::show-dialog "Some Title" id-123 "some-class" id-123))))
 
 (addtest make-dialog-js-2
   (ensure-same
     (with-request :get nil
-      (weblocks::make-dialog-js "Some Title"
-                                (lambda ()
-                                  (with-html (:p "]]>")))
-                                "some-class" t))
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "]]>")))
+                                  "some-class" t)))
     `(progn
-       (setf ID-123 "<div class='widget function'><p>]]></p></div>")
-       (setf ID-123 ,*close-html*)
+       (setf id-123 "<div class='widget function'><p>]]></p></div>")
+       (setf id-123 ,*close-html*)
        (weblocks::show-dialog "Some Title"
-                              ID-123
+                              id-123
                               "some-class"
-                              ID-123))))
+                              id-123))))
 
 (addtest make-dialog-js-3
   (ensure-same
     (with-request :get nil
-      (weblocks::make-dialog-js "Some Title"
-                                (lambda ()
-                                  (with-html (:p "</script>")))
-                                "some-class" t))
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "</script>")))
+                                  "some-class" t)))
     `(progn
-       (setf ID-123 "<div class='widget function'><p></script></p></div>")
-       (setf ID-123 ,*close-html*)
+       (setf id-123 "<div class='widget function'><p></script></p></div>")
+       (setf id-123 ,*close-html*)
        (weblocks::show-dialog "Some Title"
-                              ID-123
+                              id-123
                               "some-class"
-                              ID-123))))
+                              id-123))))
 
 ;;; test update-dialog-on-request
 (deftest-html update-dialog-on-request-1
