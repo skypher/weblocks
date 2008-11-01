@@ -75,11 +75,21 @@ variable. All html should be rendered to this stream.")
   `(with-html-output-to-string (*weblocks-output-stream* nil)
      ,@body))
 
+(defun escape-script-tags (source)
+  "Escape script blocks inside scripts."
+  (ppcre:regex-replace-all
+    (ppcre:quote-meta-chars "</script>")
+    (ppcre:regex-replace-all (ppcre:quote-meta-chars "]]>")
+                             source
+                             (format nil "]]~A + ~:*~A>"
+                                     ps:*js-string-delimiter*))
+    (format nil "</scr~A + ~:*Aipt>" ps:*js-string-delimiter*)))
+
 (defun %js (source &rest args)
   "Helper function for WITH-JAVASCRIPT macros."
   `(:script :type "text/javascript"
             (fmt "~%// <![CDATA[~%")
-            (str (format nil ,source ,@args))
+            (str (escape-script-tags (format nil ,source ,@args)))
             (fmt "~%// ]]>~%")))
 
 (defmacro with-javascript (source &rest args)

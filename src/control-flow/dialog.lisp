@@ -16,23 +16,17 @@ of type 'dialog'."
 
 (defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
-the widget inside."
-  (flet ((escape-script-tags (source)
-	   (ppcre:regex-replace-all (ppcre:quote-meta-chars "</script>")
-				    (ppcre:regex-replace-all (ppcre:quote-meta-chars "]]>")
-							     source
-							     "]]\" + \">")
-				    "</scr\" + \"ipt>"))
-         
-         (make-close-action ()
+the widget inside." 
+  (declare (ignore escape-script-tags-p)) ; backwards compatibility
+  (flet ((make-close-action ()
            (let* ((close-fn (if (functionp close)
                                 close
                                 #'(lambda (&rest args)
                                     (declare (ignore args))
                                     (answer widget))))
                   (close-action (make-action close-fn)))
-             (cl-who:with-html-output-to-string (s)
-               (:img :src "/pub/images/dialog/close.gif"
+             (with-html-to-string
+               (:img :src (make-webapp-public-file-uri "images/dialog/close.gif")
                      :onclick (format nil "initiateAction(\"~A\", \"~A\");"
                                       close-action (session-name-string-pair))
                      :onmouseover "this.style.cursor = \"pointer\";"
@@ -42,17 +36,16 @@ the widget inside."
 	     (declare (special *weblocks-output-stream*))
 	     (render-widget widget)
 	     (get-output-stream-string *weblocks-output-stream*))))
-    (format nil "showDialog(~A, ~A, ~A, ~A);"
-	    (encode-json-to-string title)
-	    (funcall (if escape-script-tags-p
-			 #'escape-script-tags
-			 #'identity)
-		     (encode-json-to-string
-		      (widget-html widget)))
-	    (encode-json-to-string (or css-class ""))
-            (encode-json-to-string (if close
-                                       (make-close-action)
-                                       nil)))))
+    ;(format t "widget-html: ~S~%" (widget-html widget))
+    (let ((inner (intern (string-upcase (gen-id))))
+          (close-action (intern (string-upcase (gen-id)))))
+      `(progn
+         (setf ,inner ,(widget-html widget))
+         (setf ,close-action ,(when close (make-close-action)) )
+         (show-dialog ,title
+                      ,inner
+                      ,(or css-class "")
+                      ,close-action)))))
 
 (defun update-dialog-on-request ()
   "This callback function is called by 'handle-client-request'. If a
@@ -62,14 +55,12 @@ inserted into the page to redraw the dialog."
     (when (and current-dialog
 	       (refresh-request-p))
       (with-javascript
-	  "Event.observe(window, 'load', function() {~%~
-             ~A~%~
-        });"
-	(make-dialog-js (dialog-title current-dialog)
-			(dialog-widget current-dialog)
-			(dialog-css-class current-dialog)
-			(dialog-close current-dialog)
-			t)))))
+	(ps* `(:|*Event.observe| window "load"
+                                 (lambda ()
+                                   ,(make-dialog-js (dialog-title current-dialog)
+                                                    (dialog-widget current-dialog)
+                                                    (dialog-css-class current-dialog)
+                                                    (dialog-close current-dialog)))))))))
 
 ;;; Presents 'callee' to the user in a modal dialog, saves the
 ;;; continuation, and returns from the delimited computation. When
@@ -87,7 +78,7 @@ inserted into the page to redraw the dialog."
 							     :widget new-callee
 							     :close close
 							     :css-class css-class))
-                         (send-script (make-dialog-js title new-callee css-class close))))
+                         (send-script (ps* (make-dialog-js title new-callee css-class close)))))
 	(setf (current-dialog) nil)
 	(send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
