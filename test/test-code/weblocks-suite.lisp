@@ -6,7 +6,8 @@
 (deftestsuite print-upcase-suite ()
   ())
 
-(defmethod lift-test ((suite print-upcase-suite) name)
+(defmethod lift::lift-test :around ((suite print-upcase-suite) name)
+  (declare (ignore suite name))
   (let ((*print-case* :upcase))
     (call-next-method)))
 
