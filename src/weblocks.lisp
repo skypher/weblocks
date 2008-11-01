@@ -1,19 +1,26 @@
 ;;; Code shared accross the entire weblocks framework
-(defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
-        :anaphora :f-underscore)
-  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-			  #:standard-generic-function #:ensure-generic-function
-			  #:standard-class #:typep #:subtypep)
-  (:shadowing-import-from :f-underscore #:f #:_)
-  (:shadowing-import-from :fare-matcher #:match)
-  (:shadow #:redirect #:errors)
-  (:documentation
-   "Weblocks is a Common Lisp framework that eases the pain of web
-application development. It achieves its goals by standardizing on
-various libraries, providing flexible and extensible generic views,
-and exposing a unique widget-based approach to maintaining UI
-state."))
+
+(defmacro without-package-variance-warnings (&body body)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (handler-bind (#+sbcl(sb-int:package-at-variance #'muffle-warning))
+       ,@body)))
+
+(without-package-variance-warnings
+  (defpackage #:weblocks
+    (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
+          :anaphora :f-underscore)
+    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+                            #:standard-generic-function #:ensure-generic-function
+                            #:standard-class #:typep #:subtypep)
+    (:shadowing-import-from :f-underscore #:f #:_)
+    (:shadowing-import-from :fare-matcher #:match)
+    (:shadow #:redirect #:errors)
+    (:documentation
+      "Weblocks is a Common Lisp framework that eases the pain of web
+      application development. It achieves its goals by standardizing on
+      various libraries, providing flexible and extensible generic views,
+      and exposing a unique widget-based approach to maintaining UI
+      state.")))
 
 (in-package :weblocks)
 
