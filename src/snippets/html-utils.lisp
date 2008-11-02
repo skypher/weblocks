@@ -323,12 +323,12 @@ in addition."
 
 (defun send-script (script &optional (place :after-load))
   (if (ajax-request-p)
-    (let ((json (with-javascript-to-string script)))
+    (let ((code (with-javascript-to-string script)))
     ;(let ((json (format nil "new Function(~A)" (encode-json-to-string script))))
       (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
-      (case place
-        (:before-load (push json *before-ajax-complete-scripts*))
-        (:after-load (push json *on-ajax-complete-scripts*))))
+      (ecase place
+        (:before-load (push code *before-ajax-complete-scripts*))
+        (:after-load (push code *on-ajax-complete-scripts*))))
     (with-javascript
       script)))
 
