@@ -82,7 +82,7 @@ variable. All html should be rendered to this stream.")
   `(with-html-output-to-string (*weblocks-output-stream* nil)
      ,@body))
 
-(defun escape-script-tags (source &key (delimiter (ps:*js-string-delimiter*)))
+(defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
   "Escape script blocks inside scripts."
   (ppcre:regex-replace-all
     (ppcre:quote-meta-chars "</script>")
