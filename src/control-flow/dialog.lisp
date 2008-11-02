@@ -37,8 +37,8 @@ the widget inside."
 	     (render-widget widget)
 	     (get-output-stream-string *weblocks-output-stream*))))
     ;(format t "widget-html: ~S~%" (widget-html widget))
-    (let ((inner (intern (string-upcase (gen-id))))
-          (close-action (intern (string-upcase (gen-id)))))
+    (let ((inner (intern (string-upcase (gen-id "inner"))))
+          (close-action (intern (string-upcase (gen-id "close")))))
       `(progn
          (setf ,inner ,(widget-html widget))
          (setf ,close-action ,(when close (make-close-action)) )
