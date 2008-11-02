@@ -21,9 +21,7 @@ the widget inside."
   (flet ((make-close-action ()
            (let* ((close-fn (if (functionp close)
                                 close
-                                #'(lambda (&rest args)
-                                    (declare (ignore args))
-                                    (answer widget))))
+                                (f_% (answer widget))))
                   (close-action (make-action close-fn)))
              (with-html-to-string
                (:img :src (make-webapp-public-file-uri "images/dialog/close.gif")
@@ -78,9 +76,9 @@ inserted into the page to redraw the dialog."
 							     :widget new-callee
 							     :close close
 							     :css-class css-class))
-                         (with-javascript (ps* (make-dialog-js title new-callee css-class close)))))
+                         (send-script (ps* (make-dialog-js title new-callee css-class close)))))
 	(setf (current-dialog) nil)
-	(with-javascript (ps (remove-dialog))))
+        (send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
 (defun render-choices-get (msg choices k)
