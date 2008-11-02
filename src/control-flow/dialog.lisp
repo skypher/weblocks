@@ -78,9 +78,9 @@ inserted into the page to redraw the dialog."
 							     :widget new-callee
 							     :close close
 							     :css-class css-class))
-                         (send-script (ps* (make-dialog-js title new-callee css-class close)))))
+                         (with-javascript (ps* (make-dialog-js title new-callee css-class close)))))
 	(setf (current-dialog) nil)
-	(send-script (ps (remove-dialog))))
+	(with-javascript (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
 (defun render-choices-get (msg choices k)
