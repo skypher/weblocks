@@ -27,7 +27,7 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key debug (port 8080) (cookie-name "weblocks-session") 
+(defun start-weblocks (&rest keys &key (debug t) (port 8080) (cookie-name "weblocks-session") 
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to the
