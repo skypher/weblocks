@@ -39,12 +39,14 @@ stores declared via 'defstore'."
       (disable-global-debugging))
   (when (null *weblocks-server*)
     (setf *session-cookie-name* cookie-name)
-    (setf *weblocks-server*
-	  (apply #'start-server :port port
-		 (remove-keyword-parameters keys :port :debug :cookie-name)))
-    (dolist (class *autostarting-webapps*)
-      (unless (get-webapps-for-class class)
-	(start-webapp class :debug debug)))))
+    (values
+      (setf *weblocks-server*
+            (apply #'start-server :port port
+                   (remove-keyword-parameters keys :port :debug :cookie-name)))
+      (mapcar (lambda (class)
+                (unless (get-webapps-for-class class)
+                  (start-webapp class :debug debug)))
+              *autostarting-webapps*))))
 
 (defun stop-weblocks ()
   "Stops weblocks. Closes all stores declared via 'defstore'."
