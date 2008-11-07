@@ -9,6 +9,7 @@
   (:default-initargs :modules '("dragdrop" "container") :class-name :|:YAHOO.widget.:Panel|))
 
 (defmethod render-widget-body ((widget yui-panel) &rest args)
+  (declare (ignore args))
   (send-script
     (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
             (setf (global-variable ,(yui-widget-variable widget))

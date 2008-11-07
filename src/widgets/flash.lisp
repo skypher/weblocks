@@ -24,6 +24,7 @@
 ;;; Add a callback function that resets the flash widget after
 ;;; rendering. On ajax calls the BlindUp effect is added.
 (defmethod initialize-instance :after ((obj flash) &rest initargs)
+  (declare (ignore initargs))
   (push (lambda ()
 	  (when (and (flash-messages obj)
 		     (not (refresh-request-p))
@@ -36,12 +37,11 @@
 	  (when (and (ajax-request-p)
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
-		(push (json-function
-		       (ps* `(new (*effect.*pulsate ,(dom-id obj)
-						    (create :pulses 3 :duration 0.5)))))
-		      *on-ajax-complete-scripts*)
-		(push (json-function (ps* `(new (*effect.*blind-up ,(dom-id obj)))))
-		      *on-ajax-complete-scripts*))))
+		(send-script
+		  (ps* `(new (*effect.*pulsate ,(dom-id obj)
+                                               (create :pulses 3 :duration 0.5)))))
+		(send-script
+                  (ps* `(new (*effect.*blind-up ,(dom-id obj))))))))
 	(request-hook :session :post-action))
   (push (lambda ()
 	  (declare (special *on-ajax-complete-scripts*))
@@ -88,6 +88,5 @@ messages that need to be shown for AJAX effects."
 		      (mapc (lambda (msg)
 			      (htm (:li (apply #'render-widget msg args))))
 			    messages))))))
-      (push (json-function (ps* `(.show ($ ,(dom-id obj)))))
-	    *on-ajax-complete-scripts*))))
+      (send-script (ps* `(.show ($ ,(dom-id obj))))))))
 

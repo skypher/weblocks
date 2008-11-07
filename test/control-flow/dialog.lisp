@@ -1,39 +1,67 @@
 
 (in-package :weblocks-test)
 
+(defparameter *close-html*
+  (with-html-to-string
+    (:img :src "/pub/images/dialog/close.gif"
+          :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\");"
+          :onmouseover "this.style.cursor = \"pointer\";"
+          :style "cursor: expression(\"hand\");")))
+
 ;;; test current-dialog
 (deftest current-dialog-1
-    (with-request :get nil
-      (values (weblocks::current-dialog)
-	      (progn
-		(setf (weblocks::current-dialog) 1)
-		(weblocks::current-dialog))))
-  nil 1)
+  (with-request :get nil
+    (values (weblocks::current-dialog)
+            (progn
+              (setf (weblocks::current-dialog) 1)
+              (weblocks::current-dialog))))
+         nil 1)
 
-;;; test show-dialog-js
-(deftest show-dialog-js-1
+;;; test make-dialog-js
+(addtest make-dialog-js-1
+  (ensure-same
     (with-request :get nil
-      (weblocks::show-dialog-js "Some Title"
-				(lambda ()
-				  (with-html (:p "]]>")))
-				"some-class" nil))
-  "showDialog(\"Some Title\", \"<div class='widget function'><p>]]></p></div>\", \"some-class\");")
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "]]>")))
+                                  "some-class" nil)))
+    `(progn
+       (setf id-123 "<div class='widget function'><p>]]></p></div>")
+       (setf id-123 nil)
+       (weblocks::show-dialog "Some Title" id-123 "some-class" id-123))))
 
-(deftest show-dialog-js-2
+(addtest make-dialog-js-2
+  (ensure-same
     (with-request :get nil
-      (weblocks::show-dialog-js "Some Title"
-				(lambda ()
-				  (with-html (:p "]]>")))
-				"some-class" t))
-  "showDialog(\"Some Title\", \"<div class='widget function'><p>]]\" + \"></p></div>\", \"some-class\");")
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "]]>")))
+                                  "some-class" t)))
+    `(progn
+       (setf id-123 "<div class='widget function'><p>]]></p></div>")
+       (setf id-123 ,*close-html*)
+       (weblocks::show-dialog "Some Title"
+                              id-123
+                              "some-class"
+                              id-123))))
 
-(deftest show-dialog-js-3
+(addtest make-dialog-js-3
+  (ensure-same
     (with-request :get nil
-      (weblocks::show-dialog-js "Some Title"
-				(lambda ()
-				  (with-html (:p "</script>")))
-				"some-class" t))
-  "showDialog(\"Some Title\", \"<div class='widget function'><p></scr\" + \"ipt></p></div>\", \"some-class\");")
+      (progv '(*package*) (list (find-package :weblocks-test))
+        (weblocks::make-dialog-js "Some Title"
+                                  (lambda ()
+                                    (with-html (:p "</script>")))
+                                  "some-class" t)))
+    `(progn
+       (setf id-123 "<div class='widget function'><p></script></p></div>")
+       (setf id-123 ,*close-html*)
+       (weblocks::show-dialog "Some Title"
+                              id-123
+                              "some-class"
+                              id-123))))
 
 ;;; test update-dialog-on-request
 (deftest-html update-dialog-on-request-1
@@ -51,22 +79,22 @@
       (weblocks::update-dialog-on-request))
   nil)
 
-(deftest-html update-dialog-on-request-3
+(addtest update-dialog-on-request-3
+  (ensure-same
     (with-request :get nil
       (setf (webapp-session-value 'weblocks::last-request-uri) *uri-tokens*)
       (setf (weblocks::current-dialog)
-	    (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
-							  (with-html (:p "bar")))
-				   :css-class "baz"))
-      (weblocks::update-dialog-on-request))
-  (:script :type "text/javascript"
-	   "
-// <![CDATA[
-Event.observe(window, 'load', function() {
-showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
-});
-// ]]>
-"))
+            (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
+                                                          (with-html (:p "bar")))
+                                   :css-class "baz"))
+      (with-output-to-string (*weblocks-output-stream*)
+        (weblocks::update-dialog-on-request)))
+    (with-javascript-to-string
+      (ps:ps (:|*Event.observe| window "load"
+                                (lambda ()
+                                  (setf ID-123 "<div class='widget function'><p>bar</p></div>")
+                                  (setf ID-123 nil)
+                                  (weblocks::show-dialog "foo" ID-123 "baz" ID-123)))))))
 
 ;;; test do-dialog
 (deftest do-dialog-1
@@ -92,13 +120,22 @@ showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
 		    (:div (:div :class "widget function"
 				(:p "some widget")))))))
 
-(deftest do-dialog-3
+(addtest do-dialog-3
+  (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-dialog "Some Title" (lambda (k)
 				(with-html (:p "some widget"))))
       *on-ajax-complete-scripts*)
-  ("new Function(\"showDialog(\\\"Some Title\\\", \\\"<div class='widget function'><p>some widget</p></div>\\\", \\\"\\\");\")"))
+    (list (with-javascript-to-string
+            (ps:ps
+              (progn
+                (setf ID-123 "<div class='widget function'><p>some widget</p></div>")
+                (setf ID-123 nil)
+                (weblocks::show-dialog "Some Title"
+                                       ID-123
+                                       ""
+                                       ID-123)))))))
 
 ;;; test render-choices-get
 (deftest-html render-choices-get-1
@@ -135,12 +172,21 @@ showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
     (:div :class "extra-bottom-3" "<!-- empty -->"))))
 
 ;;; test do-choice
-(deftest do-choice-1
+(addtest do-choice-1
+  (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-choice "Please choose" (list :a :b))
       *on-ajax-complete-scripts*)
-  ("new Function(\"showDialog(\\\"Select Option\\\", \\\"<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(\\\\\\\"abc123\\\\\\\", $(this), \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please choose</p><input name='a' type='submit' class='submit' value='A' onclick='disableIrrelevantButtons(this);' /><input name='b' type='submit' class='submit' value='B' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>\\\", \\\"choice \\\");\")"))
+    (list (with-javascript-to-string
+            (ps:ps
+              (progn
+                (setf ID-123 "<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(&quot;abc123&quot;, $(this), &quot;weblocks-session=1%3ATEST&quot;); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please choose</p><input name='a' type='submit' class='submit' value='A' onclick='disableIrrelevantButtons(this);' /><input name='b' type='submit' class='submit' value='B' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>")
+                (setf ID-123 nil)
+                (weblocks::show-dialog "Select Option"
+                                       ID-123
+                                       "choice "
+                                       ID-123)))))))
 
 (deftest do-choice-2
     (let (res)
@@ -153,19 +199,37 @@ showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
   :b)
 
 ;;; test do-confirmation
-(deftest do-confirmation-1
+(addtest do-confirmation-1
+  (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-confirmation "Please confirm")
       *on-ajax-complete-scripts*)
-  ("new Function(\"showDialog(\\\"Confirmation\\\", \\\"<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(\\\\\\\"abc123\\\\\\\", $(this), \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please confirm</p><input name='ok' type='submit' class='submit' value='Ok' onclick='disableIrrelevantButtons(this);' /><input name='cancel' type='submit' class='submit' value='Cancel' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>\\\", \\\"choice confirmation \\\");\")"))
+    (list (with-javascript-to-string
+            (ps:ps
+              (progn
+                (setf ID-123 "<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(&quot;abc123&quot;, $(this), &quot;weblocks-session=1%3ATEST&quot;); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please confirm</p><input name='ok' type='submit' class='submit' value='Ok' onclick='disableIrrelevantButtons(this);' /><input name='cancel' type='submit' class='submit' value='Cancel' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>")
+                (setf ID-123 nil)
+                (weblocks::show-dialog "Confirmation"
+                                       ID-123
+                                       "choice confirmation "
+                                       ID-123)))))))
 
-(deftest do-confirmation-2
+(addtest do-confirmation-2
+  (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-confirmation "Please confirm" :type :yes/no)
       *on-ajax-complete-scripts*)
-  ("new Function(\"showDialog(\\\"Confirmation\\\", \\\"<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(\\\\\\\"abc123\\\\\\\", $(this), \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please confirm</p><input name='yes' type='submit' class='submit' value='Yes' onclick='disableIrrelevantButtons(this);' /><input name='no' type='submit' class='submit' value='No' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>\\\", \\\"choice confirmation \\\");\")"))
+    (list (with-javascript-to-string
+            (ps:ps
+              (progn
+                (setf ID-123 "<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(&quot;abc123&quot;, $(this), &quot;weblocks-session=1%3ATEST&quot;); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>Please confirm</p><input name='yes' type='submit' class='submit' value='Yes' onclick='disableIrrelevantButtons(this);' /><input name='no' type='submit' class='submit' value='No' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>") 
+                (setf ID-123 nil)
+                (weblocks::show-dialog "Confirmation"
+                                       ID-123
+                                       "choice confirmation "
+                                       ID-123)))))))
 
 (deftest do-confirmation-3
     (let (res)
@@ -177,10 +241,20 @@ showDialog(\"foo\", \"<div class='widget function'><p>bar</p></div>\", \"baz\");
       res)
   :ok)
 
-(deftest do-information-1
+(addtest do-information-1
+  (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-information "FYI")
       *on-ajax-complete-scripts*)
-  ("new Function(\"showDialog(\\\"Information\\\", \\\"<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(\\\\\\\"abc123\\\\\\\", $(this), \\\\\\\"weblocks-session=1%3ATEST\\\\\\\"); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>FYI</p><input name='ok' type='submit' class='submit' value='Ok' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>\\\", \\\"choice information \\\");\")"))
+    (list (with-javascript-to-string
+            (ps:ps
+              (progn
+                (setf ID-123 "<div class='widget function'><form action='/foo/bar' method='post' onsubmit='initiateFormAction(&quot;abc123&quot;, $(this), &quot;weblocks-session=1%3ATEST&quot;); return false;'><div class='extra-top-1'><!-- empty --></div><div class='extra-top-2'><!-- empty --></div><div class='extra-top-3'><!-- empty --></div><fieldset><p>FYI</p><input name='ok' type='submit' class='submit' value='Ok' onclick='disableIrrelevantButtons(this);' /><input name='action' type='hidden' value='abc123' /></fieldset><div class='extra-bottom-1'><!-- empty --></div><div class='extra-bottom-2'><!-- empty --></div><div class='extra-bottom-3'><!-- empty --></div></form></div>")
+                (setf ID-123 nil)
+                (weblocks::show-dialog "Information"
+                                       ID-123
+                                       "choice information "
+                                       ID-123)))))))
+
 

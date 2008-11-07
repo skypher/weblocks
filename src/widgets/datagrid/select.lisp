@@ -4,16 +4,19 @@
 (defun render-select-bar (grid &rest keys)
   "Renders commands relevant to item selection (select all, none,
 etc.)"
+  (declare (ignore keys))
   (with-html
     (:p :class "datagrid-select-bar"
 	(:strong "Select: ")
 	(render-link (make-action (lambda (&rest args)
+                                    (declare (ignore args))
 				    (setf (dataseq-selection grid)
 					  (cons :none (mapcar #'object-id (dataseq-data grid))))
 				    (mark-dirty grid)))
 		     "All")
 	", "
 	(render-link (make-action (lambda (&rest args)
+                                    (declare (ignore args))
 				    (dataseq-clear-selection grid)
 				    (mark-dirty grid)))
 		     "None"))))

@@ -70,14 +70,46 @@ are wrapped in field-info structures with common-sense defaults."
 				 (view-fields view))))))
 	   (factor-overriden-fields (field-info-list)
 	     "Overrides parent fields redefined in children."
-	     (let (results)
-	       (dolist (field-info field-info-list (reverse results))
-		 (pushnew (or (find (view-field-slot-name (field-info-field field-info))
-				    field-info-list
-				    :from-end t :key (compose #'view-field-slot-name #'field-info-field))
-			      field-info)
-			  results
-			  :key (compose #'view-field-slot-name #'field-info-field)))))
+             ;(format t "fil: ~S~%" field-info-list)
+             (flet ((field-key (field-info &aux (field (field-info-field field-info)))
+                      (cons (view-field-slot-name field) (awhen (field-info-parent-info field-info)
+                                                              (view-field-slot-name (field-info-field IT)))))
+                    (parent (field-info &aux (field (field-info-field field-info)))
+                      (field-info-parent-info field-info))
+                    (mixin-p (field-info &aux (field (field-info-field field-info)))
+                      (typep field 'mixin-view-field)))
+               ;(format t "in: ~S~%" (mapcar (compose #'describe #'field-info-field) field-info-list))
+               (let* ((fields (remove-duplicates field-info-list :key #'field-key :from-end nil))
+                      (true-inline-fields (remove-duplicates fields :test #'equal
+                                                             :key (compose #'view-field-slot-name #'field-info-field)
+                                                             :from-end nil))
+                      (true-inline-fields (remove-if (lambda (fi) (or (parent fi) (mixin-p fi))) true-inline-fields
+                                                     :from-end t))
+                      (expanded-mixin-fields (remove-if-not (lambda (fi) (or (parent fi) (mixin-p fi)))
+                                                            fields))
+                      (expanded-mixin-fields (remove-duplicates expanded-mixin-fields :test #'equal :key #'field-key))
+                      (expanded-mixin-fields (remove-if (curry-after #'find true-inline-fields
+                                                                     :test #'equal :key (compose #'view-field-slot-name
+                                                                                                 #'field-info-field)
+                                                                     :from-end nil) expanded-mixin-fields))
+                      (merged-fields (sort (union true-inline-fields expanded-mixin-fields)
+                                           #'< :key (lambda (field)
+                                                      (flet ((pos (field where)
+                                                               (let ((r (position (field-key field) where :key #'field-key :test #'equal)))
+                                                               ;(format t "field: ~S / where: ~S -> ~S%" (field-key field)
+                                                               ;        (mapcar #'field-key where) r)
+                                                               r
+                                                               )))
+                                                        (let ((result (or (pos field fields)
+                                                                          (pos field true-inline-fields)
+                                                                          (pos field expanded-mixin-fields)
+                                                                          0)))
+                                                        #+(or)(format t "result for field ~A: ~A~%" field result) result))))))
+                 ;(format t "true inline: ~S~%" (mapcar #'field-key true-inline-fields))
+                 ;(format t "expanded ~S~%" (mapcar #'field-key expanded-mixin-fields))
+                 ;(format t "fields ~S~%" (mapcar #'field-key fields))
+                 ;(format t "merged ~S~%" (mapcar (compose #'describe #'field-info-field) merged-fields))
+                 merged-fields))) ; XXX this is quite inefficient (at least n^2 + n*log(n))
 	   (expand-mixin-fields (field-info-list)
 	     "Expands mixin fields into inline fields. Returns two
               values - a list of expanded field-infos, and true if at
@@ -235,4 +267,15 @@ returns the created object."
     (object-class-name
      presentation))
    "-presentation"))
+
+(defmethod print-object ((obj field-info) stream)
+  (flet ((field-key (field-info &aux (field (field-info-field field-info)))
+                    (cons (view-field-slot-name field) (awhen (field-info-parent-info field-info)
+                                                              (view-field-slot-name (field-info-field IT))))))
+    (print-unreadable-object (obj stream :type t :identity t)
+      (format stream "~S" (field-key obj)))))
+
+(defmethod print-object ((obj view-field) stream)
+  (print-unreadable-object (obj stream :type t :identity t)
+    (format stream "~S" (view-field-slot-name obj))))
 

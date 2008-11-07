@@ -6,7 +6,9 @@
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
-          widget-dirty-p find-widget-by-path* find-widget-by-path))
+          widget-dirty-p find-widget-by-path* find-widget-by-path
+          *current-widget*
+          *override-parent-p*))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
@@ -90,6 +92,16 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-name) (name (obj widget))
   (setf (dom-id obj) name))
 
+(defparameter *override-parent-p* nil
+  "Allow parent overriding in (SETF COMPOSITE-WIDGETS).")
+
+;;; Don't allow setting a parent for widget that already has one
+;;; (unless it's setting parent to nil)
+(defmethod (setf widget-parent) (val (obj widget))
+  (if (and val (widget-parent obj) (not *override-parent-p*))
+      (error "Widget ~a already has a parent." obj)
+      (setf (slot-value obj 'parent) val)))
+
 (defgeneric valid-widget-p (widget)
   (:documentation "Returns t when widget is a valid, renderable widget;
    this includes strings, function, etc.")
@@ -103,7 +115,7 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod widget-rendered-p (obj)
   nil)
 
-(defmethod (setf widget-rendered-p) (obj val)
+(defmethod (setf widget-rendered-p) (val obj)
   nil)
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
@@ -175,6 +187,7 @@ Another implementation allows rendering strings."))
   (apply obj args))
 
 (defmethod render-widget-body ((obj string) &rest args &key id class &allow-other-keys)
+  (declare (ignore args))
   (with-html
     (:p :id id :class class (str obj))))
 
@@ -184,25 +197,37 @@ Another implementation allows rendering strings."))
 (defmethod widget-suffix-fn (obj)
   nil)
 
-(defun render-widget (obj &key inlinep)
+(defgeneric render-widget (obj &key inlinep &allow-other-keys)
+  (:documentation
   "Renders a widget ('render-widget-body') wrapped in a
 header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
 
 Additionally, calls 'dependencies' and adds the returned items to
 *page-dependencies*. This is later used by Weblocks to declare
-stylesheets and javascript links in the page header."
+stylesheets and javascript links in the page header."))
+
+(defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
   (declare (special *page-dependencies*))
-  (setf *page-dependencies*
-	(append *page-dependencies* (dependencies obj)))
+  (if (ajax-request-p)
+    (dolist (dep (dependencies obj))
+      (send-script
+	(ps* `(,(typecase dep
+                  (stylesheet-dependency 'include_css)
+                  (script-dependency 'include_dom))
+               ,(puri:render-uri (dependency-url dep) nil)))
+        :before-load))
+    (setf *page-dependencies*
+	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
-      (funcall #'render-widget-body obj)
+      (apply #'render-widget-body obj args)
       (apply #'with-widget-header obj #'render-widget-body
 	     (append
 	      (when (widget-prefix-fn obj)
 		(list :widget-prefix-fn (widget-prefix-fn obj)))
 	      (when (widget-suffix-fn obj)
-		(list :widget-suffix-fn (widget-suffix-fn obj))))))
+		(list :widget-suffix-fn (widget-suffix-fn obj)))
+              args)))
   (setf (widget-rendered-p obj) t))
 
 ;;; Make all widgets act as composites to simplify development

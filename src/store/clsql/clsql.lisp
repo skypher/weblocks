@@ -186,12 +186,7 @@ instances of 'class-name' and order them with 'order-by'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CLSQL/Weblocks Oddities ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod class-visible-slots-impl ((cls clsql-sys::standard-db-class) &key readablep writablep)
-  (declare (ignore readablep writablep))
-  (remove-if (lambda (dsd)
-	       (string-starts-with
-		(package-name
-		 (symbol-package
-		  (c2mop:slot-definition-name dsd)))
-		"clsql" :test #'char-equal))
-	     (call-next-method)))
+(defmethod class-visible-slots-impl
+    ((cls (eql (find-class 'clsql-sys::standard-db-object))) &key &allow-other-keys)
+  "Hide slots on `standard-db-object'."
+  '())

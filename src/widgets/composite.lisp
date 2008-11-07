@@ -5,7 +5,7 @@
 
 (defwidget composite (widget)
   ((widgets :accessor composite-widgets
-	    :initform nil
+            :initform nil
 	    :initarg :widgets
 	    :documentation "A list of widgets that are contained in
             this composite widget. For convinience, one can assign a
@@ -16,6 +16,7 @@
   accessor contains a list of widgets. When 'render-widget' is invoked
   on the composite, it invokes 'render-widget' on each widget in the
   list."))
+
 
 (defmethod initialize-instance :after ((obj composite) &rest initargs &key widgets &allow-other-keys)
   (declare (ignore initargs))
@@ -48,20 +49,22 @@
 	((eq list cell) t)
 	(t (cons-in-list-p cell (cdr list)))))
 
-(defmethod (setf composite-widgets) (new-value (composite composite))
-  ;; We're no longer a parent of widgets we hold
-  (loop for widget in (ensure-list (slot-value composite 'widgets))
-     do (setf (widget-parent widget) nil))
-  (let ((new-widgets (if (or (consp new-value)
-			     (null new-value))
-			 new-value
-			 (list new-value))))
-    ;; But we're a part of new widgets we're passed
-    (loop for widget in new-widgets
-       do (adopt-widget composite widget))
-    ;; Record the widgets
-    (setf (slot-value composite 'widgets)
-	  new-widgets)))
+(defmethod (setf composite-widgets) (new-value (comp composite))
+  "Assign new children to the composite and update their parents.
+Signals an error if one of the children already has a parent
+unless *OVERRIDE-PARENT-P* is set."
+  ;; we're no longer a parent of widgets we hold
+  (symbol-macrolet ((children (slot-value comp 'widgets)))
+    (mapcar
+      (lambda (child)
+        (setf (widget-parent child) nil))
+      (ensure-list children))
+    ;; but we're a parent of new widgets we're passed
+    (let ((new-widgets (ensure-list new-value)))
+      (mapcar (lambda (child)
+                (setf (widget-parent child) comp))
+              new-widgets)
+      (setf children new-widgets))))
 
 (defmethod render-widget-body ((obj composite) &rest args)
   (declare (ignore args))

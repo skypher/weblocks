@@ -24,7 +24,7 @@
                   initial-value "")))
 
 
-(defwidget yui-widget (yui-settings-mixin)
+(defwidget yui-widget (widget yui-settings-mixin)
   ((widget-variable :reader yui-widget-variable
                     :initarg :widget-variable
 		    :initform (intern (gen-id "yuiWidget")) ; ps-gensym is broken on some lisps
@@ -63,6 +63,7 @@
         (append (yui-component-config obj) config)))
 
 (defmethod render-widget-body ((widget yui-widget) &rest args)
+  (declare (ignore args))
   (send-script
     (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
             (setf (global-variable ,(yui-widget-variable widget))

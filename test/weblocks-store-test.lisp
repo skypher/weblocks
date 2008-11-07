@@ -1,23 +1,28 @@
 
 (defpackage #:weblocks-store-test
-  (:use :cl :weblocks :rtest))
+  (:use :cl :weblocks :lift :f-underscore))
 
 (in-package :weblocks-store-test)
 
+(deftestsuite store-suite ()
+  ()
+  (:setup (weblocks::open-stores))
+  (:teardown (mapstores #'clean-store)
+	     (weblocks::close-stores))
+  (:documentation "Tests for the store API and implementations on
+  currently defined stores."))
+
+;; XXX this dupes deftest in weblocks-test (not yet loaded)
 (defmacro deftest-store (name test &rest values)
   "A macro that makes defining test cases for stores easier. The macro
 prepends the test expression with opening all stores, and appends it
 with closing all stores. The result of the test expression is
 returned."
-  `(deftest ,name
-       (unwind-protect
-	    (progn
-	      (weblocks::open-stores)
-	      ,test)
-	 (mapstores (lambda (store)
-		      (clean-store store)))
-	 (weblocks::close-stores))
-     ,@values))
+  `(addtest ,name
+     (ensure-same ,test
+       ,(if (typep values '(cons t null))
+	    `',(first values)
+	    `(values . ,(mapcar (f_ `',_) values))))))
 
 ;;; test begin-transaction (no comprehensive test)
 (deftest-store begin-transaction-1

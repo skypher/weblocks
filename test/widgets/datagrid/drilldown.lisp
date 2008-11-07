@@ -108,53 +108,50 @@
    "Joe"))
 
 ;;; test autoset-drilled-down-item-p
-(deftest-html autoset-drilled-down-item-p-1
-    (let ((res))
-      (with-request :get nil
-	(persist-objects *default-store* (list *joe* *bob*))
-	(let ((grid (make-instance 'datagrid
-				   :data-class 'employee
-				   :allow-drilldown-p t
-				   :on-drilldown
-				   (cons 'edit (lambda (grid item)
-						 (setf res
-						       (null (dataseq-drilled-down-item grid)))))))
-	      (*on-ajax-complete-scripts* nil))
-	  (declare (special *on-ajax-complete-scripts*))
-	  ;; render datagrid
-	  (dataseq-update-sort-column grid)
-	  (render-dataseq-body grid)
-	  ;; sort by name (should be descending)
-	  (do-request `((,weblocks::*action-string* . "abc126")))
-	  ;; output result
-	  (with-html (str res)))))
-  (htm
-   (:div :class "datagrid-body"
-	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
-	      (:th :class "drilldown edit" ""))
-	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
-	           :onmouseover "this.style.cursor = \"pointer\";"
-	           :style "cursor: expression(\"hand\");"
-	       (:td :class "name" (:span :class "value" "Bob"))
-	       (:td :class "manager" (:span :class "value" "Jim"))
-	       (:td :class "drilldown edit"
-		(:noscript
-		 (:div
-		  (:a :href "/foo/bar?action=abc125" "Edit")))))
-	      (:tr :class "altern"
-	           :onclick "initiateActionOnEmptySelection(\"abc126\", \"weblocks-session=1%3ATEST\");"
-	           :onmouseover "this.style.cursor = \"pointer\";"
-	           :style "cursor: expression(\"hand\");"
-	       (:td :class "name" (:span :class "value" "Joe"))
-	       (:td :class "manager" (:span :class "value" "Jim"))
-	       (:td :class "drilldown edit"
-		(:noscript
-		 (:div
-		  (:a :href "/foo/bar?action=abc126" "Edit"))))))
-	    :summary "Ordered by name, ascending."))
-   "T"))
+(addtest autoset-drilled-down-item-p-1
+  (with-request :get nil
+    (persist-objects *default-store* (list *joe* *bob*))
+    (let ((grid (make-instance 'datagrid
+			       :data-class 'employee
+			       :allow-drilldown-p t
+			       :on-drilldown
+			       (cons 'edit (lambda (grid item)
+					     (ensure-null (dataseq-drilled-down-item grid))))))
+	  (*on-ajax-complete-scripts* nil))
+      (declare (special *on-ajax-complete-scripts*))
+      ;; render datagrid
+      (dataseq-update-sort-column grid)
+      (ensure-html-output
+       (progn
+	 (render-dataseq-body grid)
+	 ;; sort by name (should be descending)
+	 (do-request `((,weblocks::*action-string* . "abc126"))))
+       (htm
+	(:div :class "datagrid-body"
+	      #.(table-header-template
+		 '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
+		   (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
+		   (:th :class "drilldown edit" ""))
+		 '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
+		    :onmouseover "this.style.cursor = \"pointer\";"
+		    :style "cursor: expression(\"hand\");"
+		    (:td :class "name" (:span :class "value" "Bob"))
+		    (:td :class "manager" (:span :class "value" "Jim"))
+		    (:td :class "drilldown edit"
+		     (:noscript
+		       (:div
+			(:a :href "/foo/bar?action=abc125" "Edit")))))
+		   (:tr :class "altern"
+		    :onclick "initiateActionOnEmptySelection(\"abc126\", \"weblocks-session=1%3ATEST\");"
+		    :onmouseover "this.style.cursor = \"pointer\";"
+		    :style "cursor: expression(\"hand\");"
+		    (:td :class "name" (:span :class "value" "Joe"))
+		    (:td :class "manager" (:span :class "value" "Jim"))
+		    (:td :class "drilldown edit"
+		     (:noscript
+		       (:div
+			(:a :href "/foo/bar?action=abc126" "Edit"))))))
+		 :summary "Ordered by name, ascending.")))))))
 
 (deftest-html autoset-drilled-down-item-p-2
     (let ((res))

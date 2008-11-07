@@ -5,8 +5,9 @@
 	  render-link render-button render-form-and-button
 	  render-checkbox render-dropdown render-autodropdown
 	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-password render-textarea
-	  render-list scriptonly noscript render-message))
+	  render-close-button render-input-field render-password
+          render-textarea render-list scriptonly noscript render-message
+          send-script))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -32,7 +33,8 @@
                 (with-extra-tags
                   (htm (:fieldset
                         ,@body
-                        (:input :name *action-string* :type "hidden" :value ,action-code)))))))))
+                        (:input :name *action-string* :type "hidden" :value ,action-code))))))
+       (log-form ,action-code :id ,id :class ,class))))
 
 (defun render-link (action name &key (ajaxp t) id class)
   "Renders an action into an href link. If 'ajaxp' is true (the
@@ -57,7 +59,11 @@ by default).
 	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
-	  (str name)))))
+	  (etypecase name
+	    (string (htm (str name)))
+	    (symbol (htm (str name)))
+	    (function (funcall name)))))
+    (log-link name action-code :id id :class class)))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
   "Renders a button in a form.
@@ -83,7 +89,7 @@ cut to quickly render a sumbit button."
 			  :id form-id :class form-class)
     (render-button name :value value :id button-id :class button-class)))
 
-(defun render-checkbox (name checkedp &key id (class "checkbox"))
+(defun render-checkbox (name checkedp &key id (class "checkbox") onclick)
   "Renders a checkbox in a form.
 
 'name' - name of the html control. The name is attributized before
@@ -94,9 +100,9 @@ being rendered.
   (with-html
     (if checkedp
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		     :value "t" :checked "checked"))
+		     :value "t" :checked "checked" :onclick onclick))
 	(htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		     :value "f")))))
+		     :value "f" :onclick onclick)))))
 
 (defparameter *dropdown-welcome-message* "[Select ~A]"
   "A welcome message used by dropdowns as the first entry.")
@@ -214,18 +220,35 @@ used instead of the default 'Close'."
     (:span :class "close-button"
 	   (render-link close-action (humanize-name button-string)))))
 
-;;; render password implementation
-(defun render-password (name value &key id (class "password") maxlength)
+(defun render-input-field (type name value &key id class maxlength style)
+  (with-html
+    (:input :type type :name (attributize-name name) :id id
+	    :value value :maxlength maxlength :class class
+            :style style)))
+
+(defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
+                        visibility-option-p)
     "Renders a password in a form.
 'name' - name of the html control. The name is attributized before being rendered.
 'value' - a value on html control.
 'id' - id of the html control. Default is nil.
  maxlength - maximum lentgh of the field
 'class' - a class used for styling. By default, \"password\"."
-  (with-html
-    (:input :type "password" :name (attributize-name name) :id id
-	    :value value :maxlength maxlength :class class)))
-
+  (render-input-field "password" name value
+                      :id id :class class :maxlength maxlength
+                      :style style)
+  (when visibility-option-p
+    (send-script (ps:ps*
+                   `(defun toggle-password-visibility (field)
+                      (let ((it ($ field)))
+                        (if (== (slot-value it 'type) "password")
+                          (setf (slot-value it 'type) "text")
+                          (setf (slot-value it 'type) "password"))))))
+    (with-html
+      (:label
+        (render-checkbox (gen-id) nil
+                         :onclick (format nil "togglePasswordVisibility(\"~A\")" id))
+        (esc "Show password")))))
 
 (defun render-textarea (name value rows cols &key id class)
   "Renders a textarea in a form.
@@ -301,6 +324,26 @@ in addition."
        (:noscript
 	 ,@body))))
 
+(defmacro pushlast (value place)
+  `(if (consp ,place)
+       (setf (cdr (last ,place)) 
+	     (cons ,value nil))
+       (setf ,place (cons ,value nil))))
+
+(defun send-script (script &optional (place :after-load))
+  "Send JavaScript to the browser. The way of sending depends
+  on whether the current request is via AJAX or not.
+  
+  FIXME: is using PUSH or PUSHLAST correct?"
+  (if (ajax-request-p)
+    (let ((code (with-javascript-to-string script)))
+      (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+      (ecase place
+        (:before-load (push code *before-ajax-complete-scripts*))
+        (:after-load (push code *on-ajax-complete-scripts*))))
+    (with-javascript
+      script)))
+
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
   (with-html
@@ -308,7 +351,3 @@ in addition."
 	    (htm (:span :class "caption" (str caption) ":&nbsp;")))
 	(:span :class "message" (str message)))))
 
-(defun json-function (code)
-  "Take a code string and encapsulate it in a new Function object,
-JSON-encoding it."
-  (format nil "new Function(~A)" (encode-json-to-string code)))

@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite snippets/suggest-suite (weblocks-suite print-upcase-suite)
+  ())
+
 ;;; test render-suggest
 (deftest-html render-suggest-1
     (with-request :get nil

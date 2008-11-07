@@ -34,6 +34,7 @@
 
 ;;; test with-navigation-header
 
+#|defunct
 (deftest-html with-navigation-header-1
     (with-navigation-header (make-instance 'navigation) (lambda (x &rest args)
 							  (with-html (:div "test"))))
@@ -102,6 +103,7 @@
   (htm
    (:li :class "selected-item" (:span "Foo"))
    (:li (:a :href "/foo/bar/%c3%a5%c3%a4%c3%b6" #.(humanize-name (url-decode "%C3%A5%C3%A4%C3%B6"))))))
+end defunct|#
 
 ;;; test full navigation widget scenario
 (deftest-html render-navigation-widget-1
@@ -118,7 +120,7 @@
   (htm
    (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     #.(data-header-template
 			"abc123"
 			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -129,19 +131,19 @@
 					   ,(link-action-template "abc123" "Modify"
 								  :class "modify"
 								  :uri "/"))))))
-	 (:div :class "view menu"
+	 (:div :class "view menu" :id "MENU-test-navigation"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li :class "selected-item" (:span "Test1"))
-		    (:li (:a :href "/test2" "Test2")))
+	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" :class "selected-item" (:span "Test1"))
+		    (:li :id "MENU-ITEM-test-navigation-test2" (:a :href "/test2" "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
    (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     (:div :class "view data education-history"
 			   (:div :class "extra-top-1" "<!-- empty -->")
 			   (:div :class "extra-top-2" "<!-- empty -->")
@@ -161,13 +163,13 @@
 			   (:div :class "extra-bottom-1" "<!-- empty -->")
 			   (:div :class "extra-bottom-2" "<!-- empty -->")
 			   (:div :class "extra-bottom-3" "<!-- empty -->"))))
-	 (:div :class "view menu"
+	 (:div :class "view menu" :id "MENU-test-navigation"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li (:a :href "/" "Test1"))
-		    (:li :class "selected-item" (:span "Test2")))
+	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" (:a :href "/test1" "Test1"))
+		    (:li :id "MENU-ITEM-test-navigation-test2" :class "selected-item" (:span "Test2")))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))))
@@ -195,7 +197,7 @@
    (:div :class "selector-mixin widget dispatcher selector navigation nomenu-navigation"
 	 :id "test-navigation"
 	 (:div :class "navigation-body"
-	       (:div :class "widget dataform" :id "id-123"
+	       (:div :class "widget data-editor dataform" :id "id-123"
 		     #.(data-header-template
 			"abc123"
 			'((:li :class "name" (:span :class "label text" "Name:&nbsp;")
@@ -394,6 +396,7 @@
   "test-nav-2")
 
 ;;; test reset-navigation-widgets
+#+(or) ; function no longer existent
 (deftest reset-navigation-widgets-1
     (with-request :get nil
       (let ((site (create-site-layout))

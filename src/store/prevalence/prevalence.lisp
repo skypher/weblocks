@@ -3,6 +3,7 @@
   (:use :cl :metabang.utilities :cl-prevalence :weblocks :weblocks-memory)
   (:shadowing-import-from :metabang.utilities #:size)
   (:shadowing-import-from :cl-prevalence #:id)
+  (:export make-persistent-instance)
   (:documentation
    "A driver for weblocks backend store API that connects to CL-Prevalence."))
 
@@ -103,12 +104,27 @@
 	(gethash object-id (persistent-objects-of-class-by-id objects))
       obj)))
 
-(defmethod find-persistent-objects ((store prevalence-system) class-name
-				    &key order-by range)
+(defmethod find-persistent-objects ((store prevalence-system) class-name 
+				    &key (filter nil) order-by range slot (value nil value-given))
+  "The slot and value keys must appear together.  If they appear, a
+filter will be applied (before the filter passed, if any) that
+requires all objects to have the given value in the given slot."
+;  (break "~A ~A ~A" filter order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
-    (query store 'tx-find-persistent-objects-prevalence
-	   class-name)
+    (let* ((seq (query store 'tx-find-persistent-objects-prevalence class-name))
+	   (seq2 (cond
+		   ((and seq slot value-given)
+		    (remove-if-not
+		      #'(lambda (x) (equal (slot-value x slot) value))
+		      seq))
+		   (t seq)))
+	   (seq3 (cond
+		   ((and seq2
+			 (functionp filter))
+		    (remove-if-not filter seq2))
+		   (t seq2))))
+      seq3)
     order-by)
    range))
 
@@ -119,7 +135,9 @@
       (loop for i being the hash-values in (persistent-objects-of-class-by-id objects)
 	 collect i))))
 
-(defmethod count-persistent-objects ((store prevalence-system) class-name
-				     &key &allow-other-keys)
-  (length (find-persistent-objects store class-name)))
+(defmethod count-persistent-objects ((store prevalence-system) class-name &rest args)
+  (length (apply #'find-persistent-objects store class-name args)))
+
+(defun make-persistent-instance (store class &rest initargs)
+  (persist-object store (apply #'make-instance class initargs)))
 

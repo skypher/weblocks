@@ -180,21 +180,24 @@ removes the drilldown operation, and then adds it again if necessary."
 
 (defmethod render-dataseq-body ((obj datalist) &rest args)
   (datalist-update-opretaions obj)
-  (with-html
-    (:div :class "datalist-body"
-	  (render-list (dataseq-data obj)
-		       :orderedp (datalist-ordered-p obj)
-		       :render-fn (curry-after (curry #'datalist-render-item obj) args)
-		       :empty-message (sequence-view-empty-message (find-view (dataseq-view obj)))
-		       :empty-caption (view-caption (find-view (dataseq-view obj)))
-		       :item-prefix-fn (lambda (item)
-					 (safe-apply (sequence-view-row-prefix-fn
-						      (find-view (dataseq-view obj)))
-						     (find-view (dataseq-view obj))
-						     item args))
-		       :item-suffix-fn (lambda (item)
-					 (safe-apply (sequence-view-row-suffix-fn
-						      (find-view (dataseq-view obj)))
-						     (find-view (dataseq-view obj))
-						     item args))))))
+  (let ((data-sequence (dataseq-data obj)))
+    (setf (slot-value obj 'rendered-data-sequence) nil)
+    (with-html
+      (:div :class "datalist-body"
+            (render-list data-sequence
+                         :orderedp (datalist-ordered-p obj)
+                         :render-fn (curry-after (curry #'datalist-render-item obj) args)
+                         :empty-message (sequence-view-empty-message (find-view (dataseq-view obj)))
+                         :empty-caption (view-caption (find-view (dataseq-view obj)))
+                         :item-prefix-fn (lambda (item)
+                                           (safe-apply (sequence-view-row-prefix-fn
+                                                        (find-view (dataseq-view obj)))
+                                                       (find-view (dataseq-view obj))
+                                                       item args))
+                         :item-suffix-fn (lambda (item)
+                                           (safe-apply (sequence-view-row-suffix-fn
+                                                        (find-view (dataseq-view obj)))
+                                                       (find-view (dataseq-view obj))
+                                                       item args)))))
+    (setf (slot-value obj 'rendered-data-sequence) data-sequence)))
 

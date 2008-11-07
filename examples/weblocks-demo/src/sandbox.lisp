@@ -8,7 +8,8 @@ ensure users have their own non-peristant sandboxes)."
   (let ((sandbox-store (open-store :memory))
 	(fixtures-store (open-store :prevalence
 				    (merge-pathnames (make-pathname :directory '(:relative "data"))
-						     (asdf-system-directory :weblocks-demo)))))
+						     (or (ignore-errors (asdf-system-directory :weblocks-demo))
+                                                         ".")))))
     (unwind-protect
 	 (progn
 	   (persist-objects sandbox-store (find-persistent-objects fixtures-store 'employee))

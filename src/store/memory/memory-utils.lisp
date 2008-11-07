@@ -52,7 +52,8 @@ function is used by the framework for sorting data.")
 
 (defun order-objects-in-memory (seq order-by)
   "Orders objects in 'seq' according to 'order-by'."
-  (if order-by
+  (if (and seq
+           order-by)
       (stable-sort seq
 		   (if (equalp (cdr order-by) :asc)
 		       #'strictly-less-p
@@ -67,7 +68,8 @@ function is used by the framework for sorting data.")
 ;;;;;;;;;;;;;
 (defun range-objects-in-memory (seq range)
   "Selects only the objects in 'range' from 'seq'."
-  (if range
-      (subseq seq (car range) (cdr range))
+  (if (and seq
+           range)
+      (subseq seq (car range) (min (length seq) (cdr range)))
       seq))
 

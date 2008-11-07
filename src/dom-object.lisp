@@ -24,7 +24,8 @@
   (:method ((obj dom-object-mixin))
     (if (slot-boundp obj 'dom-id)
 	(slot-value obj 'dom-id)
-	(setf (slot-value obj 'dom-id) (gen-id)))))
+	(when (boundp '*session*)
+	  (setf (slot-value obj 'dom-id) (gen-id))))))
 
 (defgeneric dom-id (obj)
   (:documentation "Provides a consistent interface to identifying widgets
@@ -56,7 +57,7 @@ widgets will have a CSS class of 'widget'."))
 			   ;; we remove the dom-object-mixin from the list of classes, as it
 			   ;; isn't too useful when styling widgets --jwr
 			   (loop for i in (remove (find-class 'dom-object-mixin)
-						  (superclasses obj :proper? nil))
+						  (moptilities:superclasses obj :proper? nil))
 			      until (string-equal (class-name i) 'standard-object)
 			      collect i)))
 		  " "))

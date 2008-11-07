@@ -2,8 +2,8 @@
 (in-package :weblocks)
 
 (export '(*last-session* start-weblocks stop-weblocks
-	  compute-public-files-path server-type
-	  server-version active-sessions))
+	  compute-public-files-path server-type server-version
+          session-name-string-pair))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -15,7 +15,7 @@
   hunchentoot lock in debug mode and nil in release mode by
   'start-weblocks'.")
 
-(defparameter *last-session* nil
+(defvar *last-session* nil
   "Bound to a session object associated with the last handled
   request. Note, this variable is only updated in debug mode.")
 
@@ -27,29 +27,36 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key debug (port 8080)
+(defun start-weblocks (&rest keys &key (debug t) (port 8080) (cookie-name "weblocks-session") 
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
 ':debug' keyword to true in order for stacktraces to be shown to the
-client. Other keys are passed to 'hunchentoot:start-server'. Opens all
+client. Set ':cookie-name' keyword when you want to change the name of the
+cookie. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
   (if debug
       (enable-global-debugging)
       (disable-global-debugging))
   (when (null *weblocks-server*)
-    (setf *session-cookie-name* "weblocks-session")
-    (setf *weblocks-server*
-	  (apply #'start-server :port port
-		 (remove-keyword-parameters keys :port :debug)))
-    (dolist (class *autostarting-webapps*)
-      (unless (get-webapps-for-class class)
-	(start-webapp class :debug debug)))))
+    (setf *session-cookie-name* cookie-name)
+    (values
+      (setf *weblocks-server*
+            (apply #'start-server :port port
+                   (remove-keyword-parameters keys :port :debug :cookie-name)))
+      (mapcar (lambda (class)
+                (unless (get-webapps-for-class class)
+                  (start-webapp class :debug debug)))
+              *autostarting-webapps*))))
 
 (defun stop-weblocks ()
   "Stops weblocks. Closes all stores declared via 'defstore'."
   (when (not (null *weblocks-server*))
     (dolist (app *active-webapps*)
-      (stop-webapp (weblocks-webapp-name app)))))
+      (stop-webapp (weblocks-webapp-name app)))
+    (setf *last-session* nil)
+    (reset-sessions)
+    (when (not (null *weblocks-server*)) (stop-server *weblocks-server*))
+    (setf *weblocks-server* nil)))
 
 (defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
   "Computes the directory of public files. The function uses the
@@ -66,21 +73,42 @@ The function serves all started applications"
     (let* ((script-name (script-name request))
 	   (app-prefix (webapp-prefix app))
 	   (app-pub-prefix (compute-webapp-public-files-uri-prefix app)))
-      (log-message :debug "Application dispatch for '~A'" script-name)
+      (log-message :debug "Application dispatch for ~S/~S" (hunchentoot:host) script-name)
       (cond
 	((list-starts-with (tokenize-uri script-name nil)
-			   (tokenize-uri app-pub-prefix nil)
+			   (tokenize-uri "/weblocks-common" nil)
 			   :test #'string=)
+	 (log-message :debug "Dispatching to common public file")
+         (return-from weblocks-dispatcher
+                      (funcall (create-folder-dispatcher-and-handler 
+                                 "/weblocks-common/pub/"
+                                 (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
+                                      it
+                                      #p"./pub")) ; as a last fallback
+                               request)))
+        ((and (webapp-serves-hostname (hunchentoot:host) app)
+              (list-starts-with (tokenize-uri script-name nil)
+			   (tokenize-uri app-pub-prefix nil)
+			   :test #'string=))
 	 (log-message :debug "Dispatching to public file")
+         ;; set caching parameters for static files
+         ;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
+         (if (weblocks-webapp-debug app)
+           (no-cache)
+           (let ((cache-time (weblocks-webapp-public-files-cache-time app)))
+             (check-type cache-time integer)
+             (setf (header-out "Expires") (rfc-1123-date (+ (get-universal-time) cache-time)))
+             (setf (header-out "Cache-Control") (format nil "max-age=~D" (max 0 cache-time)))))
 	 (return-from weblocks-dispatcher
 	   (funcall (create-folder-dispatcher-and-handler 
-		     (concatenate 'string app-pub-prefix)
+		     (maybe-add-trailing-slash app-pub-prefix)
 		     (compute-webapp-public-files-path app))
 		    request)))
-	((list-starts-with (tokenize-uri script-name nil)
-			   (tokenize-uri app-prefix nil)
-			   :test #'string=)
-	 (log-message :debug "Dispatching to application ~A with prefix '~A'" 
+	((and (webapp-serves-hostname (hunchentoot:host) app)
+              (list-starts-with (tokenize-uri script-name nil)
+                                (tokenize-uri app-prefix nil)
+                                :test #'string=))
+	 (log-message :debug "Dispatching to application ~A with prefix ~S"
 		      app app-prefix)
 	 (return-from weblocks-dispatcher 
 	   #'(lambda ()
@@ -100,24 +128,7 @@ The function serves all started applications"
 ;; install weblocks-dispatcher
 
 (eval-when (:load-toplevel)
-  (progn
-    (let ((pos (position 'weblocks-dispatcher *dispatch-table*))
-	  (public-files-path (compute-public-files-path :weblocks)))
-      (if pos
-	  (rplaca (nthcdr (1- pos) *dispatch-table*)
-		  #'(lambda (request)
-		      (funcall (create-folder-dispatcher-and-handler "/pub/" public-files-path)
-			       request)))
-	  (setf *dispatch-table*
-		(append 
-		 (list
-		  ;;; Default CSS files use /pub, ideally we shouldn't
-		  ;;; expose this through weblocks directly.
-		  #'(lambda (request)
-		      (funcall (create-folder-dispatcher-and-handler "/pub/" public-files-path)
-			       request))
-		  'weblocks-dispatcher)
-		 *dispatch-table*))))))
+  (push 'weblocks-dispatcher *dispatch-table* ))
 
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This

@@ -35,7 +35,8 @@ object identification schemes.")
     (let ((object-id-slot-name (object-id-slot-name obj)))
       (handler-case (when (slot-boundp obj object-id-slot-name)
 		      (slot-value obj object-id-slot-name))
-	(error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))))
+	(error ()
+          (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))))
 
 (defgeneric (setf object-id) (id obj)
   (:documentation
@@ -47,7 +48,8 @@ object identification schemes."))
 
 (defmethod (setf object-id) (id (obj standard-object))
   (handler-case (setf (slot-value obj (object-id-slot-name obj)) id)
-    (error (condition) (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
+    (error ()
+      (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
 
 ;;; Object store location
 (defgeneric class-store (class-name)
@@ -69,11 +71,11 @@ persist objects. Default implementation returns *default-store*."))
   (type nil :type symbol)
   (args nil))
 
-(defparameter *stores* (make-hash-table)
+(defvar *stores* (make-hash-table)
   "A hashmap of stores, where each item has store name as key, and
 structure of type 'store-info' as value.")
 
-(defparameter *store-names* nil
+(defvar *store-names* nil
   "A list of store names in the order in which they were defined.")
 
 (defmacro defstore (name type &rest args)

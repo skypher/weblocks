@@ -1,17 +1,26 @@
 ;;; Code shared accross the entire weblocks framework
-(defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript)
-  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-			  #:standard-generic-function #:ensure-generic-function
-			  #:standard-class #:typep #:subtypep)
-  (:shadowing-import-from :fare-matcher #:match)
-  (:shadow #:redirect)
-  (:documentation
-   "Weblocks is a Common Lisp framework that eases the pain of web
-application development. It achieves its goals by standardizing on
-various libraries, providing flexible and extensible generic views,
-and exposing a unique widget-based approach to maintaining UI
-state."))
+
+(defmacro without-package-variance-warnings (&body body)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (handler-bind (#+sbcl(sb-int:package-at-variance #'muffle-warning))
+       ,@body)))
+
+(without-package-variance-warnings
+  (defpackage #:weblocks
+    (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
+          :anaphora :f-underscore)
+    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+                            #:standard-generic-function #:ensure-generic-function
+                            #:standard-class #:typep #:subtypep)
+    (:shadowing-import-from :f-underscore #:f #:_)
+    (:shadowing-import-from :fare-matcher #:match)
+    (:shadow #:redirect #:errors)
+    (:documentation
+      "Weblocks is a Common Lisp framework that eases the pain of web
+      application development. It achieves its goals by standardizing on
+      various libraries, providing flexible and extensible generic views,
+      and exposing a unique widget-based approach to maintaining UI
+      state.")))
 
 (in-package :weblocks)
 
@@ -19,8 +28,8 @@ state."))
 (do-external-symbols (s (find-package :cont))
   (export (list s)))
 
-(export '(*weblocks-output-stream* with-html reset-sessions str
-	  with-javascript root-composite))
+(export '(*weblocks-output-stream* with-html with-html-to-string
+          reset-sessions str with-javascript with-javascript-to-string root-composite))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request
@@ -65,17 +74,39 @@ variable. All html should be rendered to this stream.")
 
 (defmacro with-html (&body body)
   "A wrapper around cl-who with-html-output macro."
-  `(with-html-output (*weblocks-output-stream* nil :indent nil)
+  `(with-html-output (*weblocks-output-stream* nil)
      ,@body))
+
+(defmacro with-html-to-string (&body body)
+  "A wrapper around cl-who with-html-output-to-string macro."
+  `(with-html-output-to-string (*weblocks-output-stream* nil)
+     ,@body))
+
+(defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
+  "Escape script blocks inside scripts."
+  (ppcre:regex-replace-all
+    (ppcre:quote-meta-chars "</script>")
+    (ppcre:regex-replace-all (ppcre:quote-meta-chars "]]>")
+                             source
+                             (format nil "]]~A + ~:*~A>" delimiter))
+    (format nil "</scr~A + ~:*~Aipt>" delimiter)))
+
+(defun %js (source &rest args)
+  "Helper function for WITH-JAVASCRIPT macros."
+  `(:script :type "text/javascript"
+            (fmt "~%// <![CDATA[~%")
+            (str (escape-script-tags (format nil ,source ,@args)))
+            (fmt "~%// ]]>~%")))
 
 (defmacro with-javascript (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
-  `(with-html
-     (:script :type "text/javascript"
-	      (fmt "~%// <![CDATA[~%")
-	      (fmt ,source ,@args)
-	      (fmt "~%// ]]>~%"))))
+  `(with-html ,(apply #'%js source args)))
+
+(defmacro with-javascript-to-string (source &rest args)
+  "Places 'source' between script and CDATA elements. Used to avoid
+having to worry about special characters in JavaScript code."
+  `(with-html-to-string ,(apply #'%js source args)))
 
 (defmacro root-composite ()
   "Expands to code that can be used as a place to access to the root

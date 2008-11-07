@@ -15,3 +15,11 @@
 	(values res (not (null present-p)))))
   foobar t)
 
+(addtest with-javascript-1
+    (set-sensible-suite)
+    (ensure-same
+      (with-output-to-string (*weblocks-output-stream*)
+        (with-javascript
+          "foo~A" "bar"))
+      (with-javascript-to-string "foo~A" "bar")))
+

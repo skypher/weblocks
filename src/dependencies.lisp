@@ -7,6 +7,7 @@
 	  render-dependency-in-page-head render-dependency-in-page-body-top
 	  render-dependency-in-page-body-bottom render-dependency-in-form-submit
 	  render-dependency-in-ajax-response
+          render-form-submit-dependencies
 	  make-local-dependency per-class-dependencies dependencies
 	  compact-dependencies build-local-dependencies))
 
@@ -165,7 +166,8 @@ type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (let ((physical-path (compute-webapp-public-files-path webapp))
-	(virtual-path (compute-webapp-public-files-uri-prefix webapp)))
+	(virtual-path (maybe-add-trailing-slash
+                        (compute-webapp-public-files-uri-prefix webapp))))
     (when (or do-not-probe (probe-file
 			    (merge-pathnames
 			     (public-file-relative-path type file-name)
@@ -173,6 +175,8 @@ returns a dependency object."
       (let ((full-path 
 	     (merge-pathnames (public-file-relative-path type file-name)
 			      virtual-path)))
+        ;(format t "relative: ~S, virtual: ~S -> full: ~S~%"
+        ;        (public-file-relative-path type file-name) virtual-path full-path)
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url full-path :media media))
@@ -241,7 +245,7 @@ represent a class."
   ;; from user-defined append methods and 2. traverse the class tree and
   ;; gather all class-related dependencies. This :around method collects
   ;; everything and removes empty dependencies.
-  (:method :around (obj) (remove nil (append (call-next-method) (per-class-dependencies obj))))
+  (:method :around (obj) (nreverse (remove nil (append (call-next-method) (per-class-dependencies obj)))))
 
   ;; No dependencies by default
   (:method append (obj) ())

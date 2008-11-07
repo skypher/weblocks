@@ -1,12 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(do-dialog do-choice do-confirmation do-information))
+(export '(do-dialog do-choice do-confirmation do-information current-dialog))
 
 (defstruct dialog
   "A structure that stores information about a currently displayed
 dialog."
-  title widget css-class)
+  title close widget css-class)
 
 (defmacro current-dialog ()
   "Expands to code that signifies a place that contains information
@@ -14,28 +14,36 @@ about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
   `(webapp-session-value 'dialog-contents))
 
-(defun show-dialog-js (title widget css-class &optional escape-script-tags-p)
+(defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
-the widget inside."
-  (flet ((escape-script-tags (source)
-	   (ppcre:regex-replace-all (ppcre:quote-meta-chars "</script>")
-				    (ppcre:regex-replace-all (ppcre:quote-meta-chars "]]>")
-							     source
-							     "]]\" + \">")
-				    "</scr\" + \"ipt>"))
+the widget inside." 
+  (declare (ignore escape-script-tags-p)) ; backwards compatibility
+  (flet ((make-close-action ()
+           (let* ((close-fn (if (functionp close)
+                                close
+                                (f_% (answer widget))))
+                  (close-action (make-action close-fn)))
+             (with-html-to-string
+               (:img :src (make-webapp-public-file-uri "images/dialog/close.gif")
+                     :onclick (format nil "initiateAction(\"~A\", \"~A\");"
+                                      close-action (session-name-string-pair))
+                     :onmouseover "this.style.cursor = \"pointer\";"
+                     :style "cursor: expression(\"hand\");"))))
 	 (widget-html (widget)
 	   (let ((*weblocks-output-stream* (make-string-output-stream)))
 	     (declare (special *weblocks-output-stream*))
 	     (render-widget widget)
 	     (get-output-stream-string *weblocks-output-stream*))))
-    (format nil "showDialog(~A, ~A, ~A);"
-	    (encode-json-to-string title)
-	    (funcall (if escape-script-tags-p
-			 #'escape-script-tags
-			 #'identity)
-		     (encode-json-to-string
-		      (widget-html widget)))
-	    (encode-json-to-string (or css-class "")))))
+    ;(format t "widget-html: ~S~%" (widget-html widget))
+    (let ((inner (intern (string-upcase (gen-id "inner"))))
+          (close-action (intern (string-upcase (gen-id "close")))))
+      `(progn
+         (setf ,inner ,(widget-html widget))
+         (setf ,close-action ,(when close (make-close-action)) )
+         (show-dialog ,title
+                      ,inner
+                      ,(or css-class "")
+                      ,close-action)))))
 
 (defun update-dialog-on-request ()
   "This callback function is called by 'handle-client-request'. If a
@@ -45,20 +53,19 @@ inserted into the page to redraw the dialog."
     (when (and current-dialog
 	       (refresh-request-p))
       (with-javascript
-	  "Event.observe(window, 'load', function() {~%~
-             ~A~%~
-        });"
-	(show-dialog-js (dialog-title current-dialog)
-			(dialog-widget current-dialog)
-			(dialog-css-class current-dialog)
-			t)))))
+	(ps* `(:|*Event.observe| window "load"
+                                 (lambda ()
+                                   ,(make-dialog-js (dialog-title current-dialog)
+                                                    (dialog-widget current-dialog)
+                                                    (dialog-css-class current-dialog)
+                                                    (dialog-close current-dialog)))))))))
 
 ;;; Presents 'callee' to the user in a modal dialog, saves the
 ;;; continuation, and returns from the delimited computation. When
 ;;; 'callee' answers, removes the modal interface and reactives the
 ;;; computation. If the modal interface isn't available, automatically
 ;;; scales down to 'do-modal' instead.
-(defun/cc do-dialog (title callee &key css-class)
+(defun/cc do-dialog (title callee &key css-class close)
   (declare (special *on-ajax-complete-scripts*))
   (if (ajax-request-p)
       (prog2
@@ -67,12 +74,11 @@ inserted into the page to redraw the dialog."
 	  (call callee (lambda (new-callee)
 			 (setf (current-dialog) (make-dialog :title title
 							     :widget new-callee
+							     :close close
 							     :css-class css-class))
-			 (push (json-function (show-dialog-js title new-callee css-class))
-			       *on-ajax-complete-scripts*)))
+                         (send-script (ps* (make-dialog-js title new-callee css-class close)))))
 	(setf (current-dialog) nil)
-	(push (json-function (ps (remove-dialog)))
-	      *on-ajax-complete-scripts*))
+        (send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
 (defun render-choices-get (msg choices k)

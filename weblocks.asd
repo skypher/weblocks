@@ -14,7 +14,7 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-			   :fare-matcher :cl-cont :parenscript)
+			   :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
@@ -30,6 +30,8 @@
 			:depends-on ("weblocks" utils "application"))
 		 (:file "actions"
 			:depends-on ("weblocks" utils))
+		 (:file "log-actions"
+			:depends-on ("weblocks"))
 		 (:file "debug-mode"
 			:depends-on ("weblocks" "actions"))
 		 (:file "request-hooks"
@@ -88,7 +90,8 @@
 						     (:file "password")
 						     (:module
 						      presentations
-						      :components ((:file "choices")
+						      :components ((:file "hidden")
+                                                                   (:file "choices")
 								   (:file "radio"
 									  :depends-on ("choices"))
 								   (:file "dropdown"
@@ -114,8 +117,10 @@
 							     (:file "widget-mop")))
 				       (:file "flash"
 					      :depends-on (widget))
-				       (:file "dataform"
+				       (:file "data-editor"
 					      :depends-on (widget))
+				       (:file "dataform"
+					      :depends-on (widget "data-editor"))
 				       (:file "quickform"
 					      :depends-on (widget "dataform"))
 				       (:file "login"
@@ -169,8 +174,10 @@
 			:depends-on ("weblocks" "debug-mode" utils store))
 		 (:file "request"
 			:depends-on ("weblocks" "actions"))
-		 (:file "application"
+		 (:file "application-mop"
 			:depends-on ("weblocks"))
+		 (:file "application"
+			:depends-on ("weblocks" "application-mop"))
 		 (:file "default-application"
 			:depends-on ("server" "weblocks" utils "request-handler")))))
   :in-order-to ((asdf:test-op (load-op "weblocks-test"))
