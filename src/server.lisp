@@ -15,7 +15,7 @@
   hunchentoot lock in debug mode and nil in release mode by
   'start-weblocks'.")
 
-(defparameter *last-session* nil
+(defvar *last-session* nil
   "Bound to a session object associated with the last handled
   request. Note, this variable is only updated in debug mode.")
 

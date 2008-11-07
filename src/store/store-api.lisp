@@ -25,7 +25,7 @@
   should erase data, but not necessarily any schema information (like
   tables, etc.)"))
 
-(defparameter *default-store* nil
+(defvar *default-store* nil
   "The default store to which objects are persisted.")
 
 ;;; Transactions

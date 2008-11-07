@@ -3,7 +3,7 @@
 
 (export '(*expired-action-handler* expired-action-handler page-not-found-handler make-action-url make-action))
 
-(defparameter *expired-action-handler* 'default-expired-action-handler
+(defvar *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a function with a single optional
 argument - the application. The function gets called when the user
 tries to invoke an expired action (due to a session timeout). The
