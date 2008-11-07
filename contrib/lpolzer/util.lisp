@@ -167,7 +167,7 @@
     (dolist (part parts)
       (write part :stream out :escape nil))))
 
-(defparameter +default-chars+ "abcdefghijklmnpqrstuvwxyx123456789")
+(defparameter +default-chars+ "abcdefghijklmnopqrstuvwxyx123456789")
 
 (defun generate-password (length &key (chars +default-chars+))
   (coerce (loop for i from 1 to length
