@@ -192,7 +192,8 @@ stylesheets and javascript links in the page header."))
 	(ps* `(,(typecase dep
                   (stylesheet-dependency 'include_css)
                   (script-dependency 'include_dom))
-               ,(puri:render-uri (dependency-url dep) nil)))))
+               ,(puri:render-uri (dependency-url dep) nil)))
+        :before-load))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
