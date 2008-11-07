@@ -101,9 +101,9 @@
 	(with-call/cc
 	  (do-widget w1 w2 (lambda (new-callee)
 			     (if (eq new-callee w2)
-				 0
-				 1))))
-	(values (eq (car (composite-widgets c)) 0)
+				 "0"
+				 "1"))))
+	(values (equal (car (composite-widgets c)) "0")
 		(progn (answer w2)
 		       (eq (car (composite-widgets c)) w1)))))
   t t)
