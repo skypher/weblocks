@@ -61,6 +61,7 @@ by default).
 				       action-code (session-name-string-pair)))
 	  (etypecase name
 	    (string (htm (str name)))
+	    (symbol (htm (str name)))
 	    (function (funcall name)))))
     (log-link name action-code :id id :class class)))
 
@@ -323,10 +324,19 @@ in addition."
        (:noscript
 	 ,@body))))
 
+(defmacro pushlast (value place)
+  `(if (consp ,place)
+       (setf (cdr (last ,place)) 
+	     (cons ,value nil))
+       (setf ,place (cons ,value nil))))
+
 (defun send-script (script &optional (place :after-load))
+  "Send JavaScript to the browser. The way of sending depends
+  on whether the current request is via AJAX or not.
+  
+  FIXME: is using PUSH or PUSHLAST correct?"
   (if (ajax-request-p)
     (let ((code (with-javascript-to-string script)))
-    ;(let ((json (format nil "new Function(~A)" (encode-json-to-string script))))
       (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
       (ecase place
         (:before-load (push code *before-ajax-complete-scripts*))
