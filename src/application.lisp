@@ -319,7 +319,7 @@ to my `application-dependencies' slot."
 ;;
 
 (defvar *current-webapp*)
-(setf (documentation '*uri-tokens* 'variable)
+(setf (documentation '*current-webapp* 'variable)
       "A currently active web application.")
 
 (defun current-webapp ()
