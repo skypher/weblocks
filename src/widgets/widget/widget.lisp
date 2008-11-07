@@ -109,7 +109,8 @@ inherits from 'widget' if no direct superclasses are provided."
   (:method ((obj widget)) t)
   (:method ((obj symbol)) t)
   (:method ((obj function)) t)
-  (:method ((obj string)) t))
+  (:method ((obj string)) t)
+  (:method (obj) nil))
 
 ;;; Define widget-rendered-p for objects that don't derive from
 ;;; 'widget'
