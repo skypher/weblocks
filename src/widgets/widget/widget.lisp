@@ -98,7 +98,8 @@ inherits from 'widget' if no direct superclasses are provided."
 ;;; Don't allow setting a parent for widget that already has one
 ;;; (unless it's setting parent to nil)
 (defmethod (setf widget-parent) (val (obj widget))
-  (if (and val (widget-parent obj) (not *override-parent-p*))
+  (if (and val (not (member (widget-parent obj) `(,val nil)))
+	   (not *override-parent-p*))
       (error "Widget ~a already has a parent." obj)
       (setf (slot-value obj 'parent) val)))
 
