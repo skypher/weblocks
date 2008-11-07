@@ -7,11 +7,8 @@
 
 (without-package-variance-warnings
   (defpackage #:weblocks
-    (:use :cl :c2mop :metabang.utilities :moptilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
+    (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
           :anaphora :f-underscore)
-    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-                            #:standard-generic-function #:ensure-generic-function
-                            #:standard-class #:typep #:subtypep)
     (:shadowing-import-from :f-underscore #:f #:_)
     (:shadowing-import-from :fare-matcher #:match)
     (:shadow #:redirect #:errors)
