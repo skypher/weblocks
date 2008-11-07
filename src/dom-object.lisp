@@ -56,7 +56,7 @@ widgets will have a CSS class of 'widget'."))
 			   ;; we remove the dom-object-mixin from the list of classes, as it
 			   ;; isn't too useful when styling widgets --jwr
 			   (loop for i in (remove (find-class 'dom-object-mixin)
-						  (superclasses obj :proper? nil))
+						  (moptilities:superclasses obj :proper? nil))
 			      until (string-equal (class-name i) 'standard-object)
 			      collect i)))
 		  " "))
