@@ -103,6 +103,11 @@ inherits from 'widget' if no direct superclasses are provided."
       (error "Widget ~a already has a parent." obj)
       (setf (slot-value obj 'parent) val)))
 
+(deftype valid-widget ()
+  "The supertype of all widgets.  Check against this type instead of
+`widget' unless you know what you're doing."
+  '(satisfies valid-widget-p))
+
 (defgeneric valid-widget-p (widget)
   (:documentation "Returns t when widget is a valid, renderable widget;
    this includes strings, function, etc.")
