@@ -126,6 +126,14 @@
     (widget-name 'identity)
   identity)
 
+;;; valid-widget typechecking
+(addtest nil-is-not-valid
+  (ensure-null (weblocks::valid-widget-p nil)))
+
+(addtest valid-widget-export-status-same
+  (ensure-same (symbol-status 'weblocks::valid-widget)
+	       (symbol-status 'weblocks::valid-widget-p)))
+
 ;;; test composite-widgets specialization for widgets
 (deftest composite-widgets-1
     (composite-widgets #'identity)
