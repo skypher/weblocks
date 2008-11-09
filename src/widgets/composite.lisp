@@ -33,13 +33,12 @@
 	     child composite))
     (lambda (&optional (callee nil callee-supplied-p))
       (assert (cons-in-list-p place (composite-widgets composite)))
-      (cond ((and callee-supplied-p (valid-widget-p callee))
+      (cond (callee-supplied-p
+	     (check-type callee valid-widget
+			 "a potential member of a composite")
 	     (rplaca place callee)
 	     (setf (widget-parent callee) composite)
 	     (mark-dirty composite))
-	    (callee-supplied-p
-	     (error "Attempted to write invalid widget ~A to composite ~A" 
-		    callee composite))
 	    (t (car place))))))
 
 (defun cons-in-list-p (cell list)

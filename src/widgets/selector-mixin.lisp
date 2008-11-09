@@ -118,12 +118,11 @@ specified uri tokens if such a pane exists. Otherwise, returns nil."
 	     child selector))
     (lambda (&optional (callee nil callee-supplied-p))
       (assert (find place (selector-mixin-panes selector)))
-      (cond ((and callee-supplied-p (valid-widget-p callee))
+      (cond (callee-supplied-p
+	     (check-type callee valid-widget
+			 "a potential pane of a selector-mixin")
 	     (rplacd place callee)
 	     (setf (widget-parent callee) selector)
 	     (mark-dirty selector))
-	    (callee-supplied-p
-	     (error "Attempted to write invalid widget ~A to selector-mixin ~A" 
-		    callee selector))
 	    (t (cdr place))))))
 
