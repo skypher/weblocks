@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite request-handler-suite (weblocks-suite)
+  ())
+
 ;;; testing handle-client-request
 (deftest handle-client-request-0
     (with-request :get nil
@@ -481,3 +484,32 @@ null:\"<p>test</p>\"~
 \"on-load\":[\"testjs\"]~
 }"))
 
+(defwidget dirtier ()
+  ((other :initarg :other)))
+
+(defmethod render-widget-body ((wij dirtier) &key &allow-other-keys)
+  (mark-dirty (slot-value wij 'other))
+  (princ 42 *weblocks-output-stream*))
+
+(addtest detect-dirty-circularity
+  (ensure-same (symbol-status 'dirtier) :internal)
+  (symbol-macrolet ((d weblocks::*dirty-widgets*))
+    (let* ((a (make-instance 'dirtier :dom-id "a"))
+	   (b (make-instance 'dirtier :other a :dom-id "b"))
+	   (weblocks::*dirty-widgets* '()))
+      (declare (special weblocks::*dirty-widgets*))
+      (setf (slot-value a 'other) b)
+      (setf d (list a b))
+      (weblocks::render-dirty-widgets)
+      (ensure-null d)
+      (ensure-same (get-output-stream-string *weblocks-output-stream*)
+		   #.(format nil "~
+{~
+\"widgets\":~
+{~
+\"a\":\"42\",~
+\"b\":\"42\"~
+},~
+\"before-load\":null,~
+\"on-load\":null~
+}")))))

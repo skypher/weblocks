@@ -151,17 +151,39 @@ association list. This function is normally called by
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
   (setf (content-type) *json-content-type*)
-  (let ((widget-alist (mapcar (lambda (w)
-				(cons
-				 (dom-id w)
-				 (progn
-				   (render-widget w :inlinep t)
-				   (get-output-stream-string *weblocks-output-stream*))))
-			      *dirty-widgets*)))
-    (format *weblocks-output-stream* "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
-	    (encode-json-to-string widget-alist)
-	    (encode-json-to-string *before-ajax-complete-scripts*)
-	    (encode-json-to-string *on-ajax-complete-scripts*))))
+  (let ((render-state (make-hash-table :test 'eq)))
+    (labels ((circularity-warn (w)
+	       (style-warn 'non-idempotent-rendering
+		:change-made
+		(format nil "~S was marked dirty and skipped after ~
+			     already being rendered" w)))
+	     (render-enqueued (dirty)
+	       (loop for w in dirty
+		     if (gethash w render-state)
+		       do (circularity-warn w)
+		     else
+		       do (render-widget w :inlinep t)
+			  (setf (gethash w render-state) t)
+		       and collect (cons (dom-id w)
+					 (get-output-stream-string
+					     *weblocks-output-stream*))))
+	     (late-propagation-warn (ws)
+	       (style-warn 'report-non-idempotent-rendering
+		:change-made
+		(format nil "~A widgets were marked dirty" (length ws))))
+	     (absorb-dirty-widgets ()
+	       (loop for dirty = *dirty-widgets*
+		     while dirty
+		     count t into runs
+		     when (= 2 runs)
+		       do (late-propagation-warn dirty)
+		     do (setf *dirty-widgets* '())
+		     nconc (render-enqueued dirty))))
+      (format *weblocks-output-stream*
+	      "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
+	      (encode-json-to-string (absorb-dirty-widgets))
+	      (encode-json-to-string *before-ajax-complete-scripts*)
+	      (encode-json-to-string *on-ajax-complete-scripts*)))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
