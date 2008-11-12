@@ -386,22 +386,21 @@ provider URI)."
     (concatenate 'string (weblocks-webapp-public-files-uri-prefix app) "/" uri)
     app))
 
-(defun webapp-session-value (symbol &optional (session *session*))
+(defun webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
   "Get a session value from the currently running webapp"
-  (declare (special *current-webapp*))
-  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)) session)))
+  
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (cond (webapp-session
 	   (gethash symbol webapp-session))
-	  (*current-webapp* (values nil nil))
+	  (webapp (values nil nil))
 	  (t nil))))
 
-(defun (setf webapp-session-value) (value symbol)
-  "Set a session value for the currently runnin webapp"
-  (declare (special *current-webapp*))
-  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)))))
+(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp *current-webapp*))
+  "Set a session value for the currently runnin webapp" 
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test 'equal)
-	    (session-value (class-name (class-of *current-webapp*))) webapp-session))
+	    (session-value (class-name (class-of webapp))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
 
