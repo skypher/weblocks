@@ -168,7 +168,7 @@ association list. This function is normally called by
 					 (get-output-stream-string
 					     *weblocks-output-stream*))))
 	     (late-propagation-warn (ws)
-	       (style-warn 'report-non-idempotent-rendering
+	       (style-warn 'non-idempotent-rendering
 		:change-made
 		(format nil "~A widgets were marked dirty" (length ws))))
 	     (absorb-dirty-widgets ()
