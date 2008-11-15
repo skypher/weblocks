@@ -29,6 +29,7 @@
 		  (throw 'annihilate-dataform nil))
      :on-success (lambda (obj)
 		   (safe-funcall (dataedit-on-add-item grid) grid (dataform-data obj))
+		   (safe-funcall (dataedit-on-add-item-completed grid) grid (dataform-data obj))
 		   (flash-message (dataseq-flash grid)
 				  (format nil "Added ~A."
 					  (humanize-name (dataseq-data-class grid))))
