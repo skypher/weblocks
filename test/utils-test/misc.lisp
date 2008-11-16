@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite utils/misc-suite (weblocks-suite)
+  ())
+
 ;;; Test humanize-name function
 (deftest humanize-name-1
     (humanize-name 'hello-world)
@@ -430,3 +433,12 @@
 (deftest function-designator-p-4
     (function-designator-p (list))
   nil)
+
+;;; maybe-add-trailing-slash
+(addtest maybe-add-trailing-slash-accept-pathnames
+  (let* ((p (make-pathname :directory '(:absolute "usr" "bin")))
+	 (p2 (make-pathname :defaults p :name "env" :type nil
+			    :version :newest)))
+    (ensure-same (weblocks::maybe-add-trailing-slash p) p)
+    (ensure-same (weblocks::maybe-add-trailing-slash p2)
+		 (make-pathname :directory '(:absolute "usr" "bin" "env")))))

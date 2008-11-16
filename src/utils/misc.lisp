@@ -485,7 +485,10 @@ Returns the number of stripped slashes as second value."
 
 (defun maybe-add-trailing-slash (s)
   "Supply a trailing slash if needed."
-  (if (equal (subseq s (1- (length s))) "/")
-    s
-    (concatenate 'string s "/")))
+  (typecase s
+    (pathname (fad:pathname-as-directory s))
+    (otherwise
+       (if (equal (subseq s (1- (length s))) "/")
+	   s
+	   (concatenate 'string s "/")))))
 
