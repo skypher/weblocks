@@ -2,7 +2,21 @@
 (in-package :weblocks)
 
 (export '(do-widget do-page do-modal answer make-widget-place-writer 
-          adopt-widget))
+          adopt-widget widget-not-in-parent))
+
+
+(define-condition widget-not-in-parent (webapp-style-warning)
+  ((widget :accessor widget :initarg :widget)
+   (parent :accessor parent :initarg :parent))
+  (:report report-widget-not-in-parent)
+  (:documentation "This style warning serves as a makeshift
+                  until we find a proper way to have an idempotent
+                  DO-WIDGET."))
+
+(defun report-widget-not-in-parent (c stream)
+  "Display human-readably that a widget could not be found in its parent."
+  (format stream "Widget ~S cannot be found in parent ~S."
+          (widget c) (parent c)))
 
 ;;; Specialize widget-continuation
 (defmethod widget-continuation ((widget function))

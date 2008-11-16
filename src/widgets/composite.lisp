@@ -28,18 +28,20 @@
   "Return a function encapsulating the list where the child is in the car
    of the first element."
   (let ((place (member child (composite-widgets composite))))
-    (unless place
-      (error "Widget ~S cannot be found in parent ~S."
-	     child composite))
-    (lambda (&optional (callee nil callee-supplied-p))
-      (assert (cons-in-list-p place (composite-widgets composite)))
-      (cond (callee-supplied-p
-	     (check-type callee valid-widget
-			 "a potential member of a composite")
-	     (rplaca place callee)
-	     (setf (widget-parent callee) composite)
-	     (mark-dirty composite))
-	    (t (car place))))))
+    (if place
+      (lambda (&optional (callee nil callee-supplied-p))
+        (assert (cons-in-list-p place (composite-widgets composite)))
+        (cond
+          (callee-supplied-p
+            (check-type callee valid-widget
+                        "a potential member of a composite")
+            (rplaca place callee)
+            (setf (widget-parent callee) composite)
+            (mark-dirty composite))
+          (t (car place))))
+      (lambda (&rest args)
+        (style-warn 'widget-not-in-parent :widget child :parent composite)
+        (mark-dirty composite)))))
 
 (defun cons-in-list-p (cell list)
   "Simple test that the cell is still part of list to validate the place

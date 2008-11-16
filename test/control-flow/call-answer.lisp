@@ -126,6 +126,19 @@
 		(not (null (widget-dirty-p c))))))
   t t t)
 
+#+(or)
+(deftest do-widget-idempotent
+    (with-request :get nil
+      (let* ((w1 (make-instance 'composite))
+             (w2 (make-instance 'composite))
+             (parent (make-instance 'composite
+                                    :widgets (list w1))))
+        (do-widget w1 w2)
+        (ensure-condition widget-not-in-parent
+          (do-widget w1 w2))
+        t))
+    t)
+
 ;;; test do-page
 (deftest do-page-1
     (with-request :get nil
