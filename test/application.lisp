@@ -23,6 +23,14 @@
     (ensure-null (webapp-description))))
 
 
+;;; webapp session values
+(addtest session-value
+  (with-webapp ()
+    (setf (webapp-session-value 'foo) 'bar)
+    (ensure-same (webapp-session-value 'foo) 'bar)))
+
+
+;;; uri prefix
 (defwebapp hello2-webapp
            :prefix "/")
 
@@ -45,6 +53,7 @@
       (ensure-same (make-webapp-uri "bar") "/foo/bar"))))
 
 
+;;; public files' uri prefix
 (defwebapp hello5-webapp
            :prefix "/"
            :public-files-uri-prefix "/pub") 
@@ -71,11 +80,19 @@
 		  (weblocks::current-webapp)) "/foo/pub")
     (ensure-same (make-webapp-public-file-uri "foo.css") "/foo/pub/foo.css")))
 
-(addtest session-value
-  (with-webapp ()
-    (setf (webapp-session-value 'foo) 'bar)
-    (ensure-same (webapp-session-value 'foo) 'bar)))
 
+;;; public files' path
+(defwebapp hello8-webapp
+           :public-files-path "./pub") 
+(defwebapp hello9-webapp
+           :public-files-path "./pub/") 
+
+(addtest defwebapp-pub-path
+  (dolist (app '(hello8-webapp hello9-webapp))
+    (with-webapp (:class-name app)
+      (ensure-same (webapp-public-files-path) "./pub/"))))
+
+;;; interaction of hostname and prefix dispatching
 (defwebapp host-1
            :hostnames '("foo.com")
            :prefix "/foo")
