@@ -33,7 +33,7 @@
         (assert (cons-in-list-p place (composite-widgets composite)))
         (cond
           (callee-supplied-p
-            (check-type callee valid-widget
+            (check-type callee widget-designator
                         "a potential member of a composite")
             (rplaca place callee)
             (setf (widget-parent callee) composite)

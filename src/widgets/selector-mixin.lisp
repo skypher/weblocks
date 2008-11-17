@@ -119,7 +119,7 @@ specified uri tokens if such a pane exists. Otherwise, returns nil."
     (lambda (&optional (callee nil callee-supplied-p))
       (assert (find place (selector-mixin-panes selector)))
       (cond (callee-supplied-p
-	     (check-type callee valid-widget
+	     (check-type callee widget-designator
 			 "a potential pane of a selector-mixin")
 	     (rplacd place callee)
 	     (setf (widget-parent callee) selector)

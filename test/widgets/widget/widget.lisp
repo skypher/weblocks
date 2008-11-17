@@ -126,13 +126,19 @@
     (widget-name 'identity)
   identity)
 
-;;; valid-widget typechecking
+;;; widget-designator typechecking
 (addtest nil-is-not-valid
-  (ensure-null (weblocks::valid-widget-p nil)))
+  (ensure-same (typep nil 'weblocks::widget-designator)
+	       (values nil t))
+  (ensure-null (weblocks::widget-designator-p nil)))
 
-(addtest valid-widget-export-status-same
-  (ensure-same (symbol-status 'weblocks::valid-widget)
-	       (symbol-status 'weblocks::valid-widget-p)))
+(addtest widget-designator-export-status-same
+  (ensure-same (symbol-status 'weblocks::widget-designator)
+	       (symbol-status 'weblocks::widget-designator-p)))
+
+(addtest widget-designator-type-not-extensible
+  (ensure-null
+   (typep #'weblocks::widget-designator-p 'generic-function)))
 
 ;;; test composite-widgets specialization for widgets
 (deftest composite-widgets-1
