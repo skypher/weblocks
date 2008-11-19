@@ -34,6 +34,11 @@
 client. Set ':cookie-name' keyword when you want to change the name of the
 cookie. Other keys are passed to 'hunchentoot:start-server'. Opens all
 stores declared via 'defstore'."
+  #+sbcl
+  (unless (member :sb-thread *features*)
+    (cerror "I know what I'm doing and will stubbornly continue."
+            "You're trying to start Weblocks on SBCL without threading
+            support. Recompile your SBCL with threads enabled."))
   (if debug
       (enable-global-debugging)
       (disable-global-debugging))
