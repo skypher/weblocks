@@ -63,7 +63,7 @@
 				   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (cond
-    ((string-equal "t" value) (values t t t))
+    ((member value '("t" "f") :test #'string-equal) (values t t t))
     ((null value) (values t t nil))
     (t nil)))
 
