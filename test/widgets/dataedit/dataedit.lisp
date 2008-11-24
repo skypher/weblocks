@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widgets/dataedit/dataedit-suite (weblocks-suite)
+  ())
+
 ;;; Test initialize instance for dataedit
 (deftest initialize-instance-dataedit-1
     (with-request :get nil
@@ -13,6 +16,12 @@
       (let ((obj (make-instance 'listedit :data-class 'employee)))
 	(not (null (dataseq-on-drilldown obj)))))
   t)
+
+(addtest initialize-instance-dataedit-with-drilldown-kwarg
+  (ensure-same (dataseq-on-drilldown
+		(make-instance 'listedit
+		  :data-class 'employee :on-drilldown '(values . values)))
+	       '(values . values)))
 
 ;;; Test dataedit-drilldown-action
 (deftest dataedit-drilldown-action-1

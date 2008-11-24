@@ -100,10 +100,12 @@ documentation for more details.")
   editing functionality."))
 
 ;;; We need to set up the value of dataseq-on-drilldown
-(defmethod initialize-instance :after ((obj dataedit-mixin) &rest initargs &key &allow-other-keys)
-  (declare (ignore initargs))
-  (setf (dataseq-on-drilldown obj)
-	(cons 'modify #'dataedit-drilldown-action)))
+(defmethod initialize-instance :after
+    ((obj dataedit-mixin) &key (on-drilldown nil on-drilldown?) &allow-other-keys)
+  (declare (ignore on-drilldown))
+  (unless on-drilldown?
+    (setf (dataseq-on-drilldown obj)
+	  (cons 'modify #'dataedit-drilldown-action))))
 
 ;;; Drilldown
 (defgeneric dataedit-create-drilldown-widget (obj item)
