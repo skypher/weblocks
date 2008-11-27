@@ -437,6 +437,31 @@ onclick='disableIrrelevantButtons(this);' />~
 	*res*))
   0)
 
+(defwebapp broken-init
+  :init-user-session 'broken-init-user-session)
+
+(defun broken-init-user-session (rootcomp)
+  (cerror "keep going" "oopsie I messed up")
+  (setf (composite-widgets rootcomp) '("hello there")))
+
+(addtest allow-restart-in-sessinit
+  (with-webapp (:class-name 'broken-init)
+    (with-request :get nil :uri "/broken-init/"
+      (let ((finished-handler 0))
+	(handler-bind
+	    ((simple-error
+	      (lambda (sig)
+		(ensure-same (format nil "~A" sig) "oopsie I messed up")
+		(let ((restart (find-restart 'continue)))
+		  (ensure restart)
+		  (incf finished-handler)
+		  (invoke-restart restart)))))
+	  (catch 'hunchentoot::handler-done
+	    (handle-client-request (weblocks::current-webapp))))
+	(ensure-same finished-handler 1)
+	(ensure-same (composite-widgets (root-composite))
+		     '("hello there"))))))
+
 ;;; test remove-session-from-uri
 (deftest remove-session-from-uri-1
     (with-request :get nil
