@@ -163,7 +163,7 @@ in order to reset the state after the item widget has done its job."
 	(dataedit-create-new-item-widget obj))
   (setf (dataedit-ui-state obj) :add))
 
-(defun dataedit-update-operations (obj &key
+(defmethod dataedit-update-operations (obj &key
 				   (delete-fn #'dataedit-delete-items-flow)
 				   (add-fn #'dataedit-add-items-flow))
   "Should be used to update operations the widget supports.
