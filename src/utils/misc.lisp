@@ -1,19 +1,20 @@
 
 (in-package :weblocks)
 
-(export '(gen-id humanize-name attributize-name insert-after insert-at
-	  slot-value-by-path safe-apply safe-funcall request-parameter
-	  request-parameters string-whitespace-p render-extra-tags
-	  with-extra-tags alist->plist intersperse
-	  remove-keyword-parameter remove-keyword-parameters
-	  public-file-relative-path public-files-relative-paths
-	  request-uri-path string-remove-left string-remove-right
-	  find-all stable-set-difference symbol-status
-	  string-invert-case ninsert add-get-param-to-url
-	  remove-parameter-from-uri asdf-system-directory
-	  make-isearch-regex hash-keys object-class-name
-	  append-custom-fields find-slot-dsd find-slot-esd drop-last
-	  function-designator-p list-starts-with safe-subseq))
+(wexport '(gen-id humanize-name attributize-name insert-after insert-at
+	   slot-value-by-path safe-apply safe-funcall request-parameter
+	   request-parameters string-whitespace-p render-extra-tags
+	   with-extra-tags alist->plist intersperse
+	   remove-keyword-parameter remove-keyword-parameters
+	   public-file-relative-path public-files-relative-paths
+	   request-uri-path string-remove-left string-remove-right
+	   find-all stable-set-difference symbol-status
+	   string-invert-case ninsert add-get-param-to-url
+	   remove-parameter-from-uri asdf-system-directory
+	   make-isearch-regex hash-keys object-class-name
+	   append-custom-fields find-slot-dsd find-slot-esd drop-last
+	   function-designator-p list-starts-with safe-subseq)
+	 '(t util))
 
 (defun gen-id (&optional (prefix ""))
   "Generates an ID unique accross the session. The generated ID can be
