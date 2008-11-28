@@ -19,13 +19,13 @@
 
 (defmethod print-view-field-value
     (value (self us-cents-presentation) field view widget obj &rest args)
-  (declare (ignorable args))
+  (declare (ignore field view widget obj args))
   (multiple-value-bind (dollars cents) (truncate value 100)
     (format nil "$~:D.~2,'0D" dollars cents)))
 
 (defmethod weblocks:parse-view-field-value
     ((parser us-cents-parser) value obj view field &rest args)
-  (declare (ignorable args))
+  (declare (ignore obj view field args))
   (let* ((present? (text-input-present-p value))
 	 (float-start
 	  (and present?
