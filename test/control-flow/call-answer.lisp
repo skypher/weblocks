@@ -126,18 +126,15 @@
 		(not (null (widget-dirty-p c))))))
   t t t)
 
-#+(or)
-(deftest do-widget-idempotent
-    (with-request :get nil
-      (let* ((w1 (make-instance 'composite))
-             (w2 (make-instance 'composite))
-             (parent (make-instance 'composite
-                                    :widgets (list w1))))
-        (do-widget w1 w2)
-        (ensure-condition widget-not-in-parent
-          (do-widget w1 w2))
-        t))
-    t)
+(addtest do-widget-idempotent
+  (let* ((w1 (make-instance 'composite))
+	 (w2 (make-instance 'composite))
+	 (parent (make-instance 'composite
+				:widgets (list w1))))
+    (setf (weblocks::weblocks-webapp-debug (weblocks::current-webapp)) t)
+    (do-widget w1 w2)
+    (ensure-condition widget-not-in-parent
+      (do-widget w1 w2))))
 
 ;;; test do-page
 (deftest do-page-1
