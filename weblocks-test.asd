@@ -115,6 +115,7 @@
 							     (:file "widget-mop"))
 						:depends-on ("widget-test-utils"))
 				       (:file "dataform")
+				       (:file "data-editor")
 				       (:file "quickform")
 				       (:file "login")
 				       (:file "flash")

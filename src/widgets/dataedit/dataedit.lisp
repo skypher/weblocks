@@ -188,12 +188,9 @@ in order to reset the state after the item widget has done its job."
 	     (dataseq-common-ops obj)
 	     :key #'car)))
 
+(defgeneric dataedit-item-widget-data (w)
+  (:documentation "Returns the item held by the dataedit-item-widget."))
+
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))
   (list (make-local-dependency :stylesheet "dataform")))
-
-
-(defgeneric dataedit-item-widget-data (w)
-  (:documentation "Returns the item held by the dataedit-item-widget.")
-  (:method ((w dataform))
-    (dataform-data w)))
