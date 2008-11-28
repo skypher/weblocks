@@ -142,7 +142,7 @@
 						:components ((:file "dataedit"
 								    :depends-on (#-cmu "delete-action"))
 							     #-cmu (:file "delete-action"))
-						:depends-on (widget))
+						:depends-on (widget dataseq))
 				       (:file "gridedit"
 					      :depends-on (datagrid dataedit "dataform"))
 				       (:file "listedit"
