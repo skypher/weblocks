@@ -118,7 +118,7 @@
 				       (:file "flash"
 					      :depends-on (widget))
 				       (:file "data-editor"
-					      :depends-on (widget))
+					      :depends-on (widget dataedit))
 				       (:file "dataform"
 					      :depends-on (widget "data-editor"))
 				       (:file "quickform"
@@ -142,7 +142,7 @@
 						:components ((:file "dataedit"
 								    :depends-on (#-cmu "delete-action"))
 							     #-cmu (:file "delete-action"))
-						:depends-on (widget))
+						:depends-on (widget dataseq))
 				       (:file "gridedit"
 					      :depends-on (datagrid dataedit "dataform"))
 				       (:file "listedit"
