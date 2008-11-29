@@ -2,6 +2,9 @@
 (defpackage #:{APPNAME}
   (:use :cl :weblocks
         :f-underscore :anaphora)
+  (:import-from :hunchentoot #:redirect #:header-in
+                             #:set-cookie #:set-cookie* #:cookie-in
+                             #:user-agent #:referer)
   (:documentation
    "A web application based on Weblocks."))
 
