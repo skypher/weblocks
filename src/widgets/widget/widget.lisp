@@ -213,13 +213,7 @@ stylesheets and javascript links in the page header."))
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
   (declare (special *page-dependencies*))
   (if (ajax-request-p)
-    (dolist (dep (dependencies obj))
-      (send-script
-	(ps* `(,(typecase dep
-                  (stylesheet-dependency 'include_css)
-                  (script-dependency 'include_dom))
-               ,(puri:render-uri (dependency-url dep) nil)))
-        :before-load))
+    (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
   (if inlinep
