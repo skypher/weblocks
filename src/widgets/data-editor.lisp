@@ -54,9 +54,6 @@
     (setf (dataform-class-store obj)
 	  (object-store (dataform-data obj)))))
 
-(defmethod dataedit-item-widget-data ((w data-editor))
-  (dataform-data w))
-
 (defgeneric render-dataform-data-buttons (dataform data)
   (:documentation "Render the buttons and links appearing with the
   data view on a dataform."))

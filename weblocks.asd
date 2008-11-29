@@ -118,7 +118,7 @@
 				       (:file "flash"
 					      :depends-on (widget))
 				       (:file "data-editor"
-					      :depends-on (widget dataedit))
+					      :depends-on (widget))
 				       (:file "dataform"
 					      :depends-on (widget "data-editor"))
 				       (:file "quickform"

@@ -5,7 +5,6 @@
 	  dataedit-on-add-item dataedit-allow-add-p
 	  dataedit-on-delete-items dataedit-cascade-delete-mixins-p
 	  dataedit-on-add-item-completed dataedit-on-delete-items-completed
-          dataedit-item-widget-data
 	  dataedit-allow-delete-p dataedit-item-data-view
 	  dataedit-item-form-view dataedit-ui-state
 	  dataedit-item-widget dataedit-create-drilldown-widget
@@ -187,9 +186,6 @@ in order to reset the state after the item widget has done its job."
     (pushnew `(add . ,add-fn)
 	     (dataseq-common-ops obj)
 	     :key #'car)))
-
-(defgeneric dataedit-item-widget-data (w)
-  (:documentation "Returns the item held by the dataedit-item-widget."))
 
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))
