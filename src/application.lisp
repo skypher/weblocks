@@ -329,7 +329,7 @@ to my `application-dependencies' slot."
 
 (defun reset-webapp-session (&optional (app (current-webapp)))
   "Reset sessions on a per-webapp basis"
-  (setf (webapp-session-value app) nil))
+  (setf (session-value (class-name (class-of app))) nil))
 
 (defun webapp-application-dependencies (&optional (app (current-webapp)))
   "Returns a list of dependencies on scripts and/or stylesheets that
