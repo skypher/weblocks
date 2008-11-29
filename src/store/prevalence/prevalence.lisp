@@ -117,7 +117,13 @@ requires all objects to have the given value in the given slot."
 	   (seq2 (cond
 		   ((and seq slot value-given)
 		    (remove-if-not
-		      (lambda (x) (funcall test (slot-value x slot) value))
+		      (lambda (obj)
+                        (cond
+                          ((not (slot-exists-p obj slot))
+                           (warn "FIND-PERSISTENT-OBJECTS: object ~A doesn't have the slot ~A" obj slot))
+                          ((not (slot-boundp obj slot))
+                           (warn "FIND-PERSISTENT-OBJECTS: slot ~A of object ~A is not bound" obj slot))
+                          (t (funcall test (slot-value obj slot) value))))
 		      seq))
 		   (t seq)))
 	   (seq3 (cond
