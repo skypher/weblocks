@@ -27,13 +27,15 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key (debug t) (port 8080) (cookie-name "weblocks-session") 
+(defun start-weblocks (&rest keys &key (debug t) (port 8080)
+                             (cookie-name (format nil "weblocks-~(~A~)" (gensym)))
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
-':debug' keyword to true in order for stacktraces to be shown to the
-client. Set ':cookie-name' keyword when you want to change the name of the
-cookie. Other keys are passed to 'hunchentoot:start-server'. Opens all
-stores declared via 'defstore'."
+DEBUG to true in order for stacktraces to be shown to the
+client. Set COOKIE-NAME when you want to have a specific cookie name;
+otherwise a random one with prefix 'weblocks' will be generated for
+this server instance. Other keys are passed to HUNCHENTOOT:START-SERVER.
+Opens all stores declared via DEFSTORE."
   #+sbcl
   (unless (member :sb-thread *features*)
     (cerror "I know what I'm doing and will stubbornly continue."
