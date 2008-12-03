@@ -63,7 +63,7 @@ the navigation as disabled."
                                      (function
                                       (render-link target label)))))))))))
     (with-html
-      (:div :class "view menu"
+      (:div :class "rendered-menu"
             :id (unattributized-name container-id 'menu)
             (with-extra-tags
               (when header
