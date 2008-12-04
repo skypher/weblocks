@@ -64,6 +64,11 @@
 		field view widget obj
 		args))))
 
+(defvar *presentation-dom-id* nil "DOM id of the currently rendered
+  presentation object. If bound during rendering (for example, in
+  an :around method for render-object-view, will be used by the various
+  functions that render form elements..")
+
 (defmethod render-view-field-value (value (presentation text-presentation)
 				    field view widget obj &rest args
 				    &key highlight &allow-other-keys)
