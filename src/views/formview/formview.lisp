@@ -286,30 +286,33 @@ differently.
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget presentation value obj 
 			      &rest args &key validation-errors &allow-other-keys)
+  (declare (special *presentation-dom-id*))
   (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
 	 (validation-error (assoc field validation-errors))
 	 (field-class (concatenate 'string attribute-slot-name
-				   (when validation-error " item-not-validated"))))
+				   (when validation-error " item-not-validated")))
+         (*presentation-dom-id* (gen-id)))
     (with-html
       (:li :class field-class
 	   (:label :class (attributize-presentation
 			   (view-field-presentation field))
+                   :for *presentation-dom-id*
 		   (:span :class "slot-name"
 			  (:span :class "extra"
 				 (unless (empty-p (view-field-label field))
 				   (str (view-field-label field))
 				   (str ":&nbsp;"))
 				 (when (form-view-field-required-p field)
-				   (htm (:em :class "required-slot" "(required)&nbsp;")))))
-		   (apply #'render-view-field-value
-			  value presentation
-			  field view widget obj
-			  args)
-		   (when validation-error
-		     (htm (:p :class "validation-error"
-			      (:em
-			       (:span :class "validation-error-heading" "Error:&nbsp;")
-			       (str (format nil "~A" (cdr validation-error))))))))))))
+				   (htm (:em :class "required-slot" "(required)&nbsp;"))))))
+           (apply #'render-view-field-value
+                  value presentation
+                  field view widget obj
+                  args)
+           (when validation-error
+             (htm (:p :class "validation-error"
+                      (:em
+                        (:span :class "validation-error-heading" "Error:&nbsp;")
+                        (str (format nil "~A" (cdr validation-error)))))))))))
 
 (defmethod render-view-field-value (value (presentation input-presentation)
 				    field view widget obj

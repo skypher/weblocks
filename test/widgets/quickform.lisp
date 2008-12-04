@@ -29,20 +29,20 @@
 	 #.(form-header-template
 	    "abc123"
 	    '((:li :class "test"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Test:&nbsp;"))
-		(:input :type "text" :name "test" :maxlength "40"))))
+		       (:span :class "extra" "Test:&nbsp;")))
+               (:input :type "text" :name "test" :maxlength "40" :id "id-123")))
 	    :method "post"
 	    :data-class-name "test-quickform-class-1"))
    (:div :class "widget data-editor dataform quickform" :id "id-123"
 	 #.(form-header-template
 	    "abc124"
 	    '((:li :class "test"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Test:&nbsp;"))
-		(:input :type "text" :name "test" :maxlength "40"))))
+		       (:span :class "extra" "Test:&nbsp;")))
+               (:input :type "text" :name "test" :maxlength "40" :id "id-123")))
 	    :method "post"
 	    :data-class-name "test-quickform-class-1"
 	    :preslots '((:div :class "validation-errors-summary"
