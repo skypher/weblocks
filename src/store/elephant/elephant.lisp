@@ -36,7 +36,7 @@
   (setup-elephant-transaction-hooks)
   (setf *default-store*
 	(make-instance 'elephant-store
-		       :controller (setf *store-controller* (elephant:open-store spec :recover t)))))
+		       :controller (setf *store-controller* (elephant:open-store spec :recover t :register nil)))))
 
 (defmethod close-store ((store elephant-store))
   (when (eq *default-store* store)
@@ -175,7 +175,7 @@
 	(catch 'finish-map
 	  (cond (filter-fn
 		 (range-objects-in-memory
-		  (order-objects-in-memory
+		  (advanced-order-objects-in-memory
 		   (filter-objects-in-memory
 		    (get-instances-by-class class-name)
 		    filter-fn)
@@ -198,7 +198,7 @@
 		      :collect t)))
 		((consp order-by)
 		 (range-objects-in-memory
-		  (order-objects-in-memory
+		  (advanced-order-objects-in-memory
 		   (get-instances-by-class class-name)
 		   order-by)
 		  range))
@@ -215,6 +215,31 @@
 	       (push object results))))
     (mapc #'filter-if objects)
     (nreverse results)))
+
+(defun advanced-order-objects-in-memory (seq order-by)
+  "Orders objects in 'seq' according to 'order-by'."
+  (cond ((not order-by)
+	 seq)
+	((not (consp (first order-by)))
+	 (weblocks-memory::order-objects-in-memory seq order-by))
+	(t 
+	 (stable-sort seq (multi-value-sort-predicate-asc order-by)))))
+
+(defun multi-value-sort-predicate-asc (order-by)
+  (let ((query-records 
+	 (mapcar #'(lambda (rec)
+		     (destructuring-bind (slot-fn . dir) rec
+		       (cons (curry-after #'slot-value-by-path slot-fn)
+			     dir)))
+		 order-by)))
+    (lambda (a b)
+      (loop for (accessor . dir) in query-records do
+	   (let ((a-value (funcall accessor a))
+		 (b-value (funcall accessor b)))
+	     (if (eq dir :asc)
+		 (weblocks-memory::strictly-less-p a-value b-value)
+		 (and (not (weblocks-memory::strictly-less-p a-value b-value))
+		      (not (weblocks-memory::equivalentp a-value b-value)))))))))
 
 (defmethod count-persistent-objects ((store elephant-store) class-name
 				     &key filter-fn &allow-other-keys)
