@@ -19,13 +19,6 @@
     :ignore-default-dependencies nil ;; accept the defaults
     )
 
-;; Ensure that your public files directory is setup appropriately
-
-(eval-when (:load-toplevel :execute)
-  (set-weblocks-default-public-files-path 
-   (compute-public-files-path :{APPNAME})))
-
-
 ;; Top level start & stop scripts
 
 (defun start-{APPNAME} (&rest args)
