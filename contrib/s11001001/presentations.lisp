@@ -2,7 +2,8 @@
 
 (in-package #:weblocks-s11)
 
-(export '(us-cents us-cents-presentation us-cents-parser))
+(export '(us-cents us-cents-presentation
+	  us-cents-input-presentation us-cents-parser))
 
 (arnesi:enable-sharp-l-syntax)
 
@@ -12,6 +13,11 @@
   ()
   (:documentation "Present a count of US cents as a pretty US dollar
   amount."))
+
+(defclass us-cents-input-presentation (input-presentation us-cents-presentation)
+  ()
+  (:documentation "The counterpart to `us-cents-presentation' for
+  forms."))
 
 (defclass us-cents-parser (text-parser)
   ()
