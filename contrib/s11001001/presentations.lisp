@@ -2,7 +2,7 @@
 
 (in-package #:weblocks-s11)
 
-(export '(us-cents us-cents-presentation
+(export '(us-cents us-cents-input us-cents-presentation
 	  us-cents-input-presentation us-cents-parser))
 
 (arnesi:enable-sharp-l-syntax)
