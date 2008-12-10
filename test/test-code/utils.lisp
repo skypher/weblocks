@@ -7,3 +7,6 @@
 
 (defun set-equal-uri= (a b)
   (set-equal a b :test #'puri:uri=))
+
+(defun remove-all-methods (gf)
+  (mapc (f_ (remove-method gf _)) (copy-list (generic-function-methods gf))))

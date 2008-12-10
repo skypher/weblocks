@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name
+(export '(defwidget widget widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
@@ -144,6 +144,53 @@ strings, function, etc."
    to the container.  The other part is that the widget is dirty after
    the write via a direct call to make-dirty, or to a write to a
    widget slot."))
+
+(defparameter *widget-classes*
+  (mapcar #'find-class '(widget symbol string function))
+  "The classes that widgets can be.")
+
+(defun ensure-widget-methods (gf args function &optional (replace? t))
+  "Define a set of methods on GF for each of the 4 standard classes
+that represent widgets, in locations indicated by ARGS (a designator
+for a list of 0-indices into the lambda list), where the specializers
+for the remaining args are all T, calling FUNCTION with the arguments
+given to the GF.  This means that for 3 widget args, 64 methods will
+be defined, and so on.
+
+When REPLACE?, the default, always replace whatever methods with equal
+signatures are already defined."
+  (when (typep gf '(or symbol list))
+    (setf gf (fdefinition gf)))
+  (setf args (sort (copy-list (ensure-list args)) #'>))
+  (let ((old-methods (generic-function-methods gf))
+	(gfll (generic-function-lambda-list gf))
+	(mclass (generic-function-method-class gf)))
+    (labels ((descend-combination (proc specializers pos args)
+	       (let ((next-arg (or (first args) -1)))
+		 (cond ((= -1 pos)
+			(funcall proc specializers))
+		       ((/= pos next-arg)
+			(descend-combination
+			 proc (nconc (make-list (- pos next-arg)
+						:initial-element (find-class 't))
+				     specializers)
+			 next-arg args))
+		       (t
+			(dolist (wclass *widget-classes*)
+			  (descend-combination proc (cons wclass specializers)
+					       (1- pos) (rest args)))))))
+	     (maybe-ensure-method (specializers)
+	       (when (or replace?
+			 (not (position specializers old-methods
+					:key #'method-specializers :test #'equal)))
+		 (add-method gf (make-instance mclass
+				  :function function :lambda-list gfll
+				  :specializers specializers)))))
+      (descend-combination
+       #'maybe-ensure-method '()
+       (1- (or (position-if (f_ (member _ lambda-list-keywords)) gfll)
+	       (length gfll)))
+       args))))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn
