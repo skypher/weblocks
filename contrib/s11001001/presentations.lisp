@@ -9,12 +9,17 @@
 
 ;;;; Money represented in US dollars and stored as #cents
 
-(defclass us-cents-presentation (text-presentation)
+(defclass us-cents-printer ()
+  ()
+  (:documentation "Mixin for data and form; see
+  `us-cents-presentation' and `us-cents-input-presentation'."))
+
+(defclass us-cents-presentation (us-cents-printer text-presentation)
   ()
   (:documentation "Present a count of US cents as a pretty US dollar
   amount."))
 
-(defclass us-cents-input-presentation (input-presentation us-cents-presentation)
+(defclass us-cents-input-presentation (us-cents-printer input-presentation)
   ()
   (:documentation "The counterpart to `us-cents-presentation' for
   forms."))
@@ -24,7 +29,7 @@
   (:documentation "Parse a US dollar amount and answer the # of US cents."))
 
 (defmethod print-view-field-value
-    (value (self us-cents-presentation) field view widget obj &rest args)
+    (value (self us-cents-printer) field view widget obj &rest args)
   (declare (ignore field view widget obj args))
   (multiple-value-bind (dollars cents) (truncate value 100)
     (format nil "$~:D.~2,'0D" dollars cents)))

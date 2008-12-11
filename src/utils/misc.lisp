@@ -493,3 +493,15 @@ Returns the number of stripped slashes as second value."
 	   s
 	   (concatenate 'string s "/")))))
 
+(defun indirect-lambda (lambda-list function)
+  "Answer a lambda expression with LAMBDA-LIST that passes all
+args (assuming the call is allowed by LAMBDA-LIST) to FUNCTION,
+answering its result."
+  (let ((reqs (required-args lambda-list))
+	(more (and (position-if (f_ (member _ '(&body &key &optional &rest)))
+				lambda-list)
+		   (gensym "MORE"))))
+    `(lambda ,(if more `(,@reqs &rest ,more) reqs)
+       ,(if more
+	    `(apply ',function ,@reqs ,more)
+	    `(funcall ',function ,@reqs)))))
