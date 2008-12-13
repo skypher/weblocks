@@ -102,7 +102,14 @@ values nil error-message if it does not."))
 	   :documentation "If this slot is bound to a function object,
 	   the function will be called with a new slot value and the
 	   object being rendered as arguments. If the slot is not
-	   bound, '(setf slot-value)' will be used."))
+	   bound, '(setf slot-value)' will be used.")
+   (delayed-write-p :initarg :delayed-write-p
+		    :initform nil
+		    :accessor form-view-field-writer-delayed-p
+		    :documentation "If this slot is set to t, then the
+writer will get called after the object has been persisted. This is useful
+for updating relations, where objects need to be assigned ids and stored
+before relations can be updated."))
   (:documentation "A writer slot mixin"))
 
 (defclass form-view-field (inline-view-field form-view-field-writer-mixin)
