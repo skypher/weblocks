@@ -23,7 +23,10 @@ inherits from 'widget' if no direct superclasses are provided."
        (dependencies-by-symbol (quote ,name)))))
 
 (defclass widget (dom-object-mixin)
-  ((propagate-dirty :accessor widget-propagate-dirty
+  ((current-navigation-url :accessor widget-current-navigation-url
+                           :type (or string null) ;; XXX unbound instead of null
+                           :initform nil)
+   (propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
 		    :documentation "A list of widget paths (see
@@ -73,6 +76,35 @@ inherits from 'widget' if no direct superclasses are provided."
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
+
+(defgeneric widget-current-navigation-url (widget)
+  (:documentation "Return the current navigation URL for WIDGET
+                  as computed at the dispatching stage.")
+  (:method ((widget string))
+           nil)
+  (:method ((widget function))
+    "FIXME: should find out somehow..."
+    nil))
+
+(defmethod widget-current-navigation-url ((widget widget))
+  (log-message :debug "~%WIDGET-CNURL: for widget ~A~%" widget)
+  (acond
+    ((eql widget (root-composite))
+     (log-message :debug "WIDGET-CNURL: root-composite~%")
+     "/")
+    ((slot-value widget 'current-navigation-url)
+     (log-message :debug "WIDGET-CNURL: has own: ~S~%" it)
+     it)
+    ((widget-parent widget)
+     (log-message :debug "WIDGET-CNURL: has parent (~S), following...~%" it)
+     (widget-current-navigation-url it))
+    (t ;; XXX huh?
+     (log-message :debug "WIDGET-CNURL: err, don't know.~%" it)
+      "/"
+      )))
+
+(defmethod widget-current-navigation-url ((widget function))
+  "/")
 
 ;; Process the :name initarg and set the dom-id accordingly. Note that
 ;; it is possible to pass :name nil, which simply means that objects
@@ -263,16 +295,19 @@ stylesheets and javascript links in the page header."))
     (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
-  (if inlinep
+  (let ((*current-navigation-url* (widget-current-navigation-url obj))
+        (*current-widget* obj))
+    (declare (special *current-navigation-url* *current-widget*))
+    (if inlinep
       (apply #'render-widget-body obj args)
       (apply #'with-widget-header obj #'render-widget-body
-	     (append
-	      (when (widget-prefix-fn obj)
-		(list :widget-prefix-fn (widget-prefix-fn obj)))
-	      (when (widget-suffix-fn obj)
-		(list :widget-suffix-fn (widget-suffix-fn obj)))
-              args)))
-  (setf (widget-rendered-p obj) t))
+             (append
+               (when (widget-prefix-fn obj)
+                 (list :widget-prefix-fn (widget-prefix-fn obj)))
+               (when (widget-suffix-fn obj)
+                 (list :widget-suffix-fn (widget-suffix-fn obj)))
+               args)))
+    (setf (widget-rendered-p obj) t)))
 
 ;;; Make all widgets act as composites to simplify development
 (defmethod composite-widgets ((obj widget))
@@ -345,4 +380,7 @@ widget object, in which case it is simply returned.
 (defmethod print-object ((obj widget) stream)
   (print-unreadable-object (obj stream :type t)
     (format stream "~s" (ensure-dom-id obj))))
+
+(defmethod container-update-children ((widget widget))
+  nil) ; only containers have children
 
