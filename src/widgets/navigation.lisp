@@ -48,7 +48,7 @@
     ;; Render navigation
     (let ((navigation-body (with-html-to-string
                              (:div :class "navigation-body"
-                                   (render-widget (car (container-children obj)))))))
+                                   (render-widget (car (widget-children obj)))))))
       ;; Restore disabled panes before menu is rendered
       (setf (selector-mixin-panes obj) saved-panes)
       ;; Render menu
