@@ -100,7 +100,8 @@
 								   (:file "paragraph")
 								   (:file "excerpt")
 								   (:file "image")
-								   (:file "url")))
+								   (:file "url")
+								   (:file "html")))
 						     (:module
 						      parsers
 						      :components ((:file "common"))))
