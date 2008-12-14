@@ -4,8 +4,18 @@
 (export '(navigation render-navigation-menu init-navigation make-navigation
           navigation-disabled-pane-names))
 
-(defwidget navigation (selector)
-  ((disabled-pane-names :initform nil
+(defwidget navigation (static-selector)
+  ((pane-names :accessor navigation-pane-names
+	       :initarg :pane-names
+	       :initform nil
+	       :documentation "An alist mapping url-tokens to
+	       human-readable pane names (rendered as a menu). Use nil
+	       as the key for the default item.")
+   (current-pane :accessor navigation-current-pane :initform nil
+		 :documentation "The uri-token corresponding to the
+		 currently selected pane, or nil if the default pane is
+		 selected.")
+   (disabled-pane-names :initform nil
                         :initarg :disabled-pane-names
                         :accessor navigation-disabled-pane-names
                         :documentation "Allows presenting panes to the
@@ -14,23 +24,25 @@
                         bound to a list of pane names to be
                         disabled."))
   (:documentation "The navigation widget can act as a menu controls, a
-  tabbed control, etc. It is a convenience combination of the selector
-  widget and a menu snippet."))
+  tabbed control, etc. It is a convenience combination of the
+  static-selector widget and a menu snippet."))
+
+(defun navigation-pane-name-for-token (navigation token)
+  "Return the pane name for a given uri-token or NIL if not found."
+  (cdr (assoc token (navigation-pane-names navigation))))
 
 (defgeneric render-navigation-menu (obj &rest args)
-  (:documentation
-   "Renders HTML menu for the navigation widget.")
+  (:documentation "Renders the HTML menu for the navigation widget.")
   (:method ((obj navigation) &rest args &key menu-args &allow-other-keys)
     (declare (ignore args))
-    (apply #'render-menu (mapcar (lambda (orig-pane)
-                                   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
-                                     (cons (pane-info-label pane)
-                                           (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
-                                 (selector-mixin-panes obj))
-           :selected-pane (selector-mixin-current-pane-name obj)
+    (apply #'render-menu (mapcar (lambda (pane)
+                                   (cons (navigation-pane-name-for-token obj (car pane))
+                                         (compose-uri-tokens-to-url (car pane))))
+                                 (static-selector-panes obj))
+           :selected-pane (navigation-current-pane obj)
            :header (if (widget-name obj)
-                       (humanize-name (widget-name obj))
-                       "Navigation")
+                     (humanize-name (widget-name obj))
+                     "Navigation")
            :container-id (ensure-dom-id obj)
            :empty-message "No navigation entries"
            :disabled-pane-names (navigation-disabled-pane-names obj)
@@ -48,7 +60,7 @@
     ;; Render navigation
     (let ((navigation-body (with-html-to-string
                              (:div :class "navigation-body"
-                                   (render-widget (car (widget-children obj)))))))
+                                   (mapc #'render-widget (widget-children obj))))))
       ;; Restore disabled panes before menu is rendered
       (setf (selector-mixin-panes obj) saved-panes)
       ;; Render menu
@@ -59,32 +71,23 @@
   (list (make-local-dependency :stylesheet "menu")))
 
 (defun init-navigation (obj &rest args)
-  "A helper function to create a navigation widget
-
-ex:
-
-\(init-navigation (make-instance 'my-navigation)
-   \"test1\" (make-instance ...)
-   \"test2\" (make-instance ...)"
-  (loop
-     for count from 1
-     for x in args
-     for y in (cdr args)
-     when (oddp count)
-     do (push-end `(,(attributize-name x) . ,y) (selector-mixin-panes obj)))
+  "A helper function to create a navigation widget."
+  (mapc (lambda (pane-info)
+          (let ((token (or (third pane-info) (attributize-name (first pane-info))))
+                (name (first pane-info))
+                (widget (second pane-info)))
+            (when (string-equal token "")
+              (setf token nil))
+            (push-end (cons token name) (navigation-pane-names obj))
+            (push-end (cons token widget) (static-selector-panes obj))))
+        args)
   obj)
 
 (defun make-navigation (name &rest args)
   "Instantiates the default navigation widget via 'make-instance'
 and forwards it along with 'args' to 'init-navigation'.
 
-The navigation widgets bears the title NAME.
-
-ex:
-
-\(make-navigation \"Main Navigation\"
-   \"test1\" (make-instance ...)
-   \"test2\" (make-instance ...)"
+The navigation widgets bears the title NAME."
   (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
