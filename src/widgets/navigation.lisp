@@ -11,10 +11,6 @@
 	       :documentation "An alist mapping url-tokens to
 	       human-readable pane names (rendered as a menu). Use nil
 	       as the key for the default item.")
-   (current-pane :accessor navigation-current-pane :initform nil
-		 :documentation "The uri-token corresponding to the
-		 currently selected pane, or nil if the default pane is
-		 selected.")
    (disabled-pane-names :initform nil
                         :initarg :disabled-pane-names
                         :accessor navigation-disabled-pane-names
@@ -27,12 +23,10 @@
   tabbed control, etc. It is a convenience combination of the
   static-selector widget and a menu snippet."))
 
-(defmethod select-pane ((navigation navigation) token)
-  (setf (navigation-current-pane navigation) (or token "")))
-
 (defun navigation-pane-name-for-token (navigation token)
-  "Return the pane name for a given uri-token or NIL if not found."
-  (cdr (assoc token (navigation-pane-names navigation))))
+  "Return the pane name for a given uri-token or NIL if not found. Token
+may be NIL in which case the default pane name is provided."
+  (cdr (assoc token (navigation-pane-names navigation) :test #'equalp)))
 
 (defgeneric render-navigation-menu (obj &rest args)
   (:documentation "Renders the HTML menu for the navigation widget.")
@@ -42,7 +36,7 @@
                                    (cons (navigation-pane-name-for-token obj (car pane))
                                          (compose-uri-tokens-to-url (car pane))))
                                  (static-selector-panes obj))
-           :selected-pane (navigation-current-pane obj)
+           :selected-pane (static-selector-current-pane obj)
            :header (if (widget-name obj)
                      (humanize-name (widget-name obj))
                      "Navigation")

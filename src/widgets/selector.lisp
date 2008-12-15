@@ -45,7 +45,11 @@
   ((panes :accessor static-selector-panes :initarg :panes :initform nil
 	  :documentation "An alist mapping uri-tokens (strings) to
 	  widgets. The default item (widget) should have nil as the
-	  key."))
+	  key.")
+   (current-pane :accessor static-selector-current-pane :initform nil
+		 :documentation "The uri-tokens corresponding to the
+		 currently selected pane, or an empty string if the
+		 default pane is selected."))
   (:documentation "A static-selector implements a static mapping from a
   single uri-token to a list of widgets, where only one widget can be
   selected at any given time. This forms the base for most static
@@ -60,11 +64,14 @@
 	  (values (cdr pane) token (rest uri-tokens)))
 	(values nil nil uri-tokens))))
 
+
 (defgeneric select-pane (selector token)
   (:documentation "Called by get-widget-for-tokens when a pane is found
    and selected. Subclasses may use this method to maintain information
    about what is currently selected.")
-  (:method ((obj static-selector) token) nil))
+  (:method ((obj static-selector) token)
+    (setf (static-selector-current-pane obj) token)))
+
 
 (defmethod make-widget-place-writer ((selector static-selector) child)
   (let ((place (find child (static-selector-panes selector) :key #'cdr)))
