@@ -46,23 +46,20 @@ may be NIL in which case the default pane name is provided."
            menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
+  ;; Render menu
+  (apply #'render-navigation-menu obj args)
+  ;; Remove disabled panes
   (let ((saved-panes (selector-mixin-panes obj)))
-    ;; Remove disabled panes
     (when (navigation-disabled-pane-names obj)
       (setf (selector-mixin-panes obj) 
             (remove-if (lambda (item)
                          (member (car item) (navigation-disabled-pane-names obj)
                                  :test #'string-equal))
                        saved-panes)))
-    ;; Render navigation
-    (let ((navigation-body (with-html-to-string
-                             (:div :class "navigation-body"
-                                   (mapc #'render-widget (widget-children obj))))))
-      ;; Restore disabled panes before menu is rendered
-      (setf (selector-mixin-panes obj) saved-panes)
-      ;; Render menu
-      (apply #'render-navigation-menu obj args)
-      (format *weblocks-output-stream* "~A" navigation-body))))
+    ;; Render navigation children
+    (mapc #'render-widget (widget-children obj))
+    ;; Restore disabled panes
+    (setf (selector-mixin-panes obj) saved-panes))) ; FIXME: unwind-protect this
 
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))
