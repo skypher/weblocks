@@ -7,7 +7,7 @@
   "A default message shown by 'render-menu' if no entries are
   available.")
 
-(defun render-menu (options &key (selected-pane "") header (container-id (gen-id))
+(defun render-menu (options &key selected-pane header (container-id (gen-id))
                     ordered-list-p (empty-message *menu-empty-message*)
                     disabled-pane-names)
   "Renders a menu snippet based on given options and selected
@@ -31,9 +31,9 @@ the navigation as disabled."
                            (cons (humanize-name option)
                                  (attributize-name option))))
                    (let* ((label (car option))
-                          (target (or (cdr option) ""))
+                          (target (cdr option))
                           (pane-selected-p (equalp (attributize-name (car option))
-                                                   selected-pane))
+                                                   (or selected-pane "")))
                           (pane-disabled-p (member (attributize-name (car option))
                                                    disabled-pane-names
                                                    :key #'attributize-name
