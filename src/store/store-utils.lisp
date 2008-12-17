@@ -91,7 +91,7 @@ is called."
 	     (make-store-info :type ,type :args ,(cons 'list args)))
        (unless (find ',name *store-names*)
 	 (push-end ',name *store-names*))
-       (defparameter ,name nil)
+       (defvar ,name nil)
        (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
 	 (unless (asdf:find-system ,system-name nil)
 	   (load (merge-pathnames (make-pathname :directory '(:relative "src" "store"

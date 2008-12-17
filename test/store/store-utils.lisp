@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite store/store-utils-suite (weblocks-suite)
+  ())
+
 ;;; test class-id-slot-name
 (deftest class-id-slot-name-1
     (class-id-slot-name 'foobar)
@@ -36,6 +39,22 @@
 
 ;;; Note, defstore, open-stores, and close-stores are tested
 ;;; implicitly as part of weblocks-test
+
+(addtest reeval-defstore-doesnt-reset
+  (ensure (typep weblocks::*stores* 'hash-table))
+  (ensure (typep weblocks::*store-names* 'list))
+  (let ((fakestore (gensym))
+	(weblocks::*stores* (make-hash-table))
+	(weblocks::*store-names* '()))
+    (eval `(defstore ,fakestore :memory))
+    (weblocks::open-stores)
+    (unwind-protect
+	 (progn
+	   (ensure (symbol-value fakestore))
+	   (let ((oldval (symbol-value fakestore)))
+	     (eval `(defstore ,fakestore :memory))
+	     (ensure-same (symbol-value fakestore) oldval)))
+      (weblocks::close-stores))))
 
 ;;; test mapstores
 (deftest mapstores-1
