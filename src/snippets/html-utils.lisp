@@ -324,12 +324,6 @@ in addition."
        (:noscript
 	 ,@body))))
 
-(defmacro pushlast (value place)
-  `(if (consp ,place)
-       (setf (cdr (last ,place)) 
-	     (cons ,value nil))
-       (setf ,place (cons ,value nil))))
-
 (defun send-script (script &optional (place :after-load))
   "Send JavaScript to the browser. The way of sending depends
   on whether the current request is via AJAX or not.
