@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(navigation render-navigation-menu init-navigation make-navigation
-          navigation-disabled-pane-names))
+          navigation-render-content navigation-disabled-pane-names))
 
 (defwidget navigation (static-selector)
   ((pane-names :accessor navigation-pane-names
@@ -11,6 +11,14 @@
 	       :documentation "An alist mapping url-tokens to
 	       human-readable pane names (rendered as a menu). Use nil
 	       as the key for the default item.")
+   (header :accessor navigation-header
+	   :initarg :header
+	   :initform nil
+	   :documentation "A heading that will be rendered in a <h1> tag")
+   (render-content :accessor navigation-render-content
+		   :initarg :render-content
+		   :initform t
+		   :documentation "Whether navigation should also render its contents")
    (disabled-pane-names :initform nil
                         :initarg :disabled-pane-names
                         :accessor navigation-disabled-pane-names
@@ -57,7 +65,10 @@ may be NIL in which case the default pane name is provided."
                                  :test #'string-equal))
                        saved-panes)))
     ;; Render navigation children
-    (mapc #'render-widget (widget-children obj))
+    (when (navigation-render-content obj)
+      (with-html 
+        (:div :class "navigation-body"
+              (mapc #'render-widget (widget-children obj)))))
     ;; Restore disabled panes
     (setf (selector-mixin-panes obj) saved-panes))) ; FIXME: unwind-protect this
 
@@ -77,6 +88,7 @@ may be NIL in which case the default pane name is provided."
         args)
   obj)
 
+;; TODO: rework this, add :header option somewhere
 (defun make-navigation (name &rest args)
   "Instantiates the default navigation widget via 'make-instance'
 and forwards it along with 'args' to 'init-navigation'.
@@ -85,4 +97,23 @@ The navigation widgets bears the title NAME."
   (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
+
+
+(export '(teleport teleport-source teleport-key))
+
+(defwidget teleport ()
+  ((source :accessor teleport-source
+	   :initarg :source
+	   :documentation "Source widget that should be teleported and
+	   rendered.")
+   (key :accessor teleport-key
+	:initarg :key
+	:initform #'identity
+	:documentation "The function that will be used to access the
+   widget from the source.")))
+
+(defmethod render-widget-body ((obj teleport) &rest args)
+  (declare (ignore args))
+  (render-widget (funcall (teleport-key obj) (teleport-source obj))))
+
 
