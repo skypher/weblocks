@@ -7,7 +7,7 @@
   "A default message shown by 'render-menu' if no entries are
   available.")
 
-(defun render-menu (options &key selected-pane header (container-id (gen-id))
+(defun render-menu (options &key selected-pane header (container-id (gen-id)) (base "")
                     ordered-list-p (empty-message *menu-empty-message*)
                     disabled-pane-names)
   "Renders a menu snippet based on given options and selected
@@ -20,7 +20,6 @@ CONTAINER-ID is provided, it is used as the basis of DOM IDs for the
 menu and each menu item generated with `unattributized-name'. If a
 given pane name is found in `disabled-pane-names', it's rendered in
 the navigation as disabled."
-  (declare (special *current-navigation-url*))
   (flet ((render-menu-items (&optional orderedp)
            (loop
               for option in options
@@ -53,12 +52,12 @@ the navigation as disabled."
                                      (string
                                       (if (or pane-selected-p pane-disabled-p)
                                         (htm (:span :class "label" (str label)))
-                                        (htm (:a :href (make-webapp-uri
-                                                         (string-left-trim
-                                                           "/" (concatenate 'string
-                                                                            (string-right-trim "/" *current-navigation-url*)
-                                                                            "/"
-                                                                            (string-left-trim "/" target))))
+                                        (htm (:a :href (:a :href
+                                                           (concatenate 'string
+                                                                        (string-right-trim "/" base)
+                                                                        "/"
+                                                                        (string-left-trim "/" target))
+                                                           (str label))
                                                    (str label)))))
                                      (function
                                       (render-link target label)))))))))))

@@ -32,7 +32,7 @@
      (lambda (obj)
        (unless crumbs
 	 (push (navigation-pane-name-for-token obj nil) crumbs))
-       (push-end (widget-uri-path obj) crumbs)
+       (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
        (push-end (navigation-pane-name-for-token obj (static-selector-current-pane obj)) crumbs)))
     (log-message* "crumbs: ~A" crumbs)
     (with-html
@@ -42,4 +42,5 @@
 	       (if (second item)
 		   (htm (:li (:a :href (second item) (str (first item)))))
 		   (htm (:li (str (first item)))))))))))
+
 

@@ -1,20 +1,26 @@
 
 (in-package :weblocks)
 
-(export '(selector static-selector get-widget-for-tokens select-pane http-not-found))
+(export '(selector get-widget-for-tokens selector-base-uri
+	  static-selector select-pane static-selector-panes static-selector-current-pane
+	  http-not-found))
+
+(define-condition http-not-found (condition) ())
+
+(defwidget selector (container)
+  ((base-uri :accessor selector-base-uri
+	     :documentation "The base URI for this selector, set during
+	     the tree shakedown phase, before rendering. Used during
+	     rendering to compute URL paths."))
+  (:documentation "A selector is a widget within the tree that has a
+  relation with URIs."))
 
 (defgeneric get-widget-for-tokens (selector uri-tokens)
   (:documentation "Given a list of uri-tokens, map them to a widget. All
   selectors implement this method. There can be multiple strategies for
   mapping uri-tokens to widgets: static maps, dynamically-generated
-  widgets, dynamically-generated widgets with caching. Returns three
-  values -- a widget, a list of consumed tokens, and a list of remaining
-  tokens."))
-
-(defwidget selector (container)
-  ())
-
-(define-condition http-not-found (condition) ())
+  widgets, dynamically-generated widgets with caching. Returns a widget
+  or NIL if not found, modifies uri-tokens."))
 
 (defgeneric update-dependents (selector children)
   (:documentation "Update the dependents for a given selector with
@@ -28,26 +34,34 @@
     (mapc (lambda (child) (setf (widget-parent child) obj)) (ensure-list children))))
 
 ;; Functionality common to all selectors: all selectors process
-;; *uri-tokens* by calling (get-widget-for-tokens), update *uri-tokens*
-;; and *uri-tokens-fully-consumed*, set the widget-uri-path of the
-;; selected widget and update widget-children to point to the selected
-;; widget.
+;; *uri-tokens* by calling (get-widget-for-tokens) and update
+;; widget-children to point to the selected widget.
 (defmethod container-update-direct-children ((selector selector))
-  (declare (special *uri-tokens* *uri-tokens-fully-consumed*))
-  (multiple-value-bind (widget consumed-tokens remaining-tokens)
-      (get-widget-for-tokens selector *uri-tokens*)
-    (setf *uri-tokens* remaining-tokens) 
-    (when (null *uri-tokens*)
-      (setf *uri-tokens-fully-consumed* t))
+  (declare (special *uri-tokens*))
+  (setf (selector-base-uri selector)
+	(make-webapp-uri
+	 (string-left-trim
+	  "/" (string-right-trim
+	       "/" (compose-uri-tokens-to-url (consumed *uri-tokens*))))))
+  (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
     (if widget
-	(let ((*current-navigation-url* (remove-spurious-slashes
-                                          (maybe-add-trailing-slash
-                                            (concatenate 'string
-                                                         "/" (widget-uri-path selector)
-                                                         "/" (compose-uri-tokens-to-url consumed-tokens))))))
-	  (declare (special *current-navigation-url*))
-          (setf (widget-uri-path widget) *current-navigation-url*)
-	  (update-dependents selector widget))
+	(update-dependents selector widget)
+        (assert (signal 'http-not-found)))))
+
+
+;; Functionality common to all selectors: all selectors process
+;; *uri-tokens* by calling (get-widget-for-tokens) and update
+;; widget-children to point to the selected widget.
+(defmethod update-children ((selector selector))
+  (declare (special *uri-tokens*))
+  (setf (selector-base-uri selector)
+	(make-webapp-uri
+	 (string-left-trim
+	  "/" (string-right-trim
+	       "/" (compose-uri-tokens-to-url (consumed *uri-tokens*))))))
+  (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
+    (if widget
+	(update-dependents selector widget)
         (assert (signal 'http-not-found)))))
 
 
@@ -66,13 +80,13 @@
   navigation systems."))
 
 (defmethod get-widget-for-tokens ((selector static-selector) uri-tokens)
-  (let* ((token (first uri-tokens))
+  ;; we peek at the token first, because if it isn't found we won't
+  ;; consume it, to give others a chance to process it
+  (let* ((token (peek-at-token uri-tokens))
 	 (pane (assoc token (static-selector-panes selector) :test #'equalp)))
-    (if pane
-	(progn
-	  (select-pane selector token)
-	  (values (cdr pane) token (rest uri-tokens)))
-	(values nil nil uri-tokens))))
+    (when pane
+      (select-pane selector (first (get-tokens uri-tokens)))
+      (cdr pane))))
 
 
 (defgeneric select-pane (selector token)

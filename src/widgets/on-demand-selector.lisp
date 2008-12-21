@@ -41,28 +41,32 @@ t (the default), calls the lookup-function to make a new one. Returns three
 values -- a widget, a list of consumed tokens, and a list of remaining
 tokens."
   (if (and (on-demand-selector-cache obj)
-	   (uri-tokens-start-with tokens (car (on-demand-selector-cache obj))))
-      ;; we have the widget cached
-      (values (cdr (on-demand-selector-cache obj))
-	      (car (on-demand-selector-cache obj))
-	      (safe-subseq tokens (length (car (on-demand-selector-cache obj)))))
+	   (uri-tokens-start-with (remaining tokens) (car (on-demand-selector-cache obj))))
+      (progn
+	;; we have the widget cached, consume the right amount of tokens
+	(get-tokens tokens (length (car (on-demand-selector-cache obj))))
+	;; ...and return the cached widget
+	(cdr (on-demand-selector-cache obj)))
       ;; widget not cached
       (when (on-demand-make-if-missing obj)
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
-	    (funcall (on-demand-lookup-function obj) obj tokens)
+	    (funcall (on-demand-lookup-function obj) obj (remaining tokens))
+	  ;; discard the tokens we have decided to consume
+	  (get-tokens tokens (length consumed-tokens))
 	  (unless widget
 	    ;; clear the cache
-	    (setf (on-demand-selector-cache obj) nil))	 
+	    (setf (on-demand-selector-cache obj) nil))
 	  (when widget
 	    (when (and (on-demand-mutate-cache obj) (not (eq caching :no-cache)))
 	      ;; reset the parent of the old cached widget
+	      ;; FIXME: I think we do this elsewhere, so this isn't needed --jwr
 	      (when (cdr (on-demand-selector-cache obj))
 		(setf (widget-parent (cdr (on-demand-selector-cache obj))) nil))
 	      ;; replace cache with new widget
 	      (setf (on-demand-selector-cache obj)
 		    (cons consumed-tokens widget)))
 	    ;; return the new widget
-	    (values widget consumed-tokens remaining-tokens))))))
+	    widget)))))
 
 
 (defmethod render-widget-body ((obj on-demand-selector) &rest args)

@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-uri-path widget-name ensure-widget-methods
+(export '(defwidget widget widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
@@ -21,20 +21,10 @@ inherits from 'widget' if no direct superclasses are provided."
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))))
 
-(defgeneric widget-uri-path (widget)
-  (:documentation "Return the current navigation URL for WIDGET
-                  as computed at the dispatching stage.")
-  (:method ((widget string))
-           nil)
-  (:method ((widget function))
-    "FIXME: should find out somehow..."
-    nil))
+
 
 (defclass widget (dom-object-mixin)
-  ((uri-path :accessor widget-uri-path
-	     :type (or string null) ;; XXX unbound instead of null
-	     :initform nil)
-   (propagate-dirty :accessor widget-propagate-dirty
+  ((propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
 		    :documentation "A list of widgets which will be made
@@ -83,25 +73,6 @@ inherits from 'widget' if no direct superclasses are provided."
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
-(defmethod widget-uri-path ((widget widget))
-  (log-message :debug "~%WIDGET-CNURL: for widget ~A~%" widget)
-  (acond
-    ((eql widget (root-composite))
-     (log-message :debug "WIDGET-CNURL: root-composite~%")
-     "/")
-    ((slot-value widget 'uri-path)
-     (log-message :debug "WIDGET-CNURL: has own: ~S~%" it)
-     it)
-    ((widget-parent widget)
-     (log-message :debug "WIDGET-CNURL: has parent (~S), following...~%" it)
-     (widget-uri-path it))
-    (t ;; XXX huh?
-     (log-message :debug "WIDGET-CNURL: err, don't know.~%" it)
-      "/"
-      )))
-
-(defmethod widget-uri-path ((widget function))
-  "/")
 
 ;; Process the :name initarg and set the dom-id accordingly. Note that
 ;; it is possible to pass :name nil, which simply means that objects
@@ -153,6 +124,13 @@ of widgets for whom WIJ is formally a parent.")
 (defgeneric (setf widget-children) (new-value wij)
   (:documentation "Set the value of `widget-children', when
 appropriate for WIJ's class."))
+
+(defgeneric update-children (widget)
+  (:documentation "Called during the tree shakedown phase (before
+  rendering) while walking the widget tree. Implement this method for
+  widgets whose children might depend on external factors.")
+  (:method (widget)
+    nil))
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
 (defmethod widget-parent (obj)
@@ -296,9 +274,8 @@ stylesheets and javascript links in the page header."))
     (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
-  (let ((*current-navigation-url* (widget-uri-path obj))
-        (*current-widget* obj))
-    (declare (special *current-navigation-url* *current-widget*))
+  (let ((*current-widget* obj))
+    (declare (special *current-widget*))
     (if inlinep
       (apply #'render-widget-body obj args)
       (apply #'with-widget-header obj #'render-widget-body

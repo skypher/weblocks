@@ -3,21 +3,46 @@
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-          *uri-tokens* *current-navigation-url* *current-page-description*))
+          *uri-tokens* *current-page-description*))
 
 (defvar *uri-tokens*)
 (setf (documentation '*uri-tokens* 'variable)
-      "URL-decoded list of the path elements in the current request
-URI, minus elements in `*current-navigation-url*.  See `dispatcher'
-for detailed semantics.")
+      "URL-decoded list of the path elements in the current request URI")
 
-(defvar *current-navigation-url*)
-(setf (documentation '*current-navigation-url* 'variable)
-      "Bound while rendering widgets to the URL so far consumed by
-`dispatcher's that are parents of the widget being rendered.  See
-`dispatcher' for detailed semantics.")
 
 (defvar *uri-tokens*)
+
+(defclass uri-tokens ()
+  ((all-tokens :accessor all
+	       :initarg :all-tokens)
+   (remaining-tokens :accessor remaining)
+   (consumed-tokens :accessor consumed
+		    :initform nil)))
+
+(defmethod initialize-instance :after ((tokens uri-tokens) &rest args)
+  (declare (ignore args))
+  (setf (remaining tokens) (all tokens)))
+
+(defgeneric peek-at-token (tokens)
+  (:method ((tokens uri-tokens))
+    (first (remaining tokens))))
+
+(defgeneric tokens-fully-consumed-p (tokens)
+  (:method ((tokens uri-tokens))
+    (not (remaining tokens))))
+
+(defgeneric get-tokens (tokens &optional how-many)
+  (:method ((tokens uri-tokens) &optional (how-many 1))
+    (unless (tokens-fully-consumed-p tokens)
+      (let ((current-tokens (firstn how-many (remaining tokens))))
+	(setf (consumed tokens) (append (consumed tokens) current-tokens))
+	(setf (remaining tokens) (safe-subseq (remaining tokens) how-many))
+	current-tokens))))
+
+(defgeneric consume-tokens (tokens token-list)
+  (:method ((tokens uri-tokens) token-list)
+    (setf (consumed tokens) (append (consumed tokens) token-list))
+    token-list))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -96,15 +121,14 @@ customize behavior)."))
 	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (*uri-tokens* (tokenize-uri (request-uri*)))
-	    (*current-navigation-url* "/") *dirty-widgets*
+	    (*uri-tokens* (make-instance 'uri-tokens :all-tokens (tokenize-uri (request-uri))))
+	     *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	    *page-dependencies* *current-page-description*
-	    *uri-tokens-fully-consumed*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
-	(declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
+	(declare (special *weblocks-output-stream* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-			  *current-page-description* *uri-tokens-fully-consumed*))
+			  *current-page-description*))
 	(when (pure-request-p)
 	  (throw 'hunchentoot::handler-done (eval-action)))
 	;; a default dynamic-action hook function wraps get operations in a transaction
@@ -123,18 +147,18 @@ customize behavior)."))
             (handle-normal-request app)))
         (eval-hook :post-render)
 	(unless (ajax-request-p)
-	  (setf (webapp-session-value 'last-request-uri) *uri-tokens*))
+	  (setf (webapp-session-value 'last-request-uri) (all *uri-tokens*)))
 	(get-output-stream-string *weblocks-output-stream*)))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
-  (declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
+  (declare (special *weblocks-output-stream* *dirty-widgets*
                     *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-                    *current-page-description* *uri-tokens-fully-consumed*))
+                    *current-page-description*))
   (render-dirty-widgets))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
-                    *uri-tokens* *uri-tokens-fully-consumed*
+                    *uri-tokens*
                     *current-page-description*))
   ; we need to render widgets before the boilerplate HTML
   ; that wraps them in order to collect a list of script and
@@ -146,15 +170,15 @@ customize behavior)."))
     (render-widget (root-composite)))
   ; set page title if it isn't already set
   (when (and (null *current-page-description*)
-             (last *uri-tokens*))
+             (last (all *uri-tokens*)))
     (setf *current-page-description* 
-          (humanize-name (last-item *uri-tokens*))))
+          (humanize-name (last-item (all *uri-tokens*)))))
   ; render page will wrap the HTML already rendered to
   ; *weblocks-output-stream* with necessary boilerplate HTML
   (render-page app)
   ;; make sure all tokens were consumed (FIXME: still necessary?)
-  (unless (or *uri-tokens-fully-consumed*
-              (null *uri-tokens*))
+  (unless (or (tokens-fully-consumed-p *uri-tokens*)
+              (null (all *uri-tokens*)))
     (page-not-found-handler app)))
 
 (defun remove-session-from-uri (uri)

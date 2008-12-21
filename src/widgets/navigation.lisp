@@ -8,7 +8,7 @@
   ((pane-names :accessor navigation-pane-names
 	       :initarg :pane-names
 	       :initform nil
-	       :documentation "An alist mapping url-tokens to
+	       :documentation "An alist mapping uri-tokens to
 	       human-readable pane names (rendered as a menu). Use nil
 	       as the key for the default item.")
    (header :accessor navigation-header
@@ -44,6 +44,7 @@ may be NIL in which case the default pane name is provided."
                                    (cons (navigation-pane-name-for-token obj (car pane))
                                          (compose-uri-tokens-to-url (car pane))))
                                  (static-selector-panes obj))
+           :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
            :header (if (widget-name obj)
                      (humanize-name (widget-name obj))
