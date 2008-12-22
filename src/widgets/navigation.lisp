@@ -15,6 +15,12 @@
 	   :initarg :header
 	   :initform nil
 	   :documentation "A heading that will be rendered in a <h1> tag")
+   (hidden-panes :accessor navigation-hidden-panes
+		 :initarg :hidden-panes
+		 :initform nil
+		 :documentation "A list of uri-tokens corresponding to
+		 panes that should be hidden (not rendered in a menu,
+		 but accessible from within this navigation object.)")
    (render-content :accessor navigation-render-content
 		   :initarg :render-content
 		   :initform t
@@ -40,10 +46,14 @@ may be NIL in which case the default pane name is provided."
   (:documentation "Renders the HTML menu for the navigation widget.")
   (:method ((obj navigation) &rest args &key menu-args &allow-other-keys)
     (declare (ignore args))
-    (apply #'render-menu (mapcar (lambda (pane)
-                                   (cons (navigation-pane-name-for-token obj (car pane))
-                                         (compose-uri-tokens-to-url (car pane))))
-                                 (static-selector-panes obj))
+    (apply #'render-menu
+           (remove nil
+                   (mapcar (lambda (pane)
+		       (let ((token (car pane)))
+			 (unless (member token (navigation-hidden-panes obj)
+					 :test #'string-equal)
+			   (cons (navigation-pane-name-for-token obj token)
+				 (compose-uri-tokens-to-url token)))))))
            :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
            :header (if (widget-name obj)
