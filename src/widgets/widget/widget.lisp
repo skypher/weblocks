@@ -159,6 +159,8 @@ be defined, and so on.
 
 When REPLACE?, the default, always replace whatever methods with equal
 signatures are already defined."
+  (unless args				;avoid (*)=1 case
+    (return-from ensure-widget-methods nil))
   (when (typep gf '(or symbol list))
     (setf gf (fdefinition gf)))
   (setf args (sort (copy-list (ensure-list args)) #'>))
