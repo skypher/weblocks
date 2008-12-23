@@ -493,15 +493,30 @@ Returns the number of stripped slashes as second value."
 	   s
 	   (concatenate 'string s "/")))))
 
-(defun indirect-lambda (lambda-list function)
+(defun congruent-lambda-expression (lambda-list function)
   "Answer a lambda expression with LAMBDA-LIST that passes all
 args (assuming the call is allowed by LAMBDA-LIST) to FUNCTION,
 answering its result."
-  (let ((reqs (required-args lambda-list))
-	(more (and (position-if (f_ (member _ '(&body &key &optional &rest)))
-				lambda-list)
-		   (gensym "MORE"))))
-    `(lambda ,(if more `(,@reqs &rest ,more) reqs)
-       ,(if more
-	    `(apply ',function ,@reqs ,more)
+  (let* ((reqs (required-args lambda-list))
+	 (opts (aand (member '&optional lambda-list)
+		     (loop for llelt in (cdr it)
+			   until (member llelt lambda-list-keywords)
+			   if (consp llelt)
+			     collect (list (first llelt) (second llelt)
+					   (or (third llelt) (gensym "OPTP")))
+			   else collect (list llelt nil (gensym "OPTP")))))
+	 (keys? (member '&key lambda-list))
+	 (more (and (or keys? (position-if (f_ (member _ '(&body &rest)))
+					   lambda-list))
+		    (gensym "MORE"))))
+    `(lambda (,@reqs
+	      ,@(and opts (cons '&optional opts))
+	      ,@(and more (list '&rest more))
+	      ,@(and keys? '(&key &allow-other-keys)))
+       ,(if (or opts more)
+	    `(apply ',function ,@reqs
+		    ,(reduce (lambda (optarg rest)
+			       `(and ,(third optarg)
+				     (cons ,(first optarg) ,rest)))
+			     opts :from-end t :initial-value more))
 	    `(funcall ',function ,@reqs)))))

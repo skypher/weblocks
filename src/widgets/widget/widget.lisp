@@ -162,9 +162,9 @@ signatures are already defined."
   (when (typep gf '(or symbol list))
     (setf gf (fdefinition gf)))
   (setf args (sort (copy-list (ensure-list args)) #'>))
-  (let ((old-methods (generic-function-methods gf))
-	(gfll (generic-function-lambda-list gf))
-	(mclass (generic-function-method-class gf)))
+  (let* ((old-methods (generic-function-methods gf))
+	 (gfll (generic-function-lambda-list gf))
+	 (function-lambda (congruent-lambda-expression gfll function)))
     (labels ((descend-combination (proc specializers pos args)
 	       (let ((next-arg (or (first args) -1)))
 		 (cond ((= -1 pos)
@@ -183,9 +183,7 @@ signatures are already defined."
 	       (when (or replace?
 			 (not (position specializers old-methods
 					:key #'method-specializers :test #'equal)))
-		 (add-method gf (make-instance mclass
-				  :function function :lambda-list gfll
-				  :specializers specializers)))))
+		 (ensure-method gf function-lambda :specializers specializers))))
       (descend-combination
        #'maybe-ensure-method '()
        (1- (or (position-if (f_ (member _ lambda-list-keywords)) gfll)
