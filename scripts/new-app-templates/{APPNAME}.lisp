@@ -15,7 +15,7 @@
 ;; A macro that generates a class or this webapp
 
 (defwebapp {APPNAME}
-    :prefix ""                       ;; default application prefix
+    :prefix "/"
     :description "{APPNAME}: A new application"
     :init-user-session '{APPNAME}::init-user-session
     :autostart nil                   ;; have to start the app manually
