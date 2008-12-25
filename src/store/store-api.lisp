@@ -3,6 +3,7 @@
 
 (export '(open-store close-store clean-store *default-store*
 	  begin-transaction commit-transaction rollback-transaction
+	  dynamic-transaction use-dynamic-transaction-p
 	  persist-object delete-persistent-object
 	  delete-persistent-object-by-id find-persistent-objects
 	  find-persistent-object-by-id count-persistent-objects))
@@ -45,6 +46,34 @@
   if the given store does not have transaction support, or the store
   isn't in a transaction, this function should return NIL without
   signalling errors."))
+
+(defgeneric dynamic-transaction (store proc)
+  (:documentation "Call PROC, a thunk, while in a transaction of
+  STORE.  See `use-dynamic-transaction-p' for details.")
+  (:method (store proc)
+    (warn "~S should not be called when the other transaction ~
+	   interface is available" 'dynamic-transaction)
+    (let (tx-error-occurred-p)
+      (unwind-protect
+	   (handler-bind ((error #'(lambda (error)
+				     (declare (ignore error))
+				     (rollback-transaction store)
+				     (setf tx-error-occurred-p t))))
+	     (begin-transaction store)
+	     (funcall proc))
+	(unless tx-error-occurred-p
+	  (commit-transaction store))))))
+
+(defgeneric use-dynamic-transaction-p (store)
+  (:documentation "Answer whether `action-txn-hook' and equivalents
+  should use GF `dynamic-transaction' for transaction control rather
+  than the `begin-transaction', `commit-transaction', and
+  `rollback-transaction' GFs.  Be warned that non-local exit behavior
+  for stores that answer true for this may have unique non-local exit
+  unwind behavior.")
+  (:method (store)
+    (declare (ignore store))
+    nil))
 
 ;;; Creating and deleting persistent objects
 (defgeneric persist-object (store object)

@@ -191,15 +191,30 @@ association list. This function is normally called by
    weblocks transaction functions over all stores"
   (if (eq (request-method) :post)
       (let (tx-error-occurred-p)
-	(unwind-protect
-	     (handler-bind ((error #'(lambda (error)
-				       (declare (ignore error))
-				       (mapstores #'rollback-transaction)
-				       (setf tx-error-occurred-p t))))
-	       (mapstores #'begin-transaction)
-	       (eval-dynamic-hooks hooks))
-	  (unless tx-error-occurred-p
-	    (mapstores #'commit-transaction))))
+	(multiple-value-bind (dynamic-stores non-dynamic-stores)
+	    (loop for store-name in *store-names*
+		  for store = (symbol-value store-name)
+		  when store
+		    if (use-dynamic-transaction-p store)
+		      collect store into dynamic-stores
+		    else collect store into non-dynamic-stores
+		  finally (return (values dynamic-stores non-dynamic-stores)))
+	  (labels ((dynamic-transactions (stores)
+		     (if (null stores)
+			 (eval-dynamic-hooks hooks)
+			 (dynamic-transaction
+			  (car stores)
+			  (f0 (dynamic-transactions (cdr stores))))))
+		   (handle-error (error)
+		     (declare (ignore error))
+		     (mapc #'rollback-transaction non-dynamic-stores)
+		     (setf tx-error-occurred-p t)))
+	    (unwind-protect
+		 (handler-bind ((error #'handle-error))
+		   (mapc #'begin-transaction non-dynamic-stores)
+		   (dynamic-transactions dynamic-stores))
+	      (unless tx-error-occurred-p
+		(mapc #'commit-transaction non-dynamic-stores))))))
       (eval-dynamic-hooks hooks)))
   
 (eval-when (:load-toplevel)
