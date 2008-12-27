@@ -36,7 +36,7 @@
                         (:input :name *action-string* :type "hidden" :value ,action-code))))))
        (log-form ,action-code :id ,id :class ,class))))
 
-(defun render-link (action name &key (ajaxp t) id class)
+(defun render-link (action name &key (ajaxp t) id class title)
   "Renders an action into an href link. If 'ajaxp' is true (the
 default), the link will be rendered in such a way that the action will
 be invoked via AJAX, or will fall back to regular request if
@@ -59,6 +59,7 @@ by default).
 	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
+	  :title title
 	  (etypecase name
 	    (string (htm (str name)))
 	    (symbol (htm (str name)))
