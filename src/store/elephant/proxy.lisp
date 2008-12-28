@@ -1,5 +1,7 @@
 (in-package :weblocks-elephant)
 
+(export '(return-proxy-classname))
+
 (defvar *proxies* (make-hash-table))
 (defvar *view-proxies* (make-hash-table))
 
@@ -7,19 +9,19 @@
   ((proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
 
 (defun return-proxy-classname (classname)
-  (if (gethash classname *proxies*) 
-      (gethash classname *proxies*)
-      (let* ((persistent-class (find-class classname))
-	     (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
-	     (visible-slot-defs (class-visible-slots-impl persistent-class))
-	     (class-def `(defclass ,new-name (persistent-proxy)
-			   ((base-class :accessor base-class :allocation :class
-					:initform ',classname)
-			    ,@(mapcar #'def-to-proxy-slot
-				      visible-slot-defs)))))
-	(eval class-def)
-	(setf (gethash classname *proxies* new-name)
-	      new-name))))
+  (aif (gethash classname *proxies*) 
+       it
+       (let* ((persistent-class (find-class classname))
+              (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
+              (visible-slot-defs (class-visible-slots-impl persistent-class))
+              (class-def `(defclass ,new-name (persistent-proxy)
+                            ((base-class :accessor base-class :allocation :class
+                                         :initform ',classname)
+                             ,@(mapcar #'def-to-proxy-slot
+                                       visible-slot-defs)))))
+         (eval class-def)
+         (setf (gethash classname *proxies* new-name)
+               new-name))))
 
 (defun def-to-proxy-slot (def)
   `(,(weblocks::slot-definition-name def)

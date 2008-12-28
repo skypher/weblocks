@@ -10,6 +10,8 @@
 
 (in-package :weblocks-elephant)
 
+(export '(elephant-store))
+
 (defclass elephant-store ()
   ((controller :accessor elephant-controller :initarg :controller)
    (stdidx :accessor elephant-stdobj-index)))
@@ -32,11 +34,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod open-store ((store-type (eql :elephant)) &rest args &key spec &allow-other-keys)
-  (declare (ignore args))
+  (declare (ignore args)) 
   (setup-elephant-transaction-hooks)
   (setf *default-store*
 	(make-instance 'elephant-store
-		       :controller (setf *store-controller* (elephant:open-store spec :recover t :register nil)))))
+		       :controller (setf *store-controller* (elephant:open-store spec)))))
 
 (defmethod close-store ((store elephant-store))
   (when (eq *default-store* store)
@@ -175,7 +177,7 @@
 	(catch 'finish-map
 	  (cond (filter-fn
 		 (range-objects-in-memory
-		  (advanced-order-objects-in-memory
+		  (weblocks-memory::advanced-order-objects-in-memory
 		   (filter-objects-in-memory
 		    (get-instances-by-class class-name)
 		    filter-fn)
@@ -198,7 +200,7 @@
 		      :collect t)))
 		((consp order-by)
 		 (range-objects-in-memory
-		  (advanced-order-objects-in-memory
+		  (weblocks-memory::advanced-order-objects-in-memory
 		   (get-instances-by-class class-name)
 		   order-by)
 		  range))
@@ -207,7 +209,10 @@
 		   (map-class collector class-name :oids t)))
 		(t
 		 (get-instances-by-class class-name)))))
-      (find-persistent-standard-objects store class-name :order-by order-by :range range)))
+      (find-persistent-standard-objects store class-name
+                                        :order-by order-by
+                                        :range range
+                                        :filter-fn filter-fn)))
 
 (defun filter-objects-in-memory (objects fn &aux results)
   (labels ((filter-if (object)
@@ -215,31 +220,6 @@
 	       (push object results))))
     (mapc #'filter-if objects)
     (nreverse results)))
-
-(defun advanced-order-objects-in-memory (seq order-by)
-  "Orders objects in 'seq' according to 'order-by'."
-  (cond ((not order-by)
-	 seq)
-	((not (consp (first order-by)))
-	 (weblocks-memory::order-objects-in-memory seq order-by))
-	(t 
-	 (stable-sort seq (multi-value-sort-predicate-asc order-by)))))
-
-(defun multi-value-sort-predicate-asc (order-by)
-  (let ((query-records 
-	 (mapcar #'(lambda (rec)
-		     (destructuring-bind (slot-fn . dir) rec
-		       (cons (curry-after #'slot-value-by-path slot-fn)
-			     dir)))
-		 order-by)))
-    (lambda (a b)
-      (loop for (accessor . dir) in query-records do
-	   (let ((a-value (funcall accessor a))
-		 (b-value (funcall accessor b)))
-	     (if (eq dir :asc)
-		 (weblocks-memory::strictly-less-p a-value b-value)
-		 (and (not (weblocks-memory::strictly-less-p a-value b-value))
-		      (not (weblocks-memory::equivalentp a-value b-value)))))))))
 
 (defmethod count-persistent-objects ((store elephant-store) class-name
 				     &key filter-fn &allow-other-keys)
@@ -328,20 +308,24 @@
     (get-value object-id (elephant-stdobj-index store))))
 
 
-(defun find-persistent-standard-objects (store class-name &key order-by range)
+(defun find-persistent-standard-objects (store class-name &key order-by range filter-fn)
   "This implements a slow version of lookup"
   (range-objects-in-memory
    (order-objects-in-memory
     (with-store-controller store
-      (map-index (lambda (k v pk) 
-		   (declare (ignore k pk))
-		   v)
-		 (get-index (elephant-stdobj-index store) 'class)
-		 :value class-name
-		 :collect t))
+      (let ((seq (map-index (lambda (k v pk) 
+                              (declare (ignore k pk))
+                              v)
+                            (get-index (elephant-stdobj-index store) 'class)
+                            :value class-name
+                            :collect t)))
+        (if (and seq
+                 (functionp filter-fn))
+            (remove-if-not filter-fn seq)
+            seq)))
     order-by)
    range))
-	
+
 
 (defun count-persistent-standard-objects (store class-name)
   "Count class instances"
