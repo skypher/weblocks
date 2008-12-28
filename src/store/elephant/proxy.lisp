@@ -1,12 +1,16 @@
 (in-package :weblocks-elephant)
 
-(export '(return-proxy-classname))
+(export '(make-proxy-instance))
 
 (defvar *proxies* (make-hash-table))
 (defvar *view-proxies* (make-hash-table))
 
 (defclass persistent-proxy ()
   ((proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
+
+(defun make-proxy-instance (class-name &rest args)
+  "Creates an instance of the proxy."
+  (apply #'make-instance (return-proxy-classname class-name) args))
 
 (defun return-proxy-classname (classname)
   (aif (gethash classname *proxies*) 
