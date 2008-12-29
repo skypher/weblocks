@@ -70,7 +70,7 @@ function is used by the framework for sorting data.")
   "Selects only the objects in 'range' from 'seq'."
   (if (and seq
            range)
-      (when (> (length seq) (car range))
-        (subseq seq (car range) (min (length seq) (cdr range))))
+      (let ((len (length seq)))
+        (subseq seq (min len (car range)) (min len (cdr range))))
       seq))
 
