@@ -70,6 +70,7 @@ function is used by the framework for sorting data.")
   "Selects only the objects in 'range' from 'seq'."
   (if (and seq
            range)
-      (subseq seq (car range) (min (length seq) (cdr range)))
+      (when (< (length seq) (car range))
+        (subseq seq (car range) (min (length seq) (cdr range))))
       seq))
 
