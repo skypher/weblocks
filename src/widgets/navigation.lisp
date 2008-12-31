@@ -2,7 +2,9 @@
 (in-package :weblocks)
 
 (export '(navigation render-navigation-menu init-navigation make-navigation
-          navigation-render-content navigation-disabled-pane-names))
+	  navigation-pane-names navigation-header
+          navigation-hidden-panes navigation-render-content
+          navigation-disabled-pane-names))
 
 (defwidget navigation (static-selector)
   ((pane-names :accessor navigation-pane-names
