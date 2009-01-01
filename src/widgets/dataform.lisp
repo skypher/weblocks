@@ -3,7 +3,7 @@
 
 (export '(dataform dataform-data-view dataform-form-view
 	  render-dataform render-dataform-data render-dataform-form
-	  annihilate-dataform dataform-submit-action))
+	  annihilate-dataform dataform-submit-action dataform-ui-state))
 
 (defwidget dataform (data-editor)
   ((data-view :accessor dataform-data-view
@@ -19,6 +19,7 @@
 	      into form view. If 'form-view' isn't provided, the
 	      scaffold view will be used by default.")
    (ui-state :initform :data
+	     :accessor dataform-ui-state
 	     :initarg :ui-state
 	     :documentation "Current internal state of the
 	     widget. Normally :data when rendering via 'render-data'
