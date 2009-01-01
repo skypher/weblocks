@@ -3,7 +3,8 @@
 
 (export '(data-editor dataform-data dataform-class-store
 	  dataform-on-cancel dataform-on-success
-	  dataform-allow-close-p dataform-on-close))
+	  dataform-allow-close-p dataform-on-close
+	  render-dataform-data-buttons))
 
 (defwidget data-editor ()
   ((data :accessor dataform-data
