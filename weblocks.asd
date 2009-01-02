@@ -100,6 +100,7 @@
 								   (:file "paragraph")
 								   (:file "excerpt")
 								   (:file "image")
+								   (:file "checkboxes")
 								   (:file "url")
 								   (:file "html")))
 						     (:module
