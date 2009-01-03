@@ -42,8 +42,9 @@
 			 (attributize-name (object-class-name obj)))
 	  (with-extra-tags
 	    (htm
-	     (:h1 (fmt (view-caption view)
-		       (humanize-name (object-class-name obj))))
+	     (unless (empty-p (view-caption view))
+	       (htm (:h1 (fmt (view-caption view)
+			      (humanize-name (object-class-name obj))))))
 	     (safe-apply fields-prefix-fn view obj args)
 	     (:ul (apply body-fn view obj args))
 	     (safe-apply fields-suffix-fn view obj args))))))
@@ -53,10 +54,11 @@
 			      &rest args)
   (with-html
     (:li :class (attributize-name (view-field-slot-name field))
-	 (:span :class (concatenate 'string "label "
-				    (attributize-presentation
-				     (view-field-presentation field)))
-		(str (view-field-label field)) ":&nbsp;")
+	 (unless (empty-p (view-field-label field))
+	   (htm (:span :class (concatenate 'string "label "
+					   (attributize-presentation
+					    (view-field-presentation field)))
+		       (str (view-field-label field)) ":&nbsp;")))
 	 (apply #'render-view-field-value
 		value presentation
 		field view widget obj

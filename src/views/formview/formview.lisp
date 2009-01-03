@@ -296,7 +296,9 @@ differently.
 			   (view-field-presentation field))
 		   (:span :class "slot-name"
 			  (:span :class "extra"
-				 (str (view-field-label field)) ":&nbsp;"
+				 (unless (empty-p (view-field-label field))
+				   (str (view-field-label field))
+				   (str ":&nbsp;"))
 				 (when (form-view-field-required-p field)
 				   (htm (:em :class "required-slot" "(required)&nbsp;")))))
 		   (apply #'render-view-field-value
