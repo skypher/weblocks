@@ -65,7 +65,7 @@
   (with-html
     (:div :class "submit"
 	  (render-link (make-action
-			(f_% (setf (slot-value obj 'ui-state) :form)))
+			(f_% (setf (dataform-ui-state obj) :form)))
 		       "Modify"
 		       :class "modify")
 	  (when (and (dataform-allow-close-p obj)
