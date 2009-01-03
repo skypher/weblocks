@@ -55,6 +55,15 @@
     (setf (dataform-class-store obj)
 	  (object-store (dataform-data obj)))))
 
+(defgeneric (setf dataform-ui-state) (new-value data-editor)
+  (:documentation "When a dataform or similar, change DATA-EDITOR's
+  state to NEW-VALUE, which should be :data or :form.")
+  (:method (new-value (wij data-editor))
+    (style-warn 'misunderstood-action
+      :action (format nil "changed a dataform's state to ~S" new-value)
+      :missing "`dataform-ui-state' accessor implementation")
+    new-value))
+
 (defgeneric render-dataform-data-buttons (dataform data)
   (:documentation "Render the buttons and links appearing with the
   data view on a dataform."))
