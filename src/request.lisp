@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*json-content-type refresh-request-p initial-request-p
+(export '(*json-content-type* refresh-request-p initial-request-p
 	  ajax-request-p pure-request-p redirect post-action-redirect
 	  compose-uri-tokens-to-url))
 
