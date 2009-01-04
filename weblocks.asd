@@ -14,7 +14,7 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore :html-template)
+	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
