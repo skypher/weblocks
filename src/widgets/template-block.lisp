@@ -23,7 +23,7 @@ HTML-TEMPLATE using 'vars'."))
       t
       (recreate-template-printer obj)))
 
-(defmethod render-widget-body ((obj template-block) &rest args)
+(defmethod render-template ((obj template-block))
   (declare (ignore args))
   (when (ensure-printer-exists obj)
     (html-template:fill-and-print-template (template-printer-of obj)

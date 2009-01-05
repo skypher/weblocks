@@ -23,7 +23,7 @@
    "This method handles each request as it comes in from the
 server. It is a hunchentoot handler and has access to all hunchentoot
 dynamic variables. The default implementation executes a user
-action (if any) and renders the main composite wrapped in HTML
+action (if any) and renders the root widget wrapped in HTML
 provided by 'render-page'. If the request is an AJAX request, only the
 dirty widgets are rendered into a JSON data structure. It also invokes
 user supplied 'init-user-session' on the first request that has no
@@ -61,18 +61,18 @@ customize behavior)."))
       (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
     (let ((*request-hook* (make-instance 'request-hooks)))
-      (when (null (root-composite))
-	(let ((root-composite (make-instance 'composite :name "root")))
+      (when (null (root-widget))
+	(let ((root-widget (make-instance 'widget :name "root")))
 	  (when (weblocks-webapp-debug app)
 	    (initialize-debug-actions))
-	  (setf (root-composite) root-composite)
+	  (setf (root-widget) root-widget)
 	  (let (finished?)
 	    (unwind-protect
 		 (progn
-		   (funcall (webapp-init-user-session) root-composite)
+		   (funcall (webapp-init-user-session) root-widget)
 		   (setf finished? t))
 	      (unless finished?
-		(setf (root-composite) nil)
+		(setf (root-widget) nil)
 		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
 	(when (cookie-in (session-cookie-name *weblocks-server*))
@@ -115,7 +115,7 @@ customize behavior)."))
   (render-dirty-widgets))
 
 (defun update-widget-tree ()
-  (walk-widget-tree (root-composite) #'update-children))
+  (walk-widget-tree (root-widget) #'update-children))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
@@ -128,7 +128,7 @@ customize behavior)."))
     (handler-case (update-widget-tree)
       (http-not-found () (return-from handle-normal-request
                                       (page-not-found-handler app))))
-    (render-widget (root-composite)))
+    (render-widget (root-widget)))
   ; set page title if it isn't already set
   (when (and (null *current-page-description*)
              (last (all *uri-tokens*)))

@@ -7,7 +7,7 @@
 
 (define-condition http-not-found (condition) ())
 
-(defwidget selector (container)
+(defwidget selector ()
   ((base-uri :accessor selector-base-uri
 	     :documentation "The base URI for this selector, set during
 	     the tree shakedown phase, before rendering. Used during

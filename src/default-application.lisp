@@ -51,8 +51,8 @@
                                                       (mark-dirty widget)) "Start"))))))))
 
 
-(defun init-user-session (comp)
-  (setf (composite-widgets comp)
+(defun init-user-session (root)
+  (setf (widget-children root)
 	(list
           (f_%
             (with-html

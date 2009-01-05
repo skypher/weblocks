@@ -68,8 +68,8 @@
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
-                         composite widget at the root of the application. 'init-user-session' is 
-                         responsible for adding initial widgets to this composite.")
+                         widget at the root of the application. 'init-user-session' is
+                         responsible for adding initial children to this widget.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))

@@ -67,8 +67,10 @@ may be NIL in which case the default pane name is provided."
            menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  ;; Render menu
-  (apply #'render-navigation-menu obj args)
+  (apply #'render-navigation-menu obj args))
+
+
+(defmethod render-widget-children ((obj navigation) &rest args)
   ;; Remove disabled panes
   (let ((saved-panes (selector-mixin-panes obj)))
     (when (navigation-disabled-pane-names obj)
@@ -81,7 +83,7 @@ may be NIL in which case the default pane name is provided."
     (when (navigation-render-content obj)
       (with-html 
         (:div :class "navigation-body"
-              (mapc #'render-widget (widget-children obj)))))
+	    (mapc (lambda (obj) (apply #'render-widget obj args)) (widget-children obj)))))
     ;; Restore disabled panes
     (setf (selector-mixin-panes obj) saved-panes))) ; FIXME: unwind-protect this
 

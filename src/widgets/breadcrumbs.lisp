@@ -13,22 +13,18 @@
 
 (defgeneric walk-navigation (obj fn)
   (:documentation "Walk the widget tree starting at obj and calling fn at every node.")
-  (:method ((obj null) fn) (assert nil))	; bug?
-  (:method ((obj widget) fn) nil)		; widgets are leaves by default
-  (:method ((obj function) fn) nil)	; functions have no children
-  (:method ((obj string) fn) nil)		; and neither do strings
-  (:method ((obj container) fn)
+  (:method (obj fn)
     (mapc (curry-after #'walk-navigation fn) (widget-children obj)))
   (:method ((obj selector) fn)
     (funcall fn obj)
     (mapc (curry-after #'walk-navigation fn) (widget-children obj))))
 
-
+;; this should really be done in a post-tree-shakedown hook, not on every render
 (defmethod render-widget-body ((obj breadcrumbs) &rest args)
   (declare (ignore args))
   (let (crumbs)
     (walk-navigation
-     (root-composite)
+     (root-widget)
      (lambda (obj)
        (unless crumbs
 	 (push (navigation-pane-name-for-token obj nil) crumbs))

@@ -158,18 +158,14 @@
 					      :depends-on (widget "dataseq"))
 				       (:file "pagination"
 					      :depends-on (widget "flash"))
-				       (:file "container"
-					      :depends-on (widget))
-				       (:file "composite"
-					      :depends-on ("container"))
                                        (:file "table-composite"
 					      :depends-on (composite))
 				       (:file "selector"
-					      :depends-on ("container" widget))
+					      :depends-on (widget))
 				       (:file "on-demand-selector"
 					      :depends-on ("selector"))
 				       (:file "navigation"
-					      :depends-on ("composite" "selector" widget))
+					      :depends-on ("selector" widget))
 				       (:file "breadcrumbs"
 					      :depends-on ("navigation")))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"

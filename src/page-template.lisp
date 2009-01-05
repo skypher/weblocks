@@ -79,7 +79,7 @@ tag). The default implementation wraps the already rendered HTML in a
 wrapper div along with extra tags. Specialize :before and :after
 methods to render extra html prior and post the page wrapper and override
 the main method to replace the generation of the page wrapper and any contents
-inside it but outside the rendering of the root composite"))
+inside it but outside the rendering of the root widget"))
 
 (defmethod render-page-body ((app weblocks-webapp) body-string)
   "Default page-body rendering method"

@@ -5,9 +5,11 @@
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
-	  widget-children update-children walk-widget-tree
-          render-widget-body widget-css-classes render-widget mark-dirty
-          widget-dirty-p 
+	  widget-children update-children update-parent-for-children
+	  walk-widget-tree
+          render-widget render-widget-body render-widget-children
+	  widget-css-classes
+	  mark-dirty widget-dirty-p
           *current-widget*))
 
 (defmacro defwidget (name direct-superclasses &body body)
@@ -50,12 +52,14 @@ inherits from 'widget' if no direct superclasses are provided."
                  computation.")
    (parent :accessor widget-parent
 	   :initform nil
-	   :documentation "Stores the 'parent' of a widget,
-	   i.e. the composite widget in which this widget is
-	   located, if any. This value is automatically set by
-	   composites with the slot 'composite-widgets' is
-	   set. Note, a widget can only have one parent at any
-	   given time.")
+	   :documentation "Stores the 'parent' of a widget, i.e. the
+	   widget in which this widget is located, if any. This value is
+	   automatically set when you set the widget's children
+	   slot. Note, a widget can only have one parent at any given
+	   time.")
+   (children :initform nil
+	     :initarg :children
+	     :documentation "This widget's children.")
    (widget-prefix-fn :initform nil
 	             :initarg :widget-prefix-fn
 	             :accessor widget-prefix-fn
@@ -79,7 +83,9 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; it is possible to pass :name nil, which simply means that objects
 ;; will render without id in generated HTML.
 (defmethod initialize-instance :after ((obj widget) &key name &allow-other-keys)
-  (when name (setf (dom-id obj) name)))
+  (when name (setf (dom-id obj) name))
+  (when (widget-children obj)
+    (update-parent-for-children obj)))
 
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
@@ -117,17 +123,32 @@ strings, function, etc."
 (defgeneric widget-children (w)
   (:documentation "Answer an ordered list, settable when appropriate,
 of widgets who are children of w for the purposes of rendering.")
-  (:method (w) "NIL unless defined otherwise." nil))
+  (:method (w) "NIL unless defined otherwise." nil)
+  (:method ((w widget)) (slot-value w 'children)))
 
-(defgeneric (setf widget-children) (new-value wij)
+(defgeneric (setf widget-children) (new-widgets w)
   (:documentation "Set the value of `widget-children', when
-appropriate for WIJ's class."))
+appropriate for WIJ's class.")
+  (:method (new-widgets (w widget))
+    "Assign new children to the container and update their parents."
+    (setf (slot-value w 'children) (ensure-list new-widgets))
+    (update-parent-for-children w)))
 
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
   rendering) while walking the widget tree. Implement this method for
   widgets whose children might depend on external factors.")
   (:method (w) "NIL unless defined otherwise" nil))
+
+(defgeneric update-parent-for-children (widget)
+  (:documentation "Called during the tree shakedown phase and when
+  creating the tree (before rendering). Updates the parent of WIDGET to
+  PARENT-WIDGET.")
+  (:method (w) "NIL unless defined otherwise" nil)
+  (:method ((w widget))
+    (mapc (lambda (child) (setf (widget-parent child) w))
+	  (widget-children w))))
+
 
 (defgeneric walk-widget-tree (obj fn)
   (:documentation "Walk the widget tree starting at obj and calling fn
@@ -148,6 +169,15 @@ appropriate for WIJ's class."))
   (declare (ignore obj val))
   nil)
 
+
+(defun cons-in-list-p (cell list)
+  "Simple test that the cell is still part of list to validate the place
+   stored in the closure"
+  (cond ((null list) nil)
+        ((eq list cell) t)
+        (t (cons-in-list-p cell (cdr list)))))
+
+
 (defgeneric make-widget-place-writer (container widget)
   (:documentation "Returns a function accepting (&optional ARG) that
    encapsulates the place where widget is stored, behaving like this:
@@ -161,7 +191,25 @@ appropriate for WIJ's class."))
    of the contract is that the fn sets the parent slot of the callee
    to the container.  The other part is that the widget is dirty after
    the write via a direct call to make-dirty, or to a write to a
-   widget slot."))
+   widget slot.")
+  (:method ((obj widget) child)
+    (let ((place (member child (widget-children obj))))
+      (if place
+	  (lambda (&optional (callee nil callee-supplied-p))
+	    (assert (cons-in-list-p place (widget-children obj)))
+	    (cond
+	      (callee-supplied-p
+	       (check-type callee widget-designator
+			   "a potential child of a widget")
+	       (rplaca place callee)
+	       (setf (widget-parent callee) obj)
+	       (mark-dirty obj))
+	      (t (car place))))
+	  (lambda (&rest args)
+	    (declare (ignore args))
+	    (style-warn 'widget-not-in-parent :widget child :parent obj)
+	    (mark-dirty obj))))))
+
 
 (defparameter *widget-classes*
   (mapcar #'find-class '(widget symbol string function))
@@ -230,6 +278,14 @@ that will be applied before and after the body is rendered.")
 	    (apply body-fn obj args)
 	    (safe-apply widget-suffix-fn obj args)))))
 
+(defgeneric render-widget-children (obj &rest args)
+  (:documentation "Renders the widget's children")
+  (:method ((obj symbol) &rest args) nil)
+  (:method ((obj function) &rest args) nil)
+  (:method ((obj string) &rest args) nil)
+  (:method ((obj widget) &rest args)
+    (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj))))
+
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
    "A generic function that renders a widget in its current state. In
@@ -239,11 +295,14 @@ order to actually render the widget, call 'render-widget' instead.
 
 One of the implementations allows \"rendering\" functions. When
 'render-widget' is called on a function, the function is simply
-called. This allows to easily add functions to composite widgets that
+called. This allows to easily add functions to widgets that
 can do custom rendering without much boilerplate. Similarly symbols
 that are fbound to functions can be treated as widgets.
 
-Another implementation allows rendering strings."))
+Another implementation allows rendering strings.")
+  (:method ((obj widget) &rest args)
+    (declare (ignore args))
+    "By default this method does nothing."))
 
 (defmethod render-widget-body ((obj symbol) &rest args)
   (if (fboundp obj)
@@ -284,8 +343,11 @@ stylesheets and javascript links in the page header."))
   (let ((*current-widget* obj))
     (declare (special *current-widget*))
     (if inlinep
-      (apply #'render-widget-body obj args)
-      (apply #'with-widget-header obj #'render-widget-body
+      (progn (apply #'render-widget-body obj args)
+	     (apply #'render-widget-children obj args))
+      (apply #'with-widget-header obj (lambda (obj &rest args)
+					(apply #'render-widget-body obj args)
+					(apply #'render-widget-children obj args))
              (append
                (when (widget-prefix-fn obj)
                  (list :widget-prefix-fn (widget-prefix-fn obj)))
@@ -293,19 +355,6 @@ stylesheets and javascript links in the page header."))
                  (list :widget-suffix-fn (widget-suffix-fn obj)))
                args)))
     (setf (widget-rendered-p obj) t)))
-
-;;; Make all widgets act as composites to simplify development
-(defmethod composite-widgets ((obj widget))
-  nil)
-
-(defmethod composite-widgets ((obj function))
-  nil)
-
-(defmethod composite-widgets ((obj symbol))
-  nil)
-
-(defmethod composite-widgets ((obj string))
-  nil)
 
 (defgeneric mark-dirty (w &key propagate)
   (:documentation
