@@ -61,8 +61,14 @@ if it was mixed into the view."
 	(let* ((pos-table
 		(let ((pos-table (make-hash-table :test 'equal)))
 		  (loop for pos from 0
-			for field in fields
-			do (setf (gethash (field-key field) pos-table) pos))
+			;; We use field-info-list instead of FIELDS
+			;; below, with backward filling (like `find'),
+			;; for compatibility with r1132:980bccf and
+			;; older.
+			for field in field-info-list
+			for key = (field-key field)
+			unless (nth-value 1 (gethash key pos-table))
+			  do (setf (gethash key pos-table) pos))
 		  pos-table))
 	       (merged-fields
 		(sort (union true-inline-fields expanded-mixin-fields)
