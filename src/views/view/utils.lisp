@@ -33,59 +33,47 @@ root object being evaluated, and the field-info of the field's parent
 if it was mixed into the view."
   field object parent-info)
 
-(defun factor-overriden-fields (field-info-list)
+(defun factor-overridden-fields (field-info-list)
   "Overrides parent fields redefined in children."
-  ;; XXX this is quite inefficient (at least n^2 + n*log(n))
+  ;; XXX this is less quite inefficient (at least n^2 + n*log(n))
   #+lp-view-field-debug
   (format t "fil: ~S~%" field-info-list)
   (labels ((field-key (field-info)
-	     (cons (view-field-slot-name (field-info-field field-info))
+	     (cons (fi-slot-name field-info)
 		   (awhen (parent field-info)
 		     (view-field-slot-name (field-info-field IT)))))
+	   (fi-slot-name (field-info)
+	     (view-field-slot-name (field-info-field field-info)))
 	   (parent (field-info)
 	     (field-info-parent-info field-info))
 	   (mixin-p (field-info)
 	     (typep (field-info-field field-info) 'mixin-view-field)))
     #+lp-view-field-debug
     (format t "in: ~S~%" (mapcar (compose #'describe #'field-info-field) field-info-list))
-    (let* ((fields (remove-duplicates field-info-list :key #'field-key :from-end nil))
-	   (true-inline-fields
-	    (remove-if (disjoin #'parent #'mixin-p)
-		       (remove-duplicates fields :test #'equal
-					  :key (compose #'view-field-slot-name
-							#'field-info-field))
-		       :from-end t))
-	   (expanded-mixin-fields
-	    (remove-if (curry-after #'find true-inline-fields
-				    :test #'equal :key (compose #'view-field-slot-name
-								#'field-info-field))
-		       (remove-duplicates (remove-if-not (disjoin #'parent #'mixin-p)
-							 fields)
-					  :test #'equal :key #'field-key)))
-	   (merged-fields
-	    (sort (union true-inline-fields expanded-mixin-fields)
-		  #'< :key (lambda (field)
-			     (flet ((pos (field where)
-				      (let ((r (position (field-key field) where
-							 :key #'field-key :test #'equal)))
-					#+lp-view-field-debug
-					(format t "field: ~S / where: ~S -> ~S%" (field-key field)
-					        (mapcar #'field-key where) r)
-					r)))
-			       (let ((result (or (pos field fields)
-						 (pos field true-inline-fields)
-						 (pos field expanded-mixin-fields)
-						 0)))
-				 #+lp-view-field-debug
-				 (format t "result for field ~A: ~A~%" field result)
-				 result))))))
-      #+lp-view-field-debug
-      (progn
-	(format t "true inline: ~S~%" (mapcar #'field-key true-inline-fields))
-	(format t "expanded ~S~%" (mapcar #'field-key expanded-mixin-fields))
-	(format t "fields ~S~%" (mapcar #'field-key fields))
-	(format t "merged ~S~%" (mapcar (compose #'describe #'field-info-field) merged-fields)))
-      merged-fields)))
+    (let ((fields (remove-duplicates field-info-list
+				     :test #'equal :key #'field-key)))
+      (multiple-value-bind (expanded-mixin-fields true-inline-fields)
+	  (partition fields (disjoin #'parent #'mixin-p))
+	(setf expanded-mixin-fields
+	      (remove-if (curry-after #'find true-inline-fields
+				      :test #'equal :key #'fi-slot-name)
+			 expanded-mixin-fields))
+	(let* ((pos-table
+		(let ((pos-table (make-hash-table :test 'equal)))
+		  (loop for pos from 0
+			for field in fields
+			do (setf (gethash (field-key field) pos-table) pos))
+		  pos-table))
+	       (merged-fields
+		(sort (union true-inline-fields expanded-mixin-fields)
+		      #'< :key (f_ (gethash (field-key _) pos-table 0)))))
+	  #+lp-view-field-debug
+	  (progn
+	    (format t "true inline: ~S~%" (mapcar #'field-key true-inline-fields))
+	    (format t "expanded ~S~%" (mapcar #'field-key expanded-mixin-fields))
+	    (format t "fields ~S~%" (mapcar #'field-key fields))
+	    (format t "merged ~S~%" (mapcar (compose #'describe #'field-info-field) merged-fields)))
+	  merged-fields)))))
 
 (defun map-view-field-info-list (proc view-designator obj parent-field-info)
   "Walk a full list of view fields, including inherited fields."
@@ -147,13 +135,13 @@ are wrapped in field-info structures with common-sense defaults."
 	       (view-field (make-field-info :field custom-field
 					    :object obj
 					    :parent-info nil)))))
-    (let* ((results (factor-overriden-fields
+    (let* ((results (factor-overridden-fields
 		     (let ((expansion '()))
 		       (map-view-field-info-list (f_ (push _ expansion))
 						 view-designator obj nil)
 		       (nreverse expansion)))))
       (when expand-mixins
-	(setf results (factor-overriden-fields
+	(setf results (factor-overridden-fields
 		       (let ((expansion '()))
 			 (map-expanding-mixin-fields
 			  (f_ (push _ expansion)) results include-invisible-p)
