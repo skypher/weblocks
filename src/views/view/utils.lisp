@@ -35,7 +35,6 @@ if it was mixed into the view."
 
 (defun factor-overridden-fields (field-info-list)
   "Overrides parent fields redefined in children."
-  ;; XXX this is less quite inefficient (at least n^2 + n*log(n))
   #+lp-view-field-debug
   (format t "fil: ~S~%" field-info-list)
   (labels ((field-key (field-info)
@@ -47,39 +46,38 @@ if it was mixed into the view."
 	   (parent (field-info)
 	     (field-info-parent-info field-info))
 	   (mixin-p (field-info)
-	     (typep (field-info-field field-info) 'mixin-view-field)))
+	     (typep (field-info-field field-info) 'mixin-view-field))
+	   (true-inline? (field-info)
+	     (not (or (parent field-info) (mixin-p field-info)))))
     #+lp-view-field-debug
     (format t "in: ~S~%" (mapcar (compose #'describe #'field-info-field) field-info-list))
-    (let ((fields (remove-duplicates field-info-list
-				     :test #'equal :key #'field-key)))
-      (multiple-value-bind (expanded-mixin-fields true-inline-fields)
-	  (partition fields (disjoin #'parent #'mixin-p))
-	(setf expanded-mixin-fields
-	      (remove-if (curry-after #'find true-inline-fields
-				      :test #'equal :key #'fi-slot-name)
-			 expanded-mixin-fields))
-	(let* ((pos-table
-		(let ((pos-table (make-hash-table :test 'equal)))
-		  (loop for pos from 0
-			;; We use field-info-list instead of FIELDS
-			;; below, with backward filling (like `find'),
-			;; for compatibility with r1132:980bccf and
-			;; older.
-			for field in field-info-list
-			for key = (field-key field)
-			unless (nth-value 1 (gethash key pos-table))
-			  do (setf (gethash key pos-table) pos))
-		  pos-table))
-	       (merged-fields
-		(sort (union true-inline-fields expanded-mixin-fields)
-		      #'< :key (f_ (gethash (field-key _) pos-table 0)))))
-	  #+lp-view-field-debug
-	  (progn
-	    (format t "true inline: ~S~%" (mapcar #'field-key true-inline-fields))
-	    (format t "expanded ~S~%" (mapcar #'field-key expanded-mixin-fields))
-	    (format t "fields ~S~%" (mapcar #'field-key fields))
-	    (format t "merged ~S~%" (mapcar (compose #'describe #'field-info-field) merged-fields)))
-	  merged-fields)))))
+    (let* ((fields (coerce field-info-list 'simple-vector))
+	   (true-inlines (make-hash-table :test 'eq))
+	   (positions (make-hash-table :test 'equal))
+	   (nils? nil))
+      (declare (type simple-vector fields))
+      ;; find the true inlines so we can eliminate others of same
+      ;; slot-name
+      (loop for field across fields
+	    do (when (true-inline? field)
+		 (setf (gethash (fi-slot-name field) true-inlines) t)))
+      (loop for pos from (1- (length fields)) downto 0
+	    for field = (aref fields pos)
+	    for fkey = (field-key field)
+	    do (acond ((gethash fkey positions)
+		       ;; "carry" to simulate <=980bccf ordering
+		       (shiftf (aref fields pos) (aref fields it) nil)
+		       (setf nils? t))
+		      ((and (not (true-inline? field))
+			    (gethash (fi-slot-name field) true-inlines))
+		       (setf (aref fields pos) nil nils? t)))
+	       (setf (gethash fkey positions) pos))
+      (let ((merged-fields (coerce fields 'list)))
+	(when nils?
+	  (setf merged-fields (delete nil merged-fields)))
+	#+lp-view-field-debug
+	(format t "merged ~S~%" (mapcar (compose #'describe #'field-info-field) merged-fields))
+	merged-fields))))
 
 (defun map-view-field-info-list (proc view-designator obj parent-field-info)
   "Walk a full list of view fields, including inherited fields."
