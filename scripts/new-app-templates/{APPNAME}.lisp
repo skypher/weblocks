@@ -24,9 +24,11 @@
 (defun start-{APPNAME} (&rest args)
   "Starts the application by calling 'start-weblocks' with appropriate
 arguments."
-  (apply #'start-weblocks args))
+  (apply #'start-weblocks args)
+  (start-webapp '{APPNAME})
 
 (defun stop-{APPNAME} ()
   "Stops the application by calling 'stop-weblocks'."
+  (stop-webapp '{APPNAME})
   (stop-weblocks))
 
