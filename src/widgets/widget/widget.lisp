@@ -6,6 +6,7 @@
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
 	  widget-children update-children update-parent-for-children
+	  set-children-of-type get-children-of-type
 	  walk-widget-tree
           render-widget render-widget-body render-widget-children
 	  widget-css-classes
@@ -58,7 +59,6 @@ inherits from 'widget' if no direct superclasses are provided."
 	   slot. Note, a widget can only have one parent at any given
 	   time.")
    (children :initform nil
-	     :initarg :children
 	     :documentation "This widget's children.")
    (widget-prefix-fn :initform nil
 	             :initarg :widget-prefix-fn
@@ -82,10 +82,9 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; Process the :name initarg and set the dom-id accordingly. Note that
 ;; it is possible to pass :name nil, which simply means that objects
 ;; will render without id in generated HTML.
-(defmethod initialize-instance :after ((obj widget) &key name &allow-other-keys)
+(defmethod initialize-instance :after ((obj widget) &key name children &allow-other-keys)
   (when name (setf (dom-id obj) name))
-  (when (widget-children obj)
-    (update-parent-for-children obj)))
+  (when children (set-children-of-type obj children :widget)))
 
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
@@ -121,18 +120,30 @@ strings, function, etc."
   nil)
 
 (defgeneric widget-children (w)
-  (:documentation "Answer an ordered list, settable when appropriate,
-of widgets who are children of w for the purposes of rendering.")
+  (:documentation "Return a list of all widgets who are children of
+w (e.g. may be rendered when w is rendered).")
   (:method (w) "NIL unless defined otherwise." nil)
-  (:method ((w widget)) (slot-value w 'children)))
+  (:method ((w widget)) (reduce #'append (slot-value w 'children) :key #'cdr)))
 
 (defgeneric (setf widget-children) (new-widgets w)
-  (:documentation "Set the value of `widget-children', when
-appropriate for WIJ's class.")
+  (:documentation "This function is obsolete and should never be used.")
   (:method (new-widgets (w widget))
-    "Assign new children to the container and update their parents."
-    (setf (slot-value w 'children) (ensure-list new-widgets))
-    (update-parent-for-children w)))
+    (error "(setf widget-children) should never be called, use set-children-of-type")))
+
+(defgeneric set-children-of-type (obj widgets type)
+  (:method ((obj widget) widgets type)
+    (let* ((children (slot-value obj 'children))
+	   (cell (assoc type children)))
+      (if cell
+	  (if widgets
+	      (rplacd cell (ensure-list widgets))
+	      (setf (slot-value obj 'children) (remove type children :key #'car)))
+	  (when widgets (push (cons type (ensure-list widgets)) (slot-value obj 'children)))))
+    (update-parent-for-children obj)))
+
+(defgeneric get-children-of-type (obj type)
+  (:method ((obj widget) type)
+    (cdr (assoc type (slot-value obj 'children)))))
 
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
@@ -170,12 +181,13 @@ appropriate for WIJ's class.")
   nil)
 
 
-(defun cons-in-list-p (cell list)
-  "Simple test that the cell is still part of list to validate the place
-   stored in the closure"
-  (cond ((null list) nil)
-        ((eq list cell) t)
-        (t (cons-in-list-p cell (cdr list)))))
+(defun place-in-children-p (cell children)
+  "Simple test that the cell is still part of one of the children lists
+   to validate the place stored in the closure"
+  (notevery #'null
+	    (mapcar (lambda (row)
+		      (notevery #'null
+				(maplist (lambda (e) (eq cell e)) (cdr row)))) children)))
 
 
 (defgeneric make-widget-place-writer (container widget)
@@ -193,10 +205,12 @@ appropriate for WIJ's class.")
    the write via a direct call to make-dirty, or to a write to a
    widget slot.")
   (:method ((obj widget) child)
-    (let ((place (member child (widget-children obj))))
+    (let ((place (find-if-not #'null
+			      (mapcar (lambda (row) (member child (cdr row)))
+				      (slot-value obj 'children)))))
       (if place
 	  (lambda (&optional (callee nil callee-supplied-p))
-	    (assert (cons-in-list-p place (widget-children obj)))
+	    (assert (place-in-children-p place (slot-value obj 'children)))
 	    (cond
 	      (callee-supplied-p
 	       (check-type callee widget-designator
@@ -284,7 +298,7 @@ that will be applied before and after the body is rendered.")
   (:method ((obj function) &rest args) nil)
   (:method ((obj string) &rest args) nil)
   (:method ((obj widget) &rest args)
-    (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj))))
+    (mapc (lambda (child) (apply #'render-widget child args)) (get-children-of-type obj :widget))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
@@ -344,10 +358,12 @@ stylesheets and javascript links in the page header."))
     (declare (special *current-widget*))
     (if inlinep
       (progn (apply #'render-widget-body obj args)
-	     (apply #'render-widget-children obj args))
-      (apply #'with-widget-header obj (lambda (obj &rest args)
-					(apply #'render-widget-body obj args)
-					(apply #'render-widget-children obj args))
+	     (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+      (apply #'with-widget-header
+	     obj
+	     (lambda (obj &rest args)
+	       (apply #'render-widget-body obj args)
+	       (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
              (append
                (when (widget-prefix-fn obj)
                  (list :widget-prefix-fn (widget-prefix-fn obj)))

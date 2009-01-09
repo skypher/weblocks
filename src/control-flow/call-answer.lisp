@@ -101,14 +101,16 @@ identity function."
 (defun/cc do-root-widget (callee  &optional (wrapper-fn #'identity))
   "Replace the children of the root widget with CALLEE,
 the latter one being optionally transformed by WRAPPER-FN."
-  (let* ((old-value (widget-children (root-widget))))
+  (let* ((old-value (slot-value (root-widget) 'children)))
     (prog1
 	(call callee
 	      (lambda (new-callee)
-		(setf (widget-children (root-widget))
-		      (funcall wrapper-fn new-callee))))
-      (setf (widget-children (root-widget))
-	    old-value))))
+		(set-children-of-type (root-widget)
+				      (funcall wrapper-fn new-callee)
+				      :widget)))
+      (setf (slot-value (root-widget) 'children)
+	    old-value)
+      (update-parent-for-children (widget-children (root-widget))))))
 
 
 (defun/cc do-page (callee)

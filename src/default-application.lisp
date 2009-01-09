@@ -52,14 +52,15 @@
 
 
 (defun init-user-session (root)
-  (setf (widget-children root)
-	(list
-          (f_%
-            (with-html
-              (:div :class "header"
-                    (with-extra-tags))
-              (:h1 "Welcome to " (:em "Weblocks!"))
-              (:p "To learn more on how to get started
+  (set-children-of-type
+   root
+   (list
+    (f_%
+      (with-html
+	(:div :class "header"
+	      (with-extra-tags))
+	(:h1 "Welcome to " (:em "Weblocks!"))
+	(:p "To learn more on how to get started
                   writing " (:em "Weblocks") " applications, please see the "
                   (:a :href "http://trac.common-lisp.net/cl-weblocks/wiki/UserManual" "user
                       manual.")
@@ -67,9 +68,10 @@
                   about " (:em "Weblocks") ", information on how to get
                   support, find documentation, etc. please
                   start " (:a :href "http://common-lisp.net/project/cl-weblocks" "here") ".")
-                  (:h2 "How did I get here?")
-                  (:p "If you expected to see your application here you probably didn't supply
+	(:h2 "How did I get here?")
+	(:p "If you expected to see your application here you probably didn't supply
                       the PREFIX keyword argument to DEFWEBAPP (try " (:code "PREFIX \"/\"") ").")))
-          (make-instance 'webapp-control)
-          (f_% (with-html (:h3 (:em "Happy hacking!")))))))
+    (make-instance 'webapp-control)
+    (f_% (with-html (:h3 (:em "Happy hacking!")))))
+   :widget))
 

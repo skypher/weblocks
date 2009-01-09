@@ -69,7 +69,6 @@ tokens."
 	    widget)))))
 
 
-;; Note there is no render-widget-body nor render-widget-children method
-;; for on-demand-selector. That's because the default from widget suit
-;; us just fine. --jwr
-
+(defmethod render-widget-children ((obj on-demand-selector) &rest args)
+  (mapc (lambda (child) (apply #'render-widget child args))
+	(get-children-of-type obj :selector)))
