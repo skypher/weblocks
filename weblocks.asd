@@ -92,6 +92,7 @@
 						      presentations
 						      :components ((:file "hidden")
                                                                    (:file "choices")
+								   (:file "date")
 								   (:file "radio"
 									  :depends-on ("choices"))
 								   (:file "dropdown"
