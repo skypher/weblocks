@@ -80,12 +80,10 @@ The function serves all started applications"
     (let* ((script-name (script-name request))
 	   (app-prefix (webapp-prefix app))
 	   (app-pub-prefix (compute-webapp-public-files-uri-prefix app)))
-      (log-message :debug "Application dispatch for ~S/~S" (hunchentoot:host) script-name)
       (cond
 	((list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri "/weblocks-common" nil)
 			   :test #'string=)
-	 (log-message :debug "Dispatching to common public file")
          (return-from weblocks-dispatcher
                       (funcall (create-folder-dispatcher-and-handler 
                                  "/weblocks-common/pub/"
@@ -97,7 +95,6 @@ The function serves all started applications"
               (list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri app-pub-prefix nil)
 			   :test #'string=))
-	 (log-message :debug "Dispatching to public file")
          ;; set caching parameters for static files
          ;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
          (if (weblocks-webapp-debug app)
@@ -115,8 +112,6 @@ The function serves all started applications"
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
-	 (log-message :debug "Dispatching to application ~A with prefix ~S"
-		      app app-prefix)
 	 (return-from weblocks-dispatcher 
 	   #'(lambda ()
 	       (handle-client-request app)))))))
