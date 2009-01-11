@@ -68,7 +68,7 @@ particular types of data.
 'args' - keyword arguments passed to functions internally. See
 'render-data', 'render-form', etc.")
   (:method ((obj dataform) data &rest args)
-    (ecase (slot-value obj 'ui-state)
+    (ecase (dataform-ui-state obj)
       (:data (apply #'render-dataform-data obj data (dataform-data-view obj) args))
       (:form (apply #'render-dataform-form obj data (dataform-form-view obj) args)))))
 
@@ -118,7 +118,7 @@ customize form behavior.")
 				      (when break-out
 					(setf (slot-value obj 'validation-errors) nil)
 					(setf (slot-value obj 'intermediate-form-values) nil)
-					(setf (slot-value obj 'ui-state) :data))))))
+					(setf (dataform-ui-state obj) :data))))))
 	   :validation-errors (slot-value obj 'validation-errors)
 	   :intermediate-values (slot-value obj 'intermediate-form-values)
 	   :widget obj

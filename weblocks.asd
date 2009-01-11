@@ -14,7 +14,7 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore :html-template)
+	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
@@ -120,8 +120,6 @@
 							     (:file "widget-mop")))
 				       (:file "flash"
 					      :depends-on (widget))
-				       (:file "template-block"
-					      :depends-on (widget))
 				       (:file "data-editor"
 					      :depends-on (widget))
 				       (:file "dataform"
@@ -189,6 +187,12 @@
 		(test-op (load-op "weblocks-test"))
 		(doc-op (load-op "weblocks-scripts"))
 		(make-app-op (load-op "weblocks-scripts"))))
+
+#+asdf-system-connections
+(defsystem-connection weblocks+html-template
+  :requires (:weblocks :html-template)
+  :components ((:module src :pathname "src/widgets/"
+		:components ((:file "template-block")))))
 
 ;;; test-op
 (defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))

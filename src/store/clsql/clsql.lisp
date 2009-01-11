@@ -13,7 +13,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod open-store ((store-type (eql :clsql)) &rest args)
   (setf *default-caching* nil)
-  (setf *default-store* (apply #'connect args)))
+  (setf *default-store* (apply #'make-instance 'fluid-database
+			       :connection-spec args)))
 
 (defmethod close-store ((store database))
   (when (eq *default-store* store)

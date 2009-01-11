@@ -1,9 +1,10 @@
 (in-package :weblocks)
 
-(export '(template-block-mixin template-block-source template-block-vars recreate-template-printer))
+(export '(template-block template-block-source template-block-vars recreate-template-printer))
 
-(defclass template-block-mixin ()
-  ((template-printer :accessor template-printer-of :initform nil)
+(defwidget template-block ()
+  ((template-printer :accessor template-printer-of :initform nil
+		     :affects-dirty-status-p nil)
    (source :accessor template-block-source :initarg :source :initform nil)
    (vars :type list :accessor template-block-vars :initarg :vars :initform nil))
   (:documentation "A block of HTML taken from 'source', which is processed by
