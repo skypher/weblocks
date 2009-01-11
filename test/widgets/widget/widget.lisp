@@ -364,7 +364,7 @@
 	      (w (make-instance 'dataform)))
 	  (declare (special weblocks::*dirty-widgets*))
 	  (render-widget w)
-	  (setf (slot-value w 'weblocks::ui-state) :form)
+	  (setf (dataform-ui-state w) :form)
 	  (widget-name (car weblocks::*dirty-widgets*)))))
   "id-123")
 
