@@ -64,7 +64,8 @@
       (unwind-protect
 	   (progn
 	     (update-records-from-instance object :database store)
-	     (setf success t))
+	     (setf success t)
+             object)
 	(when (and (not success)
 		   (null current-id))
 	  (setf (object-id object) nil))))))

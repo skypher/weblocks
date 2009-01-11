@@ -10,7 +10,13 @@
      :initform t
      :initarg  :adjust-item-widget-actions
      :documentation
-       "When set to true, the item widget will be passed to 'popover-gridedit-adjust-item-widget-actions-for-dialog'."))
+       "When set to true, the item widget will be passed to 'popover-gridedit-adjust-item-widget-actions-for-dialog'.")
+   (dialog-css-class
+     :accessor popover-gridedit-dialog-css-class
+     :initform nil
+     :initarg  :dialog-css-class
+     :documentation
+       "The CSS class of the popover dialog."))
   (:documentation "A widget based on the gridedit that uses a popover dialog for the editor"))
 
 (defgeneric popover-gridedit-adjust-item-widget-actions-for-dialog (w)
@@ -66,7 +72,8 @@
       (do-dialog title item-w
                  :close #'(lambda (&rest args)
                             (declare (ignore args))
-                            (popover-gridedit-close-dialog pg))))))
+                            (popover-gridedit-close-dialog pg))
+                 :css-class (popover-gridedit-dialog-css-class pg)))))
 
 (defmethod render-widget-body ((pg popover-gridedit) &rest args) 
   (dataedit-update-operations pg)

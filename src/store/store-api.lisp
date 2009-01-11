@@ -77,11 +77,11 @@
 
 ;;; Creating and deleting persistent objects
 (defgeneric persist-object (store object)
-  (:documentation "Persists 'object' into 'store'. If the object does
-  not have a unique ID (see 'object-id'), persist 'object' into store
-  and set its unique ID via (see '(setf object-id)'). If the object
-  has a unique ID, find relevant entry in the store and update it with
-  'object'."))
+  (:documentation "Persists 'object' into 'store', answering
+  'object'. If the object does not have a unique ID (see 'object-id'),
+  persist 'object' into store and set its unique ID via (see '(setf
+  object-id)'). If the object has a unique ID, find relevant entry in
+  the store and update it with 'object'."))
 
 (defgeneric delete-persistent-object (store object)
   (:documentation "Deletes the persistent object from 'store'. After

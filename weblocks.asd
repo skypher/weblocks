@@ -100,7 +100,9 @@
 								   (:file "paragraph")
 								   (:file "excerpt")
 								   (:file "image")
-								   (:file "url")))
+								   (:file "checkboxes")
+								   (:file "url")
+								   (:file "html")))
 						     (:module
 						      parsers
 						      :components ((:file "common"))))
@@ -184,6 +186,12 @@
 		(test-op (load-op "weblocks-test"))
 		(doc-op (load-op "weblocks-scripts"))
 		(make-app-op (load-op "weblocks-scripts"))))
+
+#+asdf-system-connections
+(defsystem-connection weblocks+html-template
+  :requires (:weblocks :html-template)
+  :components ((:module src :pathname "src/widgets/"
+		:components ((:file "template-block")))))
 
 ;;; test-op
 (defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))

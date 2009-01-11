@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite views/view/utils-suite (weblocks-suite)
+  ())
+
 ;;; Test find-view
 (deftest find-view-1
     (multiple-value-bind (res err)
@@ -71,6 +74,43 @@
 						       :view '(data education-history))
 					    (graduation-year :hidep t))))
   (name manager university graduation-year))
+
+(addtest get-object-view-fields.direct-shadows-mixedin
+  (ensure-same (mapcar #'print-field-info
+		       (get-object-view-fields
+			*joe* (defview () (:inherit-from '(:scaffold employee))
+				(education :type mixin
+					   :view '(data education-history))
+				(graduation-year))))
+	       '(name manager university graduation-year))
+  (ensure-same (mapcar #'print-field-info
+		       (get-object-view-fields
+			*joe* (defview () (:inherit-from '(:scaffold employee))
+				(education :type mixin
+					   :view '(data education-history))
+				(graduation-year :hidep t))
+			:include-invisible-p t))
+	       '(name manager university graduation-year)))
+
+(addtest get-object-view-fields.hidden-direct-noshadow
+  (let ((fields (get-object-view-fields
+		 *joe* (defview () (:inherit-from '(:scaffold employee))
+			 (education :type mixin
+				    :view '(data education-history))
+			 (graduation-year :hidep t)))))
+    (ensure-same (mapcar #'print-field-info fields)
+		 '(name manager university graduation-year))
+    (ensure-same (field-info-object (car (last fields))) *some-college*)))
+
+(addtest get-object-view-fields.direct-shadow-proper-mixin
+  (let ((fields (get-object-view-fields
+		 *joe* (defview () (:inherit-from '(:scaffold employee))
+			 (education :type mixin
+				    :view '(data education-history))
+			 (education)))))
+    (ensure-same (mapcar #'print-field-info fields)
+		 '(name manager education))
+    (ensure-same (field-info-object (third fields)) *joe*)))
 
 (deftest get-object-view-fields-8
     (mapcar #'print-field-info
