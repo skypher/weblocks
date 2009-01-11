@@ -1,7 +1,6 @@
 (in-package #:weblocks)
 
-(export '(date->utime utime->date utime->dmy
-	  date-parser date-printing-mixin
+(export '(date-parser date-printing-mixin
 	  date-presentation date-entry-presentation))
 
 (defconstant +seconds-per-day+ (* 24 60 60))
