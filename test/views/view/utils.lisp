@@ -73,34 +73,22 @@
 					    (education :type mixin
 						       :view '(data education-history))
 					    (graduation-year :hidep t))))
-  (name manager university graduation-year))
+  (name manager university))
 
 (addtest get-object-view-fields.direct-shadows-mixedin
-  (ensure-same (mapcar #'print-field-info
-		       (get-object-view-fields
-			*joe* (defview () (:inherit-from '(:scaffold employee))
-				(education :type mixin
-					   :view '(data education-history))
-				(graduation-year))))
-	       '(name manager university graduation-year))
-  (ensure-same (mapcar #'print-field-info
-		       (get-object-view-fields
-			*joe* (defview () (:inherit-from '(:scaffold employee))
-				(education :type mixin
-					   :view '(data education-history))
-				(graduation-year :hidep t))
-			:include-invisible-p t))
-	       '(name manager university graduation-year)))
-
-(addtest get-object-view-fields.hidden-direct-noshadow
-  (let ((fields (get-object-view-fields
-		 *joe* (defview () (:inherit-from '(:scaffold employee))
-			 (education :type mixin
-				    :view '(data education-history))
-			 (graduation-year :hidep t)))))
-    (ensure-same (mapcar #'print-field-info fields)
-		 '(name manager university graduation-year))
-    (ensure-same (field-info-object (car (last fields))) *some-college*)))
+  (dolist (view (list (defview () (:inherit-from '(:scaffold employee))
+			(education :type mixin
+				   :view '(data education-history))
+			(graduation-year))
+		      (defview () (:inherit-from '(:scaffold employee))
+			(education :type mixin
+				   :view '(data education-history))
+			(graduation-year :hidep t))))
+    (let ((fields (get-object-view-fields *joe* view :include-invisible-p t)))
+      (ensure-same (mapcar #'print-field-info fields)
+		   '(name manager university graduation-year))
+      (ensure-same (field-info-object (car (last fields)))
+		   *joe*))))
 
 (addtest get-object-view-fields.direct-shadow-proper-mixin
   (let ((fields (get-object-view-fields
