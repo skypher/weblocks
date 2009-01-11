@@ -8,16 +8,6 @@
 (defun date->utime (day month year)
   (encode-universal-time 0 0 0 day month year 0))
 
-(defun utime->date (time)
-  (multiple-value-bind (sec min hour day mon year a b c) (decode-universal-time time)
-    (declare (ignore sec min hour a b c))
-    (date->utime day mon year)))
-
-(defun utime->dmy (date)
-  (multiple-value-bind (sec min hour day mon year a b c) (decode-universal-time date 0)
-    (declare (ignore sec min hour a b c))
-    (values day mon year)))
-
 (defclass date-parser (parser)
   ()
   (:default-initargs :error-message nil)
@@ -42,15 +32,16 @@
 
 
 (defclass date-printing-mixin ()
-  ((separator :accessor date-printing-separator :initarg :separator :initform "/")))
+  ((format :accessor date-printing-format :initarg :format
+	   :initform "%d/%m/%Y"
+	   :documentation "`format-date' format string to use."))
+  (:documentation "Show a universal time in a friendly
+  `format-date'-generated form."))
 
 (defmethod print-view-field-value (value (presentation date-printing-mixin)
 				   field view widget obj &rest args)
-  (declare (ignore obj view field args))
-  (let ((separator (date-printing-separator presentation)))
-    (multiple-value-bind (day month year)
-	(utime->dmy value)
-      (format nil "~D~A~D~A~0,'4D" day separator month separator year))))
+  (declare (ignore obj view field widget args))
+  (format-date (date-printing-format presentation) value))
 
 (defclass date-presentation (text-presentation date-printing-mixin)
   ()

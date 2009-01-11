@@ -106,6 +106,7 @@
 										   (:file "paragraph")
 										   (:file "textarea")
 										   (:file "image")
+										   (:file "date")
 										   (:file "url"))))))
 			  :depends-on ("test-code" fixtures snippets))
 		 (:module widgets
