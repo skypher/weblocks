@@ -51,7 +51,7 @@
   (let ((separator (date-printing-separator presentation)))
     (multiple-value-bind (day month year)
 	(utime->dmy value)
-      (format nil "~D~A~D~A~0,4D" day separator month separator year))))
+      (format nil "~D~A~D~A~0,'4D" day separator month separator year))))
 
 (defclass date-presentation (text-presentation date-printing-mixin)
   ()
