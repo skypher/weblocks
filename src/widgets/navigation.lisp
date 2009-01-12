@@ -26,7 +26,10 @@
    (render-content :accessor navigation-render-content
 		   :initarg :render-content
 		   :initform t
-		   :documentation "Whether navigation should also render its contents")
+		   :documentation "Whether navigation should also render
+		   its contents. You want to set this to nil if you use
+		   the teleport widget to render the contents
+		   elsewhere.")
    (disabled-pane-names :initform nil
                         :initarg :disabled-pane-names
                         :accessor navigation-disabled-pane-names
@@ -36,8 +39,9 @@
                         bound to a list of pane names to be
                         disabled."))
   (:documentation "The navigation widget can act as a menu controls, a
-  tabbed control, etc. It is a convenience combination of the
-  static-selector widget and a menu snippet."))
+  tabbed control, etc. It is a static-selector that also knows what its
+  pane names are, so it can render a menu, set a page title, and
+  contribute to navigation breadcrumbs."))
 
 (defun navigation-pane-name-for-token (navigation token)
   "Return the pane name for a given uri-token or NIL if not found. Token
@@ -106,16 +110,13 @@ may be NIL in which case the default pane name is provided."
         args)
   obj)
 
-;; TODO: rework this, add :header option somewhere
 (defun make-navigation (name &rest args)
-  "Instantiates the default navigation widget via 'make-instance'
-and forwards it along with 'args' to 'init-navigation'.
-
-The navigation widgets bears the title NAME."
+  "Instantiates the default navigation widget via 'make-instance' and
+forwards it along with 'args' to 'init-navigation'. The navigation
+widgets bears the title NAME."
   (let ((nav (make-instance 'navigation :name name)))
     (apply #'init-navigation nav args)
     nav))
-
 
 (export '(teleport teleport-source teleport-key))
 
@@ -128,7 +129,13 @@ The navigation widgets bears the title NAME."
 	:initarg :key
 	:initform #'identity
 	:documentation "The function that will be used to access the
-   widget from the source.")))
+   widget from the source."))
+  (:documentation "A widget that will render ('teleport') another widget
+  to a particular place. It is your responsibility to make sure the
+  teleported widget isn't rendered in its source location. A good use
+  for this is navigation with detached content -- you often want to have
+  the menu for your navigation rendered in one place, and its navigated
+  content elsewhere. The teleport widget lets you do that."))
 
 (defmethod render-widget-body ((obj teleport) &rest args)
   (apply #'render-widget (funcall (teleport-key obj) (teleport-source obj)) args))

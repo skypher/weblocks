@@ -20,15 +20,36 @@
   selectors implement this method. There can be multiple strategies for
   mapping uri-tokens to widgets: static maps, dynamically-generated
   widgets, dynamically-generated widgets with caching. Returns a widget
-  or NIL if not found, modifies uri-tokens."))
+  or NIL if not found, modifies uri-tokens.
+
+  The whole tree update protocol goes like this:
+
+  1) handle-normal-request calls update-widget-tree, which walks the
+  tree using walk-widget-tree starting at root-widget and calling
+  update-children at every node.
+
+  2) selector's update-children method (valid for all selectors,
+  e.g. widgets that process uri-tokens) calls get-widget-for-tokens.
+
+  3) if a widget corresponding to particular uri-tokens is found,
+  update-children calls update-dependents, so that the selector (or its
+  subclass) may update its dependents list and do other
+  housekeeping. The default implementation of update-dependents just
+  calls set-children-of-type to store the children under the :selector
+  type.
+
+  Usually the only thing you'll want to do if you are implementing your
+  own kind of selector is to subclass selector and provide a
+  get-widget-for-tokens method for it. See 'on-demand-selector' for an
+  example."))
 
 (defgeneric update-dependents (selector children)
   (:documentation "Update the dependents for a given selector with
   children. A selector will usually contain the children, but there
-  might be selectors that have other widgets dependent on them. Children
-  is either a list of widgets or a widget. Note that we do not update
-  the widget-parent relations: those are updated by the containers for
-  all their children.")
+  might be selectors that have other widgets dependent on them and need
+  to do additional housekeeping. Children is either a list of widgets or
+  a widget. Note that we do not update the widget-parent relations:
+  those are handled by set-children-of-type.")
   (:method ((obj selector) children)
     (set-children-of-type obj children :selector)))
 
