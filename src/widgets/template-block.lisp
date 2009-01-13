@@ -10,7 +10,7 @@
   (:documentation "A block of HTML taken from 'source', which is processed by
 HTML-TEMPLATE using 'vars'."))
 
-(defmethod recreate-template-printer ((obj template-block-mixin))
+(defmethod recreate-template-printer ((obj template-block))
   (if (template-block-source obj)
       (progn
 	(setf (template-printer-of obj)
@@ -18,12 +18,12 @@ HTML-TEMPLATE using 'vars'."))
 	t)
       nil))
 
-(defmethod ensure-printer-exists ((obj template-block-mixin))
+(defmethod ensure-printer-exists ((obj template-block))
   (if (template-printer-of obj)
       t
       (recreate-template-printer obj)))
 
-(defmethod render-widget-body ((obj template-block-mixin) &rest args)
+(defmethod render-widget-body ((obj template-block) &rest args)
   (declare (ignore args))
   (when (ensure-printer-exists obj)
     (html-template:fill-and-print-template (template-printer-of obj)
