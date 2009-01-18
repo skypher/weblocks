@@ -3,7 +3,7 @@
 
 (export '(class-id-slot-name object-id-slot-name object-id id
 	  class-store object-store defstore persist-objects
-	  mapstores))
+	  mapstores open-stores))
 
 ;;; Object ID management
 (defgeneric class-id-slot-name (class)
