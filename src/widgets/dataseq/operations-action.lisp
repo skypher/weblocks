@@ -16,9 +16,9 @@
   (loop for i in (append
 		  (dataseq-item-ops obj)
 		  (dataseq-common-ops obj))
-     when (member (car i) (request-parameters)
-		  :key #'car
-		  :test #'string-equal)
-     do (funcall (cdr i) obj (dataseq-selection obj)))
+        when (member (attributize-name (car i)) (request-parameters)
+                     :key (compose #'attributize-name #'car)
+                     :test #'string-equal)
+          do (funcall (cdr i) obj (dataseq-selection obj)))
   (dataseq-clear-selection obj))
 
