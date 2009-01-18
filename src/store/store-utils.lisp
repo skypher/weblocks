@@ -103,13 +103,15 @@ is called."
 
 (defun open-stores ()
   "Opens and binds all stores."
-  (dolist (store-name *store-names*)
-    (unless (symbol-value store-name)
-      (let ((store-info (gethash store-name *stores*)))
-	(setf (symbol-value store-name)
-	      (apply #'open-store
-		     (store-info-type store-info)
-		     (store-info-args store-info)))))))
+  (remove-if #'null
+             (mapcar (lambda (store-name)
+                       (unless (symbol-value store-name)
+                         (let ((store-info (gethash store-name *stores*)))
+                           (setf (symbol-value store-name)
+                                 (apply #'open-store
+                                        (store-info-type store-info)
+                                        (store-info-args store-info))))))
+                     *store-names*)))
 
 (defun close-stores ()
   "Closes all stores."
