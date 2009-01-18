@@ -5,7 +5,7 @@
 
 (defwidget yui-resize (yui-widget)
   ((panel :type (or symbol nil) :accessor resize-panel :initarg :panel :initform nil))
-  (:default-initargs :modules '("resize") :class-name :|:YAHOO.util.:Resize|))
+  (:default-initargs :modules '("resize") :class-name |:YAHOO.util.:Resize|))
 
 (defmethod with-widget-header ((widget yui-resize) body-fn &rest args)
   (apply body-fn widget args))

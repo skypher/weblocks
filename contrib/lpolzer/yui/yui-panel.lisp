@@ -6,7 +6,7 @@
 (defwidget yui-panel (yui-widget)
   ((on-close :type function :accessor panel-on-close :initarg :on-close :initform (constantly t))
    (on-end-drag :type function :accessor panel-on-end-drag :initarg :on-end-drag :initform (constantly t)))
-  (:default-initargs :modules '("dragdrop" "container") :class-name :|:YAHOO.widget.:Panel|))
+  (:default-initargs :modules '("dragdrop" "container") :class-name |:YAHOO.widget.:Panel|))
 
 (defmethod render-widget-body ((widget yui-panel) &rest args)
   (declare (ignore args))
