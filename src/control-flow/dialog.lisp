@@ -53,7 +53,7 @@ inserted into the page to redraw the dialog."
     (when (and current-dialog
 	       (refresh-request-p))
       (with-javascript
-	(ps* `(:|*Event.observe| window "load"
+	(ps* `(*Event.observe window "load"
                                  (lambda ()
                                    ,(make-dialog-js (dialog-title current-dialog)
                                                     (dialog-widget current-dialog)

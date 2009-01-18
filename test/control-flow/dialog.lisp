@@ -90,7 +90,7 @@
       (with-output-to-string (*weblocks-output-stream*)
         (weblocks::update-dialog-on-request)))
     (with-javascript-to-string
-      (ps:ps (:|*Event.observe| window "load"
+      (ps:ps (*Event.observe window "load"
                                 (lambda ()
                                   (setf ID-123 "<div class='widget function'><p>bar</p></div>")
                                   (setf ID-123 nil)
