@@ -100,9 +100,7 @@
 (defmethod find-persistent-object-by-id ((store prevalence-system) class-name object-id)
   (let ((objects (get-root-object store class-name)))
     ; find the object
-    (multiple-value-bind (obj)
-	(gethash object-id (persistent-objects-of-class-by-id objects))
-      obj)))
+    (gethash object-id (persistent-objects-of-class-by-id objects))))
 
 (defmethod find-persistent-objects ((store prevalence-system) class-name 
 				    &key (filter nil) order-by range slot

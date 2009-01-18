@@ -106,9 +106,7 @@ Ex:
   "Gets the name of the action from the request."
   (let* ((request-action-name (request-parameter *action-string*))
 	 (get/post-action-name (parameter *action-string*))
-	 (action-name (if request-action-name
-			  request-action-name
-			  get/post-action-name)))
+	 (action-name (or request-action-name get/post-action-name)))
     action-name))
 
 (defun get-request-action ()
