@@ -8,6 +8,8 @@
 
 (in-package :weblocks-clsql)
 
+(export '(order-by-expression range-to-offset range-to-limit))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
