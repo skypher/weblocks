@@ -43,7 +43,10 @@ etc."
   "Sends a redirect response to the client. If 'redirect' is called on
 a regular request, sends appropriate HTTP headers. If it is called
 during an AJAX request, sends weblocks specific JSON interpreted as
-redirect on the client."
+redirect on the client.
+
+This function returns immediately; any code following it will not be
+executed."
   (if (ajax-request-p)
       (progn
 	(setf (content-type) *json-content-type*)
