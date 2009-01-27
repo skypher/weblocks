@@ -3,9 +3,10 @@
 
 (export '(find-view field-info field-info-field field-info-object
 	  field-info-path get-object-view-fields map-view-fields
-	  map-mixin-fields count-view-fields obtain-view-field-value
-	  render-object-view class-from-view render-view
-	  render-object-view-impl attributize-presentation))
+	  find-field-info find-view-field map-mixin-fields
+	  count-view-fields obtain-view-field-value render-object-view
+	  class-from-view render-view render-object-view-impl
+	  attributize-presentation))
 
 ;;; View rendering utils
 (defun find-view (view &optional (signal-error-p t))
@@ -166,6 +167,23 @@ type field-info."
   (mapcar fn (get-object-view-fields obj view
 				     :include-invisible-p include-invisible-p
 				     :custom-fields custom-fields)))
+
+(defun find-field-info (name view obj &key include-invisible-p custom-fields)
+  "Finds a field-info object by name and returns it."
+  (let (fields)
+    (map-view-fields (lambda (fi)
+                       (when (equalp (view-field-slot-name (field-info-field fi))
+                                     name)
+                         (push fi fields)))
+                     view obj
+                     :include-invisible-p include-invisible-p
+                     :custom-fields custom-fields)
+    (car fields)))
+
+(defun find-view-field (&rest args)
+  (let ((field-info (apply #'find-field-info args)))
+    (when field-info
+      (field-info-field field-info))))
 
 (defun map-mixin-fields (fn view obj &rest args)
   (mapc fn (remove-if
