@@ -136,3 +136,9 @@ submission behavior.")
 	   :class-store (dataform-class-store obj)
 	   args)))
 
+;; Dependencies
+(defmethod dependencies append ((obj dataform))
+  (dependencies
+   (ecase (dataform-ui-state obj)
+     (:form (dataform-form-view obj))
+     (:data (dataform-data-view obj)))))
