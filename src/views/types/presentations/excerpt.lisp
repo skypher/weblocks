@@ -26,7 +26,7 @@ before the text is cut off and an ellipsis is inserted.")
 			       value (make-instance 'text-presentation) field view widget obj args))
 	     (item (apply #'print-view-field-value value presentation field view widget obj args))
 	     (lit-item (if highlight
-			   (highlight-regex-matches item highlight)
+			   (highlight-regex-matches item highlight presentation)
 			   (escape-for-html item))))
 	(with-html
 	  (:span :class "value"

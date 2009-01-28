@@ -167,7 +167,7 @@ before relations can be updated."))
 (defparameter *max-raw-input-length* 40
   "Default maximum allowed input length for input fields.")
 
-(defclass input-presentation (form-presentation)
+(defclass input-presentation (form-presentation text-presentation-mixin)
   ((max-length :initform *max-raw-input-length*
 	       :initarg :max-length
 	       :accessor input-presentation-max-length

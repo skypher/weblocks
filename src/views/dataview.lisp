@@ -2,7 +2,9 @@
 (in-package :weblocks)
 
 (export '(data data-view data-view-field data-scaffold
-	  text-presentation highlight-regex-matches *presentation-dom-id*))
+	  text-presentation text-presentation-mixin
+          text-presentation-mixin-format-string
+	  highlight-regex-matches *presentation-dom-id*))
 
 ;;; Data view
 (defclass data-view (view)
@@ -18,8 +20,17 @@
 (defclass data-scaffold (scaffold)
   ())
 
+;;; Text mixin
+(defclass text-presentation-mixin ()
+  ((format-string :accessor text-presentation-mixin-format-string
+                  :initform "~A"
+                  :initarg :format-string
+                  :documentation "A format string used to print text
+                  value."))
+  (:documentation "A mixin for presentations that format strings."))
+
 ;;; Presentation
-(defclass text-presentation (presentation)
+(defclass text-presentation (presentation text-presentation-mixin)
   ()
   (:documentation "A default presentation that renders values as
   text."))
@@ -76,7 +87,7 @@
     (with-html
       (:span :class "value"
 	     (str (if highlight
-		      (highlight-regex-matches printed-value highlight)
+		      (highlight-regex-matches printed-value highlight presentation)
 		      (escape-for-html printed-value)))))))
 
 (defmethod render-view-field-value ((value null) (presentation text-presentation)
@@ -88,7 +99,7 @@
       (with-html
 	(:span :class "value missing" "Not Specified"))))
 
-(defun highlight-regex-matches (item highlight)
+(defun highlight-regex-matches (item highlight presentation)
   "This function highlights regex matches in text by wrapping them in
 HTML 'string' tag. The complexity arises from the need to escape HTML
 to prevent XSS attacks. If we simply wrap all matches in 'strong' tags
@@ -101,7 +112,8 @@ the desired outcome."
 		       for match = (subseq item j k)
 		    collect (escape-for-html (subseq item i j)) into matches
 		    when (not (equalp match ""))
-		         collect (format nil "<strong>~A</strong>"
+		         collect (format nil (format nil "<strong>~A</strong>"
+                                                     (text-presentation-mixin-format-string presentation))
 					 (escape-for-html match))
 		           into matches
 		    when (null rest) collect (escape-for-html (subseq item k (length item))) into matches
@@ -110,8 +122,8 @@ the desired outcome."
 					(list (escape-for-html item))))))))
 
 (defmethod print-view-field-value (value presentation field view widget obj &rest args)
-  (declare (ignore presentation obj view field args))
-  (format nil "~A" value))
+  (declare (ignore obj view field args))
+  (format nil (text-presentation-mixin-format-string presentation) value))
 
 (defmethod print-view-field-value ((value symbol) presentation field view widget obj &rest args)
   (declare (ignore presentation obj view field args))
