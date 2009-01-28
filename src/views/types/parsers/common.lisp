@@ -1,26 +1,32 @@
 
 (in-package :weblocks)
 
-(export '(integer-parser integer-parser-radix integer-parser-min
-	  integer-parser-max symbol-parser keyword-parser object-id
-	  object-id-parser object-id-parser-class-name))
+(export '(number-parser number-parser-min number-parser-max
+	  integer-parser integer-parser-radix float-parser
+	  symbol-parser keyword-parser object-id object-id-parser
+	  object-id-parser-class-name))
 
-;;; Integer
-(defclass integer-parser (parser)
-  ((radix :initform 10
-	  :initarg :radix
-	  :accessor integer-parser-radix
-	  :documentation "Parse the integer in the specified radix.")
-   (min :initform nil
+;;; Numeric base
+(defclass number-parser (parser)
+  ((min :initform nil
 	:initarg :min
-	:accessor integer-parser-min
+	:accessor number-parser-min
 	:documentation "If not null, the parsed value must be greater
 	than or equal to this slot.")
    (max :initform nil
 	:initarg :max
-	:accessor integer-parser-max
+	:accessor number-parser-max
 	:documentation "If not null, the parsed value must be less
 	than or equal to this slot."))
+  (:default-initargs :error-message nil)
+  (:documentation "An abstract class that should serve as a base for numeric parsers."))
+
+;;; Integer
+(defclass integer-parser (number-parser)
+  ((radix :initform 10
+	  :initarg :radix
+	  :accessor integer-parser-radix
+	  :documentation "Parse the integer in the specified radix."))
   (:default-initargs :error-message nil)
   (:documentation "A parser designed to parse strings into
   integers."))
@@ -30,13 +36,13 @@
     (or error-message
 	(concatenate 'string
 		     "This value must be an integer"
-		     (when (integer-parser-min parser)
-		       (format nil " greater than ~A" (- (integer-parser-min parser) 1)))
-		     (when (and (integer-parser-min parser)
-				(integer-parser-max parser))
+		     (when (number-parser-min parser)
+		       (format nil " greater than ~A" (- (number-parser-min parser) 1)))
+		     (when (and (number-parser-min parser)
+				(number-parser-max parser))
 		       " and")
-		     (when (integer-parser-max parser)
-		       (format nil " less than ~A" (+ (integer-parser-max parser) 1)))))))
+		     (when (number-parser-max parser)
+		       (format nil " less than ~A" (+ (number-parser-max parser) 1)))))))
 
 (defmethod parse-view-field-value ((parser integer-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
@@ -48,15 +54,55 @@
 			    (parse-integer value
 					   :junk-allowed nil
 					   :radix (integer-parser-radix parser)))))
-      (when (and integer-value (integer-parser-min parser))
-	(assert (>= integer-value (integer-parser-min parser))))
-      (when (and integer-value (integer-parser-max parser))
-	(assert (<= integer-value (integer-parser-max parser))))
+      (when (and integer-value (number-parser-min parser))
+	(assert (>= integer-value (number-parser-min parser))))
+      (when (and integer-value (number-parser-max parser))
+	(assert (<= integer-value (number-parser-max parser))))
       (values t presentp integer-value))))
 
 (defmethod typespec->form-view-field-parser ((scaffold form-scaffold)
 					     (typespec (eql 'integer)) args)
   (values t (make-instance 'integer-parser)))
+
+;;; Float
+(defclass float-parser (number-parser)
+  ()
+  (:default-initargs :error-message nil)
+  (:documentation "A parser designed to parse strings into
+  floats."))
+
+(defmethod parser-error-message ((parser float-parser))
+  (with-slots (error-message) parser
+    (or error-message
+	(concatenate 'string
+		     "This value must be an decimal"
+		     (when (number-parser-min parser)
+		       (format nil " greater than ~A" (- (number-parser-min parser) 1)))
+		     (when (and (number-parser-min parser)
+				(number-parser-max parser))
+		       " and")
+		     (when (number-parser-max parser)
+		       (format nil " less than ~A" (+ (number-parser-max parser) 1)))))))
+
+(defmethod parse-view-field-value ((parser float-parser) value obj
+				   (view form-view) (field form-view-field) &rest args)
+  (declare (ignore args))
+  (declare (optimize safety))
+  (ignore-errors
+    (let* ((presentp (text-input-present-p value))
+	   (float-value (when presentp
+                          (float (read-from-string value)))))
+      (unless (floatp float-value)
+        (error 'parse-error))
+      (when (and float-value (number-parser-min parser))
+	(assert (>= float-value (number-parser-min parser))))
+      (when (and float-value (number-parser-max parser))
+	(assert (<= float-value (number-parser-max parser))))
+      (values t presentp float-value))))
+
+(defmethod typespec->form-view-field-parser ((scaffold form-scaffold)
+					     (typespec (eql 'float)) args)
+  (values t (make-instance 'float-parser)))
 
 ;;; Symbol
 (defclass symbol-parser (parser)
