@@ -33,10 +33,8 @@
 		   (flash-message (dataseq-flash grid)
 				  (format nil "Added ~A."
 					  (humanize-name (dataseq-data-class grid))))
-		   (dataedit-reset-state grid))
-     :on-close (lambda (obj)
-		 (declare (ignore obj))
-		 (dataedit-reset-state grid))
+		   (dataedit-reset-state grid)
+                   (throw 'annihilate-dataform nil))
      :data-view (dataedit-item-data-view grid)
      :form-view (dataedit-item-form-view grid)))
 
@@ -53,12 +51,15 @@
 					      (format nil "Modified ~A."
 						      (humanize-name (dataseq-data-class grid))))
 			       (if (eql (gridedit-drilldown-type grid) :edit)
-				   (dataedit-reset-state grid)
+                                   (progn
+                                     (dataedit-reset-state grid)
+                                     (throw 'annihilate-dataform nil))
 				   (mark-dirty grid)))
 		 :on-cancel (when (eql (gridedit-drilldown-type grid) :edit)
 			      (lambda (obj)
 				(declare (ignore obj))
-				(dataedit-reset-state grid)))
+				(dataedit-reset-state grid)
+                                (throw 'annihilate-dataform nil)))
 		 :on-close (lambda (obj)
 			     (declare (ignore obj))
 			     (dataedit-reset-state grid))
