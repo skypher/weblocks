@@ -3,7 +3,7 @@
 
 (export '(image image-presentation image-presentation-alt
 	  image-presentation-title image-presentation-width
-	  image-presentation-height))
+	  image-presentation-height image-presentation-url-default))
 
 (defclass image-presentation (text-presentation)
   ((alt :initform nil
@@ -22,8 +22,23 @@
    (height :initform nil
 	   :initarg :height
 	   :accessor image-presentation-height
-	   :documentation "A height attribute of the image."))
+	   :documentation "A height attribute of the image.")
+   (url-default :initform nil
+                :initarg :url-default
+                :accessor image-presentation-url-default
+                :documentation "If specified, uses this URL to render
+                a default image, if the value being rendered is
+                null."))
   (:documentation "Presents a url as an image."))
+
+(defmethod render-view-field-value ((value null) (presentation image-presentation)
+				    field view widget obj &rest args
+				    &key highlight &allow-other-keys)
+  (declare (ignore highlight))
+  (if (image-presentation-url-default presentation)
+      (apply #'render-view-field-value (image-presentation-url-default presentation)
+             presentation field view widget obj args)
+      (call-next-method)))
 
 (defmethod render-view-field-value (value (presentation image-presentation)
 				    field view widget obj &rest args
