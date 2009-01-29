@@ -177,7 +177,7 @@
 		 (:file "server"
 			:depends-on ("weblocks" "debug-mode" utils store))
 		 (:file "request"
-			:depends-on ("weblocks" "actions"))
+			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"
 			:depends-on ("weblocks"))
 		 (:file "application"
