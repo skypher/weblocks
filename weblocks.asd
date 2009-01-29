@@ -83,7 +83,8 @@
 					      :depends-on (view dataview "sequence-view"))
 				       (:module
 					types
-					:components ((:file "us-states")
+					:components ((:file "file-upload")
+                                                     (:file "us-states")
 						     (:file "boolean")
 						     (:file "member"
 							    :depends-on (presentations parsers))
