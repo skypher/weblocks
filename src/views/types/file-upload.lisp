@@ -26,7 +26,7 @@
               :documentation "Can be :browser, in which case name
               provided by the browser will be used, :unique, in which
               case a random hash will be used, or a string that will
-              be used directly.")))
+              be used directly."))
   (:documentation "A parser designed to handle file uploads."))
 
 (defmethod parse-view-field-value ((parser file-upload-parser) value obj
