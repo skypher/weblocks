@@ -3,7 +3,7 @@
 
 (export '(*json-content-type* refresh-request-p initial-request-p
 	  ajax-request-p pure-request-p redirect post-action-redirect
-	  compose-uri-tokens-to-url))
+	  post-render-redirect compose-uri-tokens-to-url))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
   "A content type sent to the client to identify json data.")
@@ -63,6 +63,12 @@ executed."
    but before rendering"
   (push (lambda () (redirect url))
 	(request-hook :request :post-action)))
+
+(defun post-render-redirect (url)
+  "Similar to `post-action-redirect', except redirects after completing
+the rendering. This is occassionally useful."
+  (push (lambda () (redirect url))
+	(request-hook :request :post-render)))
 
 (defun compose-uri-tokens-to-url (tokens)
   "Encodes and concatenates uri tokens into a url string. Note that
