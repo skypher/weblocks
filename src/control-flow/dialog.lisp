@@ -99,7 +99,7 @@ links."
 form buttons in a POST form."
   (with-html-form (:post (lambda (&rest args)
 			   (loop for choice in choices
-			      when (member choice args)
+			      when (member choice args :test #'string-equal)
 			      do (progn (answer k choice)
 					(return)))))
     (:p (str msg))
