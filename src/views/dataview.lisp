@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(data data-view data-view-field data-scaffold
-	  text-presentation highlight-regex-matches))
+	  text-presentation highlight-regex-matches *presentation-dom-id*))
 
 ;;; Data view
 (defclass data-view (view)
