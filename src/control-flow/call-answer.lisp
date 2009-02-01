@@ -133,9 +133,5 @@ for styling purposes."
 		   (:div :class "modal"
 			 (:h1 (:span (str title)))
 			 (:div :class css-class
-                               (render-link (f_%
-                                              (answer new-callee))
-                                            "Close"
-                                            :ajaxp nil)
 			       (render-widget new-callee))))))))
 
