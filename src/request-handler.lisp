@@ -160,7 +160,7 @@ association list. This function is normally called by
 		     if (gethash w render-state)
 		       do (circularity-warn w)
 		     else
-		       do (render-widget w :inlinep t)
+		       do (render-widget w)
 			  (setf (gethash w render-state) t)
 		       and collect (cons (dom-id w)
 					 (get-output-stream-string
