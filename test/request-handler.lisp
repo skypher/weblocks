@@ -501,9 +501,9 @@ onclick='disableIrrelevantButtons(this);' />~
 {~
 \"widgets\":~
 {~
-\"id-123\":\"\",~
-\"foo-bar\":\"\",~
-null:\"<p>test</p>\"~
+\"id-123\":\"<div class='widget composite' id='id-123'></div>\",~
+\"foo-bar\":\"<div class='widget composite' id='foo-bar'></div>\",~
+null:\"<div class='widget function'><p>test</p></div>\"~
 },~
 \"before-load\":null,~
 \"on-load\":[\"testjs\"]~
@@ -532,8 +532,8 @@ null:\"<p>test</p>\"~
 {~
 \"widgets\":~
 {~
-\"a\":\"42\",~
-\"b\":\"42\"~
+\"a\":\"<div class='widget dirtier' id='a'>42</div>\",~
+\"b\":\"<div class='widget dirtier' id='b'>42</div>\"~
 },~
 \"before-load\":null,~
 \"on-load\":null~
