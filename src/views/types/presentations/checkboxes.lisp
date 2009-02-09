@@ -2,7 +2,7 @@
 
 (export '(checkboxes checkboxes-presentation checkboxes-parser render-checkboxes))
 
-;;; Checkboxes
+;;;; PRESENTATION
 (defclass checkboxes-presentation (form-presentation choices-presentation-mixin)
   ())
 
@@ -40,9 +40,9 @@
     (render-checkboxes (view-field-slot-name field)
                           (obtain-presentation-choices presentation obj)
                           :selected-values (if intermediate-value-p
-                                              intermediate-value
-                                              (when value
-                                                (mapcar #'attributize-name value))))))
+                                             intermediate-value
+                                             (when value
+                                               (mapcar #'string-upcase value))))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args
@@ -60,9 +60,15 @@
           (label (if (consp val) (car val) val))
           (value (if (consp val) (cdr val) val)))
     (with-html
-      (:input :name name :type "checkbox" :id id :class class
+      (:input :name (attributize-name name) :type "checkbox" :id id :class class
 	      :checked checked-p :value value (str (humanize-name label)))))))
 
+(defmethod request-parameter-for-presentation (name (presentation checkboxes-presentation))
+  (declare (ignore presentation))
+  (post-parameter->list name))
+
+
+;;;; PARSER
 (defclass checkboxes-parser (parser)
   ()
   (:documentation "A parser for checkboxes"))
@@ -79,6 +85,7 @@
                         (post-parameter->list
                           (symbol-name (view-field-slot-name field))))))
       (values t result result)))
+
 
 ;; ; usage
 ;; 
