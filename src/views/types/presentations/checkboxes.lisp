@@ -1,6 +1,6 @@
 (in-package :weblocks)
 
-(export '(checkboxes checkboxes-presentation))
+(export '(checkboxes checkboxes-presentation checkboxes-parser render-checkboxes))
 
 ;;; Checkboxes
 (defclass checkboxes-presentation (form-presentation choices-presentation-mixin)
@@ -57,31 +57,31 @@
 (defun render-checkboxes (name selections &key id (class "checkbox") selected-values)
   (dolist (val selections)
     (let ((checked-p (if (find (cdr val) selected-values :test #'equal) "checked" nil))
-          (value (if (consp val) (car val) val)))
+          (label (if (consp val) (car val) val))
+          (value (if (consp val) (cdr val) val)))
     (with-html
       (:input :name name :type "checkbox" :id id :class class
-	      :checked checked-p :value value (str (humanize-name value)))))))
+	      :checked checked-p :value value (str (humanize-name label)))))))
 
-(defclass checkbox-parser (parser)
+(defclass checkboxes-parser (parser)
   ()
   (:documentation "A parser for checkboxes"))
 
 (defun post-parameter->list (param)
-  (let ((result nil))
-    (mapcar (lambda (x)
-              (when (equalp (car x) param)
-                (push (cdr x) result)))
-            (hunchentoot:post-parameters))
-    result))
+  (loop for x in (hunchentoot:post-parameters)
+        when (equalp (car x) param)
+        collect (cdr x)))
 
-(defmethod parse-view-field-value ((parser checkbox-parser) value obj
+(defmethod parse-view-field-value ((parser checkboxes-parser) value obj
                                    (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
-  (let ((result (post-parameter->list (symbol-name (view-field-slot-name field)))))
+  (let ((result (mapcar (curry-after #'intern "KEYWORD")
+                        (post-parameter->list
+                          (symbol-name (view-field-slot-name field))))))
       (values t result result)))
 
-;; ; usage examples
+;; ; usage
 ;; 
-;;   (dressings :present-as (checkboxes :choices (lambda (obj) (declare (ignore obj))
-;;                                                  (list 'mustard 'onions 'cheese)))
-;;              :parse-as checkbox)
+;;   (dressings :present-as (checkboxes :choices (f_ '(mustard onions cheese)))
+;;              :parse-as checkboxes)
+
