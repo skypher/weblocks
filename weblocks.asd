@@ -157,6 +157,8 @@
 					      :depends-on (widget "flash"))
 				       (:file "composite"
 					      :depends-on (widget))
+                                       (:file "table-composite"
+					      :depends-on (composite))
 				       (:file "dispatcher"
 					      :depends-on (widget))
 				       (:file "selector-mixin"
