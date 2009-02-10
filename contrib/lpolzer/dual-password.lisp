@@ -10,10 +10,40 @@
   (:documentation "A presentation for passwords."))
 
 (defun render-dual-password-fields (name value maxlength)
-  (render-password (format nil "~A-weblocks-1" name) (or value "") :maxlength maxlength)
-  (with-html (:br))
-  (render-password (format nil "~A-weblocks-2" name) (or value "") :maxlength maxlength
-                   :class "password confirm"))
+  (let* ((basename (format nil "~A-weblocks" name))
+         (name1 (format nil "~A-1" basename))
+         (name2 (format nil "~A-2" basename))
+         (status-name (format nil "~A-status" basename)))
+    (with-html
+      (:div
+        (render-password name1 (or value "") :id name1 :maxlength maxlength
+                         :style (when value "border:1px solid green"))))
+    (with-html 
+      (:div
+        (render-password name2 (or value "") :id name2 :maxlength maxlength
+                         :class "password confirm"
+                         :style (when value "border:1px solid green"))))
+    (send-script
+      (concatenate 'string
+        "function checkPasswordFields() {
+          var f1 = $('" name1 "'),
+              f2 = $('" name2 "'),
+              color;
+
+          if (f1.value == f2.value
+              && f1.value != '')
+            color = 'green';
+          else
+            color = 'red';
+
+          f1.style.borderColor = color;
+          f2.style.borderColor = color;
+        }"
+        "
+         $('" name1 "').observe('keyup', checkPasswordFields);
+         $('" name2 "').observe('keyup', checkPasswordFields);
+        "
+    ))))
 
 (defmethod render-view-field-value (value (presentation dual-password-presentation)
 				    (field form-view-field) (view form-view)
