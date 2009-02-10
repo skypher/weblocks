@@ -38,7 +38,7 @@ menu and each menu item generated with `unattributized-name'."
 			    (setf selected-pane (car option)))
 			  (let* ((label (car option))
 				 (target (cdr option))
-				 (pane-selected-p (equalp (attributize-name (car option)) selected-pane))
+				 (pane-selected-p (equalp (car option) selected-pane))
 				 (pane-class (when pane-selected-p
 					       "selected-item")))
 			    (htm
