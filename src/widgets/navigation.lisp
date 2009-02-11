@@ -12,25 +12,27 @@
 (defgeneric render-navigation-menu (obj &rest args)
   (:documentation
    "Renders HTML menu for the navigation widget.")
-  (:method ((obj navigation) &rest args)
+  (:method ((obj navigation) &rest args &key menu-args &allow-other-keys)
     (declare (ignore args))
-    (render-menu (mapcar (lambda (orig-pane)
-			   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
-			     (cons (pane-info-label pane)
-				   (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
-			 (selector-mixin-panes obj))
-		 :selected-pane (selector-mixin-current-pane-name obj)
-		 :header (if (widget-name obj)
-			      (humanize-name (widget-name obj))
-			      "Navigation")
-		 :container-id (ensure-dom-id obj)
-		 :empty-message "No navigation entries")))
+    (apply #'render-menu (mapcar (lambda (orig-pane)
+                                   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
+                                     (cons (pane-info-label pane)
+                                           (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
+                                 (selector-mixin-panes obj))
+           :selected-pane (selector-mixin-current-pane-name obj)
+           :header (if (widget-name obj)
+                       (humanize-name (widget-name obj))
+                       "Navigation")
+           :container-id (ensure-dom-id obj)
+           :empty-message "No navigation entries"
+           menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (with-html 
-    (:div :class "navigation-body"
-	  (call-next-method)))
-  (apply #'render-navigation-menu obj args))
+  (let ((navigation-body (with-html-to-string
+                           (:div :class "navigation-body"
+                                 (call-next-method)))))
+    (apply #'render-navigation-menu obj args)
+    (format *weblocks-output-stream* "~A" navigation-body)))
 
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))
