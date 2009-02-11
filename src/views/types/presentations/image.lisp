@@ -47,9 +47,10 @@
   (if (null value)
       (call-next-method)
       (with-html
-	(:img :src value
-	      :width (image-presentation-width presentation) 
-	      :height (image-presentation-height presentation) 
-	      :alt (image-presentation-alt presentation)
-	      :title (image-presentation-title presentation)))))
+        (:div
+         (:img :src value
+               :width (image-presentation-width presentation) 
+               :height (image-presentation-height presentation) 
+               :alt (image-presentation-alt presentation)
+               :title (image-presentation-title presentation))))))
 
