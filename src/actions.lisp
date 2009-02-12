@@ -1,7 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler* expired-action-handler page-not-found-handler make-action-url make-action))
+(export '(*expired-action-handler*
+          expired-action-handler
+          page-not-found-handler
+          make-action-url
+          make-action
+          function-or-action->action))
 
 (defvar *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a function with a single optional
