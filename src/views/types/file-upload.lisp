@@ -34,15 +34,19 @@
   (declare (ignore args))
   (when (null value)
     (return-from parse-view-field-value (values t nil)))
-  (let* ((temp-path (first value))
-         (browser-name (second value))
-         (file-name (etypecase (file-upload-parser-file-name parser)
-                      (symbol (ecase (file-upload-parser-file-name parser)
-                                (:browser browser-name)
-                                (:unique (hunchentoot::create-random-string))))
-                      (string (file-upload-parser-file-name parser)))))
-    (copy-file temp-path
-               (merge-pathnames file-name
-                                (file-upload-parser-upload-directory parser))
-               :if-exists :supersede)
-    (values t value file-name)))
+  (flet ((octet-string->utf-8 (s)
+           "Kludge to fix librfc2388 bug."
+           (hunchentoot::octets-to-string
+            (map '(vector (unsigned-byte 8)) #'char-int s))))
+    (let* ((temp-path (first value))
+           (browser-name (octet-string->utf-8 (second value)))
+           (file-name (etypecase (file-upload-parser-file-name parser)
+                        (symbol (ecase (file-upload-parser-file-name parser)
+                                  (:browser browser-name)
+                                  (:unique (hunchentoot::create-random-string))))
+                        (string (file-upload-parser-file-name parser)))))
+      (copy-file temp-path
+                 (merge-pathnames file-name
+                                  (file-upload-parser-upload-directory parser))
+                 :if-exists :supersede)
+      (values t value file-name))))
