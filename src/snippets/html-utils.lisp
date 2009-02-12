@@ -150,9 +150,8 @@ submitted."
 			 "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }")
 	     :multiple (when multiple "on" "off")
 	     (mapc (lambda (i)
-		     (if (member (format nil "~A" (or (cdr i) (car i)))
-				 (ensure-list selected-value)
-				 :test #'equalp :key (curry #'format nil "~A"))
+		     (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
+                                 :test #'string-equal :key #'princ-to-string)
 			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
 			 (htm (:option :value (cdr i) (str (car i))))))
 		   (list->assoc (append (when welcome-name
