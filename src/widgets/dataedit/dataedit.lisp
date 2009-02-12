@@ -36,6 +36,14 @@ documentation for more details.")
 		:initarg :allow-add-p
 		:documentation "If true, the widget should provide the
 		UI to add entries to the collection.")
+   (show-add-form-when-empty-p :accessor dataedit-show-add-form-when-empty-p
+                               :initform nil
+                               :initarg :show-add-form-when-empty-p
+                               :documentation "If set to true, when
+                               the dataseq is empty (has no data), the
+                               add form is automatically presented to
+                               the user (only if dataedit-allow-add-p
+                               is true as well).")
    ;; Deleting items
    (on-delete-items :accessor dataedit-on-delete-items
 		    :initform nil
@@ -186,6 +194,19 @@ in order to reset the state after the item widget has done its job."
     (pushnew `(add . ,add-fn)
 	     (dataseq-common-ops obj)
 	     :key #'car)))
+
+;;; If the settings are right and there is no data yet, set our state
+;;; to add new item immediately
+(defmethod render-widget-body :before ((obj dataedit-mixin) &rest args)
+  (declare (ignore args))
+  (when (and (dataedit-show-add-form-when-empty-p obj)
+             (dataedit-allow-add-p obj)
+             (not (eq (dataedit-ui-state obj) :add))
+             (not (dataedit-item-widget obj))
+             (= 0 (dataseq-data-count obj)))
+    (dataedit-add-items-flow obj nil)
+    (setf (data-editor-form-buttons (dataedit-item-widget obj))
+          '(:submit))))
 
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))

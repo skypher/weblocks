@@ -122,6 +122,7 @@ customize form behavior.")
 	   :validation-errors (slot-value obj 'validation-errors)
 	   :intermediate-values (slot-value obj 'intermediate-form-values)
 	   :widget obj
+           :form-view-buttons (data-editor-form-buttons obj)
 	   args)))
 
 (defgeneric dataform-submit-action (obj data &rest args)

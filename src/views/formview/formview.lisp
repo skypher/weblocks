@@ -226,7 +226,7 @@ differently.")
 				   (str (format nil "~A" (cdr err))))))
 			      field-errors))))))))))
 
-(defgeneric render-form-view-buttons (view obj widget &rest args)
+(defgeneric render-form-view-buttons (view obj widget &rest args &key buttons &allow-other-keys)
   (:documentation
    "Renders buttons specified view 'buttons' slot of the 'form-view'
 object. By default, this method renders 'Submit' and 'Cancel' buttons
@@ -234,14 +234,21 @@ for the form view. Override this method to render form controls
 differently.
 
 'view' - the view being rendered.
-'obj' - the object being rendered.")
-  (:method ((view form-view) obj widget &rest args)
+'obj' - the object being rendered.
+'buttons' - same as form-view-buttons, can be used to override
+form-view-buttons for a given view.")
+  (:method ((view form-view) obj widget &rest args &key form-view-buttons &allow-other-keys)
     (declare (ignore obj args))
     (flet ((find-button (name)
 	     (ensure-list
-	      (find name (form-view-buttons view)
-		    :key (lambda (item)
-			   (car (ensure-list item)))))))
+	      (and (if form-view-buttons
+                       (find name form-view-buttons
+                             :key (lambda (item)
+                                    (car (ensure-list item))))
+                       t)
+                   (find name (form-view-buttons view)
+                         :key (lambda (item)
+                                (car (ensure-list item))))))))
       (with-html
 	(:div :class "submit"
 	      (let ((submit (find-button :submit)))

@@ -4,7 +4,7 @@
 (export '(data-editor dataform-data dataform-class-store
 	  dataform-on-cancel dataform-on-success
 	  dataform-allow-close-p dataform-on-close
-	  render-dataform-data-buttons))
+	  data-editor-form-buttons render-dataform-data-buttons))
 
 (defwidget data-editor ()
   ((data :accessor dataform-data
@@ -43,7 +43,14 @@
 	     :documentation "An optional callback function with one
 	     argument (the dataform widget). Called when the user
 	     clicks on the close button. Note that the close button is
-	     only rendered if 'allow-close-p' is true."))
+	     only rendered if 'allow-close-p' is true.")
+   (form-buttons :initform nil
+                 :initarg :form-buttons
+                 :accessor data-editor-form-buttons
+                 :documentation "Same as `form-view-buttons'. If not null,
+	    used to override the value of `form-view-buttons' for the
+	    view being rendered (by passing :form-view-buttons arg to
+	    the view)."))
   (:documentation "The details of stateful handling of forms
   manipulating objects.  Mix this in to drop-in your own replacement
   for `dataform', when the view DSL isn't expressive enough and you
