@@ -2,17 +2,18 @@
 (in-package :weblocks)
 
 (export '(*form-default-error-summary-threshold*
-	  *required-field-message* form form-view
-	  form-view-error-summary-threshold form-view-use-ajax-p
-	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-persist-p form-view-focus-p form-view-satisfies
-	  form-view-buttons form-view-field-writer-mixin form-view-field
-	  form-view-field-parser form-view-field-satisfies
-	  form-view-field-writer form-view-field-required-p mixin-form
-	  mixin-form-view-field mixin-form-view-field-persist-p
-	  *max-raw-input-length* input-presentation-max-length form-presentation
-	  input input-presentation render-validation-summary
-	  render-form-view-buttons form-field-intermediate-value))
+          *required-field-message* form form-view
+          form-view-error-summary-threshold form-view-use-ajax-p
+          form-view-default-method form-view-default-enctype
+          form-view-default-action form-view-persist-p form-view-focus-p
+          form-view-satisfies form-view-buttons form-view-field-writer-mixin
+          form-view-field form-view-field-parser form-view-field-satisfies
+          form-view-field-writer form-view-field-required-p
+          form-view-field-required-error-msg mixin-form mixin-form-view-field
+          mixin-form-view-field-persist-p *max-raw-input-length*
+          input-presentation-max-length form-presentation input
+          input-presentation render-validation-summary render-form-view-buttons
+          form-field-intermediate-value))
 
 ;;; Default initialization parameters
 (defparameter *form-default-error-summary-threshold* 15
@@ -134,8 +135,24 @@ before relations can be updated."))
 	      :initarg :requiredp
 	      :accessor form-view-field-required-p
 	      :documentation "A predicate which determines whether the
-	      field is required."))
+	      field is required.")
+   (required-error-msg :initform nil
+                       :initarg :required-error-msg
+                       :accessor form-view-field-required-error-msg
+                       :documentation "If this value isn't nil, it is
+                       presented to the user when the field is
+                       required and missing from the input
+                       data. Otherwise, the standard required error
+                       message is presented."))
   (:documentation "A field class of the form view."))
+
+(defun get-required-error-msg (form-view-field)
+  "Returns an error message for a missing required field."
+  (if (form-view-field-required-error-msg form-view-field)
+      (form-view-field-required-error-msg form-view-field)
+      (format nil *required-field-message*
+              (humanize-name
+               (view-field-label form-view-field)))))
 
 (defclass mixin-form-view-field (mixin-view-field form-view-field-writer-mixin)
   ((persistp :initarg :persistp

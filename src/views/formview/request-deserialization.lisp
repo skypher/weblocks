@@ -49,10 +49,7 @@ Specialize this function to parse given objects differently.")
 				(if parsedp
 				    (if (not presentp)
 					(if (form-view-field-required-p field)
-					    (push (cons field
-							(format nil *required-field-message*
-								(humanize-name
-								 (view-field-label field))))
+					    (push (cons field (get-required-error-msg field))
 						  errors)
 					    (push (cons field-info nil) results))
 					(push (cons field-info parsed-value) results))
