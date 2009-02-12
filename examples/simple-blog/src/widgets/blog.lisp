@@ -1,4 +1,4 @@
-(in-package :blog)
+(in-package :simple-blog)
 
 (defwidget blog-widget ()
   ((current-post :accessor current-post
@@ -69,7 +69,7 @@
   is called by RENDER-WIDGET-BODY."))
 
 (defmethod render-blog ((blog-widget blog-widget) (mode (eql :blog)))
-  (with-html (:h1 *blog-title*))
+  (with-html (:h1 "Simple Blog"))
   (render-widget (posts blog-widget)))
 
 (defmethod render-blog ((blog-widget blog-widget) (mode (eql :post)))
@@ -77,7 +77,7 @@
     (:h1
      ;; link to come back to the blog
      (render-link (blog-action-blog-mode blog-widget)
-		  *blog-title*)))
+		  "Simple Blog")))
   (render-widget (current-post blog-widget)))
 
 (defmethod render-widget-body ((obj blog-widget) &key)

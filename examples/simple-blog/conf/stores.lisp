@@ -1,9 +1,9 @@
 
-(in-package :blog)
+(in-package :simple-blog)
 
 ;;; Multiple stores may be defined. The last defined store will be the
 ;;; default.
 (defstore *blog-store* :prevalence
   (merge-pathnames (make-pathname :directory '(:relative "data"))
-		   (asdf-system-directory :blog-v4)))
+		   (asdf-system-directory :simple-blog)))
 
