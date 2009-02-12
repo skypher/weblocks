@@ -6,10 +6,10 @@
 	  textarea-presentation-cols))
 
 ;;; some defaults
-(defparameter *textarea-rows* 5
+(defparameter *textarea-rows* 10
   "Default number of rows rendered in textarea")
 
-(defparameter *textarea-cols* 20
+(defparameter *textarea-cols* 50
   "Default number of columns rendered in textarea")
 
 (defparameter *max-textarea-input-length* 200
