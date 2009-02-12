@@ -21,8 +21,11 @@ menu and each menu item generated with `unattributized-name'. If a
 given pane name is found in `disabled-pane-names', it's rendered in
 the navigation as disabled."
   (declare (special *current-navigation-url*))
-  (flet ((render-menu-items ()
-           (mapc (lambda (option)
+  (flet ((render-menu-items (&optional orderedp)
+           (loop
+              for option in options
+              for item-number from 1
+              do (progn
                    (unless (consp option)
                      (setf option
                            (cons (humanize-name option)
@@ -44,11 +47,14 @@ the navigation as disabled."
                        (:li :id (unattributized-name (format nil "~A-~A" container-id label)
                                                      'menu-item)
                             :class pane-class
-                            (:span :class "item-wrapper"
+                            (:span :class (concatenate 'string
+                                                       "item-wrapper"
+                                                       (when orderedp
+                                                         (format nil " item-number-~A" item-number)))
                                    (etypecase target
                                      (string
                                       (if (or pane-selected-p pane-disabled-p)
-                                        (htm (:span (str label)))
+                                        (htm (:span :class "label" (str label)))
                                         (htm (:a :href (make-webapp-uri
                                                          (string-left-trim
                                                            "/" (concatenate 'string
@@ -57,8 +63,7 @@ the navigation as disabled."
                                                                             (string-left-trim "/" target))))
                                                    (str label)))))
                                      (function
-                                      (render-link target label))))))))
-                 options)))
+                                      (render-link target label)))))))))))
     (with-html
       (:div :class "view menu"
             :id (unattributized-name container-id 'menu)
@@ -69,6 +74,6 @@ the navigation as disabled."
                   (htm
                    (:div :class "empty-menu" (str empty-message)))
                   (if ordered-list-p
-                      (htm (:ol (render-menu-items)))
+                      (htm (:ol (render-menu-items t)))
                       (htm (:ul (render-menu-items))))))))))
 
