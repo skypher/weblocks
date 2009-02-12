@@ -34,6 +34,9 @@
   (declare (ignore args))
   (when (null value)
     (return-from parse-view-field-value (values t nil)))
+  (when (stringp value)
+    (error "The value of the upload field is incorrect. Please turn on
+    multipart requests and turn off ajax."))
   (flet ((octet-string->utf-8 (s)
            "Kludge to fix librfc2388 bug."
            (hunchentoot::octets-to-string
