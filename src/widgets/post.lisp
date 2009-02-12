@@ -1,4 +1,4 @@
-(in-package :blog)
+(in-package :simple-blog)
 
 (defwidget post-widget ()
   ((post :accessor post

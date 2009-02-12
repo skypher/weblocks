@@ -1,0 +1,158 @@
+
+/* Body */
+.dataseq form.dataseq-form fieldset
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dataseq form.dataseq-form
+{
+  margin: 0;
+  padding: 0;
+}
+
+.dataseq form.dataseq-form
+{
+  margin-bottom: 1em;
+}
+
+/* Mining Bar */
+.dataseq .data-mining-bar
+{
+  position: relative;
+  margin-bottom: 0.25em;
+  height: 1em;
+}
+
+.dataseq > .data-mining-bar
+{
+  height: auto;
+  min-height: 1em;
+}
+
+.dataseq .data-mining-bar .total-items
+{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+/* Operations */
+.dataseq form .operations
+{
+  position: absolute;
+  right: 0;
+  margin-top: 0.25em;
+}
+
+.dataseq form.operations-form .operations input.submit,
+.dataseq form.dataseq-form .operations input.submit
+{
+  margin-left: 0.5em;
+}
+
+.dataseq form.operations-form,
+.dataseq form.operations-form fieldset
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Datagrid specific pagination styles */
+.dataseq div.pagination
+{
+  margin-top: -1em;
+}
+
+.dataseq div.pagination,
+.dataseq div.pagination form fieldset input
+{
+  font-size: x-small;
+}
+
+/* Flash */
+div.dataseq .flash
+{
+  position: relative;
+  _height: 1%; /* hasLayout IE 6 fix */
+}
+
+div.dataseq .flash .view .extra-top-1
+{
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  width: 5px;
+  overflow: hidden;
+}
+
+div.dataseq .flash .view .extra-top-2
+{
+  right: 0;
+  width: 5px;
+  border: none;
+  position: absolute;
+  margin-top: 0;
+  z-index: 10;
+  overflow: hidden;
+}
+
+div.dataseq .flash .view .extra-top-3
+{
+  height: 2px;
+  background: url(/weblocks-common/pub/images/widget/flash/top_background.png) repeat-x;
+  display: block;
+  overflow: hidden;
+}
+
+div.dataseq .flash .view
+{
+  margin-bottom: 0.25em;
+  background-image: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png);
+  background-repeat: repeat-y;
+  background-position: left;
+}
+
+div.dataseq .flash .view ul.messages
+{
+  background: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png) repeat-y right;
+  border: none;
+  margin-bottom: 5px;
+}
+
+div.dataseq .flash .view ul.messages li
+{
+  background-image: none;
+  border: none;
+  padding-left: 0;
+}
+
+div.dataseq .flash .view ul.messages p
+{
+  text-align: center;
+  font-size: x-small;
+  padding-top: 1px;
+}
+
+div.dataseq .flash .view .extra-bottom-1
+{
+  background-image: none;
+  border-bottom: solid 2px #ead8c2;
+  margin-top: -14px;
+}
+
+div.dataseq .flash .view .extra-bottom-2
+{
+  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_left.png) no-repeat top left;
+  margin-top: -7px;
+}
+
+div.dataseq .flash .view .extra-bottom-3
+{
+  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_right.png) no-repeat top right;
+  margin-top: -7px;
+}
+

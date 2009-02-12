@@ -1,0 +1,73 @@
+
+.table
+{
+  min-width: 42em;
+}
+
+.table table
+{
+  width: 100%;
+}
+
+.table table thead tr th
+{
+  text-align: left;
+}
+
+.table table thead tr th, .table table tbody tr td
+{
+  padding-left: 0.5em;
+}
+
+.table table tbody tr td strong
+{
+  background: #fe4631;
+  color: white;
+  font-weight: normal;
+}
+
+.view table tbody tr td
+{
+  border-bottom: 1px solid #dbeac1;
+  padding-top: 1px;
+  background-image: url(/weblocks-common/pub/images/widget/table_border_top.png);
+  background-repeat: repeat-x;
+  background-position: top;
+}
+
+/* Hover on table */
+.table table tbody tr:hover,
+.datagrid table tbody tr.drilled-down,
+.table table tr.hover
+{
+  background: #dbeac1;
+}
+
+/* IE specific border behavior (no support for border-spacing) */
+.table table
+{
+  border-collapse: collapse;
+}
+
+/* Border behavior for other browsers (can't use border-collapse
+   because of incosistent behavior between Opera, Mozilla, IE, and
+   Safari). Note, comment is necessary to hide from IE7. */
+.table >/**/table
+{
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+/* Safari and WebKit specific caption fix */
+html[xmlns*=""] body:last-child .table table caption
+{
+  width: 100%;
+}
+
+@media all and (min-width: 0px)
+{
+  body:not(:root:root) .table table caption
+  {
+    width: 100%;
+  }
+}

@@ -1,0 +1,172 @@
+
+.form
+{
+  margin-top: 0;
+}
+
+form fieldset
+{
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form fieldset .validation-errors-summary .error-count,
+.form fieldset .validation-errors-summary .field-validation-errors
+{
+  display: none;
+}
+
+/* For long forms, change display of validation summary back */
+.long-form fieldset .validation-errors-summary .error-count,
+.long-form fieldset .validation-errors-summary .field-validation-errors
+{
+  display: block;
+}
+
+.form fieldset .validation-errors-summary h2.error-count,
+.form fieldset .validation-errors-summary ul li
+{
+  color: red;
+}
+
+.form fieldset .validation-errors-summary ul li,
+.long-form fieldset .validation-errors-summary .non-field-validation-errors
+{
+  font-style: italic;
+  border-top: none;
+  border-bottom: none;
+}
+
+.form fieldset .form-fields-title
+{
+  display: none;
+}
+
+form.view fieldset ul li label em.required-slot,
+form.view fieldset ul li span.label em.required-slot
+{
+  font-weight: normal;
+  display: inline;
+  font-size: x-small;
+  font-style: normal;
+  color: red;
+}
+
+form.view fieldset ul li label input,
+form.view fieldset ul li label select,
+form.view fieldset ul li label textarea
+{
+  margin-top: 2px;
+  margin-bottom: 2px;
+  width: 12em;
+}
+
+/* Target firefox */
+html>/**/body form.view fieldset ul li label textarea, x:-moz-any-link
+{
+  width: auto;
+}
+
+/* IE6 font size hacks */
+* html form.view fieldset ul li label input,
+* html form.view fieldset ul li label textarea
+{
+  font-size: 1em;
+}
+* html form.view fieldset ul li label select
+{
+  font-size: small;
+}
+
+/* Target Safari */
+/* Safari and WebKit specific caption fix */
+html[xmlns*=""] form.view fieldset ul li label input,
+html[xmlns*=""] form.view fieldset ul li label select,
+html[xmlns*=""] form.view fieldset ul li label textarea
+{
+  font-size: 1em;
+}
+
+form.view fieldset ul li label input
+{
+  padding: 0;
+}
+
+form.view fieldset ul li label input.checkbox,
+form.view fieldset ul li label.radio input.radio
+{
+  width: auto;
+  /* A hack for IE to line up the checkbox and radio button */
+  margin-left: -4px;
+}
+
+/* Set normal margin for other browsers (comment is necessary to hide
+from IE7) */
+form.view >/**/fieldset ul li label input.checkbox,
+form.view >/**/fieldset ul li label.radio input.radio
+
+{
+  margin-left: 0;
+}
+
+form.view fieldset div.submit input.submit
+{
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-right: 0.5em;
+}
+
+p.validation-error
+{
+  color: red;
+  font-weight: normal;
+  font-style: italic;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+p.validation-error span.validation-error-heading
+{
+  display: none;
+}
+
+/* Radio buttons */
+form.view fieldset ul li label.radio
+{
+  display: block;
+  margin-left: 12em;
+}
+
+form.view >/**/fieldset ul li label.radio
+{
+  /* We only need this for non-IE browsers */
+  margin-top: 0.25em;
+}
+
+form.view fieldset ul li label.radio.first
+{
+  display: inline;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+form.view fieldset ul li label.radio input.radio
+{
+  width: auto;
+  vertical-align: middle;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+form.view fieldset ul li label.radio span
+{
+  vertical-align: middle;
+}
+
+/* Text area label alignment */
+form fieldset ul li label.textarea span.slot-name
+{
+  vertical-align: top;
+}
+
