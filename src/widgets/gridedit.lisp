@@ -30,9 +30,11 @@
      :on-success (lambda (obj)
 		   (safe-funcall (dataedit-on-add-item grid) grid (dataform-data obj))
 		   (safe-funcall (dataedit-on-add-item-completed grid) grid (dataform-data obj))
-		   (flash-message (dataseq-flash grid)
-				  (format nil "Added ~A."
-					  (humanize-name (dataseq-data-class grid))))
+                   (when (or (dataedit-mixin-flash-message-on-first-add-p grid)
+                             (> (dataseq-data-count grid) 1))
+                     (flash-message (dataseq-flash grid)
+                                    (format nil "Added ~A."
+                                            (humanize-name (dataseq-data-class grid)))))
 		   (dataedit-reset-state grid)
                    (throw 'annihilate-dataform nil))
      :data-view (dataedit-item-data-view grid)

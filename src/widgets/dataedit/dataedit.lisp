@@ -3,14 +3,16 @@
 
 (export '(*default-cascade-delete-mixins-p* dataedit-mixin
 	  dataedit-on-add-item dataedit-allow-add-p
+	  show-add-form-when-empty-p
+	  dataedit-mixin-flash-message-on-first-add-p
 	  dataedit-on-delete-items dataedit-cascade-delete-mixins-p
-	  dataedit-on-add-item-completed dataedit-on-delete-items-completed
-	  dataedit-allow-delete-p dataedit-item-data-view
-	  dataedit-item-form-view dataedit-ui-state
-	  dataedit-item-widget dataedit-create-drilldown-widget
-	  dataedit-drilldown-action dataedit-create-new-item-widget
-	  dataedit-reset-state dataedit-add-items-flow
-	  dataedit-update-operations))
+	  dataedit-on-add-item-completed
+	  dataedit-on-delete-items-completed dataedit-allow-delete-p
+	  dataedit-item-data-view dataedit-item-form-view
+	  dataedit-ui-state dataedit-item-widget
+	  dataedit-create-drilldown-widget dataedit-drilldown-action
+	  dataedit-create-new-item-widget dataedit-reset-state
+	  dataedit-add-items-flow dataedit-update-operations))
 
 (defparameter *default-cascade-delete-mixins-p* t
   "Default value for 'dataedit-cascade-delete-mixins-p'. See its
@@ -44,6 +46,13 @@ documentation for more details.")
                                add form is automatically presented to
                                the user (only if dataedit-allow-add-p
                                is true as well).")
+   (flash-message-on-first-add-p :accessor dataedit-mixin-flash-message-on-first-add-p
+                                 :initform nil
+                                 :initarg :flash-message-on-first-add-p
+                                 :documentation "If this field is set
+                                 to nil (the default), a message about
+                                 adding an item will not be flashed
+                                 when the first item is added.")
    ;; Deleting items
    (on-delete-items :accessor dataedit-on-delete-items
 		    :initform nil
