@@ -9,7 +9,7 @@
 					    :slot-name 'foo)
 			     (make-instance 'data-view)
 			     nil *joe*)
-  (:a :href "www.hello.com" :onclick "stopPropagation(event);" "Link"))
+  (:a :href "www.hello.com" :onclick "stopPropagation(event);" "www.hello.com"))
 
 (deftest-html url-presentation-2
     (render-view-field-value "www.hello.com"

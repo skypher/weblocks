@@ -106,6 +106,7 @@
 end defunct|#
 
 ;;; test full navigation widget scenario
+#+(or) ; disabled -- rewrite for nav-jwr
 (deftest-html render-navigation-widget-1
     (with-webapp ()
       (let ((nav (make-navigation "Test Navigation"
@@ -136,8 +137,13 @@ end defunct|#
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
 	       (:h1 "Test Navigation")
-	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" :class "selected-item" (:span "Test1"))
-		    (:li :id "MENU-ITEM-test-navigation-test2" (:a :href "/test2" "Test2")))
+	       (:ul (:li :id "MENU-ITEM-test-navigation-test1" :class "selected-item"
+                         (:span :class "item-wrapper"
+                                (:span :class "label" "Test1")))
+		    (:li :id "MENU-ITEM-test-navigation-test2"
+                         (:span :class "item-wrapper"
+                                (:span :class "label" 
+                                       (:a :href "/test2" "Test2")))))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -162,8 +168,9 @@ end defunct|#
 									 :uri "/test2"))
 			   (:div :class "extra-bottom-1" "<!-- empty -->")
 			   (:div :class "extra-bottom-2" "<!-- empty -->")
-			   (:div :class "extra-bottom-3" "<!-- empty -->"))))
-	 (:div :class "view menu" :id "MENU-test-navigation"
+			   (:div :class "extra-bottom-3" "<!-- empty -->")))))
+   (:div :class "selector-mixin widget dispatcher selector navigation" :id "test-navigation"
+         (:div :class "view menu" :id "MENU-test-navigation"
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")

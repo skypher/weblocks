@@ -396,7 +396,7 @@
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
 	(:div :class "empty"
-	      (:p (:span :class "message" "There are no items in the list.")))
+	      (:p :class "user-message" (:span :class "message" "There are no items in the list.")))
 	(:div :class "extra-bottom-1" "<!-- empty -->")
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -440,10 +440,12 @@
 ;;; test render-message
 (deftest-html render-message-1
     (render-message "Some Message" "Some Caption")
-  (:p (:span :class "caption" "Some Caption:&nbsp;")
+  (:p :class "user-message"
+      (:span :class "caption" "Some Caption:&nbsp;")
       (:span :class "message" "Some Message")))
 
 (deftest-html render-message-2
     (render-message "Some Message")
-  (:p (:span :class "message" "Some Message")))
+  (:p :class "user-message"
+      (:span :class "message" "Some Message")))
 

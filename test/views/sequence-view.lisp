@@ -7,7 +7,7 @@
 	(:div :class "extra-top-1" "<!-- empty -->")
 	(:div :class "extra-top-2" "<!-- empty -->")
 	(:div :class "extra-top-3" "<!-- empty -->")
-	(:p (:span :class "message" "No information available."))
+	(:p :class "user-message" (:span :class "message" "No information available."))
 	(:div :class "extra-bottom-1" "<!-- empty -->")
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))

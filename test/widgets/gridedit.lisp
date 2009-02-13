@@ -226,7 +226,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th "Test"))
+		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -435,7 +435,7 @@
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
-	       (:p (:span :class "message" "No information available."))
+	       (:p :class "user-message" (:span :class "message" "No information available."))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -892,7 +892,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "test" "Test"))
+		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -935,7 +935,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager")))
-		(:th :class "test" "Test"))
+		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -1010,7 +1010,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th "Test"))
+		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))

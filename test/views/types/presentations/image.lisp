@@ -9,7 +9,8 @@
 					    :slot-name 'foo)
 			     (make-instance 'data-view)
 			     nil *joe*)
-  (:img :src "www.hello.com"))
+  (:div
+    (:img :src "www.hello.com")))
 
 (deftest-html image-presentation-2
     (render-view-field-value "www.hello.com"
@@ -20,5 +21,6 @@
 					    :slot-name 'foo)
 			     (make-instance 'data-view)
 			     nil *joe*)
-  (:img :src "www.hello.com" :alt "foo" :title "bar"))
+    (:div
+      (:img :src "www.hello.com" :alt "foo" :title "bar")))
 
