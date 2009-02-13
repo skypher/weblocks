@@ -16,7 +16,7 @@
 				(declare (ignore w))
 				(safe-funcall (dataedit-on-add-item obj) obj item)
                                 (when (or (dataedit-mixin-flash-message-on-first-add-p obj)
-                                          (> 1 (dataseq-data-count obj)))
+                                          (> (dataseq-data-count obj) 1))
                                   (flash-message (dataseq-flash obj)
                                                  (format nil "Added ~A."
                                                          (humanize-name (dataseq-data-class obj)))))
