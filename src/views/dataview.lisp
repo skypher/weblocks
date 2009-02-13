@@ -4,6 +4,7 @@
 (export '(data data-view data-view-field data-scaffold
 	  text-presentation text-presentation-mixin
           text-presentation-mixin-format-string
+          *text-presentation-mixin-default-format-string*
 	  highlight-regex-matches *presentation-dom-id*))
 
 ;;; Data view
@@ -20,14 +21,20 @@
 (defclass data-scaffold (scaffold)
   ())
 
+(defparameter *text-presentation-mixin-default-format-string* "~A")
+
 ;;; Text mixin
 (defclass text-presentation-mixin ()
   ((format-string :accessor text-presentation-mixin-format-string
-                  :initform "~A"
+                  :initform *text-presentation-mixin-default-format-string*
                   :initarg :format-string
                   :documentation "A format string used to print text
                   value."))
   (:documentation "A mixin for presentations that format strings."))
+
+(defmethod text-presentation-mixin-format-string ((presentation null))
+  "Convenience method, useful e.g. for testing."
+  *text-presentation-mixin-default-format-string*)
 
 ;;; Presentation
 (defclass text-presentation (presentation text-presentation-mixin)
@@ -99,7 +106,7 @@
       (with-html
 	(:span :class "value missing" "Not Specified"))))
 
-(defun highlight-regex-matches (item highlight presentation)
+(defun highlight-regex-matches (item highlight &optional presentation)
   "This function highlights regex matches in text by wrapping them in
 HTML 'string' tag. The complexity arises from the need to escape HTML
 to prevent XSS attacks. If we simply wrap all matches in 'strong' tags
