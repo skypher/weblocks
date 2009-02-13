@@ -341,7 +341,8 @@ in addition."
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
   (with-html
-    (:p (if caption
-	    (htm (:span :class "caption" (str caption) ":&nbsp;")))
+    (:p :class "user-message"
+        (when caption
+          (htm (:span :class "caption" (str caption) ":&nbsp;")))
 	(:span :class "message" (str message)))))
 
