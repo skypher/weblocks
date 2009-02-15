@@ -17,7 +17,7 @@
     :init-user-session '{APPNAME}::init-user-session
     :autostart nil                   ;; have to start the app manually
     :ignore-default-dependencies nil ;; accept the defaults
-    :slot ((debug :initform t))
+    :slots ((debug :initform t))
     )
 
 ;; Top level start & stop scripts
