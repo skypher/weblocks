@@ -2,9 +2,6 @@
 (defpackage #:{APPNAME}
   (:use :cl :weblocks
         :f-underscore :anaphora)
-  (:import-from :hunchentoot #:redirect #:header-in
-                             #:set-cookie #:set-cookie* #:cookie-in
-                             #:user-agent #:referer)
   (:documentation
    "A web application based on Weblocks."))
 
@@ -20,6 +17,7 @@
     :init-user-session '{APPNAME}::init-user-session
     :autostart nil                   ;; have to start the app manually
     :ignore-default-dependencies nil ;; accept the defaults
+    :slot ((debug :initform t))
     )
 
 ;; Top level start & stop scripts
@@ -28,7 +26,7 @@
   "Starts the application by calling 'start-weblocks' with appropriate
 arguments."
   (apply #'start-weblocks args)
-  (start-webapp '{APPNAME})
+  (start-webapp '{APPNAME}))
 
 (defun stop-{APPNAME} ()
   "Stops the application by calling 'stop-weblocks'."
