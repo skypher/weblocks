@@ -9,17 +9,28 @@
 
 (in-package :weblocks-prevalence)
 
+(defvar *locks* (make-hash-table :test #'eq)
+  "Locks for Prevalence operation guards; one lock per store.")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod open-store ((store-type (eql :prevalence)) &rest args)
-  (setf *default-store* (apply #'make-prevalence-system args)))
+  (let* ((store (apply #'make-instance 'guarded-prevalence-system :directory (car args) (cdr args)))
+         (lock-name (format nil "Prevalence lock for store ~S" store))
+         (lock (hunchentoot-mp:make-lock lock-name)))
+    (setf (gethash store *locks*) lock)
+    (setf (get-guard store) (lambda (thunk)
+                              (hunchentoot-mp:with-lock (lock)
+                                (funcall thunk))))
+    (setf *default-store* store)))
 
 (defmethod close-store ((store prevalence-system))
   (when (eq *default-store* store)
     (setf *default-store* nil))
   (snapshot store)
-  (cl-prevalence::close-open-streams store))
+  (cl-prevalence::close-open-streams store)
+  (setf (gethash store *locks*) nil))
 
 (defmethod clean-store ((store prevalence-system))
   (totally-destroy store))
