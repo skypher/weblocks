@@ -2,6 +2,9 @@
 (defpackage #:{APPNAME}
   (:use :cl :weblocks
         :f-underscore :anaphora)
+  (:import-from :hunchentoot #:header-in
+		#:set-cookie #:set-cookie* #:cookie-in
+		#:user-agent #:referer)
   (:documentation
    "A web application based on Weblocks."))
 
@@ -17,7 +20,7 @@
     :init-user-session '{APPNAME}::init-user-session
     :autostart nil                   ;; have to start the app manually
     :ignore-default-dependencies nil ;; accept the defaults
-    :slots ((debug :initform t))
+    :debug t
     )
 
 ;; Top level start & stop scripts
