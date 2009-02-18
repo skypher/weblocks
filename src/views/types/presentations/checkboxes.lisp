@@ -6,6 +6,11 @@
 (defclass checkboxes-presentation (form-presentation choices-presentation-mixin)
   ())
 
+(defmethod obtain-presentation-choices ((choices-mixin checkboxes-presentation) obj)
+  (mapcar (lambda (cons) (cons (car cons)
+                               (intern (string-upcase (cdr cons)) :keyword)))
+          (call-next-method)))
+
 (defmethod render-view-field ((field form-view-field) (view form-view)
                               widget (presentation checkboxes-presentation) value obj
                               &rest args &key validation-errors &allow-other-keys)
@@ -42,7 +47,7 @@
                           :selected-values (if intermediate-value-p
                                              intermediate-value
                                              (when value
-                                               (mapcar #'string-upcase value))))))
+                                               (mapcar (compose (curry-after #'intern :keyword) #'string-upcase) value))))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args
@@ -81,7 +86,7 @@
 (defmethod parse-view-field-value ((parser checkboxes-parser) value obj
                                    (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
-  (let ((result (mapcar (curry-after #'intern "KEYWORD")
+  (let ((result (mapcar (compose (curry-after #'intern "KEYWORD") #'string-upcase)
                         (post-parameter->list
                           (symbol-name (view-field-slot-name field))))))
       (values t result result)))
