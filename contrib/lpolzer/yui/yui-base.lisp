@@ -2,7 +2,11 @@
 
 (export '(yui-widget yui-widget-variable yui-target-id yui-component-config
 	  yui-settings-mixin add-options
+	  *yui-loader-base* 
           add-component-config js-bool))
+
+(defparameter *yui-loader-base* "http://yui.yahooapis.com/2.6.0/build/"
+  "Default base for yui-loader, change if necessary (eg. for 2.7.0, or a local cache)")
 
 (defclass yui-settings-mixin ()
   ((yui-settings :accessor yui-settings :initarg :settings :initform ""))
@@ -82,7 +86,7 @@
 DOM-ready event is triggered."
   `(|:YAHOO.util.:Event.:onDOMReady| (lambda () ,@body)))
 
-(defpsmacro with-lazy-loaded-modules ((modules &key (load-optional t) base (include-css-p t)) &body body)
+(defpsmacro with-lazy-loaded-modules ((modules &key (load-optional t) (base *yui-loader-base*) (include-css-p t)) &body body)
   "Take &body and put it in a function that will be called back once
 required modules have been loaded and the DOM is ready."
   (let ((callback-name (ps-gensym "$yui_callback"))

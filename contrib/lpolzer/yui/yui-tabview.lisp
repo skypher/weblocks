@@ -1,4 +1,3 @@
-
 (in-package :weblocks)
 
 (export '(yui-tabview yui-tabview-tabs yui-tabview-selected))
@@ -15,16 +14,18 @@
              :documentation "Tab that will be selected by default. An
              integer number, starting from 1 (e.g. the first tab
              corresponds to 1)."))
+  (:default-initargs :modules '("tabview"))
   (:documentation "YUI TabView widget"))
 
 (defmethod initialize-instance :after ((obj yui-tabview) &rest initargs &key &allow-other-keys)
   (declare (ignore initargs))
   (setf (composite-widgets obj) (mapcar #'cdr (yui-tabview-tabs obj)))
-  (setf (yui-target-id obj) (widget-dom-id obj)))
+  (setf (yui-target-id obj) (dom-id obj)))
 
 (defmethod widget-css-classes ((obj yui-tabview))
   (declare (ignore obj))
   "yui-navset")
+
 
 (defmethod render-widget-body ((widget yui-tabview) &rest args)
   (flet ((render-tab (i) (let ((child (cdr (nth i (yui-tabview-tabs widget)))))
@@ -38,14 +39,15 @@
                                                (when (eql (yui-tabview-selected widget) i)
                                                  " selected"))
                            (:a :href (format nil "#tab~D" i)
-                               (esc (humanize-name name)))))))
+                               (:em (esc (humanize-name name))))))))
       (:div :class "yui-content"
         (loop for child in (mapcar #'cdr (yui-tabview-tabs widget))
               do (htm (:div (render-widget child))))))
     #+OLD(send-script
       (ps:ps* `(new (|:YAHOO.widget.:TabView| ,(widget-dom-id widget)))))
     (send-script
-      (ps* `(with-lazy-loaded-modules (("tabview"))
+      (ps* `(with-lazy-loaded-modules (,(yui-modules widget) 
+				       ,@(yui-loader-args widget))
          (setf ,(yui-widget-variable widget)
                (new (|:YAHOO.widget.:TabView| ,(yui-target-id widget)
                                               (keywords-to-object ,(yui-component-config widget))))))))
