@@ -1,9 +1,14 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler* expired-action-handler page-not-found-handler make-action-url make-action))
+(export '(*expired-action-handler*
+          expired-action-handler
+          page-not-found-handler
+          make-action-url
+          make-action
+          function-or-action->action))
 
-(defparameter *expired-action-handler* 'default-expired-action-handler
+(defvar *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a function with a single optional
 argument - the application. The function gets called when the user
 tries to invoke an expired action (due to a session timeout). The
@@ -106,9 +111,7 @@ Ex:
   "Gets the name of the action from the request."
   (let* ((request-action-name (request-parameter *action-string*))
 	 (get/post-action-name (parameter *action-string*))
-	 (action-name (if request-action-name
-			  request-action-name
-			  get/post-action-name)))
+	 (action-name (or request-action-name get/post-action-name)))
     action-name))
 
 (defun get-request-action ()

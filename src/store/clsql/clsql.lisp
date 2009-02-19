@@ -8,12 +8,15 @@
 
 (in-package :weblocks-clsql)
 
+(export '(order-by-expression range-to-offset range-to-limit))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod open-store ((store-type (eql :clsql)) &rest args)
   (setf *default-caching* nil)
-  (setf *default-store* (apply #'connect args)))
+  (setf *default-store* (apply #'make-instance 'fluid-database
+			       :connection-spec args)))
 
 (defmethod close-store ((store database))
   (when (eq *default-store* store)
@@ -63,7 +66,8 @@
       (unwind-protect
 	   (progn
 	     (update-records-from-instance object :database store)
-	     (setf success t))
+	     (setf success t)
+             object)
 	(when (and (not success)
 		   (null current-id))
 	  (setf (object-id object) nil))))))

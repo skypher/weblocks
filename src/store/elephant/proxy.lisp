@@ -1,31 +1,40 @@
 (in-package :weblocks-elephant)
 
+(export '(make-proxy-instance))
+
 (defvar *proxies* (make-hash-table))
 (defvar *view-proxies* (make-hash-table))
 
 (defclass persistent-proxy ()
-  ((base-class :accessor base-class :initarg :base :allocation :class)
-   (proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
+  ((proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
+
+(defun make-proxy-instance (class-name &rest args)
+  "Creates an instance of the proxy."
+  (apply #'make-instance (return-proxy-classname class-name) args))
 
 (defun return-proxy-classname (classname)
-  (if (gethash classname *proxies*) 
-      (gethash classname *proxies*)
-    (let* ((persistent-class (find-class classname))
-	   (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
-	   (visible-slot-defs (class-visible-slots-impl persistent-class))
-	   (class-def `(defclass ,new-name (persistent-proxy)
-			 (,@(mapcar #'def-to-proxy-slot
-				    visible-slot-defs))
-			 (:default-initargs :base ',classname))))
-      (eval class-def)
-      (setf (gethash classname *proxies* new-name)
-	    new-name))))
+  (aif (gethash classname *proxies*) 
+       it
+       (let* ((persistent-class (find-class classname))
+              (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
+              (visible-slot-defs (class-visible-slots-impl persistent-class))
+              (class-def `(defclass ,new-name (persistent-proxy)
+                            ((base-class :accessor base-class :allocation :class
+                                         :initform ',classname)
+                             ,@(mapcar #'def-to-proxy-slot
+                                       visible-slot-defs)))))
+         (eval class-def)
+         (setf (gethash classname *proxies* new-name)
+               new-name))))
 
 (defun def-to-proxy-slot (def)
   `(,(weblocks::slot-definition-name def)
      ,@(mapcan #'(lambda (arg)
 		   `(:reader ,arg))
 	       (weblocks::slot-definition-readers def))
+     ,@(mapcan #'(lambda (arg)
+		   `(:writer ,arg))
+	       (weblocks::slot-definition-writers def))
      ,@(mapcan #'(lambda (arg)
 		   `(:initarg ,arg))
 	       (weblocks::slot-definition-initargs def))

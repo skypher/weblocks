@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name
+(export '(defwidget widget widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-prefix-fn widget-suffix-fn
           with-widget-header
@@ -98,9 +98,20 @@ inherits from 'widget' if no direct superclasses are provided."
 ;;; Don't allow setting a parent for widget that already has one
 ;;; (unless it's setting parent to nil)
 (defmethod (setf widget-parent) (val (obj widget))
-  (if (and val (widget-parent obj) (not *override-parent-p*))
+  (if (and val (not (member (widget-parent obj) `(,val nil)))
+	   (not *override-parent-p*))
       (error "Widget ~a already has a parent." obj)
       (setf (slot-value obj 'parent) val)))
+
+(deftype widget-designator ()
+  "The supertype of all widgets.  Check against this type instead of
+`widget' unless you know what you're doing."
+  '(or widget (and symbol (not null)) string function))
+
+(defun widget-designator-p (widget)
+  "Returns t when widget is a valid, renderable widget; this includes
+strings, function, etc."
+  (identity (typep widget 'widget-designator)))
 
 ;;; Define widget-rendered-p for objects that don't derive from
 ;;; 'widget'
@@ -118,6 +129,68 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-parent) (obj val)
   (declare (ignore obj val))
   nil)
+
+(defgeneric make-widget-place-writer (container widget)
+  (:documentation "Returns a function accepting (&optional ARG) that
+   encapsulates the place where widget is stored, behaving like this:
+
+      When ARG not given, return the current contained widget.
+      Otherwise, put ARG in the place, set ARG's parent to CONTAINER,
+      and dirty CONTAINER.  Signal an error if this place is no longer
+      valid or ARG is null.
+
+   Any widget that supports flows must implement this function.  Part
+   of the contract is that the fn sets the parent slot of the callee
+   to the container.  The other part is that the widget is dirty after
+   the write via a direct call to make-dirty, or to a write to a
+   widget slot."))
+
+(defparameter *widget-classes*
+  (mapcar #'find-class '(widget symbol string function))
+  "The classes that widgets can be.")
+
+(defun ensure-widget-methods (gf args function &optional (replace? t))
+  "Define a set of methods on GF for each of the 4 standard classes
+that represent widgets, in locations indicated by ARGS (a designator
+for a list of 0-indices into the lambda list), where the specializers
+for the remaining args are all T, calling FUNCTION with the arguments
+given to the GF.  This means that for 3 widget args, 64 methods will
+be defined, and so on.
+
+When REPLACE?, the default, always replace whatever methods with equal
+signatures are already defined."
+  (unless args				;avoid (*)=1 case
+    (return-from ensure-widget-methods nil))
+  (when (typep gf '(or symbol list))
+    (setf gf (fdefinition gf)))
+  (setf args (sort (copy-list (ensure-list args)) #'>))
+  (let* ((old-methods (generic-function-methods gf))
+	 (gfll (generic-function-lambda-list gf))
+	 (function-lambda (congruent-lambda-expression gfll function)))
+    (labels ((descend-combination (proc specializers pos args)
+	       (let ((next-arg (or (first args) -1)))
+		 (cond ((= -1 pos)
+			(funcall proc specializers))
+		       ((/= pos next-arg)
+			(descend-combination
+			 proc (nconc (make-list (- pos next-arg)
+						:initial-element (find-class 't))
+				     specializers)
+			 next-arg args))
+		       (t
+			(dolist (wclass *widget-classes*)
+			  (descend-combination proc (cons wclass specializers)
+					       (1- pos) (rest args)))))))
+	     (maybe-ensure-method (specializers)
+	       (when (or replace?
+			 (not (position specializers old-methods
+					:key #'method-specializers :test #'equal)))
+		 (ensure-method gf function-lambda :specializers specializers))))
+      (descend-combination
+       #'maybe-ensure-method '()
+       (1- (or (position-if (f_ (member _ lambda-list-keywords)) gfll)
+	       (length gfll)))
+       args))))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn
@@ -187,13 +260,7 @@ stylesheets and javascript links in the page header."))
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
   (declare (special *page-dependencies*))
   (if (ajax-request-p)
-    (dolist (dep (dependencies obj))
-      (send-script
-	(ps* `(,(typecase dep
-                  (stylesheet-dependency 'include_css)
-                  (script-dependency 'include_dom))
-               ,(puri:render-uri (dependency-url dep) nil)))
-        :before-load))
+    (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
   (if inlinep

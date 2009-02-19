@@ -276,8 +276,8 @@
 	(render-dataseq-body grid)))
      (:div :class "datagrid-body"
 	   #.(table-header-template
-	      '((:th :class "name" "Name")
-		(:th :class "manager" "Manager"))
+	      '((:th :class "name" (:span :class "label" "Name"))
+		(:th :class "manager" (:span :class "label" "Manager")))
 	      '((:tr
 		 (:td :class "name" (:span :class "value" "Joe"))
 		 (:td :class "manager" (:span :class "value" "Jim")))

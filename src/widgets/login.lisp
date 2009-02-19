@@ -1,12 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(do-login authenticatedp logout hash-password
-	  *default-login-title* *default-login-failure-error*
-	  *authentication-key* default-login-view email password login
-	  login-view login-on-login login-quickform authenticated-server-users
-          login-class-store login-data
-	  anonymous-user-count print-user-stats))
+(export '(do-login authenticatedp on-signout-hooks on-signin-hooks
+          logout hash-password *default-login-title*
+          *default-login-failure-error* *authentication-key* default-login-view
+          email password login login-view login-on-login login-quickform
+          authenticated-server-users login-class-store login-data
+          anonymous-user-count print-user-stats))
 
 ;;; A wrapper function to quickly present a login dialog
 (defun/cc do-login (on-login &key (view 'default-login-view) (title *default-login-title*))
@@ -20,9 +20,19 @@ returned."
       (webapp-session-value *authentication-key*)
     (when success auth-info)))
 
+(defmacro on-signout-hooks ()
+  "A list of callback functions of no arguments to be called when the user signs out."
+  `(webapp-session-value 'on-signout))
+
+(defmacro on-signin-hooks ()
+  "A list of callback functions of no arguments to be called when the user signs out."
+  `(webapp-session-value 'on-signin))
+
 (defun logout ()
   "Removes any authentication information from the session."
-  (setf (webapp-session-value *authentication-key*) nil))
+  (setf (webapp-session-value *authentication-key*) nil)
+  (dolist (fn (on-signout-hooks))
+    (safe-funcall fn)))
 
 (defun hash-password (password)
   "Returns a one way hash of a plain-text password."
@@ -131,7 +141,10 @@ returned."
 				     (multiple-value-bind (success error)
 					 (funcall (login-on-login obj) obj o)
 				       (if success
-					   (setf (webapp-session-value *authentication-key*) success)
+                                           (progn
+                                             (setf (webapp-session-value *authentication-key*) success)
+                                             (dolist (fn (on-signin-hooks))
+                                               (safe-funcall fn)))
 					   (values nil
 						   (list
 						    (cons nil (or error *default-login-failure-error*)))))))

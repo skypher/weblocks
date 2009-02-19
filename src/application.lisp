@@ -5,6 +5,7 @@
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name
 	  webapp-description weblocks-webapp-public-files-path
+          webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix
 	  running-webapp make-webapp-uri make-webapp-public-file-uri
           reset-webapp-session
@@ -17,9 +18,6 @@
 
 (defvar *registered-webapps* nil
   "A list of applications that the system knows about")
-
-(defvar *webapp-permanent-actions*
-  (make-hash-table))
 
 (defclass weblocks-webapp ()
   ((name :accessor weblocks-webapp-name :initarg :name
@@ -86,24 +84,29 @@ not see the prefix parameter in URLs that are provided to it.  You can, for
 instance, have different sites (e.g. mobile vs. desktop) with vastly different 
 layout and dependencies running on the same server."))
 
-;; we use a "transform on write" approach for two reasons:
+;; Slash-normalizing accessors
 ;;
-;; 1. sane values in slots all the time (except when someone messes around
+;; We use a "transform on write" approach for two reasons:
+;;
+;; 1. Sane values in slots all the time (except when someone messes around
 ;;    with SLOT-VALUE)
 ;;
-;; 2. increased performance
+;; 2. Increased performance
 ;;
 (defmethod (setf weblocks-webapp-prefix) (prefix (app weblocks-webapp))
   "Set the prefix of the webapp. Ensures normalization."
   (unless (string= prefix "/") ;; XXX multiple slashes?
     (setf (slot-value app 'prefix) (strip-trailing-slashes prefix))))
+
 (defmethod (setf weblocks-webapp-public-files-uri-prefix) (prefix (app weblocks-webapp))
   "Set the public files URI prefix of the webapp. Ensures normalization."
   (setf (slot-value app 'public-files-uri-prefix) (strip-trailing-slashes prefix)))
 
-(defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
-  (weblocks-webapp-public-files-uri-prefix app))
+(defmethod (setf weblocks-webapp-public-files-path) (path (app weblocks-webapp))
+  "Set the public files URI prefix of the webapp. Ensures normalization."
+  (setf (slot-value app 'public-files-path) (maybe-add-trailing-slash path)))
 
+;; abstraction macro
 (defmacro defwebapp (name &rest initargs &key 
 		     subclasses
 		     slots
@@ -184,6 +187,10 @@ to my `application-dependencies' slot."
     (when (slot-boundp self 'public-files-uri-prefix)
       (setf (weblocks-webapp-public-files-uri-prefix self)
             (slot-value self 'public-files-uri-prefix)))
+    (and (slot-boundp self 'public-files-path)
+         (slot-value self 'public-files-path)
+      (setf (weblocks-webapp-public-files-path self)
+            (slot-value self 'public-files-path)))
     (slot-default html-indent-p (weblocks-webapp-debug self))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
@@ -314,64 +321,7 @@ to my `application-dependencies' slot."
     (stop-webapp name)
     (start-webapp class :name name)))
 
-;;
-;; These procedures are relative to the current request's selected webapp
-;;
-
-(defvar *current-webapp*)
-(setf (documentation '*current-webapp* 'variable)
-      "A currently active web application.")
-
-(defun current-webapp ()
-  "Returns the currently invoked instance of a web application."
-  (declare (special *current-webapp*))
-  *current-webapp*)
-
-(defun reset-webapp-session (&optional (app (current-webapp)))
-  "Reset sessions on a per-webapp basis"
-  (setf (session-value (class-name (class-of app))) nil))
-
-(defun webapp-application-dependencies (&optional (app (current-webapp)))
-  "Returns a list of dependencies on scripts and/or stylesheets that
-   will persist throughout the whole application. See documentation for
-   'widget-application-dependencies' for more details."
-  (build-local-dependencies
-   (weblocks-webapp-application-dependencies app)))
-
-(defun webapp-name (&optional (app (current-webapp)))
-  "Returns the name of the web application (also see 'defwebapp'). Please
-   note, this name will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
-  (weblocks-webapp-name app))
-
-(defun webapp-description (&optional (app (current-webapp)))
-  "Returns the description of the web application. Please note, this
-   description will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
-  (weblocks-webapp-description app))
-
-(defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
-  "Does APP serve requests for HOSTNAME?"
-  (or (null (webapp-hostnames app))
-      (member (car (cl-ppcre:split ":" hostname))
-              (webapp-hostnames app)
-              :test #'equalp)))
-
-(defun webapp-hostnames (&optional (app (current-webapp)))
-  "Returns the hostnames this application will serve requests for."
-  (weblocks-webapp-hostnames app))
-
-(defun webapp-prefix (&optional (app (current-webapp)))
-  "Returns the URL prefix of the application."
-  (weblocks-webapp-prefix app))
-
-(defun webapp-init-user-session (&optional (app (current-webapp)))
-  "Returns the init function for the user session."
-  (let ((init (weblocks-webapp-init-user-session app)))
-    (etypecase init
-      (function init)
-      (symbol (symbol-function init)))))
-
+;;; building webapp uris
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
   "Makes a URI for a weblocks application (by concatenating the app
 prefix and the provided uri)."
@@ -386,22 +336,23 @@ provider URI)."
     (concatenate 'string (weblocks-webapp-public-files-uri-prefix app) "/" uri)
     app))
 
-(defun webapp-session-value (symbol &optional (session *session*))
+
+;;; webapp-scoped session values
+(defun webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
   "Get a session value from the currently running webapp"
-  (declare (special *current-webapp*))
-  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)) session)))
+  
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (cond (webapp-session
 	   (gethash symbol webapp-session))
-	  (*current-webapp* (values nil nil))
+	  (webapp (values nil nil))
 	  (t nil))))
 
-(defun (setf webapp-session-value) (value symbol)
-  "Set a session value for the currently runnin webapp"
-  (declare (special *current-webapp*))
-  (let ((webapp-session (session-value (class-name (class-of *current-webapp*)))))
+(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp *current-webapp*))
+  "Set a session value for the currently runnin webapp" 
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test 'equal)
-	    (session-value (class-name (class-of *current-webapp*))) webapp-session))
+	    (session-value (class-name (class-of webapp))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
 
@@ -409,7 +360,9 @@ provider URI)."
 ;; Permanent actions
 ;;
 
-;; NOTES: Should lock-protect this table since users may add actions at runtime
+;; FIXME: lock-protect this table since users may add actions at runtime
+(defvar *webapp-permanent-actions*
+  (make-hash-table))
 
 (defun webapp-permanent-action (action)
   "Returns the action function associated with this symbol in the current webapp"
@@ -503,3 +456,67 @@ provider URI)."
   "A wrapper around 'compute-webapp-public-files-uri-prefix' that
   handles current app."
   (compute-webapp-public-files-uri-prefix app))
+
+
+;;; Convenience accessors
+;;; These procedures are relative to the current request's selected webapp
+(defvar *current-webapp*)
+(setf (documentation '*current-webapp* 'variable)
+      "A currently active web application.")
+
+(defun current-webapp ()
+  "Returns the currently invoked instance of a web application."
+  (declare (special *current-webapp*))
+  *current-webapp*)
+
+(defun reset-webapp-session (&optional (app (current-webapp)))
+  "Reset sessions on a per-webapp basis"
+  (setf (session-value (class-name (class-of app))) nil))
+
+(defun webapp-application-dependencies (&optional (app (current-webapp)))
+  "Returns a list of dependencies on scripts and/or stylesheets that
+   will persist throughout the whole application. See documentation for
+   'widget-application-dependencies' for more details."
+  (build-local-dependencies
+   (weblocks-webapp-application-dependencies app)))
+
+(defun webapp-name (&optional (app (current-webapp)))
+  "Returns the name of the web application (also see 'defwebapp'). Please
+   note, this name will be used for the composition of the page title
+   displayed to the user. See 'page-title' for details."
+  (weblocks-webapp-name app))
+
+(defun webapp-description (&optional (app (current-webapp)))
+  "Returns the description of the web application. Please note, this
+   description will be used for the composition of the page title
+   displayed to the user. See 'page-title' for details."
+  (weblocks-webapp-description app))
+
+(defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
+  "Does APP serve requests for HOSTNAME?"
+  (or (null (webapp-hostnames app))
+      (member (car (cl-ppcre:split ":" hostname))
+              (webapp-hostnames app)
+              :test #'equalp)))
+
+(defun webapp-hostnames (&optional (app (current-webapp)))
+  "Returns the hostnames this application will serve requests for."
+  (weblocks-webapp-hostnames app))
+
+(defun webapp-prefix (&optional (app (current-webapp)))
+  "Returns the URL prefix of the application."
+  (weblocks-webapp-prefix app))
+
+(defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
+  (weblocks-webapp-public-files-uri-prefix app))
+
+(defun webapp-public-files-path (&optional (app (current-webapp)))
+  (weblocks-webapp-public-files-path app))
+
+(defun webapp-init-user-session (&optional (app (current-webapp)))
+  "Returns the init function for the user session."
+  (let ((init (weblocks-webapp-init-user-session app)))
+    (etypecase init
+      (function init)
+      (symbol (symbol-function init)))))
+

@@ -14,6 +14,13 @@
 				(superclass standard-class))
   t)
 
+(defmethod initialize-instance :after ((class widget-class) &key &allow-other-keys)
+  (awhen (find-class 'widget nil)
+    (unless (subclassp class it)
+      (warn "~S is not defined to be a subclass of ~S; consider ~
+	     adding ~S or a subclass thereof to the superclass list"
+	    class 'widget 'widget))))
+
 ;;; Allow customization of widget slot options
 (defclass widget-slot-definition-mixin ()
   ((affects-dirty-status-p :accessor widget-slot-affects-dirty-status-p

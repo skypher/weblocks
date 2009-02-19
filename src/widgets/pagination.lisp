@@ -5,7 +5,8 @@
 	  pagination-items-per-page pagination-total-items
 	  pagination-show-total-items-p pagination-current-page
 	  pagination-on-change pagination-on-error pagination-page-count
-	  pagination-render-total-item-count pagination-page-item-range))
+	  pagination-render-total-item-count pagination-page-item-range
+	  pagination-on-go-to-page pagination-call-on-change))
 
 (defparameter *pagination-items-per-page* 15
   "Default number of items visible on a page.")

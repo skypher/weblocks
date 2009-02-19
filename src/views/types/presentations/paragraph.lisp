@@ -15,7 +15,7 @@
       (call-next-method)
       (let* ((item (apply #'print-view-field-value value presentation field view widget obj args))
 	     (lit-item (if highlight
-			   (highlight-regex-matches item highlight)
+			   (highlight-regex-matches item highlight presentation)
 			   (escape-for-html item))))
 	(with-html
 	  (:p :class "value text"

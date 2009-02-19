@@ -2,7 +2,10 @@
 (in-package :weblocks)
 
 (export '(data data-view data-view-field data-scaffold
-	  text-presentation highlight-regex-matches))
+	  text-presentation text-presentation-mixin
+          text-presentation-mixin-format-string
+          *text-presentation-mixin-default-format-string*
+	  highlight-regex-matches *presentation-dom-id*))
 
 ;;; Data view
 (defclass data-view (view)
@@ -18,8 +21,23 @@
 (defclass data-scaffold (scaffold)
   ())
 
+(defparameter *text-presentation-mixin-default-format-string* "~A")
+
+;;; Text mixin
+(defclass text-presentation-mixin ()
+  ((format-string :accessor text-presentation-mixin-format-string
+                  :initform *text-presentation-mixin-default-format-string*
+                  :initarg :format-string
+                  :documentation "A format string used to print text
+                  value."))
+  (:documentation "A mixin for presentations that format strings."))
+
+(defmethod text-presentation-mixin-format-string ((presentation null))
+  "Convenience method, useful e.g. for testing."
+  *text-presentation-mixin-default-format-string*)
+
 ;;; Presentation
-(defclass text-presentation (presentation)
+(defclass text-presentation (presentation text-presentation-mixin)
   ()
   (:documentation "A default presentation that renders values as
   text."))
@@ -42,8 +60,9 @@
 			 (attributize-name (object-class-name obj)))
 	  (with-extra-tags
 	    (htm
-	     (:h1 (fmt (view-caption view)
-		       (humanize-name (object-class-name obj))))
+	     (unless (empty-p (view-caption view))
+	       (htm (:h1 (fmt (view-caption view)
+			      (humanize-name (object-class-name obj))))))
 	     (safe-apply fields-prefix-fn view obj args)
 	     (:ul (apply body-fn view obj args))
 	     (safe-apply fields-suffix-fn view obj args))))))
@@ -53,14 +72,20 @@
 			      &rest args)
   (with-html
     (:li :class (attributize-name (view-field-slot-name field))
-	 (:span :class (concatenate 'string "label "
-				    (attributize-presentation
-				     (view-field-presentation field)))
-		(str (view-field-label field)) ":&nbsp;")
+	 (unless (empty-p (view-field-label field))
+	   (htm (:span :class (concatenate 'string "label "
+					   (attributize-presentation
+					    (view-field-presentation field)))
+		       (str (view-field-label field)) ":&nbsp;")))
 	 (apply #'render-view-field-value
 		value presentation
 		field view widget obj
 		args))))
+
+(defvar *presentation-dom-id* nil "DOM id of the currently rendered
+  presentation object. If bound during rendering (for example, in
+  an :around method for render-object-view, will be used by the various
+  functions that render form elements..")
 
 (defmethod render-view-field-value (value (presentation text-presentation)
 				    field view widget obj &rest args
@@ -69,7 +94,7 @@
     (with-html
       (:span :class "value"
 	     (str (if highlight
-		      (highlight-regex-matches printed-value highlight)
+		      (highlight-regex-matches printed-value highlight presentation)
 		      (escape-for-html printed-value)))))))
 
 (defmethod render-view-field-value ((value null) (presentation text-presentation)
@@ -81,7 +106,7 @@
       (with-html
 	(:span :class "value missing" "Not Specified"))))
 
-(defun highlight-regex-matches (item highlight)
+(defun highlight-regex-matches (item highlight &optional presentation)
   "This function highlights regex matches in text by wrapping them in
 HTML 'string' tag. The complexity arises from the need to escape HTML
 to prevent XSS attacks. If we simply wrap all matches in 'strong' tags
@@ -94,7 +119,8 @@ the desired outcome."
 		       for match = (subseq item j k)
 		    collect (escape-for-html (subseq item i j)) into matches
 		    when (not (equalp match ""))
-		         collect (format nil "<strong>~A</strong>"
+		         collect (format nil (format nil "<strong>~A</strong>"
+                                                     (text-presentation-mixin-format-string presentation))
 					 (escape-for-html match))
 		           into matches
 		    when (null rest) collect (escape-for-html (subseq item k (length item))) into matches
@@ -103,8 +129,8 @@ the desired outcome."
 					(list (escape-for-html item))))))))
 
 (defmethod print-view-field-value (value presentation field view widget obj &rest args)
-  (declare (ignore presentation obj view field args))
-  (format nil "~A" value))
+  (declare (ignore obj view field args))
+  (format nil (text-presentation-mixin-format-string presentation) value))
 
 (defmethod print-view-field-value ((value symbol) presentation field view widget obj &rest args)
   (declare (ignore presentation obj view field args))

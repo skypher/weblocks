@@ -3,7 +3,7 @@
 
 (export '(dataform dataform-data-view dataform-form-view
 	  render-dataform render-dataform-data render-dataform-form
-	  annihilate-dataform dataform-submit-action))
+	  annihilate-dataform dataform-submit-action dataform-ui-state))
 
 (defwidget dataform (data-editor)
   ((data-view :accessor dataform-data-view
@@ -19,6 +19,7 @@
 	      into form view. If 'form-view' isn't provided, the
 	      scaffold view will be used by default.")
    (ui-state :initform :data
+	     :accessor dataform-ui-state
 	     :initarg :ui-state
 	     :documentation "Current internal state of the
 	     widget. Normally :data when rendering via 'render-data'
@@ -67,7 +68,7 @@ particular types of data.
 'args' - keyword arguments passed to functions internally. See
 'render-data', 'render-form', etc.")
   (:method ((obj dataform) data &rest args)
-    (ecase (slot-value obj 'ui-state)
+    (ecase (dataform-ui-state obj)
       (:data (apply #'render-dataform-data obj data (dataform-data-view obj) args))
       (:form (apply #'render-dataform-form obj data (dataform-form-view obj) args)))))
 
@@ -117,10 +118,11 @@ customize form behavior.")
 				      (when break-out
 					(setf (slot-value obj 'validation-errors) nil)
 					(setf (slot-value obj 'intermediate-form-values) nil)
-					(setf (slot-value obj 'ui-state) :data))))))
+					(setf (dataform-ui-state obj) :data))))))
 	   :validation-errors (slot-value obj 'validation-errors)
 	   :intermediate-values (slot-value obj 'intermediate-form-values)
 	   :widget obj
+           :form-view-buttons (data-editor-form-buttons obj)
 	   args)))
 
 (defgeneric dataform-submit-action (obj data &rest args)
@@ -135,3 +137,9 @@ submission behavior.")
 	   :class-store (dataform-class-store obj)
 	   args)))
 
+;; Dependencies
+(defmethod dependencies append ((obj dataform))
+  (dependencies
+   (ecase (dataform-ui-state obj)
+     (:form (dataform-form-view obj))
+     (:data (dataform-data-view obj)))))

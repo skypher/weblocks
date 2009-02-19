@@ -148,6 +148,18 @@ when new dependencies appeared in AJAX page updates.")
 (defmethod render-dependency-in-form-submit ((obj javascript-code-dependency))
   (javascript-code obj))
 
+(defmethod render-dependency-in-ajax-response ((obj stylesheet-dependency))
+  (send-script
+   (ps* `(include_css
+	  ,(puri:render-uri (dependency-url obj) nil)))
+   :before-load))
+
+(defmethod render-dependency-in-ajax-response ((obj script-dependency))
+  (send-script
+   (ps* `(include_dom
+	  ,(puri:render-uri (dependency-url obj) nil)))
+   :before-load))
+
 ;; since rendering dependencies for views is more complex than a simple mapc, there is a utility function
 (defun render-form-submit-dependencies (dependency-list)
   (let ((code-string (reduce (lambda (e v)

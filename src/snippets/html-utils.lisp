@@ -36,7 +36,7 @@
                         (:input :name *action-string* :type "hidden" :value ,action-code))))))
        (log-form ,action-code :id ,id :class ,class))))
 
-(defun render-link (action name &key (ajaxp t) id class)
+(defun render-link (action name &key (ajaxp t) id class title)
   "Renders an action into an href link. If 'ajaxp' is true (the
 default), the link will be rendered in such a way that the action will
 be invoked via AJAX, or will fall back to regular request if
@@ -59,7 +59,11 @@ by default).
 	  :href url :onclick (when ajaxp
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
-	  (str name)))
+	  :title title
+	  (etypecase name
+	    (string (htm (str name)))
+	    (symbol (htm (str name)))
+	    (function (funcall name)))))
     (log-link name action-code :id id :class class)))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
@@ -146,9 +150,8 @@ submitted."
 			 "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }")
 	     :multiple (when multiple "on" "off")
 	     (mapc (lambda (i)
-		     (if (member (format nil "~A" (or (cdr i) (car i)))
-				 (ensure-list selected-value)
-				 :test #'equalp :key (curry #'format nil "~A"))
+		     (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
+                                 :test #'string-equal :key #'princ-to-string)
 			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
 			 (htm (:option :value (cdr i) (str (car i))))))
 		   (list->assoc (append (when welcome-name
@@ -322,9 +325,12 @@ in addition."
 	 ,@body))))
 
 (defun send-script (script &optional (place :after-load))
+  "Send JavaScript to the browser. The way of sending depends
+  on whether the current request is via AJAX or not.
+  
+  FIXME: is using PUSH or PUSHLAST correct?"
   (if (ajax-request-p)
     (let ((code (with-javascript-to-string script)))
-    ;(let ((json (format nil "new Function(~A)" (encode-json-to-string script))))
       (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
       (ecase place
         (:before-load (push code *before-ajax-complete-scripts*))
@@ -335,7 +341,8 @@ in addition."
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
   (with-html
-    (:p (if caption
-	    (htm (:span :class "caption" (str caption) ":&nbsp;")))
+    (:p :class "user-message"
+        (when caption
+          (htm (:span :class "caption" (str caption) ":&nbsp;")))
 	(:span :class "message" (str message)))))
 

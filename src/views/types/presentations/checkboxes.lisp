@@ -1,11 +1,15 @@
-
 (in-package :weblocks)
 
-(export '(checkboxes checkboxes-presentation checkboxes-parser))
+(export '(checkboxes checkboxes-presentation checkboxes-parser render-checkboxes))
 
-;;; Checkboxes
+;;;; PRESENTATION
 (defclass checkboxes-presentation (form-presentation choices-presentation-mixin)
   ())
+
+(defmethod obtain-presentation-choices ((choices-mixin checkboxes-presentation) obj)
+  (mapcar (lambda (cons) (cons (car cons)
+                               (intern (string-upcase (cdr cons)) :keyword)))
+          (call-next-method)))
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
                               widget (presentation checkboxes-presentation) value obj
@@ -43,7 +47,7 @@
                           :selected-values (if intermediate-value-p
                                              intermediate-value
                                              (when value
-                                               (mapcar #'attributize-name value))))))
+                                               (mapcar (compose (curry-after #'intern :keyword) #'string-upcase) value))))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args
@@ -58,56 +62,38 @@
 (defun render-checkboxes (name selections &key id (class "checkbox") selected-values)
   (dolist (val selections)
     (let ((checked-p (if (find (cdr val) selected-values :test #'equal) "checked" nil))
-          (value (if (consp val) (car val) val)))
+          (label (if (consp val) (car val) val))
+          (value (if (consp val) (cdr val) val)))
     (with-html
-      (:input :name name :type "checkbox" :id id :class class
-             :checked checked-p :value value (str (humanize-name value)))))))
+      (:input :name (attributize-name name) :type "checkbox" :id id :class class
+	      :checked checked-p :value value (str (humanize-name label)))))))
 
-(defun render-checkboxes2 (name selections &key id (class "checkbox") selected-values)
-  "Renders a group of checkboxes.
+(defmethod request-parameter-for-presentation (name (presentation checkboxes-presentation))
+  (declare (ignore presentation))
+  (post-parameter->list name))
 
-'name' - name of checkboxes.
-'selections' - a list of selections. May be an association list, in
-which case its car is used to dispaly selection text, and cdr is used
-for the value.
-'id' - id of a label that holds the checkboxes.
-'class' - class of the label and of checkboxes.
-'selected-value' - list of selected checkbox values."
-  (loop for i in (list->assoc selections)
-        for j from 1
-        with count = (length selections)
-        for label-class = (cond
-                            ((eq j 1) (concatenate 'string class " first"))
-                            ((eq j count) (concatenate 'string class " last"))
-                            (t class))
-        do (progn
-             (with-html
-               (:label :id id :class label-class
-                       (let ((cb-name (concatenate 'string (attributize-name name) "-" (attributize-name j))))
-                         (htm (:input :name cb-name :type "checkbox" :class "checkbox"
-                                      :value (cdr i)
-                                      (if (find (cdr i) selected-values :test 'equal) :checked "checked"))))
-                       (:span (str (format nil "~A&nbsp;" (car i))))))))
-    (with-html (:input :name (attributize-name name) :type "hidden")))
 
+;;;; PARSER
 (defclass checkboxes-parser (parser)
   ()
-  (:documentation "A parser for checkboxes."))
+  (:documentation "A parser for checkboxes"))
 
 (defun post-parameter->list (param)
-  (let ((result nil))
-    (mapcar (lambda (x)
-              ;(format t "~S~%" x)
-              (when (equalp (car x) param)
-                (push (cdr x) result)))
-            (hunchentoot:post-parameters))
-    result))
+  (loop for x in (hunchentoot:post-parameters)
+        when (equalp (car x) param)
+        collect (cdr x)))
 
 (defmethod parse-view-field-value ((parser checkboxes-parser) value obj
                                    (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
-  (let ((result (mapcar (lambda (s)
-                          (intern (string-upcase s) "KEYWORD"))
-                        (post-parameter->list (symbol-name (view-field-slot-name field))))))
+  (let ((result (mapcar (compose (curry-after #'intern "KEYWORD") #'string-upcase)
+                        (post-parameter->list
+                          (symbol-name (view-field-slot-name field))))))
       (values t result result)))
+
+
+;; ; usage
+;; 
+;;   (dressings :present-as (checkboxes :choices (f_ '(mustard onions cheese)))
+;;              :parse-as checkboxes)
 

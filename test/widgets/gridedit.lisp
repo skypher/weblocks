@@ -12,16 +12,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post")))
 
 (deftest-html create-new-item-widget-gridedit-2
@@ -37,16 +37,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post")))
 
 (deftest-html create-new-item-widget-gridedit-3
@@ -64,16 +64,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post")))
 
 ;;; testing gridedit-create-drilldown-widget
@@ -87,16 +87,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
 
@@ -132,16 +132,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Foo:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
 
@@ -161,16 +161,16 @@
 	#.(form-header-template
 	   "abc123"
 	   '((:li :class "name"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Bar:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+              (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
 	     (:li :class "manager"
-	      (:label :class "input"
+	      (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;"))
-	       (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		      (:span :class "extra" "Manager:&nbsp;")))
+              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	   :method "post"
 	   :title-action "Modifying:&nbsp;")))
 
@@ -226,7 +226,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th "Test"))
+		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -281,16 +281,16 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
-			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :maxlength "40")))
+			      (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	      (:li :class "manager"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		       (:span :class "extra" "Manager:&nbsp;")))
+               (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	    :method "post"))
    ;; "Submit" clicked
    (:div :class "data-mining-bar"
@@ -435,7 +435,7 @@
 	       (:div :class "extra-top-1" "<!-- empty -->")
 	       (:div :class "extra-top-2" "<!-- empty -->")
 	       (:div :class "extra-top-3" "<!-- empty -->")
-	       (:p (:span :class "message" "No information available."))
+	       (:p :class "user-message" (:span :class "message" "No information available."))
 	       (:div :class "extra-bottom-1" "<!-- empty -->")
 	       (:div :class "extra-bottom-2" "<!-- empty -->")
 	       (:div :class "extra-bottom-3" "<!-- empty -->")))
@@ -559,16 +559,16 @@
 	 #.(form-header-template
 	    "abc135"
 	    '((:li :class "name"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
-			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+			      (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
 	      (:li :class "manager"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		       (:span :class "extra" "Manager:&nbsp;")))
+               (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	    :method "post"
 	    :title-action "Modifying:&nbsp;"))
     ;; Submit clicked
@@ -892,7 +892,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th :class "test" "Test"))
+		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -935,7 +935,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager")))
-		(:th :class "test" "Test"))
+		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -951,16 +951,16 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
-			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :maxlength "40")))
+			      (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	      (:li :class "manager"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		       (:span :class "extra" "Manager:&nbsp;")))
+               (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	    :method "post"))))
 
 (deftest-html render-widget-body-gridedit-7
@@ -1010,7 +1010,7 @@
 	      '((:th :class "select" "")
 		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
 		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
-		(:th "Test"))
+		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -1065,16 +1065,16 @@
 	 #.(form-header-template
 	    "abc133"
 	    '((:li :class "name"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
 		       (:span :class "extra" "Name:&nbsp;"
-			      (:em :class "required-slot" "(required)&nbsp;")))
-		(:input :type "text" :name "name" :maxlength "40")))
+			      (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
 	      (:li :class "manager"
-	       (:label :class "input"
+	       (:label :class "input" :for "id-123"
 		(:span :class "slot-name"
-		       (:span :class "extra" "Manager:&nbsp;"))
-		(:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		       (:span :class "extra" "Manager:&nbsp;")))
+               (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
 	    :method "post"))
    ;; "Submit" clicked
    (:div :class "data-mining-bar"

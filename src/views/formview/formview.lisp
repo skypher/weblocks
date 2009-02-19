@@ -2,17 +2,18 @@
 (in-package :weblocks)
 
 (export '(*form-default-error-summary-threshold*
-	  *required-field-message* form form-view
-	  form-view-error-summary-threshold form-view-use-ajax-p
-	  form-view-default-method form-view-default-enctype
-	  form-view-default-action form-view-persist-p form-view-focus-p form-view-satisfies
-	  form-view-buttons form-view-field-writer-mixin form-view-field
-	  form-view-field-parser form-view-field-satisfies
-	  form-view-field-writer form-view-field-required-p mixin-form
-	  mixin-form-view-field mixin-form-view-field-persist-p
-	  *max-raw-input-length* input-presentation-max-length form-presentation
-	  input input-presentation render-validation-summary
-	  render-form-view-buttons form-field-intermediate-value))
+          *required-field-message* form form-view
+          form-view-error-summary-threshold form-view-use-ajax-p
+          form-view-default-method form-view-default-enctype
+          form-view-default-action form-view-persist-p form-view-focus-p
+          form-view-satisfies form-view-buttons form-view-field-writer-mixin
+          form-view-field form-view-field-parser form-view-field-satisfies
+          form-view-field-writer form-view-field-required-p
+          form-view-field-required-error-msg mixin-form mixin-form-view-field
+          mixin-form-view-field-persist-p *max-raw-input-length*
+          input-presentation-max-length form-presentation input
+          input-presentation render-validation-summary render-form-view-buttons
+          form-field-intermediate-value))
 
 ;;; Default initialization parameters
 (defparameter *form-default-error-summary-threshold* 15
@@ -102,7 +103,14 @@ values nil error-message if it does not."))
 	   :documentation "If this slot is bound to a function object,
 	   the function will be called with a new slot value and the
 	   object being rendered as arguments. If the slot is not
-	   bound, '(setf slot-value)' will be used."))
+	   bound, '(setf slot-value)' will be used.")
+   (delayed-write-p :initarg :delayed-write-p
+		    :initform nil
+		    :accessor form-view-field-writer-delayed-p
+		    :documentation "If this slot is set to t, then the
+writer will get called after the object has been persisted. This is useful
+for updating relations, where objects need to be assigned ids and stored
+before relations can be updated."))
   (:documentation "A writer slot mixin"))
 
 (defclass form-view-field (inline-view-field form-view-field-writer-mixin)
@@ -127,8 +135,24 @@ values nil error-message if it does not."))
 	      :initarg :requiredp
 	      :accessor form-view-field-required-p
 	      :documentation "A predicate which determines whether the
-	      field is required."))
+	      field is required.")
+   (required-error-msg :initform nil
+                       :initarg :required-error-msg
+                       :accessor form-view-field-required-error-msg
+                       :documentation "If this value isn't nil, it is
+                       presented to the user when the field is
+                       required and missing from the input
+                       data. Otherwise, the standard required error
+                       message is presented."))
   (:documentation "A field class of the form view."))
+
+(defun get-required-error-msg (form-view-field)
+  "Returns an error message for a missing required field."
+  (if (form-view-field-required-error-msg form-view-field)
+      (form-view-field-required-error-msg form-view-field)
+      (format nil *required-field-message*
+              (humanize-name
+               (view-field-label form-view-field)))))
 
 (defclass mixin-form-view-field (mixin-view-field form-view-field-writer-mixin)
   ((persistp :initarg :persistp
@@ -160,7 +184,7 @@ values nil error-message if it does not."))
 (defparameter *max-raw-input-length* 40
   "Default maximum allowed input length for input fields.")
 
-(defclass input-presentation (form-presentation)
+(defclass input-presentation (form-presentation text-presentation-mixin)
   ((max-length :initform *max-raw-input-length*
 	       :initarg :max-length
 	       :accessor input-presentation-max-length
@@ -202,7 +226,7 @@ differently.")
 				   (str (format nil "~A" (cdr err))))))
 			      field-errors))))))))))
 
-(defgeneric render-form-view-buttons (view obj widget &rest args)
+(defgeneric render-form-view-buttons (view obj widget &rest args &key buttons &allow-other-keys)
   (:documentation
    "Renders buttons specified view 'buttons' slot of the 'form-view'
 object. By default, this method renders 'Submit' and 'Cancel' buttons
@@ -210,14 +234,21 @@ for the form view. Override this method to render form controls
 differently.
 
 'view' - the view being rendered.
-'obj' - the object being rendered.")
-  (:method ((view form-view) obj widget &rest args)
+'obj' - the object being rendered.
+'buttons' - same as form-view-buttons, can be used to override
+form-view-buttons for a given view.")
+  (:method ((view form-view) obj widget &rest args &key form-view-buttons &allow-other-keys)
     (declare (ignore obj args))
     (flet ((find-button (name)
 	     (ensure-list
-	      (find name (form-view-buttons view)
-		    :key (lambda (item)
-			   (car (ensure-list item)))))))
+	      (and (if form-view-buttons
+                       (find name form-view-buttons
+                             :key (lambda (item)
+                                    (car (ensure-list item))))
+                       t)
+                   (find name (form-view-buttons view)
+                         :key (lambda (item)
+                                (car (ensure-list item))))))))
       (with-html
 	(:div :class "submit"
 	      (let ((submit (find-button :submit)))
@@ -279,32 +310,38 @@ differently.
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget presentation value obj 
 			      &rest args &key validation-errors &allow-other-keys)
+  (declare (special *presentation-dom-id*))
   (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
 	 (validation-error (assoc field validation-errors))
 	 (field-class (concatenate 'string attribute-slot-name
-				   (when validation-error " item-not-validated"))))
+				   (when validation-error " item-not-validated")))
+         (*presentation-dom-id* (gen-id)))
     (with-html
       (:li :class field-class
 	   (:label :class (attributize-presentation
 			   (view-field-presentation field))
+                   :for *presentation-dom-id*
 		   (:span :class "slot-name"
 			  (:span :class "extra"
-				 (str (view-field-label field)) ":&nbsp;"
+				 (unless (empty-p (view-field-label field))
+				   (str (view-field-label field))
+				   (str ":&nbsp;"))
 				 (when (form-view-field-required-p field)
-				   (htm (:em :class "required-slot" "(required)&nbsp;")))))
-		   (apply #'render-view-field-value
-			  value presentation
-			  field view widget obj
-			  args)
-		   (when validation-error
-		     (htm (:p :class "validation-error"
-			      (:em
-			       (:span :class "validation-error-heading" "Error:&nbsp;")
-			       (str (format nil "~A" (cdr validation-error))))))))))))
+				   (htm (:em :class "required-slot" "(required)&nbsp;"))))))
+           (apply #'render-view-field-value
+                  value presentation
+                  field view widget obj
+                  args)
+           (when validation-error
+             (htm (:p :class "validation-error"
+                      (:em
+                        (:span :class "validation-error-heading" "Error:&nbsp;")
+                        (str (format nil "~A" (cdr validation-error)))))))))))
 
 (defmethod render-view-field-value (value (presentation input-presentation)
 				    field view widget obj
 				    &rest args &key intermediate-values &allow-other-keys)
+  (declare (special *presentation-dom-id*))
   (let ((attributized-slot-name (attributize-name (view-field-slot-name field))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
 	(form-field-intermediate-value field intermediate-values)
@@ -313,7 +350,8 @@ differently.
 		  :value (if intermediate-value-p
 			     intermediate-value
 			     (apply #'print-view-field-value value presentation field view widget obj args))
-		  :maxlength (input-presentation-max-length presentation))))))
+		  :maxlength (input-presentation-max-length presentation)
+		  :id *presentation-dom-id*)))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)
 				   field view widget obj &rest args)

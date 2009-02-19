@@ -9,5 +9,5 @@
 					    :slot-name 'foo)
 			     (make-instance 'form-view)
 			     nil *joe*)
-  (:textarea :name "foo" :rows "5" :cols "20" "Hello World!"))
+  (:textarea :name "foo" :rows "10" :cols "50" "Hello World!"))
 

@@ -125,7 +125,7 @@ rendering.")
   (:method (value presentation (field table-view-field) (view table-view) widget obj &rest args)
     (declare (ignore args))
     (with-html
-      (str (view-field-label field)))))
+      (:span :class "label" (str (view-field-label field))))))
 
 ;; Table body
 (defgeneric with-table-view-body-row (view obj widget &rest args &key alternp &allow-other-keys)

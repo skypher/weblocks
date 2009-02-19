@@ -113,3 +113,6 @@ state."
 					     (typespec (eql 'us-state)) args)
   (values t (make-instance 'us-state-parser)))
 
+(defmethod dependencies append ((self us-state-presentation))
+  (when (us-state-presentation-use-suggest-p self)
+    (list (make-local-dependency :stylesheet "suggest"))))

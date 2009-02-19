@@ -60,9 +60,6 @@ customize behavior)."))
 (defmethod handle-client-request (app)
   (let ((*current-webapp* app))
     (declare (special *current-webapp*))
-    (when (hunchentoot::mime-type (script-name))
-      (setf (return-code) +http-not-found+)
-      (throw 'handler-done nil))
     (when (null *session*)
       (when (get-request-action-name)
 	(expired-action-handler app))
@@ -78,13 +75,14 @@ customize behavior)."))
 	  (when (weblocks-webapp-debug app)
 	    (initialize-debug-actions))
 	  (setf (root-composite) root-composite)
-          (handler-bind
-            ;; we don't want a half-finished session
-            ((error (lambda (c)
-                      (setf (root-composite) nil)
-                      (reset-webapp-session)
-                      (error c))))
-            (funcall (webapp-init-user-session) root-composite))
+	  (let (finished?)
+	    (unwind-protect
+		 (progn
+		   (funcall (webapp-init-user-session) root-composite)
+		   (setf finished? t))
+	      (unless finished?
+		(setf (root-composite) nil)
+		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
 	(when (cookie-in *session-cookie-name*)
 	  (redirect (remove-session-from-uri (request-uri)))))
@@ -151,32 +149,69 @@ association list. This function is normally called by
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
   (setf (content-type) *json-content-type*)
-  (let ((widget-alist (mapcar (lambda (w)
-				(cons
-				 (dom-id w)
-				 (progn
-				   (render-widget w :inlinep t)
-				   (get-output-stream-string *weblocks-output-stream*))))
-			      *dirty-widgets*)))
-    (format *weblocks-output-stream* "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
-	    (encode-json-to-string widget-alist)
-	    (encode-json-to-string *before-ajax-complete-scripts*)
-	    (encode-json-to-string *on-ajax-complete-scripts*))))
+  (let ((render-state (make-hash-table :test 'eq)))
+    (labels ((circularity-warn (w)
+	       (style-warn 'non-idempotent-rendering
+		:change-made
+		(format nil "~S was marked dirty and skipped after ~
+			     already being rendered" w)))
+	     (render-enqueued (dirty)
+	       (loop for w in dirty
+		     if (gethash w render-state)
+		       do (circularity-warn w)
+		     else
+		       do (render-widget w)
+			  (setf (gethash w render-state) t)
+		       and collect (cons (dom-id w)
+					 (get-output-stream-string
+					     *weblocks-output-stream*))))
+	     (late-propagation-warn (ws)
+	       (style-warn 'non-idempotent-rendering
+		:change-made
+		(format nil "~A widgets were marked dirty" (length ws))))
+	     (absorb-dirty-widgets ()
+	       (loop for dirty = *dirty-widgets*
+		     while dirty
+		     count t into runs
+		     when (= 2 runs)
+		       do (late-propagation-warn dirty)
+		     do (setf *dirty-widgets* '())
+		     nconc (render-enqueued dirty))))
+      (format *weblocks-output-stream*
+	      "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
+	      (encode-json-to-string (absorb-dirty-widgets))
+	      (encode-json-to-string *before-ajax-complete-scripts*)
+	      (encode-json-to-string *on-ajax-complete-scripts*)))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
    weblocks transaction functions over all stores"
   (if (eq (request-method) :post)
       (let (tx-error-occurred-p)
-	(unwind-protect
-	     (handler-bind ((error #'(lambda (error)
-				       (declare (ignore error))
-				       (mapstores #'rollback-transaction)
-				       (setf tx-error-occurred-p t))))
-	       (mapstores #'begin-transaction)
-	       (eval-dynamic-hooks hooks))
-	  (unless tx-error-occurred-p
-	    (mapstores #'commit-transaction))))
+	(multiple-value-bind (dynamic-stores non-dynamic-stores)
+	    (loop for store-name in *store-names*
+		  for store = (symbol-value store-name)
+		  when store
+		    if (use-dynamic-transaction-p store)
+		      collect store into dynamic-stores
+		    else collect store into non-dynamic-stores
+		  finally (return (values dynamic-stores non-dynamic-stores)))
+	  (labels ((dynamic-transactions (stores)
+		     (if (null stores)
+			 (eval-dynamic-hooks hooks)
+			 (dynamic-transaction
+			  (car stores)
+			  (f0 (dynamic-transactions (cdr stores))))))
+		   (handle-error (error)
+		     (declare (ignore error))
+		     (mapc #'rollback-transaction non-dynamic-stores)
+		     (setf tx-error-occurred-p t)))
+	    (unwind-protect
+		 (handler-bind ((error #'handle-error))
+		   (mapc #'begin-transaction non-dynamic-stores)
+		   (dynamic-transactions dynamic-stores))
+	      (unless tx-error-occurred-p
+		(mapc #'commit-transaction non-dynamic-stores))))))
       (eval-dynamic-hooks hooks)))
   
 (eval-when (:load-toplevel)

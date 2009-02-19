@@ -11,6 +11,6 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A weblocks backend for clsql."
-  :depends-on (:closer-mop :metatilities :clsql :weblocks)
+  :depends-on (:closer-mop :metatilities :clsql :clsql-fluid :weblocks)
   :components ((:file "clsql")))
 

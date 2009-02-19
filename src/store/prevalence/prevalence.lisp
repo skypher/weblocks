@@ -9,17 +9,28 @@
 
 (in-package :weblocks-prevalence)
 
+(defvar *locks* (make-hash-table :test #'eq)
+  "Locks for Prevalence operation guards; one lock per store.")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod open-store ((store-type (eql :prevalence)) &rest args)
-  (setf *default-store* (apply #'make-prevalence-system args)))
+  (let* ((store (apply #'make-instance 'guarded-prevalence-system :directory (car args) (cdr args)))
+         (lock-name (format nil "Prevalence lock for store ~S" store))
+         (lock (hunchentoot-mp:make-lock lock-name)))
+    (setf (gethash store *locks*) lock)
+    (setf (get-guard store) (lambda (thunk)
+                              (hunchentoot-mp:with-lock (lock)
+                                (funcall thunk))))
+    (setf *default-store* store)))
 
 (defmethod close-store ((store prevalence-system))
   (when (eq *default-store* store)
     (setf *default-store* nil))
   (snapshot store)
-  (cl-prevalence::close-open-streams store))
+  (cl-prevalence::close-open-streams store)
+  (setf (gethash store *locks*) nil))
 
 (defmethod clean-store ((store prevalence-system))
   (totally-destroy store))
@@ -100,23 +111,28 @@
 (defmethod find-persistent-object-by-id ((store prevalence-system) class-name object-id)
   (let ((objects (get-root-object store class-name)))
     ; find the object
-    (multiple-value-bind (obj)
-	(gethash object-id (persistent-objects-of-class-by-id objects))
-      obj)))
+    (gethash object-id (persistent-objects-of-class-by-id objects))))
 
 (defmethod find-persistent-objects ((store prevalence-system) class-name 
-				    &key (filter nil) order-by range slot (value nil value-given))
+				    &key (filter nil) order-by range slot
+                                         (value nil value-given)
+                                         (test #'equal))
   "The slot and value keys must appear together.  If they appear, a
 filter will be applied (before the filter passed, if any) that
 requires all objects to have the given value in the given slot."
-;  (break "~A ~A ~A" filter order-by range)
   (range-objects-in-memory
    (order-objects-in-memory
     (let* ((seq (query store 'tx-find-persistent-objects-prevalence class-name))
 	   (seq2 (cond
 		   ((and seq slot value-given)
 		    (remove-if-not
-		      #'(lambda (x) (equal (slot-value x slot) value))
+		      (lambda (obj)
+                        (cond
+                          ((not (slot-exists-p obj slot))
+                           (warn "FIND-PERSISTENT-OBJECTS: object ~A doesn't have the slot ~A" obj slot))
+                          ((not (slot-boundp obj slot))
+                           (warn "FIND-PERSISTENT-OBJECTS: slot ~A of object ~A is not bound" obj slot))
+                          (t (funcall test (slot-value obj slot) value))))
 		      seq))
 		   (t seq)))
 	   (seq3 (cond

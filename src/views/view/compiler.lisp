@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(*custom-view-field-argument-compilers*
-	  view-argument-quoting-strategy defview))
+	  view-argument-quoting-strategy defview-anon defview))
 
 ;;; Declarative view definition implementation
 (eval-when (:compile-toplevel :load-toplevel :execute)

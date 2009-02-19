@@ -14,7 +14,7 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-			   :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
+	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
@@ -83,7 +83,8 @@
 					      :depends-on (view dataview "sequence-view"))
 				       (:module
 					types
-					:components ((:file "us-states")
+					:components ((:file "file-upload")
+                                                     (:file "us-states")
 						     (:file "boolean")
 						     (:file "member"
 							    :depends-on (presentations parsers))
@@ -92,6 +93,7 @@
 						      presentations
 						      :components ((:file "hidden")
                                                                    (:file "choices")
+								   (:file "date")
 								   (:file "radio"
 									  :depends-on ("choices"))
 								   (:file "dropdown"
@@ -100,7 +102,9 @@
 								   (:file "paragraph")
 								   (:file "excerpt")
 								   (:file "image")
-								   (:file "url")))
+								   (:file "checkboxes")
+								   (:file "url")
+								   (:file "html")))
 						     (:module
 						      parsers
 						      :components ((:file "common"))))
@@ -142,7 +146,7 @@
 						:components ((:file "dataedit"
 								    :depends-on (#-cmu "delete-action"))
 							     #-cmu (:file "delete-action"))
-						:depends-on (widget))
+						:depends-on (widget dataseq))
 				       (:file "gridedit"
 					      :depends-on (datagrid dataedit "dataform"))
 				       (:file "listedit"
@@ -153,6 +157,8 @@
 					      :depends-on (widget "flash"))
 				       (:file "composite"
 					      :depends-on (widget))
+                                       (:file "table-composite"
+					      :depends-on (composite))
 				       (:file "dispatcher"
 					      :depends-on (widget))
 				       (:file "selector-mixin"
@@ -173,7 +179,7 @@
 		 (:file "server"
 			:depends-on ("weblocks" "debug-mode" utils store))
 		 (:file "request"
-			:depends-on ("weblocks" "actions"))
+			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"
 			:depends-on ("weblocks"))
 		 (:file "application"
@@ -184,6 +190,12 @@
 		(test-op (load-op "weblocks-test"))
 		(doc-op (load-op "weblocks-scripts"))
 		(make-app-op (load-op "weblocks-scripts"))))
+
+#+asdf-system-connections
+(defsystem-connection weblocks+html-template
+  :requires (:weblocks :html-template)
+  :components ((:module src :pathname "src/widgets/"
+		:components ((:file "template-block")))))
 
 ;;; test-op
 (defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))

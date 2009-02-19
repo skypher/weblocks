@@ -1,6 +1,8 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite views/formview/formview-suite (weblocks-suite) nil)
+
 ;;; Test view-caption
 (deftest formview-view-caption-1
     (view-caption (make-instance 'form-view
@@ -152,11 +154,11 @@ $('id-123').focusFirstElement();
 		       (make-instance 'input-presentation)
 		       "Joe" *joe*)
   (:li :class "name"
-       (:label :class "input"
+       (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :value "Joe" :maxlength "40"))))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 (deftest-html render-view-field-2
     (let ((field (make-instance 'form-view-field
@@ -169,14 +171,14 @@ $('id-123').focusFirstElement();
 			 "Joe" *joe*
 			 :validation-errors (list (cons field "Some Error!"))))
   (:li :class "name item-not-validated"
-       (:label :class "input"
+       (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;")))
-	       (:input :type "text" :name "name" :value "Joe" :maxlength "40")
-	       (:p :class "validation-error"
-		   (:em (:span :class "validation-error-heading" "Error:&nbsp;")
-			"Some Error!")))))
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")
+       (:p :class "validation-error"
+           (:em (:span :class "validation-error-heading" "Error:&nbsp;")
+                "Some Error!"))))
 
 ;;; Test form view render-view-field-value
 (deftest-html form-view-render-view-field-value-1
@@ -220,16 +222,16 @@ $('id-123').focusFirstElement();
 				    (declare (ignore args)))))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label :class "input"
+	(:label :class "input" :for "id-123"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
-		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+		       (:em :class "required-slot" "(required)&nbsp;"))))
+        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
        (:li :class "manager"
-	(:label :class "input"
+	(:label :class "input" :for "id-123"
 	 (:span :class "slot-name"
-		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))))
+		(:span :class "extra" "Manager:&nbsp;")))
+        (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))))
 
 (deftest-html form-view-render-object-view-2
     (with-request :get nil
@@ -240,16 +242,16 @@ $('id-123').focusFirstElement();
 				    (declare (ignore args)))))
   #.(form-header-template "abc123"
      '((:li :class "name"
-	(:label :class "input"
+	(:label :class "input" :for "id-123"
 	 (:span :class "slot-name"
 		(:span :class "extra" "Name:&nbsp;"
-		       (:em :class "required-slot" "(required)&nbsp;")))
-	 (:input :type "text" :name "name" :value "Joe" :maxlength "40")))
+		       (:em :class "required-slot" "(required)&nbsp;"))))
+        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123"))
        (:li :class "manager"
-	(:label :class "input"
+	(:label :class "input" :for "id-123"
 	 (:span :class "slot-name"
-		(:span :class "extra" "Manager:&nbsp;"))
-	 (:input :type "text" :name "manager" :value "Jim" :maxlength "40"))))
+		(:span :class "extra" "Manager:&nbsp;")))
+        (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
      :enctype "fooenc"
      :use-ajax-p nil))
 

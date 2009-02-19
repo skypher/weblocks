@@ -35,7 +35,8 @@
 (defmethod render-view-field-value (value (presentation radio-presentation)
 				    (field form-view-field) (view form-view) widget obj
 				    &rest args &key intermediate-values &allow-other-keys)
-  (declare (ignore args))
+  (declare (ignore args)
+	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (render-radio-buttons (view-field-slot-name field)
@@ -43,5 +44,6 @@
 			  :selected-value (if intermediate-value-p
 					      intermediate-value
 					      (when value
-						(attributize-name value))))))
+						(attributize-name value)))
+			  :id *presentation-dom-id*)))
 

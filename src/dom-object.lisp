@@ -24,7 +24,8 @@
   (:method ((obj dom-object-mixin))
     (if (slot-boundp obj 'dom-id)
 	(slot-value obj 'dom-id)
-	(setf (slot-value obj 'dom-id) (gen-id)))))
+	(when (boundp '*session*)
+	  (setf (slot-value obj 'dom-id) (gen-id))))))
 
 (defgeneric dom-id (obj)
   (:documentation "Provides a consistent interface to identifying widgets

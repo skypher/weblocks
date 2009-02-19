@@ -10,6 +10,8 @@
 
 (in-package :weblocks-elephant)
 
+(export '(elephant-store))
+
 (defclass elephant-store ()
   ((controller :accessor elephant-controller :initarg :controller)
    (stdidx :accessor elephant-stdobj-index)))
@@ -32,19 +34,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod open-store ((store-type (eql :elephant)) &rest args &key spec &allow-other-keys)
-  (declare (ignore args))
-  (setup-elephant-transaction-hooks)
+  (declare (ignore args)) 
   (setf *default-store*
 	(make-instance 'elephant-store
-		       :controller (setf *store-controller* (elephant:open-store spec :recover t)))))
+		       :controller (setf *store-controller* (elephant:open-store spec)))))
 
 (defmethod close-store ((store elephant-store))
   (when (eq *default-store* store)
     (setf *default-store* nil))
   (elephant:close-store (elephant-controller store))
   (when (eq (elephant-controller store) *store-controller*)
-    (setf *store-controller* nil))
-  (remove-elephant-transaction-hooks))
+    (setf *store-controller* nil)))
 
 (defmethod clean-store ((store elephant-store))
   ;; Drop everything from the root
@@ -79,45 +79,14 @@
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(defmethod begin-transaction ((store elephant-store))
+(defmethod use-dynamic-transaction-p ((store elephant-store))
   t)
 
-(defmethod commit-transaction ((store elephant-store))
-  t)
-
-(defmethod rollback-transaction ((store elephant-store))
-  t)
-
-(defun elephant-transaction-hook (hooks)
+(defmethod dynamic-transaction ((store elephant-store) proc)
   "This dynamic hook wraps an elephant transaction macro around the body hooks.
    This allows us to gain the benefits of the stable transaction system in elephant"
-  (let ((valid-sc (get-valid-sc)))
-    (if valid-sc
-	(ensure-transaction (:store-controller valid-sc)
-	  (eval-dynamic-hooks hooks))
-	(eval-dynamic-hooks hooks))))
-
-(defun get-valid-sc ()
-  "This function provides some reasonable defaults for elephant.  Namely, that
-   the default transaction is either the default store or the current store controller.
-   Care must be taken when using multiple elephant stores with weblocks.  The 
-   consequences are as yet undefined."
-  (cond ((subtypep (type-of *default-store*) 'elephant-store)
-	 (elephant-controller *default-store*))
-	((not (null *store-controller*))
-	 *store-controller*)))
-
-(defun setup-elephant-transaction-hooks ()
-  "Ensure that the elephant transaction hook is registered on action and rendering code"
-  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-action)))
-;;  (pushnew 'elephant-transaction-hook (request-hook :application :dynamic-render)))
-
-(defun remove-elephant-transaction-hooks ()
-  "Remove the elephant-specific transaction hooks"
-  (symbol-macrolet ((action-list (request-hook :application :dynamic-action))
-		    (render-list (request-hook :application :dynamic-render)))
-    (setf action-list (delete 'elephant-transaction-hook action-list))
-    (setf render-list (delete 'elephant-transaction-hook render-list))))
+  (ensure-transaction (:store-controller store)
+    (funcall proc)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
@@ -175,7 +144,7 @@
 	(catch 'finish-map
 	  (cond (filter-fn
 		 (range-objects-in-memory
-		  (order-objects-in-memory
+		  (weblocks-memory::advanced-order-objects-in-memory
 		   (filter-objects-in-memory
 		    (get-instances-by-class class-name)
 		    filter-fn)
@@ -198,7 +167,7 @@
 		      :collect t)))
 		((consp order-by)
 		 (range-objects-in-memory
-		  (order-objects-in-memory
+		  (weblocks-memory::advanced-order-objects-in-memory
 		   (get-instances-by-class class-name)
 		   order-by)
 		  range))
@@ -207,7 +176,10 @@
 		   (map-class collector class-name :oids t)))
 		(t
 		 (get-instances-by-class class-name)))))
-      (find-persistent-standard-objects store class-name :order-by order-by :range range)))
+      (find-persistent-standard-objects store class-name
+                                        :order-by order-by
+                                        :range range
+                                        :filter-fn filter-fn)))
 
 (defun filter-objects-in-memory (objects fn &aux results)
   (labels ((filter-if (object)
@@ -303,20 +275,24 @@
     (get-value object-id (elephant-stdobj-index store))))
 
 
-(defun find-persistent-standard-objects (store class-name &key order-by range)
+(defun find-persistent-standard-objects (store class-name &key order-by range filter-fn)
   "This implements a slow version of lookup"
   (range-objects-in-memory
    (order-objects-in-memory
     (with-store-controller store
-      (map-index (lambda (k v pk) 
-		   (declare (ignore k pk))
-		   v)
-		 (get-index (elephant-stdobj-index store) 'class)
-		 :value class-name
-		 :collect t))
+      (let ((seq (map-index (lambda (k v pk) 
+                              (declare (ignore k pk))
+                              v)
+                            (get-index (elephant-stdobj-index store) 'class)
+                            :value class-name
+                            :collect t)))
+        (if (and seq
+                 (functionp filter-fn))
+            (remove-if-not filter-fn seq)
+            seq)))
     order-by)
    range))
-	
+
 
 (defun count-persistent-standard-objects (store class-name)
   "Count class instances"

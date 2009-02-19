@@ -1,10 +1,18 @@
 
 (in-package :weblocks)
 
-(export '(navigation render-navigation-menu init-navigation make-navigation))
+(export '(navigation render-navigation-menu init-navigation make-navigation
+          navigation-disabled-pane-names))
 
 (defwidget navigation (selector)
-  ()
+  ((disabled-pane-names :initform nil
+                        :initarg :disabled-pane-names
+                        :accessor navigation-disabled-pane-names
+                        :documentation "Allows presenting panes to the
+                        user as a visual queue, but disabling access
+                        to them. If not null, this slot should be
+                        bound to a list of pane names to be
+                        disabled."))
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It is a convenience combination of the selector
   widget and a menu snippet."))
@@ -12,25 +20,40 @@
 (defgeneric render-navigation-menu (obj &rest args)
   (:documentation
    "Renders HTML menu for the navigation widget.")
-  (:method ((obj navigation) &rest args)
+  (:method ((obj navigation) &rest args &key menu-args &allow-other-keys)
     (declare (ignore args))
-    (render-menu (mapcar (lambda (orig-pane)
-			   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
-			     (cons (pane-info-label pane)
-				   (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
-			 (selector-mixin-panes obj))
-		 :selected-pane (selector-mixin-current-pane-name obj)
-		 :header (if (widget-name obj)
-			      (humanize-name (widget-name obj))
-			      "Navigation")
-		 :container-id (ensure-dom-id obj)
-		 :empty-message "No navigation entries")))
+    (apply #'render-menu (mapcar (lambda (orig-pane)
+                                   (let ((pane (car (selector-mixin-canonicalize-pane orig-pane))))
+                                     (cons (pane-info-label pane)
+                                           (compose-uri-tokens-to-url (pane-info-uri-tokens pane)))))
+                                 (selector-mixin-panes obj))
+           :selected-pane (selector-mixin-current-pane-name obj)
+           :header (if (widget-name obj)
+                       (humanize-name (widget-name obj))
+                       "Navigation")
+           :container-id (ensure-dom-id obj)
+           :empty-message "No navigation entries"
+           :disabled-pane-names (navigation-disabled-pane-names obj)
+           menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
-  (with-html 
-    (:div :class "navigation-body"
-	  (call-next-method)))
-  (apply #'render-navigation-menu obj args))
+  (let ((saved-panes (selector-mixin-panes obj)))
+    ;; Remove disabled panes
+    (when (navigation-disabled-pane-names obj)
+      (setf (selector-mixin-panes obj) 
+            (remove-if (lambda (item)
+                         (member (car item) (navigation-disabled-pane-names obj)
+                                 :test #'string-equal))
+                       saved-panes)))
+    ;; Render navigation
+    (let ((navigation-body (with-html-to-string
+                             (:div :class "navigation-body"
+                                   (call-next-method)))))
+      ;; Restore disabled panes before menu is rendered
+      (setf (selector-mixin-panes obj) saved-panes)
+      ;; Render menu
+      (apply #'render-navigation-menu obj args)
+      (format *weblocks-output-stream* "~A" navigation-body))))
 
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))

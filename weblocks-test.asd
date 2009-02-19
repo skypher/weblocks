@@ -106,6 +106,7 @@
 										   (:file "paragraph")
 										   (:file "textarea")
 										   (:file "image")
+										   (:file "date")
 										   (:file "url"))))))
 			  :depends-on ("test-code" fixtures snippets))
 		 (:module widgets
@@ -115,6 +116,7 @@
 							     (:file "widget-mop"))
 						:depends-on ("widget-test-utils"))
 				       (:file "dataform")
+				       (:file "data-editor")
 				       (:file "quickform")
 				       (:file "login")
 				       (:file "flash")

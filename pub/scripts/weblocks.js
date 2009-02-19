@@ -4,6 +4,10 @@ function updateElementBody(element, newBody) {
     element.update(newBody);
 }
 
+function updateElement(element, newElement) {
+    element.replace(newElement);
+}
+
 function selectionEmpty() {
     if(document.getSelection) {
 	return document.getSelection() == "";
@@ -37,7 +41,7 @@ function stopPropagation(event) {
 Ajax.Responders.register({
   onCreate: function() {
 	    $('ajax-progress').innerHTML = "<img src='/pub/images/progress.gif'>";
-	}, 
+	},
   onComplete: function() {
 	    $('ajax-progress').innerHTML = "";
 	}
@@ -52,7 +56,7 @@ function onActionSuccess(transport) {
     } else {
         json = transport.responseText.evalJSON(true);
     }
-    
+
     // See if there are redirects
     var redirect = json['redirect'];
     if (redirect)
@@ -60,7 +64,7 @@ function onActionSuccess(transport) {
 	window.location.href = redirect;
 	return;
     }
-    
+
     execJsonCalls(json['before-load']);
 
     // Update dirty widgets
@@ -69,7 +73,7 @@ function onActionSuccess(transport) {
 	var widget = $(i);
 	if(widget) {
             //console.log("updating widget %s", i);
-	    updateElementBody(widget, dirtyWidgets[i]);
+	    updateElement(widget, dirtyWidgets[i]);
 	}
     }
 
@@ -101,9 +105,10 @@ function getActionUrl(actionCode, sessionString, isPure) {
     return url;
 }
 
-function initiateActionWithArgs(actionCode, sessionString, args, method) {
+function initiateActionWithArgs(actionCode, sessionString, args, method, url) {
     if (!method) method = 'get';
-    new Ajax.Request(getActionUrl(actionCode, sessionString),
+    if (!url) url = getActionUrl(actionCode, sessionString);
+    new Ajax.Request(url,
                      {
                          method: method,
                          onSuccess: onActionSuccess,
@@ -124,7 +129,7 @@ function initiateFormAction(actionCode, form, sessionString) {
     delete(serializedForm['action']);
 
     initiateActionWithArgs(actionCode, sessionString, serializedForm, form.method);
-} 
+}
 
 function disableIrrelevantButtons(currentButton) {
     $(currentButton.form).getInputs('submit').each(function(obj)
@@ -151,10 +156,10 @@ if(!window.XMLHttpRequest) {
 	    tableRows.each(function(row) {
 		    Event.observe(row, 'mouseover', function() {
 			    row.addClassName('hover');
-			}); 
+			});
 		    Event.observe(row, 'mouseout', function() {
 			    row.removeClassName('hover');
-			}); 
+			});
 		});
 	});
 }
@@ -183,10 +188,10 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
 	inputBox += 'value="' + value +'"';
     }
     inputBox += '/>';
-    
+
     var suggestHTML = inputBox + '<div id="' + choicesId + '" class="suggest"></div>';
     $(inputId).replace(suggestHTML);
-    
+
     declareSuggest(inputId, choicesId, suggestOptions);
 }
 

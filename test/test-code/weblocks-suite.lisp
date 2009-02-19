@@ -33,7 +33,8 @@
 
 ;;; A suite that sets up a web request environment
 (deftestsuite request-suite ()
-  ()
+  (make-action-orig
+   generate-widget-id-orig)
   (:dynamic-variables (*request* (make-instance 'unittest-request))
 		      (*server* (make-instance 'unittest-server))
 		      (hunchentoot::*remote-host* "localhost")
@@ -43,7 +44,13 @@
 		      *uri-tokens* *on-ajax-complete-scripts*
 		      *before-ajax-complete-scripts*
 		      weblocks::*page-dependencies*)
-  (:setup (setf (slot-value *request* 'method) :get)))
+  (:setup (setf (slot-value *request* 'method) :get)
+          (setf generate-widget-id-orig #'gen-id)
+          (setf (symbol-function 'gen-id)
+			      (lambda (&optional prefix)
+                                (declare (ignore prefix))
+                                "id-123")))
+  (:teardown (setf (symbol-function 'gen-id) generate-widget-id-orig)))
 
 ;;; WEBLOCKS-SUITE must set up an environment for all weblocks tests
 ;;; to run in. This includes setting up an application, a web session,

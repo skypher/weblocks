@@ -3,15 +3,16 @@
 
 (export '(*default-cascade-delete-mixins-p* dataedit-mixin
 	  dataedit-on-add-item dataedit-allow-add-p
+	  show-add-form-when-empty-p
+	  dataedit-mixin-flash-message-on-first-add-p
 	  dataedit-on-delete-items dataedit-cascade-delete-mixins-p
-	  dataedit-on-add-item-completed dataedit-on-delete-items-completed
-          dataedit-item-widget-data
-	  dataedit-allow-delete-p dataedit-item-data-view
-	  dataedit-item-form-view dataedit-ui-state
-	  dataedit-item-widget dataedit-create-drilldown-widget
-	  dataedit-drilldown-action dataedit-create-new-item-widget
-	  dataedit-reset-state dataedit-add-items-flow
-	  dataedit-update-operations))
+	  dataedit-on-add-item-completed
+	  dataedit-on-delete-items-completed dataedit-allow-delete-p
+	  dataedit-item-data-view dataedit-item-form-view
+	  dataedit-ui-state dataedit-item-widget
+	  dataedit-create-drilldown-widget dataedit-drilldown-action
+	  dataedit-create-new-item-widget dataedit-reset-state
+	  dataedit-add-items-flow dataedit-update-operations))
 
 (defparameter *default-cascade-delete-mixins-p* t
   "Default value for 'dataedit-cascade-delete-mixins-p'. See its
@@ -37,6 +38,21 @@ documentation for more details.")
 		:initarg :allow-add-p
 		:documentation "If true, the widget should provide the
 		UI to add entries to the collection.")
+   (show-add-form-when-empty-p :accessor dataedit-show-add-form-when-empty-p
+                               :initform nil
+                               :initarg :show-add-form-when-empty-p
+                               :documentation "If set to true, when
+                               the dataseq is empty (has no data), the
+                               add form is automatically presented to
+                               the user (only if dataedit-allow-add-p
+                               is true as well).")
+   (flash-message-on-first-add-p :accessor dataedit-mixin-flash-message-on-first-add-p
+                                 :initform nil
+                                 :initarg :flash-message-on-first-add-p
+                                 :documentation "If this field is set
+                                 to nil (the default), a message about
+                                 adding an item will not be flashed
+                                 when the first item is added.")
    ;; Deleting items
    (on-delete-items :accessor dataedit-on-delete-items
 		    :initform nil
@@ -100,10 +116,12 @@ documentation for more details.")
   editing functionality."))
 
 ;;; We need to set up the value of dataseq-on-drilldown
-(defmethod initialize-instance :after ((obj dataedit-mixin) &rest initargs &key &allow-other-keys)
-  (declare (ignore initargs))
-  (setf (dataseq-on-drilldown obj)
-	(cons 'modify #'dataedit-drilldown-action)))
+(defmethod initialize-instance :after
+    ((obj dataedit-mixin) &key (on-drilldown nil on-drilldown?) &allow-other-keys)
+  (declare (ignore on-drilldown))
+  (unless on-drilldown?
+    (setf (dataseq-on-drilldown obj)
+	  (cons 'modify #'dataedit-drilldown-action))))
 
 ;;; Drilldown
 (defgeneric dataedit-create-drilldown-widget (obj item)
@@ -186,12 +204,19 @@ in order to reset the state after the item widget has done its job."
 	     (dataseq-common-ops obj)
 	     :key #'car)))
 
+;;; If the settings are right and there is no data yet, set our state
+;;; to add new item immediately
+(defmethod render-widget-body :before ((obj dataedit-mixin) &rest args)
+  (declare (ignore args))
+  (when (and (dataedit-show-add-form-when-empty-p obj)
+             (dataedit-allow-add-p obj)
+             (not (eq (dataedit-ui-state obj) :add))
+             (not (dataedit-item-widget obj))
+             (= 0 (dataseq-data-count obj)))
+    (dataedit-add-items-flow obj nil)
+    (setf (data-editor-form-buttons (dataedit-item-widget obj))
+          '(:submit))))
+
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))
   (list (make-local-dependency :stylesheet "dataform")))
-
-
-(defgeneric dataedit-item-widget-data (w)
-  (:documentation "Returns the item held by the dataedit-item-widget.")
-  (:method ((w dataform))
-    (dataform-data w)))

@@ -4,7 +4,7 @@
 (export '(url url-presentation url-presentation-body))
 
 (defclass url-presentation (text-presentation)
-  ((body :initform "Link"
+  ((body :initform nil
 	 :initarg :body
 	 :accessor url-presentation-body
 	 :documentation "Body of the link. This can be a string or a
@@ -26,5 +26,6 @@
 	    (etypecase (url-presentation-body presentation)
 	      (string (str (url-presentation-body presentation)))
 	      (function (apply (url-presentation-body presentation)
-			       value presentation field view widget obj args)))))))
+			       value presentation field view widget obj args))
+              (null (str value)))))))
 

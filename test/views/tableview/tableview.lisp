@@ -33,8 +33,8 @@
     (render-table-view-header-row (find-view '(table employee))
 				  *joe* nil)
   (htm
-   (:th :class "name" "Name")
-   (:th :class "manager" "Manager")))
+   (:th :class "name" (:span :class "label" "Name"))
+   (:th :class "manager" (:span :class "label" "Manager"))))
 
 ;;; Test table view render-view-field-header
 (deftest-html table-view-render-view-field-header-1
@@ -43,7 +43,7 @@
 			      (find-view '(table employee))
 			      nil (make-instance 'text-presentation)
 			      "Joe" *joe*)
-  (:th :class "name" "Name"))
+  (:th :class "name" (:span :class "label" "Name")))
 
 ;;; Test table view render-view-field-header-value
 (deftest-html table-view-render-view-field-header-value-1
@@ -54,7 +54,7 @@
 				    (find-view '(table employee))
 				    nil 
 				     *joe*)
-  "Name")
+  (:span :class "label" "Name"))
 
 ;;; Test with-table-view-body-row
 (deftest-html with-table-view-body-row-1
@@ -96,8 +96,8 @@
       (declare (special weblocks::*page-dependencies*))
       (render-object-view (list *joe* *bob*) '(table employee)))
   #.(table-header-template
-     '((:th :class "name" "Name")
-       (:th :class "manager" "Manager"))
+     '((:th :class "name" (:span :class "label" "Name"))
+       (:th :class "manager" (:span :class "label" "Manager")))
      '((:tr
 	(:td :class "name" (:span :class "value" "Joe"))
 	(:td :class "manager" (:span :class "value" "Jim")))

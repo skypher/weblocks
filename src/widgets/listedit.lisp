@@ -15,9 +15,11 @@
 		  :on-success (lambda (w item)
 				(declare (ignore w))
 				(safe-funcall (dataedit-on-add-item obj) obj item)
-				(flash-message (dataseq-flash obj)
-					       (format nil "Added ~A."
-						       (humanize-name (dataseq-data-class obj))))
+                                (when (or (dataedit-mixin-flash-message-on-first-add-p obj)
+                                          (> (dataseq-data-count obj) 1))
+                                  (flash-message (dataseq-flash obj)
+                                                 (format nil "Added ~A."
+                                                         (humanize-name (dataseq-data-class obj)))))
                                 (safe-funcall (dataedit-on-add-item-completed obj) obj item)
 				(dataedit-reset-state obj))
 		  :on-cancel (lambda (w)

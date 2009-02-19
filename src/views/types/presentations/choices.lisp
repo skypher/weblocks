@@ -56,7 +56,7 @@
 	      'attributize-name' (see
 	      presentation-choices-default-value-key).")))
 
-(defun obtain-presentation-choices (choices-mixin obj)
+(defmethod obtain-presentation-choices ((choices-mixin choices-presentation-mixin) obj)
   "Accepts a 'choices-presentation-mixin' and an object being rendered
 and returns a list as specified in the 'choices' slot."
   (labels ((obtain-presentation-choices-aux (choices obj)

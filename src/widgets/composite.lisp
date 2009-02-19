@@ -24,6 +24,32 @@
   (setf (slot-value obj 'widgets) nil)
   (setf (composite-widgets obj) widgets))
 
+(defmethod make-widget-place-writer ((composite composite) child)
+  "Return a function encapsulating the list where the child is in the car
+   of the first element."
+  (let ((place (member child (composite-widgets composite))))
+    (if place
+      (lambda (&optional (callee nil callee-supplied-p))
+        (assert (cons-in-list-p place (composite-widgets composite)))
+        (cond
+          (callee-supplied-p
+            (check-type callee widget-designator
+                        "a potential member of a composite")
+            (rplaca place callee)
+            (setf (widget-parent callee) composite)
+            (mark-dirty composite))
+          (t (car place))))
+      (lambda (&rest args)
+        (style-warn 'widget-not-in-parent :widget child :parent composite)
+        (mark-dirty composite)))))
+
+(defun cons-in-list-p (cell list)
+  "Simple test that the cell is still part of list to validate the place
+   stored in the closure"
+  (cond ((null list) nil)
+	((eq list cell) t)
+	(t (cons-in-list-p cell (cdr list)))))
+
 (defmethod (setf composite-widgets) (new-value (comp composite))
   "Assign new children to the composite and update their parents.
 Signals an error if one of the children already has a parent

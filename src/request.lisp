@@ -1,9 +1,9 @@
 
 (in-package :weblocks)
 
-(export '(*json-content-type refresh-request-p initial-request-p
-	  ajax-request-p pure-request-p redirect
-	  compose-uri-tokens-to-url))
+(export '(*json-content-type* refresh-request-p initial-request-p
+	  ajax-request-p pure-request-p redirect post-action-redirect
+	  post-render-redirect compose-uri-tokens-to-url))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
   "A content type sent to the client to identify json data.")
@@ -43,13 +43,32 @@ etc."
   "Sends a redirect response to the client. If 'redirect' is called on
 a regular request, sends appropriate HTTP headers. If it is called
 during an AJAX request, sends weblocks specific JSON interpreted as
-redirect on the client."
+redirect on the client.
+
+This function returns immediately; any code following it will not be
+executed."
   (if (ajax-request-p)
       (progn
 	(setf (content-type) *json-content-type*)
 	(throw 'handler-done
 	  (format nil "{\"redirect\":\"~A\"}" url)))
       (hunchentoot:redirect url)))
+
+(defun post-action-redirect (url)
+  "A common pattern is to have an action redirect after taking some action.  
+   Typically an action is wrapped in a transaction which will abort if the 
+   redirect happens during the action execution (due to the throw to 
+   'handler-done, a non-local exit).  This pushes a redirect to the url
+   argument onto the post-action hook so it occurs after the action transaction
+   but before rendering"
+  (push (lambda () (redirect url))
+	(request-hook :request :post-action)))
+
+(defun post-render-redirect (url)
+  "Similar to `post-action-redirect', except redirects after completing
+the rendering. This is occassionally useful."
+  (push (lambda () (redirect url))
+	(request-hook :request :post-render)))
 
 (defun compose-uri-tokens-to-url (tokens)
   "Encodes and concatenates uri tokens into a url string. Note that

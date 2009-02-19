@@ -15,7 +15,7 @@
   hunchentoot lock in debug mode and nil in release mode by
   'start-weblocks'.")
 
-(defparameter *last-session* nil
+(defvar *last-session* nil
   "Bound to a session object associated with the last handled
   request. Note, this variable is only updated in debug mode.")
 
@@ -27,13 +27,15 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key (debug t) (port 8080) (cookie-name "weblocks-session") 
+(defun start-weblocks (&rest keys &key (debug t) (port 8080)
+                             (cookie-name (format nil "weblocks-~(~A~)" (gensym)))
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server. Set
-':debug' keyword to true in order for stacktraces to be shown to the
-client. Set ':cookie-name' keyword when you want to change the name of the
-cookie. Other keys are passed to 'hunchentoot:start-server'. Opens all
-stores declared via 'defstore'."
+DEBUG to true in order for stacktraces to be shown to the
+client. Set COOKIE-NAME when you want to have a specific cookie name;
+otherwise a random one with prefix 'weblocks' will be generated for
+this server instance. Other keys are passed to HUNCHENTOOT:START-SERVER.
+Opens all stores declared via DEFSTORE."
   #+sbcl
   (unless (member :sb-thread *features*)
     (cerror "I know what I'm doing and will stubbornly continue."
@@ -78,12 +80,10 @@ The function serves all started applications"
     (let* ((script-name (script-name request))
 	   (app-prefix (webapp-prefix app))
 	   (app-pub-prefix (compute-webapp-public-files-uri-prefix app)))
-      (log-message :debug "Application dispatch for ~S/~S" (hunchentoot:host) script-name)
       (cond
 	((list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri "/weblocks-common" nil)
 			   :test #'string=)
-	 (log-message :debug "Dispatching to common public file")
          (return-from weblocks-dispatcher
                       (funcall (create-folder-dispatcher-and-handler 
                                  "/weblocks-common/pub/"
@@ -95,7 +95,6 @@ The function serves all started applications"
               (list-starts-with (tokenize-uri script-name nil)
 			   (tokenize-uri app-pub-prefix nil)
 			   :test #'string=))
-	 (log-message :debug "Dispatching to public file")
          ;; set caching parameters for static files
          ;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
          (if (weblocks-webapp-debug app)
@@ -113,8 +112,6 @@ The function serves all started applications"
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
-	 (log-message :debug "Dispatching to application ~A with prefix ~S"
-		      app app-prefix)
 	 (return-from weblocks-dispatcher 
 	   #'(lambda ()
 	       (handle-client-request app)))))))

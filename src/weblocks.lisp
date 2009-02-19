@@ -20,7 +20,17 @@
       application development. It achieves its goals by standardizing on
       various libraries, providing flexible and extensible generic views,
       and exposing a unique widget-based approach to maintaining UI
-      state.")))
+      state."))
+
+  ;; the following are export-only; see `wexport'
+
+  (defpackage #:weblocks-cont
+    (:documentation "Operators for continuation-based web development
+    with Weblocks."))
+
+  (defpackage #:weblocks-util
+    (:documentation "General Lisp utilities traditionally exported
+    with Weblocks.")))
 
 (in-package :weblocks)
 
@@ -30,6 +40,25 @@
 
 (export '(*weblocks-output-stream* with-html with-html-to-string
           reset-sessions str with-javascript with-javascript-to-string root-composite))
+
+(defun wexport (symbols-designator &optional (package-specs t))
+  "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',
+PACKAGE-SPECS can be a list of packages, and the name designators
+therein are interpreted by prepending \"WEBLOCKS-\".  In the latter
+case, the symbols will be imported first if need be."
+  (dolist (pkg (ensure-list package-specs))
+    (multiple-value-bind (pkg import-first?)
+	(typecase pkg
+	  (boolean '#:weblocks)
+	  (symbol (values (concatenate 'string (symbol-name '#:weblocks-)
+				       (symbol-name pkg))
+			  t))
+	  (string (values (concatenate 'string (symbol-name '#:weblocks-) pkg)
+			  t))
+	  (otherwise pkg))
+      (when import-first?
+	(import symbols-designator pkg))
+      (export symbols-designator pkg))))
 
 (defparameter *weblocks-output-stream* nil
   "Output stream for Weblocks framework created for each request

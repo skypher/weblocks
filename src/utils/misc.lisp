@@ -1,19 +1,20 @@
 
 (in-package :weblocks)
 
-(export '(gen-id humanize-name attributize-name insert-after insert-at
-	  slot-value-by-path safe-apply safe-funcall request-parameter
-	  request-parameters string-whitespace-p render-extra-tags
-	  with-extra-tags alist->plist intersperse
-	  remove-keyword-parameter remove-keyword-parameters
-	  public-file-relative-path public-files-relative-paths
-	  request-uri-path string-remove-left string-remove-right
-	  find-all stable-set-difference symbol-status
-	  string-invert-case ninsert add-get-param-to-url
-	  remove-parameter-from-uri asdf-system-directory
-	  make-isearch-regex hash-keys object-class-name
-	  append-custom-fields find-slot-dsd find-slot-esd drop-last
-	  function-designator-p list-starts-with safe-subseq))
+(wexport '(gen-id humanize-name attributize-name insert-after insert-at
+	   slot-value-by-path safe-apply safe-funcall request-parameter
+	   request-parameters string-whitespace-p render-extra-tags
+	   with-extra-tags alist->plist intersperse
+	   remove-keyword-parameter remove-keyword-parameters
+	   public-file-relative-path public-files-relative-paths
+	   request-uri-path string-remove-left string-remove-right
+	   find-all stable-set-difference symbol-status
+	   string-invert-case ninsert add-get-param-to-url
+	   remove-parameter-from-uri asdf-system-directory
+	   make-isearch-regex hash-keys object-class-name
+	   append-custom-fields find-slot-dsd find-slot-esd drop-last
+	   function-designator-p list-starts-with safe-subseq)
+	 '(t util))
 
 (defun gen-id (&optional (prefix ""))
   "Generates an ID unique accross the session. The generated ID can be
@@ -485,7 +486,37 @@ Returns the number of stripped slashes as second value."
 
 (defun maybe-add-trailing-slash (s)
   "Supply a trailing slash if needed."
-  (if (equal (subseq s (1- (length s))) "/")
-    s
-    (concatenate 'string s "/")))
+  (typecase s
+    (pathname (fad:pathname-as-directory s))
+    (otherwise
+       (if (equal (subseq s (1- (length s))) "/")
+	   s
+	   (concatenate 'string s "/")))))
 
+(defun congruent-lambda-expression (lambda-list function)
+  "Answer a lambda expression with LAMBDA-LIST that passes all
+args (assuming the call is allowed by LAMBDA-LIST) to FUNCTION,
+answering its result."
+  (let* ((reqs (required-args lambda-list))
+	 (opts (aand (member '&optional lambda-list)
+		     (loop for llelt in (cdr it)
+			   until (member llelt lambda-list-keywords)
+			   if (consp llelt)
+			     collect (list (first llelt) (second llelt)
+					   (or (third llelt) (gensym "OPTP")))
+			   else collect (list llelt nil (gensym "OPTP")))))
+	 (keys? (member '&key lambda-list))
+	 (more (and (or keys? (position-if (f_ (member _ '(&body &rest)))
+					   lambda-list))
+		    (gensym "MORE"))))
+    `(lambda (,@reqs
+	      ,@(and opts (cons '&optional opts))
+	      ,@(and more (list '&rest more))
+	      ,@(and keys? '(&key &allow-other-keys)))
+       ,(if (or opts more)
+	    `(apply ',function ,@reqs
+		    ,(reduce (lambda (optarg rest)
+			       `(and ,(third optarg)
+				     (cons ,(first optarg) ,rest)))
+			     opts :from-end t :initial-value more))
+	    `(funcall ',function ,@reqs)))))

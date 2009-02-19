@@ -101,9 +101,9 @@
 	(with-call/cc
 	  (do-widget w1 w2 (lambda (new-callee)
 			     (if (eq new-callee w2)
-				 0
-				 1))))
-	(values (eq (car (composite-widgets c)) 0)
+				 "0"
+				 "1"))))
+	(values (equal (car (composite-widgets c)) "0")
 		(progn (answer w2)
 		       (eq (car (composite-widgets c)) w1)))))
   t t)
@@ -125,6 +125,16 @@
 		       (equalp (composite-widgets c) (list w1 w2 w3)))
 		(not (null (widget-dirty-p c))))))
   t t t)
+
+(addtest do-widget-idempotent
+  (let* ((w1 (make-instance 'composite))
+	 (w2 (make-instance 'composite))
+	 (parent (make-instance 'composite
+				:widgets (list w1))))
+    (setf (weblocks::weblocks-webapp-debug (weblocks::current-webapp)) t)
+    (do-widget w1 w2)
+    (ensure-condition widget-not-in-parent
+      (do-widget w1 w2))))
 
 ;;; test do-page
 (deftest do-page-1
