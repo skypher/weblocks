@@ -1,0 +1,172 @@
+body
+{
+  background: url(/weblocks-common/pub/images/page/background.png);
+  text-align: center;
+}
+
+div.page-wrapper
+{
+  max-width: 70em;
+  min-width: 60em;
+
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* IE 6 specific hacks (has layout and min-width)*/
+* html div.page-wrapper
+{
+  width: 70em;
+}
+
+.page-wrapper .page-extra-top-1,
+.dialog .dialog-extra-top-1
+{
+  height: 5px;
+  background: url(/weblocks-common/pub/images/page/top_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.page-wrapper .page-extra-top-2,
+.dialog .dialog-extra-top-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/weblocks-common/pub/images/page/top_right.png) no-repeat top right;
+  overflow: hidden;
+}
+
+.page-wrapper .page-extra-top-3,
+.dialog .dialog-extra-top-3
+{
+  height: 5px;
+  margin-top: -5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  background: url(/weblocks-common/pub/images/page/hor_border.png) repeat-x top;
+  overflow: hidden;
+}
+
+div#root, .dialog-body, .dialog h1
+{
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+div#root
+{
+  padding: 1em;
+  min-height: 60em;
+  background-color: white;
+}
+
+/* IE 6 specific hacks (has layout and min-height)*/
+* html div#root
+{
+  height: 60em;
+}
+
+div#main-menu
+{
+  position: relative;
+}
+
+div#main-menu div.composite
+{
+  margin-left: 16em;
+}
+
+div#main-menu div.menu
+{
+  position: absolute;
+  top: 0;
+}
+
+.page-wrapper .page-extra-bottom-1,
+.dialog .dialog-extra-bottom-1
+{
+  height: 5px;
+  background: url(/weblocks-common/pub/images/page/bottom_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.page-wrapper .page-extra-bottom-2,
+.dialog .dialog-extra-bottom-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/weblocks-common/pub/images/page/bottom_right.png) no-repeat top right;
+  overflow: hidden;
+}
+
+.page-wrapper .page-extra-bottom-3,
+.dialog .dialog-extra-bottom-3
+{
+  height: 5px;
+  margin-top: -5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  background: url(/weblocks-common/pub/images/page/hor_border_bottom.png) repeat-x top;
+  overflow: hidden;
+}
+
+.header
+{
+  height: 52px;
+  background: url(/weblocks-common/pub/images/header/background.png) repeat-x;
+  margin-top: -5px;
+  margin-bottom: 1em;
+}
+
+.header .extra-top-1
+{
+  height: 5px;
+  background: url(/weblocks-common/pub/images/header/top_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.header .extra-top-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/weblocks-common/pub/images/header/top_right.png) no-repeat top right;
+  overflow: hidden;
+}
+
+.header .extra-top-3
+{
+  height: 42px;
+  margin-left: 5px;
+  background: url(/weblocks-common/pub/images/header/logo.png) no-repeat center left;
+}
+
+.header .extra-bottom-1
+{
+  height: 5px;
+  background: url(/weblocks-common/pub/images/header/bottom_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.header .extra-bottom-2
+{
+  height: 5px;
+  margin-top: -5px;
+  background: url(/weblocks-common/pub/images/header/bottom_right.png) no-repeat top right;
+  overflow: hidden;
+}
+
+.footer
+{
+  margin-top: 1em;
+}
+
+.footer p#system-info
+{
+  margin-bottom: 0;
+}
+
+.footer p#contact-info
+{
+  margin-top: 0;
+}
+

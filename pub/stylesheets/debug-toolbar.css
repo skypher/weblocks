@@ -1,0 +1,36 @@
+
+.debug-toolbar
+{
+  background-color: #d0d0d0;
+  border-top: #f5f5f5 1px solid;
+
+  width: 100%;
+  text-align: left;
+}
+
+/* 'position: fixed' for all modern browsers */
+body > .debug-toolbar
+{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+/* IE 6 specific fix for lack of 'position: fixed' implementation */
+* html .debug-toolbar
+{
+  position: absolute;
+  /* in case JS is turned off */
+  left: 0;
+  /* in case JS is on */
+  left: expression((documentElement.scrollLeft) + 'px');
+  top: expression((documentElement.scrollTop
+                     + (documentElement.clientHeight - this.clientHeight - 1))
+                   + 'px');
+  width: expression((document.documentElement.clientWidth) + 'px');
+}
+
+.debug-toolbar img
+{
+  border: none;
+}

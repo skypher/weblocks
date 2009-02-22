@@ -1,0 +1,62 @@
+
+.flash .view
+{
+  width: 100%;
+  background: #f8e9d8 url(/weblocks-common/pub/images/widget/flash/top_background.png) repeat-x;
+}
+
+.flash .view .extra-top-1
+{
+  background: url(/weblocks-common/pub/images/widget/flash/top_left.png) no-repeat top left;
+}
+
+.flash .view .extra-top-2
+{
+  background: url(/weblocks-common/pub/images/widget/flash/top_right.png) no-repeat top right;
+  border-bottom-color: #ead8c2;
+}
+
+.flash .view ul.messages p
+{
+  padding: 0;
+  margin: 0;
+}
+
+.flash .view ul.messages
+{ 
+  border-left-color: #ead8c2;
+  border-right-color: #ead8c2;
+}
+
+.flash .view ul.messages li
+{
+  padding-left: 32px;
+  min-height: 16px;
+  border-top-color: #fef9f6;
+  border-bottom-color: #ead8c2;
+  list-style-image: none;
+  background: url(/weblocks-common/pub/images/widget/flash/flag.png) no-repeat top left;
+}
+
+/* Fake min-height for IE 6 */
+* html .flash .view ul.messages li
+{
+  height: 16px;
+}
+
+.flash .view .extra-bottom-1
+{
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_background.png) repeat-x top;
+  border-top-color: #fef9f6; 
+}
+
+.flash .view .extra-bottom-2
+{
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_left.png) no-repeat top left;
+}
+
+.flash .view .extra-bottom-3
+{
+  background: url(/weblocks-common/pub/images/widget/flash/bottom_right.png) no-repeat top right;
+}
+

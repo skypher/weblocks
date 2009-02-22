@@ -1,0 +1,44 @@
+diff -rN -u old-cl-weblocks/src/views/formview/request-deserialization.lisp new-cl-weblocks/src/views/formview/request-deserialization.lisp
+--- old-cl-weblocks/src/views/formview/request-deserialization.lisp	2008-06-17 11:37:50.192587184 +0200
++++ new-cl-weblocks/src/views/formview/request-deserialization.lisp	2008-06-17 11:37:50.276564898 +0200
+@@ -2,7 +2,8 @@
+ (in-package :weblocks)
+ 
+ (export '(update-object-view-from-request
+-	  request-parameters-for-object-view))
++	  request-parameters-for-object-view
++          request-parameter-for-presentation))
+ 
+ (defgeneric update-object-view-from-request (obj view &rest args
+ 						 &key class-store
+@@ -38,7 +39,8 @@
+ 			  (let* ((field (field-info-field field-info))
+ 				 (obj (field-info-object field-info))
+ 				 (field-key (attributize-name (view-field-slot-name field)))
+-				 (field-value (request-parameter field-key)))
++				 (field-value (request-parameter-for-presentation field-key
++                                                                                  (view-field-presentation field))))
+ 			    (when (typep (view-field-presentation field) 'form-presentation)
+ 			      (multiple-value-bind (parsedp presentp parsed-value)
+ 				  (apply #'parse-view-field-value (form-view-field-parser field)
+@@ -75,6 +77,7 @@
+ 					   (find-slot-dsd (class-of obj)
+ 							  (view-field-slot-name field)))))
+ 			    (writer (when writer-name (fdefinition writer-name))))
++                       ;(format t "slot ~A => ~A~%" (view-field-slot-name field) value)
+ 		       (if writer
+ 			   (funcall writer value obj)
+ 			   (setf (slot-value obj (view-field-slot-name field))
+@@ -141,7 +144,11 @@
+ 	     (when (typep (view-field-presentation field) 'form-presentation)
+ 	       (let* ((slot-name (view-field-slot-name field))
+ 		      (slot-key (attributize-name slot-name))
+-		      (request-slot-value (request-parameter slot-key)))
++		      (request-slot-value (request-parameter-for-presentation slot-key (view-field-presentation field))))
+ 		 (cons field request-slot-value)))))
+ 	 (find-view view) nil args))
+ 
++(defmethod request-parameter-for-presentation (name presentation)
++  (declare (ignore presentation))
++  (request-parameter name))
++
