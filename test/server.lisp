@@ -13,7 +13,7 @@
       (let ((*rewrite-for-session-urls* t))
 	(declare (special *rewrite-for-session-urls*))
 	(setf (slot-value *request* 'hunchentoot::cookies-in)
-	      (cons `(,*session-cookie-name* . "foo") (slot-value *request* 'hunchentoot::cookies-in)))
+	      (cons `(,(session-cookie-name *acceptor*) . "foo") (slot-value *request* 'hunchentoot::cookies-in)))
 	(weblocks::session-name-string-pair)))
   "")
 

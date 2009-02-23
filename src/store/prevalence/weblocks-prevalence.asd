@@ -11,7 +11,7 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A weblocks backend for cl-prevalence."
-  :depends-on (:metatilities :cl-ppcre :cl-prevalence)
+  :depends-on (:metatilities :cl-ppcre :cl-prevalence :bordeaux-threads)
   :components ((:file "prevalence"))
   :in-order-to ((compile-op (prepare-prevalence-op :weblocks-prevalence))
 		(load-op (prepare-prevalence-op :weblocks-prevalence))))

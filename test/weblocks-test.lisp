@@ -1,12 +1,18 @@
 
-(defpackage #:weblocks-test
-  (:use :cl :weblocks :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
-        :anaphora :f-underscore)
-  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-                          #:standard-generic-function #:ensure-generic-function #:standard-class
-                          #:typep #:subtypep)
-  (:shadowing-import-from :weblocks #:redirect)
-  (:export #:test-weblocks))
+(defmacro without-package-variance-warnings (&body body)
+    `(eval-when (:compile-toplevel :load-toplevel :execute)
+            (handler-bind (#+sbcl(sb-int:package-at-variance #'muffle-warning))
+                     ,@body)))
+
+(without-package-variance-warnings
+  (defpackage #:weblocks-test
+    (:use :cl :weblocks :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+          :anaphora :f-underscore)
+    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+                            #:standard-generic-function #:ensure-generic-function #:standard-class
+                            #:typep #:subtypep)
+    (:shadowing-import-from :weblocks #:redirect)
+    (:export #:test-weblocks)))
 
 (in-package :weblocks-test)
 
@@ -110,7 +116,7 @@ and then compares the string to the expected result."
        (ensure-html-output ,form ,value))))
 
 ;;; faking hunchentoot's requests
-(defclass unittest-request ()
+(defclass unittest-request (request)
   ((headers-in :initform nil)
    method server-protocol
    (hunchentoot::uri :initform nil)
@@ -125,11 +131,12 @@ and then compares the string to the expected result."
    (aux-data :initform nil
              :accessor hunchentoot::aux-data)
    (raw-post-data :initform nil))
+  (:default-initargs :remote-addr "localhost")
   (:documentation "A class used to mock hunchentoot requests in
   order to be able to unit test across requests."))
 
 ;;; faking hunchentoot's server
-(defclass unittest-server ()
+(defclass unittest-server (weblocks-acceptor)
   ((mod-lisp-p :initform nil
                :initarg :mod-lisp-p
                :reader hunchentoot::server-mod-lisp-p)
@@ -141,6 +148,9 @@ and then compares the string to the expected result."
 
 (defmethod hunchentoot::server-mod-lisp-p ((obj unittest-server))
   (slot-value obj 'mod-lisp-p))
+
+(defmethod session-cookie-name ((obj unittest-server))
+  "weblocks-session")
 
 (defparameter *dummy-action* "abc"
   "A dummy action code for unit tests.")
@@ -185,15 +195,14 @@ webapp in my context."
   (let ((parameters-slot (ecase method
 			   (:get 'get-parameters)
 			   (:post 'post-parameters))))
-    (let* ((*request* (make-instance 'unittest-request))
-	   (*server* (make-instance 'unittest-server))
-	   (hunchentoot::*remote-host* "localhost")
+    (let* ((*acceptor* (make-instance 'unittest-server))
+           (*weblocks-server* *acceptor*)
+           (*request* (make-instance 'unittest-request :acceptor *acceptor*))
 	   (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
 	   (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
 	   (make-action-orig #'weblocks::make-action)
 	   (generate-widget-id-orig #'weblocks::gen-id)
 	   (dummy-action-count 123)
-	   (*session-cookie-name* "weblocks-session")
 	   (*uri-tokens* '("foo" "bar"))
 	   weblocks::*page-dependencies* *session*
 	   *on-ajax-complete-scripts*
@@ -275,7 +284,7 @@ URI - Set the Hunchentoot request URI to this."
 
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."
-  (setf (slot-value *request* (ecase (request-method)
+  (setf (slot-value *request* (ecase (request-method*)
 				(:get 'get-parameters)
 				(:post 'post-parameters))) parameters)
   (weblocks::eval-action))

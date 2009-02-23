@@ -25,7 +25,7 @@ if there is an action involved (even if the user hits refresh)."
   "Detects if the current request was initiated via AJAX by looking
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
-  (header-in "X-Requested-With"))
+  (header-in* "X-Requested-With"))
 
 (defun pure-request-p ()
   "Detects if the current request is declared as 'pure', i.e. affects
@@ -49,8 +49,8 @@ This function returns immediately; any code following it will not be
 executed."
   (if (ajax-request-p)
       (progn
-	(setf (content-type) *json-content-type*)
-	(throw 'handler-done
+	(setf (content-type*) *json-content-type*)
+	(throw 'hunchentoot::handler-done
 	  (format nil "{\"redirect\":\"~A\"}" url)))
       (hunchentoot:redirect url)))
 

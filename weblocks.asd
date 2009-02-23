@@ -14,7 +14,8 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore)
+	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore
+               :bordeaux-threads)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
@@ -176,8 +177,10 @@
 				       (:file "workflow"
 					      :depends-on ("call-answer")))
 			  :depends-on ("weblocks" "widgets" "request-handler" "snippets"))
+                 (:file "acceptor"
+                        :depends-on ("weblocks"))
 		 (:file "server"
-			:depends-on ("weblocks" "debug-mode" utils store))
+			:depends-on ("weblocks" "acceptor" "debug-mode" utils store))
 		 (:file "request"
 			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"

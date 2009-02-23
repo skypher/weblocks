@@ -5,7 +5,7 @@
 (deftest dispatcher-cache-1
     (with-request :get nil :uri "/test1"
       (setf (root-composite) (create-site-layout))
-      (catch 'handler-done
+      (catch 'hunchentoot::handler-done
 	(handle-client-request (weblocks::current-webapp)))
       (flet ((the-cache-path ()
 	       (car (dispatcher-cache

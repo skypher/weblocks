@@ -28,16 +28,15 @@
 (deftestsuite session-suite ()
   ()
   (:dynamic-variables (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
-		      (*session-cookie-name* "weblocks-session")
 		      *session*))
 
 ;;; A suite that sets up a web request environment
 (deftestsuite request-suite ()
   (make-action-orig
    generate-widget-id-orig)
-  (:dynamic-variables (*request* (make-instance 'unittest-request))
-		      (*server* (make-instance 'unittest-server))
-		      (hunchentoot::*remote-host* "localhost")
+  (:dynamic-variables (*acceptor* (make-instance 'unittest-server))
+                      (*weblocks-server* *acceptor*)
+                      (*request* (make-instance 'unittest-request :acceptor *acceptor*))
 		      (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
 		      (weblocks::*dirty-widgets* nil)
 		      (*weblocks-output-stream* (make-string-output-stream))

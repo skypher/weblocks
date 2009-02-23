@@ -114,9 +114,9 @@ tokens."
 						     (string-right-trim "/" *current-navigation-url*)
 						     "/" (compose-uri-tokens-to-url consumed-tokens))))
 	  (declare (special *current-navigation-url*))
-	  (log-message* "CNURL: ~A" *current-navigation-url*)
+	  (log-message :debug "CNURL: ~A" *current-navigation-url*)
 	  (render-widget widget))
-	(setf (return-code) +http-not-found+))))
+	(setf (return-code*) +http-not-found+))))
 
 (defmethod find-widget-by-path* (path (obj dispatcher))
   (declare (special *current-navigation-url*))

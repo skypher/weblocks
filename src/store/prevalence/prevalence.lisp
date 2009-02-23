@@ -18,10 +18,10 @@
 (defmethod open-store ((store-type (eql :prevalence)) &rest args)
   (let* ((store (apply #'make-instance 'guarded-prevalence-system :directory (car args) (cdr args)))
          (lock-name (format nil "Prevalence lock for store ~S" store))
-         (lock (hunchentoot-mp:make-lock lock-name)))
+         (lock (bordeaux-threads:make-lock lock-name)))
     (setf (gethash store *locks*) lock)
     (setf (get-guard store) (lambda (thunk)
-                              (hunchentoot-mp:with-lock (lock)
+                              (bordeaux-threads:with-lock-held (lock)
                                 (funcall thunk))))
     (setf *default-store* store)))
 

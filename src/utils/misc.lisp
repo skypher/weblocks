@@ -125,7 +125,7 @@ submitted via GET method, the parameter is obtained from the
 query string. If the request was submitted via POST, the
 parameter is obtained from the body of the request. Otherwise, an
 error is signalled."
-  (ecase (request-method)
+  (ecase (request-method*)
     (:get (get-parameter name))
     (:post (post-parameter name))))
 
@@ -134,9 +134,9 @@ error is signalled."
 via GET method, the parameters are obtained from the query string. If
 the request was submitted via POST, the parameters are obtained from
 the body of the request. Otherwise, an error is signalled."
-  (ecase (request-method)
-    (:get (get-parameters))
-    (:post (post-parameters))))
+  (ecase (request-method*)
+    (:get (get-parameters*))
+    (:post (post-parameters*))))
 
 (defun string-whitespace-p (str)
   "Returns true if every character in a string is a whitespace
@@ -275,7 +275,7 @@ Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 \(request-uri-path)
 => \"/foo/bar\""
   (declare (special *uri-tokens*))
-  (identity (cl-ppcre:regex-replace "/?(?:\\?.*)$" (request-uri) "")))
+  (identity (cl-ppcre:regex-replace "/?(?:\\?.*)$" (request-uri*) "")))
 
 (defun string-remove-left (str prefix &key ignore-case-p)
   "If string 'str' starts with 'prefix', remove 'prefix' from the
@@ -357,7 +357,7 @@ which is more appropriate for our uses."
 (defun remove-parameter-from-uri (uri parameter)
   "Removes the given parameter from a URI."
   (let ((path (puri:uri-path (puri:parse-uri uri))))
-    (loop for x in (get-parameters)
+    (loop for x in (get-parameters*)
        when (not (string-equal (car x) parameter))
        do (setf path (add-get-param-to-url path (car x) (cdr x))))
     path))

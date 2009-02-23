@@ -65,9 +65,9 @@ customize behavior)."))
 	(expired-action-handler app))
       (start-session)
       (setf (webapp-session-value 'last-request-uri) :none)
-      (redirect (request-uri)))
+      (redirect (request-uri*)))
     (when *maintain-last-session*
-      (hunchentoot::with-lock (*maintain-last-session*)
+      (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
     (let ((*request-hook* (make-instance 'request-hooks)))
       (when (null (root-composite))
@@ -84,11 +84,11 @@ customize behavior)."))
 		(setf (root-composite) nil)
 		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
-	(when (cookie-in *session-cookie-name*)
-	  (redirect (remove-session-from-uri (request-uri)))))
+	(when (cookie-in (session-cookie-name *weblocks-server*))
+	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (*uri-tokens* (tokenize-uri (request-uri)))
+	    (*uri-tokens* (tokenize-uri (request-uri*)))
 	    (*current-navigation-url* "/") *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	    *page-dependencies* *current-page-description*
@@ -98,16 +98,16 @@ customize behavior)."))
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
 			  *current-page-description* *uri-tokens-fully-consumed*))
 	(when (pure-request-p)
-	  (throw 'handler-done (eval-action)))
+	  (throw 'hunchentoot::handler-done (eval-action)))
 	;; a default dynamic-action hook function wraps get operations in a transaction
 	(eval-hook :pre-action)
 	(with-dynamic-hooks (:dynamic-action)
 	  (eval-action))
 	(eval-hook :post-action)
 	(when (and (not (ajax-request-p))
-		   (find *action-string* (get-parameters)
+		   (find *action-string* (get-parameters*)
 			 :key #'car :test #'string-equal))
-	  (redirect (remove-action-from-uri (request-uri))))
+	  (redirect (remove-action-from-uri (request-uri*))))
 	(eval-hook :pre-render)
 	(with-dynamic-hooks (:dynamic-render)
 	  (if (ajax-request-p)
@@ -136,7 +136,7 @@ customize behavior)."))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
-  (remove-parameter-from-uri uri *session-cookie-name*))
+  (remove-parameter-from-uri uri (session-cookie-name *weblocks-server*)))
 
 (defun remove-action-from-uri (uri)
   "Removes the action info from a URI."
@@ -148,7 +148,7 @@ association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
   (declare (special *dirty-widgets* *weblocks-output-stream*
 		    *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
-  (setf (content-type) *json-content-type*)
+  (setf (content-type*) *json-content-type*)
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)
 	       (style-warn 'non-idempotent-rendering
@@ -186,7 +186,7 @@ association list. This function is normally called by
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
    weblocks transaction functions over all stores"
-  (if (eq (request-method) :post)
+  (if (eq (request-method*) :post)
       (let (tx-error-occurred-p)
 	(multiple-value-bind (dynamic-stores non-dynamic-stores)
 	    (loop for store-name in *store-names*

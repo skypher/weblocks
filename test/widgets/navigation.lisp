@@ -225,7 +225,7 @@ end defunct|#
 			  *weblocks-output-stream*))
 	;; render widget
 	(render-widget nav)
-	(return-code)))
+	(return-code*)))
   404)
 
 ;;; test init-navigation
@@ -356,9 +356,9 @@ end defunct|#
 	  (defun autn-init-user-session (root) nil)
 	  (unwind-protect
 	       (progn
-		 (catch 'handler-done
+		 (catch 'hunchentoot::handler-done
 		   (handle-client-request (weblocks::current-webapp)))
-		 (return-code))
+		 (return-code*))
 	    (fmakunbound 'init-user-session)))))
   404)
 
@@ -371,7 +371,7 @@ end defunct|#
 	(print *uri-tokens*)
 	(setf (root-composite)
 	      (make-instance 'composite :widgets (list nav)))
-	(catch 'handler-done
+	(catch 'hunchentoot::handler-done
 	  (handle-client-request (weblocks::current-webapp)))
 	(loop for i across (selector-mixin-current-pane-name nav)
 	   collect (char-code i))))

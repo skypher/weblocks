@@ -297,13 +297,9 @@ to my `application-dependencies' slot."
   (:method ((app t)) nil))
 
 (defmethod finalize-webapp :after ((app weblocks-webapp))
-  "When all webapps are shut down, close any open stores and stop the weblocks server"
+  "Shutdown Weblocks when no more apps are running."
   (when (null *active-webapps*)
-    (close-stores)
-    (setf *last-session* nil)
-    (reset-sessions)
-    (stop-server *weblocks-server*)
-    (setf *weblocks-server* nil)))
+    (stop-weblocks)))
 
 (defun find-app (name)
   (let ((app (get-webapp name nil))

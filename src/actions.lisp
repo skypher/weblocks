@@ -20,7 +20,6 @@ redirects to the root of the application.")
   (:documentation "Webapp specific protocol now used in action 
    handler.  This method provides backwards compatability")
   (:method ((app t))
-    (declare (ignore app))
     (funcall *expired-action-handler* app)))
 
 (defun default-expired-action-handler (&optional (app (current-webapp)))
@@ -39,7 +38,7 @@ page may display a relevant message, if necessary."
    +http-not-found+ return code")
   (:method ((app t))
     (declare (ignore app))
-    (setf (return-code) +http-not-found+)))
+    (setf (return-code*) +http-not-found+)))
 
 
 (defparameter *action-string* "action"

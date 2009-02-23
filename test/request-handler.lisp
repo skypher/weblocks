@@ -191,7 +191,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	(setf *session* nil)
 	(catch 'hunchentoot::handler-done
 	  (handle-client-request (weblocks::current-webapp)))
-	(string-downcase (header-out "Location"))))
+	(string-downcase (header-out :location))))
   "http://nil/?weblocks-session=1%3atest")
 
 (deftest handle-client-request-5
@@ -282,7 +282,7 @@ onclick='disableIrrelevantButtons(this);' />~
 		    (incf res))
 		  (request-hook :request :post-render)))
 	  ;; do the test
-	  (catch 'handler-done
+	  (catch 'hunchentoot::handler-done
 	    (handle-client-request (weblocks::current-webapp)))
 	  ;; tear down the application
 	  (fmakunbound 'hcr-init-user-session)
@@ -333,7 +333,7 @@ onclick='disableIrrelevantButtons(this);' />~
 	(catch 'hunchentoot::handler-done
 	  (handle-client-request (weblocks::current-webapp)))
 	;; result
-	(values (string-downcase (header-out "Location")) res)))
+	(values (string-downcase (header-out :location)) res)))
   "http://nil/?weblocks-session=1%3atest" 2)
 
 (deftest handle-client-request-11
@@ -352,7 +352,7 @@ onclick='disableIrrelevantButtons(this);' />~
       (catch 'hunchentoot::handler-done
 	(handle-client-request (weblocks::current-webapp)))
       ;; result
-      (header-out "Location"))
+      (header-out :location))
   nil)
 
 (deftest handle-client-request-12
@@ -369,7 +369,7 @@ onclick='disableIrrelevantButtons(this);' />~
       ;; clean up app
       (fmakunbound 'init-user-session)
       ;; result
-      (header-out "Location"))
+      (header-out :location))
   nil)
 
 (defmethod begin-transaction :after (store)

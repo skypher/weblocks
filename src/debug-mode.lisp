@@ -7,16 +7,16 @@
   "Setup hooks for session maintenance and showing backtraces"
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
-  (setf *show-lisp-backtraces-p* t)
+  ;(setf *show-lisp-backtraces-p* t)
   ;; Set session maintenance (for everyone)
   (unless *maintain-last-session*
     (setf *maintain-last-session*
-	  (hunchentoot-mp:make-lock "*maintain-last-session*"))))
+	  (bordeaux-threads:make-lock "*maintain-last-session*"))))
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
   (setf *show-lisp-errors-p* nil)
-  (setf *show-lisp-backtraces-p* nil)
+  ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
 
 (defun render-debug-toolbar ()

@@ -404,7 +404,7 @@
 (deftest find-widget-by-path-5
     (with-request :get nil :uri "/test2"
       (setf (root-composite) (create-site-layout))
-      (catch 'handler-done
+      (catch 'hunchentoot::handler-done
 	(handle-client-request (weblocks::current-webapp)))
       (let ((test2 (find-widget-by-path '(root-inner test-nav-1 test2))))
 	(values (widget-name test2)
