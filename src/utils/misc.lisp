@@ -238,19 +238,19 @@ ex:
   "Constructs a relative path to a public file from the \"/pub\" directory.
 
 'type' - currently either :stylesheet or :script
-'filename' the name of the file
+'filename' the name of the file or 'reldir/filename'
 
 Ex:
 \(public-file-relative-path :stylesheet \"navigation\")
 => #P\"stylesheets/navigation.css\""
-  (make-pathname :directory `(:relative
-			      ,(ecase type
-				      (:stylesheet "stylesheets")
-				      (:script "scripts")))
-		 :name filename
-		 :type (ecase type
-			 (:stylesheet "css")
-			 (:script "js"))))
+  (merge-pathnames (make-pathname :defaults filename)
+		   (make-pathname :directory `(:relative
+					       ,(ecase type
+						       (:stylesheet "stylesheets")
+						       (:script "scripts")))
+				  :type (ecase type
+					  (:stylesheet "css")
+					  (:script "js")))))
 
 (defun public-files-relative-paths (&rest args)
   "A helper function that returns a list of paths for files provided
