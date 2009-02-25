@@ -1,7 +1,9 @@
 (in-package :simple-blog)
 
 (defwidget post-widget ()
-  ((post :accessor post
+  ((blog :accessor blog-widget
+	 :initarg :blog) 
+   (post :accessor post
 	 :initarg :post
 	 :initform nil)
    (mode :accessor mode
@@ -26,28 +28,11 @@
 	      selected.  It accepts POST-WIDGET as argument."))
   (:documentation "widget to handle a blog post"))
 
-(defgeneric post-action-select (post-widget)
-  (:documentation "return an action that selects POST-WIDGET")
-  (:method ((post-widget post-widget))
-    (make-action
-     (lambda (&rest args)
-       (declare (ignore args))
-       (setf (mode post-widget) :full)
-       (safe-funcall (on-select post-widget) post-widget)))))
-
 (defmethod render-widget-body ((obj post-widget) &key)
   (ecase (mode obj)
     (:short
      (when (short-view obj)
-      (render-object-view (post obj) (short-view obj)
-			  :widget obj
-			  ;; after the fields of the POST object,
-			  ;; display a link to see the full post
-			  :fields-suffix-fn
-			  (lambda (&rest args)
-			    (declare (ignore args))
-			    (when (on-select obj)
-			      (render-link (post-action-select obj) "more"))))))
+      (render-object-view (post obj) (short-view obj) :widget obj)))
     (:full
      (when (full-view obj)
       (render-object-view (post obj) (full-view obj) :widget obj)))))

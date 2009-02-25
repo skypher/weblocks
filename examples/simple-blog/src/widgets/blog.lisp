@@ -44,10 +44,10 @@
   RESET-BLOG)")
   (:method ((blog-widget blog-widget) (post post))
     (make-instance 'post-widget
+		   :blog blog-widget
 		   :post post
 		   :short-view (post-short-view blog-widget)
 		   :full-view (post-full-view blog-widget)
-		   ;;; we'll add a new slot to POST-WIDGET for this
 		   :on-select (lambda (post-widget)
 				(setf (current-post blog-widget) post-widget)
 				(setf (mode blog-widget) :post)))))
