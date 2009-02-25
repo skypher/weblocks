@@ -80,5 +80,17 @@
 		  "Simple Blog")))
   (render-widget (current-post blog-widget)))
 
+(defmethod with-widget-header ((obj blog-widget) body-fn &rest args)
+  (with-html
+    (:div :class (format nil "~A ~A-mode"
+			 (dom-classes obj)
+			 (remove #\: (write-to-string (mode obj) :case :downcase)))
+	  :id (dom-id obj)
+	  (apply body-fn obj args)
+	  (when (eql (mode obj) :blog)
+	    (htm
+	     (:img :id "bubblehead"
+		   :src "/pub/images/bubblehead.png"))))))
+
 (defmethod render-widget-body ((obj blog-widget) &key)
   (render-blog obj (mode obj)))

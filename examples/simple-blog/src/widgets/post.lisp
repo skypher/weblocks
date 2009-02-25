@@ -28,6 +28,17 @@
 	      selected.  It accepts POST-WIDGET as argument."))
   (:documentation "widget to handle a blog post"))
 
+(defmethod with-widget-header ((obj post-widget) body-fn &rest args &key
+			       widget-prefix-fn widget-suffix-fn
+			       &allow-other-keys)
+  (with-html
+    (:div :class (dom-classes obj) :id (dom-id obj)
+	  :style (when (eql (mode obj) :short)
+		   (format nil "margin-left: ~A%;" (random 60)))
+	  (safe-apply widget-prefix-fn obj args)
+	  (apply body-fn obj args)
+	  (safe-apply widget-suffix-fn obj args))))
+
 (defmethod render-widget-body ((obj post-widget) &key)
   (ecase (mode obj)
     (:short
