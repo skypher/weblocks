@@ -10,6 +10,7 @@
 	  selector-mixin-canonicalize-pane-info
 	  selector-mixin-canonicalize-pane
 	  selector-mixin-find-pane-by-name
+	  selector-mixin-remove-pane-by-name
 	  selector-mixin-find-pane-by-tokens))
 
 (defstruct pane-info
@@ -104,6 +105,25 @@ specified uri tokens if such a pane exists. Otherwise, returns nil."
 		  (pane-info-uri-tokens c-pane-info))
      when (uri-tokens-start-with tokens match)
      do (return (cons c-pane-info widget))))
+
+(defun selector-mixin-remove-pane-by-name (obj name)
+  "Remove a pane from the mixin.  By default updates current pane to be
+   the next pane or the previous if this was at the end."
+  (let ((member (member name (selector-mixin-panes obj)
+			:key (lambda (record)
+			       (pane-info-name 
+				(selector-mixin-canonicalize-pane-info (car record))))
+			:test #'equalp)))
+    (setf (selector-mixin-panes obj)
+	  (remove name (selector-mixin-panes obj)
+		  :key (lambda (record)
+			 (pane-info-name 
+			  (selector-mixin-canonicalize-pane-info (car record))))
+		  :test #'equalp))
+    (when (equalp (selector-mixin-current-pane-name obj) name)
+      (setf (selector-mixin-current-pane-name obj) 
+	    (pane-info-name 
+	     (car (or (second member) (car (last (selector-mixin-panes obj))))))))))
 
 (defmethod find-widget-by-path* (path (obj selector-mixin))
   (let ((pane (cdr (selector-mixin-find-pane-by-name obj (car path)))))
