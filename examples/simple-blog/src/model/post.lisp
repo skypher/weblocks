@@ -2,7 +2,13 @@
 (in-package :simple-blog)
 
 (defclass post ()
-  ((weblocks:id)
+  ((id)
+   (title :accessor post-title
+	  :initarg :title
+	  :initform ""
+	  :type string
+	  :documentation "a title for the post, to be displayed on
+	  both the blog page and on the post page.")
    (short-text :accessor post-short-text 
 	       :initarg :short-text
 	       :initform ""
