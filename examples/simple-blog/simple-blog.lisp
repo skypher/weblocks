@@ -14,8 +14,8 @@
     :description "simple-blog: An example application"
     :init-user-session 'simple-blog::init-user-session
     :autostart nil                   ;; have to start the app manually
-    :ignore-default-dependencies nil ;; accept the defaults
-    :slots ((debug :initform t)))
+    :dependencies '((:stylesheet "navigation"))
+    :ignore-default-dependencies nil) ;; accept the defaults
 
 (defun start-simple-blog (&rest args)
   "Starts the application by calling 'start-weblocks' with appropriate
