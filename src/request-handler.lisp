@@ -153,7 +153,7 @@ association list. This function is normally called by
     (labels ((circularity-warn (w)
 	       (style-warn 'non-idempotent-rendering
 		:change-made
-		(format nil "~S was marked dirty and skipped after ~
+		(format nil "~A was marked dirty and skipped after ~
 			     already being rendered" w)))
 	     (render-enqueued (dirty)
 	       (loop for w in dirty
