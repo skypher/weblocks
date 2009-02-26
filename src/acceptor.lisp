@@ -11,7 +11,7 @@
 (defmethod initialize-instance :after ((inst weblocks-acceptor) &rest initargs)
   "Set the session secret to prevent a Hunchentoot warning emitted upon
   starting the acceptor."
-  (unless (boundp 'hunchentoot:*session-secret*)
+  (unless (boundp 'hunchentoot::*session-secret*)
     (hunchentoot:reset-session-secret)))
 
 (defmethod process-connection ((acceptor weblocks-acceptor) socket)
