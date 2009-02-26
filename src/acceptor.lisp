@@ -8,8 +8,3 @@
                         :initarg :session-cookie-name
                         :initform (format nil "weblocks-~(~A~)" (gensym)))))
 
-(defmethod initialize-instance :after ((inst weblocks-acceptor) &rest initargs)
-  "Set the session secret to prevent a Hunchentoot warning emitted upon
-  starting the acceptor."
-  (hunchentoot:reset-session-secret))
-
