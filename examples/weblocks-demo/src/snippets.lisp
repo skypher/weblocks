@@ -19,8 +19,8 @@
 		" (" (str (concatenate 'string (lisp-implementation-type) " "
 				      (lisp-implementation-version))) ")")
 	    (:p :id "contact-info"
-		"Contact me with any questions or comments at "
-		(:a :href "mailto:coffeemug@gmail.com" "coffeemug@gmail.com") ".")
+		"Contact us with any questions or comments at the "
+		(:a :href "http://groups.google.com/group/weblocks" "Weblocks Google Group") ".")
 	    (:img :src "/pub/images/footer/valid-xhtml11.png" :alt "This site has valid XHTML 1.1.")
 	    (:img :src "/pub/images/footer/valid-css.png" :alt "This site has valid CSS."))))
 

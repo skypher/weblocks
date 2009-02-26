@@ -42,7 +42,7 @@
   padding-left: 0.5em;
 }
 
-.menu ul li.selected-item span
+.menu ul li.selected-item span.label
 {
   background: url(/weblocks-common/pub/images/menu/arrow.png) no-repeat center left;
   padding-left: 1em;

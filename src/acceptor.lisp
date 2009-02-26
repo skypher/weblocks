@@ -8,3 +8,7 @@
                         :initarg :session-cookie-name
                         :initform (format nil "weblocks-~(~A~)" (gensym)))))
 
+(defmethod process-connection ((acceptor weblocks-acceptor) socket)
+  (let ((*print-readably* nil))
+    (call-next-method)))
+
