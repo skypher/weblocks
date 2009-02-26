@@ -14,3 +14,7 @@
   (unless (boundp 'hunchentoot:*session-secret*)
     (hunchentoot:reset-session-secret)))
 
+(defmethod process-connection ((acceptor weblocks-acceptor) socket)
+  (let ((*print-readably* nil))
+    (call-next-method)))
+
