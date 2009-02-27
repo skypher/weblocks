@@ -1,0 +1,211 @@
+(in-package :weblocks)
+
+(defparameter *template-temporary-validation-errors* nil)
+(defparameter *template-temporary-intermediate-values* nil)
+(defparameter *out-of-band-template-vars* nil)
+
+(defclass templform-view (form-view)
+  ((caption :initform "Template Form View" :initarg :caption :accessor template-caption)
+   (language :initform "it" :initarg :language :accessor template-language)
+   (file :initform nil :initarg :file 
+	 :accessor template-file 
+	 :documentation "A file MUST be specified. This file will be looked up in the pub/templates/lang/ directory"))
+  (:documentation "A view designed to present a template filled with data to the user."))
+
+(defclass templform-scaffold (scaffold)
+  ())
+
+(defclass templform-view-field (form-view-field)
+  ()
+  (:documentation "A field class of the data view."))
+
+(defmethod view-caption ((view templform-view))
+  (if (slot-value view 'caption)
+      (slot-value view 'caption)))
+
+(let ((keyword-package (find-package :keyword)))
+  (defun fv-symbol-to-keyword (symbol)
+    (intern (symbol-name symbol) keyword-package)))
+
+(defun fv-format-weblocks-render-into-string (view widget field-info
+					      &rest args  &key
+			     (method (form-view-default-method view))
+			     (action (form-view-default-action view))
+			     (fields-prefix-fn (view-fields-default-prefix-fn view))
+			     (fields-suffix-fn (view-fields-default-suffix-fn view))
+			     &allow-other-keys)
+  (declare (special *weblocks-output-stream*))
+  ;(break (format nil "Args were ~A" args))
+  (let ((field (field-info-field field-info))
+	(flobj (field-info-object field-info))
+	(*weblocks-output-stream* (make-string-output-stream))) 
+    #+OLD(safe-apply (view-field-prefix-fn field) view field flobj)
+    (apply #'render-view-field
+	   field view widget (view-field-presentation field)
+	   (obtain-view-field-value field flobj) flobj
+	   nil
+	   )
+    (get-output-stream-string *weblocks-output-stream*)))
+
+(defun fv-gather-field-symbol-render-list (view obj widget &rest args  &key
+			     (method (form-view-default-method view))
+			     (action (form-view-default-action view))
+			     (fields-prefix-fn (view-fields-default-prefix-fn view))
+			     (fields-suffix-fn (view-fields-default-suffix-fn view))
+			     &allow-other-keys)
+  (let ((a-lambda (lambda (field-info)
+		    (list (fv-symbol-to-keyword (view-field-slot-name (field-info-field field-info))) 
+			  (fv-format-weblocks-render-into-string view widget field-info)))))
+    (map-view-fields a-lambda view obj :include-invisible-p nil)))
+
+(defmethod view-default-field-type ((view-type (eql 'templform)) (field-type (eql 'mixin)))
+  'mixin-form)
+
+(defun fv-insert-rendered-template (view o w &rest args &key
+			     (method (form-view-default-method view))
+			     (action (form-view-default-action view))
+			     (fields-prefix-fn (view-fields-default-prefix-fn view))
+			     (fields-suffix-fn (view-fields-default-suffix-fn view))
+			     &allow-other-keys)
+  (declare (special *out-of-band-template-vars*))
+  (warn (format nil "template form oob at use ~A" *out-of-band-template-vars*))
+  (let ((field-symbol-render-list (flatten (fv-gather-field-symbol-render-list view o w))))
+    (with-html (htm (:div :class "template"
+			  (render-widget-body (fill-template-widget (template-file view)
+								    :language (template-language view)
+								    :assoc field-symbol-render-list
+								    :assoc2 *out-of-band-template-vars*)))))))
+
+(defmethod with-view-header ((view templform-view) obj widget body-fn &rest args &key
+			     (method (form-view-default-method view))
+			     (action (form-view-default-action view))
+			     (fields-prefix-fn (view-fields-default-prefix-fn view))
+			     (fields-suffix-fn (view-fields-default-suffix-fn view))
+			     validation-errors
+			     intermediate-values
+			     &allow-other-keys)
+  (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
+  (let ((form-id (gen-id))
+	(header-class (format nil "view form ~A"
+			      (attributize-name (object-class-name obj)))))
+    (when (>= (count-view-fields view)
+	      (form-view-error-summary-threshold view))
+      (setf header-class (concatenate 'string header-class " long-form")))
+    (let ((form-body
+	   (let ((*weblocks-output-stream* (make-string-output-stream))
+		 (*template-temporary-validation-errors* validation-errors)
+		 (*template-temporary-intermediate-values* intermediate-values))
+	     (with-html
+	       (:h1 (fmt (view-caption view)
+			 (humanize-name (object-class-name obj))))
+	       (render-validation-summary view obj widget validation-errors)
+	       (:h2 :class "form-fields-title" "Form fields:")
+	       (safe-apply fields-prefix-fn view obj args)
+	       (fv-insert-rendered-template view obj widget)
+	       (safe-apply fields-suffix-fn view obj args)
+	       (apply #'render-form-view-buttons view obj widget args)
+	       (get-output-stream-string *weblocks-output-stream*)))))
+      (with-html-form (method action
+			      :id form-id ;used to be (when (form-view-focus-p view) form-id) but we *always* want the id
+			      :class header-class
+			      :enctype (form-view-default-enctype view)
+			      :extra-submit-code (weblocks::render-form-submit-dependencies *form-submit-dependencies*)
+			      :use-ajax-p (form-view-use-ajax-p view))
+	(write-string form-body *weblocks-output-stream*)))
+     (when (form-view-focus-p view)
+        (send-script (ps* `(.focus-first-element ($ ,form-id)))))
+     (when (and validation-errors
+		(form-view-jump-to-error-p view))
+  	(send-script " $$('.validation-error-site')[0].scrollTo(); new Effect.Highlight ( $$('.validation-error')[0] ); "))))
+
+
+(defmethod render-view-field ((field templform-view-field) (view templform-view)
+			      widget presentation value obj 
+			      &rest args &key validation-errors &allow-other-keys)
+  (declare (special *template-temporary-validation-errors*))
+  (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
+	 (validation-error (assoc field *template-temporary-validation-errors*))
+	 (intermediate-values *template-temporary-intermediate-values*)
+	 (field-class (concatenate 'string attribute-slot-name
+				   (when validation-error " item-not-validated"))))
+    (with-html
+      (:label :class (attributize-presentation
+			   (view-field-presentation field))
+		   (:span :class "slot-name"
+			  (:span :class "extra"
+				 ;(str (view-field-label field)) ":&nbsp;"
+				 (when (form-view-field-required-p field)
+				   (htm (:em :class "required-slot" ;"(required)&nbsp;"
+					     )))))
+		   (:span :class
+			  (if validation-error
+			    "validation-error-site"
+			    "regular-field")
+				 (if intermediate-values
+				     (progn
+				       (apply #'render-view-field-value
+					      value presentation
+					      field view widget obj
+					      (list :intermediate-values intermediate-values)))
+				     (apply #'render-view-field-value
+					    value presentation
+					    field view widget obj
+			  args)))
+			   
+		   (when validation-error
+		     (htm (:p :class "validation-error"
+			      (:em
+			       (:span :class "validation-error-heading" "Error:&nbsp;")
+			       (str (format nil "~A" (cdr validation-error)))))))))))
+
+(defmethod render-view-field ((field mixin-form-view-field) (view templform-view)
+			      widget presentation value obj 
+			      &rest args &key validation-errors &allow-other-keys)
+  (declare (special *template-temporary-validation-errors*))
+  (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
+	 (validation-error (assoc field *template-temporary-validation-errors*))
+	 (intermediate-values *template-temporary-intermediate-values*)
+	 (field-class (concatenate 'string attribute-slot-name
+				   (when validation-error " item-not-validated"))))
+    (with-html
+      (:label :class (attributize-presentation
+			   (view-field-presentation field))
+		   (:span :class "slot-name"
+			  (:span :class "extra"
+				 (when (form-view-field-required-p field)
+				   (htm (:em :class "required-slot")))))
+
+		   (:span :class
+			  (if validation-error
+			    "validation-error-site"
+			    "regular-field")
+				 (if intermediate-values
+				     (progn
+				       (apply #'render-view-field-value
+					      value presentation
+					      field view widget obj
+					      (list :intermediate-values intermediate-values)))
+				     (apply #'render-view-field-value
+					    value presentation
+					    field view widget obj
+			  args)))
+		   (when validation-error
+		     (htm (:p :class "validation-error"
+			      (:em
+			       (:span :class "validation-error-heading" "Error:&nbsp;")
+			       (str (format nil "~A" (cdr validation-error)))))))))))
+
+(defmethod template-render-view-field-value (value (presentation input-presentation)
+				    field (view templform-view) widget obj
+				    &rest args)
+  (let ((attributized-slot-name (attributize-name (view-field-slot-name field)))
+	(intermediate-values *template-temporary-intermediate-values*))
+    (multiple-value-bind (intermediate-value intermediate-value-p)
+	(form-field-intermediate-value field intermediate-values)
+      (with-html
+	  (:input :type "text" :name attributized-slot-name
+		  :value (if intermediate-value-p
+			     intermediate-value
+			     (apply #'print-view-field-value value presentation field view widget obj args))
+		  :maxlength (input-presentation-max-length presentation))))))
+
