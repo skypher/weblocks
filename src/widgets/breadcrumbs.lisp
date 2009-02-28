@@ -32,16 +32,18 @@
      (lambda (obj)
        (unless crumbs
 	 (push (navigation-pane-name-for-token obj nil) crumbs))
-       (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
        ;; FIXME: rework this entirely, widgets should be able to define
        ;; a widget-navigation-title method and walk-widget-tree should
        ;; extract those somehow --jwr
        (cond 
 	 ((equal (class-of obj) (find-class 'navigation))
+	  (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
 	  (push-end (navigation-pane-name-for-token obj (static-selector-current-pane obj)) crumbs))
 	 ((equal (class-of obj) (find-class 'on-demand-selector))
 	  (let ((name (first (car (on-demand-selector-cache obj)))))
-	    (when name (push-end (humanize-name name) crumbs)))))))
+	    (when name
+	      (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
+	      (push-end (humanize-name name) crumbs)))))))
     (with-html
       (:ul
        (loop for item on crumbs by #'cddr
