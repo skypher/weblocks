@@ -35,12 +35,14 @@
 			:depends-on ("weblocks"))
 		 (:file "debug-mode"
 			:depends-on ("weblocks" "actions"))
+                 (:file "error-handler"
+                        :depends-on ("weblocks"))
 		 (:file "request-hooks"
 			:depends-on ("weblocks"))
 		 (:file "request-handler"
 			:depends-on (utils "weblocks" "page-template" "debug-mode"
 					   "actions" "request-hooks" "application"
-					   "request" "dependencies" store))
+					   "request" "dependencies" "error-handler" store))
 		 (:module snippets
 			  :components ((:file "suggest")
 				       (:file "menu")
