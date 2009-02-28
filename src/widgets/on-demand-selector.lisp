@@ -61,8 +61,6 @@ tokens."
 	      ;; replace cache with new widget
 	      (setf (on-demand-selector-cache obj)
 		    (cons consumed-tokens widget)))
-	    ;; set the dispatcher as parent of the new widget
-	    (setf (widget-parent widget) obj)
 	    ;; return the new widget
 	    (values widget consumed-tokens remaining-tokens))))))
 
