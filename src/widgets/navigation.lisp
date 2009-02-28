@@ -22,8 +22,8 @@
 		 :documentation "A list of uri-tokens representing a set
 		 of panes that should be hidden (not rendered in a menu,
 		 but accessible from within this navigation object.)")
-   (render-content :accessor navigation-render-content
-		   :initarg :render-content
+   (render-content-p :accessor navigation-render-content-p
+		   :initarg :render-content-p
 		   :initform t
 		   :documentation "Whether navigation should also render
 		   its contents. You want to set this to nil if you use
@@ -66,7 +66,7 @@ may be NIL in which case the default pane name is provided."
 
 
 (defmethod render-widget-children ((obj navigation) &rest args)
-    (when (navigation-render-content obj)
+    (when (navigation-render-content-p obj)
       (with-html 
         (:div :class "navigation-body"
 	    (mapc (lambda (obj) (apply #'render-widget obj args))
