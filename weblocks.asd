@@ -167,7 +167,9 @@
 				       (:file "on-demand-selector"
 					      :depends-on ("selector"))
 				       (:file "navigation"
-					      :depends-on ("composite" "selector" widget)))
+					      :depends-on ("composite" "selector" widget))
+				       (:file "breadcrumbs"
+					      :depends-on "navigation"))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
