@@ -92,30 +92,10 @@
       (select-pane selector (first (get-tokens uri-tokens)))
       (cdr pane))))
 
-
 (defgeneric select-pane (selector token)
   (:documentation "Called by get-widget-for-tokens when a pane is found
    and selected. Subclasses may use this method to maintain information
    about what is currently selected.")
   (:method ((obj static-selector) token)
     (setf (static-selector-current-pane obj) token)))
-
-
-(defmethod make-widget-place-writer ((selector static-selector) child)
-  (let ((place (find child (static-selector-panes selector) :key #'cdr)))
-    (unless place
-      (error "Widget ~S cannot be found in parent static-selector ~S."
-	     child selector))
-    (lambda (&optional (callee nil callee-supplied-p))
-      (assert (find place (static-selector-panes selector)))
-      (cond (callee-supplied-p
-	     (check-type callee widget-designator
-			 "a potential pane of a static-selector")
-	     (rplacd place callee)
-	     (setf (widget-parent callee) selector)
-	     (mark-dirty selector))
-	    (t (cdr place))))))
-
-
-
 
