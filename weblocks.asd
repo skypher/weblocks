@@ -169,7 +169,7 @@
 				       (:file "navigation"
 					      :depends-on ("composite" "selector" widget))
 				       (:file "breadcrumbs"
-					      :depends-on "navigation"))
+					      :depends-on ("navigation")))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
