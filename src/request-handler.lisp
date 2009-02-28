@@ -1,48 +1,8 @@
-
 (in-package :weblocks)
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-          *uri-tokens* *current-page-description*))
-
-(defvar *uri-tokens*)
-(setf (documentation '*uri-tokens* 'variable)
-      "URL-decoded list of the path elements in the current request URI")
-
-
-(defvar *uri-tokens*)
-
-(defclass uri-tokens ()
-  ((all-tokens :accessor all
-	       :initarg :all-tokens)
-   (remaining-tokens :accessor remaining)
-   (consumed-tokens :accessor consumed
-		    :initform nil)))
-
-(defmethod initialize-instance :after ((tokens uri-tokens) &rest args)
-  (declare (ignore args))
-  (setf (remaining tokens) (all tokens)))
-
-(defgeneric peek-at-token (tokens)
-  (:method ((tokens uri-tokens))
-    (first (remaining tokens))))
-
-(defgeneric tokens-fully-consumed-p (tokens)
-  (:method ((tokens uri-tokens))
-    (not (remaining tokens))))
-
-(defgeneric get-tokens (tokens &optional how-many)
-  (:method ((tokens uri-tokens) &optional (how-many 1))
-    (unless (tokens-fully-consumed-p tokens)
-      (let ((current-tokens (firstn how-many (remaining tokens))))
-	(setf (consumed tokens) (append (consumed tokens) current-tokens))
-	(setf (remaining tokens) (safe-subseq (remaining tokens) how-many))
-	current-tokens))))
-
-(defgeneric consume-tokens (tokens token-list)
-  (:method ((tokens uri-tokens) token-list)
-    (setf (consumed tokens) (append (consumed tokens) token-list))
-    token-list))
+	  *current-page-description*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
