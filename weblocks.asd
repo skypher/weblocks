@@ -158,8 +158,8 @@
 					      :depends-on (widget "dataseq"))
 				       (:file "pagination"
 					      :depends-on (widget "flash"))
-                                       (:file "table-composite"
-					      :depends-on (composite))
+                                       #+(or)(:file "table-composite"
+                                                    :depends-on (composite))
 				       (:file "selector"
 					      :depends-on (widget))
 				       (:file "on-demand-selector"
