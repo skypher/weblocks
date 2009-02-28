@@ -11,17 +11,16 @@
   on the composite, it invokes 'render-widget' on each widget in the
   list."))
 
-(defmethod initialize-instance :around ((obj composite) &rest initargs)
+(defmethod initialize-instance :around
+    ((obj composite) &rest initargs &key widgets children &allow-other-keys)
   ;; FIXME: remove :widgets from initargs and pass as :children
-  (let ((deprecated-children-arg (getf initargs :widgets))
-        (children-arg (getf initargs :children)))
-    (if deprecated-children-arg
+  (if widgets
       (progn
-        (warn "The :WIDGETS initarg to composites is deprecated, use :CHILDREN instead. This time I will do it for you.")
+        (warn "The :WIDGETS initarg to composites is deprecated; ~
+               use :CHILDREN instead. This time I will do it for you.")
         (remf initargs :widgets)
-        (remf initargs :children)
-        (apply #'call-next-method obj (append initargs `(:children ,(append children-arg deprecated-children-arg)))))
-      (call-next-method))))
+        (apply #'call-next-method obj :children (append children widgets) initargs))
+      (call-next-method)))
 
 ;;; backwards compatibility
 (defmethod composite-widgets ((comp composite))
