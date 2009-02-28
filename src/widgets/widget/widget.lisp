@@ -334,17 +334,17 @@ stylesheets and javascript links in the page header."))
 (defmethod composite-widgets ((obj string))
   nil)
 
-(defgeneric mark-dirty (w &key putp)
+(defgeneric mark-dirty (w &key propagate)
   (:documentation
    "Default implementation adds a widget to a list of dirty
 widgets. Normally used during an AJAX request. If there are any
-widgets in the 'propagate-dirty' slot of 'w' and 'putp' is true, these
+widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true, these
 widgets are added to the dirty list as well.
 
 Note, this function is automatically called when widget slots are
 modified, unless slots are marked with affects-dirty-status-p."))
 
-(defmethod mark-dirty ((w widget) &key putp)
+(defmethod mark-dirty ((w widget) &key propagate)
   (declare (special *dirty-widgets*))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
@@ -352,7 +352,7 @@ modified, unless slots are marked with affects-dirty-status-p."))
   (ignore-errors
     (when (widget-rendered-p w)
       (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
-    (when putp
+    (when propagate
       (mapc #'mark-dirty
 	    (remove nil (loop for i in (widget-propagate-dirty w)
 			   collect (find-widget-by-path i)))))))
