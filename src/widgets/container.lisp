@@ -40,6 +40,10 @@ unless *OVERRIDE-PARENT-P* is set."
               new-widgets)
       (setf children new-widgets))))
 
+(defgeneric container-update-direct-children (cont)
+  (:method ((cont container))
+    nil))
+
 (defgeneric container-update-children (cont)
   (:documentation "Update the children of the container.")
   (:method ((obj null))
@@ -51,10 +55,6 @@ unless *OVERRIDE-PARENT-P* is set."
      (dolist (child (widget-children cont))
        (when (typep child 'container)
          (container-update-children child)))))
-
-(defgeneric container-update-direct-children (cont)
-  (:method ((cont container))
-    nil))
 
 (defmethod render-widget-body ((widget container) &rest args)
   (error "Can't render the children of a pure container."))
