@@ -51,10 +51,8 @@ unless *OVERRIDE-PARENT-P* is set."
   (:method ((cont container))
      ;; first let's get our own children straight
      (container-update-direct-children cont)
-     ;; now update the indirect children
-     (dolist (child (widget-children cont))
-       (when (typep child 'container)
-         (update-widget-tree child)))))
+     ;; now go down the tree and update the indirect children
+     (mapc #'update-widget-tree (widget-children cont))))
 
 (defmethod render-widget-body ((widget container) &rest args)
   (error "Can't render the children of a pure container."))
