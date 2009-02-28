@@ -6,7 +6,7 @@
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
-          widget-dirty-p find-widget-by-path* find-widget-by-path
+          widget-dirty-p 
           *current-widget*
           *override-parent-p*))
 
@@ -38,13 +38,11 @@ inherits from 'widget' if no direct superclasses are provided."
    (propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
-		    :documentation "A list of widget paths (see
-                    'find-widget-by-path') or widgets each of which
-                    will be made dirty when this widget is made dirty
-                    via a POST request. This slot allows setting up
-                    dependencies between widgets that will make
-                    multiple widgets update automatically during AJAX
-                    requests.")
+		    :documentation "A list of widgets which will be made
+                    dirty when this widget is made dirty via a POST
+                    request. This slot allows setting up dependencies
+                    between widgets that will make multiple widgets
+                    update automatically during AJAX requests.")
    (renderedp :accessor widget-rendered-p
 	      :initform nil
 	      :affects-dirty-status-p nil
@@ -353,9 +351,7 @@ modified, unless slots are marked with affects-dirty-status-p."))
     (when (widget-rendered-p w)
       (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
     (when propagate
-      (mapc #'mark-dirty
-	    (remove nil (loop for i in (widget-propagate-dirty w)
-			   collect (find-widget-by-path i)))))))
+      (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
@@ -369,25 +365,6 @@ modified, unless slots are marked with affects-dirty-status-p."))
     (mark-dirty object))
   (call-next-method new-value class object slot-name))
 
-(defgeneric find-widget-by-path* (path root)
-  (:documentation
-   "Returns a widget object located at 'path', where 'path' is a list
-of widget names starting from root. For convinience, 'path' can be a
-widget object, in which case it is simply returned.
-
-'root' - a widget to start the search from."))
-
-(defmethod find-widget-by-path* ((path (eql nil)) root)
-  root)
-
-(defmethod find-widget-by-path* ((path widget) root)
-  path)
-
-(defmethod find-widget-by-path* (path (root (eql nil)))
-  nil)
-
-(defun find-widget-by-path (path &optional (root (root-composite)))
-  (find-widget-by-path* path root))
 
 (defmethod print-object ((obj widget) stream)
   (print-unreadable-object (obj stream :type t)

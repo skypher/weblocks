@@ -61,10 +61,5 @@
 	  (render-widget w))
 	(widget-children obj)))
 
-(defmethod find-widget-by-path* (path (root composite))
-  (find-widget-by-path* (cdr path)
-			(car (member (car path)
-				     (composite-widgets root)
-				     :key #'widget-name
-				     :test #'string-equal))))
+
 
