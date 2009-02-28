@@ -10,16 +10,6 @@
   > Latest Event'. Its render-widget-body method walks the widget tree,
   finds navigation widgets and learns about their selections."))
 
-
-(defgeneric walk-navigation (obj fn)
-  (:documentation "Walk the widget tree starting at obj and calling fn at every node.")
-  (:method (obj fn)
-    (mapc (curry-after #'walk-navigation fn) (widget-children obj)))
-  (:method ((obj selector) fn)
-    (funcall fn obj)
-    (mapc (curry-after #'walk-navigation fn) (widget-children obj))))
-
-;; this should really be done in a post-tree-shakedown hook, not on every render
 (defmethod render-widget-body ((obj breadcrumbs) &rest args)
   (declare (ignore args))
   (let (crumbs)
@@ -27,7 +17,7 @@
      (root-widget)
      (lambda (obj depth)
        (declare (ignore depth))
-       ;; we only process objects that eat URI tokens
+       ;; we only process objects that eat URI tokens, we need to know them, unfortunately
        (cond 
 	 ((equal (class-of obj) (find-class 'navigation))
 	  (unless crumbs
