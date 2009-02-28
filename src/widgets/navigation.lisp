@@ -3,8 +3,7 @@
 
 (export '(navigation render-navigation-menu init-navigation make-navigation
 	  navigation-pane-names navigation-header
-          navigation-hidden-panes navigation-render-content
-          navigation-disabled-pane-names))
+          navigation-hidden-panes navigation-render-content))
 
 (defwidget navigation (static-selector)
   ((pane-names :accessor navigation-pane-names
@@ -29,15 +28,7 @@
 		   :documentation "Whether navigation should also render
 		   its contents. You want to set this to nil if you use
 		   the teleport widget to render the contents
-		   elsewhere.")
-   (disabled-pane-names :initform nil
-                        :initarg :disabled-pane-names
-                        :accessor navigation-disabled-pane-names
-                        :documentation "Allows presenting panes to the
-                        user as a visual queue, but disabling access
-                        to them. If not null, this slot should be
-                        bound to a list of pane names to be
-                        disabled."))
+		   elsewhere."))
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It is a static-selector that also knows what its
   pane names are, so it can render a menu, set a page title, and
@@ -67,7 +58,6 @@ may be NIL in which case the default pane name is provided."
                      "Navigation")
            :container-id (ensure-dom-id obj)
            :empty-message "No navigation entries"
-           :disabled-pane-names (navigation-disabled-pane-names obj)
            menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)
@@ -75,21 +65,11 @@ may be NIL in which case the default pane name is provided."
 
 
 (defmethod render-widget-children ((obj navigation) &rest args)
-  ;; Remove disabled panes
-  (let ((saved-panes (selector-mixin-panes obj)))
-    (when (navigation-disabled-pane-names obj)
-      (setf (selector-mixin-panes obj) 
-            (remove-if (lambda (item)
-                         (member (car item) (navigation-disabled-pane-names obj)
-                                 :test #'string-equal))
-                       saved-panes)))
-    ;; Render navigation children
     (when (navigation-render-content obj)
       (with-html 
         (:div :class "navigation-body"
-	    (mapc (lambda (obj) (apply #'render-widget obj args)) (get-children-of-type obj :selector)))))
-    ;; Restore disabled panes
-    (setf (selector-mixin-panes obj) saved-panes))) ; FIXME: unwind-protect this
+	    (mapc (lambda (obj) (apply #'render-widget obj args))
+                  (get-children-of-type obj :selector))))))
 
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))
