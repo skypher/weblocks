@@ -56,6 +56,11 @@ at different points before and after request. See 'request-hook'.
 Override this method (along with :before and :after specifiers to
 customize behavior)."))
 
+(defmethod handle-client-request :around (app)
+  (handler-bind ((error (lambda (c)
+                          (return-from handle-client-request
+                                       (handle-error-condition c)))))
+    (call-next-method)))
 
 (defmethod handle-client-request (app)
   (let ((*current-webapp* app))
