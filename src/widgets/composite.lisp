@@ -5,11 +5,9 @@
 
 (defwidget composite (container)
   ()
-  (:documentation "A composite widget is simply a container for other
-  widgets. The 'widgets' slot accessible with 'composite-widgets'
-  accessor contains a list of widgets. When 'render-widget' is invoked
-  on the composite, it invokes 'render-widget' on each widget in the
-  list."))
+  (:documentation "A composite widget is a specialized container tht
+  also renders its widgets. When 'render-widget' is invoked on the
+  composite, it invokes 'render-widget' on each widget in the list."))
 
 (defmethod initialize-instance :around
     ((obj composite) &rest initargs &key widgets children &allow-other-keys)

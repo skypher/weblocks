@@ -30,24 +30,8 @@
   the widget-parent relations: those are updated by the containers for
   all their children.")
   (:method ((obj selector) children)
-    (setf (widget-children obj) children)
+    (setf (widget-children obj) (ensure-list children))
     (mapc (lambda (child) (setf (widget-parent child) obj)) (ensure-list children))))
-
-;; Functionality common to all selectors: all selectors process
-;; *uri-tokens* by calling (get-widget-for-tokens) and update
-;; widget-children to point to the selected widget.
-(defmethod container-update-direct-children ((selector selector))
-  (declare (special *uri-tokens*))
-  (setf (selector-base-uri selector)
-	(make-webapp-uri
-	 (string-left-trim
-	  "/" (string-right-trim
-	       "/" (compose-uri-tokens-to-url (consumed *uri-tokens*))))))
-  (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
-    (if widget
-	(update-dependents selector widget)
-        (assert (signal 'http-not-found)))))
-
 
 ;; Functionality common to all selectors: all selectors process
 ;; *uri-tokens* by calling (get-widget-for-tokens) and update

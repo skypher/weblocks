@@ -5,6 +5,7 @@
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
+	  widget-children update-children walk-widget-tree
           render-widget-body widget-css-classes render-widget mark-dirty
           widget-dirty-p 
           *current-widget*))
@@ -113,13 +114,10 @@ strings, function, etc."
 (defmethod (setf widget-rendered-p) (val obj)
   nil)
 
-(defgeneric widget-children (wij)
+(defgeneric widget-children (w)
   (:documentation "Answer an ordered list, settable when appropriate,
-of widgets for whom WIJ is formally a parent.")
-  (:method (wij)
-    "NIL unless defined otherwise."
-    (check-type wij valid-widget)
-    nil))
+of widgets who are children of w for the purposes of rendering.")
+  (:method (w) "NIL unless defined otherwise." nil))
 
 (defgeneric (setf widget-children) (new-value wij)
   (:documentation "Set the value of `widget-children', when
@@ -129,8 +127,17 @@ appropriate for WIJ's class."))
   (:documentation "Called during the tree shakedown phase (before
   rendering) while walking the widget tree. Implement this method for
   widgets whose children might depend on external factors.")
-  (:method (widget)
-    nil))
+  (:method (w) "NIL unless defined otherwise" nil))
+
+(defgeneric walk-widget-tree (obj fn)
+  (:documentation "Walk the widget tree starting at obj and calling fn
+  at every node. Fn is a function that takes one argument (a widget).")
+  (:method ((obj function) fn) (funcall fn obj))
+  (:method ((obj string) fn) (funcall fn obj))
+  (:method ((obj symbol) fn) (funcall fn obj))
+  (:method ((obj widget) fn)
+    (funcall fn obj)
+    (mapc (curry-after #'walk-widget-tree fn) (widget-children obj))))
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
 (defmethod widget-parent (obj)

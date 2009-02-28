@@ -57,8 +57,6 @@
 (defvar *dispatch/render-lock* (hunchentoot-mp:make-lock
                                  "*dispatch-render-lock*"))
 
-(defgeneric update-children (obj))
-
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -156,6 +154,9 @@ customize behavior)."))
                     *current-page-description*))
   (render-dirty-widgets))
 
+(defun update-widget-tree ()
+  (walk-widget-tree (root-composite) #'update-children))
+
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
                     *uri-tokens*
@@ -164,7 +165,7 @@ customize behavior)."))
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
   (hunchentoot-mp:with-lock (*dispatch/render-lock*)
-    (handler-case (update-widget-tree (root-composite))
+    (handler-case (update-widget-tree)
       (http-not-found () (return-from handle-normal-request
                                       (page-not-found-handler app))))
     (render-widget (root-composite)))
