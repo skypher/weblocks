@@ -70,7 +70,7 @@ may be NIL in which case the default pane name is provided."
       (with-html 
         (:div :class "navigation-body"
 	    (mapc (lambda (obj) (apply #'render-widget obj args))
-                  (get-children-of-type obj :selector))))))
+                  (widget-children obj :selector))))))
 
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))
@@ -112,11 +112,10 @@ widgets bears the title NAME."
 (defmethod update-dependents ((obj lazy-navigation) children)
   "Lazily resolve our new children -- if any of them are functions, call
 them to get the real widgets."
-  (set-children-of-type obj
+  (setf (widget-children obj :selector)
 			(mapcar (lambda (child)
 				  (if (functionp child) (funcall child) child))
-				(ensure-list children))
-			:selector))
+				(ensure-list children))))
 
 (defun make-lazy-navigation (name &rest args)
   (let ((nav (make-instance 'lazy-navigation :name name)))

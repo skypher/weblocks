@@ -71,4 +71,5 @@ tokens."
 
 (defmethod render-widget-children ((obj on-demand-selector) &rest args)
   (mapc (lambda (child) (apply #'render-widget child args))
-	(get-children-of-type obj :selector)))
+	(widget-children obj :selector)))
+

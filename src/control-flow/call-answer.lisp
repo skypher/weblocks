@@ -103,11 +103,10 @@ identity function."
 the latter one being optionally transformed by WRAPPER-FN."
   (let* ((old-value (slot-value (root-widget) 'children)))
     (prog1
-	(call callee
-	      (lambda (new-callee)
-		(set-children-of-type (root-widget)
-				      (funcall wrapper-fn new-callee)
-				      :widget)))
+      (call callee
+            (lambda (new-callee)
+              (setf (widget-children (root-widget))
+                    (funcall wrapper-fn new-callee))))
       (setf (slot-value (root-widget) 'children)
 	    old-value)
       (update-parent-for-children (widget-children (root-widget))))))

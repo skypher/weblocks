@@ -5,8 +5,7 @@
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
-	  widget-children update-children update-parent-for-children
-	  set-children-of-type get-children-of-type
+	  update-children update-parent-for-children
 	  walk-widget-tree page-title
           render-widget render-widget-body render-widget-children
 	  widget-css-classes
@@ -84,7 +83,7 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; will render without id in generated HTML.
 (defmethod initialize-instance :after ((obj widget) &key name children &allow-other-keys)
   (when name (setf (dom-id obj) name))
-  (when children (set-children-of-type obj children :widget)))
+  (when children (setf (widget-children obj :widget) children)))
 
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
@@ -119,16 +118,14 @@ strings, function, etc."
 (defmethod (setf widget-rendered-p) (val obj)
   nil)
 
-(defgeneric widget-children (w)
+(defgeneric widget-children (w &optional type)
   (:documentation "Return a list of all widgets (all types) who are
 children of w (e.g. may be rendered when w is rendered).")
-  (:method (w) "NIL unless defined otherwise." nil)
-  (:method ((w widget)) (reduce #'append (slot-value w 'children) :key #'cdr)))
-
-(defgeneric (setf widget-children) (new-widgets w)
-  (:documentation "This function is obsolete and should never be used.")
-  (:method (new-widgets (w widget))
-    (error "(setf widget-children) should never be called, use set-children-of-type")))
+  (:method (w &optional type) "NIL unless defined otherwise." nil)
+  (:method ((w widget) &optional type)
+    (if type
+      (cdr (assoc type (slot-value w 'children)))
+      (reduce #'append (slot-value w 'children) :key #'cdr))))
 
 ;; Rationale: yes, I realize it would be nicer to use methods (and
 ;; possibly generators) to functionally enumerate the children of
@@ -154,18 +151,18 @@ children of w (e.g. may be rendered when w is rendered).")
 ;; all cases, so you will very rarely need to write your own. --jwr
 
 ;; One caveat: if your widget stores some of its children in its own
-;; slots, you should still call set-children-of-type, so that they
+;; slots, you should still call (SETF WIDGET-CHILDREN), so that they
 ;; become a part of the widget tree, and when you render, you should
-;; call render-widget on get-children-of-type, not on your slot. The
+;; call render-widget on WIDGET-CHILDREN, not on your slot. The
 ;; reason for this is that someone might have replaced your child with
-;; do-widget. get-children-of-type will give you the current list of
+;; do-widget. WIDGET-CHILDREN will give you the current list of
 ;; children, your slot will not. --jwr
 
-(defgeneric set-children-of-type (obj widgets type)
+(defgeneric (setf widget-children) (widgets obj &optional type)
   (:documentation "Set the list of children of type TYPE for OBJ to be
   WIDGETS. TYPE is a symbol (usually a keyword) and serves as a handle
   so that these particular children may later be retrieved.")
-  (:method ((obj widget) widgets type)
+  (:method (widgets (obj widget) &optional (type :widget))
     (let* ((children (slot-value obj 'children))
 	   (cell (assoc type children)))
       (if cell
@@ -174,11 +171,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	      (setf (slot-value obj 'children) (remove type children :key #'car)))
 	  (when widgets (push (cons type (ensure-list widgets)) (slot-value obj 'children)))))
     (update-parent-for-children obj)))
-
-(defgeneric get-children-of-type (obj type)
-  (:documentation "Get the list of children of type TYPE for OBJ.")
-  (:method ((obj widget) type)
-    (cdr (assoc type (slot-value obj 'children)))))
 
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
@@ -348,7 +340,7 @@ that will be applied before and after the body is rendered.")
   (:method ((obj function) &rest args) nil)
   (:method ((obj string) &rest args) nil)
   (:method ((obj widget) &rest args)
-    (mapc (lambda (child) (apply #'render-widget child args)) (get-children-of-type obj :widget))))
+    (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj :widget))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation

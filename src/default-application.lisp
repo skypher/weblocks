@@ -52,8 +52,7 @@
 
 
 (defun init-user-session (root)
-  (set-children-of-type
-   root
+  (setf (widget-children root)
    (list
     (f_%
       (with-html
@@ -72,6 +71,5 @@
 	(:p "If you expected to see your application here you probably didn't supply
                       the PREFIX keyword argument to DEFWEBAPP (try " (:code "PREFIX \"/\"") ").")))
     (make-instance 'webapp-control)
-    (f_% (with-html (:h3 (:em "Happy hacking!")))))
-   :widget))
+    (f_% (with-html (:h3 (:em "Happy hacking!")))))))
 

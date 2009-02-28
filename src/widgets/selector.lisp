@@ -35,7 +35,7 @@
   update-children calls update-dependents, so that the selector (or its
   subclass) may update its dependents list and do other
   housekeeping. The default implementation of update-dependents just
-  calls set-children-of-type to store the children under the :selector
+  calls (SETF WIDGET-CHILDREN) to store the children under the :selector
   type.
 
   Usually the only thing you'll want to do if you are implementing your
@@ -49,13 +49,13 @@
   might be selectors that have other widgets dependent on them and need
   to do additional housekeeping. Children is either a list of widgets or
   a widget. Note that we do not update the widget-parent relations:
-  those are handled by set-children-of-type.")
+  those are handled by (SETF WIDGET-CHILDREN).")
   (:method ((obj selector) children)
-    (set-children-of-type obj children :selector)))
+    (setf (widget-children obj :selector) children)))
 
 ;; Functionality common to all selectors: all selectors process
 ;; *uri-tokens* by calling (get-widget-for-tokens) and update
-;; widget-children to point to the selected widget.
+;; WIDGET-CHILDREN to point to the selected widget.
 (defmethod update-children ((selector selector))
   (declare (special *uri-tokens*))
   (setf (selector-base-uri selector)
