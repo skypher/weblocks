@@ -18,8 +18,8 @@
    (hidden-panes :accessor navigation-hidden-panes
 		 :initarg :hidden-panes
 		 :initform nil
-		 :documentation "A list of uri-tokens corresponding to
-		 panes that should be hidden (not rendered in a menu,
+		 :documentation "A list of uri-tokens representing a set
+		 of panes that should be hidden (not rendered in a menu,
 		 but accessible from within this navigation object.)")
    (render-content :accessor navigation-render-content
 		   :initarg :render-content
