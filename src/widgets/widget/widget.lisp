@@ -22,6 +22,15 @@ inherits from 'widget' if no direct superclasses are provided."
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))))
 
+(defgeneric widget-current-navigation-url (widget)
+  (:documentation "Return the current navigation URL for WIDGET
+                  as computed at the dispatching stage.")
+  (:method ((widget string))
+           nil)
+  (:method ((widget function))
+    "FIXME: should find out somehow..."
+    nil))
+
 (defclass widget (dom-object-mixin)
   ((current-navigation-url :accessor widget-current-navigation-url
                            :type (or string null) ;; XXX unbound instead of null
@@ -76,15 +85,6 @@ inherits from 'widget' if no direct superclasses are provided."
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
-
-(defgeneric widget-current-navigation-url (widget)
-  (:documentation "Return the current navigation URL for WIDGET
-                  as computed at the dispatching stage.")
-  (:method ((widget string))
-           nil)
-  (:method ((widget function))
-    "FIXME: should find out somehow..."
-    nil))
 
 (defmethod widget-current-navigation-url ((widget widget))
   (log-message :debug "~%WIDGET-CNURL: for widget ~A~%" widget)
