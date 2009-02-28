@@ -14,8 +14,17 @@
 (defwidget selector (container)
   ())
 
-
 (define-condition http-not-found (condition) ())
+
+(defgeneric update-dependents (selector children)
+  (:documentation "Update the dependents for a given selector with
+  children. A selector will usually contain the children, but there
+  might be selectors that have other widgets dependent on them. Children
+  is either a list of widgets or a widget. Note that we do not update
+  the widget-parent relations: those are updated by the containers for
+  all their children.")
+  (:method ((obj selector) children)
+    (setf (widget-children obj) children)))
 
 ;; Functionality common to all selectors: all selectors process
 ;; *uri-tokens* by calling (get-widget-for-tokens), update *uri-tokens*
@@ -37,7 +46,7 @@
                                                          "/" (compose-uri-tokens-to-url consumed-tokens))))))
 	  (declare (special *current-navigation-url*))
           (setf (widget-uri-path widget) *current-navigation-url*)
-	  (setf (widget-children selector) widget))
+	  (update-dependents selector widget))
         (assert (signal 'http-not-found)))))
 
 
