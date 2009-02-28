@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(render-page render-page-body render-page-headers page-title))
+(export '(render-page render-page-body render-page-headers application-page-title))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
@@ -11,7 +11,7 @@
 ;; Compute the webapp page title
 ;;
 
-(defmethod page-title ((app weblocks-webapp))
+(defmethod application-page-title ((app weblocks-webapp))
   "The default page-title method generates a page title from the 
    application name, application description, and current navigation state."
   (declare (special *current-page-description*))
@@ -47,7 +47,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
-	      (:title (str (page-title app)))
+	      (:title (str (application-page-title app)))
 	      (render-page-headers app)
 	      (mapc #'render-dependency-in-page-head all-dependencies))
 	     (:body
