@@ -36,10 +36,10 @@
        (push-end (navigation-pane-name-for-token obj (static-selector-current-pane obj)) crumbs)))
     (log-message* "crumbs: ~A" crumbs)
     (with-html
-      (loop for item on crumbs by #'cddr
-	 do (progn
-	      (if (second item)
-		  (htm (:a :href (second item) (str (first item)))
-		       " > ")
-		  (htm (:span (str (first item))))))))))
+      (:ul
+       (loop for item on crumbs by #'cddr
+	  do (progn
+	       (if (second item)
+		   (htm (:li (:a :href (second item) (str (first item)))))
+		   (htm (:li (str (first item)))))))))))
 
