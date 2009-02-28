@@ -370,6 +370,4 @@ modified, unless slots are marked with affects-dirty-status-p."))
   (print-unreadable-object (obj stream :type t)
     (format stream "~s" (ensure-dom-id obj))))
 
-(defmethod container-update-children ((widget widget))
-  nil) ; only containers have children
 

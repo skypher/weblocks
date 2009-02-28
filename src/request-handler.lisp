@@ -140,7 +140,7 @@ customize behavior)."))
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
   (hunchentoot-mp:with-lock (*dispatch/render-lock*)
-    (handler-case (container-update-children (root-composite))
+    (handler-case (update-widget-tree (root-composite))
       (http-not-found () (return-from handle-normal-request
                                       (page-not-found-handler app))))
     (render-widget (root-composite)))

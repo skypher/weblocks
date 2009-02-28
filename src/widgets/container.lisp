@@ -44,17 +44,17 @@ unless *OVERRIDE-PARENT-P* is set."
   (:method ((cont container))
     nil))
 
-(defgeneric container-update-children (cont)
+(defgeneric update-widget-tree (cont)
   (:documentation "Update the children of the container.")
-  (:method ((obj null))
-    nil) ;; bug?
+  (:method ((obj null)) (assert nil))	; bug?
+  (:method ((obj widget)) nil)		; widgets are leaves by default
   (:method ((cont container))
      ;; first let's get our own children straight
      (container-update-direct-children cont)
      ;; now update the indirect children
      (dolist (child (widget-children cont))
        (when (typep child 'container)
-         (container-update-children child)))))
+         (update-widget-tree child)))))
 
 (defmethod render-widget-body ((widget container) &rest args)
   (error "Can't render the children of a pure container."))
