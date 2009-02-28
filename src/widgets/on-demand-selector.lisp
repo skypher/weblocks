@@ -1,19 +1,24 @@
 (in-package :weblocks)
 
-(export '(on-demand-selector on-demand-selector-lookup-function on-demand-make-if-missing
+(export '(on-demand-selector on-demand-lookup-function on-demand-make-if-missing
 	  on-demand-mutate-cache uri-tokens-start-with))
 
 (defwidget on-demand-selector (selector)
-  ((lookup-function :accessor on-demand-selector-lookup-function
+  ((lookup-function :accessor on-demand-lookup-function
 		    :initarg :lookup-function
-		    :initform nil)
-   (cache :accessor on-demand-selector-cache :initform nil)
+		    :initform nil
+		    :documentation "Lookup function should return
+		    multiple values: the created widget, consumed
+		    tokens, remaining tokens and an optional
+		    fourth :no-cache value, indicating that the result
+		    is not to be cached.")
    (make-if-missing :accessor on-demand-make-if-missing
 		    :initarg :make-if-missing-p
 		    :initform t)
    (mutate-cache :accessor on-demand-mutate-cache
 		 :initarg :mutate-cache-p
-		 :initform t))
+		 :initform t)
+   (cache :accessor on-demand-selector-cache :initform nil))
   (:documentation "This selector implements the dynamic wiki-style
   content creation. When provided with a lookup-function, creates and
   caches content based on url-tokens. Lookup function should return
@@ -44,7 +49,7 @@ tokens."
       ;; widget not cached
       (when (on-demand-make-if-missing obj)
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
-	    (funcall (dispatcher-on-dispatch obj) obj tokens)
+	    (funcall (on-demand-lookup-function obj) obj tokens)
 	  (unless widget
 	    ;; clear the cache
 	    (setf (on-demand-selector-cache obj) nil))	 
@@ -58,6 +63,6 @@ tokens."
 		    (cons consumed-tokens widget)))
 	    ;; set the dispatcher as parent of the new widget
 	    (setf (widget-parent widget) obj)
-	    ;; return new widget
+	    ;; return the new widget
 	    (values widget consumed-tokens remaining-tokens))))))
 
