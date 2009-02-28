@@ -1,8 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(selector static-selector get-widget-for-tokens select-pane
-	  uri-tokens-start-with))
+(export '(selector static-selector get-widget-for-tokens select-pane))
 
 (defgeneric get-widget-for-tokens (selector uri-tokens)
   (:documentation "Given a list of uri-tokens, map them to a widget. All
@@ -82,12 +81,6 @@
 	     (mark-dirty selector))
 	    (t (cdr place))))))
 
-(defun uri-tokens-start-with (uri-tokens match-tokens)
-  "Returns true if 'uri-tokens' start with 'match-tokens'. Returns
-false otherwise."
-  (or (and match-tokens
-	   (list-starts-with uri-tokens match-tokens :test #'string=))
-      (and (null match-tokens)
-	   (null uri-tokens))))
+
 
 

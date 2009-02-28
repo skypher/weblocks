@@ -164,6 +164,8 @@
 					      :depends-on (composite))
 				       (:file "selector"
 					      :depends-on ("container" widget))
+				       (:file "on-demand-selector"
+					      :depends-on ("selector"))
 				       (:file "navigation"
 					      :depends-on ("composite" "selector" widget)))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
