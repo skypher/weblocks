@@ -52,13 +52,12 @@ the navigation as disabled."
                                      (string
                                       (if (or pane-selected-p pane-disabled-p)
                                         (htm (:span :class "label" (str label)))
-                                        (htm (:a :href (:a :href
-                                                           (concatenate 'string
-                                                                        (string-right-trim "/" base)
-                                                                        "/"
-                                                                        (string-left-trim "/" target))
-                                                           (str label))
-                                                   (str label)))))
+                                        (htm (:a :href
+                                                 (concatenate 'string
+                                                              (string-right-trim "/" base)
+                                                              "/"
+                                                              (string-left-trim "/" target))
+                                                 (str label)))))
                                      (function
                                       (render-link target label)))))))))))
     (with-html
