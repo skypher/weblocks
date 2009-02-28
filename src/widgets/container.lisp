@@ -1,19 +1,21 @@
 
 (in-package :weblocks)
 
-(export '(container))
+(export '(container widget-children container-update-direct-children
+	  update-widget-tree))
 
 (defwidget container (widget)
   ((children :accessor widget-children
              :initform nil
              :initarg :children
-             :documentation "A list of children of this container."))
-  (:documentation "A widget containing other widgets.
-                   Acts as a non-leaf tree node."))
+             :documentation "A list of renderable children of this container."))
+  (:documentation "A widget containing other widgets. Acts as a non-leaf tree node."))
 
 (defmethod initialize-instance :after ((obj container) &rest initargs &key children &allow-other-keys)
   (declare (ignore initargs))
-  ;; We need this to properly initialize values
+  ;; We need this in order to properly initialize the parent slot in all
+  ;; the children, which requires calling the (setf widget-children)
+  ;; method.
   (setf (slot-value obj 'children) nil)
   (setf (widget-children obj) children))
 
@@ -40,11 +42,11 @@ unless *OVERRIDE-PARENT-P* is set."
       (setf children new-widgets))))
 
 (defgeneric container-update-direct-children (cont)
-  (:method ((cont container))
-    nil))
+  (:documentation "Update the list of our direct renderable children.")
+  (:method ((cont container)) nil))
 
 (defgeneric update-widget-tree (cont)
-  (:documentation "Update the children of the container.")
+  (:documentation "Update widget the tree so that it represents the renderable part of the widget tree.")
   (:method ((obj null)) (assert nil))	; bug?
   (:method ((obj widget)) nil)		; widgets are leaves by default
   (:method ((obj function)) nil)	; functions have no children
