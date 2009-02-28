@@ -50,7 +50,8 @@ may be NIL in which case the default pane name is provided."
 			 (unless (member token (navigation-hidden-panes obj)
 					 :test #'string-equal)
 			   (cons (navigation-pane-name-for-token obj token)
-				 (compose-uri-tokens-to-url token)))))))
+				 (compose-uri-tokens-to-url token)))))
+                           (static-selector-panes obj)))
            :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
            :header (if (widget-name obj)
@@ -98,6 +99,7 @@ widgets bears the title NAME."
     (apply #'init-navigation nav args)
     nav))
 
+
 (export '(lazy-navigation make-lazy-navigation))
 
 (defwidget lazy-navigation (navigation)
@@ -121,6 +123,7 @@ them to get the real widgets."
     (apply #'init-navigation nav args)
     nav))
 
+
 (export '(teleport teleport-source teleport-key))
 
 (defwidget teleport ()
@@ -142,5 +145,4 @@ them to get the real widgets."
 
 (defmethod render-widget-body ((obj teleport) &rest args)
   (apply #'render-widget (funcall (teleport-key obj) (teleport-source obj)) args))
-
 
