@@ -7,10 +7,9 @@
   ((children :accessor widget-children
              :initform nil
              :initarg :children
-             :documentation "The children of this container. An alist where
-             the CAR is a widget and the CDR contains book-keeping information."))
+             :documentation "A list of children of this container."))
   (:documentation "A widget containing other widgets.
-             Acts as a non-leaf tree node."))
+                   Acts as a non-leaf tree node."))
 
 (defmethod initialize-instance :after ((obj container) &rest initargs &key children &allow-other-keys)
   (declare (ignore initargs))
