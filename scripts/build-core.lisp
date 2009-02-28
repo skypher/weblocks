@@ -1,0 +1,5 @@
+(dolist (sys '(weblocks weblocks-demo))
+  (asdf:oos 'asdf:load-op sys))
+(use-package :weblocks)
+(use-package :cl-who)
+(save-lisp-and-die #p"weblocks.sbclcore")

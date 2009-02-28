@@ -1,0 +1,95 @@
+
+.pagination .current-page,
+.pagination .total-pages
+{
+  font-weight: bolder;
+  font-size: small;
+}
+
+.pagination .page-info
+{
+  margin-top: 4px;
+}
+
+.pagination .viewing-label
+{
+  display: none;
+}
+
+.pagination form fieldset
+{
+  vertical-align: middle;
+}
+
+.pagination form,
+.pagination fieldset
+{
+  display: inline;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pagination fieldset
+{
+  margin-left: 0.75em;
+}
+
+.pagination form fieldset input.page-number
+{
+  width: 2em;
+  margin-right: 0.5em;
+}
+
+/* We need to increate input width on Safari */
+html[xmlns*=""] body:last-child .pagination form fieldset input.page-number
+{
+  width: 2.5em;
+}
+
+.pagination form fieldset input.item-not-validated
+{
+  border: solid 1px red;
+}
+
+.pagination div.extra-top-1,
+.pagination div.extra-top-2,
+.pagination div.extra-top-3,
+.pagination div.extra-bottom-1,
+.pagination div.extra-bottom-2,
+.pagination div.extra-bottom-3
+{
+  display: none;
+}
+
+.pagination form label span
+{
+  color: gray;
+}
+
+/* Fix the vertical alignment issue for IE 6 */
+* html .pagination form label span
+{
+  display: inline-block;
+  padding-bottom: 3px;
+}
+
+/* Fix the vertical alignment issue for IE 7 */
+*:first-child+html .pagination form label span
+{
+  display: inline-block;
+  padding-bottom: 3px;
+}
+
+/* Normalize alignment for all modern browsers (without IE 7) */
+html>/**/body .pagination .page-info,
+html>/**/body .pagination a
+{
+  vertical-align: middle;
+}
+
+.pagination .total-items
+{
+  display: block;
+}
+

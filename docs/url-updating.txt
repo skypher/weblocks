@@ -1,0 +1,80 @@
+
+::: The request handling pipeline and delegation of behavior:
+
+It is helpful to understand the request handler process in weblocks and the 'normal' mode of operation.  We will introduce exceptions to this normal mode to address specific problems that show up in real websites.  When hunchentoot receives a URL, it passes it to the weblocks client request handler after doing any cookie-based session maintenance or stripping it off the URL parameter list.
+
+The weblocks request handler sequence is:
+- Session detection and initialization
+- Exception handling: expired actions
+- Action pipeline
+- Rendering pipeline
+- Exception handling: page-not-found
+
+Actions are intended to be behavior evoked by a user action which side effects the state of the widget hierarchy.  Actions should not, however, create side effects that change the widgets that are rendered in an action.  This should be done via explicit links in the rendered pages. (Actions can use redirect to 'rewrite' the URL to change how the widget tree is behaving).
+
+The rendering pipeline first writes all the widgets descended from a root widget, to a stream and collects important information such as javascript calls, dependencies, etc.  After the widgets have been rendered, the whole page is rendered using the accumulated information to, for example, generate script tags in the header, etc.
+
+
+::: URL models and action discipline in Weblocks:
+
+Normal operation:
+ - Every URL uniquely identifies a tree of widget 'composites'
+ - The rendering pipeline does not side-effect widget state
+ - Actions simply call through to the URL they were rendered under.
+ - AJAX calls maintain client-server correspondence for a given URL; refresh works
+ - Back button only works for the last widget tree mapped to a given URL,
+   not the interior state of those widgets
+
+Complex composites:
+ - Flows can run against any widget that maintains the composite protocol:
+   (Slava: my proposal)
+   i)  Sets the parent slot of any widget it contains to itself
+   ii) Implements the protocol (replace-widget parent old-child new-child) which
+       returns the original child and replaces the old child with the new child
+       in the composite.
+   iii) Calls render on the new child exactly the same as the old.
+
+Flows:
+ - The reason for a 1:1 map between URLs and tree-composites is that we need an anchor
+   point for continuation flows.  When you answer, you don't want the URL you answer to
+   to mismatch the answering widget!
+ - If you perform a flow on a composite in the interior of the tree, the called widget
+   ignores any URLs for sub-widgets; this makes sense as the new widget is replacing the
+   behavior of the old.
+
+Lazy Instantiation:
+ - The dispatch widget can instantiate widgets dynamically; but the URL dispatched to
+   is cached so the same instance is returned on future requests to the same URL
+ - This can lead to the "proliferation problem"
+
+Stateful URLs (SEE LONGER DISCUSSION BELOW):
+ - To keep the interior state of a widget in a URL and avoid proliferation, we use the
+   parameter component of the URL (it's what it's meant for).
+ - We'll provide a mechanism for changing state and automatically having the URL
+   updated so the client bar always matches the server state.  This is optional
+   behavior.
+ - For any state coupled to parameters, the back button will work as expected!
+
+Client-side history:
+ - To provide client-side history without a page load....
+   Something smart that uses a clean version of the RSH idea as an additional option
+   A widget can keep it's history in its memory
+   It can optionally write the last rendered state to a DB when the session is shut down
+
+
+
+Major State
+
+So I can see how having slot values turn into parameters is helpful.  It's easy to reconstruct both the widget hierarchy and internal state from a full URL.
+
+1)  When you dynamically change object state in an AJAX action, you can detect dirty writes that are mapped to parameters and instead of rendering dirty widgets, you simply send the new parameter list over to the client, write location.search with the new set, and cause a page reload.  (Turns out that's what Marco did - he just didn't say the fact that it forces a reload so I misunderstood).
+
+If we change parameter state during a normal call, we can send a simple redirect response to the client with the new URL + parameters.  This is easy to compute after the actions have all fired but before the rendering stage if a find-parameters-by-path (i.e. 1:1 URL->widgets) function can pick up all parameters from all objects that would render themselves.
+
+This would seamlessly handle per-object state without messing up flows or proliferating objects.  It also enables the back button to basically do the right thing but at the cost of page loads.  It also means we can redirect to parameter based URLs via actions instead of having to generate the right links while rendering.
+
+The big downside of the above is two roundtrips to the server, even if the packets are small, to handle these kinds of changes.  To avoid this we can have a special kind of action that allows the programmer to declare what parameters will change and generates the appropriate URL based on the current URL so it fetches the new URL, runs the action, and returns the page or snippets.
+
+
+
+I'll write up something on an RSH mechanism in a bit.

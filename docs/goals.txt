@@ -1,0 +1,13 @@
+
+A modern web framework must have:
+ 1. A simple, persistent and temporary model layer - elephant
+ 2. A set of flexible, customizable generic renderers
+ 3. A set of flexible, extensible widgets (do rendering, maintain UI state, etc.)
+ 4. Good looks out of the box
+ 5. Architectural guidance (how to create widgets, where to put them, widget interaction, callbacks, etc.)
+?6. Support for natural modal coding
+?7. Support for maintaining/reloading/versioning UI state
+
+Options:
+- A thread per session
+- Rebuild widgets (ala ASP.NET), use some sort of monadic/cps code for modal code

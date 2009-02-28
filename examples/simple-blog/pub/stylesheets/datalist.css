@@ -1,0 +1,167 @@
+
+.datalist .data-mining-bar form,
+.datalist .data-mining-bar form fieldset
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.datalist form.datalist-sort-bar,
+.datalist form.datalist-sort-bar fieldset select,
+.datalist form.datalist-sort-bar fieldset input
+{
+  font-size: x-small;
+  margin-right: 0.5em;
+}
+
+.datalist form.datalist-sort-bar span,
+.datalist form.datalist-sort-bar input,
+.datalist form.datalist-sort-bar select
+{ 
+  vertical-align: middle;
+}
+
+/* Replacing sort direction with an arrow */
+.datalist form.datalist-sort-bar a
+{
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.datalist form.datalist-sort-bar a span.direction,
+.datalist form.datalist-sort-bar span span.direction
+{
+  display: none;
+}
+
+.datalist form.datalist-sort-bar a.sort-asc:before
+{
+  content: url(/weblocks-common/pub/images/widget/datalist/up_arrow_link.png);
+}
+
+.datalist form.datalist-sort-bar a.sort-desc:before
+{
+  content: url(/weblocks-common/pub/images/widget/datalist/down_arrow_link.png);
+}
+
+/* Replacing sort direction with an arrow on IE browsers */
+*:first-child+html .datalist form.datalist-sort-bar a span.direction
+{
+  display: inline;
+}
+
+* html .datalist form.datalist-sort-bar a span.direction
+{
+  display: inline;
+}
+
+*:first-child+html form.datalist-sort-bar a.sort-asc,
+*:first-child+html .datalist form.datalist-sort-bar a.sort-desc
+{
+  display: inline-block;
+  text-indent: -1000em;
+  cursor: pointer;
+  width: 11px;
+}
+
+* html .datalist form.datalist-sort-bar a.sort-asc,
+* html .datalist form.datalist-sort-bar a.sort-desc,
+.datalist form.datalist-sort-bar span.sort-asc,
+.datalist form.datalist-sort-bar span.sort-desc
+{
+  display: -moz-inline-box;
+  display: inline-block;
+  text-indent: -1000em;
+  cursor: pointer;
+  width: 11px;
+  height: 6px;
+}
+
+* html .datalist form.datalist-sort-bar a.sort-asc,
+* html .datalist form.datalist-sort-bar a.sort-desc
+{
+  cursor: pointer;
+}
+
+*:first-child+html .datalist form.datalist-sort-bar a.sort-asc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/up_arrow_link.png) no-repeat right center;
+}
+
+* html .datalist form.datalist-sort-bar a.sort-asc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/up_arrow_link.png) no-repeat right center;
+}
+
+*:first-child+html .datalist form.datalist-sort-bar a.sort-desc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/down_arrow_link.png) no-repeat right center;
+}
+
+* html .datalist form.datalist-sort-bar a.sort-desc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/down_arrow_link.png) no-repeat right center;
+}
+
+.datalist form.datalist-sort-bar span.sort-asc,
+.datalist form.datalist-sort-bar span.sort-desc
+{
+  cursor: default;
+}
+
+/* No Script Arrow */
+.datalist form.datalist-sort-bar span.sort-desc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/down_arrow.png) no-repeat right center;
+}
+
+.datalist form.datalist-sort-bar span.sort-asc
+{
+  background: url(/weblocks-common/pub/images/widget/datalist/up_arrow.png) no-repeat right center;
+}
+
+/* Some colors */
+.datalist form.datalist-sort-bar span
+{
+  color: gray;
+}
+
+/* Lists */
+.datalist ol, .datalist ul
+{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.datalist .datalist-body .view
+{
+  width: 100%;
+}
+
+.datalist form.operations-form fieldset .operations
+{
+  margin-top: -0.75em;
+}
+
+/* IE6 and IE7 fix for gaps between list items Note, once we set
+   element to inline, we need to reset inner elements to block */
+.datalist .datalist-body ol li,
+.datalist .datalist-body ul li
+{ 
+  display: inline;
+}
+
+.datalist .datalist-body ol li li,
+.datalist .datalist-body ul li li
+{ 
+  display: block;
+}
+
+/* Remove view headers in the body */
+.datalist .datalist-body .view h1
+{
+  display: none;
+}
+

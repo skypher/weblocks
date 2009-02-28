@@ -1,0 +1,1 @@
+./examples/weblocks-demo/weblocks-demo.asd

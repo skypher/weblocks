@@ -1,0 +1,118 @@
+
+.graybox
+{
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: black;
+  z-index: 500;
+
+  filter: alpha(opacity=30);
+  -moz-opacity: 0.3;
+  opacity: 0.3;
+}
+
+/* IE 6 specific fix for lack of 'position: fixed' implementation */
+* html .graybox
+{
+  position: absolute;
+  left: expression(documentElement.scrollLeft + 'px');
+  top: expression(documentElement.scrollTop + 'px');
+  width: expression(document.documentElement.clientWidth + 'px');
+  height: expression(document.documentElement.clientHeight + 'px');
+}
+
+.dialog
+{
+  position: fixed;
+  _position: absolute; /* Degrade to this in IE for now */
+  z-index: 725;
+  width: 10em;
+}
+
+.dialog-body
+{
+  padding: 1em;
+  _height: 1%; /* hasLayout */
+  background-color: white;
+}
+
+/* Style choice dialog */
+.choice .dialog-body, .modal .choice
+{
+  background: white url(/weblocks-common/pub/images/dialog/question.png) no-repeat 0.5em center;
+}
+
+.dialog h1, .modal h1
+{
+  background-color: white;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.dialog h1 span, .modal h1 span
+{
+  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
+  display: block;
+}
+
+.dialog h1 span
+{
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+.choice
+{
+  text-align: center;
+}
+
+.choice form, .choice form fieldset, .choice p
+{
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.choice p
+{
+  margin-bottom: 1em;
+}
+
+.choice input
+{
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+}
+
+/* Style information dialog */
+.information .dialog-body, .modal .information
+{
+  background-image: url(/weblocks-common/pub/images/dialog/information.png);
+}
+
+/* Modal interaction */
+.modal
+{
+  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
+  padding-bottom: 2px;
+}
+
+.modal h1
+{
+  border: none;
+  margin: 0;
+}
+
+.modal .choice
+{
+  min-height: 48px;
+  _height: 48px;
+  background-position: left center;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+

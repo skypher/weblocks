@@ -1,0 +1,74 @@
+
+(in-package :weblocks)
+
+(export '(datagrid-drilldown-field))
+
+;;; Utilities
+(defun datagrid-drilldown-style (slot-name)
+  "Returns a style used in datagrid drilldown cells."
+  (concatenate 'string "drilldown" " " (attributize-name slot-name)))
+
+;;; Custom drilldown field
+(defclass datagrid-drilldown-field (table-view-field)
+  ((allow-sorting-p :initform nil))
+  (:documentation "A field used to render drilldown control."))
+
+(defun make-drilldown-field (grid-obj)
+  "Makes a custom field for rendering drilldown controls."
+  (let ((label (humanize-name (car (dataseq-on-drilldown grid-obj)))))
+    (make-instance 'datagrid-drilldown-field
+		   :label label
+		   :reader label
+		   :present-as nil)))
+
+;;; Drilldown cells
+(defmethod render-view-field-header ((field datagrid-drilldown-field) (view table-view)
+				     (widget datagrid) presentation value obj &rest args)
+  (declare (ignore args))
+  (with-html (:th :class (datagrid-drilldown-style
+			  (car (dataseq-on-drilldown widget)))
+		  "")))
+
+(defmethod render-view-field ((field datagrid-drilldown-field) (view table-view)
+			      (widget datagrid) presentation value obj &rest args
+			      &key row-action &allow-other-keys)
+  (declare (ignore args))
+  (with-html
+    (:td :class (datagrid-drilldown-style (car (dataseq-on-drilldown widget)))
+	 (unless (ajax-request-p)
+	   (htm
+	    (:noscript
+	     (:div
+	      (render-link row-action
+			   (humanize-name (car (dataseq-on-drilldown widget)))
+			   :ajaxp nil))))))))
+
+;;; Drilldown row
+(defmethod with-table-view-body-row ((view table-view) obj (widget datagrid) &rest args
+				     &key alternp &allow-other-keys)
+  (if (and (dataseq-allow-drilldown-p widget)
+	   (dataseq-on-drilldown widget))
+      (let ((row-action (make-action
+			 (lambda (&rest args)
+			   (declare (ignore args))
+			   (when (dataseq-autoset-drilled-down-item-p widget)
+			     (setf (dataseq-drilled-down-item widget) obj))
+			   (funcall (cdr (dataseq-on-drilldown widget)) widget obj))))
+	    (drilled-down-p (and (dataseq-drilled-down-item widget)
+				 (eql (object-id (dataseq-drilled-down-item widget))
+				      (object-id obj)))))
+	(safe-apply (sequence-view-row-prefix-fn view) view obj args)
+	(with-html
+	  (:tr :class (when (or alternp drilled-down-p)
+			(concatenate 'string
+				     (when alternp "altern")
+				     (when (and alternp drilled-down-p) " ")
+				     (when drilled-down-p "drilled-down")))
+	       :onclick (format nil "initiateActionOnEmptySelection(\"~A\", \"~A\");"
+				row-action (session-name-string-pair))
+	       :onmouseover "this.style.cursor = \"pointer\";"
+	       :style "cursor: expression(\"hand\");"
+	       (apply #'render-table-view-body-row view obj widget :row-action row-action args)))
+	(safe-apply (sequence-view-row-suffix-fn view) view obj args))
+      (call-next-method)))
+

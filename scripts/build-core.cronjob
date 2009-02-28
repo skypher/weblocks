@@ -1,0 +1,2 @@
+# MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+0 4 * * * cd /home/sky/www/weblocks-dev/scripts/weblocks-core/ && sbcl --load ../build-core.lisp && tar vcj --dereference --exclude=\*.asd -f ../weblocks-core-`date "+%Y-%m-%d"`.tar.bz2 ../weblocks-core

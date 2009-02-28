@@ -1,0 +1,80 @@
+@import url(/weblocks-common/pub/stylesheets/table.css);
+
+/* Body */
+.datagrid
+{
+  margin-bottom: 1em;
+  position: relative;
+  _height: 1%; /* IE 6 fix */
+}
+
+/* Sorting */
+.sort-asc span
+{
+  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
+}
+
+.sort-asc span a
+{
+  background: url(/weblocks-common/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
+}
+
+.sort-desc span
+{
+  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
+}
+
+.sort-desc span a
+{
+  background: url(/weblocks-common/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
+}
+
+
+.sort-asc span a, .sort-desc span a,
+.sort-asc span, .sort-desc span
+{
+  display: block;
+  text-decoration: underline;
+}
+
+/* Selecting */
+p.datagrid-select-bar
+{
+  padding: 0;
+  margin: 0;
+  font-size: x-small;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+p.datagrid-select-bar strong
+{
+  color: gray;
+  font-family: Garamond, New York, serif;
+  font-weight: normal;
+}
+
+.datagrid form .select
+{
+  text-align: right;
+  width: 1em;
+}
+
+.datagrid table tbody tr.drilled-down td.select input
+{
+  visibility: hidden;
+}
+
+.datagrid table tbody tr.drilled-down td.select div
+{
+  background: url(/weblocks-common/pub/images/widget/arrow.png) no-repeat center center;
+}
+
+/* We need to adjust margins to properly style pagination and item
+operations */
+.datagrid .datagrid-body .view.table
+{
+  margin-bottom: 0;
+}
+

@@ -1,0 +1,238 @@
+
+body
+{
+  font-size: small;
+  font-family: arial, helvetica, sans-serif;
+}
+
+a
+{
+  color: #A61E2E;
+}
+
+.view
+{
+  background: #ecf8d7 url(/weblocks-common/pub/images/widget/top_background.png) repeat-x;
+  margin-bottom: 1em;
+  _height: 0; /* IE specific hasLayout fix */
+}
+
+.view h1, .view fieldset h1
+{
+  background-color: #ecf8d7;
+}
+
+.view .extra-top-1
+{
+  height: 7px;
+  background: url(/weblocks-common/pub/images/widget/top_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.view .extra-top-2
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/weblocks-common/pub/images/widget/top_right.png) no-repeat top right;
+  border-bottom: 1px solid #dbeac1;
+  overflow: hidden;
+}
+
+.view h1, .view fieldset h1,
+.long-form fieldset .validation-errors-summary h2.error-count
+{
+  margin: 0;
+  padding: 0;
+  padding-left: 0.4em;
+}
+
+.view h1, .view fieldset h1, .table table caption, div.empty p,
+.view .empty-navigation, .view ul li, .view fieldset ul li,
+.view table thead tr th,
+.view fieldset div.submit, .view div.submit,
+.long-form fieldset .validation-errors-summary h2.error-count,
+.form fieldset .validation-errors-summary .non-field-validation-errors
+{
+  border-top: 1px solid #fcfef6;
+}
+
+.view h1, .view fieldset h1, .table table caption, div.empty p,
+.view .empty-navigation, .view ul li, .view fieldset ul li,
+.view table thead tr th,
+.view fieldset div.submit, .view div.submit,
+.long-form fieldset .validation-errors-summary,
+.form fieldset .validation-errors-summary .non-field-validation-errors
+{
+  border-bottom: 1px solid #dbeac1;
+}
+
+.view h1, .view fieldset h1, .table table caption, div.empty p,
+.view .empty-navigation, .view ul, .view fieldset ul, .table table,
+.view fieldset div.submit, .view div.submit,
+.long-form fieldset .validation-errors-summary h2.error-count
+{
+  border-left: 2px solid #dbeac1;
+  border-right: 2px solid #dbeac1;
+}
+
+h1, h2
+{
+  font-size: large;
+  color: #29364F;
+  font-weight: bold;
+  font-family: Garamond, New York, serif;
+}
+
+.view h1 .action, .view fieldset h1 .action
+{
+  display: none;
+}
+
+.view ul, .view fieldset ul, .table table, .view fieldset div.submit,
+.view div.submit
+{
+  padding-left: 0;
+  margin: 0;
+}
+
+.view ul li, .view fieldset ul li, .menu ul li a
+{
+  list-style: none;
+  padding-left: 1.5em;
+}
+
+.view div.submit, .form fieldset div.submit
+{
+  padding-left: 13.5em;
+}
+
+.view ul li .label, .view fieldset ul li label span.slot-name,
+.table table thead
+{
+  color: #808080;
+  font-weight: bold;
+}
+
+.view ul li .label, .view fieldset ul li label span.slot-name
+{
+  display: -moz-inline-box;
+  display: inline-block;
+  width: 12em;
+}
+
+.view .extra-bottom-1
+{
+  height: 7px;
+  background: url(/weblocks-common/pub/images/widget/bottom_background.png) repeat-x top;
+  overflow: hidden;
+}
+
+.view .extra-bottom-2
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/weblocks-common/pub/images/widget/bottom_left.png) no-repeat top left;
+  overflow: hidden;
+}
+
+.view .extra-bottom-3
+{
+  height: 7px;
+  margin-top: -7px;
+  background: url(/weblocks-common/pub/images/widget/bottom_right.png) no-repeat top right;
+  overflow: hidden;
+}
+
+.missing
+{
+  font-style: italic;
+  color: #808080;
+}
+
+input[type=hidden]
+{
+  visibility: hidden;
+}
+
+#ajax-progress
+{
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+/* IE 6 specific progress bar fix */
+* html #ajax-progress
+{
+  position: absolute;
+  left: expression((documentElement.scrollLeft
+                     + (documentElement.clientWidth - this.clientWidth))
+                   + 'px')
+  top: expression(documentElement.scrollTop + 'px');
+}
+
+/* Common styles for form, and data */
+.data, .form
+{
+  width: 27em;
+}
+
+/* Close button */
+span.close-button 
+{
+  display: block;
+  width: 15px;
+  height: 15px;
+  overflow: hidden;
+}
+
+span.close-button a
+{
+  /* background: url(/weblocks-common/pub/images/close.png) no-repeat top left; */
+  padding-left: 1000em;
+}
+
+span.close-button a:hover
+{
+  /* background: url(/weblocks-common/pub/images/close_hl.png) no-repeat top left; */
+}
+
+/* Total Items */
+span.total-items
+{
+  color: gray;
+  font-size: x-small;
+}
+
+/* Text */
+.ellipsis
+{
+  color: gray;
+  font-weight: bold;
+}
+
+p.text
+{
+  margin: 0;
+}
+
+.view ul li p.text
+{
+  margin-left: 0.5em;
+}
+
+/* No elements */
+div.empty p
+{
+  padding-left: 0.5em;
+  margin: 0;
+}
+
+div.empty p span.caption
+{
+  color: #29364F;
+  font-weight: bold;
+  font-family: Garamond, New York, serif;
+}
+

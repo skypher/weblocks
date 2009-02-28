@@ -1,0 +1,8 @@
+rename ChangeLog examples/simple-blog/ChangeLog
+rename conf examples/simple-blog/conf
+rename data examples/simple-blog/data
+rename license.txt examples/simple-blog/license.txt
+exclude pub 
+rename simple-blog.asd examples/simple-blog/simple-blog.asd
+rename simple-blog.lisp examples/simple-blog/simple-blog.lisp
+rename src examples/simple-blog/src

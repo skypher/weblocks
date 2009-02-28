@@ -1,0 +1,10 @@
+To run, you'll need to modify the paths in rundemo.lisp to match
+your system, then just run that (i.e. "sbcl --load rundemo.lisp") or
+whatever.  Note that you'll get the REPL back with very little
+feedback; this means the server is running on port 8080.
+
+To see the demo be persistent across different runs of the server,
+comment out every reference to the sandbox store, and in cases where
+simply commenting them out won't work (i.e. (find-persistent-objects
+(sandbox-store) ...)) replace (sandbox-store) with
+*prevalence-store*
