@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name ensure-widget-methods
+(export '(defwidget widget widget-uri-path widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
@@ -22,7 +22,7 @@ inherits from 'widget' if no direct superclasses are provided."
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))))
 
-(defgeneric widget-current-navigation-url (widget)
+(defgeneric widget-uri-path (widget)
   (:documentation "Return the current navigation URL for WIDGET
                   as computed at the dispatching stage.")
   (:method ((widget string))
@@ -32,9 +32,9 @@ inherits from 'widget' if no direct superclasses are provided."
     nil))
 
 (defclass widget (dom-object-mixin)
-  ((current-navigation-url :accessor widget-current-navigation-url
-                           :type (or string null) ;; XXX unbound instead of null
-                           :initform nil)
+  ((uri-path :accessor widget-uri-path
+	     :type (or string null) ;; XXX unbound instead of null
+	     :initform nil)
    (propagate-dirty :accessor widget-propagate-dirty
 		    :initform nil
 		    :initarg :propagate-dirty
@@ -84,24 +84,24 @@ inherits from 'widget' if no direct superclasses are provided."
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
-(defmethod widget-current-navigation-url ((widget widget))
+(defmethod widget-uri-path ((widget widget))
   (log-message :debug "~%WIDGET-CNURL: for widget ~A~%" widget)
   (acond
     ((eql widget (root-composite))
      (log-message :debug "WIDGET-CNURL: root-composite~%")
      "/")
-    ((slot-value widget 'current-navigation-url)
+    ((slot-value widget 'uri-path)
      (log-message :debug "WIDGET-CNURL: has own: ~S~%" it)
      it)
     ((widget-parent widget)
      (log-message :debug "WIDGET-CNURL: has parent (~S), following...~%" it)
-     (widget-current-navigation-url it))
+     (widget-uri-path it))
     (t ;; XXX huh?
      (log-message :debug "WIDGET-CNURL: err, don't know.~%" it)
       "/"
       )))
 
-(defmethod widget-current-navigation-url ((widget function))
+(defmethod widget-uri-path ((widget function))
   "/")
 
 ;; Process the :name initarg and set the dom-id accordingly. Note that
@@ -305,7 +305,7 @@ stylesheets and javascript links in the page header."))
     (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
-  (let ((*current-navigation-url* (widget-current-navigation-url obj))
+  (let ((*current-navigation-url* (widget-uri-path obj))
         (*current-widget* obj))
     (declare (special *current-navigation-url* *current-widget*))
     (if inlinep
