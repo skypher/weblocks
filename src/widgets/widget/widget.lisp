@@ -120,8 +120,8 @@ strings, function, etc."
   nil)
 
 (defgeneric widget-children (w)
-  (:documentation "Return a list of all widgets who are children of
-w (e.g. may be rendered when w is rendered).")
+  (:documentation "Return a list of all widgets (all types) who are
+children of w (e.g. may be rendered when w is rendered).")
   (:method (w) "NIL unless defined otherwise." nil)
   (:method ((w widget)) (reduce #'append (slot-value w 'children) :key #'cdr)))
 
@@ -130,7 +130,41 @@ w (e.g. may be rendered when w is rendered).")
   (:method (new-widgets (w widget))
     (error "(setf widget-children) should never be called, use set-children-of-type")))
 
+;; Rationale: yes, I realize it would be nicer to use methods (and
+;; possibly generators) to functionally enumerate the children of
+;; widgets that inherit from multiple parents. However, since a) this
+;; would be quite hard to understand for newcomers, b) it would be more
+;; difficult to control and override the order of rendering, c) weblocks
+;; is written in a mutable-data style anyway, I figured we might as well
+;; store these children somewhere. Now, if everyone uses (setf
+;; widget-children), then in the case of multiple inheritance we'll get
+;; conflicts: some widgets will clobber the list, replacing the children
+;; of other widgets. A solution is to use an alist keyed by a symbol
+;; (keyword), with a list corresponding to each symbol. That way widgets
+;; can store as many lists of children as they like.
+
+;; This solution has the disadvantage of looking less clean and
+;; functional, but has many advantages. In particular, it is very easy
+;; to debug, as the current list of children is simply stored in a slot
+;; and can easily be looked at. The same cannot be said for methods with
+;; custom method combinations. Also, it is very flexible: a widget can
+;; easily control the way _all_ of its children are rendered, including
+;; children inherited from its superclasses. Another advantage is that
+;; we get one make-widget-place-writer function which works for nearly
+;; all cases, so you will very rarely need to write your own. --jwr
+
+;; One caveat: if your widget stores some of its children in its own
+;; slots, you should still call set-children-of-type, so that they
+;; become a part of the widget tree, and when you render, you should
+;; call render-widget on get-children-of-type, not on your slot. The
+;; reason for this is that someone might have replaced your child with
+;; do-widget. get-children-of-type will give you the current list of
+;; children, your slot will not. --jwr
+
 (defgeneric set-children-of-type (obj widgets type)
+  (:documentation "Set the list of children of type TYPE for OBJ to be
+  WIDGETS. TYPE is a symbol (usually a keyword) and serves as a handle
+  so that these particular children may later be retrieved.")
   (:method ((obj widget) widgets type)
     (let* ((children (slot-value obj 'children))
 	   (cell (assoc type children)))
@@ -142,6 +176,7 @@ w (e.g. may be rendered when w is rendered).")
     (update-parent-for-children obj)))
 
 (defgeneric get-children-of-type (obj type)
+  (:documentation "Get the list of children of type TYPE for OBJ.")
   (:method ((obj widget) type)
     (cdr (assoc type (slot-value obj 'children)))))
 
@@ -152,8 +187,9 @@ w (e.g. may be rendered when w is rendered).")
   (:method (w) "NIL unless defined otherwise" nil))
 
 (defgeneric update-parent-for-children (widget)
-  (:documentation "Called during the tree shakedown phase and when
-  creating the tree (before rendering). Updates the parent of WIDGET to
+  (:documentation "Called during the tree shakedown phase, when creating
+  the tree (before rendering) and when modifying the list of children
+  for a widget. Updates the parent of WIDGET's children to point to
   PARENT-WIDGET.")
   (:method (w) "NIL unless defined otherwise" nil)
   (:method ((w widget))
