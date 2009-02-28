@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(selector static-selector get-widget-for-tokens select-pane))
+(export '(selector static-selector get-widget-for-tokens select-pane http-not-found))
 
 (defgeneric get-widget-for-tokens (selector uri-tokens)
   (:documentation "Given a list of uri-tokens, map them to a widget. All
