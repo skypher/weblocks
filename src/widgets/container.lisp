@@ -1,10 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(container container-children))
+(export '(container))
 
 (defwidget container (widget)
-  ((children :accessor container-children
+  ((children :accessor widget-children
              :initform nil
              :initarg :children
              :documentation "The children of this container. An alist where
@@ -16,12 +16,12 @@
   (declare (ignore initargs))
   ;; We need this to properly initialize values
   (setf (slot-value obj 'children) nil)
-  (setf (container-children obj) children))
+  (setf (widget-children obj) children))
 
 (defparameter *override-parent-p* nil
-  "If set, allow parent overriding in (SETF CONTAINER-CHILDREN).")
+  "If set, allow parent overriding in (SETF WIDGET-CHILDREN).")
 
-(defmethod (setf container-children) (new-value (cont container))
+(defmethod (setf widget-children) (new-value (cont container))
   "Assign new children to the container and update their parents.
 Signals an error if one of the children already has a parent
 unless *OVERRIDE-PARENT-P* is set."
@@ -48,7 +48,7 @@ unless *OVERRIDE-PARENT-P* is set."
      ;; first let's get our own children straight
      (container-update-direct-children cont)
      ;; now update the indirect children
-     (dolist (child (container-children cont))
+     (dolist (child (widget-children cont))
        (when (typep child 'container)
          (container-update-children child)))))
 

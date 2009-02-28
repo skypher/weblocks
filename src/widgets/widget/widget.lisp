@@ -3,7 +3,7 @@
 
 (export '(defwidget widget widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
-          widget-parent widget-prefix-fn widget-suffix-fn
+          widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
           widget-dirty-p find-widget-by-path* find-widget-by-path
@@ -152,6 +152,18 @@ strings, function, etc."
 
 (defmethod (setf widget-rendered-p) (val obj)
   nil)
+
+(defgeneric widget-children (wij)
+  (:documentation "Answer an ordered list, settable when appropriate,
+of widgets for whom WIJ is formally a parent.")
+  (:method (wij)
+    "NIL unless defined otherwise."
+    (check-type wij valid-widget)
+    nil))
+
+(defgeneric (setf widget-children) (new-value wij)
+  (:documentation "Set the value of `widget-children', when
+appropriate for WIJ's class."))
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
 (defmethod widget-parent (obj)

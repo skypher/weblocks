@@ -24,16 +24,16 @@
 
 ;;; backwards compatibility
 (defmethod composite-widgets ((comp composite))
-  (container-children comp))
+  (widget-children comp))
 
 (defmethod (setf composite-widgets) (value (comp composite))
-  (setf (container-children comp) value))
+  (setf (widget-children comp) value))
 
 (defmethod render-widget-body ((obj composite) &rest args)
   (declare (ignore args))
   (mapc (lambda (w)
 	  (render-widget w))
-	(container-children obj)))
+	(widget-children obj)))
 
 (defmethod find-widget-by-path* (path (root composite))
   (find-widget-by-path* (cdr path)

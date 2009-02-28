@@ -26,7 +26,7 @@
   consumed."))
 
 (defmethod (setf dispatcher-cache) :after (value (d dispatcher))
-  (setf (container-children d) (list (cdr value))))
+  (setf (widget-children d) (list (cdr value))))
 
 (defun uri-tokens-start-with (uri-tokens match-tokens)
   "Returns true if 'uri-tokens' start with 'match-tokens'. Returns
