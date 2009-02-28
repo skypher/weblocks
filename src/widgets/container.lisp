@@ -19,13 +19,8 @@
   (setf (slot-value obj 'children) nil)
   (setf (widget-children obj) children))
 
-(defparameter *override-parent-p* nil
-  "If set, allow parent overriding in (SETF WIDGET-CHILDREN).")
-
 (defmethod (setf widget-children) (new-value (cont container))
-  "Assign new children to the container and update their parents.
-Signals an error if one of the children already has a parent
-unless *OVERRIDE-PARENT-P* is set."
+  "Assign new children to the container and update their parents."
   ;; we're no longer a parent of widgets we hold
   (symbol-macrolet ((children (slot-value cont 'children)))
     (mapcar
@@ -34,11 +29,9 @@ unless *OVERRIDE-PARENT-P* is set."
       (ensure-list children))
     ;; but we're a parent of new widgets we're passed
     (let ((new-widgets (ensure-list new-value)))
-      (mapcar (lambda (child)
-                (if (and (widget-parent child) (not *override-parent-p*))
-                  (error "Widget ~A already has a parent." child)
-                  (setf (widget-parent child) cont)))
-              new-widgets)
+      (mapc (lambda (child)
+	      (setf (widget-parent child) cont))
+	    new-widgets)
       (setf children new-widgets))))
 
 (defgeneric container-update-direct-children (cont)

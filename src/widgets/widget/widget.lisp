@@ -7,8 +7,7 @@
           with-widget-header
           render-widget-body widget-css-classes render-widget mark-dirty
           widget-dirty-p 
-          *current-widget*
-          *override-parent-p*))
+          *current-widget*))
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
@@ -122,16 +121,8 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod (setf widget-name) (name (obj widget))
   (setf (dom-id obj) name))
 
-(defparameter *override-parent-p* nil
-  "Allow parent overriding in (SETF COMPOSITE-WIDGETS).")
-
-;;; Don't allow setting a parent for widget that already has one
-;;; (unless it's setting parent to nil)
 (defmethod (setf widget-parent) (val (obj widget))
-  (if (and val (not (member (widget-parent obj) `(,val nil)))
-	   (not *override-parent-p*))
-      (error "Widget ~a already has a parent." obj)
-      (setf (slot-value obj 'parent) val)))
+  (setf (slot-value obj 'parent) val))
 
 (deftype widget-designator ()
   "The supertype of all widgets.  Check against this type instead of
