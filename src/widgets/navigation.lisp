@@ -118,6 +118,29 @@ widgets bears the title NAME."
     (apply #'init-navigation nav args)
     nav))
 
+(export '(lazy-navigation make-lazy-navigation))
+
+(defwidget lazy-navigation (navigation)
+  ()
+  (:documentation "Lazy navigation does not create the entire widget
+  tree immediately. Instead, parts of the widget tree are created as
+  they are needed. Note that in the current implementation parts of the
+  tree that are not selected are forgotten."))
+
+(defmethod update-dependents ((obj lazy-navigation) children)
+  "Lazily resolve our new children -- if any of them are functions, call
+them to get the real widgets."
+  (set-children-of-type obj
+			(mapcar (lambda (child)
+				  (if (functionp child) (funcall child) child))
+				(ensure-list children))
+			:selector))
+
+(defun make-lazy-navigation (name &rest args)
+  (let ((nav (make-instance 'lazy-navigation :name name)))
+    (apply #'init-navigation nav args)
+    nav))
+
 (export '(teleport teleport-source teleport-key))
 
 (defwidget teleport ()
