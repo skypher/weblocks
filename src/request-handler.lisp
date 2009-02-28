@@ -17,6 +17,11 @@
 (defvar *dispatch/render-lock* (bordeaux-threads:make-lock
                                  "*dispatch-render-lock*"))
 
+(defmethod handle-client-request :around (app)
+  (handler-bind ((error (lambda (c)
+                          (return-from handle-client-request
+                                       (handle-error-condition c)))))
+    (call-next-method)))
 
 (defgeneric handle-client-request (app)
   (:documentation

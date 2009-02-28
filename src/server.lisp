@@ -83,8 +83,8 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
    (asdf-system-directory asdf-system-name)))
 
 (defun weblocks-dispatcher (request)
-  "Dispatcher function suitable for inclusion into hunchentooth dispatch table.
-The function serves all started applications"
+  "Weblocks' Hunchentoot dispatcher. The function serves all started applications
+  and their static files."
   (dolist (app *active-webapps*)
     (let* ((script-name (script-name* request))
 	   (app-prefix (webapp-prefix app))
@@ -121,10 +121,8 @@ The function serves all started applications"
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
-	 (return-from weblocks-dispatcher 
-	   #'(lambda ()
-	       (handle-client-request app)))))))
-  (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
+         (return-from weblocks-dispatcher (f0 (handle-client-request app)))))))
+      (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
 (setf hunchentoot:*default-handler*
