@@ -27,6 +27,9 @@
   tabbed control, etc. It is a convenience combination of the
   static-selector widget and a menu snippet."))
 
+(defmethod select-pane ((navigation navigation) token)
+  (setf (navigation-current-pane navigation) (or token "")))
+
 (defun navigation-pane-name-for-token (navigation token)
   "Return the pane name for a given uri-token or NIL if not found."
   (cdr (assoc token (navigation-pane-names navigation))))
