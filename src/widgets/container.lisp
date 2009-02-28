@@ -47,6 +47,8 @@ unless *OVERRIDE-PARENT-P* is set."
   (:documentation "Update the children of the container.")
   (:method ((obj null)) (assert nil))	; bug?
   (:method ((obj widget)) nil)		; widgets are leaves by default
+  (:method ((obj function)) nil)	; functions have no children
+  (:method ((obj string)) nil)		; and neither do strings
   (:method ((cont container))
      ;; first let's get our own children straight
      (container-update-direct-children cont)
