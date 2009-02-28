@@ -29,7 +29,11 @@
 				   (:file "user")))
 			 (:module views
 				  :components
-				  ((:file "post-views"))
+				  ((:file "post-views"
+					  :depends-on ("presentations"))
+				   (:module presentations
+					    :components
+					    ((:file "action-link"))))
 				  :depends-on ("model"))
 			 (:module widgets
 				  :components
@@ -38,4 +42,3 @@
 					  :depends-on ("post")))
 				  :depends-on ("model" "views")))
 			:depends-on ("simple-blog" conf))))
-
