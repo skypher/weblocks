@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(container container-children *override-parent-p*))
+(export '(container container-children))
 
 (defwidget container (widget)
   ((children :accessor container-children
