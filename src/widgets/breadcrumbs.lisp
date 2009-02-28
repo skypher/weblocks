@@ -40,10 +40,10 @@
 	  (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
 	  (push-end (navigation-pane-name-for-token obj (static-selector-current-pane obj)) crumbs))
 	 ((equal (class-of obj) (find-class 'on-demand-selector))
-	  (let ((name (first (car (on-demand-selector-cache obj)))))
+	  (let ((name (car (last (car (on-demand-selector-cache obj))))))
 	    (when name
 	      (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
-	      (push-end (humanize-name name) crumbs)))))))
+	      (push-end (string-capitalize (string-downcase (humanize-name name)) :end 1) crumbs)))))))
     (with-html
       (:ul
        (loop for item on crumbs by #'cddr
