@@ -90,6 +90,9 @@ may be NIL in which case the default pane name is provided."
 (defmethod per-class-dependencies append ((obj navigation))
   (list (make-local-dependency :stylesheet "menu")))
 
+(defmethod page-title ((obj navigation))
+  (navigation-pane-name-for-token obj (static-selector-current-pane obj)))
+
 (defun init-navigation (obj &rest args)
   "A helper function to create a navigation widget."
   (mapc (lambda (pane-info)

@@ -23,23 +23,25 @@
 (defmethod render-widget-body ((obj breadcrumbs) &rest args)
   (declare (ignore args))
   (let (crumbs)
-    (walk-navigation
+    (walk-widget-tree
      (root-widget)
-     (lambda (obj)
-       (unless crumbs
-	 (push (navigation-pane-name-for-token obj nil) crumbs))
-       ;; FIXME: rework this entirely, widgets should be able to define
-       ;; a widget-navigation-title method and walk-widget-tree should
-       ;; extract those somehow --jwr
+     (lambda (obj depth)
+       (declare (ignore depth))
+       ;; we only process objects that eat URI tokens
        (cond 
 	 ((equal (class-of obj) (find-class 'navigation))
+	  (unless crumbs
+	    (push (navigation-pane-name-for-token obj nil) crumbs))
 	  (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
 	  (push-end (navigation-pane-name-for-token obj (static-selector-current-pane obj)) crumbs))
 	 ((equal (class-of obj) (find-class 'on-demand-selector))
 	  (let ((name (car (last (car (on-demand-selector-cache obj))))))
 	    (when name
 	      (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
-	      (push-end (string-capitalize (string-downcase (humanize-name name)) :end 1) crumbs)))))))
+	      ;; hopefully one of our children defined a page-title method...
+	      (push-end (or (first (remove nil (mapcar #'page-title (widget-children obj))))
+			    (humanize-name name))
+			crumbs)))))))
     (with-html
       (:ul
        (loop for item on crumbs by #'cddr

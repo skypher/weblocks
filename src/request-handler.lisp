@@ -115,7 +115,15 @@ customize behavior)."))
   (render-dirty-widgets))
 
 (defun update-widget-tree ()
-  (walk-widget-tree (root-widget) #'update-children))
+  (declare (special *current-page-description*))
+  (let ((depth 0) page-title)
+    (walk-widget-tree (root-widget)
+		      (lambda (widget d)
+			(update-children widget)
+			(let ((title (page-title widget)))
+			  (when (and title (> d depth))
+			    (setf page-title title)))))
+    (when page-title (setf *current-page-description* page-title))))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*

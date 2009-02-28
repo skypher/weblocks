@@ -7,7 +7,7 @@
           with-widget-header
 	  widget-children update-children update-parent-for-children
 	  set-children-of-type get-children-of-type
-	  walk-widget-tree
+	  walk-widget-tree page-title
           render-widget render-widget-body render-widget-children
 	  widget-css-classes
 	  mark-dirty widget-dirty-p
@@ -160,16 +160,30 @@ w (e.g. may be rendered when w is rendered).")
     (mapc (lambda (child) (setf (widget-parent child) w))
 	  (widget-children w))))
 
-
-(defgeneric walk-widget-tree (obj fn)
+(defgeneric walk-widget-tree (obj fn &optional depth)
   (:documentation "Walk the widget tree starting at obj and calling fn
-  at every node. Fn is a function that takes one argument (a widget).")
-  (:method ((obj function) fn) (funcall fn obj))
-  (:method ((obj string) fn) (funcall fn obj))
-  (:method ((obj symbol) fn) (funcall fn obj))
-  (:method ((obj widget) fn)
-    (funcall fn obj)
-    (mapc (curry-after #'walk-widget-tree fn) (widget-children obj))))
+  at every node. Fn is a function that takes two arguments: a widget
+  being processed and an integer indicating the current depth in the
+  widget tree.")
+  (:method ((obj function) fn &optional (depth 0)) (funcall fn obj depth))
+  (:method ((obj string) fn &optional (depth 0)) (funcall fn obj depth))
+  (:method ((obj symbol) fn &optional (depth 0)) (funcall fn obj depth))
+  (:method ((obj widget) fn &optional (depth 0))
+    (funcall fn obj depth)
+    (mapc (curry-after #'walk-widget-tree fn (+ depth 1)) (widget-children obj))))
+
+
+(defgeneric page-title (w)
+  (:documentation "Generate a page title. This method will be called
+  when walking the widget tree before rendering. Widgets that wish to
+  set the page title should have a method defined. If multiple widgets
+  provide a page title, one deepest in the widget tree (most specific)
+  will be chosen.")
+  (:method ((obj widget)) nil)
+  (:method ((obj string)) nil)
+  (:method ((obj function)) nil)
+  (:method ((obj symbol)) nil))
+
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
 (defmethod widget-parent (obj)
