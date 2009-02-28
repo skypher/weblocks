@@ -64,3 +64,6 @@ tokens."
 	    ;; return the new widget
 	    (values widget consumed-tokens remaining-tokens))))))
 
+
+(defmethod render-widget-body ((obj on-demand-selector) &rest args)
+  (apply #'render-widget (cdr (on-demand-selector-cache obj)) args))
