@@ -19,7 +19,8 @@
        (declare (ignore depth))
        ;; we only process objects that eat URI tokens, we need to know them, unfortunately
        (cond 
-	 ((equal (class-of obj) (find-class 'navigation))
+	 ((or (equal (class-of obj) (find-class 'navigation))
+	      (equal (class-of obj) (find-class 'lazy-navigation)))
 	  (unless crumbs
 	    (push (navigation-pane-name-for-token obj nil) crumbs))
 	  (push-end (make-webapp-uri (selector-base-uri obj)) crumbs)
