@@ -14,7 +14,7 @@
       "A list of client-side scripts to be sent over to the browser at
       the end of ajax request execution.")
 
-(defvar *dispatch/render-lock* (hunchentoot-mp:make-lock
+(defvar *dispatch/render-lock* (bordeaux-threads:make-lock
                                  "*dispatch-render-lock*"))
 
 
@@ -44,9 +44,8 @@ a refresh will work).
 This function also manages lists of callback functions and calls them
 at different points before and after request. See 'request-hook'.
 
-Override this method (along with :before and :after specifiers to
-customize behavior)."))
-
+Override this method (along with :before and :after specifiers) to
+customize behavior."))
 
 (defmethod handle-client-request ((app weblocks-webapp))
   (let ((*current-webapp* app))
@@ -132,7 +131,7 @@ customize behavior)."))
   ; we need to render widgets before the boilerplate HTML
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
-  (hunchentoot-mp:with-lock (*dispatch/render-lock*)
+  (bordeaux-threads:with-lock-held (*dispatch/render-lock*)
     (handler-case (update-widget-tree)
       (http-not-found () (return-from handle-normal-request
                                       (page-not-found-handler app))))
@@ -233,3 +232,4 @@ association list. This function is normally called by
 (eval-when (:load-toplevel)
   (pushnew 'action-txn-hook
 	   (request-hook :application :dynamic-action)))
+
