@@ -125,6 +125,8 @@
 						:components ((:file "widget"
 								    :depends-on ("widget-mop"))
 							     (:file "widget-mop")))
+                                       (:file "composite"
+					      :depends-on (widget))
 				       (:file "flash"
 					      :depends-on (widget))
 				       (:file "data-editor"
