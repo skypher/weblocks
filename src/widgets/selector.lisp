@@ -10,7 +10,7 @@
 (defwidget selector ()
   ((base-uri :accessor selector-base-uri
 	     :documentation "The base URI for this selector, set during
-	     the tree shakedown phase, before rendering. Used during
+	     the tree shakedown phase before rendering. Used during
 	     rendering to compute URL paths."))
   (:documentation "A selector is a widget within the tree that has a
   relation with URIs."))
@@ -24,24 +24,24 @@
 
   The whole tree update protocol goes like this:
 
-  1) handle-normal-request calls update-widget-tree, which walks the
-  tree using walk-widget-tree starting at root-widget and calling
+  1) HANDLE-NORMAL-REQUEST calls UPDATE-WIDGET-TREE, which walks the
+  tree using WALK-WIDGET-TREE starting at ROOT-WIDGET and calling
   update-children at every node.
 
-  2) selector's update-children method (valid for all selectors,
-  e.g. widgets that process uri-tokens) calls get-widget-for-tokens.
+  2) The selector's UPDATE-CHILDREN method (valid for all selectors,
+  i.e. widgets that process URI tokens) calls GET-WIDGET-FOR-TOKENS.
 
-  3) if a widget corresponding to particular uri-tokens is found,
-  update-children calls update-dependents, so that the selector (or its
-  subclass) may update its dependents list and do other
-  housekeeping. The default implementation of update-dependents just
-  calls (SETF WIDGET-CHILDREN) to store the children under the :selector
+  3) if a widget corresponding to particular URI tokens is found,
+  UPDATE-CHILDREN calls UPDATE-DEPENDENTS, so that the selector (or its
+  subclass) may update its dependents list and do other housekeeping.
+  The default implementation of UPDATE-DEPENDENTS just calls
+  (SETF WIDGET-CHILDREN) to store the children under the :SELECTOR
   type.
 
   Usually the only thing you'll want to do if you are implementing your
   own kind of selector is to subclass selector and provide a
-  get-widget-for-tokens method for it. See 'on-demand-selector' for an
-  example."))
+  GET-WIDGET-FOR-TOKENS method for it. See class ON-DEMAND-SELECTOR for
+  an example."))
 
 (defgeneric update-dependents (selector children)
   (:documentation "Update the dependents for a given selector with
@@ -73,7 +73,8 @@
   ((panes :accessor static-selector-panes :initarg :panes :initform nil
 	  :documentation "An alist mapping uri-tokens (strings) to
 	  widgets. The default item (widget) should have nil as the
-	  key.")
+	  key. Not providing a default item will cause a redirect to
+          the first item's URI.")
    (current-pane :accessor static-selector-current-pane :initform nil
 		 :documentation "The uri-tokens corresponding to the
 		 currently selected pane, or an empty string if the
@@ -88,9 +89,17 @@
   ;; consume it, to give others a chance to process it
   (let* ((token (peek-at-token uri-tokens))
 	 (pane (assoc token (static-selector-panes selector) :test #'equalp)))
-    (when pane
-      (select-pane selector (first (get-tokens uri-tokens)))
-      (cdr pane))))
+    (cond
+      ;; found pane
+      (pane
+        (select-pane selector (first (get-tokens uri-tokens)))
+        (cdr pane))
+      ;; no default pane -- redirect to the first pane's URI
+      ((static-selector-panes selector)
+        (redirect (concatenate 'string
+                               (string-right-trim "/" (selector-base-uri selector))
+                               "/"
+                               (car (first (static-selector-panes selector)))))))))
 
 (defgeneric select-pane (selector token)
   (:documentation "Called by get-widget-for-tokens when a pane is found
