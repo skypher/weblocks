@@ -327,6 +327,8 @@ that will be applied before and after the body is rendered.")
   (:method (obj body-fn &rest args
 	    &key widget-prefix-fn widget-suffix-fn
 	    &allow-other-keys)
+    (remf args :widget-prefix-fn)
+    (remf args :widget-suffix-fn)
     (with-html
       (:div :class (dom-classes obj)
 	    :id (dom-id obj)
