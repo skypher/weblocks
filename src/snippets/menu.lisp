@@ -61,7 +61,8 @@ the navigation as disabled."
                                      (function
                                       (render-link target label)))))))))))
     (with-html
-      (:div :class "rendered-menu"
+      (:div :class "view menu" ; should probably be 'rendered-menu' but I'm not going to be
+                               ; the one adapting the CSS to this.
             :id (unattributized-name container-id 'menu)
             (with-extra-tags
               (when header
