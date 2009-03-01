@@ -420,13 +420,13 @@ stylesheets and javascript links in the page header."))
   (:documentation
    "Default implementation adds a widget to a list of dirty
 widgets. Normally used during an AJAX request. If there are any
-widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true, these
-widgets are added to the dirty list as well.
+widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
+(the default), these widgets are added to the dirty list as well.
 
-Note, this function is automatically called when widget slots are
+Note that this function is automatically called when widget slots are
 modified, unless slots are marked with affects-dirty-status-p."))
 
-(defmethod mark-dirty ((w widget) &key propagate)
+(defmethod mark-dirty ((w widget) &key (propagate t))
   (declare (special *dirty-widgets*))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
