@@ -59,7 +59,7 @@ customize behavior)."))
 (defmethod handle-client-request :around (app)
   (handler-bind ((error (lambda (c)
                           (return-from handle-client-request
-                                       (handle-error-condition c)))))
+                                       (handle-error-condition app c)))))
     (call-next-method)))
 
 (defmethod handle-client-request (app)
@@ -137,7 +137,9 @@ customize behavior)."))
 	(eval-hook :post-render)
 	(unless (ajax-request-p)
 	  (setf (webapp-session-value 'last-request-uri) *uri-tokens*))
-	(get-output-stream-string *weblocks-output-stream*)))))
+        (if (member (return-code*) *approved-return-codes*)
+          (get-output-stream-string *weblocks-output-stream*)
+          (handle-http-error app (return-code*)))))))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
