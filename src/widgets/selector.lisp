@@ -95,6 +95,7 @@
         (select-pane selector (first (get-tokens uri-tokens)))
         (cdr pane))
       ;; no default pane -- redirect to the first pane's URI
+      ;; FIXME: doesn't cope well with the Flash widget
       ((static-selector-panes selector)
         (redirect (concatenate 'string
                                (string-right-trim "/" (selector-base-uri selector))
