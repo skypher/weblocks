@@ -8,6 +8,7 @@
 	  update-children update-parent-for-children
 	  walk-widget-tree page-title
           render-widget render-widget-body render-widget-children
+          get-widgets-by-type
 	  widget-css-classes
 	  mark-dirty widget-dirty-p
           *current-widget*))
@@ -192,7 +193,10 @@ children of w (e.g. may be rendered when w is rendered).")
   (:documentation "Walk the widget tree starting at obj and calling fn
   at every node. Fn is a function that takes two arguments: a widget
   being processed and an integer indicating the current depth in the
-  widget tree.")
+  widget tree.
+  
+  TODO: should support an optional kwarg COLLECT to collect the return
+  values of applying FN.")
   (:method ((obj function) fn &optional (depth 0)) (funcall fn obj depth))
   (:method ((obj string) fn &optional (depth 0)) (funcall fn obj depth))
   (:method ((obj symbol) fn &optional (depth 0)) (funcall fn obj depth))
@@ -452,6 +456,27 @@ modified, unless slots are marked with affects-dirty-status-p."))
 
 (defmethod print-object ((obj widget) stream)
   (print-unreadable-object (obj stream :type t)
-    (format stream "~s" (ensure-dom-id obj))))
+    (format stream "~S" (ensure-dom-id obj))))
 
+(defmethod get-widgets-by-type (type &key (include-subtypes-p t))
+  "Find all widgets of a specific type in the widget tree."
+  (let (widgets)
+    (walk-widget-tree (root-widget)
+                      (lambda (widget d)
+                        (declare (ignore d))
+                        (when (or (eq (type-of widget) type)
+                                  (and include-subtypes-p
+                                       (typep widget type)))
+                          (push widget widgets))))
+    widgets))
+
+(defmethod get-widget-by-id (id &key (test #'string-equal))
+  "Find a widget by its DOM id."
+  (let (widgets)
+    (walk-widget-tree (root-widget)
+                      (lambda (widget d)
+                        (declare (ignore d))
+                        (when (funcall test id (dom-id widget))
+                          (push widget widgets))))
+    widgets))
 
