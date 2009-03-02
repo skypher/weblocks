@@ -3,7 +3,7 @@
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-	  *current-page-description*))
+	  *current-page-description* *catch-errors-p*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -18,10 +18,15 @@
 (defvar *dispatch/render-lock* (bordeaux-threads:make-lock
                                  "*dispatch-render-lock*"))
 
+;; remove this when Hunchentoot reintroduces *catch-errors-p*
+(defvar *catch-errors-p* t)
+
 (defmethod handle-client-request :around (app)
   (handler-bind ((error (lambda (c)
-                          (return-from handle-client-request
-                                       (handle-error-condition c)))))
+                          (if *catch-errors-p*
+                            (return-from handle-client-request
+                                         (handle-error-condition c))
+                            (signal c)))))
     (call-next-method)))
 
 (defgeneric handle-client-request (app)
