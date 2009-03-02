@@ -35,14 +35,17 @@
 			:depends-on ("weblocks"))
 		 (:file "debug-mode"
 			:depends-on ("weblocks" "actions"))
-                 (:file "error-handler"
-                        :depends-on ("weblocks"))
+		 (:file "uri-tokens"
+			:depends-on ("weblocks"))
 		 (:file "request-hooks"
 			:depends-on ("weblocks"))
+                 (:file "error-handler"
+                        :depends-on ("weblocks"))
 		 (:file "request-handler"
 			:depends-on (utils "weblocks" "page-template" "debug-mode"
 					   "actions" "request-hooks" "application"
-					   "request" "dependencies" "error-handler" store))
+					   "request" "dependencies" "uri-tokens"
+                                           "error-handler" store))
 		 (:module snippets
 			  :components ((:file "suggest")
 				       (:file "menu")
@@ -122,6 +125,8 @@
 						:components ((:file "widget"
 								    :depends-on ("widget-mop"))
 							     (:file "widget-mop")))
+                                       (:file "composite"
+					      :depends-on (widget))
 				       (:file "flash"
 					      :depends-on (widget))
 				       (:file "data-editor"
@@ -158,18 +163,16 @@
 					      :depends-on (widget "dataseq"))
 				       (:file "pagination"
 					      :depends-on (widget "flash"))
-				       (:file "composite"
-					      :depends-on (widget))
-                                       (:file "table-composite"
-					      :depends-on (composite))
-				       (:file "dispatcher"
-					      :depends-on (widget))
-				       (:file "selector-mixin"
-					      :depends-on (widget))
+                                       #+(or)(:file "table-composite"
+                                                    :depends-on (composite))
 				       (:file "selector"
-					      :depends-on ("dispatcher" "selector-mixin" widget))
+					      :depends-on (widget))
+				       (:file "on-demand-selector"
+					      :depends-on ("selector"))
 				       (:file "navigation"
-					      :depends-on ("composite" "selector" widget)))
+					      :depends-on ("selector" widget))
+				       (:file "breadcrumbs"
+					      :depends-on ("navigation")))
 			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow

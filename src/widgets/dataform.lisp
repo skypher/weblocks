@@ -104,7 +104,7 @@ customize form behavior.")
 					    (apply #'dataform-submit-action obj data args)
 					  (if success
 					      (progn
-						(mark-dirty obj :putp t)
+						(mark-dirty obj :propagate t)
 						(safe-funcall (dataform-on-success obj) obj)
 						(setf break-out t))
 					      (progn

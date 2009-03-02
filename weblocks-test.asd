@@ -32,6 +32,8 @@
 			:depends-on ("test-code" utils-test))
 		 (:file "actions"
 			:depends-on ("test-code"))
+                 (:file "uri-tokens"
+			:depends-on ("test-code"))
 		 (:file "request-hooks"
 			:depends-on ("test-code"))
 		 (:file "request-handler-utils"
@@ -135,7 +137,7 @@
 						:depends-on ("widget-test-utils" "pagination-utils"))
 				       (:file "gridedit"
 					      :depends-on ("widget-test-utils" "pagination-utils"))
-				       (:file "dispatcher")
+				       (:file "selector")
 				       (:file "navigation")
 				       (:file "pagination-utils")
 				       (:file "pagination"

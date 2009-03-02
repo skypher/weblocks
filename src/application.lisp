@@ -25,7 +25,7 @@
    (description :accessor weblocks-webapp-description :initarg :description 
 		:initform nil :type (or null string)
 		:documentation "The name of the application.  This slot will be used 
-                   by 'page-title' to generate the default title for each page.")
+                   by 'application-page-title' to generate the default title for each page.")
    (public-files-path :initarg :public-files-path 
 		      :accessor weblocks-webapp-public-files-path
 		      :initform nil
@@ -68,8 +68,8 @@
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
-                         composite widget at the root of the application. 'init-user-session' is 
-                         responsible for adding initial widgets to this composite.")
+                         widget at the root of the application. 'init-user-session' is
+                         responsible for adding initial children to this widget.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))
@@ -479,13 +479,13 @@ provider URI)."
 (defun webapp-name (&optional (app (current-webapp)))
   "Returns the name of the web application (also see 'defwebapp'). Please
    note, this name will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
+   displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-name app))
 
 (defun webapp-description (&optional (app (current-webapp)))
   "Returns the description of the web application. Please note, this
    description will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
+   displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-description app))
 
 (defun webapp-serves-hostname (hostname &optional (app (current-webapp)))

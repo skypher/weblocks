@@ -71,7 +71,7 @@ div#main-menu
   position: relative;
 }
 
-div#main-menu div.composite
+div#main-menu div.navigation-body
 {
   margin-left: 16em;
 }

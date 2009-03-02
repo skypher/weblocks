@@ -274,7 +274,6 @@ does not include the domain name, and any query string parameters.
 Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
 \(request-uri-path)
 => \"/foo/bar\""
-  (declare (special *uri-tokens*))
   (identity (cl-ppcre:regex-replace "/?(?:\\?.*)$" (request-uri*) "")))
 
 (defun string-remove-left (str prefix &key ignore-case-p)

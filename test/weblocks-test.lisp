@@ -235,7 +235,7 @@ webapp in my context."
 			  (setf *uri-tokens* (weblocks::tokenize-uri uri)))
 			(setf (slot-value *request* 'hunchentoot::uri)
 			      (or uri (concatenate 'string "/"
-						   (compose-uri-tokens-to-url *uri-tokens*))))
+						   (uri-tokens-to-string *uri-tokens*))))
 			(funcall thunk))
 	(setf (symbol-function 'weblocks::make-action) make-action-orig)
 	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
