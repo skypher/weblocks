@@ -24,6 +24,7 @@
       (make-instance 'composite :widgets w))))
 
 ;;; Make sure parents are switched properly
+#+(or) ; disabled for now -- see comment to (SETF WIDGET-CHILDREN)
 (addtest composite-add-widget-parent-switching
   (let* ((w1 (make-instance 'composite))
 	 (w2 (make-instance 'composite))

@@ -99,6 +99,11 @@ inherits from 'widget' if no direct superclasses are provided."
   (setf (dom-id obj) name))
 
 (defmethod (setf widget-parent) (val (obj widget))
+  ;; TODO: we might want to ensure that the old parent doesn't
+  ;;       keep a reference to the widget.
+  ;;
+  ;;       Enable test COMPOSITE-ADD-WIDGET-PARENT-SWITCHING
+  ;;       when this is implemented.
   (setf (slot-value obj 'parent) val))
 
 (deftype widget-designator ()
