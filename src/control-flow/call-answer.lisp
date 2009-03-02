@@ -107,8 +107,7 @@ the latter one being optionally transformed by WRAPPER-FN."
             (lambda (new-callee)
               (setf (widget-children (root-widget))
                     (funcall wrapper-fn new-callee))))
-      (setf (slot-value (root-widget) 'children)
-	    old-value)
+      (setf (slot-value (root-widget) 'children) old-value)
       (update-parent-for-children (widget-children (root-widget))))))
 
 
