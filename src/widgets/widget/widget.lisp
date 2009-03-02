@@ -167,16 +167,25 @@ children of w (e.g. may be rendered when w is rendered).")
 (defgeneric (setf widget-children) (widgets obj &optional type)
   (:documentation "Set the list of children of type TYPE for OBJ to be
   WIDGETS. TYPE is a symbol (usually a keyword) and serves as a handle
-  so that these particular children may later be retrieved.")
+  so that these particular children may later be retrieved.
+  
+  The children alist is copied before modification so the changed
+  list of children does not share structure with the old one.
+  
+  This is especially important for DO-WIDGET and friends.")
   (:method (widgets (obj widget) &optional (type :widget))
-    (let* ((children (slot-value obj 'children))
-	   (cell (assoc type children)))
-      (if cell
-	  (if widgets
-	      (rplacd cell (ensure-list widgets))
-	      (setf (slot-value obj 'children) (remove type children :key #'car)))
-	  (when widgets (push (cons type (ensure-list widgets)) (slot-value obj 'children)))))
-    (update-parent-for-children obj)))
+    (let* ((children (copy-alist (slot-value obj 'children)))
+           (cell (assoc type children)))
+      (setf (slot-value obj 'children) 
+            (cond
+              ((and cell widgets)
+               (rplacd cell (ensure-list widgets))
+               children)
+              (cell
+               (remove type children :key #'car))
+              (widgets
+               (cons (cons type (ensure-list widgets)) children))))
+      (update-parent-for-children obj))))
 
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
