@@ -420,7 +420,7 @@ stylesheets and javascript links in the page header."))
                args)))
     (setf (widget-rendered-p obj) t)))
 
-(defgeneric mark-dirty (w &key propagate)
+(defgeneric mark-dirty (w &key propagate putp)
   (:documentation
    "Default implementation adds a widget to a list of dirty
 widgets. Normally used during an AJAX request. If there are any
@@ -428,13 +428,18 @@ widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
 (the default), these widgets are added to the dirty list as well.
 
 Note that this function is automatically called when widget slots are
-modified, unless slots are marked with affects-dirty-status-p."))
+modified, unless slots are marked with affects-dirty-status-p.
 
-(defmethod mark-dirty ((w widget) &key (propagate t))
+PUTP is a legacy argument. Do not use it in new code."))
+
+(defmethod mark-dirty ((w widget) &key (propagate t propagate-supplied)
+                                       (putp nil putp-supplied))
   (declare (special *dirty-widgets*))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
     into a CLOS object derived from 'widget'."))
+  (and propagate-supplied putp-supplied
+       (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
   (ignore-errors
     (when (widget-rendered-p w)
       (setf *dirty-widgets* (adjoin w *dirty-widgets*)))

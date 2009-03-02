@@ -307,7 +307,7 @@
 	(declare (special weblocks::*dirty-widgets*))
 	(mark-dirty (make-instance 'composite :name "test"
 				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
-		    :putp t)
+		    :propagate t)
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))
   nil)
 
@@ -323,7 +323,7 @@
 	  (declare (special weblocks::*dirty-widgets*))
 	  (render-widget w)
 	  (render-widget (find-widget-by-path (car path)))
-	  (mark-dirty w :putp t)
+	  (mark-dirty w :propagate t)
 	  (mapcar #'widget-name weblocks::*dirty-widgets*))))
   (test2-leaf "test"))
 
@@ -335,6 +335,9 @@
 	(setf (widget-rendered-p w) t)
 	(widget-name (car weblocks::*dirty-widgets*))))
   nil)
+
+(addtest mark-dirty-both-propagate-and-putp-supplied
+  (ensure-error (mark-dirty (make-instance 'widget) :propagate t :putp t)))
 
 ;;; test widget-dirty-p
 (deftest widget-dirty-p-1
