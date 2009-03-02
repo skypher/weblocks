@@ -21,14 +21,6 @@
 ;; remove this when Hunchentoot reintroduces *catch-errors-p*
 (defvar *catch-errors-p* t)
 
-(defmethod handle-client-request :around (app)
-  (handler-bind ((error (lambda (c)
-                          (if *catch-errors-p*
-                            (return-from handle-client-request
-                                         (handle-error-condition c))
-                            (signal c)))))
-    (call-next-method)))
-
 (defgeneric handle-client-request (app)
   (:documentation
    "This method handles each request as it comes in from the
@@ -60,8 +52,10 @@ customize behavior."))
 
 (defmethod handle-client-request :around (app)
   (handler-bind ((error (lambda (c)
-                          (return-from handle-client-request
-                                       (handle-error-condition app c)))))
+                          (if *catch-errors-p*
+                            (return-from handle-client-request
+                                         (handle-error-condition c))
+                            (signal c)))))
     (call-next-method)))
 
 (defmethod handle-client-request ((app weblocks-webapp))
