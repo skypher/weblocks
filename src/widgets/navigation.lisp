@@ -84,7 +84,23 @@ may be NIL in which case the default pane name is provided."
   (navigation-pane-name-for-token obj (static-selector-current-pane obj)))
 
 (defun init-navigation (obj &rest args)
-  "A helper function to create a navigation widget."
+  "A helper function to create a navigation widget.
+  
+  The elements of ARGS are either lists of the form
+  (NAME WIDGET [URI-TOKEN]) or flat pairs of atoms,
+  in which case the first atom will be the name
+  and the second atom the widget.
+  
+  The two forms of elements may be mixed, but an atom
+  must always be followed by another atom."
+  ;; normalize args
+  (setf args (loop for arg = (pop args)
+                   while arg
+                   if (atom arg)
+                     collect (list arg (pop args))
+                   else
+                     collect arg))
+  ;; initialize nav from args
   (mapc (lambda (pane-info)
           (let ((token (or (third pane-info) (attributize-name (first pane-info))))
                 (name (first pane-info))
