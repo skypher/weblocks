@@ -84,7 +84,7 @@ customize behavior."))
 	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (*uri-tokens* (make-instance 'uri-tokens :all-tokens (tokenize-uri (request-uri*))))
+	    (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
 	     *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	    *page-dependencies* *current-page-description*
@@ -110,7 +110,7 @@ customize behavior."))
             (handle-normal-request app)))
         (eval-hook :post-render)
 	(unless (ajax-request-p)
-	  (setf (webapp-session-value 'last-request-uri) (all *uri-tokens*)))
+	  (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
 	(get-output-stream-string *weblocks-output-stream*)))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
@@ -144,15 +144,15 @@ customize behavior."))
     (render-widget (root-widget)))
   ; set page title if it isn't already set
   (when (and (null *current-page-description*)
-             (last (all *uri-tokens*)))
+             (last (all-tokens *uri-tokens*)))
     (setf *current-page-description* 
-          (humanize-name (last-item (all *uri-tokens*)))))
+          (humanize-name (last-item (all-tokens *uri-tokens*)))))
   ; render page will wrap the HTML already rendered to
   ; *weblocks-output-stream* with necessary boilerplate HTML
   (render-page app)
   ;; make sure all tokens were consumed (FIXME: still necessary?)
   (unless (or (tokens-fully-consumed-p *uri-tokens*)
-              (null (all *uri-tokens*)))
+              (null (all-tokens *uri-tokens*)))
     (page-not-found-handler app)))
 
 (defun remove-session-from-uri (uri)

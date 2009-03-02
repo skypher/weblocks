@@ -49,7 +49,7 @@ may be NIL in which case the default pane name is provided."
                         (unless (member token (navigation-hidden-panes obj)
                                         :test #'string-equal)
                           (cons (navigation-pane-name-for-token obj token)
-                                (compose-uri-tokens-to-url token)))))
+                                (uri-tokens-to-string token)))))
                     (static-selector-panes obj)))))
 
 (defgeneric render-navigation-menu (obj &rest args)

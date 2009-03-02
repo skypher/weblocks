@@ -1,7 +1,7 @@
 (in-package :weblocks)
 
 (export '(on-demand-selector on-demand-lookup-function on-demand-make-if-missing
-	  on-demand-mutate-cache uri-tokens-start-with))
+	  on-demand-mutate-cache))
 
 (defwidget on-demand-selector (selector)
   ((lookup-function :accessor on-demand-lookup-function
@@ -26,14 +26,6 @@
   and an optional fourth :no-cache value, indicating that the result is
   not to be cached."))
 
-(defun uri-tokens-start-with (uri-tokens match-tokens)
-  "Returns true if 'uri-tokens' start with 'match-tokens'. Returns
-false otherwise."
-  (or (and match-tokens
-	   (list-starts-with uri-tokens match-tokens :test #'string=))
-      (and (null match-tokens)
-	   (null uri-tokens))))
-
 (defmethod get-widget-for-tokens ((obj on-demand-selector) tokens)
   "Looks up and returns the widget in the cache based on the
 tokens. If the widget is not in the cache and make-if-missing is
@@ -41,18 +33,18 @@ t (the default), calls the lookup-function to make a new one. Returns three
 values -- a widget, a list of consumed tokens, and a list of remaining
 tokens."
   (if (and (on-demand-selector-cache obj)
-	   (uri-tokens-start-with (remaining tokens) (car (on-demand-selector-cache obj))))
+	   (uri-tokens-start-with (remaining-tokens tokens) (car (on-demand-selector-cache obj))))
       (progn
 	;; we have the widget cached, consume the right amount of tokens
-	(get-tokens tokens (length (car (on-demand-selector-cache obj))))
+	(pop-tokens tokens (length (car (on-demand-selector-cache obj))))
 	;; ...and return the cached widget
 	(cdr (on-demand-selector-cache obj)))
       ;; widget not cached
       (when (on-demand-make-if-missing obj)
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
-	    (funcall (on-demand-lookup-function obj) obj (remaining tokens))
+	    (funcall (on-demand-lookup-function obj) obj (remaining-tokens tokens))
 	  ;; discard the tokens we have decided to consume
-	  (get-tokens tokens (length consumed-tokens))
+	  (pop-tokens tokens (length consumed-tokens))
 	  (unless widget
 	    ;; clear the cache
 	    (setf (on-demand-selector-cache obj) nil))

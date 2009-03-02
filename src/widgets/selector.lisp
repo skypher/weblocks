@@ -16,11 +16,11 @@
   relation with URIs."))
 
 (defgeneric get-widget-for-tokens (selector uri-tokens)
-  (:documentation "Given a list of uri-tokens, map them to a widget. All
+  (:documentation "Given a list of URI tokens, map them to a widget. All
   selectors implement this method. There can be multiple strategies for
-  mapping uri-tokens to widgets: static maps, dynamically-generated
+  mapping URI tokens to widgets: static maps, dynamically-generated
   widgets, dynamically-generated widgets with caching. Returns a widget
-  or NIL if not found, modifies uri-tokens.
+  or NIL if not found. Modifies URI-TOKENS.
 
   The whole tree update protocol goes like this:
 
@@ -62,7 +62,7 @@
 	(make-webapp-uri
 	 (string-left-trim
 	  "/" (string-right-trim
-	       "/" (compose-uri-tokens-to-url (consumed *uri-tokens*))))))
+	       "/" (uri-tokens-to-string (consumed-tokens *uri-tokens*))))))
   (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
     (if widget
 	(update-dependents selector widget)
@@ -92,7 +92,7 @@
     (cond
       ;; found pane
       (pane
-        (select-pane selector (first (get-tokens uri-tokens)))
+        (select-pane selector (first (pop-tokens uri-tokens)))
         (cdr pane))
       ;; no default pane -- redirect to the first pane's URI
       ((and (static-selector-panes selector)
@@ -104,7 +104,7 @@
                               (car (first (static-selector-panes selector)))))))))
 
 (defgeneric select-pane (selector token)
-  (:documentation "Called by get-widget-for-tokens when a pane is found
+  (:documentation "Called by GET-WIDGET-FOR-TOKENS when a pane is found
    and selected. Subclasses may use this method to maintain information
    about what is currently selected.")
   (:method ((obj static-selector) token)
