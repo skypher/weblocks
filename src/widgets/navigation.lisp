@@ -2,8 +2,8 @@
 (in-package :weblocks)
 
 (export '(navigation render-navigation-menu init-navigation make-navigation
-	  navigation-pane-names navigation-header
-          navigation-hidden-panes navigation-render-content))
+	  navigation-pane-names navigation-menu-items navigation-header
+          navigation-hidden-panes navigation-render-content-p))
 
 (defwidget navigation (static-selector)
   ((pane-names :accessor navigation-pane-names
@@ -39,19 +39,24 @@
 may be NIL in which case the default pane name is provided."
   (cdr (assoc token (navigation-pane-names navigation) :test #'equalp)))
 
+(defgeneric navigation-menu-items (obj)
+  (:documentation "Returns the menu items for a navigation object
+  in a format suitable for RENDER-MENU. Hidden panes will not be included.")
+  (:method ((obj navigation))
+    (remove nil
+            (mapcar (lambda (pane)
+                      (let ((token (car pane)))
+                        (unless (member token (navigation-hidden-panes obj)
+                                        :test #'string-equal)
+                          (cons (navigation-pane-name-for-token obj token)
+                                (compose-uri-tokens-to-url token)))))
+                    (static-selector-panes obj)))))
+
 (defgeneric render-navigation-menu (obj &rest args)
   (:documentation "Renders the HTML menu for the navigation widget.")
   (:method ((obj navigation) &rest args &key menu-args &allow-other-keys)
     (declare (ignore args))
-    (apply #'render-menu
-           (remove nil
-                   (mapcar (lambda (pane)
-		       (let ((token (car pane)))
-			 (unless (member token (navigation-hidden-panes obj)
-					 :test #'string-equal)
-			   (cons (navigation-pane-name-for-token obj token)
-				 (compose-uri-tokens-to-url token)))))
-                           (static-selector-panes obj)))
+    (apply #'render-menu (navigation-menu-items obj)
            :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
            :header (if (widget-name obj)
