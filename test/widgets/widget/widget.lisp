@@ -381,38 +381,16 @@
 	  weblocks::*dirty-widgets*)))
   nil)
 
-;;; test find-widget-by-path
-(deftest find-widget-by-path-1
-    (find-widget-by-path '(hello) nil)
-  nil)
 
-(deftest find-widget-by-path-2
-    (find-widget-by-path nil 'hello)
-  hello)
+;;; test get-widgets-by-type
 
-(deftest find-widget-by-path-3
-    (with-request :get nil
-      (setf (root-composite) (create-site-layout))
-      (let ((res (find-widget-by-path '(root-inner test-nav-1 test2 test2-leaf))))
-	(values (widget-name res)
-		(type-of res))))
-  test2-leaf composite)
+;; TODO
 
-(deftest find-widget-by-path-4
-    (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))
-      (find-widget-by-path '(doesnt exist)))
-  nil)
 
-(deftest find-widget-by-path-5
-    (with-request :get nil :uri "/test2"
-      (setf (root-composite) (create-site-layout))
-      (catch 'hunchentoot::handler-done
-	(handle-client-request (weblocks::current-webapp)))
-      (let ((test2 (find-widget-by-path '(root-inner test-nav-1 test2))))
-	(values (widget-name test2)
-		(type-of test2))))
-  "test2" composite)
+;;; test get-widgets-by-id
+
+;; TODO
+
 
 ;;; test customized widget printing
 (deftest widget-printing-1
