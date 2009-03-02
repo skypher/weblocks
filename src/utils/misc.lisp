@@ -556,9 +556,9 @@ answering its result."
 		 :type (pathname-type full-path)))
 
 (defun modified-time-path (real-file-path &key (system :weblocks) (modified-time-folder "modified-time/"))
-  (let ((weblocks-folder (asdf-system-directory system)))
-    (merge-pathnames (relative-path real-file-path weblocks-folder)
-		     (merge-pathnames modified-time-folder weblocks-folder))))
+  (let ((system-folder (asdf-system-directory system)))
+    (merge-pathnames (relative-path real-file-path system-folder)
+		     (merge-pathnames modified-time-folder system-folder))))
 
 
 (defun previous-modified-time (record-file-path)
