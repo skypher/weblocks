@@ -64,6 +64,8 @@
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
+   (dependency-bundling-p :accessor weblocks-webapp-dependency-bundling :initarg :bundling :initform t
+			  :documentation "Turns on bundling for local dependency files (e.g. css js).")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the

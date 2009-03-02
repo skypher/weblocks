@@ -520,3 +520,66 @@ answering its result."
 				     (cons ,(first optarg) ,rest)))
 			     opts :from-end t :initial-value more))
 	    `(funcall ',function ,@reqs)))))
+
+
+(defmacro with-file-write ((stream-name path) &body body)
+  `(progn
+     (ensure-directories-exist ,path)
+     (with-open-file (,stream-name ,path :direction :output :if-exists
+				   :supersede :if-does-not-exist :create)
+       ,@body)))
+
+(defun write-to-file (object path)
+  (with-file-write (stream path)
+    (write object :stream stream)))
+
+(defun read-from-file (path)
+  (with-open-file (stream path :direction :input :if-does-not-exist nil)
+    (eval (read stream nil nil))))
+
+(defun slurp-file (filepath)
+  (let* ((stream (open filepath))
+	 (seq (make-string (file-length stream))))
+    (read-sequence seq stream)
+    seq))
+
+(defun merge-files (file-list saved-path)
+  (with-file-write (stream saved-path)
+	(dolist (file file-list)
+	  (write-string (slurp-file file) stream))))
+
+(defun relative-path (full-path prefix-path)
+  (make-pathname :directory (cons :relative
+				  (nthcdr (length (pathname-directory prefix-path))
+					  (pathname-directory full-path)))
+		 :name (pathname-name full-path)
+		 :type (pathname-type full-path)))
+
+(defun modified-time-path (real-file-path &key (system :weblocks) (modified-time-folder "modified-time/"))
+  (let ((weblocks-folder (asdf-system-directory system)))
+    (merge-pathnames (relative-path real-file-path weblocks-folder)
+		     (merge-pathnames modified-time-folder weblocks-folder))))
+
+
+(defun previous-modified-time (record-file-path)
+  (read-from-file record-file-path))
+
+(defun write-to-modified-time (time record-path)
+  (write-to-file time record-path))
+
+(defun file-modified-p (file-path)
+  (let ((record-path (modified-time-path file-path))
+	(modified-time (file-write-date file-path)))
+    (if (and (cl-fad:file-exists-p record-path)
+	     (= (file-write-date file-path)
+		(previous-modified-time record-path)))
+	nil
+	(progn
+	  (write-to-modified-time modified-time record-path)
+	  t))))
+
+(defun files-modified-p (path-list)
+  (let ((modified nil))
+    (dolist (path path-list modified)
+      (when (file-modified-p path)
+	(setf modified t)))))
