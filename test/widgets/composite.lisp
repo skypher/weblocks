@@ -16,12 +16,12 @@
 	 (c (make-instance 'composite :widgets w)))
     (ensure-same (widget-parent w) c)))
 
-;;; widget can't be in multiple composites
+;;; widget can be in multiple composites; it's up to the user to ensure
+;;; proper parentship
 (addtest composite-add-widget-multiple
   (let ((w (make-instance 'composite)))
     (make-instance 'composite :widgets w)
-    (ensure-error
-      (make-instance 'composite :widgets w))))
+    (make-instance 'composite :widgets w)))
 
 ;;; Make sure parents are switched properly
 #+(or) ; disabled for now -- see comment to (SETF WIDGET-CHILDREN)
@@ -41,11 +41,11 @@
 	b-rendered
 	(comp (make-instance 'composite)))
     (push-end (lambda ()
-		(setf a-rendered t))
-	      (composite-widgets comp))
+                (setf a-rendered t))
+              (composite-widgets comp))
     (push-end (lambda ()
-		(setf b-rendered t))
-	      (composite-widgets comp))
+                (setf b-rendered t))
+              (composite-widgets comp))
     (render-widget comp)
     (ensure a-rendered)
     (ensure b-rendered)))
