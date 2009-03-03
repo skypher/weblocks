@@ -104,100 +104,6 @@ when new dependencies appeared in AJAX page updates.")
 (defun sort-dependencies-by-type (dependency-list)
   (sort dependency-list #'dependencies-lessp))
 
-
-;;; === Bundling dependency ===
-
-;;; A record of locations and compositions of the bundled files
-(defclass bundle-tally ()
-  ((last-id :accessor last-id :initarg :last-id
-	    :documentation "The id of the last created bundle file.")
-   (composition-list :accessor composition-list :initarg :composition-list
-		     :documentation "A list of lists. Each list contains a bundle id and a list of files that the bundle is composed of.")
-   (modified-p :accessor modified-p :initform nil
-	       :documentation "Indicate if the tally has been modified.")
-   (bundle-folder :accessor bundle-folder :initarg :bundle-folder
-		  :documentation "Stores the path of the bundle folder for easier access.")
-   (tally-path :reader tally-path :initarg :tally-path
-	       :documentation "Stores the path of the tally file for easier access."))
-  (:documentation "A record of all bundles and their composition files."))
-
-;;; Copy the tally file into a bundle-tally object
-(defun get-bundle-tally ()
-  (let* ((bundle-folder (merge-pathnames "bundles/" (compute-webapp-public-files-path (current-webapp))))
-	 (tally-path (merge-pathnames "tally" bundle-folder))
-	 (tally (if (cl-fad:file-exists-p tally-path)
-		    (read-from-file tally-path)
-		    '(0))))
-    (make-instance 'bundle-tally :last-id (car tally) :composition-list (cdr tally)
-		   :bundle-folder bundle-folder :tally-path tally-path)))
-
-;;; Save the bundle-tally object into the tally file
-(defun store-bundle-tally (tally)
-  (when (modified-p tally)
-    (write-to-file `',(cons (last-id tally) (composition-list tally))
-		   (tally-path tally))))
-
-(defun add-to-tally (bundle-name file-list tally)
-  (with-slots (composition-list modified-p) tally
-    (push (cons bundle-name file-list) composition-list)			      
-    (setf modified-p t)))
-
-
-(defun remove-from-tally (bundle-name tally)
-  (with-slots (composition-list modified-p) tally
-    (setf composition-list (remove-if #'(lambda (x) (string-equal (car x) bundle-name)) composition-list))
-    (setf modified-p t)))
-
-(defun create-bundle-file (file-list type tally)
-  (let ((bundle-name (format nil "~A.~A" (incf (last-id tally)) type)))
-    (add-to-tally bundle-name file-list tally)
-    (merge-files file-list (merge-pathnames bundle-name (bundle-folder tally)))
-    bundle-name))
-
-(defun delete-bundle-file (bundle-name tally)
-  (remove-from-tally bundle-name tally)
-  (delete-file (merge-pathnames bundle-name (bundle-folder tally))))
-
-
-;;; covers all cases because used after prune-dependencies
-;;; otherwise it should be (and (set-difference lst1 lst2) (set-difference lst2 lst1))
-(defun contain-same-strings (lst1 lst2)
-  (if (= (length lst1) (length lst2))
-      (null (set-difference lst1 lst2 :test #'string-equal))))
-
-;;; If the same files have already been bundled, return the bundle-name
-(defun find-bundle (file-list tally)
-  (car (find-if #'(lambda (x) (contain-same-strings (cdr x) file-list))
-		(composition-list tally))))
-
-(defun bundle-modified-p (bundle-name file-list tally)
-  (if (files-modified-p file-list)
-      (progn
-	(delete-bundle-file bundle-name tally)
-	t)
-      nil))
-
-(defun build-bundle (file-list type &key media)
-  (bordeaux-threads:with-lock-held ((bordeaux-threads:make-lock))
-    (let* ((tally (get-bundle-tally))
-	   (bundle-name (find-bundle file-list tally)))
-      (when (or (null bundle-name)
-		(bundle-modified-p bundle-name file-list tally))
-	(setf bundle-name (create-bundle-file file-list type tally)))
-      (store-bundle-tally tally)
-      ;; make new dependency object for the bundle file
-      (let ((physical-path (merge-pathnames bundle-name (bundle-folder tally)))
-	    (virtual-path (merge-pathnames (format nil "bundles/~A" bundle-name)
-					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix (current-webapp))))))
-	(cond ((string-equal type "css")
-	       (make-instance 'stylesheet-dependency
-			      :url virtual-path :media media
-			      :local-path physical-path))
-	      ((string-equal type "js")
-	       (make-instance 'script-dependency :url virtual-path
-			      :local-path physical-path)))))))
-
-
 (defun bundle-dependencies (dependency-list)
   (let* (newlist local-stylesheet local-script)
     (dolist (dep dependency-list)
@@ -224,7 +130,7 @@ when new dependencies appeared in AJAX page updates.")
   do more interesting things, such as combining differences.")
   (:method (dependency-list)
     (let ((pruned-list (prune-dependencies dependency-list)))
-      (sort-dependencies-by-type (if (weblocks-webapp-dependency-bundling (current-webapp))
+      (sort-dependencies-by-type (if (bundle-dependencies-p (current-webapp))
 				     (bundle-dependencies pruned-list)
 				     pruned-list)))))
 

@@ -23,8 +23,10 @@
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
 			  :depends-on ("weblocks"))
+		 (:file "bundling"
+			:depends-on ("weblocks" utils))
 		 (:file "dependencies"
-			:depends-on ("weblocks" "server" utils))
+			:depends-on ("weblocks" "server" "bundling" utils))
 		 (:file "dom-object"
 			:depends-on ("weblocks" utils))
 		 (:file "page-template"
