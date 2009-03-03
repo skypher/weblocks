@@ -55,14 +55,18 @@
   (delete-file (merge-pathnames bundle-name (bundle-folder tally))))
 
 
-;;; covers all cases because used after prune-dependencies
-;;; otherwise it should be (and (set-difference lst1 lst2) (set-difference lst2 lst1))
+
 (defun contain-same-strings (lst1 lst2)
+  "(and (set-difference lst1 lst2) (set-difference lst2 lst1)) is a more
+    accurate prompt for whether two lists contains the same elements. However,
+    in this use case, being called after prune-dependencies ensures no duplicates in
+    each list. Thus, after matching lists' lengths, one SET-DIFFERENCE will suffice."
   (if (= (length lst1) (length lst2))
       (null (set-difference lst1 lst2 :test #'string-equal))))
 
-;;; If the same files have already been bundled, return the bundle-name
+
 (defun find-bundle (file-list tally)
+  "If the same files have already been bundled, return the bundle-name"
   (car (find-if #'(lambda (x) (contain-same-strings (cdr x) file-list))
 		(composition-list tally))))
 
