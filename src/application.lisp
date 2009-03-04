@@ -4,6 +4,7 @@
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name
+	  bundle-dependencies-p
 	  webapp-description weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix

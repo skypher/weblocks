@@ -1,5 +1,6 @@
 (in-package :weblocks)
 
+(export '(*initial-bundle-id*))
 
 (defclass bundle-tally ()
   ((last-bundle-id :accessor last-bundle-id :initarg :last-bundle-id
@@ -14,6 +15,7 @@
 	       :documentation "Stores the path of the tally file for easier access."))
   (:documentation "A record of the locations and composition files of all bundled files."))
 
+(defvar *initial-bundle-id* 1)
 
 (defun get-bundle-tally ()
   "Copy the tally file into a bundle-tally object"
@@ -21,7 +23,7 @@
 	 (tally-path (merge-pathnames "tally" bundle-folder))
 	 (file-data (when (cl-fad:file-exists-p tally-path)
 		      (read-from-file tally-path)))
-	 (last-bundle-id (if file-data (car file-data) 0))
+	 (last-bundle-id (if file-data (car file-data) (1- *initial-bundle-id*)))
 	 (composition-list (cdr file-data)))
     (make-instance 'bundle-tally :last-bundle-id last-bundle-id :composition-list composition-list
 		   :bundle-folder bundle-folder :tally-path tally-path)))

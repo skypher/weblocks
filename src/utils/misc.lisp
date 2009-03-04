@@ -522,11 +522,11 @@ answering its result."
 	    `(funcall ',function ,@reqs)))))
 
 
-(defmacro with-file-write ((stream-name path) &body body)
+(defmacro with-file-write ((stream-name path &key (element-type ``base-char)) &body body)
   `(progn
      (ensure-directories-exist ,path)
-     (with-open-file (,stream-name ,path :direction :output :if-exists
-				   :supersede :if-does-not-exist :create)
+     (with-open-file (,stream-name ,path :direction :output :element-type ,element-type
+				   :if-exists :supersede :if-does-not-exist :create)
        ,@body)))
 
 (defun write-to-file (object path)
@@ -537,16 +537,16 @@ answering its result."
   (with-open-file (stream path :direction :input :if-does-not-exist nil)
     (eval (read stream nil nil))))
 
-(defun slurp-file (filepath)
-  (let* ((stream (open filepath))
-	 (seq (make-string (file-length stream))))
+(defun slurp-file (filepath &key (element-type 'base-char))
+  (let* ((stream (open filepath :element-type element-type))
+	 (seq (make-array (file-length stream) :element-type element-type)))
     (read-sequence seq stream)
     seq))
 
 (defun merge-files (file-list saved-path)
-  (with-file-write (stream saved-path)
-	(dolist (file file-list)
-	  (write-string (slurp-file file) stream))))
+  (with-file-write (stream saved-path :element-type 'unsigned-byte)
+      (dolist (file file-list)
+	  (write-sequence (slurp-file file :element-type 'unsigned-byte) stream))))
 
 (defun relative-path (full-path prefix-path)
   (make-pathname :directory (cons :relative
