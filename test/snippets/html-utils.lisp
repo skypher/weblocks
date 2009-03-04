@@ -316,7 +316,7 @@
     (render-radio-buttons 'some-name '("a" "b" "c") :id "some-id" :class "some-class")
   (htm
    (:label :id "some-id" :class "some-class first"
-	   (:input :name "some-name" :type "radio" :class "radio" :value "a" :checked "checked")
+	   (:input :name "some-name" :type "radio" :class "radio" :value "a")
 	   (:span "a&nbsp;"))
    (:label :id "some-id" :class "some-class"
 	   (:input :name "some-name" :type "radio" :class "radio" :value "b")

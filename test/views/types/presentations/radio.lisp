@@ -13,8 +13,7 @@
   (htm
    (:label :class "radio first"
 	   (:input :name "foo" :type "radio" :class "radio"
-		   :value "1"
-		   :checked "checked")
+		   :value "1")
 	   (:span "Employee&nbsp;"))
    (:label :class "radio last"
 	   (:input :name "foo" :type "radio" :class "radio"

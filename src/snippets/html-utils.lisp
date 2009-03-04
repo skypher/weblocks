@@ -183,7 +183,8 @@ presented to the user."
      (render-button *submit-control-name* :value (humanize-name submit-button-name)
 		    :id submit-id :class submit-class))))
 
-(defun render-radio-buttons (name selections &key id (class "radio") selected-value)
+(defun render-radio-buttons (name selections &key id (class "radio")
+                                                  (selected-value nil selected-value-supplied))
   "Renders a group of radio buttons.
 
 'name' - name of radio buttons.
@@ -196,21 +197,17 @@ for the value.
   (loop for i in (list->assoc selections)
      for j from 1
      with count = (length selections)
-     for label-class = (cond
-			 ((eq j 1) (concatenate 'string class " first"))
-			 ((eq j count) (concatenate 'string class " last"))
-			 (t class))
-     do (progn
-	  (when (null selected-value)
-	    (setf selected-value (cdr i)))
-	  (with-html
-	    (:label :id id :class label-class
-		    (if (equalp (cdr i) selected-value)
-			(htm (:input :name (attributize-name name) :type "radio" :class "radio"
-				     :value (cdr i) :checked "checked"))
-			(htm (:input :name (attributize-name name) :type "radio" :class "radio"
-				     :value (cdr i))))
-		    (:span (str (format nil "~A&nbsp;" (car i)))))))))
+     for label-class = (concatenate 'string class (cond
+                                                    ((eql j 1) " first")
+                                                    ((eql j count) " last")
+                                                    (t "")))
+     do (with-html
+          (:label :id id :class label-class
+                  (htm (:input :name (attributize-name name) :type "radio" :class "radio"
+                               :value (cdr i) :checked (when (and selected-value-supplied
+                                                                  (equalp (cdr i) selected-value))
+                                                         "checked")))
+                  (:span (str (format nil "~A&nbsp;" (car i))))))))
 
 (defun render-close-button (close-action &optional (button-string "(Close)"))
   "Renders a close button. If the user clicks on the close button,
