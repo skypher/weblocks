@@ -116,10 +116,10 @@ when new dependencies appeared in AJAX page updates.")
 	    (t
 	     (push dep newlist)))
 	  (push dep newlist)))
-    (when local-stylesheet
-      (push (build-bundle local-stylesheet "css") newlist))
     (when local-script
-      (push (build-bundle local-script "js") newlist))
+      (push (build-bundle (nreverse local-script) "js") newlist))
+    (when local-stylesheet
+      (push (build-bundle (nreverse local-stylesheet) "css") newlist))
     newlist))
 
 
