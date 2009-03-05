@@ -546,7 +546,8 @@ answering its result."
 (defun merge-files (file-list saved-path)
   (with-file-write (stream saved-path :element-type 'unsigned-byte)
       (dolist (file file-list)
-	  (write-sequence (slurp-file file :element-type 'unsigned-byte) stream))))
+	  (write-sequence (slurp-file file :element-type 'unsigned-byte) stream)
+	  (write-byte 10 stream))))
 
 (defun relative-path (full-path prefix-path)
   (make-pathname :directory (cons :relative

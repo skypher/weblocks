@@ -65,7 +65,7 @@
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
-   (bundle-dependencies-p :accessor bundle-dependencies-p :initarg bundle-dependencies-p :initform t
+   (bundle-dependencies-p :accessor bundle-dependencies-p :initarg bundle-dependencies-p :initform nil
 			  :documentation "Enable merging of related local dependency files (e.g. css js) into a single file.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
 		      :type (or symbol function)
