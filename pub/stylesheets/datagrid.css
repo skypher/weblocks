@@ -1,5 +1,3 @@
-@import url(/weblocks-common/pub/stylesheets/table.css);
-
 /* Body */
 .datagrid
 {
@@ -11,24 +9,23 @@
 /* Sorting */
 .sort-asc span
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;
+/*  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_asc.png) repeat-x bottom;*/
 }
 
 .sort-asc span a
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
+/*  background: url(/weblocks-common/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;*/
 }
 
 .sort-desc span
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;
+/*  background: url(/weblocks-common/pub/images/widget/datagrid/sort_bg_desc.png) repeat-x top;*/
 }
 
 .sort-desc span a
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
+/*  background: url(/weblocks-common/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;*/
 }
-
 
 .sort-asc span a, .sort-desc span a,
 .sort-asc span, .sort-desc span
@@ -68,8 +65,9 @@ p.datagrid-select-bar strong
 
 .datagrid table tbody tr.drilled-down td.select div
 {
-  background: url(/weblocks-common/pub/images/widget/arrow.png) no-repeat center center;
+/*  background: url(/weblocks-common/pub/images/widget/arrow.png) no-repeat center center;*/
 }
+
 
 /* We need to adjust margins to properly style pagination and item
 operations */

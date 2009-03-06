@@ -105,22 +105,9 @@ when new dependencies appeared in AJAX page updates.")
   (sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list)
-  (let* (newlist local-stylesheet local-script)
-    (dolist (dep dependency-list)
-      (if (local-path dep) ;; only bundle local dependencies
-	  (cond ;; create lists of file paths
-	    ((typep dep 'stylesheet-dependency)
-	     (push (local-path dep) local-stylesheet))
-	    ((typep dep 'script-dependency)
-	     (push (local-path dep) local-script))
-	    (t
-	     (push dep newlist)))
-	  (push dep newlist)))
-    (when local-script
-      (push (build-bundle (nreverse local-script) "js") newlist))
-    (when local-stylesheet
-      (push (build-bundle (nreverse local-stylesheet) "css") newlist))
-    newlist))
+  (loop for type in (bundle-dependency-types (current-webapp))
+     do (setf dependency-list (bundle-some-dependencies dependency-list type))
+     finally (return dependency-list)))
 
 
 (defgeneric compact-dependencies (dependency-list)
@@ -129,10 +116,7 @@ when new dependencies appeared in AJAX page updates.")
   dependencies. By adding :before, :after or :around methods one could
   do more interesting things, such as combining differences.")
   (:method (dependency-list)
-    (let ((pruned-list (prune-dependencies dependency-list)))
-      (sort-dependencies-by-type (if (bundle-dependencies-p (current-webapp))
-				     (bundle-dependencies pruned-list)
-				     pruned-list)))))
+    (sort-dependencies-by-type (bundle-dependencies (prune-dependencies dependency-list)))))     
 
 ;; Dependency rendering protocol
 
@@ -230,9 +214,14 @@ more convenient."
   "A utility function used to help in gathering dependencies. Determines
 dependencies for a particular symbol, which could (but doesn't have to)
 represent a class."
-  (let ((attributized-widget-class-name (attributize-name symbol)))
-    (loop for type in '(:stylesheet :script)
-       collect (make-local-dependency type attributized-widget-class-name))))
+  (let* ((attributized-widget-class-name (attributize-name symbol))
+	 (base-dependencies (loop for type in '(:stylesheet :script)
+			       collect (make-local-dependency type attributized-widget-class-name)))
+	 (import-stylesheet-name (format nil "~A-import" attributized-widget-class-name))
+	 (import-dependency (make-local-dependency :stylesheet import-stylesheet-name)))
+    (if import-dependency
+	(push import-dependency base-dependencies)
+	base-dependencies)))
 
 (defgeneric per-class-dependencies (obj)
   (:documentation "Return a list of dependencies for an object of a

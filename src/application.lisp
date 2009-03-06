@@ -4,7 +4,7 @@
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name
-	  bundle-dependencies-p
+	  bundle-dependency-types
 	  webapp-description weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix
@@ -65,8 +65,17 @@
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
-   (bundle-dependencies-p :accessor bundle-dependencies-p :initarg bundle-dependencies-p :initform nil
-			  :documentation "Enable merging of related local dependency files (e.g. css js) into a single file.")
+   (bundle-dependency-types :accessor bundle-dependency-types :initarg bundle-dependency-types
+			    :initform '(stylesheet-dependency script-dependency)
+			    :documentation "This enables bundling of css, js files.
+       If you only want js files to get bundled, set this to '(script-dependency).
+       Set it to nil disables bundling. When debug is t, this is set to nil automatically.
+       ATTENTION: If your 'whatever.css' file contains import rules, please take them out,
+       put them in a separate file, and name it 'whatever-import.css'. This way all import
+       rules will get properly placed in the beginning of the bundled css file.
+       You can also prevent files from being bundled, for example,
+       '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
+       These two files however, will come after the bundled ones in HTML.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
@@ -194,7 +203,9 @@ to my `application-dependencies' slot."
          (slot-value self 'public-files-path)
       (setf (weblocks-webapp-public-files-path self)
             (slot-value self 'public-files-path)))
-    (slot-default html-indent-p (weblocks-webapp-debug self))
+    (when (weblocks-webapp-debug self)
+      (slot-default html-indent-p t)
+      (slot-default bundle-dependency-types nil))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session

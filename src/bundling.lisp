@@ -47,7 +47,11 @@
     (setf modified-p t)))
 
 (defun create-bundle-file (file-list type tally)
-  (let ((bundle-name (format nil "~A.~A" (incf (last-bundle-id tally)) type)))
+  (let ((bundle-name (format nil "~A.~A"
+			     (incf (last-bundle-id tally))
+			     (ecase type
+			       (stylesheet-dependency "css")
+			       (script-dependency "js")))))
     (add-to-tally bundle-name file-list tally)
     (merge-files file-list (merge-pathnames bundle-name (bundle-folder tally)))
     bundle-name))
@@ -81,10 +85,33 @@
       (let ((physical-path (merge-pathnames bundle-name (bundle-folder tally)))
 	    (virtual-path (merge-pathnames (format nil "bundles/~A" bundle-name)
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix (current-webapp))))))
-	(cond ((string-equal type "css")
-	       (make-instance 'stylesheet-dependency
-			      :url virtual-path :media media
-			      :local-path physical-path))
-	      ((string-equal type "js")
-	       (make-instance 'script-dependency :url virtual-path
-			      :local-path physical-path)))))))
+	(ecase type
+	  (stylesheet-dependency
+	   (make-instance 'stylesheet-dependency
+			  :url virtual-path :media media
+			  :local-path physical-path))
+	  (script-dependency
+	   (make-instance 'script-dependency :url virtual-path
+			  :local-path physical-path)))))))
+
+
+(defun bundle-some-dependencies (dependency-list dependency-type)
+  (let (exceptions)
+    (when (listp dependency-type)
+      (setf exceptions (cdr dependency-type))
+      (setf dependency-type (car dependency-type)))
+    (loop
+       for dep in dependency-list
+       for path = (local-path dep)
+       if (and (typep dep dependency-type)
+	       (null (find path exceptions :test #'string-equal)))
+          if (cl-ppcre:scan "(?i)-import\.css$" path)
+             collect path into imports
+          else
+	     collect path into main
+	  end
+       else
+          collect dep into others
+       finally
+	 (return (push (build-bundle (append imports main) dependency-type)
+		       others)))))
