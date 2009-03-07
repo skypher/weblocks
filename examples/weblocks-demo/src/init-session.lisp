@@ -4,7 +4,7 @@
 ;; Define our application
 (defwebapp weblocks-demo
     :description "A web application based on Weblocks"
-    :init-user-session	'init-user-session
+    :init-user-session	'init-user-session :public-files-cache-time 100000
     :dependencies
     '((:stylesheet "suggest")))
 
