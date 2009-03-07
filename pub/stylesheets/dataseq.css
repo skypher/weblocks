@@ -103,7 +103,7 @@ div.dataseq .flash .view .extra-top-2
 div.dataseq .flash .view .extra-top-3
 {
   height: 2px;
-  background: url(/weblocks-common/pub/images/widget/flash/top_background.png) repeat-x;
+/*  background: url(/weblocks-common/pub/images/widget/flash/top_background.png) repeat-x;*/
   display: block;
   overflow: hidden;
 }
@@ -111,14 +111,14 @@ div.dataseq .flash .view .extra-top-3
 div.dataseq .flash .view
 {
   margin-bottom: 0.25em;
-  background-image: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png);
+/*  background-image: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png);*/
   background-repeat: repeat-y;
   background-position: left;
 }
 
 div.dataseq .flash .view ul.messages
 {
-  background: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png) repeat-y right;
+/*  background: url(/weblocks-common/pub/images/widget/dataseq/flash/vertical_border.png) repeat-y right;*/
   border: none;
   margin-bottom: 5px;
 }
@@ -146,13 +146,13 @@ div.dataseq .flash .view .extra-bottom-1
 
 div.dataseq .flash .view .extra-bottom-2
 {
-  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_left.png) no-repeat top left;
+/*  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_left.png) no-repeat top left;*/
   margin-top: -7px;
 }
 
 div.dataseq .flash .view .extra-bottom-3
 {
-  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_right.png) no-repeat top right;
+/*  background: url(/weblocks-common/pub/images/widget/dataseq/flash/bottom_right.png) no-repeat top right;*/
   margin-top: -7px;
 }
 
