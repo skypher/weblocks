@@ -544,43 +544,64 @@ answering its result."
     seq))
 
 (defun merge-files (file-list saved-path)
-  (with-file-write (stream saved-path :element-type 'unsigned-byte)
-      (dolist (file file-list)
-	  (write-sequence (slurp-file file :element-type 'unsigned-byte) stream)
-	  (write-byte 10 stream))))
+  (with-file-write (stream saved-path :element-type '(unsigned-byte 8))
+    (dolist (file file-list)
+      (write-sequence (slurp-file file :element-type '(unsigned-byte 8)) stream)
+      (write-byte 10 stream))))
 
 (defun relative-path (full-path prefix-path)
-  (make-pathname :directory (cons :relative
-				  (nthcdr (length (pathname-directory prefix-path))
-					  (pathname-directory full-path)))
-		 :name (pathname-name full-path)
-		 :type (pathname-type full-path)))
+  (princ-to-string
+   (make-pathname :directory (cons :relative
+				   (nthcdr (length (pathname-directory prefix-path))
+					   (pathname-directory full-path)))
+		  :name (pathname-name full-path)
+		  :type (pathname-type full-path))))
 
-(defun modified-time-path (real-file-path &key (system :weblocks) (modified-time-folder "modified-time/"))
+;;; Checking file modification and Versioning modified files
+
+(defun mod-record-path (real-file-path &key (system :weblocks)
+			(record-folder "mod-record/") (extention ".mod"))
   (let ((system-folder (asdf-system-directory system)))
-    (merge-pathnames (relative-path real-file-path system-folder)
-		     (merge-pathnames modified-time-folder system-folder))))
+    (merge-pathnames (concatenate 'string (relative-path real-file-path system-folder)
+				  extention)
+		     (merge-pathnames record-folder system-folder))))
 
+(defun get-mod-record (record-path)
+  (let ((time-version (read-from-file record-path)))
+    (values (car time-version) (cdr time-version))))
 
-(defun previous-modified-time (record-file-path)
-  (read-from-file record-file-path))
+(defun write-to-mod-record (time version record-path)
+  (write-to-file `',(cons time version) record-path))
 
-(defun write-to-modified-time (time record-path)
-  (write-to-file time record-path))
+(defun make-versioned-name (name-without-extention version)
+  (concatenate 'string name-without-extention "-" (write-to-string version)))
 
-(defun file-modified-p (file-path)
-  (let ((record-path (modified-time-path file-path))
-	(modified-time (file-write-date file-path)))
-    (if (and (cl-fad:file-exists-p record-path)
-	     (= (file-write-date file-path)
-		(previous-modified-time record-path)))
-	nil
-	(progn
-	  (write-to-modified-time modified-time record-path)
-	  t))))
+(defun make-versioned-file-path (file-path version)
+  (princ-to-string (make-pathname :directory (pathname-directory file-path)
+				  :name (make-versioned-name (pathname-name file-path) version)
+				  :type (pathname-type file-path))))
 
-(defun files-modified-p (path-list)
-  (let ((modified nil))
-    (dolist (path path-list modified)
-      (when (file-modified-p path)
-	(setf modified t)))))
+(defvar *mod-record-lock* (bordeaux-threads:make-lock))
+
+(defun update-path-file-version (physical-path &optional virtual-path)
+  (bordeaux-threads:with-lock-held (*mod-record-lock*)
+    (let ((record-path (mod-record-path physical-path))
+	  (mod-time (file-write-date physical-path))
+	  (version 0)
+	  (original-path nil))
+      (if (cl-fad:file-exists-p record-path)
+	  (multiple-value-bind (old-time old-version) (get-mod-record record-path)
+	    (if (= mod-time old-time)
+		(setf version old-version)
+		(progn
+		  (setf original-path physical-path)
+		  (setf version (1+ old-version)))))
+	  (write-to-mod-record mod-time 0 record-path))
+      (when (not (zerop version))
+	(setf physical-path (make-versioned-file-path physical-path version))
+	(when virtual-path
+	  (setf virtual-path (make-versioned-file-path virtual-path version))))
+      (when original-path
+	(copy-file original-path physical-path :if-does-not-exist :ignore :if-exists :supersede)
+	(write-to-mod-record mod-time version record-path))
+      (values physical-path virtual-path))))

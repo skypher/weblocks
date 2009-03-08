@@ -191,6 +191,8 @@ returns a dependency object."
     (when (or do-not-probe (probe-file physical-path))
       (let ((virtual-path (merge-pathnames relative-path
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp)))))
+	(multiple-value-setq (physical-path virtual-path)
+	  (update-path-file-version physical-path virtual-path))
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url virtual-path :media media

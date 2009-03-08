@@ -66,19 +66,13 @@
   (car (find-if #'(lambda (x) (equalp (cdr x) file-list))
 		(composition-list tally))))
 
-(defun bundle-modified-p (bundle-name file-list tally)
-  (when (files-modified-p file-list)
-    (delete-bundle-file bundle-name tally)
-    t))
-
 (defvar *bundle-dependencies-lock* (bordeaux-threads:make-lock))
 
 (defun build-bundle (file-list type &key media)
   (bordeaux-threads:with-lock-held (*bundle-dependencies-lock*)
     (let* ((tally (get-bundle-tally))
 	   (bundle-name (find-bundle file-list tally)))
-      (when (or (null bundle-name)
-		(bundle-modified-p bundle-name file-list tally))
+      (when (null bundle-name)		
 	(setf bundle-name (create-bundle-file file-list type tally)))
       (store-bundle-tally tally)
       ;; make new dependency object for the bundle file
