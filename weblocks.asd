@@ -40,7 +40,7 @@
 		 (:file "request-hooks"
 			:depends-on ("weblocks"))
                  (:file "error-handler"
-                        :depends-on ("weblocks"))
+                        :depends-on ("weblocks" "application"))
 		 (:file "request-handler"
 			:depends-on (utils "weblocks" "page-template" "debug-mode"
 					   "actions" "request-hooks" "application"
