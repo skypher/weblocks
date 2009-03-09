@@ -99,7 +99,11 @@
        for path = (local-path dep)
        if (and (typep dep dependency-type)
 	       (null (find path exceptions :test #'string-equal)))
-          if (cl-ppcre:scan "(?i)-import\.css$" path)
+          if (cl-ppcre:scan '(:alternation (:sequence "-import."
+					           (:greedy-repetition 1 nil :digit-class)
+					           ".css" :end-anchor)
+			                   (:sequence "-import.css" :end-anchor))
+			    path)
              collect path into imports
           else
 	     collect path into main

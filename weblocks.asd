@@ -15,7 +15,7 @@
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
 	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore
-               :bordeaux-threads)
+               :bordeaux-threads :salza2)
   :components ((:module src
 		:components (
 		 (:file "weblocks")
@@ -23,10 +23,12 @@
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
 			  :depends-on ("weblocks"))
+		 (:file "versioning"
+			:depends-on ("weblocks" utils))
 		 (:file "bundling"
 			:depends-on ("weblocks" utils))
 		 (:file "dependencies"
-			:depends-on ("weblocks" "server" "bundling" utils))
+			:depends-on ("weblocks" "server" "bundling" "versioning" utils))
 		 (:file "dom-object"
 			:depends-on ("weblocks" utils))
 		 (:file "page-template"

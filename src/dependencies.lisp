@@ -105,9 +105,12 @@ when new dependencies appeared in AJAX page updates.")
   (sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list)
-  (loop for type in (bundle-dependency-types (current-webapp))
-     do (setf dependency-list (bundle-some-dependencies dependency-list type))
-     finally (return dependency-list)))
+  (let ((types (bundle-dependency-types (current-webapp))))
+    (when (find :stylesheet types)
+      (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency)))
+    (when (find :script types)
+      (setf dependency-list (bundle-some-dependencies dependency-list 'script-dependency)))
+    dependency-list))
 
 
 (defgeneric compact-dependencies (dependency-list)
@@ -172,9 +175,9 @@ when new dependencies appeared in AJAX page updates.")
 ;; since rendering dependencies for views is more complex than a simple mapc, there is a utility function
 (defun render-form-submit-dependencies (dependency-list)
   (let ((code-string (reduce (lambda (e v)
-	    (concatenate 'string e (render-dependency-in-form-submit v)))
-	  (remove nil dependency-list)
-	  :initial-value "")))
+			       (concatenate 'string e (render-dependency-in-form-submit v)))
+			     (remove nil dependency-list)
+			     :initial-value "")))
     (if (equalp code-string "")
 	nil
 	code-string)))
@@ -191,8 +194,9 @@ returns a dependency object."
     (when (or do-not-probe (probe-file physical-path))
       (let ((virtual-path (merge-pathnames relative-path
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp)))))
-	(multiple-value-setq (physical-path virtual-path)
-	  (update-path-file-version physical-path virtual-path))
+	(when (find type (version-dependency-types webapp))
+	  (multiple-value-setq (physical-path virtual-path)
+	    (update-versioned-path physical-path virtual-path)))
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url virtual-path :media media

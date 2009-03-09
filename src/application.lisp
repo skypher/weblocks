@@ -4,7 +4,7 @@
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
 	  webapp-application-dependencies webapp-name
-	  bundle-dependency-types
+	  bundle-dependency-types version-dependency-types
 	  webapp-description weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix
@@ -65,8 +65,8 @@
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
-   (bundle-dependency-types :accessor bundle-dependency-types :initarg bundle-dependency-types
-			    :initform '(stylesheet-dependency script-dependency)
+   (bundle-dependency-types :accessor bundle-dependency-types :initarg :bundle-dependency-types
+			    :initform '(:stylesheet :script)
 			    :documentation "This enables bundling of css, js files.
        If you only want js files to get bundled, set this to '(script-dependency).
        Set it to nil disables bundling. When debug is t, this is set to nil automatically.
@@ -76,6 +76,13 @@
        You can also prevent files from being bundled, for example,
        '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
        These two files however, will come after the bundled ones in HTML.")
+   (version-dependency-types :accessor version-dependency-types :initarg :version-dependency-types
+			     :initform '(:stylesheet :script)
+			     :documentation "This enables versioning of css, js files. The purpose
+       of versioning is to serve modified static files that have been cached permanently, and gziping.
+       Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)
+       file will get created. This way, you only need to work on the unversioned file and not keep
+       track of the versioned ones.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
@@ -205,7 +212,8 @@ to my `application-dependencies' slot."
             (slot-value self 'public-files-path)))
     (when (weblocks-webapp-debug self)
       (slot-default html-indent-p t)
-      (slot-default bundle-dependency-types nil))
+      (setf (bundle-dependency-types self) nil)
+      (setf (version-dependency-types self) nil))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session
