@@ -156,6 +156,11 @@ rewriting in JavaScript code."
 (defun server-version ()
   hunchentoot::*hunchentoot-version*)
 
+(defun reset-sessions ()
+  (let ((*acceptor* *weblocks-server*))
+    (hunchentoot:reset-sessions)))
+(export 'reset-sessions)
+
 (defun active-sessions ()
   "Returns a list of currently active sessions."
   (loop for s in (mapcar #'cdr (session-db *weblocks-server*))
