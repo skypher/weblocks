@@ -54,7 +54,7 @@ customize behavior."))
   (handler-bind ((error (lambda (c)
                           (if *catch-errors-p*
                             (return-from handle-client-request
-                                         (handle-error-condition c))
+                                         (handle-error-condition app c))
                             (signal c)))))
     (call-next-method)))
 
