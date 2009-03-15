@@ -46,7 +46,8 @@
                             :initarg :public-files-cache-time
                             :type integer
                             :documentation "HTTP cache time for public files in seconds.
-                            Caching is automatically disabled in debug mode.")
+                            Caching is automatically disabled in debug mode.
+                            When debug is on, caching is turned off.")
    (hostnames :reader weblocks-webapp-hostnames :type list
          :initarg :hostnames :initform nil
          :documentation "The hostnames (a list of strings) reserved for this webapp.
@@ -69,10 +70,11 @@
 			    :initform '(:stylesheet :script)
 			    :documentation "This enables bundling of css, js files.
        If you only want js files to get bundled, set this to '(script-dependency).
-       Set it to nil disables bundling. When debug is t, this is set to nil automatically.
+       Set it to nil disables bundling. When debug is on, bundling is turned off.
        ATTENTION: If your 'whatever.css' file contains import rules, please take them out,
        put them in a separate file, and name it 'whatever-import.css'. This way all import
        rules will get properly placed in the beginning of the bundled css file.
+       ATTENTION: Bundling depends on versioning to detect change in a bundle.
        You can also prevent files from being bundled, for example,
        '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
        These two files however, will come after the bundled ones in HTML.")
@@ -82,7 +84,11 @@
        of versioning is to serve modified static files that have been cached permanently, and gziping.
        Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)
        file will get created. This way, you only need to work on the unversioned file and not keep
-       track of the versioned ones.")
+       track of the versioned ones. When debug is t, versioning is turned off.")
+   (gzip-dependency-types :accessor gzip-dependency-types :initarg :gzip-dependency-types
+			  :initform '(:stylesheet :script)
+			  :documentation "This enables gziping of css, js files.
+                                          When debug is on, gzip is turned off.")
    (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
@@ -102,6 +108,24 @@ prefix parameter that defines the URLs parsed by that webapp.  The webapp does
 not see the prefix parameter in URLs that are provided to it.  You can, for 
 instance, have different sites (e.g. mobile vs. desktop) with vastly different 
 layout and dependencies running on the same server."))
+
+
+;;; Make slot readers that will return nil if debug is on
+;;; Yet still retain the original values when debug is off
+(defmacro def-debug-p-slot-readers (&rest reader-symbols)
+  `(progn
+     ,@(loop for symbol in reader-symbols
+	  collect `(defun ,(form-symbol symbol '*) (object)
+		     "This reader will prompt debug parameters first."
+		     (unless (or *weblocks-global-debug*
+				 (weblocks-webapp-debug object))
+		       (,symbol object))))))
+
+(def-debug-p-slot-readers
+    weblocks-webapp-public-files-cache-time
+    version-dependency-types
+    bundle-dependency-types
+    gzip-dependency-types)
 
 ;; Slash-normalizing accessors
 ;;
@@ -211,9 +235,7 @@ to my `application-dependencies' slot."
       (setf (weblocks-webapp-public-files-path self)
             (slot-value self 'public-files-path)))
     (when (weblocks-webapp-debug self)
-      (slot-default html-indent-p t)
-      (setf (bundle-dependency-types self) nil)
-      (setf (version-dependency-types self) nil))
+      (slot-default html-indent-p t))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session

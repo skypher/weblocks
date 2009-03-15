@@ -27,7 +27,7 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key (debug t) (port 8080)
+(defun start-weblocks (&rest keys &key (debug nil) (port 8080)
                                        (acceptor-class 'weblocks-acceptor)
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server.
@@ -82,41 +82,66 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
    (make-pathname :directory `(:relative ,suffix))
    (asdf-system-directory asdf-system-name)))
 
+
+;;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
+(defun send-cache-rules (cache-time)
+  (when cache-time
+    (check-type cache-time integer)
+    (setf (header-out "Expires") (rfc-1123-date (+ (get-universal-time) cache-time)))
+    (setf (header-out "Cache-Control") (format nil "max-age=~D" (max 0 cache-time)))))
+
+(defun send-gzip-rules (types script-name request virtual-folder physical-folder)
+  (let (content-type)
+    (when (and types
+	       (search "gzip" (header-in :accept-encoding request))
+	       (cl-fad:file-exists-p (format nil "~A~A.gz" physical-folder
+					     (relative-path script-name virtual-folder)))
+	       (or (and (find :script types)
+			(cl-ppcre:scan "(?i)\\.js$" script-name)
+			(setf content-type "text/javascript"))
+		   (and (find :stylesheet types)
+			(cl-ppcre:scan "(?i)\\.css$" script-name)
+			(setf content-type "text/css"))))
+      (setf (header-out "Content-Encoding") "gzip")
+      (setf (slot-value request 'script-name) (format nil "~A.gz" script-name))
+      content-type)))
+    
 (defun weblocks-dispatcher (request)
   "Weblocks' Hunchentoot dispatcher. The function serves all started applications
   and their static files."
   (dolist (app *active-webapps*)
     (let* ((script-name (script-name* request))
            (app-prefix (webapp-prefix app))
-           (app-pub-prefix (compute-webapp-public-files-uri-prefix app)))
+           (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
+	   content-type)
       (cond
         ((list-starts-with (tokenize-uri script-name nil)
                            (tokenize-uri "/weblocks-common" nil)
                            :test #'string=)
-         (return-from weblocks-dispatcher
-                      (funcall (create-folder-dispatcher-and-handler 
-                                 "/weblocks-common/pub/"
-                                 (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
-                                   it
-                                   #p"./pub")) ; as a last fallback
-                               request)))
+	 (let ((virtual-folder "/weblocks-common/pub/")
+	       (physical-folder (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
+				       it
+				       #p"./pub")))
+	   (unless *weblocks-global-debug*
+	     (send-cache-rules 100000)
+	     (setf content-type
+		   (send-gzip-rules '(:stylesheet :script)
+				    script-name request virtual-folder physical-folder)))
+	   (return-from weblocks-dispatcher
+	     (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+		      request))))
         ((and (webapp-serves-hostname (hunchentoot:host) app)
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-pub-prefix nil)
                                 :test #'string=))
-         ;; set caching parameters for static files
-         ;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
-         (if (weblocks-webapp-debug app)
-           (no-cache)
-           (let ((cache-time (weblocks-webapp-public-files-cache-time app)))
-             (check-type cache-time integer)
-             (setf (header-out "Expires") (rfc-1123-date (+ (get-universal-time) cache-time)))
-             (setf (header-out "Cache-Control") (format nil "max-age=~D" (max 0 cache-time)))))
-         (return-from weblocks-dispatcher
-                      (funcall (create-folder-dispatcher-and-handler 
-                                 (maybe-add-trailing-slash app-pub-prefix)
-                                 (compute-webapp-public-files-path app))
-                               request)))
+	 (let ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
+	       (physical-folder (compute-webapp-public-files-path app)))
+	   (send-cache-rules (weblocks-webapp-public-files-cache-time app))
+	   (setf content-type (send-gzip-rules (gzip-dependency-types* app)
+					       script-name request virtual-folder physical-folder))
+	   (return-from weblocks-dispatcher
+	     (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+		      request))))
         ((and (webapp-serves-hostname (hunchentoot:host) app)
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)

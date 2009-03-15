@@ -2,6 +2,15 @@
 
 (export '(*initial-bundle-id*))
 
+;;; This file contains utilities for bundling css, js dependencies.
+;;; It is turned on through bundle-dependency-types in application.lisp
+;;; Please read that documentation for more info.
+
+;;; Bundling depends on versioning to keep track of modification of files
+;;; that make up the bundle.
+
+;;; --JT jt@homejt.com
+
 (defclass bundle-tally ()
   ((last-bundle-id :accessor last-bundle-id :initarg :last-bundle-id
 	    :documentation "The id of the last created bundle file.")
@@ -70,15 +79,22 @@
 
 (defun build-bundle (file-list type &key media)
   (bordeaux-threads:with-lock-held (*bundle-dependencies-lock*)
-    (let* ((tally (get-bundle-tally))
+    (let* ((app (current-webapp))
+	   (tally (get-bundle-tally))
 	   (bundle-name (find-bundle file-list tally)))
       (when (null bundle-name)		
 	(setf bundle-name (create-bundle-file file-list type tally)))
       (store-bundle-tally tally)
       ;; make new dependency object for the bundle file
-      (let ((physical-path (merge-pathnames bundle-name (bundle-folder tally)))
+      (let ((physical-path (princ-to-string (merge-pathnames bundle-name (bundle-folder tally))))
 	    (virtual-path (merge-pathnames (format nil "bundles/~A" bundle-name)
-					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix (current-webapp))))))
+					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix app)))))
+	(let ((keys (gzip-dependency-types* app)))
+	  (when (or (and (eq type 'script-dependency)
+			 (find :script keys))
+		    (and (eq type 'stylesheet-dependency)
+			 (find :stylesheet keys)))
+	    (create-gziped-dependency-file physical-path)))
 	(ecase type
 	  (stylesheet-dependency
 	   (make-instance 'stylesheet-dependency

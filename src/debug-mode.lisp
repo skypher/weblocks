@@ -1,10 +1,14 @@
 
 (in-package :weblocks)
 
-(export '(disable-global-debugging enable-global-debugging))
+(export '(disable-global-debugging enable-global-debugging *weblocks-global-debug*))
+
+(defvar *weblocks-global-debug* nil)
 
 (defun enable-global-debugging ()
-  "Setup hooks for session maintenance and showing backtraces"
+  "Setup hooks for session maintenance and showing backtraces.
+and disable caching, versioning, gziping, bundling of weblocks-common/pub/ files"
+  (setf *weblocks-global-debug* t)
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
   ;(setf *show-lisp-backtraces-p* t)
@@ -15,6 +19,7 @@
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
+  (setf *weblocks-global-debug* nil)
   (setf *show-lisp-errors-p* nil)
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
@@ -24,10 +29,10 @@
 present the user with a toolbar that aids development."
   (with-html
     (:div :class "debug-toolbar"
-	  (:a :href (make-action-url "debug-reset-sessions")
-	      :title "Reset Sessions"
-	      (:img :src (make-webapp-public-file-uri "images/reset.png")
-		    :alt "Reset Sessions")))))
+	  (:a :href (make-action-url "debug-reset-sessions") (:b "Reset Sessions")
+	      ;;:title "Reset Sessions"
+	      ;;(:img :src (make-webapp-public-file-uri "images/reset.png") :alt "Reset Sessions")
+	      ))))
 
 (defun initialize-debug-actions ()
   "When weblocks is started in debug mode, called on session

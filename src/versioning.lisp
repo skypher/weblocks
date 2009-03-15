@@ -1,7 +1,23 @@
 (in-package weblocks)
 
 ;;; This file contains utilities to check whether a file has been modified.
-;;; Versioning of a modified file can be turned on 
+;;; This done by creating a shadow directory that contains the modification record
+;;; for files in a user specified directory. The shadow directory has the same
+;;; structure as the original directory and is under the orginal directory.
+;;; Modification is detected by comparing last modified time of a file against its
+;;; modification record.
+
+;;; Versioning is used for dependencies (e.g. CSS JS files)
+;;; It is turned on through version-dependency-types in application.lisp
+
+;;; Versioning works like this: When modification of a file is detected, a new file
+;;; is created with versioined name under the folder vzn, which is located under the
+;;; same folder as the file itself. (e.g. ../pub/script/weblocks.js is copied to
+;;; ../pub/script/vzn/weblocks.0.js) The path of the versioned file is then used for
+;;; serving replies, bundling, gziping and etc. This means you can work on the
+;;; original file without keep track of versions of a file at all.
+
+;;; --JT jt@homejt.com
 
 (defclass mod-record ()
   ((original-path :accessor original-path :initarg :original-path
@@ -33,6 +49,10 @@
 				    :name (make-versioned-name (pathname-name path) version)
 				    :type (pathname-type path)))))
 
+(defun create-versioned-file (original-path version)
+  (let ((new-path (make-versioned-path original-path version)))
+    (copy-file original-path new-path :if-does-not-exist :ignore :if-exists :supersede)))
+
 (defun get-mod-record (original-path &key (versioning-p nil))
   (let ((record-path (make-record-path original-path)))
     (if (cl-fad:file-exists-p record-path)
@@ -40,13 +60,14 @@
 	       (time (car cell))
 	       (version (cdr cell)))
 	  (make-instance 'mod-record :last-mod-time time
+			 :mod-record-path record-path
 			 :last-version version :original-path original-path))
 	(let ((time (file-write-date original-path)))
 	  (write-to-mod-record time 0 record-path)
 	  (when versioning-p
-	    (copy-file original-path (make-versioned-path original-path 0)
-		       :if-does-not-exist :ignore :if-exists :supersede))
+	    (create-versioned-file original-path 0))
 	  (make-instance 'mod-record :last-mod-time time
+			 :mod-record-path record-path
 			 :last-version 0 :original-path original-path)))))
 
 (defun file-modified-p (mod-record)
@@ -58,13 +79,12 @@
     (setf last-mod-time (file-write-date original-path))
     (when versioning-p
       (incf last-version)
-      (copy-file original-path (make-versioned-path original-path last-version)
-		 :if-does-not-exist :ignore :if-exists :supersede))
+      (create-versioned-file original-path last-version))
     (write-to-mod-record last-mod-time last-version mod-record-path)))
 			 
 (defvar *version-dependencies-lock* (bordeaux-threads:make-lock))
 
-(defun update-versioned-path (original-path &optional other-path)
+(defun update-versioned-dependency-path (original-path &optional other-path)
   "If the file has been modified, it is copied and renamed with the correct version number in the same directory. If the file has never being modified before, its name is kept the same."
   (bordeaux-threads:with-lock-held (*version-dependencies-lock*)
     (let ((mod-record (get-mod-record original-path :versioning-p t)))

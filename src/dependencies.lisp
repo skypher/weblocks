@@ -105,7 +105,7 @@ when new dependencies appeared in AJAX page updates.")
   (sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list)
-  (let ((types (bundle-dependency-types (current-webapp))))
+  (let ((types (bundle-dependency-types* (current-webapp))))
     (when (find :stylesheet types)
       (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency)))
     (when (find :script types)
@@ -182,8 +182,62 @@ when new dependencies appeared in AJAX page updates.")
 	nil
 	code-string)))
 
+(defvar *gzip-dependency-lock* (bordeaux-threads:make-lock))
+
+(defun create-gziped-dependency-file (original-path)
+  (bordeaux-threads:with-lock-held (*gzip-dependency-lock*)
+    (let ((new-path (format nil "~A.gz" original-path)))
+      (unless (cl-fad:file-exists-p new-path)
+	(salza2:gzip-file original-path new-path)))))
+
+;;; Dealing with CSS import rules
+
+(defun write-import-css (url stream)
+  (write-char #\Newline stream)
+  (write-string "@import url(" stream)
+  (princ url stream)
+  (write-string ");" stream))
+	   
+(defun extract-import-urls (string)
+  (let (urls (start 0))
+    (loop
+       (multiple-value-bind (head tail) (cl-ppcre:scan "(?i)import url\(.*?\);" string :start start)
+	 (if head
+	     (progn
+	       (push (subseq string (+ head 11) (- tail 2)) urls)
+	       (setf start tail))
+	     (return-from extract-import-urls urls))))))
+
+(defun local-path-from-url (url &key (type :stylesheet))
+  (let* ((name (pathname-name url))
+	 (relative (public-file-relative-path type name))
+	 (webapp (current-webapp))
+	 (local (princ-to-string (merge-pathnames relative
+						  (compute-webapp-public-files-path webapp)))))
+    (when (cl-fad:file-exists-p local)
+      (values local
+	      (princ-to-string (merge-pathnames relative
+						(maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
+
+(defun update-import-css-content (import-path)
+  (let ((urls (extract-import-urls (slurp-file import-path)))
+	(webapp (current-webapp)))
+    (with-file-write (stream import-path)
+      (dolist (url urls)
+	(multiple-value-bind (physical-path virtual-path) (local-path-from-url url)
+	  (if physical-path
+	      (progn
+		(when (find :stylesheet (version-dependency-types* webapp))
+		  (multiple-value-setq (physical-path virtual-path)
+		    (update-versioned-dependency-path physical-path virtual-path)))
+		(when (find :stylesheet (gzip-dependency-types* webapp))
+		  (create-gziped-dependency-file physical-path))
+		(write-import-css virtual-path stream))
+	      (write-import-css url stream)))))))
+
 ;; Dependency gathering
-(defun make-local-dependency (type file-name &key do-not-probe media (webapp (current-webapp)))
+
+(defun make-local-dependency (type file-name &key do-not-probe media (webapp (current-webapp)) (import-p nil))
   "Make a local (e.g. residing on the same web server) dependency of
 type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
@@ -194,9 +248,13 @@ returns a dependency object."
     (when (or do-not-probe (probe-file physical-path))
       (let ((virtual-path (merge-pathnames relative-path
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp)))))
-	(when (find type (version-dependency-types webapp))
+	(when (find type (version-dependency-types* webapp))
 	  (multiple-value-setq (physical-path virtual-path)
-	    (update-versioned-path physical-path virtual-path)))
+	    (update-versioned-dependency-path physical-path virtual-path)))
+	(when import-p
+	  (update-import-css-content physical-path))	  
+	(when (find type (gzip-dependency-types* webapp))
+	  (create-gziped-dependency-file physical-path))
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url virtual-path :media media
@@ -224,7 +282,7 @@ represent a class."
 	 (base-dependencies (loop for type in '(:stylesheet :script)
 			       collect (make-local-dependency type attributized-widget-class-name)))
 	 (import-stylesheet-name (format nil "~A-import" attributized-widget-class-name))
-	 (import-dependency (make-local-dependency :stylesheet import-stylesheet-name)))
+	 (import-dependency (make-local-dependency :stylesheet import-stylesheet-name :import-p t)))
     (if import-dependency
 	(push import-dependency base-dependencies)
 	base-dependencies)))
