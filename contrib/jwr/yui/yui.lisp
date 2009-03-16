@@ -114,11 +114,11 @@ its subclasses."))
   (declare (ignore initargs))
   ;; we don't actually use this list for rendering, but it is necessary
   ;; to keep the weblocks widget tree consistent --jwr
-  (set-children-of-type obj (list (yui-grid-page-header obj)
-				  (yui-grid-page-primary-body obj)
-				  (yui-grid-page-secondary-body obj)
-				  (yui-grid-page-footer obj))
-			:yui-grid-page)
+  (setf (widget-children obj :yui-grid-page)
+	(list (yui-grid-page-header obj)
+	      (yui-grid-page-primary-body obj)
+	      (yui-grid-page-secondary-body obj)
+	      (yui-grid-page-footer obj)))
   ;; this will set HTML id for us
   (setf (widget-name obj) type)
   (setf (dom-class obj) template))
@@ -149,7 +149,7 @@ its subclasses."))
   (setf (dom-class obj) (format nil "yui-g~:[~; first~]" (yui-grid-first obj))))
 
 (defmethod update-children ((obj yui-grid-layout))
-  (set-children-of-type obj (list (yui-grid-left obj) (yui-grid-right obj)) :yui-grid-layout))
+  (setf (widget-children obj :yui-grid-layout) (list (yui-grid-left obj) (yui-grid-right obj))))
 
 (defmethod render-widget-body ((obj yui-grid-layout) &rest args)
   (declare (ignore args))
@@ -203,11 +203,11 @@ its subclasses."))
   (declare (ignore initargs))
   ;; this will set HTML id for us
   (setf (dom-class obj) "yui-navset")
-  (set-children-of-type obj (yui-tabview-tabs obj) :yui-tabview))
+  (setf (widget-children obj :yui-tabview) (yui-tabview-tabs obj)))
 
 (defmethod (setf yui-tabview-tabs) ((obj yui-tabview) tab-list)
   (setf (slot-value obj 'tabs) tab-list)
-  (set-children-of-type obj (yui-tabview-tabs obj) :yui-tabview))
+  (setf (widget-children obj :yui-tabview) (yui-tabview-tabs obj)))
 
 (defun tabview-script (tabview-js-var tabview-id)
   (ps* `(with-lazy-loaded-modules (("tabview"))
