@@ -125,10 +125,6 @@ for styling purposes."
 	     (lambda (new-callee)
 	       (lambda (&rest args)
 		 (declare (ignore args))
-                 (declare (special *uri-tokens-fully-consumed*))
-                 ;; Consume all tokens
-                 (setf *uri-tokens-fully-consumed* t)
-                 ;; Do the content wrrapping
 		 (with-html
 		   (:div :class "modal"
 			 (:h1 (:span (str title)))
