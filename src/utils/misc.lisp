@@ -556,3 +556,16 @@ answering its result."
 					   (pathname-directory full-path)))
 		  :name (pathname-name full-path)
 		  :type (pathname-type full-path))))
+
+(defun gzip-file (input output &key (if-exists :supersede) (if-does-not-exist :create)
+		  (minimum-length 300))
+  "Redefined salsa2:gzip-file with more keywords."
+  (with-open-file (istream input :element-type '(unsigned-byte 8))
+    (unless (< (file-length istream) minimum-length)
+      (with-open-file (ostream output
+			       :element-type '(unsigned-byte 8)
+			       :direction :output
+			       :if-does-not-exist if-does-not-exist
+			       :if-exists if-exists)
+	(salza2:gzip-stream istream ostream)))
+    (probe-file output)))

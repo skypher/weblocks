@@ -46,7 +46,6 @@
                             :initarg :public-files-cache-time
                             :type integer
                             :documentation "HTTP cache time for public files in seconds.
-                            Caching is automatically disabled in debug mode.
                             When debug is on, caching is turned off.")
    (hostnames :reader weblocks-webapp-hostnames :type list
          :initarg :hostnames :initform nil
@@ -75,7 +74,7 @@
        put them in a separate file, and name it 'whatever-import.css'. This way all import
        rules will get properly placed in the beginning of the bundled css file.
        ATTENTION: Bundling depends on versioning to detect change in a bundle.
-       You can also prevent files from being bundled, for example,
+       TIPS:You can also prevent files from being bundled, for example,
        '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
        These two files however, will come after the bundled ones in HTML.")
    (version-dependency-types :accessor version-dependency-types :initarg :version-dependency-types

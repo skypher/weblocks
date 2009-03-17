@@ -4,6 +4,7 @@
 
 ;;; This file contains utilities for bundling css, js dependencies.
 ;;; It is turned on through bundle-dependency-types in application.lisp
+
 ;;; Please read that documentation for more info.
 
 ;;; Bundling depends on versioning to keep track of modification of files

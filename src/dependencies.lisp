@@ -187,8 +187,7 @@ when new dependencies appeared in AJAX page updates.")
 (defun create-gziped-dependency-file (original-path)
   (bordeaux-threads:with-lock-held (*gzip-dependency-lock*)
     (let ((new-path (format nil "~A.gz" original-path)))
-      (unless (cl-fad:file-exists-p new-path)
-	(salza2:gzip-file original-path new-path)))))
+      (gzip-file original-path new-path))))
 
 ;;; Dealing with CSS import rules
 
