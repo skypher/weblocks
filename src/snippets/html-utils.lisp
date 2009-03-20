@@ -36,22 +36,19 @@
                         (:input :name *action-string* :type "hidden" :value ,action-code))))))
        (log-form ,action-code :id ,id :class ,class))))
 
-(defun render-link (action name &key (ajaxp t) id class title)
-  "Renders an action into an href link. If 'ajaxp' is true (the
+(defun render-link (action label &key (ajaxp t) id class title render-fn)
+  "Renders an action into a href link. If AJAXP is true (the
 default), the link will be rendered in such a way that the action will
-be invoked via AJAX, or will fall back to regular request if
-JavaScript is not available. When the user clicks on the link, the
+be invoked via AJAX or will fall back to a regular request if
+JavaScript is not available. When the user clicks on the link the
 action will be called on the server.
 
-'action' - may be a function (in which case 'render-link' will
-automatically call 'make-action'), or a result of a call
-to 'make-action'.
-'name' - A string that will be presented to the user in the
-link.
-'ajaxp' - whether link is submitted via AJAX if JS is available (true
-by default).
-'id' - An id passed into HTML.
-'class' - A class placed into HTML."
+ACTION may be a function or a result of a call to MAKE-ACTION.
+ID, CLASS and TITLE represent their HTML counterparts.
+RENDER-FN is an optional function of one argument that is reponsible
+for rendering the link's content (i.e. its label). The default rendering
+function just calls PRINC-TO-STRING on the label and renders it
+without escaping."
   (let* ((action-code (function-or-action->action action))
 	 (url (make-action-url action-code)))
     (with-html
@@ -60,11 +57,10 @@ by default).
 			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
 				       action-code (session-name-string-pair)))
 	  :title title
-	  (etypecase name
-	    (string (htm (str name)))
-	    (symbol (htm (str name)))
-	    (function (funcall name)))))
-    (log-link name action-code :id id :class class)))
+          (funcall (or render-fn (lambda (label)
+                                   (htm (str (princ-to-string label)))))
+                   label)))
+    (log-link label action-code :id id :class class)))
 
 (defun render-button (name  &key (value (humanize-name name)) id (class "submit"))
   "Renders a button in a form.
