@@ -11,7 +11,7 @@
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function #:standard-class
                             #:typep #:subtypep)
-    (:shadowing-import-from :weblocks #:redirect)
+    (:shadowing-import-from :weblocks #:redirect #:reset-sessions)
     (:export #:test-weblocks)))
 
 (in-package :weblocks-test)
