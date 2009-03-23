@@ -5,8 +5,8 @@
 
 (defconstant +seconds-per-day+ (* 24 60 60))
 
-(defun date->utime (day month year)
-  (encode-universal-time 0 0 0 day month year 0))
+(defun date->utime (day month year hour minute)
+  (encode-universal-time 0 minute hour day month year))
 
 (defclass date-parser (parser)
   ()
@@ -15,19 +15,20 @@
 
 ;; Note: this is a very simple parser -- it will try to match three
 ;; numbers separated by one of ./- and make them into a date assuming it
-;; is in the format DD.MM.YYYY.
+;; is in the format DD.MM.YYYY. If there is a HH:MM after the date, it will get parsed as well.
 (defmethod parse-view-field-value ((parser date-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (if (text-input-present-p value)
       (multiple-value-bind (matched elements)
-	  (cl-ppcre:scan-to-strings "(\\d+)[\\-/\\.](\\d+)[\\-/\\.](\\d+)" value)
+	  (cl-ppcre:scan-to-strings "(\\d+)[\\-/\\.](\\d+)[\\-/\\.](\\d+)(\\s+(\\d+)[:\\.](\\d+))?" value)
 	(when matched
 	  (let ((date (date->utime (parse-integer (aref elements 0) :junk-allowed t)
 				   (parse-integer (aref elements 1) :junk-allowed t)
-				   (parse-integer (aref elements 2) :junk-allowed t))))
-	    (when date
-	      (values t t date)))))
+				   (parse-integer (aref elements 2) :junk-allowed t)
+				   (or (and (aref elements 4) (parse-integer (aref elements 4) :junk-allowed t)) 0)
+				   (or (and (aref elements 5) (parse-integer (aref elements 5) :junk-allowed t)) 0))))
+	    (when date (values t t date)))))
       (values t (text-input-present-p value) value)))
 
 
