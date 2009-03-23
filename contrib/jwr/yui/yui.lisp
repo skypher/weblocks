@@ -70,14 +70,6 @@ its subclasses."))
 	  (setf (slot-value ,editor-widget '_default-toolbar.titlebar) false)
 	  (.render ,editor-widget))))
 
-(defmethod render-view-field-value :around (value (presentation yui-any-editor-presentation)
-						  (field form-view-field) (view form-view) widget obj
-						  &rest args)
-  (declare (special *presentation-dom-id*)
-	   (ignore args))
-  (let ((*presentation-dom-id* (gen-id)))
-    (call-next-method)))
-
 (defmethod render-view-field-value :after (value (presentation yui-any-editor-presentation)
 						 (field form-view-field) (view form-view) widget obj
 						 &rest args &key &allow-other-keys)
