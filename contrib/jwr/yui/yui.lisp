@@ -19,7 +19,7 @@ required modules have been loaded and the DOM is ready."
 					  :load-optional ,load-optional
 					  ,@(when base `(:base ,base))
 					  :on-success ,callback-name))))
-       (.insert ,loader-name))))
+       ((@ ,loader-name insert)))))
 
 (defpsmacro keywords-to-object (args)
   `(create ,@args))
@@ -58,7 +58,7 @@ its subclasses."))
 						    (keywords-to-object
 						     ,(yui-component-config presentation)))))
 	  (setf (slot-value ,editor-widget '_default-toolbar.titlebar) false)
-	  (.render ,editor-widget))))
+	  ((@ ,editor-widget render)))))
 
 (defmethod create-and-configure-editor-script ((presentation yui-editor-presentation)
 					       editor-widget target-id)
@@ -68,7 +68,7 @@ its subclasses."))
 					     (keywords-to-object
 					      ,(yui-component-config presentation)))))
 	  (setf (slot-value ,editor-widget '_default-toolbar.titlebar) false)
-	  (.render ,editor-widget))))
+	  ((@ ,editor-widget render)))))
 
 (defmethod render-view-field-value :after (value (presentation yui-any-editor-presentation)
 						 (field form-view-field) (view form-view) widget obj
@@ -82,7 +82,7 @@ its subclasses."))
 						     widget-variable
 						     *presentation-dom-id*))
     (push (make-instance 'javascript-code-dependency
-			 :code (ps* `(.save-H-T-M-L ,widget-variable)))
+			 :code (ps* `((@ ,widget-variable save-H-T-M-L))))
 	  *form-submit-dependencies*)))
 
 
