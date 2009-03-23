@@ -59,9 +59,7 @@ may be NIL in which case the default pane name is provided."
     (apply #'render-menu (navigation-menu-items obj)
            :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
-           :header (if (widget-name obj)
-                     (humanize-name (widget-name obj))
-                     "Navigation")
+           :header (navigation-header obj)
            :container-id (ensure-dom-id obj)
            :empty-message "No navigation entries"
            menu-args)))
