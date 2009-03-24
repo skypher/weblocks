@@ -128,8 +128,8 @@ were defined. Returns NIL."
       (funcall fn (symbol-value store-name)))))
 
 ;;; Persisting objects
-(defun persist-objects (store objects)
+(defun persist-objects (store objects &rest keys)
   "Persists all objects in 'objects' sequence into 'store'."
   (dolist (obj objects)
-    (persist-object store obj)))
+    (apply #'persist-object store obj keys)))
 

@@ -92,7 +92,7 @@
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmethod persist-object ((store elephant-store) (object elephant:persistent-object))
+(defmethod persist-object ((store elephant-store) (object elephant:persistent-object) &key)
   object)
 
 (defmethod delete-persistent-object ((store elephant-store) (object elephant:persistent-object))

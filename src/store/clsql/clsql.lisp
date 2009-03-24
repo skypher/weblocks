@@ -46,7 +46,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod persist-object ((store database) object)
+(defmethod persist-object ((store database) object &key)
   ;; Note, we persist new objects in three steps, this should be
   ;; optimized into a single query later
   (let* ((class-name (class-name (class-of object)))

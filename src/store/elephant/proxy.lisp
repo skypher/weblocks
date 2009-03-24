@@ -69,7 +69,7 @@
       (find-class (return-proxy-classname class-name))
       (call-next-method)))
 
-(defmethod persist-object ((store elephant-store) (object persistent-proxy))
+(defmethod persist-object ((store elephant-store) (object persistent-proxy) &key)
   "Catch when weblocks tries to persist a proxy object and create an instance
    of the persistent-object"
   (if (proxy-oid object)

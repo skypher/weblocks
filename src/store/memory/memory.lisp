@@ -71,7 +71,7 @@
   (:documentation "This class represents an alternative to RDBMS
   table, holding object instances of a given class."))
 
-(defmethod persist-object ((store memory-store) object)
+(defmethod persist-object ((store memory-store) object &key)
   (let* ((class-name (class-name (class-of object)))
 	 (objects (or (get-root-object store class-name)
 		      (setf (get-root-object store class-name)
