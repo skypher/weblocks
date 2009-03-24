@@ -139,7 +139,7 @@ documentation for 'allow-select-p' on the datalist for more details.")
     (funcall (cdr (dataseq-on-drilldown obj)) obj item)))
 
 ;;; Body
-(defun datalist-update-opretaions (obj)
+(defun datalist-update-operations (obj)
   "Datalist implements drilldown via an item-op. This function first
 removes the drilldown operation, and then adds it again if necessary."
   (let ((drilldown-op-name (car (dataseq-on-drilldown obj))))
@@ -179,7 +179,7 @@ removes the drilldown operation, and then adds it again if necessary."
 	     args))))
 
 (defmethod render-dataseq-body ((obj datalist) &rest args)
-  (datalist-update-opretaions obj)
+  (datalist-update-operations obj)
   (let ((data-sequence (dataseq-data obj)))
     (setf (slot-value obj 'rendered-data-sequence) nil)
     (with-html
