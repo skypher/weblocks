@@ -72,11 +72,13 @@ yourself."))
 					     (,parent ,parent-specializer))
        ,expr)))
 
-(defmethod weblocks:persist-object :before (store (object persistent-children-mixin))
+(defmethod weblocks:persist-object :before
+    (store (object persistent-children-mixin) &key &allow-other-keys)
   "Glue persistent children to the persistence API."
   (persist-children store object :before))
 
-(defmethod weblocks:persist-object :after (store (object persistent-children-mixin))
+(defmethod weblocks:persist-object :after
+    (store (object persistent-children-mixin) &key &allow-other-keys)
   "Glue persistent children to the persistence API."
   (persist-children store object :after))
 
