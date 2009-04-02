@@ -15,9 +15,9 @@
 	  compute-webapp-public-files-uri-prefix
 	  compute-webapp-public-files-uri-prefix-util
           current-webapp))
-
-(defvar *registered-webapps* nil
-  "A list of applications that the system knows about")
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *registered-webapps* nil
+    "A list of applications that the system knows about"))
 
 (defclass weblocks-webapp ()
   ((name :accessor weblocks-webapp-name :initarg :name
