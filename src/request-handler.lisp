@@ -131,6 +131,8 @@ customize behavior."))
   (let ((depth 0) page-title)
     (walk-widget-tree (root-widget)
 		      (lambda (widget d)
+			(update-widget-parameters 
+			 widget (request-method*) (request-parameters))
 			(update-children widget)
 			(let ((title (page-title widget)))
 			  (when (and title (> d depth))

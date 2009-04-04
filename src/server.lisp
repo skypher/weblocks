@@ -121,8 +121,13 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
-         (return-from weblocks-dispatcher (f0 (handle-client-request app)))))))
-      (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
+	 (return-from weblocks-dispatcher 
+	   #'(lambda ()
+	       (handler-bind 
+		   ((error (f (e) (safe-funcall *debugger-hook* 
+						e *debugger-hook*))))
+		 (handle-client-request app))))))))
+  (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
 (setf hunchentoot:*default-handler*

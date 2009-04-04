@@ -28,7 +28,12 @@
 			   :initarg :affects-dirty-status-p
 			   :documentation "When set to true (the
 			   default), the widget will be made dirty
-			   when this slot is modified."))
+			   when this slot is modified.")
+   (parameter-name :accessor widget-slot-parameter-name
+		   :initarg :uri-parameter
+		   :documentation "When supplied, provides a string or
+                   symbol which will be used to extract values from 
+                   a URI GET parameter"))
   (:documentation "A mixin class used in
   'widget-direct-slot-definition' and
   'widget-effective-slot-definition' to allow specifying custom widget

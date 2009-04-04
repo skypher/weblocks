@@ -292,7 +292,7 @@ returns the created object."
 (defmethod print-object ((obj field-info) stream)
   (flet ((field-key (field-info &aux (field (field-info-field field-info)))
                     (cons (view-field-slot-name field) (awhen (field-info-parent-info field-info)
-                                                              (view-field-slot-name (field-info-field IT))))))
+                                                              (view-field-slot-name (field-info-field it))))))
     (print-unreadable-object (obj stream :type t :identity t)
       (format stream "~S" (field-key obj)))))
 

@@ -123,7 +123,8 @@
 		 (:module widgets
 			  :components ((:module widget
 						:components ((:file "widget"
-								    :depends-on ("widget-mop"))
+								    :depends-on ("widget-mop" "uri-parameters-mixin"))
+							     (:file "uri-parameters-mixin")
 							     (:file "widget-mop")))
                                        (:file "composite"
 					      :depends-on (widget))

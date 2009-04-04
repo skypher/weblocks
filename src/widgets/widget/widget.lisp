@@ -4,7 +4,8 @@
 (export '(defwidget widget widget-name ensure-widget-methods
           widget-propagate-dirty widget-rendered-p widget-continuation
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
-          with-widget-header
+          with-widget-header update-widget-parameters
+	  update-widget-slots-with-map
 	  update-children update-parent-for-children
 	  walk-widget-tree page-title
           render-widget render-widget-body render-widget-children
@@ -18,14 +19,17 @@
 defclass, except adds 'widget-class' metaclass specification and
 inherits from 'widget' if no direct superclasses are provided."
   `(progn
-     (defclass ,name ,(or direct-superclasses '(widget))
+     (defclass ,name ,(remove-duplicates
+		       (append (or direct-superclasses '(widget))
+			       (when (uri-parameter-def-p (car body))
+				 (list 'uri-parameters-mixin))))
        ,@body
        (:metaclass widget-class))
      (defmethod per-class-dependencies append ((obj ,name))
        (declare (ignore obj))
-       (dependencies-by-symbol (quote ,name)))))
-
-
+       (dependencies-by-symbol (quote ,name)))
+     ,@(awhen (maybe-generate-parameter-slot-map-fn name (car body))
+	      (list it))))
 
 (defclass widget (dom-object-mixin)
   ((propagate-dirty :accessor widget-propagate-dirty
@@ -202,6 +206,28 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((w widget))
     (mapc (lambda (child) (setf (widget-parent child) w))
 	  (widget-children w))))
+
+(defgeneric update-widget-parameters (widget request-method uri-parameters)
+  (:documentation "Given an alist of parameters, widget updates its state
+  appropriately.  The default method for plain widgets does
+  nothing.  The default method for uri-parameters-mixin uses a
+  method (parameter-slot-map that is automatically defined by
+  the macro to get the list slots to update and the associated
+  parameter names.")
+  (:method (w m u) (declare (ignore w m u)) :default)
+  (:method ((w uri-parameters-mixin) method uri-params)
+    (when (eq method :get)
+      (update-widget-slots-with-map
+       w (uri-parameters-slotmap w) uri-params))))
+
+(defun update-widget-slots-with-map (w slot-map uri-params)
+   "A helper function we export to users if they want to define
+    their own method for updating parameters (for example based
+    on a widget name) without relying on the mixin or the MOP"
+   (loop for (sname . pname) in slot-map
+	 for param = (assoc pname uri-params :test #'equalp)
+	 when param
+         do (setf (slot-value w sname) (cdr param))))
 
 (defgeneric walk-widget-tree (obj fn &optional depth)
   (:documentation "Walk the widget tree starting at obj and calling fn

@@ -58,7 +58,8 @@ the navigation as disabled."
                                                               (string-left-trim "/" target))
                                                  (str label)))))
                                      (function
-                                      (render-link target label)))))))))))
+				      (funcall target label pane-selected-p)))))))))))
+;;                                      (render-link target label)))))))))))
     (with-html
       (:div :class "view menu" ; should probably be 'rendered-menu' but I'm not going to be
                                ; the one adapting the CSS to this.
