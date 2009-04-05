@@ -6,7 +6,7 @@
           widget-parent widget-children widget-prefix-fn widget-suffix-fn
           with-widget-header
 	  update-children update-parent-for-children
-	  walk-widget-tree page-title
+	  map-subwidgets walk-widget-tree page-title
           render-widget render-widget-body render-widget-children
           get-widgets-by-type
 	  widget-css-classes
@@ -156,13 +156,9 @@ children of w (e.g. may be rendered when w is rendered).")
 ;; we get one make-widget-place-writer function which works for nearly
 ;; all cases, so you will very rarely need to write your own. --jwr
 
-;; One caveat: if your widget stores some of its children in its own
-;; slots, you should still call (SETF WIDGET-CHILDREN), so that they
-;; become a part of the widget tree, and when you render, you should
-;; call render-widget on WIDGET-CHILDREN, not on your slot. The
-;; reason for this is that someone might have replaced your child with
-;; do-widget. WIDGET-CHILDREN will give you the current list of
-;; children, your slot will not. --jwr
+;; If your widget stores some of its children in its own slots, you
+;; should see the docstring for `map-subwidgets' to take care of
+;; additional complexities.
 
 (defgeneric (setf widget-children) (widgets obj &optional type)
   (:documentation "Set the list of children of type TYPE for OBJ to be
@@ -187,6 +183,20 @@ children of w (e.g. may be rendered when w is rendered).")
                (cons (cons type (ensure-list widgets)) children))))
       (update-parent-for-children obj))))
 
+(defgeneric map-subwidgets (function widget)
+  (:argument-precedence-order widget function)
+  (:method-combination progn :most-specific-last)
+  (:documentation "Call FUNCTION once for every direct child of
+  WIDGET.  The return value is unspecified.
+
+  You should define a method for your widget class if it introduces
+  child widgets that should be seen by `walk-widget-tree', but are not
+  included in `widget-children', and are not rendered by
+  `render-widget-children'.  You should also define a method on
+  `make-widget-place-writer' in that case.")
+  (:method progn (function widget)
+    (mapc function (widget-children widget))))
+
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
   rendering) while walking the widget tree. Implement this method for
@@ -200,8 +210,7 @@ children of w (e.g. may be rendered when w is rendered).")
   PARENT-WIDGET.")
   (:method (w) "NIL unless defined otherwise" nil)
   (:method ((w widget))
-    (mapc (lambda (child) (setf (widget-parent child) w))
-	  (widget-children w))))
+    (map-subwidgets (lambda (child) (setf (widget-parent child) w)) w)))
 
 (defgeneric walk-widget-tree (obj fn &optional depth)
   (:documentation "Walk the widget tree starting at obj and calling fn
@@ -216,7 +225,7 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((obj symbol) fn &optional (depth 0)) (funcall fn obj depth))
   (:method ((obj widget) fn &optional (depth 0))
     (funcall fn obj depth)
-    (mapc (curry-after #'walk-widget-tree fn (+ depth 1)) (widget-children obj))))
+    (map-subwidgets (curry-after #'walk-widget-tree fn (+ depth 1)) obj)))
 
 
 (defgeneric page-title (w)
@@ -360,6 +369,8 @@ that will be applied before and after the body is rendered.")
   (:method ((obj function) &rest args) nil)
   (:method ((obj string) &rest args) nil)
   (:method ((obj widget) &rest args)
+    ;; leave out the other `map-subwidgets' subjects, as they should
+    ;; be rendered manually
     (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj :widget))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
