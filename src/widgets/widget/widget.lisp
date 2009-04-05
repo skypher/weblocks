@@ -131,7 +131,7 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((w widget) &optional type)
     (if type
       (cdr (assoc type (slot-value w 'children)))
-      (reduce #'append (slot-value w 'children) :key #'cdr))))
+      (reduce #'append (slot-value w 'children) :from-end t :key #'cdr))))
 
 ;; Rationale: yes, I realize it would be nicer to use methods (and
 ;; possibly generators) to functionally enumerate the children of
