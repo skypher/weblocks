@@ -1,11 +1,17 @@
 
 (in-package :weblocks)
 
-(export '(render-page render-page-body render-page-headers application-page-title))
+(export '(render-page render-page-body render-page-headers application-page-title
+	  *current-page-description*))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
       "A list of dependencies of the currently rendered page.")
+
+(defvar *current-page-description*)
+(setf (documentation '*current-page-description* 'variable)
+      "Description of the currently rendered page; used for default
+      page title.")
 
 ;;
 ;; Compute the webapp page title
@@ -14,7 +20,6 @@
 (defmethod application-page-title ((app weblocks-webapp))
   "The default page-title method generates a page title from the 
    application name, application description, and current navigation state."
-  (declare (special *current-page-description*))
   (let ((webapp-description (webapp-description)))
     (apply #'format nil "~A~A~A"
 	   (webapp-name)

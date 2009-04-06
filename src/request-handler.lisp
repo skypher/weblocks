@@ -3,7 +3,7 @@
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-	  *current-page-description* *catch-errors-p*))
+	  *catch-errors-p*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -95,8 +95,7 @@ customize behavior."))
 	    *page-dependencies* *current-page-description*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 	(declare (special *weblocks-output-stream* *dirty-widgets*
-			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-			  *current-page-description*))
+			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
 	(when (pure-request-p)
 	  (throw 'hunchentoot::handler-done (eval-action)))
 	;; a default dynamic-action hook function wraps get operations in a transaction
@@ -122,12 +121,10 @@ customize behavior."))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream* *dirty-widgets*
-                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-                    *current-page-description*))
+                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
   (render-dirty-widgets))
 
 (defun update-widget-tree ()
-  (declare (special *current-page-description*))
   (let ((depth 0) page-title)
     (walk-widget-tree (root-widget)
 		      (lambda (widget d)
@@ -140,8 +137,7 @@ customize behavior."))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
-                    *uri-tokens*
-                    *current-page-description*))
+                    *uri-tokens*))
   ; we need to render widgets before the boilerplate HTML
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
