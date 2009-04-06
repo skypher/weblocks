@@ -134,7 +134,8 @@ customize behavior."))
 			(update-children widget)
 			(let ((title (page-title widget)))
 			  (when (and title (> d depth))
-			    (setf page-title title)))))
+			    (setf page-title title
+				  depth d)))))
     (when page-title (setf *current-page-description* page-title))))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
