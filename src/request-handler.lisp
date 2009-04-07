@@ -55,7 +55,7 @@ customize behavior."))
                           (if *catch-errors-p*
                             (return-from handle-client-request
                                          (handle-error-condition app c))
-                            (signal c)))))
+                            (invoke-debugger c)))))
     (call-next-method)))
 
 (defmethod handle-client-request ((app weblocks-webapp))
