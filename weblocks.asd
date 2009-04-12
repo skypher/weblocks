@@ -8,7 +8,7 @@
 
 (defsystem weblocks
   :name "weblocks"
-  :version "0.0.1"
+  :version "0.8.3"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
   :licence "LLGPL"
