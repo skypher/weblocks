@@ -344,7 +344,7 @@ provider URI)."
 	  (t nil))))
 
 (defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp *current-webapp*))
-  "Set a session value for the currently runnin webapp" 
+  "Set a session value for the currently running webapp" 
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test 'equal)
