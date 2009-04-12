@@ -9,7 +9,8 @@
 	  webapp-public-files-uri-prefix webapp-prefix
 	  running-webapp make-webapp-uri make-webapp-public-file-uri
           reset-webapp-session
-	  webapp-session-value define-permanent-action
+	  webapp-session-value delete-webapp-session-value
+	  define-permanent-action
 	  define-permanent-action/cc remove-webapp-permanent-action
 	  compute-webapp-public-files-path
 	  compute-webapp-public-files-uri-prefix
@@ -351,6 +352,11 @@ provider URI)."
 	    (session-value (class-name (class-of webapp))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
+(defun delete-webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
+  "Clear the session value for the currently running webapp" 
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
+    (when webapp-session
+      (remhash symbol webapp-session))))
 
 ;;
 ;; Permanent actions
