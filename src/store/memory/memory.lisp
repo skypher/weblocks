@@ -106,9 +106,10 @@
 (defmethod find-persistent-object-by-id ((store memory-store) class-name object-id)
   (let ((objects (get-root-object store class-name)))
     ; find the object
-    (multiple-value-bind (obj)
-	(gethash object-id (persistent-objects-of-class-by-id objects))
-      obj)))
+    (when objects
+      (multiple-value-bind (obj)
+          (gethash object-id (persistent-objects-of-class-by-id objects))
+        obj))))
 
 (defmethod find-persistent-objects ((store memory-store) class-name
 				    &key (filter nil) order-by range)
