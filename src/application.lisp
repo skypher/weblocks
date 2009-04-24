@@ -335,7 +335,7 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
-(defun webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
+(defun webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
   "Get a session value from the currently running webapp"
   
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
@@ -344,7 +344,7 @@ provider URI)."
 	  (webapp (values nil nil))
 	  (t nil))))
 
-(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp *current-webapp*))
+(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp (current-webapp)))
   "Set a session value for the currently running webapp" 
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
@@ -352,7 +352,7 @@ provider URI)."
 	    (session-value (class-name (class-of webapp))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
-(defun delete-webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
+(defun delete-webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
   "Clear the session value for the currently running webapp" 
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (when webapp-session
