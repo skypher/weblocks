@@ -79,7 +79,7 @@
   (:documentation "A parser for checkboxes"))
 
 (defun post-parameter->list (param)
-  (loop for x in (hunchentoot:post-parameters)
+  (loop for x in (hunchentoot:post-parameters*)
         when (equalp (car x) param)
         collect (cdr x)))
 

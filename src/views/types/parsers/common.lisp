@@ -106,7 +106,8 @@
 
 ;;; Symbol
 (defclass symbol-parser (parser)
-  ()
+  ((target-package :type (or package symbol string) :accessor symbol-parser-target-package
+                   :initarg :target-package))
   (:documentation "A parser designed to parse strings into
   symbols."))
 
@@ -130,21 +131,15 @@ on 'symbol' and 'keyword'."
   (values t (text-input-present-p value)
 	  (intern
 	   (parse-symbol-from-request value)
-	   (symbol-package (view-field-slot-name field)))))
+	   (if (slot-boundp parser 'target-package)
+             (find-package (symbol-parser-target-package parser))
+             (symbol-package (view-field-slot-name field))))))
 
 ;;; Keyword
-(defclass keyword-parser (parser)
+(defclass keyword-parser (symbol-parser)
   ()
-  (:documentation "A parser designed to parse strings into
-  keywords."))
-
-(defmethod parse-view-field-value ((parser keyword-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
-  (declare (ignore args))
-  (values t (text-input-present-p value)
-	  (intern
-	   (parse-symbol-from-request value)
-	   (find-package :keyword))))
+  (:default-initargs :target-package :keyword)
+  (:documentation "A parser designed to parse strings into keywords."))
 
 ;;; Object id
 (defclass object-id-parser (parser)

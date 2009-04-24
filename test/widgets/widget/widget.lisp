@@ -307,7 +307,7 @@
 	(declare (special weblocks::*dirty-widgets*))
 	(mark-dirty (make-instance 'composite :name "test"
 				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
-		    :putp t)
+		    :propagate t)
 	(mapcar #'widget-name weblocks::*dirty-widgets*)))
   nil)
 
@@ -323,7 +323,7 @@
 	  (declare (special weblocks::*dirty-widgets*))
 	  (render-widget w)
 	  (render-widget (find-widget-by-path (car path)))
-	  (mark-dirty w :putp t)
+	  (mark-dirty w :propagate t)
 	  (mapcar #'widget-name weblocks::*dirty-widgets*))))
   (test2-leaf "test"))
 
@@ -335,6 +335,9 @@
 	(setf (widget-rendered-p w) t)
 	(widget-name (car weblocks::*dirty-widgets*))))
   nil)
+
+(addtest mark-dirty-both-propagate-and-putp-supplied
+  (ensure-error (mark-dirty (make-instance 'widget) :propagate t :putp t)))
 
 ;;; test widget-dirty-p
 (deftest widget-dirty-p-1
@@ -378,38 +381,16 @@
 	  weblocks::*dirty-widgets*)))
   nil)
 
-;;; test find-widget-by-path
-(deftest find-widget-by-path-1
-    (find-widget-by-path '(hello) nil)
-  nil)
 
-(deftest find-widget-by-path-2
-    (find-widget-by-path nil 'hello)
-  hello)
+;;; test get-widgets-by-type
 
-(deftest find-widget-by-path-3
-    (with-request :get nil
-      (setf (root-composite) (create-site-layout))
-      (let ((res (find-widget-by-path '(root-inner test-nav-1 test2 test2-leaf))))
-	(values (widget-name res)
-		(type-of res))))
-  test2-leaf composite)
+;; TODO
 
-(deftest find-widget-by-path-4
-    (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))
-      (find-widget-by-path '(doesnt exist)))
-  nil)
 
-(deftest find-widget-by-path-5
-    (with-request :get nil :uri "/test2"
-      (setf (root-composite) (create-site-layout))
-      (catch 'hunchentoot::handler-done
-	(handle-client-request (weblocks::current-webapp)))
-      (let ((test2 (find-widget-by-path '(root-inner test-nav-1 test2))))
-	(values (widget-name test2)
-		(type-of test2))))
-  "test2" composite)
+;;; test get-widgets-by-id
+
+;; TODO
+
 
 ;;; test customized widget printing
 (deftest widget-printing-1

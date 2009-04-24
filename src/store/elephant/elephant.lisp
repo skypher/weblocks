@@ -92,7 +92,7 @@
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmethod persist-object ((store elephant-store) (object elephant:persistent-object))
+(defmethod persist-object ((store elephant-store) (object elephant:persistent-object) &key)
   object)
 
 (defmethod delete-persistent-object ((store elephant-store) (object elephant:persistent-object))
@@ -273,7 +273,7 @@
 			   (values t (class-of v))))
     bt))
 
-(defmethod persist-object ((store elephant-store) object)
+(defmethod persist-object ((store elephant-store) object &key)
   (aif (object-id object)
        (setf (get-value it (elephant-stdobj-index store))
 	     object)

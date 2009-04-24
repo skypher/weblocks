@@ -1,20 +1,25 @@
 
 (in-package :weblocks)
 
-(export '(render-page render-page-body render-page-headers page-title))
+(export '(render-page render-page-body render-page-headers application-page-title
+	  *current-page-description*))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
       "A list of dependencies of the currently rendered page.")
 
+(defvar *current-page-description*)
+(setf (documentation '*current-page-description* 'variable)
+      "Description of the currently rendered page; used for default
+      page title.")
+
 ;;
 ;; Compute the webapp page title
 ;;
 
-(defmethod page-title ((app weblocks-webapp))
+(defmethod application-page-title ((app weblocks-webapp))
   "The default page-title method generates a page title from the 
    application name, application description, and current navigation state."
-  (declare (special *current-page-description*))
   (let ((webapp-description (webapp-description)))
     (apply #'format nil "~A~A~A"
 	   (webapp-name)
@@ -47,7 +52,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
-	      (:title (str (page-title app)))
+	      (:title (str (application-page-title app)))
 	      (render-page-headers app)
 	      (mapc #'render-dependency-in-page-head all-dependencies))
 	     (:body
@@ -79,7 +84,7 @@ tag). The default implementation wraps the already rendered HTML in a
 wrapper div along with extra tags. Specialize :before and :after
 methods to render extra html prior and post the page wrapper and override
 the main method to replace the generation of the page wrapper and any contents
-inside it but outside the rendering of the root composite"))
+inside it but outside the rendering of the root widget"))
 
 (defmethod render-page-body ((app weblocks-webapp) body-string)
   "Default page-body rendering method"

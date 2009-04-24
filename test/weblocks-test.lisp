@@ -11,7 +11,7 @@
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function #:standard-class
                             #:typep #:subtypep)
-    (:shadowing-import-from :weblocks #:redirect)
+    (:shadowing-import-from :weblocks #:redirect #:reset-sessions)
     (:export #:test-weblocks)))
 
 (in-package :weblocks-test)
@@ -101,6 +101,10 @@ DESCRIBE-ing them."
 
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
+
+;; see store/store-utils.lisp
+(defwebapp app-with-not-searchable-store
+  :autostart nil)
 
 ; We'll use memory store for testing
 (defstore *not-searchable-store* :memory)
@@ -235,7 +239,7 @@ webapp in my context."
 			  (setf *uri-tokens* (weblocks::tokenize-uri uri)))
 			(setf (slot-value *request* 'hunchentoot::uri)
 			      (or uri (concatenate 'string "/"
-						   (compose-uri-tokens-to-url *uri-tokens*))))
+						   (uri-tokens-to-string *uri-tokens*))))
 			(funcall thunk))
 	(setf (symbol-function 'weblocks::make-action) make-action-orig)
 	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)

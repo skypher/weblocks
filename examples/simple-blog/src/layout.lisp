@@ -1,5 +1,10 @@
 (in-package :simple-blog)
 
+(defun make-main-page ()
+  (make-navigation 'navigation
+		   'main (make-blog-widget)
+		   'admin (make-admin-page)))
+
 (defun make-users-gridedit ()
   (make-instance 'gridedit
 		 :name 'users-grid
@@ -25,12 +30,7 @@
 (defun make-admin-page ()
   (make-instance 'composite
 		 :widgets
-		 (list (lambda ()
-			 (render-link (lambda (&rest args)
-					(declare (ignore args))
-					(do-page (make-blog-widget)))
-				      "view blog"))
-		       (make-users-gridedit)
+		 (list (make-users-gridedit)
 		       (lambda ()
 			 ;; gridedit widgets were probably not
 			 ;; intended to be put 2 on the same page, so
@@ -45,11 +45,5 @@
 	  :widgets (list
 		    (make-instance 'blog-widget
 				   :post-short-view 'post-short-view
-				   :post-full-view 'post-full-view)))))
-    (push (lambda ()
-	    (render-link (lambda (&rest args)
-			   (declare (ignore args))
-			   (answer composite))
-			 "admin"))
-	  (composite-widgets composite))
+				   :post-full-view 'post-full-view)))))    
     composite))

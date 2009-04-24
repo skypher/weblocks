@@ -44,10 +44,10 @@
   RESET-BLOG)")
   (:method ((blog-widget blog-widget) (post post))
     (make-instance 'post-widget
+		   :blog blog-widget
 		   :post post
 		   :short-view (post-short-view blog-widget)
 		   :full-view (post-full-view blog-widget)
-		   ;;; we'll add a new slot to POST-WIDGET for this
 		   :on-select (lambda (post-widget)
 				(setf (current-post blog-widget) post-widget)
 				(setf (mode blog-widget) :post)))))
@@ -79,6 +79,18 @@
      (render-link (blog-action-blog-mode blog-widget)
 		  "Simple Blog")))
   (render-widget (current-post blog-widget)))
+
+(defmethod with-widget-header ((obj blog-widget) body-fn &rest args)
+  (with-html
+    (:div :class (format nil "~A ~A-mode"
+			 (dom-classes obj)
+			 (remove #\: (write-to-string (mode obj) :case :downcase)))
+	  :id (dom-id obj)
+	  (apply body-fn obj args)
+	  (when (eql (mode obj) :blog)
+	    (htm
+	     (:img :id "bubblehead"
+		   :src "/pub/images/bubblehead.png"))))))
 
 (defmethod render-widget-body ((obj blog-widget) &key)
   (render-blog obj (mode obj)))

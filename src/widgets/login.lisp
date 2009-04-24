@@ -141,7 +141,7 @@ returned."
 				     (multiple-value-bind (success error)
 					 (funcall (login-on-login obj) obj o)
 				       (if success
-                                           (progn
+                                           (prog1 ; make sure we return the proper value, or validation will fail
                                              (setf (webapp-session-value *authentication-key*) success)
                                              (dolist (fn (on-signin-hooks))
                                                (safe-funcall fn)))

@@ -24,6 +24,12 @@
 	:requiredp t))
 
 (defview post-short-view (:type data :inherit-from 'post-data-view)
+  (title :present-as (action-link
+		      :action-fn (lambda (w)
+				   (setf (mode w) :full)
+				   (let ((blog (blog-widget w)))
+				     (setf (mode blog) :post))
+				   (safe-funcall (on-select w) w))))
   (text :hidep t))
 
 (defview post-full-view (:type data :inherit-from 'post-data-view)

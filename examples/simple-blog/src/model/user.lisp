@@ -2,7 +2,7 @@
 (in-package :simple-blog)
 
 (defclass user ()
-  ((weblocks:id)
+  ((id)
    (name :accessor user-name
 	 :initarg :name
 	 :initform ""

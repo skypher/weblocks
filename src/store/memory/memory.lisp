@@ -71,7 +71,7 @@
   (:documentation "This class represents an alternative to RDBMS
   table, holding object instances of a given class."))
 
-(defmethod persist-object ((store memory-store) object)
+(defmethod persist-object ((store memory-store) object &key)
   (let* ((class-name (class-name (class-of object)))
 	 (objects (or (get-root-object store class-name)
 		      (setf (get-root-object store class-name)
@@ -106,9 +106,10 @@
 (defmethod find-persistent-object-by-id ((store memory-store) class-name object-id)
   (let ((objects (get-root-object store class-name)))
     ; find the object
-    (multiple-value-bind (obj)
-	(gethash object-id (persistent-objects-of-class-by-id objects))
-      obj)))
+    (when objects
+      (multiple-value-bind (obj)
+          (gethash object-id (persistent-objects-of-class-by-id objects))
+        obj))))
 
 (defmethod find-persistent-objects ((store memory-store) class-name
 				    &key (filter nil) order-by range)

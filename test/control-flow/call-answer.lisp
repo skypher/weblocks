@@ -1,6 +1,8 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite control-flow/call-answer-suite (weblocks-suite) nil)
+
 ;;; test widget-continuation
 (deftest widget-continuation-1
     (let ((foo (lambda () nil)))
@@ -81,17 +83,17 @@
 
 (deftest do-widget-4
     (with-request :get nil
-      (let* ((w1 (make-instance 'composite))
-	     (w2 (make-instance 'composite))
-	     (w3 (make-instance 'composite))
-	     (c (make-instance 'composite :widgets (list w1 w2))))
-	(setf (root-composite) c)
+      (let* ((w1 (make-instance 'widget))
+	     (w2 (make-instance 'widget))
+	     (w3 (make-instance 'widget))
+	     (c (make-instance 'widget :children (list w1 w2))))
+	(setf (root-widget) c)
 	(with-call/cc
 	  (do-widget nil w3))
-	(values (equalp (composite-widgets c) (list w3))
-		(progn (answer w3)
-		       (equalp (composite-widgets c) (list w1 w2))))))
-  t t)
+	(list (equalp (widget-children c) (list w3))
+              (progn (answer w3)
+                     (equalp (widget-children c) (list w1 w2))))))
+  (t t))
 
 (deftest do-widget-5
     (with-request :get nil

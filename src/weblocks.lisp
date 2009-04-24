@@ -15,7 +15,7 @@
     (:shadowing-import-from :f-underscore #:f #:_)
     (:shadowing-import-from :fare-matcher #:match)
     (:shadowing-import-from :metabang.utilities #:with-array)
-    (:shadow #:redirect #:errors)
+    (:shadow #:redirect #:reset-sessions #:errors)
     (:documentation
       "Weblocks is a Common Lisp framework that eases the pain of web
       application development. It achieves its goals by standardizing on
@@ -40,7 +40,7 @@
   (export (list s)))
 
 (export '(*weblocks-output-stream* with-html with-html-to-string
-          reset-sessions str with-javascript with-javascript-to-string root-composite))
+          reset-sessions str with-javascript with-javascript-to-string root-widget))
 
 (defun wexport (symbols-designator &optional (package-specs t))
   "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',
@@ -138,10 +138,10 @@ having to worry about special characters in JavaScript code."
 having to worry about special characters in JavaScript code."
   `(with-html-to-string ,(apply #'%js source args)))
 
-(defmacro root-composite ()
+(defmacro root-widget ()
   "Expands to code that can be used as a place to access to the root
 composite."
-  `(webapp-session-value 'root-composite))
+  `(webapp-session-value 'root-widget))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

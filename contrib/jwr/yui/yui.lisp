@@ -19,7 +19,7 @@ required modules have been loaded and the DOM is ready."
 					  :load-optional ,load-optional
 					  ,@(when base `(:base ,base))
 					  :on-success ,callback-name))))
-       (.insert ,loader-name))))
+       ((@ ,loader-name insert)))))
 
 (defpsmacro keywords-to-object (args)
   `(create ,@args))
@@ -58,7 +58,7 @@ its subclasses."))
 						    (keywords-to-object
 						     ,(yui-component-config presentation)))))
 	  (setf (slot-value ,editor-widget '_default-toolbar.titlebar) false)
-	  (.render ,editor-widget))))
+	  ((@ ,editor-widget render)))))
 
 (defmethod create-and-configure-editor-script ((presentation yui-editor-presentation)
 					       editor-widget target-id)
@@ -68,15 +68,7 @@ its subclasses."))
 					     (keywords-to-object
 					      ,(yui-component-config presentation)))))
 	  (setf (slot-value ,editor-widget '_default-toolbar.titlebar) false)
-	  (.render ,editor-widget))))
-
-(defmethod render-view-field-value :around (value (presentation yui-any-editor-presentation)
-						  (field form-view-field) (view form-view) widget obj
-						  &rest args)
-  (declare (special *presentation-dom-id*)
-	   (ignore args))
-  (let ((*presentation-dom-id* (gen-id)))
-    (call-next-method)))
+	  ((@ ,editor-widget render)))))
 
 (defmethod render-view-field-value :after (value (presentation yui-any-editor-presentation)
 						 (field form-view-field) (view form-view) widget obj
@@ -90,7 +82,7 @@ its subclasses."))
 						     widget-variable
 						     *presentation-dom-id*))
     (push (make-instance 'javascript-code-dependency
-			 :code (ps* `(.save-H-T-M-L ,widget-variable)))
+			 :code (ps* `((@ ,widget-variable save-H-T-M-L))))
 	  *form-submit-dependencies*)))
 
 
@@ -114,11 +106,11 @@ its subclasses."))
   (declare (ignore initargs))
   ;; we don't actually use this list for rendering, but it is necessary
   ;; to keep the weblocks widget tree consistent --jwr
-  (set-children-of-type obj (list (yui-grid-page-header obj)
-				  (yui-grid-page-primary-body obj)
-				  (yui-grid-page-secondary-body obj)
-				  (yui-grid-page-footer obj))
-			:yui-grid-page)
+  (setf (widget-children obj :yui-grid-page)
+	(list (yui-grid-page-header obj)
+	      (yui-grid-page-primary-body obj)
+	      (yui-grid-page-secondary-body obj)
+	      (yui-grid-page-footer obj)))
   ;; this will set HTML id for us
   (setf (widget-name obj) type)
   (setf (dom-class obj) template))
@@ -149,7 +141,7 @@ its subclasses."))
   (setf (dom-class obj) (format nil "yui-g~:[~; first~]" (yui-grid-first obj))))
 
 (defmethod update-children ((obj yui-grid-layout))
-  (set-children-of-type obj (list (yui-grid-left obj) (yui-grid-right obj)) :yui-grid-layout))
+  (setf (widget-children obj :yui-grid-layout) (list (yui-grid-left obj) (yui-grid-right obj))))
 
 (defmethod render-widget-body ((obj yui-grid-layout) &rest args)
   (declare (ignore args))
@@ -203,11 +195,11 @@ its subclasses."))
   (declare (ignore initargs))
   ;; this will set HTML id for us
   (setf (dom-class obj) "yui-navset")
-  (set-children-of-type obj (yui-tabview-tabs obj) :yui-tabview))
+  (setf (widget-children obj :yui-tabview) (yui-tabview-tabs obj)))
 
 (defmethod (setf yui-tabview-tabs) ((obj yui-tabview) tab-list)
   (setf (slot-value obj 'tabs) tab-list)
-  (set-children-of-type obj (yui-tabview-tabs obj) :yui-tabview))
+  (setf (widget-children obj :yui-tabview) (yui-tabview-tabs obj)))
 
 (defun tabview-script (tabview-js-var tabview-id)
   (ps* `(with-lazy-loaded-modules (("tabview"))
