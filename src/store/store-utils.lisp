@@ -80,6 +80,13 @@ structure of type 'store-info' as value.")
 (defvar *store-names* nil
   "A list of store names in the order in which they were defined.")
 
+(defun %defstore-predefine (name type &rest args)
+  "Helper for `defstore'."
+  (setf (gethash name *stores*)
+	(make-store-info :type type :args args))
+  (unless (find name *store-names*)
+    (push-end name *store-names*)))
+
 (defmacro defstore (name type &rest args)
   "A macro that helps define a store. A global variable 'name' is
 defined, and 'open-store' is called with appropriate store type and
@@ -89,10 +96,7 @@ bound when 'start-weblocks' is called, and closed when 'stop-weblocks'
 is called."
   (let ((system-name (gensym)))
     `(progn
-       (setf (gethash ',name *stores*)
-	     (make-store-info :type ,type :args ,(cons 'list args)))
-       (unless (find ',name *store-names*)
-	 (push-end ',name *store-names*))
+       (%defstore-predefine ',name ,type ,@args)
        (defvar ,name nil)
        (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
 	 (unless (asdf:find-system ,system-name nil)
