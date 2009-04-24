@@ -5,6 +5,8 @@
 	  class-store object-store defstore persist-objects
 	  mapstores open-stores))
 
+(declaim (special *default-store*))
+
 ;;; Object ID management
 (defgeneric class-id-slot-name (class)
   (:documentation
