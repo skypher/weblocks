@@ -3,6 +3,8 @@
 
 (export '(disable-global-debugging enable-global-debugging))
 
+(declaim (special *maintain-last-session*))
+
 (defun enable-global-debugging ()
   "Setup hooks for session maintenance and showing backtraces"
   ;; Set hunchentoot defaults (for everyone)
