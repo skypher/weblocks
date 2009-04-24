@@ -87,6 +87,18 @@ structure of type 'store-info' as value.")
   (unless (find name *store-names*)
     (push-end name *store-names*)))
 
+(defun %defstore-postdefine (name type)
+  "Helper for `defstore'."
+  (let ((system-name (make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
+    (unless (asdf:find-system system-name nil)
+      (load (merge-pathnames
+	     (make-pathname :directory `(:relative "src" "store"
+					 ,(string-downcase (symbol-name type)))
+			    :name (string-downcase (symbol-name system-name))
+			    :type "asd")
+	     (asdf-system-directory :weblocks))))
+    (asdf:operate 'asdf:load-op system-name)))
+
 (defmacro defstore (name type &rest args)
   "A macro that helps define a store. A global variable 'name' is
 defined, and 'open-store' is called with appropriate store type and
@@ -94,18 +106,10 @@ arguments. Note that the last store will also be the default (see
 *default-store*). All stores defined via 'defstore' will be opened and
 bound when 'start-weblocks' is called, and closed when 'stop-weblocks'
 is called."
-  (let ((system-name (gensym)))
-    `(progn
-       (%defstore-predefine ',name ,type ,@args)
-       (defvar ,name nil)
-       (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
-	 (unless (asdf:find-system ,system-name nil)
-	   (load (merge-pathnames (make-pathname :directory '(:relative "src" "store"
-							      ,(string-downcase (symbol-name type)))
-						 :name (string-downcase (symbol-name ,system-name))
-						 :type "asd")
-				  (asdf-system-directory :weblocks))))
-	 (asdf:operate 'asdf:load-op ,system-name)))))
+  `(progn
+     (%defstore-predefine ',name ,type ,@args)
+     (defvar ,name nil)
+     (%defstore-postdefine ',name ,type)))
 
 (defun open-stores ()
   "Opens and binds all stores."
