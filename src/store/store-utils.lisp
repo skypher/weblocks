@@ -89,6 +89,7 @@ structure of type 'store-info' as value.")
 
 (defun %defstore-postdefine (name type)
   "Helper for `defstore'."
+  (declare (ignore name))
   (let ((system-name (make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
     (unless (asdf:find-system system-name nil)
       (load (merge-pathnames
