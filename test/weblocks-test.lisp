@@ -102,6 +102,10 @@ DESCRIBE-ing them."
 (defparameter *test-widget-id* 0
   "Used to generate a unique ID for fixtures.")
 
+;; see store/store-utils.lisp
+(defwebapp app-with-not-searchable-store
+  :autostart nil)
+
 ; We'll use memory store for testing
 (defstore *not-searchable-store* :memory)
 (defstore *test-store* :memory)

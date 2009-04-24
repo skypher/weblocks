@@ -27,7 +27,11 @@
   tables, etc.)"))
 
 (defvar *default-store* nil
-  "The default store to which objects are persisted.")
+  "The default store to which objects are persisted.  Bound while a
+  webapp is handling a request to the value of its
+  `webapp-default-store-name'.  By using `defstore' after the relevant
+  `defwebapp' in the same package, barring an explicit setting, the
+  webapp will be set to use the defined store automatically.")
 
 ;;; Transactions
 (defgeneric begin-transaction (store)

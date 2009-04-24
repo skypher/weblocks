@@ -56,11 +56,10 @@ customize behavior."))
                             (return-from handle-client-request
                                          (handle-error-condition app c))
                             (invoke-debugger c)))))
-    (call-next-method)))
+    (in-webapp app (call-next-method))))
 
 (defmethod handle-client-request ((app weblocks-webapp))
-  (let ((*current-webapp* app))
-    (declare (special *current-webapp*))
+  (progn				;save it for splitting this up
     (when (null *session*)
       (when (get-request-action-name)
 	(expired-action-handler app))

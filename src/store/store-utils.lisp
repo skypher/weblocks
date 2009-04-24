@@ -85,7 +85,11 @@ structure of type 'store-info' as value.")
   (setf (gethash name *stores*)
 	(make-store-info :type type :args args))
   (unless (find name *store-names*)
-    (push-end name *store-names*)))
+    (push-end name *store-names*))
+  ;; `*package*' should be appropriate as defstore should be toplevel
+  (dolist (probable-webapp-class (package-webapp-classes))
+    (sunless (webapp-default-store-name probable-webapp-class)
+      (setf it name))))
 
 (defun %defstore-postdefine (name type)
   "Helper for `defstore'."

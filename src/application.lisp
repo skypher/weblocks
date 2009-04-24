@@ -3,7 +3,7 @@
 
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
-	  webapp-application-dependencies webapp-name
+	  webapp-application-dependencies webapp-name in-webapp
 	  webapp-description weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix
@@ -71,6 +71,10 @@
                          same package as 'name'. This function will accept a single parameter - a 
                          widget at the root of the application. 'init-user-session' is
                          responsible for adding initial children to this widget.")
+   (default-store-name
+    :accessor webapp-default-store-name :initarg :default-store :type symbol
+    :documentation "If non-nil, the name of the `*default-store*'
+    bound during request handlers.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))
@@ -192,6 +196,8 @@ to my `application-dependencies' slot."
          (slot-value self 'public-files-path)
       (setf (weblocks-webapp-public-files-path self)
             (slot-value self 'public-files-path)))
+    (slot-default default-store-name
+                  (webapp-default-store-name (class-of self)))
     (slot-default html-indent-p (weblocks-webapp-debug self))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
@@ -471,6 +477,29 @@ provider URI)."
   (declare (special *current-webapp*))
   *current-webapp*)
 
+(defun package-webapp-classes (&optional (package *package*))
+  "Answer a list of webapp classes that were defined (e.g. by
+`defwebapp') in PACKAGE, by default the current package."
+  (loop for webapp-class-name in *registered-webapps*
+	for class = (find-class webapp-class-name)
+	when (eql package (webapp-class-home-package class))
+	  collect class))
+
+(defun call-in-webapp (app proc)
+  "Helper for `in-webapp'."
+  (let ((*current-webapp* app))
+    (aif (aand (webapp-default-store-name app)
+	       (symbol-value it))
+	 (let ((*default-store* it))
+	   (funcall proc))
+	 (funcall proc))))
+
+(defmacro in-webapp (webapp &body forms)
+  "Bind variables that are both webapp-specific, or applicable to just
+this app, and webapp-general, or not particular to some request to
+this app, with regard to WEBAPP."
+  `(call-in-webapp ,webapp (f0 . ,forms)))
+
 (defun reset-webapp-session (&optional (app (current-webapp)))
   "Reset sessions on a per-webapp basis"
   (setf (session-value (class-name (class-of app))) nil))
@@ -521,4 +550,3 @@ provider URI)."
     (etypecase init
       (function init)
       (symbol (symbol-function init)))))
-
