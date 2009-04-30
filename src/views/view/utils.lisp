@@ -40,12 +40,8 @@ inserts each of CUSTOM-FIELDS as defined by `get-object-view-fields'.
 Secondary, answer a termination thunk."
   (unless custom-fields
     (return-from inserting-custom-fields (values proc (constantly nil))))
-  (multiple-value-bind (end-customs posned-customs)
-      (loop for cf in custom-fields
-	    if (consp cf)
-	      collect (cons (car cf) (cdr cf)) into posned-customs
-	    else collect cf into end-customs
-	    finally (return (values end-customs posned-customs)))
+  (multiple-value-bind (posned-customs end-customs)
+      (partition custom-fields #'consp)
     (setf posned-customs (stable-sort posned-customs #'< :key #'car))
     (let ((posn -1))
       (labels ((custom-field->field-info (custom-field)
