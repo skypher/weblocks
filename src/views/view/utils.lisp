@@ -6,7 +6,7 @@
 	  find-field-info find-view-field map-mixin-fields
 	  count-view-fields obtain-view-field-value render-object-view
 	  class-from-view render-view render-object-view-impl
-	  attributize-presentation))
+	  attributize-presentation attributize-view-field-name))
 
 ;;; View rendering utils
 (defun find-view (view &optional (signal-error-p t))
@@ -266,6 +266,13 @@ returns the created object."
     (object-class-name
      presentation))
    "-presentation"))
+
+(defmethod attributize-view-field-name ((field-info field-info))
+  "Attributize a view field name from its FIELD-INFO structure."
+  (let ((parent-prefix (awhen (field-info-parent-info field-info)
+                              (view-field-slot-name (field-info-field it))))
+        (name (view-field-slot-name (field-info-field field-info))))
+    (attributize-name (format nil "~@[~A-~]~A" parent-prefix name))))
 
 (defmethod print-object ((obj field-info) stream)
   (flet ((field-key (field-info &aux (field (field-info-field field-info)))

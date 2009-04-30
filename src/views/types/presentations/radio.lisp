@@ -9,8 +9,8 @@
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget (presentation radio-presentation) value obj
-			      &rest args &key validation-errors &allow-other-keys)
-  (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
+			      &rest args &key validation-errors field-info &allow-other-keys)
+  (let* ((attribute-slot-name (attributize-view-field-name field-info))
 	 (validation-error (assoc attribute-slot-name validation-errors
 				  :test #'string-equal
 				  :key #'view-field-slot-name))
@@ -34,12 +34,12 @@
 
 (defmethod render-view-field-value (value (presentation radio-presentation)
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (ignore args)
 	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-radio-buttons (view-field-slot-name field)
+    (render-radio-buttons (attributize-view-field-name field-info)
 			  (obtain-presentation-choices presentation obj)
 			  :selected-value (if intermediate-value-p
 					      intermediate-value

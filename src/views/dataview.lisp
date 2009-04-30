@@ -69,9 +69,9 @@
 
 (defmethod render-view-field ((field data-view-field) (view data-view)
 			      widget presentation value obj
-			      &rest args)
+			      &rest args &key field-info &allow-other-keys)
   (with-html
-    (:li :class (attributize-name (view-field-slot-name field))
+    (:li :class (attributize-view-field-name field-info)
 	 (unless (empty-p (view-field-label field))
 	   (htm (:span :class (concatenate 'string "label "
 					   (attributize-presentation

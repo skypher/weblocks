@@ -61,7 +61,7 @@ state."
 
 (defmethod render-view-field-value (value (presentation us-state-presentation) 
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (ignore args))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
@@ -74,14 +74,14 @@ state."
 						  :test #'equalp))))))
 	  (welcome-name "State"))
       (if (us-state-presentation-use-suggest-p presentation)
-	  (render-suggest (view-field-slot-name field)
+	  (render-suggest (attributize-view-field-name field-info)
 			  selections
 			  :default-value default-value
 			  :welcome-name welcome-name
 			  :max-length (input-presentation-max-length presentation)
 			  :input-id (us-state-presentation-input-id presentation)
 			  :choices-id (us-state-presentation-choices-id presentation))
-	  (render-dropdown (view-field-slot-name field) selections
+	  (render-dropdown (attributize-view-field-name field-info) selections
 			   :selected-value default-value
 			   :welcome-name welcome-name
 			   :id (us-state-presentation-input-id presentation))))))

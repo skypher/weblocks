@@ -112,12 +112,14 @@ rendering.")
 		      args)))
 	   view obj args)))
 
-(defgeneric render-view-field-header (field view widget presentation value obj &rest args)
+(defgeneric render-view-field-header (field view widget presentation value obj &rest args
+                                      &key field-info &allow-other-keys)
   (:documentation "Renders a table header cell.")
-  (:method ((field table-view-field) (view table-view) widget presentation value obj &rest args)
+  (:method ((field table-view-field) (view table-view) widget presentation value obj &rest args
+                                     &key field-info &allow-other-keys)
     (with-html
-      (:th :class (when (view-field-slot-name field)
-		    (attributize-name (view-field-slot-name field)))
+      (:th :class (when field-info 
+		    (attributize-view-field-name field-info))
 	   (apply #'render-view-field-header-value value presentation field view widget obj args)))))
 
 (defgeneric render-view-field-header-value (value presentation field view widget obj &rest args)
@@ -160,10 +162,11 @@ details.")
 
 (defmethod render-view-field ((field table-view-field) (view table-view)
 			      widget presentation value obj
-			      &rest args)
+			      &rest args
+                              &key field-info &allow-other-keys)
   (with-html
-    (:td :class (when (view-field-slot-name field)
-		  (attributize-name (view-field-slot-name field)))
+    (:td :class (when field-info 
+		  (attributize-view-field-name field-info))
 	 (apply #'render-view-field-value value presentation field view widget obj args))))
 
 ;; The table itself

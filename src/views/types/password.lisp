@@ -12,10 +12,10 @@
 
 (defmethod render-view-field-value (value (presentation password-presentation)
 				    (field form-view-field) (view form-view)
-				    widget obj &rest args)
+				    widget obj field-info &rest args)
   (declare (ignore args)
 	   (special *presentation-dom-id*))
-  (render-password (view-field-slot-name field) nil
+  (render-password (attributize-view-field-name field-info) nil
 		   :maxlength (input-presentation-max-length presentation)
 		   :id *presentation-dom-id*))
 
@@ -24,7 +24,7 @@
 				    widget obj &rest args)
   (declare (ignore args)
 	   (special *presentation-dom-id*))
-  (render-password (view-field-slot-name field) nil
+  (render-password (attributize-view-field-name field-info) nil
 		   :maxlength (input-presentation-max-length presentation)
 		   :id *presentation-dom-id*))
 
