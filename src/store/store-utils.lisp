@@ -135,6 +135,8 @@ is called."
       (close-store (symbol-value store-name))
       (setf (symbol-value store-name) nil))))
 
+#+sbcl(pushnew 'close-stores sb-ext:*exit-hooks*)
+
 (defun mapstores (fn)
   "Maps a function over existing stores in the order in which they
 were defined. Returns NIL."
