@@ -18,7 +18,8 @@
                :bordeaux-threads)
   :components ((:module src
 		:components (
-		 (:file "weblocks")
+		 (:file "package")
+		 (:file "weblocks" :depends-on ("package"))
 		 (:module utils
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
