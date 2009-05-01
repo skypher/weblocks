@@ -1,0 +1,6 @@
+state management:
+
+  * the state of specific widget slots should be bookmarkable
+    as long as it is easily serializable.
+
+  * continuation state need not be bookmarkable.
