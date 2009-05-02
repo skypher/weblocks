@@ -15,7 +15,7 @@
             (setf (global-variable ,(yui-widget-variable widget))
                   (new (,(yui-class-name widget) ,(yui-target-id widget)
                                                  (keywords-to-object ,(yui-component-config widget)))))
-            (.render (global-variable ,(yui-widget-variable widget)))
+            ((@ (global-variable ,(yui-widget-variable widget)) render))
             ;(console.log ,(format nil "rendered yui widget ~A." (yui-widget-variable widget)))
             ))))
 

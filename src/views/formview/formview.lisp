@@ -305,7 +305,7 @@ form-view-buttons for a given view.")
 			      :use-ajax-p (form-view-use-ajax-p view))
 	(write-string form-body *weblocks-output-stream*)))
     (when (form-view-focus-p view)
-        (send-script (ps* `(.focus-first-element ($ ,form-id)))))))
+        (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
 			      widget presentation value obj 

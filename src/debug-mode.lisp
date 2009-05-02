@@ -1,14 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(disable-global-debugging enable-global-debugging *weblocks-global-debug*))
+(export '(disable-global-debugging enable-global-debugging))
 
-(defvar *weblocks-global-debug* nil)
+(declaim (special *maintain-last-session*))
 
 (defun enable-global-debugging ()
-  "Setup hooks for session maintenance and showing backtraces.
-and disable caching, versioning, gziping, bundling of weblocks-common/pub/ files"
-  (setf *weblocks-global-debug* t)
+  "Setup hooks for session maintenance and showing backtraces"
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
   ;(setf *show-lisp-backtraces-p* t)
@@ -19,7 +17,6 @@ and disable caching, versioning, gziping, bundling of weblocks-common/pub/ files
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
-  (setf *weblocks-global-debug* nil)
   (setf *show-lisp-errors-p* nil)
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
@@ -29,10 +26,10 @@ and disable caching, versioning, gziping, bundling of weblocks-common/pub/ files
 present the user with a toolbar that aids development."
   (with-html
     (:div :class "debug-toolbar"
-	  (:a :href (make-action-url "debug-reset-sessions") (:b "Reset Sessions")
-	      ;;:title "Reset Sessions"
-	      ;;(:img :src (make-webapp-public-file-uri "images/reset.png") :alt "Reset Sessions")
-	      ))))
+	  (:a :href (make-action-url "debug-reset-sessions")
+	      :title "Reset Sessions"
+	      (:img :src (make-webapp-public-file-uri "images/reset.png")
+		    :alt "Reset Sessions")))))
 
 (defun initialize-debug-actions ()
   "When weblocks is started in debug mode, called on session
@@ -93,3 +90,17 @@ seem to be implemented correctly."))
   (format stream "A webapp user did: \"~A\"
 But it was handled incorrectly; this is probably an issue with ~A"
 	  (misunderstood-action c) (missing-action-handler-part c)))
+
+(define-condition missing-default-store (webapp-style-warning)
+  ((webapp :initarg :webapp :reader webapp-missing-default-store
+	   :documentation "The webapp lacking one at start-time."))
+  (:report report-missing-default-store)
+  (:documentation "Signalled when a webapp lacking a `*default-store*'
+  is started."))
+
+(defun report-missing-default-store (c stream)
+  "Describe a `missing-default-store'."
+  (format stream "~A has no default store defined ~
+		  (try ~S or moving ~S after ~S)"
+	  (webapp-missing-default-store c)
+	  :default-store 'defstore 'defwebapp))

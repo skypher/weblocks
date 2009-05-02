@@ -88,5 +88,5 @@ messages that need to be shown for AJAX effects."
 		      (mapc (lambda (msg)
 			      (htm (:li (apply #'render-widget msg args))))
 			    messages))))))
-      (send-script (ps* `(.show ($ ,(dom-id obj))))))))
+      (send-script (ps* `((@ ($ ,(dom-id obj)) show)))))))
 

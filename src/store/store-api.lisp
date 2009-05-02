@@ -27,7 +27,11 @@
   tables, etc.)"))
 
 (defvar *default-store* nil
-  "The default store to which objects are persisted.")
+  "The default store to which objects are persisted.  Bound while a
+  webapp is handling a request to the value of its
+  `webapp-default-store-name'.  By using `defstore' after the relevant
+  `defwebapp' in the same package, barring an explicit setting, the
+  webapp will be set to use the defined store automatically.")
 
 ;;; Transactions
 (defgeneric begin-transaction (store)
@@ -76,7 +80,7 @@
     nil))
 
 ;;; Creating and deleting persistent objects
-(defgeneric persist-object (store object)
+(defgeneric persist-object (store object &key)
   (:documentation "Persists 'object' into 'store', answering
   'object'. If the object does not have a unique ID (see 'object-id'),
   persist 'object' into store and set its unique ID via (see '(setf
@@ -119,7 +123,7 @@
   Other implementation dependent keys may be defined by a given
   store."))
 
-(defgeneric count-persistent-objects (store class-name &key &allow-other-keys)
+(defgeneric count-persistent-objects (store class-name &key)
   (:documentation "Returns the number of persistent objects stored in
   'store' of 'class-name', bound by the given keyword parameters. For
   documentation of keyword parameters, see

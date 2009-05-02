@@ -68,11 +68,12 @@ if it was mixed into the view."
 	    do (acond ((gethash fkey positions)
 		       ;; "carry" to simulate <=980bccf ordering
 		       (shiftf (aref fields pos) (aref fields it) nil)
-		       (setf nils? t))
+		       (setf nils? t)
+		       (setf (gethash fkey positions) pos))
 		      ((and (not (true-inline? field))
 			    (gethash (fi-slot-name field) true-inlines))
-		       (setf (aref fields pos) nil nils? t)))
-	       (setf (gethash fkey positions) pos))
+		       (setf (aref fields pos) nil nils? t))
+		      (t (setf (gethash fkey positions) pos))))
       (let ((merged-fields (coerce fields 'list)))
 	(when nils?
 	  (setf merged-fields (delete nil merged-fields)))

@@ -1,21 +1,9 @@
-
 (in-package :weblocks)
+
 
 (export '(handle-client-request
           *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-          *uri-tokens* *current-navigation-url* *current-page-description*))
-
-(defvar *uri-tokens*)
-(setf (documentation '*uri-tokens* 'variable)
-      "URL-decoded list of the path elements in the current request
-URI, minus elements in `*current-navigation-url*.  See `dispatcher'
-for detailed semantics.")
-
-(defvar *current-navigation-url*)
-(setf (documentation '*current-navigation-url* 'variable)
-      "Bound while rendering widgets to the URL so far consumed by
-`dispatcher's that are parents of the widget being rendered.  See
-`dispatcher' for detailed semantics.")
+	  *catch-errors-p*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -27,12 +15,18 @@ for detailed semantics.")
       "A list of client-side scripts to be sent over to the browser at
       the end of ajax request execution.")
 
+(defvar *dispatch/render-lock* (bordeaux-threads:make-lock
+                                 "*dispatch-render-lock*"))
+
+;; remove this when Hunchentoot reintroduces *catch-errors-p*
+(defvar *catch-errors-p* t)
+
 (defgeneric handle-client-request (app)
   (:documentation
    "This method handles each request as it comes in from the
 server. It is a hunchentoot handler and has access to all hunchentoot
 dynamic variables. The default implementation executes a user
-action (if any) and renders the main composite wrapped in HTML
+action (if any) and renders the root widget wrapped in HTML
 provided by 'render-page'. If the request is an AJAX request, only the
 dirty widgets are rendered into a JSON data structure. It also invokes
 user supplied 'init-user-session' on the first request that has no
@@ -53,18 +47,19 @@ a refresh will work).
 This function also manages lists of callback functions and calls them
 at different points before and after request. See 'request-hook'.
 
-Override this method (along with :before and :after specifiers to
-customize behavior)."))
+Override this method (along with :before and :after specifiers) to
+customize behavior."))
 
 (defmethod handle-client-request :around (app)
   (handler-bind ((error (lambda (c)
-                          (return-from handle-client-request
-                                       (handle-error-condition app c)))))
-    (call-next-method)))
+                          (if *catch-errors-p*
+                            (return-from handle-client-request
+                                         (handle-error-condition app c))
+                            (invoke-debugger c)))))
+    (in-webapp app (call-next-method))))
 
-(defmethod handle-client-request (app)
-  (let ((*current-webapp* app))
-    (declare (special *current-webapp*))
+(defmethod handle-client-request ((app weblocks-webapp))
+  (progn				;save it for splitting this up
     (when (null *session*)
       (when (get-request-action-name)
 	(expired-action-handler app))
@@ -75,33 +70,31 @@ customize behavior)."))
       (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
     (let ((*request-hook* (make-instance 'request-hooks)))
-      (when (null (root-composite))
-	(let ((root-composite (make-instance 'composite :name "root")))
+      (when (null (root-widget))
+	(let ((root-widget (make-instance 'widget :name "root")))
 	  (when (weblocks-webapp-debug app)
 	    (initialize-debug-actions))
-	  (setf (root-composite) root-composite)
+	  (setf (root-widget) root-widget)
 	  (let (finished?)
 	    (unwind-protect
 		 (progn
-		   (funcall (webapp-init-user-session) root-composite)
+		   (funcall (webapp-init-user-session) root-widget)
 		   (setf finished? t))
 	      (unless finished?
-		(setf (root-composite) nil)
+		(setf (root-widget) nil)
 		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
 	(when (cookie-in (session-cookie-name *weblocks-server*))
 	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (*uri-tokens* (tokenize-uri (request-uri*)))
-	    (*current-navigation-url* "/") *dirty-widgets*
+	    (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
+	     *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
 	    *page-dependencies* *current-page-description*
-	    *uri-tokens-fully-consumed*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
-	(declare (special *weblocks-output-stream* *current-navigation-url* *dirty-widgets*
-			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-			  *current-page-description* *uri-tokens-fully-consumed*))
+	(declare (special *weblocks-output-stream* *dirty-widgets*
+			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
 	(when (pure-request-p)
 	  (throw 'hunchentoot::handler-done (eval-action)))
 	;; a default dynamic-action hook function wraps get operations in a transaction
@@ -116,30 +109,54 @@ customize behavior)."))
 	(eval-hook :pre-render)
 	(with-dynamic-hooks (:dynamic-render)
 	  (if (ajax-request-p)
-	      (render-dirty-widgets)
-	      (progn
-		; we need to render widgets before the boilerplate HTML
-		; that wraps them in order to collect a list of script and
-		; stylesheet dependencies.
-		(render-widget (root-composite))
-		; set page title if it isn't already set
-		(when (and (null *current-page-description*)
-			   (last *uri-tokens*))
-		  (setf *current-page-description* 
-			(humanize-name (last-item *uri-tokens*))))
-		; render page will wrap the HTML already rendered to
-		; *weblocks-output-stream* with necessary boilerplate HTML
-		(render-page app)
-		;; make sure all tokens were consumed
-		(unless (or *uri-tokens-fully-consumed*
-                            (null *uri-tokens*))
-		  (page-not-found-handler app)))))
-	(eval-hook :post-render)
+            (handle-ajax-request app)
+            (handle-normal-request app)))
+        (eval-hook :post-render)
 	(unless (ajax-request-p)
-	  (setf (webapp-session-value 'last-request-uri) *uri-tokens*))
+	  (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
         (if (member (return-code*) *approved-return-codes*)
           (get-output-stream-string *weblocks-output-stream*)
           (handle-http-error app (return-code*)))))))
+
+(defmethod handle-ajax-request ((app weblocks-webapp))
+  (declare (special *weblocks-output-stream* *dirty-widgets*
+                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
+  (render-dirty-widgets))
+
+(defun update-widget-tree ()
+  (let ((depth 0) page-title)
+    (walk-widget-tree (root-widget)
+		      (lambda (widget d)
+			(update-children widget)
+			(let ((title (page-title widget)))
+			  (when (and title (> d depth))
+			    (setf page-title title
+				  depth d)))))
+    (when page-title (setf *current-page-description* page-title))))
+
+(defmethod handle-normal-request ((app weblocks-webapp))
+  (declare (special *weblocks-output-stream*
+                    *uri-tokens*))
+  ; we need to render widgets before the boilerplate HTML
+  ; that wraps them in order to collect a list of script and
+  ; stylesheet dependencies.
+  (bordeaux-threads:with-lock-held (*dispatch/render-lock*)
+    (handler-case (update-widget-tree)
+      (http-not-found () (return-from handle-normal-request
+                                      (page-not-found-handler app))))
+    (render-widget (root-widget)))
+  ; set page title if it isn't already set
+  (when (and (null *current-page-description*)
+             (last (all-tokens *uri-tokens*)))
+    (setf *current-page-description* 
+          (humanize-name (last-item (all-tokens *uri-tokens*)))))
+  ; render page will wrap the HTML already rendered to
+  ; *weblocks-output-stream* with necessary boilerplate HTML
+  (render-page app)
+  ;; make sure all tokens were consumed (FIXME: still necessary?)
+  (unless (or (tokens-fully-consumed-p *uri-tokens*)
+              (null (all-tokens *uri-tokens*)))
+    (page-not-found-handler app)))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
@@ -224,3 +241,4 @@ association list. This function is normally called by
 (eval-when (:load-toplevel)
   (pushnew 'action-txn-hook
 	   (request-hook :application :dynamic-action)))
+

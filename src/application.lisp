@@ -3,22 +3,23 @@
 
 (export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
 	  get-webapps-for-class initialize-webapp finalize-webapp
-	  webapp-application-dependencies webapp-name
+	  webapp-application-dependencies webapp-name in-webapp
 	  bundle-dependency-types version-dependency-types
 	  webapp-description weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix webapp-prefix
 	  running-webapp make-webapp-uri make-webapp-public-file-uri
           reset-webapp-session
-	  webapp-session-value define-permanent-action
+	  webapp-session-value delete-webapp-session-value
+	  define-permanent-action
 	  define-permanent-action/cc remove-webapp-permanent-action
 	  compute-webapp-public-files-path
 	  compute-webapp-public-files-uri-prefix
 	  compute-webapp-public-files-uri-prefix-util
           current-webapp))
-
-(defvar *registered-webapps* nil
-  "A list of applications that the system knows about")
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *registered-webapps* nil
+    "A list of applications that the system knows about"))
 
 (defclass weblocks-webapp ()
   ((name :accessor weblocks-webapp-name :initarg :name
@@ -26,7 +27,7 @@
    (description :accessor weblocks-webapp-description :initarg :description 
 		:initform nil :type (or null string)
 		:documentation "The name of the application.  This slot will be used 
-                   by 'page-title' to generate the default title for each page.")
+                   by 'application-page-title' to generate the default title for each page.")
    (public-files-path :initarg :public-files-path 
 		      :accessor weblocks-webapp-public-files-path
 		      :initform nil
@@ -92,8 +93,12 @@
 		      :type (or symbol function)
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
-                         composite widget at the root of the application. 'init-user-session' is 
-                         responsible for adding initial widgets to this composite.")
+                         widget at the root of the application. 'init-user-session' is
+                         responsible for adding initial children to this widget.")
+   (default-store-name
+    :accessor webapp-default-store-name :initarg :default-store :type symbol
+    :documentation "If non-nil, the name of the `*default-store*'
+    bound during request handlers.")
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))
@@ -233,8 +238,9 @@ to my `application-dependencies' slot."
          (slot-value self 'public-files-path)
       (setf (weblocks-webapp-public-files-path self)
             (slot-value self 'public-files-path)))
-    (when (weblocks-webapp-debug self)
-      (slot-default html-indent-p t))
+    (slot-default default-store-name
+                  (webapp-default-store-name (class-of self)))
+    (slot-default html-indent-p (weblocks-webapp-debug self))
     (let ((class-name (class-name (class-of self))))
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session
@@ -298,6 +304,8 @@ to my `application-dependencies' slot."
     (let ((*default-webapp* app))
       (declare (special *default-webapp*))
       (initialize-webapp app)
+      (unless (webapp-default-store-name app)
+	(style-warn 'missing-default-store :webapp app))
       (enable-webapp app)
       app)))
 
@@ -377,7 +385,7 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
-(defun webapp-session-value (symbol &optional (session *session*) (webapp *current-webapp*))
+(defun webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
   "Get a session value from the currently running webapp"
   
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
@@ -386,14 +394,19 @@ provider URI)."
 	  (webapp (values nil nil))
 	  (t nil))))
 
-(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp *current-webapp*))
-  "Set a session value for the currently runnin webapp" 
+(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp (current-webapp)))
+  "Set a session value for the currently running webapp" 
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test 'equal)
 	    (session-value (class-name (class-of webapp))) webapp-session))
     (setf (gethash symbol webapp-session) value)))
 
+(defun delete-webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
+  "Clear the session value for the currently running webapp" 
+  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
+    (when webapp-session
+      (remhash symbol webapp-session))))
 
 ;;
 ;; Permanent actions
@@ -508,6 +521,29 @@ provider URI)."
   (declare (special *current-webapp*))
   *current-webapp*)
 
+(defun package-webapp-classes (&optional (package *package*))
+  "Answer a list of webapp classes that were defined (e.g. by
+`defwebapp') in PACKAGE, by default the current package."
+  (loop for webapp-class-name in *registered-webapps*
+	for class = (find-class webapp-class-name)
+	when (eql package (webapp-class-home-package class))
+	  collect class))
+
+(defun call-in-webapp (app proc)
+  "Helper for `in-webapp'."
+  (let ((*current-webapp* app))
+    (aif (aand (webapp-default-store-name app)
+	       (symbol-value it))
+	 (let ((*default-store* it))
+	   (funcall proc))
+	 (funcall proc))))
+
+(defmacro in-webapp (webapp &body forms)
+  "Bind variables that are both webapp-specific, or applicable to just
+this app, and webapp-general, or not particular to some request to
+this app, with regard to WEBAPP."
+  `(call-in-webapp ,webapp (f0 . ,forms)))
+
 (defun reset-webapp-session (&optional (app (current-webapp)))
   "Reset sessions on a per-webapp basis"
   (setf (session-value (class-name (class-of app))) nil))
@@ -522,13 +558,13 @@ provider URI)."
 (defun webapp-name (&optional (app (current-webapp)))
   "Returns the name of the web application (also see 'defwebapp'). Please
    note, this name will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
+   displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-name app))
 
 (defun webapp-description (&optional (app (current-webapp)))
   "Returns the description of the web application. Please note, this
    description will be used for the composition of the page title
-   displayed to the user. See 'page-title' for details."
+   displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-description app))
 
 (defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
@@ -558,4 +594,3 @@ provider URI)."
     (etypecase init
       (function init)
       (symbol (symbol-function init)))))
-

@@ -447,7 +447,8 @@ onclick='disableIrrelevantButtons(this);' />~
 (addtest allow-restart-in-sessinit
   (with-webapp (:class-name 'broken-init)
     (with-request :get nil :uri "/broken-init/"
-      (let ((finished-handler 0))
+      (let ((finished-handler 0)
+            (*catch-errors-p* nil))
 	(handler-bind
 	    ((simple-error
 	      (lambda (sig)

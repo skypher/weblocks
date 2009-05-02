@@ -45,11 +45,10 @@ the initargs :PORT and :SESSION-COOKIE-NAME default to
 
 Also opens all stores declared via DEFSTORE and starts webapps
 declared AUTOSTART."
-  #+sbcl
-  (unless (member :sb-thread *features*)
+  (unless (member :bordeaux-threads *features*)
     (cerror "I know what I'm doing and will stubbornly continue."
-            "You're trying to start Weblocks on SBCL without threading
-            support. Recompile your SBCL with threads enabled."))
+            "You're trying to start Weblocks without threading ~
+            support. Recompile your Lisp with threads enabled."))
   (if debug
       (enable-global-debugging)
       (disable-global-debugging))
@@ -180,6 +179,11 @@ rewriting in JavaScript code."
 
 (defun server-version ()
   hunchentoot::*hunchentoot-version*)
+
+(defun reset-sessions ()
+  (let ((*acceptor* *weblocks-server*))
+    (hunchentoot:reset-sessions)))
+(export 'reset-sessions)
 
 (defun active-sessions ()
   "Returns a list of currently active sessions."

@@ -204,6 +204,12 @@ in order to reset the state after the item widget has done its job."
 	     (dataseq-common-ops obj)
 	     :key #'car)))
 
+(defmethod map-subwidgets progn (function (widget dataedit-mixin))
+  "Walk into the item widget if in `:add' or `:drilldown' state."
+  (case (dataedit-ui-state widget)
+    ((:add :drilldown)
+       (funcall function (dataedit-item-widget widget)))))
+
 ;;; If the settings are right and there is no data yet, set our state
 ;;; to add new item immediately
 (defmethod render-widget-body :before ((obj dataedit-mixin) &rest args)

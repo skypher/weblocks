@@ -65,7 +65,7 @@ modify standard behavior for deleting items from a sequence."
 	    (:none (dolist (item (cdr items))
 		     (dataedit-delete-item obj item)))))
       (setf deleted-items-count (- initial-items-count (dataseq-data-count obj)))
-      (mark-dirty obj :putp t)
+      (mark-dirty obj :propagate t)
       (flash-message (dataseq-flash obj)
 		     (format nil "Deleted ~A ~A."
 			     deleted-items-count

@@ -26,7 +26,7 @@ flow, it accepts K - the continuation parameter."
   "Lays out the main page. It consists of a FLASH widget for showing
 initial message, and a NAVIGATION widget with panes that hold
 employees page and companies page."
-  (make-instance 'composite :widgets
+  (make-instance 'widget :children
 		 (list
 		  (make-instance 'flash :messages
 				 (list "Welcome to weblocks demo - a
@@ -34,14 +34,14 @@ employees page and companies page."
 				       continuations-based web
 				       framework written in Common
 				       Lisp."))
-		  (make-navigation 'main-menu
-				   'employees (make-employees-page)
-				   'companies (make-companies-page)))))
+		  (make-navigation "Main Menu"
+				   (list "Employees" (make-employees-page) "employees")
+				   (list "Companies" (make-companies-page) "companies")))))
 
 (defun make-employees-page ()
   "Lays out the widgets for the employees page. It consists of a
 single GRIDEDIT widget."
-  (make-instance 'composite :widgets
+  (make-instance 'widget :children
 		 (list
 		  (make-instance 'gridedit
 				 :name 'employees-grid
@@ -54,7 +54,7 @@ single GRIDEDIT widget."
 (defun make-companies-page ()
   "Lays out the widgets for the companies page. It consists of a
 single GRIDEDIT widget."
-  (make-instance 'composite :widgets
+  (make-instance 'widget :children
 		 (list
 		  (make-instance 'gridedit
 				 :name 'companies-grid

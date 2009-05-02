@@ -1,37 +1,5 @@
 ;;; Code shared accross the entire weblocks framework
 
-(defmacro without-package-variance-warnings (&body body)
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (handler-bind (#+sbcl(sb-int:package-at-variance #'muffle-warning))
-       ,@body)))
-
-(without-package-variance-warnings
-  (defpackage #:weblocks
-    (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
-          :anaphora :f-underscore)
-    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-                            #:standard-generic-function #:ensure-generic-function
-                            #:standard-class #:typep #:subtypep)
-    (:shadowing-import-from :f-underscore #:f #:_)
-    (:shadowing-import-from :fare-matcher #:match)
-    (:shadow #:redirect #:errors)
-    (:documentation
-      "Weblocks is a Common Lisp framework that eases the pain of web
-      application development. It achieves its goals by standardizing on
-      various libraries, providing flexible and extensible generic views,
-      and exposing a unique widget-based approach to maintaining UI
-      state."))
-
-  ;; the following are export-only; see `wexport'
-
-  (defpackage #:weblocks-cont
-    (:documentation "Operators for continuation-based web development
-    with Weblocks."))
-
-  (defpackage #:weblocks-util
-    (:documentation "General Lisp utilities traditionally exported
-    with Weblocks.")))
-
 (in-package :weblocks)
 
 ; re-export external symbols from cl-cont
@@ -39,7 +7,7 @@
   (export (list s)))
 
 (export '(*weblocks-output-stream* with-html with-html-to-string
-          reset-sessions str with-javascript with-javascript-to-string root-composite))
+          reset-sessions str with-javascript with-javascript-to-string root-widget))
 
 (defun wexport (symbols-designator &optional (package-specs t))
   "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',
@@ -137,10 +105,10 @@ having to worry about special characters in JavaScript code."
 having to worry about special characters in JavaScript code."
   `(with-html-to-string ,(apply #'%js source args)))
 
-(defmacro root-composite ()
+(defmacro root-widget ()
   "Expands to code that can be used as a place to access to the root
 composite."
-  `(webapp-session-value 'root-composite))
+  `(webapp-session-value 'root-widget))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

@@ -66,6 +66,13 @@
 	(> i 0)))
   t)
 
+;;; test webapp/store association
+(addtest webapp-associates-first-defstore
+  (with-webapp (:class-name 'app-with-not-searchable-store)
+    (in-webapp (current-webapp)
+      (ensure-same *default-store* *not-searchable-store*)))
+  (ensure-same *default-store* *test-store*))
+
 ;;; test persist-objects
 (deftest persist-objects-1
     (with-request :get nil

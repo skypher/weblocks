@@ -66,9 +66,11 @@
   (:documentation "This class represents an alternative to RDBMS
   table, holding object instances of a given class."))
 
-(defmethod persist-object ((store prevalence-system) object)
-  (execute store (make-transaction 'tx-persist-object-prevalence
-				   object)))
+(defmethod persist-object ((store prevalence-system) object &key (txn-p t))
+  (if txn-p
+    (execute store (make-transaction 'tx-persist-object-prevalence
+                                     object))
+    (funcall 'tx-persist-object-prevalence store object)))
 
 (defun tx-persist-object-prevalence (store object)
   "Persists the object in the store."
@@ -111,7 +113,8 @@
 (defmethod find-persistent-object-by-id ((store prevalence-system) class-name object-id)
   (let ((objects (get-root-object store class-name)))
     ; find the object
-    (gethash object-id (persistent-objects-of-class-by-id objects))))
+    (when objects
+      (gethash object-id (persistent-objects-of-class-by-id objects)))))
 
 (defmethod find-persistent-objects ((store prevalence-system) class-name 
 				    &key (filter nil) order-by range slot

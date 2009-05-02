@@ -46,6 +46,8 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
           (:li (render-link (f_% (reset-webapp-session)) "Reset this web application's session")))
         (:h2 "Session data")
         (:p "TODO")
+        (:h2 "Restarts")
+        (:p "TODO")
         (:h2 "Backtrace")
         #-sbcl
         (:pre (esc (format nil "~A" (print-trivial-backtrace c))))

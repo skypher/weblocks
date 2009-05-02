@@ -99,7 +99,7 @@ required modules have been loaded and the DOM is ready."
 					  :load-optional ,load-optional
 					  ,@(when base `(:base ,base))
 					  :on-success ,callback-name))))
-       (.insert ,loader-name ,@(unless include-css-p '({} "js"))))))
+       ((@ ,loader-name insert) ,@(unless include-css-p '({} "js"))))))
 
 (defpsmacro keywords-to-object (args)
   `(create ,@args))

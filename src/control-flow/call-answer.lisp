@@ -80,7 +80,7 @@ If WRAPPER-FN is present, passes it the new callee and sets the return
 value as the value of a place. By default WRAPPER-FN is simply the
 identity function."
   (if (or (null widget)
-	  (eq widget (root-composite)))
+	  (eq widget (root-widget)))
       (do-root-widget callee wrapper-fn)
       (do-widget-aux widget callee wrapper-fn)))
 
@@ -96,26 +96,26 @@ identity function."
       ;; the following is the rest of the computation 
       (funcall place-writer widget))))
 
-;; This function is aware of the internal structure of the root composite;
+;; This function is aware of the internal structure of the root widget;
 ;; this should be OK as it's a special case; it does violate the contract.
 (defun/cc do-root-widget (callee  &optional (wrapper-fn #'identity))
-  "Replace the contents of the root composite with CALLEE,
-the latter one being optinonally transformed by WRAPPER-FN."
-  (let* ((old-value (composite-widgets (root-composite))))
+  "Replace the children of the root widget with CALLEE,
+the latter one being optionally transformed by WRAPPER-FN."
+  (let* ((old-value (slot-value (root-widget) 'children)))
     (prog1
-	(call callee
-	      (lambda (new-callee)
-		(setf (composite-widgets (root-composite))
-		      (funcall wrapper-fn new-callee))))
-      (setf (composite-widgets (root-composite))
-	    old-value))))
+      (call callee
+            (lambda (new-callee)
+              (setf (widget-children (root-widget))
+                    (funcall wrapper-fn new-callee))))
+      (setf (slot-value (root-widget) 'children) old-value)
+      (update-parent-for-children (widget-children (root-widget))))))
 
 
 (defun/cc do-page (callee)
-  "Sets CALLEE as the only widget in the root composite, saves the
+  "Sets CALLEE as the only child in the root widget, saves the
 continuation, and returns from the delimited computation. When
-CALLEE answers, restores the original widgets in the root
-composite and reactivates the computation."
+CALLEE answers, restores the original children in the root
+widget and reactivates the computation."
   (do-widget nil callee))
 
 (defun/cc do-modal (title callee &key css-class)
@@ -125,10 +125,6 @@ for styling purposes."
 	     (lambda (new-callee)
 	       (lambda (&rest args)
 		 (declare (ignore args))
-                 (declare (special *uri-tokens-fully-consumed*))
-                 ;; Consume all tokens
-                 (setf *uri-tokens-fully-consumed* t)
-                 ;; Do the content wrrapping
 		 (with-html
 		   (:div :class "modal"
 			 (:h1 (:span (str title)))

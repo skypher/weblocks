@@ -5,6 +5,8 @@
 	  class-store object-store defstore persist-objects
 	  mapstores open-stores))
 
+(declaim (special *default-store*))
+
 ;;; Object ID management
 (defgeneric class-id-slot-name (class)
   (:documentation
@@ -78,6 +80,30 @@ structure of type 'store-info' as value.")
 (defvar *store-names* nil
   "A list of store names in the order in which they were defined.")
 
+(defun %defstore-predefine (name type &rest args)
+  "Helper for `defstore'."
+  (setf (gethash name *stores*)
+	(make-store-info :type type :args args))
+  (unless (find name *store-names*)
+    (push-end name *store-names*))
+  ;; `*package*' should be appropriate as defstore should be toplevel
+  (dolist (probable-webapp-class (package-webapp-classes))
+    (sunless (webapp-default-store-name probable-webapp-class)
+      (setf it name))))
+
+(defun %defstore-postdefine (name type)
+  "Helper for `defstore'."
+  (declare (ignore name))
+  (let ((system-name (make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
+    (unless (asdf:find-system system-name nil)
+      (load (merge-pathnames
+	     (make-pathname :directory `(:relative "src" "store"
+					 ,(string-downcase (symbol-name type)))
+			    :name (string-downcase (symbol-name system-name))
+			    :type "asd")
+	     (asdf-system-directory :weblocks))))
+    (asdf:operate 'asdf:load-op system-name)))
+
 (defmacro defstore (name type &rest args)
   "A macro that helps define a store. A global variable 'name' is
 defined, and 'open-store' is called with appropriate store type and
@@ -85,21 +111,10 @@ arguments. Note that the last store will also be the default (see
 *default-store*). All stores defined via 'defstore' will be opened and
 bound when 'start-weblocks' is called, and closed when 'stop-weblocks'
 is called."
-  (let ((system-name (gensym)))
-    `(progn
-       (setf (gethash ',name *stores*)
-	     (make-store-info :type ,type :args ,(cons 'list args)))
-       (unless (find ',name *store-names*)
-	 (push-end ',name *store-names*))
-       (defvar ,name nil)
-       (let ((,system-name ',(make-symbol (concatenate 'string "WEBLOCKS-" (symbol-name type)))))
-	 (unless (asdf:find-system ,system-name nil)
-	   (load (merge-pathnames (make-pathname :directory '(:relative "src" "store"
-							      ,(string-downcase (symbol-name type)))
-						 :name (string-downcase (symbol-name ,system-name))
-						 :type "asd")
-				  (asdf-system-directory :weblocks))))
-	 (asdf:operate 'asdf:load-op ,system-name)))))
+  `(progn
+     (%defstore-predefine ',name ,type ,@args)
+     (defvar ,name nil)
+     (%defstore-postdefine ',name ,type)))
 
 (defun open-stores ()
   "Opens and binds all stores."
@@ -120,6 +135,8 @@ is called."
       (close-store (symbol-value store-name))
       (setf (symbol-value store-name) nil))))
 
+#+sbcl(pushnew 'close-stores sb-ext:*exit-hooks*)
+
 (defun mapstores (fn)
   "Maps a function over existing stores in the order in which they
 were defined. Returns NIL."
@@ -128,8 +145,8 @@ were defined. Returns NIL."
       (funcall fn (symbol-value store-name)))))
 
 ;;; Persisting objects
-(defun persist-objects (store objects)
+(defun persist-objects (store objects &rest keys)
   "Persists all objects in 'objects' sequence into 'store'."
   (dolist (obj objects)
-    (persist-object store obj)))
+    (apply #'persist-object store obj keys)))
 

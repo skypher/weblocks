@@ -100,6 +100,20 @@
 		 '(name manager education))
     (ensure-same (field-info-object (third fields)) *joe*)))
 
+;; XXX We believe the mixin should win here, but this is how it
+;; behaves at the moment.  The easy fix will not do, because mixed-in
+;; views are treated differently.
+(addtest get-object-view-fields.direct-shadow-proper-mixin-after
+  (let ((fields (get-object-view-fields
+		 *joe* (defview () (:inherit-from '(:scaffold employee))
+			 (education)
+			 (education :type mixin
+				    :view '(data education-history))))))
+    (ensure-same (mapcar #'print-field-info fields)
+		 '(name manager education))
+    ;; this is what would change, to (slot-value *joe* 'education)
+    (ensure-same (field-info-object (third fields)) *joe*)))
+
 (deftest get-object-view-fields-8
     (mapcar #'print-field-info
 	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))

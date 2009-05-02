@@ -60,13 +60,14 @@ inserted into the page to redraw the dialog."
                                                     (dialog-css-class current-dialog)
                                                     (dialog-close current-dialog)))))))))
 
-;;; Presents 'callee' to the user in a modal dialog, saves the
-;;; continuation, and returns from the delimited computation. When
-;;; 'callee' answers, removes the modal interface and reactives the
-;;; computation. If the modal interface isn't available, automatically
-;;; scales down to 'do-modal' instead.
 (defun/cc do-dialog (title callee &key css-class close)
   (declare (special *on-ajax-complete-scripts*))
+  "Presents 'callee' to the user in a modal dialog, saves the
+continuation, and returns from the delimited computation. When
+'callee' answers, removes the modal interface and reactives the
+computation. If the modal interface isn't available, automatically
+scales down to 'do-modal' instead."
+  (assert (stringp title))
   (if (ajax-request-p)
       (prog2
 	  (when (current-dialog)
