@@ -247,13 +247,14 @@ returns a dependency object."
     (when (or do-not-probe (probe-file physical-path))
       (let ((virtual-path (merge-pathnames relative-path
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp)))))
-	(when (find type (version-dependency-types* webapp))
-	  (multiple-value-setq (physical-path virtual-path)
-	    (update-versioned-dependency-path physical-path virtual-path)))
-	(when import-p
-	  (update-import-css-content physical-path))	  
-	(when (find type (gzip-dependency-types* webapp))
-	  (create-gziped-dependency-file physical-path))
+	(unless do-not-probe
+	  (when (find type (version-dependency-types* webapp))
+	    (multiple-value-setq (physical-path virtual-path)
+	      (update-versioned-dependency-path physical-path virtual-path)))
+	  (when import-p
+	    (update-import-css-content physical-path))	  
+	  (when (find type (gzip-dependency-types* webapp))
+	    (create-gziped-dependency-file physical-path)))
 	(ecase type
 	  (:stylesheet (make-instance 'stylesheet-dependency
 				      :url virtual-path :media media

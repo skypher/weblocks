@@ -114,13 +114,10 @@
     (loop
        for dep in dependency-list
        for path = (local-path dep)
-       if (and (typep dep dependency-type)
+       if (and path
+	       (typep dep dependency-type)
 	       (null (find path exceptions :test #'string-equal)))
-          if (cl-ppcre:scan '(:alternation (:sequence "-import."
-					           (:greedy-repetition 1 nil :digit-class)
-					           ".css" :end-anchor)
-			                   (:sequence "-import.css" :end-anchor))
-			    path)
+          if (cl-ppcre:scan "-import(?:\\.\\d\\d*?|)\\.css$" path)
              collect path into imports
           else
 	     collect path into main
@@ -128,5 +125,11 @@
        else
           collect dep into others
        finally
-	 (return (push (build-bundle (append imports main) dependency-type)
-		       others)))))
+	 (return (progn
+		   (when imports
+		     (setf main
+			   (append imports main)))
+		   (when main
+		     (push (build-bundle main dependency-type)
+			   others))
+		   others)))))
