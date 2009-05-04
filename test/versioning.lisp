@@ -22,14 +22,16 @@
 (addtest versioning-test-1
   (cl-fad:delete-directory-and-files *temp-version-folder* :if-does-not-exist :ignore)
   (cl-fad:delete-directory-and-files *temp-mod-record-folder* :if-does-not-exist :ignore)
-  (weblocks::write-to-file 'test-text *temp-version-file*)
+  (weblocks::with-file-write (stream *temp-version-file*)
+      (write-stream "test-text" stream))
   ;; version file initialization
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
 	       (values (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.0.test")
 		       "/www/vzn/temp.0.test"))
 
   (sleep 1) ;; so that modified time of temp.test will change
-  (weblocks::write-to-file 'new-test-text *temp-version-file*)
+  (weblocks::with-file-write (stream *temp-version-file*)
+      (write-stream "new-test-text" stream))
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
 	       (values (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.1.test")
 		       "/www/vzn/temp.1.test"))

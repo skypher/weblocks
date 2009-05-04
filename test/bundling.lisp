@@ -10,12 +10,14 @@
   (let ((path1 (merge-pathnames "test1" *temp-bundles-folder*))
 	(path2 (merge-pathnames "test2" *temp-bundles-folder*))
 	(path3 (merge-pathnames "test3" *temp-bundles-folder*)))
-  (weblocks::write-to-file 'test1 path1)
-  (weblocks::write-to-file 'test2 path2)
-  (weblocks::merge-files-with-newline (list path1 path2) path3)
-  (ensure-same (weblocks::slurp-file path3)
-	       "TEST1
-TEST2")))
+    (weblocks::with-file-write (stream path1)
+      (write-stream "test1" stream))
+    (weblocks::with-file-write (stream path2)
+      (write-stream "test2" stream))
+    (weblocks::merge-files-with-newline (list path1 path2) path3)
+    (ensure-same (weblocks::slurp-file path3)
+		 "test1
+test2")))
 
 (defun make-test-dependencies-1 ()
   (let ((test-deps (mapcar (lambda (x) (apply #'make-local-dependency x))
