@@ -542,11 +542,20 @@ answering its result."
     (read-sequence seq stream)
     seq))
 
-(defun merge-files (file-list saved-path)
-  (with-file-write (stream saved-path :element-type '(unsigned-byte 8))
-    (dolist (file file-list)
-      (write-sequence (slurp-file file :element-type '(unsigned-byte 8)) stream)
-      (write-byte 10 stream))))
+(defun merge-files (file-list saved-path
+		    &key (element-type '(unsigned-byte 8)) linkage-element-fn)
+  (with-file-write (stream saved-path :element-type element-type)
+    (write-sequence (slurp-file (car file-list) :element-type element-type)
+		    stream)
+    (dolist (file (cdr file-list))
+      (when linkage-element-fn
+	(funcall linkage-element-fn stream))
+      (write-sequence (slurp-file file :element-type element-type)
+		      stream))))
+
+(defun merge-files-with-newline (file-list saved-path)
+  (merge-files file-list saved-path
+	       :linkage-element-fn (lambda (stream) (write-byte 10 stream))))
 
 (defun relative-path (full-path prefix-path)
   (princ-to-string

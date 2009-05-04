@@ -3,13 +3,6 @@
 (deftestsuite dependencies-suite (weblocks-suite)
   ())
 
-(defun make-versioned-regex (name type)
-  "Used for checking potential local dependency path."
-  (let ((dir (cond ((string= type "css") "stylesheets")
-		   ((string= type "js") "scripts")))
-	(pub-dir "pub"))
-    (format nil "^/~A/~A/(?:vzn/~A\\.\\d\\d*?|~A)\\.~A$" pub-dir dir name name type)))
-
 (addtest dependencies-by-symbol
   (ensure-same (remove nil (weblocks::dependencies-by-symbol 'non-existent-widget-name))
 	       nil)

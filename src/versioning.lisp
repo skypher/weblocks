@@ -92,3 +92,49 @@
       (with-slots (last-version) mod-record
 	(values (make-versioned-path original-path last-version)
 		(make-versioned-path other-path last-version))))))
+
+
+;;; Dealing with CSS import rules
+
+(defun write-import-css (url stream)
+  (write-char #\Newline stream)
+  (write-string "@import url(" stream)
+  (princ url stream)
+  (write-string ");" stream))
+	   
+(defun extract-import-urls (string)
+  (let (urls (start 0))
+    (loop
+       (multiple-value-bind (head tail) (cl-ppcre:scan "(?i)import url\(.*?\);" string :start start)
+	 (if head
+	     (progn
+	       (push (subseq string (+ head 11) (- tail 2)) urls)
+	       (setf start tail))
+	     (return-from extract-import-urls urls))))))
+
+(defun local-path-from-url (url &key (type :stylesheet))
+  (let* ((name (pathname-name url))
+	 (relative (public-file-relative-path type name))
+	 (webapp (current-webapp))
+	 (local (princ-to-string (merge-pathnames relative
+						  (compute-webapp-public-files-path webapp)))))
+    (when (cl-fad:file-exists-p local)
+      (values local
+	      (princ-to-string (merge-pathnames relative
+						(maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
+
+(defun update-import-css-content (import-path &key (version-types (version-dependency-types* (current-webapp)))
+				  (gzip-types (gzip-dependency-types* (current-webapp))))
+  (let ((urls (extract-import-urls (slurp-file import-path))))
+    (with-file-write (stream import-path)
+      (dolist (url (nreverse urls))
+	(multiple-value-bind (physical-path virtual-path) (local-path-from-url url)
+	  (if physical-path
+	      (progn
+		(when (find :stylesheet version-types)
+		  (multiple-value-setq (physical-path virtual-path)
+		    (update-versioned-dependency-path physical-path virtual-path)))
+		(when (find :stylesheet gzip-types)
+		  (create-gziped-dependency-file physical-path))
+		(write-import-css virtual-path stream))
+	      (write-import-css url stream)))))))

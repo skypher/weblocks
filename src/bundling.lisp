@@ -27,10 +27,11 @@
 
 (defvar *initial-bundle-id* 1)
 
-(defun get-bundle-tally ()
+(defun get-bundle-tally (&key bundle-folder)
   "Copy the tally file into a bundle-tally object"
-  (let* ((bundle-folder (merge-pathnames "bundles/" (compute-webapp-public-files-path (current-webapp))))
-	 (tally-path (merge-pathnames "tally" bundle-folder))
+  (when (null bundle-folder)
+    (setf bundle-folder (merge-pathnames "bundles/" (compute-webapp-public-files-path (current-webapp)))))
+  (let* ((tally-path (merge-pathnames "tally" bundle-folder))
 	 (file-data (when (cl-fad:file-exists-p tally-path)
 		      (read-from-file tally-path)))
 	 (last-bundle-id (if file-data (car file-data) (1- *initial-bundle-id*)))
@@ -50,11 +51,17 @@
     (push (cons bundle-name file-list) composition-list)			      
     (setf modified-p t)))
 
-
+#|
 (defun remove-from-tally (bundle-name tally)
   (with-slots (composition-list modified-p) tally
-    (setf composition-list (remove-if #'(lambda (x) (string-equal (car x) bundle-name)) composition-list))
+    (setf composition-list (remove-if #'(lambda (x) (string-equal (car x) bundle-name))
+				      composition-list))
     (setf modified-p t)))
+
+(defun delete-bundle-file (bundle-name tally)
+  (remove-from-tally bundle-name tally)
+  (delete-file (merge-pathnames bundle-name (bundle-folder tally))))
+|#
 
 (defun create-bundle-file (file-list type tally)
   (let ((bundle-name (format nil "~A.~A"
@@ -63,13 +70,8 @@
 			       (stylesheet-dependency "css")
 			       (script-dependency "js")))))
     (add-to-tally bundle-name file-list tally)
-    (merge-files file-list (merge-pathnames bundle-name (bundle-folder tally)))
+    (merge-files-with-newline file-list (merge-pathnames bundle-name (bundle-folder tally)))
     bundle-name))
-
-(defun delete-bundle-file (bundle-name tally)
-  (remove-from-tally bundle-name tally)
-  (delete-file (merge-pathnames bundle-name (bundle-folder tally))))
-
 
 (defun find-bundle (file-list tally)
   "If the same files have already been bundled, return the bundle-name"
@@ -78,10 +80,10 @@
 
 (defvar *bundle-dependencies-lock* (bordeaux-threads:make-lock))
 
-(defun build-bundle (file-list type &key media)
+(defun build-bundle (file-list type &key media bundle-folder)
   (bordeaux-threads:with-lock-held (*bundle-dependencies-lock*)
     (let* ((app (current-webapp))
-	   (tally (get-bundle-tally))
+	   (tally (get-bundle-tally :bundle-folder bundle-folder))
 	   (bundle-name (find-bundle file-list tally)))
       (when (null bundle-name)		
 	(setf bundle-name (create-bundle-file file-list type tally)))
@@ -106,7 +108,7 @@
 			  :local-path physical-path)))))))
 
 
-(defun bundle-some-dependencies (dependency-list dependency-type)
+(defun bundle-some-dependencies (dependency-list dependency-type &key bundle-folder)
   (let (exceptions)
     (when (listp dependency-type)
       (setf exceptions (cdr dependency-type))
@@ -127,9 +129,7 @@
        finally
 	 (return (progn
 		   (when imports
-		     (setf main
-			   (append imports main)))
+		     (setf main (append imports main)))
 		   (when main
-		     (push (build-bundle main dependency-type)
-			   others))
+		     (push (build-bundle main dependency-type :bundle-folder bundle-folder) others))
 		   others)))))
