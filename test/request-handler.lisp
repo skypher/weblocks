@@ -444,6 +444,7 @@ onclick='disableIrrelevantButtons(this);' />~
   (cerror "keep going" "oopsie I messed up")
   (setf (composite-widgets rootcomp) '("hello there")))
 
+#+(or) ; disabled until Andrea's error handling patch is applied.
 (addtest allow-restart-in-sessinit
   (with-webapp (:class-name 'broken-init)
     (with-request :get nil :uri "/broken-init/"
