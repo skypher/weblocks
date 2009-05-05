@@ -11,9 +11,9 @@
 	(path2 (merge-pathnames "test2" *temp-bundles-folder*))
 	(path3 (merge-pathnames "test3" *temp-bundles-folder*)))
     (weblocks::with-file-write (stream path1)
-      (write-stream "test1" stream))
+      (write-string "test1" stream))
     (weblocks::with-file-write (stream path2)
-      (write-stream "test2" stream))
+      (write-string "test2" stream))
     (weblocks::merge-files-with-newline (list path1 path2) path3)
     (ensure-same (weblocks::slurp-file path3)
 		 "test1
