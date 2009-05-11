@@ -320,16 +320,22 @@ in addition."
 (defun send-script (script &optional (place :after-load))
   "Send JavaScript to the browser. The way of sending depends
   on whether the current request is via AJAX or not.
+
+  Script may be either a string or a list; if it is a list
+  it will be compiled through Parenscript first.
   
   FIXME: is using PUSH or PUSHLAST correct?"
-  (if (ajax-request-p)
-    (let ((code (with-javascript-to-string script)))
-      (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
-      (ecase place
-        (:before-load (push code *before-ajax-complete-scripts*))
-        (:after-load (push code *on-ajax-complete-scripts*))))
-    (with-javascript
-      script)))
+  (let ((script (etypecase script
+                  (string script)
+                  (list (ps* script)))))
+    (if (ajax-request-p)
+      (let ((code (with-javascript-to-string script)))
+        (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+        (ecase place
+          (:before-load (push code *before-ajax-complete-scripts*))
+          (:after-load (push code *on-ajax-complete-scripts*))))
+      (with-javascript
+        script))))
 
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
