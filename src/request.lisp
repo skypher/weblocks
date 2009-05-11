@@ -39,34 +39,50 @@ all other parameters. However, none of the callbacks (see
 etc."
   (string-equal (get-parameter "pure") "true"))
 
-(defun redirect (url)
-  "Sends a redirect response to the client. If 'redirect' is called on
-a regular request, sends appropriate HTTP headers. If it is called
-during an AJAX request, sends weblocks specific JSON interpreted as
-redirect on the client.
+(defun redirect (uri &key (defer :post-render) new-window (window-title uri))
+  "Redirects the client to a new URI.
 
-This function returns immediately; any code following it will not be
-executed."
-  (if (ajax-request-p)
-      (progn
-	(setf (content-type*) *json-content-type*)
-	(throw 'hunchentoot::handler-done
-	  (format nil "{\"redirect\":\"~A\"}" url)))
-      (hunchentoot:redirect url)))
+There are several modes of redirecting:
 
-(defun post-action-redirect (url)
-  "A common pattern is to have an action redirect after taking some action.  
-   Typically an action is wrapped in a transaction which will abort if the 
-   redirect happens during the action execution (due to the throw to 
-   'handler-done, a non-local exit).  This pushes a redirect to the url
-   argument onto the post-action hook so it occurs after the action transaction
-   but before rendering"
-  (push (lambda () (redirect url))
-	(request-hook :request :post-action)))
+Immediate redirect (:DEFER NIL): interrupt request processing at once
+and send either a `redirect' HTTP response (for normal requests) or
+an appropriate JSON command (for AJAX requests).
 
-(defun post-render-redirect (url)
-  "Similar to `post-action-redirect', except redirects after completing
-the rendering. This is occassionally useful."
-  (push (lambda () (redirect url))
-	(request-hook :request :post-render)))
+Deferred redirect (:DEFER (:POST-ACTION|:POST-RENDER); the default
+being :POST-RENDER): like immediate redirecting but the execution will be
+deferred until action processing (POST-ACTION) or rendering (POST-RENDER)
+is finished.
+
+Redirect to new window (NEW-WINDOW=T): opens URI in a new window. The current
+request continues to be processed in a normal fashion.
+WINDOW-TITLE is the title of the new window, defaulting to the target URI.
+DEFER is disregarded in this case.
+
+NEW-WINDOW functionality will only work when Javascript is enabled."
+  (assert (member defer '(nil :post-action :post-render)))
+  (flet ((do-redirect ()
+           (if (ajax-request-p)
+             (progn
+               (setf (content-type*) *json-content-type*)
+               (throw 'hunchentoot::handler-done
+                      (format nil "{\"redirect\":\"~A\"}" url)))
+             (hunchentoot:redirect url))))
+    (cond
+      (new-window
+        (send-script
+          (ps:ps*
+            `((slot-value window 'open) ,uri ,window-title))))
+      ((eq defer :post-action)
+       (push #'do-redirect (request-hook :request :post-action)))
+      ((eq defer :post-render)
+       (push #'do-redirect (request-hook :request :post-render)))
+      (t (do-redirect)))))
+
+(defun post-action-redirect (uri)
+  "Legacy wrapper; use REDIRECT with :DEFER set to :POST-ACTION instead."
+  (redirect url :defer :post-action))
+
+(defun post-render-redirect (uri)
+  "Legacy wrapper; use REDIRECT with :DEFER set to :POST-RENDER instead."
+  (redirect uri :defer :post-render))
 
