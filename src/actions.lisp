@@ -1,12 +1,9 @@
 
 (in-package :weblocks)
 
-(export '(*expired-action-handler*
-          expired-action-handler
-          page-not-found-handler
-          make-action-url
-          make-action
-          function-or-action->action))
+(export '(*expired-action-handler* expired-action-handler page-not-found-handler
+          make-action-url make-action function-or-action->action
+          *ignore-missing-actions*))
 
 (defvar *expired-action-handler* 'default-expired-action-handler
   "Must be bound to a designator of a function with a single optional
@@ -113,6 +110,8 @@ Ex:
 	 (action-name (or request-action-name get/post-action-name)))
     action-name))
 
+(defvar *ignore-missing-actions* t)
+
 (defun get-request-action ()
   "Gets an action from the request. If the request contains
 *action-string* parameter, the action is looked up in the session and
@@ -125,8 +124,9 @@ raises an assertion."
       (let ((permanent-action (webapp-permanent-action action-name))
 	    (session-action (webapp-session-value action-name)))
 	(setf request-action (or permanent-action session-action))
-	(assert request-action (request-action)
-		(concatenate 'string "Cannot find action: " action-name))
+        (unless *ignore-missing-actions*
+          (assert request-action (request-action)
+                  (concatenate 'string "Cannot find action: " action-name)))
 	request-action))))
 
 (defun eval-action ()
