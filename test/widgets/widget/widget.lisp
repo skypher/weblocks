@@ -12,7 +12,7 @@
   (progn
     (defclass foo (bar)
       ((slot1 :initarg :slot1)
-       (slot2 :initform nil))
+      (slot2 :initform nil))
       (:metaclass widget-class))
     (defmethod per-class-dependencies append ((weblocks::obj foo))
        (declare (ignore weblocks::obj))
@@ -36,23 +36,27 @@
 
 ;;; test widget-dependencies
 (addtest widget-dependencies-1
-  (ensure-same (values-list
-		(mapcar #'dependency-url
-			(dependencies (make-instance 'navigation))))
-	       (values (puri:uri "/pub/stylesheets/menu.css")
-		       (puri:uri "/pub/stylesheets/navigation.css"))
-	       :test puri:uri=))
+  (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+				    (dependencies (make-instance 'navigation))))
+	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+				    '(("menu" "css")
+				      ("navigation" "css"))))
+	       :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest widget-dependencies-2
   (ensure-same
-   (mapcar #'dependency-url
-	   (dependencies (make-instance 'gridedit :data-class 'employee)))
+   (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+					    (dependencies (make-instance 'gridedit
+									 :data-class 'employee)))))
    ;; note, pagination and dataform are there because for gridedit and
    ;; datagrid widget-dependencies is specialized
-   '(#U"/pub/stylesheets/dataform.css" #U"/pub/stylesheets/pagination.css"
-     #U"/pub/stylesheets/datagrid.css" #U"/pub/scripts/datagrid.js"
-     #U"/pub/stylesheets/dataseq.css")
-   :test set-equal-uri=))
+   (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+			'(("dataseq" "css")
+			  ("datagrid" "js")
+			  ("datagrid" "css")
+			  ("pagination" "css")
+			  ("dataform" "css"))))
+   :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (deftest widget-dependencies-3
     (with-request :get nil
@@ -255,12 +259,14 @@
        (:li :class "manager" (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
 (deftest render-widget-4
-    (let ((*weblocks-output-stream* (make-string-output-stream)))
-      (declare (special *weblocks-output-stream*))
-      (with-request :get nil
-	(render-widget (make-instance 'dataform :data *joe*))
-	(format nil "~A" (mapcar #'dependency-url weblocks::*page-dependencies*))))
-  "(/pub/stylesheets/dataform.css)")
+    (ensure-same
+     (let ((*weblocks-output-stream* (make-string-output-stream)))
+       (declare (special *weblocks-output-stream*))
+       (with-request :get nil
+	 (render-widget (make-instance 'dataform :data *joe*))
+	 (format nil "~A" (car (mapcar #'dependency-url weblocks::*page-dependencies*)))))
+     (make-versioned-regex "dataform-import" "css")
+     :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (deftest render-widget-5
     (with-request :get nil

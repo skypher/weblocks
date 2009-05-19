@@ -26,7 +26,7 @@
 
 ;; Define our application
 (defwebapp weblocks-demo
-	   :prefix ""
+    :prefix "" :public-files-cache-time 100000
 	   :description "A web application based on Weblocks"
 	   :dependencies '((:stylesheet "suggest")))
 
