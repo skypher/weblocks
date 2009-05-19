@@ -4,7 +4,10 @@
 (deftestsuite .application-suite (weblocks-suite)
   ())
 
-(defwebapp hello-webapp)
+(defwebapp hello-webapp
+    :bundle-dependency-types nil
+    :version-dependency-types nil
+    :gzip-dependency-types nil)
 
 ;;; test defwebapp
 (addtest defwebapp-simple

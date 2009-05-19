@@ -2,7 +2,10 @@
 (in-package :weblocks-test)
 
 
-(defwebapp some-name)
+(defwebapp some-name
+    :bundle-dependency-types nil
+    :version-dependency-types nil
+    :gzip-dependency-types nil)
 
 ;;; test with-page
 (deftest-html with-page-1

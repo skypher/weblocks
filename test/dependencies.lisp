@@ -3,16 +3,14 @@
 (deftestsuite dependencies-suite (weblocks-suite)
   ())
 
-
-
 (addtest dependencies-by-symbol
   (ensure-same (remove nil (weblocks::dependencies-by-symbol 'non-existent-widget-name))
 	       nil)
   (ensure-same (values-list
-		(mapcar #'dependency-url
+		(mapcar (lambda (x) (puri:uri-path (dependency-url x)))
 			(remove nil (weblocks::dependencies-by-symbol 'navigation))))
-	       (puri:uri "/pub/stylesheets/navigation.css")
-	       :test puri:uri=))
+	       (make-versioned-regex "navigation" "css")
+	       :test (lambda (x y) (cl-ppcre:scan y x))))
 
 
 
@@ -21,18 +19,19 @@
 	       nil))
 
 (addtest probe-dependencies
-  (let ((*lift-equality-test* 'puri:uri=))
-    (ensure-same (dependency-url (make-local-dependency :stylesheet "non-existing-file-name"
-							:do-not-probe t))
-		 (puri:uri "/pub/stylesheets/non-existing-file-name.css"))
-    (ensure-same (dependency-url (make-local-dependency :stylesheet "main"))
-		 (puri:uri "/pub/stylesheets/main.css"))
-    (ensure-same (dependency-url (make-local-dependency :script "weblocks"))
-		 (puri:uri "/pub/scripts/weblocks.js"))
-    (ensure-same (dependency-url (make-local-dependency :script "weblocks" :do-not-probe t))
-		 (puri:uri "/pub/scripts/weblocks.js"))))
-
-
+  (ensure-same (values-list (mapcar (lambda (x) (dependency-url (apply #'make-local-dependency x)))
+				   '((:stylesheet "non-existing-file-name" :do-not-probe t)
+				     (:script "weblocks" :do-not-probe t))))
+	       (values (puri:uri "/pub/stylesheets/non-existing-file-name.css")
+		       (puri:uri "/pub/scripts/weblocks.js"))
+	       :test puri:uri=)
+  (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url (apply #'make-local-dependency x))))
+				   '((:stylesheet "main")
+				     (:script "weblocks"))))
+	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+				    '(("main" "css")
+				      ("weblocks" "js"))))
+	       :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest stylesheet-dependency-compare
   (ensure-different (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
@@ -110,12 +109,12 @@
 	       :test dependencies-equalp))
 
 (addtest dependencies-6
-  (ensure-same (values-list (mapcar #'dependency-url
+  (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
 				    (dependencies (make-instance 'navigation))))
-	       (values
-		 (puri:uri "/pub/stylesheets/menu.css")
-		 (puri:uri "/pub/stylesheets/navigation.css"))
-	       :test puri:uri=))
+	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+				    '(("menu" "css")
+				      ("navigation" "css"))))
+	       :test (lambda (x y) (cl-ppcre:scan y x))))
 
 
 (addtest prune-dependencies-1

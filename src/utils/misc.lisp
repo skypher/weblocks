@@ -519,3 +519,61 @@ answering its result."
 				     (cons ,(first optarg) ,rest)))
 			     opts :from-end t :initial-value more))
 	    `(funcall ',function ,@reqs)))))
+
+
+(defmacro with-file-write ((stream-name path &key (element-type ``base-char)) &body body)
+  `(progn
+     (ensure-directories-exist ,path)
+     (with-open-file (,stream-name ,path :direction :output :element-type ,element-type
+				   :if-exists :supersede :if-does-not-exist :create)
+       ,@body)))
+
+(defun write-to-file (object path)
+  (with-file-write (stream path)
+    (write object :stream stream)))
+
+(defun read-from-file (path)
+  (with-open-file (stream path :direction :input :if-does-not-exist nil)
+    (eval (read stream nil nil))))
+
+(defun slurp-file (filepath &key (element-type 'base-char))
+  (let* ((stream (open filepath :element-type element-type))
+	 (seq (make-array (file-length stream) :element-type element-type)))
+    (read-sequence seq stream)
+    seq))
+
+(defun merge-files (file-list saved-path
+		    &key (element-type '(unsigned-byte 8)) linkage-element-fn)
+  (with-file-write (stream saved-path :element-type element-type)
+    (write-sequence (slurp-file (car file-list) :element-type element-type)
+		    stream)
+    (dolist (file (cdr file-list))
+      (when linkage-element-fn
+	(funcall linkage-element-fn stream))
+      (write-sequence (slurp-file file :element-type element-type)
+		      stream))))
+
+(defun merge-files-with-newline (file-list saved-path)
+  (merge-files file-list saved-path
+	       :linkage-element-fn (lambda (stream) (write-byte 10 stream))))
+
+(defun relative-path (full-path prefix-path)
+  (princ-to-string
+   (make-pathname :directory (cons :relative
+				   (nthcdr (length (pathname-directory prefix-path))
+					   (pathname-directory full-path)))
+		  :name (pathname-name full-path)
+		  :type (pathname-type full-path))))
+
+(defun gzip-file (input output &key (if-exists :supersede) (if-does-not-exist :create)
+		  (minimum-length 300))
+  "Redefined salsa2:gzip-file with more keywords."
+  (with-open-file (istream input :element-type '(unsigned-byte 8))
+    (unless (< (file-length istream) minimum-length)
+      (with-open-file (ostream output
+			       :element-type '(unsigned-byte 8)
+			       :direction :output
+			       :if-does-not-exist if-does-not-exist
+			       :if-exists if-exists)
+	(salza2:gzip-stream istream ostream)))
+    (probe-file output)))

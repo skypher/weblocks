@@ -5,8 +5,11 @@
 
 (declaim (special *maintain-last-session*))
 
+(defvar *weblocks-global-debug* nil)
+
 (defun enable-global-debugging ()
   "Setup hooks for session maintenance and showing backtraces"
+  (setf *weblocks-global-debug* t)
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
   ;(setf *show-lisp-backtraces-p* t)
@@ -17,6 +20,7 @@
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
+  (setf *weblocks-global-debug* nil)
   (setf *show-lisp-errors-p* nil)
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))

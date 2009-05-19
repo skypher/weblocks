@@ -225,4 +225,4 @@ in order to reset the state after the item widget has done its job."
 
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))
-  (list (make-local-dependency :stylesheet "dataform")))
+  (list (make-local-dependency :stylesheet "dataform-import" :import-p t)))
