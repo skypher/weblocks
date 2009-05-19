@@ -39,7 +39,9 @@ all other parameters. However, none of the callbacks (see
 etc."
   (string-equal (get-parameter "pure") "true"))
 
-(defun redirect (uri &key (defer :post-render) new-window (window-title uri))
+(defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
+                                      :post-render))
+                          new-window (window-title uri))
   "Redirects the client to a new URI.
 
 There are several modes of redirecting:
@@ -65,8 +67,8 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
              (progn
                (setf (content-type*) *json-content-type*)
                (throw 'hunchentoot::handler-done
-                      (format nil "{\"redirect\":\"~A\"}" url)))
-             (hunchentoot:redirect url))))
+                      (format nil "{\"redirect\":\"~A\"}" uri)))
+             (hunchentoot:redirect uri))))
     (cond
       (new-window
         (send-script
@@ -80,7 +82,7 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
 
 (defun post-action-redirect (uri)
   "Legacy wrapper; use REDIRECT with :DEFER set to :POST-ACTION instead."
-  (redirect url :defer :post-action))
+  (redirect uri :defer :post-action))
 
 (defun post-render-redirect (uri)
   "Legacy wrapper; use REDIRECT with :DEFER set to :POST-RENDER instead."
