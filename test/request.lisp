@@ -76,3 +76,36 @@
 	(redirect "/foo")
 	1))
   "{\"redirect\":\"/foo\"}")
+
+(addtest redirect-post-action
+  (let ((weblocks:*request-hook* (make-instance 'weblocks::request-hooks)))
+    (redirect "/foo" :defer :post-action)
+    (ensure (weblocks::post-action-hook *request-hook*))))
+
+(addtest redirect-post-render
+  (let ((weblocks:*request-hook* (make-instance 'weblocks::request-hooks)))
+    (redirect "/foo" :defer :post-render)
+    (ensure (weblocks::post-render-hook *request-hook*))))
+
+(addtest redirect-post-action-legacy-wrapper
+  (let ((weblocks:*request-hook* (make-instance 'weblocks::request-hooks)))
+    (post-action-redirect "/foo")
+    (ensure (weblocks::post-action-hook *request-hook*))))
+
+(addtest redirect-post-render-legacy-wrapper
+  (let ((weblocks:*request-hook* (make-instance 'weblocks::request-hooks)))
+    (post-render-redirect "/foo")
+    (ensure (weblocks::post-render-hook *request-hook*))))
+
+(addtest redirect-open-new-window
+  (with-request :get nil
+    (redirect "/foo" :new-window-p t))
+  (ps:ps*
+    `((slot-value window 'open) "/foo" "/foo")))
+
+(addtest redirect-open-new-window-custom-title
+  (with-request :get nil
+    (redirect "/foo" :new-window-p t :window-title "bar"))
+  (ps:ps*
+    `((slot-value window 'open) "/foo" "bar")))
+
