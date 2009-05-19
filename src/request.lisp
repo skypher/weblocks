@@ -41,7 +41,7 @@ etc."
 
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
                                       :post-render))
-                          new-window (window-title uri))
+                          new-window-p (window-title uri))
   "Redirects the client to a new URI.
 
 There are several modes of redirecting:
@@ -70,7 +70,7 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
                       (format nil "{\"redirect\":\"~A\"}" uri)))
              (hunchentoot:redirect uri))))
     (cond
-      (new-window
+      (new-window-p
         (send-script
           (ps:ps*
             `((slot-value window 'open) ,uri ,window-title))))
@@ -80,6 +80,7 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
        (push #'do-redirect (request-hook :request :post-render)))
       (t (do-redirect)))))
 
+;;; legacy wrappers for redirect
 (defun post-action-redirect (uri)
   "Legacy wrapper; use REDIRECT with :DEFER set to :POST-ACTION instead."
   (redirect uri :defer :post-action))
