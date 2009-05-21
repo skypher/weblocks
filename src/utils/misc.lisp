@@ -16,12 +16,12 @@
 	   function-designator-p list-starts-with safe-subseq)
 	 '(t util))
 
-(defun gen-id (&optional (prefix ""))
+(defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (session-value 'last-unique-id) -1))))
     (setf (session-value 'last-unique-id) new-widget-id)
-    (format nil "~A~A" prefix new-widget-id)))
+    (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable
