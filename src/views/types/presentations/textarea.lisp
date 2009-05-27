@@ -30,11 +30,13 @@
 
 (defmethod render-view-field-value (value (presentation textarea-presentation)
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-textarea (attributize-name (view-field-slot-name field))
+    (render-textarea (if field-info
+                       (attributize-view-field-name field-info)
+                       (attributize-name (view-field-slot-name field)))
 		     (if intermediate-value-p
 			 intermediate-value
 			 (apply #'print-view-field-value value presentation

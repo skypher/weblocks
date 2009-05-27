@@ -15,12 +15,14 @@
 
 (defmethod render-view-field-value (value (presentation dropdown-presentation)
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (ignore args)
 	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-dropdown (view-field-slot-name field)
+    (render-dropdown (if field-info
+                       (attributize-view-field-name field-info)
+                       (attributize-name (view-field-slot-name field)))
 		     (obtain-presentation-choices presentation obj)
 		     :welcome-name (if value
 				       (if (form-view-field-required-p field)

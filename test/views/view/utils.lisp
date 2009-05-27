@@ -67,13 +67,39 @@
 						       :view '(data education-history)))))
   (name manager university graduation-year))
 
-(deftest get-object-view-fields-7
-    (mapcar #'print-field-info
-	    (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
-					    (education :type mixin
-						       :view '(data education-history))
-					    (graduation-year :hidep t))))
-  (name manager university))
+(addtest get-object-view-fields-7
+  (let ((fields (get-object-view-fields *joe*
+		  (defview () (:inherit-from '(:scaffold employee))
+		    (education :type mixin
+			       :view '(data education-history))
+		    (graduation-year :hidep t)))))
+    (ensure-same (mapcar #'print-field-info fields)
+		 '(name manager university graduation-year))
+    (ensure-same (field-info-object (car (last fields)))
+		 (slot-value *joe* 'education))))
+
+(defclass educated-employee nil
+  ((education1 :initform (make-instance 'education-history))
+   (education2 :initform (make-instance 'education-history))))
+
+(addtest get-object-view-fields.properly-discern-mixins
+  (dolist (view (list (defview () nil 
+			(education1 :type mixin
+                                    :view '(data education-history))
+                        (education2 :type mixin
+                                    :view '(data education-history)))
+		      (defview () nil 
+			(education1 :type mixin
+                                    :view '(data education-history))
+                        (education2 :type mixin
+                                    :view '(data education-history)))))
+    (let ((fields (get-object-view-fields (make-instance 'educated-employee)
+                                          view :include-invisible-p t)))
+      (ensure-same (mapcar #'print-field-info fields)
+		   '(university graduation-year university graduation-year))
+      (ensure-same (mapcar #'attributize-view-field-name fields)
+		   '("education1-university" "education1-graduation-year"
+                     "education2-university" "education2-graduation-year")))))
 
 (addtest get-object-view-fields.direct-shadows-mixedin
   (dolist (view (list (defview () (:inherit-from '(:scaffold employee))
@@ -86,9 +112,11 @@
 			(graduation-year :hidep t))))
     (let ((fields (get-object-view-fields *joe* view :include-invisible-p t)))
       (ensure-same (mapcar #'print-field-info fields)
-		   '(name manager university graduation-year))
+		   '(name manager university graduation-year graduation-year))
       (ensure-same (field-info-object (car (last fields)))
-		   *joe*))))
+		   *joe*)
+      (ensure-same (field-info-object (car (last fields 2)))
+		   (slot-value *joe* 'education)))))
 
 (addtest get-object-view-fields.direct-shadow-proper-mixin
   (let ((fields (get-object-view-fields
@@ -100,9 +128,6 @@
 		 '(name manager education))
     (ensure-same (field-info-object (third fields)) *joe*)))
 
-;; XXX We believe the mixin should win here, but this is how it
-;; behaves at the moment.  The easy fix will not do, because mixed-in
-;; views are treated differently.
 (addtest get-object-view-fields.direct-shadow-proper-mixin-after
   (let ((fields (get-object-view-fields
 		 *joe* (defview () (:inherit-from '(:scaffold employee))
@@ -110,9 +135,8 @@
 			 (education :type mixin
 				    :view '(data education-history))))))
     (ensure-same (mapcar #'print-field-info fields)
-		 '(name manager education))
-    ;; this is what would change, to (slot-value *joe* 'education)
-    (ensure-same (field-info-object (third fields)) *joe*)))
+		 '(name manager university graduation-year))
+    (ensure-same (field-info-object (third fields)) (slot-value *joe* 'education))))
 
 (deftest get-object-view-fields-8
     (mapcar #'print-field-info
