@@ -49,7 +49,9 @@
 	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-checkbox (attributize-view-field-name field-info)
+    (render-checkbox (if field-info
+                       (attributize-view-field-name field-info)
+                       (attributize-name (view-field-slot-name field)))
 		     (if intermediate-value-p
 			 intermediate-value
 			 value)

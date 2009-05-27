@@ -20,7 +20,9 @@
 	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-dropdown (attributize-view-field-name field-info)
+    (render-dropdown (if field-info
+                       (attributize-view-field-name field-info)
+                       (attributize-name (view-field-slot-name field)))
 		     (obtain-presentation-choices presentation obj)
 		     :welcome-name (if value
 				       (if (form-view-field-required-p field)

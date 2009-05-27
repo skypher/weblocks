@@ -15,7 +15,11 @@
 				      (attributize-name (string (dataseq-sort-direction widget))))))
 	     (sort-dir (dataseq-sort-direction widget)))
 	(with-html
-	  (:th :class (concatenate 'string (attributize-name slot-name) th-class)
+	  (:th :class (concatenate 'string
+                                   (if field-info
+                                     (attributize-view-field-name field-info)
+                                     (attributize-name slot-name))
+                                   th-class)
 	       (:span (render-link
 		       (make-action
 			(lambda (&rest args)

@@ -118,8 +118,9 @@ rendering.")
   (:method ((field table-view-field) (view table-view) widget presentation value obj &rest args
                                      &key field-info &allow-other-keys)
     (with-html
-      (:th :class (when field-info 
-		    (attributize-view-field-name field-info))
+      (:th :class (if field-info
+                    (attributize-view-field-name field-info)
+                    (attributize-name (view-field-slot-name field)))
 	   (apply #'render-view-field-header-value value presentation field view widget obj args)))))
 
 (defgeneric render-view-field-header-value (value presentation field view widget obj &rest args)
@@ -156,6 +157,7 @@ details.")
 	       (apply #'render-view-field
 		      field view widget (view-field-presentation field)
 		      (obtain-view-field-value field obj) obj
+                      :field-info field-info
 		      args)
 	       (safe-apply (view-field-suffix-fn field) view field obj args)))
 	   view obj args)))
@@ -165,8 +167,9 @@ details.")
 			      &rest args
                               &key field-info &allow-other-keys)
   (with-html
-    (:td :class (when field-info 
-		  (attributize-view-field-name field-info))
+    (:td :class (if field-info
+                  (attributize-view-field-name field-info)
+                  (attributize-name (view-field-slot-name field)))
 	 (apply #'render-view-field-value value presentation field view widget obj args))))
 
 ;; The table itself

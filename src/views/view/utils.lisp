@@ -272,7 +272,8 @@ returns the created object."
   (let ((parent-prefix (awhen (field-info-parent-info field-info)
                               (view-field-slot-name (field-info-field it))))
         (name (view-field-slot-name (field-info-field field-info))))
-    (attributize-name (format nil "~@[~A-~]~A" parent-prefix name))))
+    (when name
+      (attributize-name (format nil "~@[~A-~]~A" parent-prefix name)))))
 
 (defmethod print-object ((obj field-info) stream)
   (flet ((field-key (field-info &aux (field (field-info-field field-info)))

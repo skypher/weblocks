@@ -311,9 +311,11 @@ form-view-buttons for a given view.")
 			      widget presentation value obj 
 			      &rest args &key validation-errors field-info &allow-other-keys)
   (declare (special *presentation-dom-id*))
-  (let* ((attributized-slot-name (attributize-view-field-name field-info))
+  (let* ((attributized-slot-name (if field-info
+                                   (attributize-view-field-name field-info)
+                                   (attributize-name (view-field-slot-name field))))
 	 (validation-error (assoc field validation-errors))
-	 (field-class (concatenate 'string attributized-slot-name
+	 (field-class (concatenate 'string (aif attributized-slot-name it "")
 				   (when validation-error " item-not-validated")))
          (*presentation-dom-id* (gen-id)))
     (with-html
@@ -331,6 +333,7 @@ form-view-buttons for a given view.")
            (apply #'render-view-field-value
                   value presentation
                   field view widget obj
+                  :field-info field-info
                   args)
            (when validation-error
              (htm (:p :class "validation-error"
@@ -342,7 +345,9 @@ form-view-buttons for a given view.")
 				    field view widget obj
 				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (special *presentation-dom-id*))
-  (let ((attributized-slot-name (attributize-view-field-name field-info)))
+  (let ((attributized-slot-name (if field-info
+                                  (attributize-view-field-name field-info)
+                                  (attributize-name (view-field-slot-name field)))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
 	(form-field-intermediate-value field intermediate-values)
       (with-html

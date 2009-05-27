@@ -78,6 +78,29 @@
     (ensure-same (field-info-object (car (last fields)))
 		 (slot-value *joe* 'education))))
 
+(defclass educated-employee nil
+  ((education1 :initform (make-instance 'education-history))
+   (education2 :initform (make-instance 'education-history))))
+
+(addtest get-object-view-fields.properly-discern-mixins
+  (dolist (view (list (defview () nil 
+			(education1 :type mixin
+                                    :view '(data education-history))
+                        (education2 :type mixin
+                                    :view '(data education-history)))
+		      (defview () nil 
+			(education1 :type mixin
+                                    :view '(data education-history))
+                        (education2 :type mixin
+                                    :view '(data education-history)))))
+    (let ((fields (get-object-view-fields (make-instance 'educated-employee)
+                                          view :include-invisible-p t)))
+      (ensure-same (mapcar #'print-field-info fields)
+		   '(university graduation-year university graduation-year))
+      (ensure-same (mapcar #'attributize-view-field-name fields)
+		   '("education1-university" "education1-graduation-year"
+                     "education2-university" "education2-graduation-year")))))
+
 (addtest get-object-view-fields.direct-shadows-mixedin
   (dolist (view (list (defview () (:inherit-from '(:scaffold employee))
 			(education :type mixin

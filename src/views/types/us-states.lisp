@@ -74,7 +74,9 @@ state."
 						  :test #'equalp))))))
 	  (welcome-name "State"))
       (if (us-state-presentation-use-suggest-p presentation)
-	  (render-suggest (attributize-view-field-name field-info)
+	  (render-suggest (if field-info
+                            (attributize-view-field-name field-info)
+                            (attributize-name(view-field-slot-name field)))
 			  selections
 			  :default-value default-value
 			  :welcome-name welcome-name
