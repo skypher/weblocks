@@ -1,13 +1,27 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name ensure-widget-methods
-          widget-propagate-dirty widget-rendered-p widget-continuation
-          widget-parent widget-children widget-prefix-fn widget-suffix-fn
+(export '(defwidget
+          widget
+          widget-name
+          ensure-widget-methods
+          widget-propagate-dirty
+          widget-rendered-p
+          widget-continuation
+          widget-parent
+          widget-parents
+          widgets-roots
+          widget-children
+          widget-prefix-fn
+          widget-suffix-fn
           with-widget-header
-	  update-children update-parent-for-children
-	  map-subwidgets walk-widget-tree page-title
-          render-widget render-widget-body render-widget-children
+	  update-children
+          update-parent-for-children
+	  map-subwidgets
+          walk-widget-tree page-title
+          render-widget
+          render-widget-body
+          render-widget-children
           get-widgets-by-type
 	  widget-css-classes
 	  mark-dirty widget-dirty-p
@@ -52,6 +66,7 @@ inherits from 'widget' if no direct superclasses are provided."
                  on a widget, this value is used to resume the
                  computation.")
    (parent :accessor widget-parent
+           :initarg :parent 
 	   :initform nil
 	   :documentation "Stores the 'parent' of a widget, i.e. the
 	   widget in which this widget is located, if any. This value is
@@ -509,4 +524,22 @@ PUTP is a legacy argument. Do not use it in new code."))
                         (when (funcall test id (dom-id widget))
                           (push widget widgets))))
     widgets))
+
+(defun widget-parents (widget)
+  "Return the parent chain of a widget."
+  (let ((parent (widget-parent widget)))
+    (when parent
+      (cons parent (widget-parents parent)))))
+
+(defun widgets-roots (widgets)
+  "Find the common roots of the passed list of WIDGETS
+  that are still part of the list."
+  (declare (list widgets))
+  (let (roots)
+    (dolist (widget widgets)
+      (setf widgets (remove widget widgets))
+      (let ((parents (widget-parents widget)))
+        (unless (some (curry-after #'member (union roots widgets)) parents)
+          (push widget roots))))
+    roots))
 

@@ -421,3 +421,61 @@
       (progv '(*package*) (list (find-package :weblocks-test))
 	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
   "#<NAVIGATION \"id-234\">")
+
+
+;;; widget-parents
+(addtest widget-parents.simple
+  (ensure-same (widget-parents (make-instance 'widget)) nil))
+
+(addtest widget-parents-2
+  (let* ((w1 (make-instance 'widget))
+         (w2 (make-instance 'widget :parent w1))
+         (w3 (make-instance 'widget :parent w2)))
+  (ensure-same (widget-parents w3) (list w2 w1))))
+
+
+;;; widgets-roots
+(addtest widgets-roots.simple
+  (let ((w (make-instance 'widget)))
+    (ensure-same (widgets-roots (list w)) (list w))))
+
+(addtest widgets-roots.straight-parent-chain-1
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3)) (list w3))))
+
+(addtest widgets-roots.straight-parent-chain-2
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2)) (list w2))))
+
+(addtest widgets-roots.straight-parent-chain-3
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2 w1)) (list w1))))
+
+(addtest widgets-roots.common-root
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2)) (list w2 w3))))
+
+(addtest widgets-roots.common-root-with-root
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2 w1)) (list w1))))
+
+(addtest widgets-roots.multiple-roots
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3"))
+         (w4 (make-instance 'widget :parent w3 :dom-id "w4")))
+    (ensure-same (widgets-roots (list w4)) (list w4))
+    (ensure-same (widgets-roots (list w3)) (list w3))
+    (ensure-same (widgets-roots (list w4 w2)) (list w2 w4))
+    (ensure-same (widgets-roots (list w4 w2 w1)) (list w1))))
+
