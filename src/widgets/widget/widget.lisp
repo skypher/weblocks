@@ -478,12 +478,13 @@ PUTP is a legacy argument. Do not use it in new code."))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
     into a CLOS object derived from 'widget'."))
-  (and propagate-supplied putp-supplied
-       (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
-  (when (widget-rendered-p w)
-    (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
-  (when propagate
-    (mapc #'mark-dirty (remove nil (widget-propagate-dirty w)))))
+  (unless (member w *dirty-widgets* :test #'eq)
+    (and propagate-supplied putp-supplied
+         (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
+    (when (widget-rendered-p w)
+      (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
+    (when propagate
+      (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
