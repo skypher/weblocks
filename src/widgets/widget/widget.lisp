@@ -598,10 +598,10 @@ Slots will be copied shallowly except for CHILDREN."
 
 (defun widget-equal (w1 w2)
   ;; TODO: ensure parental sanity
-  (slot-equal tree1 tree2 :exclude '(children parent)))
+  (slot-equal w1 w2 :exclude '(children parent)))
 
 (defun widget-tree-equal (tree1 tree2)
-  (and (widget-equal w1 w2)
+  (and (widget-equal tree1 tree2)
        (every #'widget-tree-equal
               (widget-children tree1) (widget-children tree2))))
 
