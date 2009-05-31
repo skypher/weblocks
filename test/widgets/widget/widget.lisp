@@ -479,3 +479,90 @@
     (ensure-same (widgets-roots (list w4 w2)) (list w2 w4))
     (ensure-same (widgets-roots (list w4 w2 w1)) (list w1))))
 
+
+;;; slot-equal
+(defclass slot-equal-test-class nil
+  ((s1 :initarg :s1)
+   (s2 :initarg :s2)))
+
+(addtest slot-equal-both-unbound
+  (ensure (slot-equal (make-instance 'slot-equal-test-class)
+                      (make-instance 'slot-equal-test-class))))
+
+(addtest slot-equal-one-unbound
+  (ensure-null
+    (slot-equal (make-instance 'slot-equal-test-class :s1 t)
+                (make-instance 'slot-equal-test-class))))
+
+(addtest slot-equal-unbound-equal-mix
+  (ensure (slot-equal (make-instance 'slot-equal-test-class :s1 t)
+                      (make-instance 'slot-equal-test-class :s1 t))))
+
+(addtest slot-equal-all-bound
+  (ensure (slot-equal (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                      (make-instance 'slot-equal-test-class :s1 t :s2 nil))))
+
+(addtest slot-equal-custom-test
+  (let ((test (lambda (x y) (and (integerp x) (= x y)))))
+    (ensure-null
+      (slot-equal (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                  (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                  :test test))
+    (ensure
+      (slot-equal (make-instance 'slot-equal-test-class :s1 5 :s2 1)
+                  (make-instance 'slot-equal-test-class :s1 5 :s2 1)
+                  :test test))
+    (ensure
+      (slot-equal (make-instance 'slot-equal-test-class :s1 5)
+                  (make-instance 'slot-equal-test-class :s1 5)
+                  :test test))))
+
+(addtest widget-tree-equal.root-only
+  (let ((w1 (make-instance 'widget :dom-id "w"))
+        (w2 (make-instance 'widget :dom-id "w")))
+  (ensure (widget-tree-equal w1 w2))))
+
+(addtest widget-tree-equal.unrelated
+  (let ((w1 (make-instance 'widget :dom-id "w1"))
+        (w2 (make-instance 'widget :dom-id "w2")))
+  (ensure-null (widget-tree-equal w1 w2))))
+
+(addtest widget-tree-equal.straight
+  (let ((t1-w1 (make-instance 'widget :dom-id "w1"))
+        (t1-w2 (make-instance 'widget :dom-id "w2"))
+        (t2-w1 (make-instance 'widget :dom-id "w1"))
+        (t2-w2 (make-instance 'widget :dom-id "w2")))
+    (setf (widget-children t1-w1) (list t1-w2))
+    (setf (widget-children t2-w1) (list t2-w2))
+  (ensure (widget-tree-equal t1-w1 t2-w1))))
+
+(addtest widget-tree-equal.hierarchy
+  (let ((t1-w1 (make-instance 'widget :dom-id "w1"))
+        (t1-w1-a (make-instance 'widget :dom-id "w1a"))
+        (t1-w2 (make-instance 'widget :dom-id "w2"))
+        (t1-w2-a (make-instance 'widget :dom-id "w2a"))
+        (t1-w2-b (make-instance 'widget :dom-id "w2b"))
+        (t2-w1 (make-instance 'widget :dom-id "w1"))
+        (t2-w1-a (make-instance 'widget :dom-id "w1a"))
+        (t2-w2 (make-instance 'widget :dom-id "w2"))
+        (t2-w2-a (make-instance 'widget :dom-id "w2a"))
+        (t2-w2-b (make-instance 'widget :dom-id "w2b")))
+    (setf (widget-children t1-w1) (list t1-w1-a t1-w2))
+    (setf (widget-children t1-w2) (list t1-w2-a t1-w2-b))
+    (setf (widget-children t2-w1) (list t2-w1-a t2-w2))
+    (setf (widget-children t2-w2) (list t2-w2-a t2-w2-b))
+  (ensure (widget-tree-equal t1-w1 t2-w1))))
+
+#+(or)
+(addtest copy-widget-tree.simple
+  (let ((*lift-equality-test* #'widget-tree-equal))
+    (let* ((w1 (make-instance 'widget :dom-id "w1")))
+      (ensure-same (copy-widget-tree w4) w4))))
+
+#+(or)
+(addtest copy-widget-tree.straight
+  (let ((*lift-equality-test* #'widget-tree-equal))
+    (let* ((w1 (make-instance 'widget :dom-id "w1"))
+           (w2 (make-instance 'widget :parent w1 :dom-id "w2")))
+      (ensure-same (copy-widget-tree w1) 5))))
+

@@ -543,3 +543,58 @@ PUTP is a legacy argument. Do not use it in new code."))
           (push widget roots))))
     roots))
 
+(defun copy-widget-tree (root)
+  "Copy the widget tree at ROOT including all widgets below.
+Slots will be copied shallowly except for CHILDREN."
+  (declare (type (or widget string function) root))
+  (etypecase root
+    ((or string function)
+      root)
+    (widget
+      (let ((slotnames (mapcar #'slot-definition-name (class-slots (class-of root))))
+            ;; we use MAKE-INSTANCE in case side effects are attached
+            ;; to the INITIALIZE-INSTANCE stage.
+            (copy (make-instance (type-of root))))
+        (dolist (slotname slotnames)
+          (if (slot-boundp root slotname)
+            (case slotname
+              (children (mapc #'copy-widget-tree slotname))
+              (t (setf (slot-value copy slotname) (slot-value root slotname))))
+            (slot-makunbound root slotname)))
+        copy))))
+
+(defun slot-equal (o1 o2 &key exclude (test #'equal))
+  "Whether O1 and O2 have identical slot contents, excluding
+  slot names in EXCLUDE.
+
+  Two slots are considered equal if they are either both unbound
+  or if they are both bound and pass TEST.
+
+  Signals an error when the slot names of O1 and O2 don't match."
+  (let* ((slotnames-o1 (mapcar #'slot-definition-name (class-slots (class-of o1))))
+         (slotnames-o2 (mapcar #'slot-definition-name (class-slots (class-of o2))))
+         (diff (set-difference slotnames-o1 slotnames-o2)))
+    (when diff
+      (error "Objects with differing slot names detected. Difference: ~S~%" diff))
+    (dolist (slotname slotnames-o1 t)
+      (unless (member slotname (ensure-list exclude) :test #'eq)
+        (cond
+          ((or (and (slot-boundp o1 slotname) (not (slot-boundp o2 slotname)))
+               (and (slot-boundp o2 slotname) (not (slot-boundp o1 slotname))))
+           (return-from slot-equal nil))
+          ((and (not (slot-boundp o1 slotname)) (not (slot-boundp o2 slotname)))
+           t)
+          ((funcall test (slot-value o1 slotname) (slot-value o2 slotname))
+           t)
+          (t
+           (return-from slot-equal nil)))))))
+
+(defun widget-equal (w1 w2)
+  ;; TODO: ensure parental sanity
+  (slot-equal tree1 tree2 :exclude '(children parent)))
+
+(defun widget-tree-equal (tree1 tree2)
+  (and (widget-equal w1 w2)
+       (every #'widget-tree-equal
+              (widget-children tree1) (widget-children tree2))))
+
