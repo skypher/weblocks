@@ -481,9 +481,11 @@ PUTP is a legacy argument. Do not use it in new code."))
   (unless (member w *dirty-widgets* :test #'eq)
     (and propagate-supplied putp-supplied
          (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
-    (when (widget-rendered-p w)
+    ;; NOTE: we have to check for unbound slots because this function
+    ;; may get called at initialization time before those slots are bound
+    (when (and (slot-boundp w 'renderedp) (widget-rendered-p w))
       (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
-    (when propagate
+    (when (and propagate (slot-boundp w 'propagate-dirty))
       (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
 
 (defun widget-dirty-p (w)
