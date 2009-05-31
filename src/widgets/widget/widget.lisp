@@ -6,7 +6,6 @@
           widget-name
           ensure-widget-methods
           widget-propagate-dirty
-          widget-rendered-p
           widget-continuation
           widget-parent
           widget-parents
@@ -55,14 +54,6 @@ inherits from 'widget' if no direct superclasses are provided."
                     request. This slot allows setting up dependencies
                     between widgets that will make multiple widgets
                     update automatically during AJAX requests.")
-   (renderedp :accessor widget-rendered-p
-             :initform nil
-             :affects-dirty-status-p nil
-             :documentation "This slot holds a boolean flag
-              indicating whether the widget has been rendered at least
-              once. Because marking unrendered widgets as dirty may
-              cause JS problems, 'mark-dirty' will use this flag to
-              determine the status of a widget.")
    (continuation :accessor widget-continuation
 		 :initform nil
 		 :documentation "Stores the continuation object for
@@ -135,14 +126,6 @@ inherits from 'widget' if no direct superclasses are provided."
   "Returns t when widget is a valid, renderable widget; this includes
 strings, function, etc."
   (identity (typep widget 'widget-designator)))
-
-;;; Define widget-rendered-p for objects that don't derive from
-;;; 'widget'
-(defmethod widget-rendered-p (obj)
-  nil)
-
-(defmethod (setf widget-rendered-p) (val obj)
-  nil)
 
 (defgeneric widget-children (w &optional type)
   (:documentation "Return a list of all widgets (all types) who are
@@ -462,8 +445,7 @@ stylesheets and javascript links in the page header."))
                  (list :widget-prefix-fn (widget-prefix-fn obj)))
                (when (widget-suffix-fn obj)
                  (list :widget-suffix-fn (widget-suffix-fn obj)))
-               args)))
-    (setf (widget-rendered-p obj) t)))
+               args)))))
 
 (defgeneric mark-dirty (w &key propagate putp)
   (:documentation
@@ -486,8 +468,7 @@ PUTP is a legacy argument. Do not use it in new code."))
   (and propagate-supplied putp-supplied
        (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
   (unless (widget-dirty-p w)
-    (when (and (slot-boundp w 'renderedp) (widget-rendered-p w))
-      (push w *dirty-widgets*))
+    (push w *dirty-widgets*)
     ;; NOTE: we have to check for unbound slots because this function
     ;; may get called at initialization time before those slots are bound
     (when (and propagate (slot-boundp w 'propagate-dirty))

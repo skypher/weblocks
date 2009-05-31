@@ -121,7 +121,6 @@
 	(declare (special weblocks::*dirty-widgets*))
 	(with-call/cc
 	  (do-widget w2 w4))
-	(setf (widget-rendered-p c) t)
 	(values (equalp (composite-widgets c) (list w1 w4 w3))
 		(progn (answer w4)
 		       (equalp (composite-widgets c) (list w1 w2 w3)))

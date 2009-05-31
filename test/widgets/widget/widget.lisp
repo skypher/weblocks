@@ -268,18 +268,8 @@
      (make-versioned-regex "dataform-import" "css")
      :test (lambda (x y) (cl-ppcre:scan y x))))
 
-(deftest render-widget-5
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((w (make-instance 'dataform :data *joe*))
-	      res1 res2)
-	  (setf res1 (widget-rendered-p w))
-	  (render-widget w :inlinep t)
-	  (setf res2 (widget-rendered-p w))
-	  (values res1 res2))))
-  nil t)
 
-;;; test mark-dirty
+;;; mark-dirty
 (deftest mark-dirty-1
     (multiple-value-bind (res errors)
 	(ignore-errors (mark-dirty (lambda () nil)))
@@ -297,28 +287,11 @@
 	  (widget-name (car weblocks::*dirty-widgets*)))))
   "test")
 
-(deftest mark-dirty-3
-    (with-request :get nil
-      (let ((weblocks::*dirty-widgets* nil)
-	    (w (make-instance 'composite :name "test")))
-	(declare (special weblocks::*dirty-widgets*))
-	(mark-dirty w)
-	(widget-name (car weblocks::*dirty-widgets*))))
-  nil)
-
-(deftest mark-dirty-4
-    (with-request :get nil
-      (let ((weblocks::*dirty-widgets* nil)
-	    (w (make-instance 'composite :name "test")))
-	(declare (special weblocks::*dirty-widgets*))
-	(setf (widget-rendered-p w) t)
-	(widget-name (car weblocks::*dirty-widgets*))))
-  nil)
-
 (addtest mark-dirty-both-propagate-and-putp-supplied
   (ensure-error (mark-dirty (make-instance 'widget) :propagate t :putp t)))
 
-;;; test widget-dirty-p
+
+;;; widget-dirty-p
 (deftest widget-dirty-p-1
     (let ((weblocks::*dirty-widgets* nil)
 	  (w (make-instance 'composite :name "test")))
@@ -337,28 +310,13 @@
 	  (not (null (widget-dirty-p w))))))
   t)
 
-;;; test that (setf slot-value-using-class) method is modified for
-;;; widgets to automatically mark them as dirty
-(deftest setf-slot-value-using-class-1
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'dataform)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (setf (dataform-ui-state w) :form)
-	  (widget-name (car weblocks::*dirty-widgets*)))))
-  "id-123")
-
-(deftest setf-slot-value-using-class-2
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'dataform)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  weblocks::*dirty-widgets*)))
-  nil)
+(addtest setf-slot-value-using-class-marks-dirty
+  (with-request :get nil
+    (let ((weblocks::*dirty-widgets* nil)
+          (w (make-instance 'dataform)))
+      (declare (special weblocks::*dirty-widgets*))
+      (setf (dataform-ui-state w) :form)
+      (ensure (widget-dirty-p w)))))
 
 
 ;;; test get-widgets-by-type
