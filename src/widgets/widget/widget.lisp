@@ -24,7 +24,12 @@
           render-widget-children
           get-widgets-by-type
 	  widget-css-classes
-	  mark-dirty widget-dirty-p
+	  mark-dirty
+          widget-dirty-p
+          slot-equal
+          widget-equal
+          widget-tree-equal
+          copy-widget-tree
           *current-widget*))
 
 (defmacro defwidget (name direct-superclasses &body body)
