@@ -1,0 +1,26 @@
+=== Design:
+
+(define-javascript-backend NAME ROOT FILES)
+
+FILES are relative to ROOT, which in turn is relative to the
+static files path.
+
+
+=== Files that need to be ported:
+weblocks.js
+weblocks-debug.js
+dialog.js
+datagrid.js
+hard-coded js in src/
+
+
+=== Initial portable API:
+AJAX requests
+Effects (simple)
+
+History (later)
+
+
+=== Misc.
+Get rid of shortcut.js (?)
+
