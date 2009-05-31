@@ -56,9 +56,9 @@ inherits from 'widget' if no direct superclasses are provided."
                     between widgets that will make multiple widgets
                     update automatically during AJAX requests.")
    (renderedp :accessor widget-rendered-p
-	      :initform nil
-	      :affects-dirty-status-p nil
-	      :documentation "This slot holds a boolean flag
+             :initform nil
+             :affects-dirty-status-p nil
+             :documentation "This slot holds a boolean flag
               indicating whether the widget has been rendered at least
               once. Because marking unrendered widgets as dirty may
               cause JS problems, 'mark-dirty' will use this flag to
@@ -483,13 +483,13 @@ PUTP is a legacy argument. Do not use it in new code."))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
     into a CLOS object derived from 'widget'."))
+  (and propagate-supplied putp-supplied
+       (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
   (unless (widget-dirty-p w)
-    (and propagate-supplied putp-supplied
-         (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
+    (when (and (slot-boundp w 'renderedp) (widget-rendered-p w))
+      (push w *dirty-widgets*))
     ;; NOTE: we have to check for unbound slots because this function
     ;; may get called at initialization time before those slots are bound
-    (when (and (slot-boundp w 'renderedp) (widget-rendered-p w))
-      (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
     (when (and propagate (slot-boundp w 'propagate-dirty))
       (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
 
