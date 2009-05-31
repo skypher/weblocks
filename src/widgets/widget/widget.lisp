@@ -483,7 +483,7 @@ PUTP is a legacy argument. Do not use it in new code."))
   (when (functionp w)
     (error "AJAX is not supported for functions. Convert the function
     into a CLOS object derived from 'widget'."))
-  (unless (member w *dirty-widgets* :test #'eq)
+  (unless (widget-dirty-p w)
     (and propagate-supplied putp-supplied
          (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
     ;; NOTE: we have to check for unbound slots because this function
@@ -495,7 +495,7 @@ PUTP is a legacy argument. Do not use it in new code."))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
-  (member w *dirty-widgets*))
+  (member w *dirty-widgets* :test #'eq))
 
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
