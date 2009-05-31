@@ -308,33 +308,6 @@
 
 (deftest mark-dirty-4
     (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))	
-      (let ((weblocks::*dirty-widgets* nil))
-	(declare (special weblocks::*dirty-widgets*))
-	(mark-dirty (make-instance 'composite :name "test"
-				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
-		    :propagate t)
-	(mapcar #'widget-name weblocks::*dirty-widgets*)))
-  nil)
-
-#+(or)
-(deftest mark-dirty-5
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(setf (root-composite) (create-site-layout))	
-	(let* ((weblocks::*dirty-widgets* nil)
-	       (path '((root-inner test-nav-1 test2 test2-leaf)))
-	       (w (make-instance 'composite :name "test"
-					    :propagate-dirty path)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (render-widget (find-widget-by-path (car path)))
-	  (mark-dirty w :propagate t)
-	  (mapcar #'widget-name weblocks::*dirty-widgets*))))
-  (test2-leaf "test"))
-
-(deftest mark-dirty-6
-    (with-request :get nil
       (let ((weblocks::*dirty-widgets* nil)
 	    (w (make-instance 'composite :name "test")))
 	(declare (special weblocks::*dirty-widgets*))
