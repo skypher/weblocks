@@ -1,6 +1,8 @@
 
 (in-package :weblocks)
 
+(export 'funcall-widget)
+
 (defwidget funcall-widget ()
   ((fun-designator :type (or symbol function)
                    :accessor funcall-widget-fun-designator
