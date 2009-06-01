@@ -128,16 +128,6 @@ inherits from 'widget' if no direct superclasses are provided."
   ;;       when this is implemented.
   (setf (slot-value obj 'parent) val))
 
-(deftype widget-designator ()
-  "The supertype of all widgets.  Check against this type instead of
-`widget' unless you know what you're doing."
-  '(or widget (and symbol (not null)) string function))
-
-(defun widget-designator-p (widget)
-  "Returns t when widget is a valid, renderable widget; this includes
-strings, function, etc."
-  (identity (typep widget 'widget-designator)))
-
 (defgeneric widget-children (w &optional type)
   (:documentation "Return a list of all widgets (all types) who are
 children of w (e.g. may be rendered when w is rendered).")
@@ -296,8 +286,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	    (assert (place-in-children-p place (slot-value obj 'children)))
 	    (cond
 	      (callee-supplied-p
-	       (check-type callee widget-designator
-			   "a potential child of a widget")
 	       (rplaca place callee)
 	       (setf (widget-parent callee) obj)
 	       (mark-dirty obj))

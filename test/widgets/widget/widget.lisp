@@ -130,62 +130,6 @@
     (widget-name 'identity)
   identity)
 
-;;; test ensure-widget-methods
-
-(defgeneric ewm-g0 ())
-(defgeneric ewm-g1 (a &optional b))
-(defgeneric ewm-g2 (a b &rest c))
-(defgeneric ewm-g5 (a b c d e))
-
-(defun widget-class-count ()
-  (length weblocks::*widget-classes*))
-
-(addtest ensure-widget-methods-0
-  (remove-all-methods #'ewm-g0)
-  (ensure-widget-methods #'ewm-g0 '() (constantly 42))
-  (ensure-same (generic-function-methods #'ewm-g0) '()))
-
-(addtest ensure-widget-methods-1
-  (remove-all-methods #'ewm-g1)
-  (ensure-widget-methods #'ewm-g1 0 (lambda (n &optional m)
-				      (declare (ignore n m))
-				      42))
-  (ensure-same (ewm-g1 (make-instance 'composite)) 42)
-  (ensure-same (length (generic-function-methods #'ewm-g1))
-	       (widget-class-count)))
-
-(addtest ensure-widget-methods-2
-  (remove-all-methods #'ewm-g2)
-  (ensure-widget-methods #'ewm-g2 1 (lambda (a b &rest c)
-				      (declare (ignore a b c))
-				      84))
-  (ensure-same (ewm-g2 t (make-instance 'composite)) 84)
-  (ensure-same (length (generic-function-methods #'ewm-g2))
-	       (widget-class-count)))
-
-(addtest ensure-widget-methods-5
-  (remove-all-methods #'ewm-g5)
-  (ensure-widget-methods #'ewm-g5 '(3 1)
-			 (lambda (a b c d e)
-			   (list b a c d e)))
-  (ensure-same (ewm-g5 1 'two 3 'four 5)
-	       '(two 1 3 four 5))
-  (ensure-same (length (generic-function-methods #'ewm-g5))
-	       (expt (widget-class-count) 2)))
-
-;;; widget-designator typechecking
-(addtest nil-is-not-valid
-  (ensure-same (typep nil 'weblocks::widget-designator)
-	       (values nil t))
-  (ensure-null (weblocks::widget-designator-p nil)))
-
-(addtest widget-designator-export-status-same
-  (ensure-same (symbol-status 'weblocks::widget-designator)
-	       (symbol-status 'weblocks::widget-designator-p)))
-
-(addtest widget-designator-type-not-extensible
-  (ensure-null
-   (typep #'weblocks::widget-designator-p 'generic-function)))
 
 ;;; test composite-widgets specialization for widgets
 (deftest composite-widgets-1
