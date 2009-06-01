@@ -428,16 +428,25 @@
     (setf (widget-children t2-w2) (list t2-w2-a t2-w2-b))
   (ensure (widget-tree-equal t1-w1 t2-w1))))
 
-#+(or)
+#+(or) ; to be finished
 (addtest copy-widget-tree.simple
   (let ((*lift-equality-test* #'widget-tree-equal))
     (let* ((w1 (make-instance 'widget :dom-id "w1")))
       (ensure-same (copy-widget-tree w4) w4))))
 
-#+(or)
+#+(or) ; to be finished
 (addtest copy-widget-tree.straight
   (let ((*lift-equality-test* #'widget-tree-equal))
     (let* ((w1 (make-instance 'widget :dom-id "w1"))
            (w2 (make-instance 'widget :parent w1 :dom-id "w2")))
       (ensure-same (copy-widget-tree w1) 5))))
+
+
+;;; make-widget
+(addtest make-widget.funcall
+  (ensure (typep (make-widget (lambda nil)) 'funcall-widget))
+  (ensure (typep (make-widget 'foo) 'funcall-widget)))
+
+(addtest make-widget.string
+  (ensure (typep (make-widget "foo") 'string-widget)))
 
