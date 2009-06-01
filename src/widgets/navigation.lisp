@@ -90,7 +90,11 @@ may be NIL in which case the default pane name is provided."
   and the second atom the widget.
   
   The two forms of elements may be mixed, but an atom
-  must always be followed by another atom."
+  must always be followed by another atom.
+  
+  MAKE-WIDGET is applied to the widget argument so
+  you can use strings and function designators as widgets
+  in this context."
   ;; normalize args
   (setf args (loop for arg = (pop args)
                    while arg
@@ -102,7 +106,7 @@ may be NIL in which case the default pane name is provided."
   (mapc (lambda (pane-info)
           (let ((token (or (third pane-info) (attributize-name (first pane-info))))
                 (name (first pane-info))
-                (widget (second pane-info)))
+                (widget (make-widget (second pane-info))))
             (when (string-equal token "")
               (setf token nil))
             (push-end (cons token name) (navigation-pane-names obj))

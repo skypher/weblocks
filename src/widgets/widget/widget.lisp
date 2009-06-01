@@ -3,8 +3,8 @@
 
 (export '(defwidget
           widget
+          make-widget
           widget-name
-          ensure-widget-methods
           widget-propagate-dirty
           widget-continuation
           widget-parent
@@ -96,6 +96,17 @@ inherits from 'widget' if no direct superclasses are provided."
 (defmethod initialize-instance :after ((obj widget) &key name children &allow-other-keys)
   (when name (setf (dom-id obj) name))
   (when children (setf (widget-children obj :widget) children)))
+
+(defgeneric make-widget (obj)
+  (:documentation "Create a widget from OBJ.")
+  (:method (obj)
+    "Create a widget from the printable (PRINC-TO-STRING) representation
+     of OBJ."
+    (warn "Fallback: Creating widget from printable representation of ~S~%" obj)
+    (make-instance 'string-widget :content (princ-to-string obj)))
+  (:method ((obj widget))
+    "MAKE-WIDGET is idempotent."
+    obj))
 
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
@@ -296,53 +307,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	    (style-warn 'widget-not-in-parent :widget child :parent obj)
 	    (mark-dirty obj))))))
 
-
-(defparameter *widget-classes*
-  (mapcar #'find-class '(widget symbol string function))
-  "The classes that widgets can be.")
-
-(defun ensure-widget-methods (gf args function &optional (replace? t))
-  "Define a set of methods on GF for each of the 4 standard classes
-that represent widgets, in locations indicated by ARGS (a designator
-for a list of 0-indices into the lambda list), where the specializers
-for the remaining args are all T, calling FUNCTION with the arguments
-given to the GF.  This means that for 3 widget args, 64 methods will
-be defined, and so on.
-
-When REPLACE?, the default, always replace whatever methods with equal
-signatures are already defined."
-  (unless args				;avoid (*)=1 case
-    (return-from ensure-widget-methods nil))
-  (when (typep gf '(or symbol list))
-    (setf gf (fdefinition gf)))
-  (setf args (sort (copy-list (ensure-list args)) #'>))
-  (let* ((old-methods (generic-function-methods gf))
-	 (gfll (generic-function-lambda-list gf))
-	 (function-lambda (congruent-lambda-expression gfll function)))
-    (labels ((descend-combination (proc specializers pos args)
-	       (let ((next-arg (or (first args) -1)))
-		 (cond ((= -1 pos)
-			(funcall proc specializers))
-		       ((/= pos next-arg)
-			(descend-combination
-			 proc (nconc (make-list (- pos next-arg)
-						:initial-element (find-class 't))
-				     specializers)
-			 next-arg args))
-		       (t
-			(dolist (wclass *widget-classes*)
-			  (descend-combination proc (cons wclass specializers)
-					       (1- pos) (rest args)))))))
-	     (maybe-ensure-method (specializers)
-	       (when (or replace?
-			 (not (position specializers old-methods
-					:key #'method-specializers :test #'equal)))
-		 (ensure-method gf function-lambda :specializers specializers))))
-      (descend-combination
-       #'maybe-ensure-method '()
-       (1- (or (position-if (f_ (member _ lambda-list-keywords)) gfll)
-	       (length gfll)))
-       args))))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn

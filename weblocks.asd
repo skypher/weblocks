@@ -129,6 +129,10 @@
 			  :components ((:module widget
 						:components ((:file "widget"
 								    :depends-on ("widget-mop"))
+                                                             (:file "string-widget"
+                                                                    :depends-on ("widget"))
+                                                             (:file "funcall-widget"
+                                                                    :depends-on ("widget"))
 							     (:file "widget-mop")))
                                        (:file "composite"
 					      :depends-on (widget))
