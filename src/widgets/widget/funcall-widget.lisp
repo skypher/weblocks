@@ -7,7 +7,15 @@
                    :initarg :fun-designator)))
 
 (defmethod render-widget-body ((widget funcall-widget) &rest args)
-  (funcall (funcall-widget-fun-designator widget) widget))
+  (let ((fun-designator (funcall-widget-fun-designator widget)))
+    (etypecase fun-designator
+      (symbol
+        (if (fboundp fun-designator)
+          (apply fun-designator args)
+          (error "Cannot render ~A as widget. Symbol not bound to a function."
+                 fun-designator)))
+      (function
+        (apply fun-designator args)))))
                    
 (defmethod make-widget ((obj symbol))
   "Create a widget from a symbol denoting a function."

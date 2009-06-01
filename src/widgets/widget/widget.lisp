@@ -332,9 +332,6 @@ that will be applied before and after the body is rendered.")
 
 (defgeneric render-widget-children (obj &rest args)
   (:documentation "Renders the widget's children")
-  (:method ((obj symbol) &rest args) nil)
-  (:method ((obj function) &rest args) nil)
-  (:method ((obj string) &rest args) nil)
   (:method ((obj widget) &rest args)
     ;; leave out the other `map-subwidgets' subjects, as they should
     ;; be rendered manually
@@ -357,20 +354,6 @@ Another implementation allows rendering strings.")
   (:method ((obj widget) &rest args)
     (declare (ignore args))
     "By default this method does nothing."))
-
-(defmethod render-widget-body ((obj symbol) &rest args)
-  (if (fboundp obj)
-      (apply obj args)
-      (error "Cannot render ~A as widget. Symbol not bound to a
-      function." obj)))
-
-(defmethod render-widget-body ((obj function) &rest args)
-  (apply obj args))
-
-(defmethod render-widget-body ((obj string) &rest args &key id class &allow-other-keys)
-  (declare (ignore args))
-  (with-html
-    (:p :id id :class class (str obj))))
 
 (defmethod widget-prefix-fn (obj)
   nil)
@@ -426,9 +409,6 @@ PUTP is a legacy argument. Do not use it in new code."))
 (defmethod mark-dirty ((w widget) &key (propagate t propagate-supplied)
                                        (putp nil putp-supplied))
   (declare (special *dirty-widgets*))
-  (when (functionp w)
-    (error "AJAX is not supported for functions. Convert the function
-    into a CLOS object derived from 'widget'."))
   (and propagate-supplied putp-supplied
        (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
   (unless (widget-dirty-p w)
