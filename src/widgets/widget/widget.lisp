@@ -320,6 +320,9 @@ that will be applied before and after the body is rendered.")
 
 (defgeneric render-widget-children (obj &rest args)
   (:documentation "Renders the widget's children")
+  (:method (obj &rest args)
+    (warn "Cannot update the widget children of ~S because it is not a widget."
+          obj))
   (:method ((obj widget) &rest args)
     ;; leave out the other `map-subwidgets' subjects, as they should
     ;; be rendered manually
@@ -330,15 +333,14 @@ that will be applied before and after the body is rendered.")
    "A generic function that renders a widget in its current state. In
 order to actually render the widget, call 'render-widget' instead.
 
-'obj' - widget object to render.
-
-One of the implementations allows \"rendering\" functions. When
-'render-widget' is called on a function, the function is simply
-called. This allows to easily add functions to widgets that
-can do custom rendering without much boilerplate. Similarly symbols
-that are fbound to functions can be treated as widgets.
-
-Another implementation allows rendering strings.")
+'obj' - widget object to render.")
+  (:method (obj &rest args)
+    (typecase obj
+      ((or string symbol function)
+       (warn "Implicitly calling MAKE-WIDGET to render ~S.~%" obj)
+       (apply #'render-widget-body (make-widget obj) args))
+      (t
+       (error "I don't know how to render ~S.~%" obj))))
   (:method ((obj widget) &rest args)
     (declare (ignore args))
     "By default this method does nothing."))
