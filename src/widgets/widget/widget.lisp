@@ -102,7 +102,7 @@ inherits from 'widget' if no direct superclasses are provided."
   (:method (obj)
     "Create a widget from the printable (PRINC-TO-STRING) representation
      of OBJ."
-    (warn "Fallback: Creating widget from printable representation of ~S~%" obj)
+    (warn "Fallback: Creating widget from printable representation of ~S" obj)
     (make-instance 'string-widget :content (princ-to-string obj)))
   (:method ((obj widget))
     "MAKE-WIDGET is idempotent."
@@ -337,7 +337,7 @@ order to actually render the widget, call 'render-widget' instead.
   (:method (obj &rest args)
     (typecase obj
       ((or string symbol function)
-       (warn "Implicitly calling MAKE-WIDGET to render ~S.~%" obj)
+       (warn "Implicitly calling MAKE-WIDGET to render ~S." obj)
        (apply #'render-widget-body (make-widget obj) args))
       (t
        (error "I don't know how to render ~S.~%" obj))))
