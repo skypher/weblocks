@@ -394,6 +394,9 @@ widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
 Note that this function is automatically called when widget slots are
 modified, unless slots are marked with affects-dirty-status-p.
 
+Returns NIL if the widget is already dirty or T and the results
+of calling MARK-DIRTY on the list of dependents (propagate-dirty).
+
 PUTP is a legacy argument. Do not use it in new code."))
 
 (defmethod mark-dirty ((w widget) &key (propagate t propagate-supplied)
@@ -405,8 +408,8 @@ PUTP is a legacy argument. Do not use it in new code."))
     (push w *dirty-widgets*)
     ;; NOTE: we have to check for unbound slots because this function
     ;; may get called at initialization time before those slots are bound
-    (when (and propagate (slot-boundp w 'propagate-dirty))
-      (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
+    (values t (when (and propagate (slot-boundp w 'propagate-dirty))
+                (mapc #'mark-dirty (remove nil (widget-propagate-dirty w)))))))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
