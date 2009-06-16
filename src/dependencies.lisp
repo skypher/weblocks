@@ -42,6 +42,7 @@
 
 (defclass url-dependency-mixin ()
   ((url :accessor dependency-url :initarg :url
+        :type (or string pathname puri:uri)
 	:documentation "URL to the object, represented as a string. May
 	be a relative or an absolute URL. Using the reader for this slot
 	always returns an URI object (as defined by the PURI
@@ -52,7 +53,10 @@
 
 (defmethod dependency-url ((obj url-dependency-mixin))
   "Reading dependency-url always returns an URI object"
-  (puri:uri (slot-value obj 'url)))
+  (with-slots (url) obj
+    (etypecase url
+      ((or string pathname) (setf url (puri:uri url)))
+      (puri:uri url))))
 
 (defclass stylesheet-dependency (dependency url-dependency-mixin)
   ((media :accessor stylesheet-media :initarg :media :initform nil))
