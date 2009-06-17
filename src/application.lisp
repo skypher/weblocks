@@ -1,18 +1,35 @@
 
 (in-package :weblocks)
 
-(export '(defwebapp start-webapp stop-webapp restart-webapp get-webapp
-	  get-webapps-for-class initialize-webapp finalize-webapp
-	  webapp-application-dependencies webapp-name in-webapp
-	  bundle-dependency-types version-dependency-types
-	  webapp-description weblocks-webapp-public-files-path
+;; make SBCL use and verify type information for slots
+(declaim (optimize (safety 3)))
+
+(export '(defwebapp
+          weblocks-webapp
+          start-webapp
+          stop-webapp
+          restart-webapp
+          get-webapp
+	  get-webapps-for-class
+          initialize-webapp
+          finalize-webapp
+	  webapp-application-dependencies
+          webapp-name in-webapp
+	  bundle-dependency-types
+          version-dependency-types
+	  webapp-description
+          weblocks-webapp-public-files-path
           webapp-public-files-path
-	  webapp-public-files-uri-prefix webapp-prefix
-	  running-webapp make-webapp-uri make-webapp-public-file-uri
+	  webapp-public-files-uri-prefix
+          webapp-prefix
+	  running-webapp make-webapp-uri
+          make-webapp-public-file-uri
           reset-webapp-session
-	  webapp-session-value delete-webapp-session-value
+	  webapp-session-value
+          delete-webapp-session-value
 	  define-permanent-action
-	  define-permanent-action/cc remove-webapp-permanent-action
+	  define-permanent-action/cc
+          remove-webapp-permanent-action
 	  compute-webapp-public-files-path
 	  compute-webapp-public-files-uri-prefix
 	  compute-webapp-public-files-uri-prefix-util
@@ -27,51 +44,64 @@
     "A list of applications that the system knows about"))
 
 (defclass weblocks-webapp ()
-  ((name :accessor weblocks-webapp-name :initarg :name
-	 :type (or symbol string))
-   (description :accessor weblocks-webapp-description :initarg :description 
-		:initform nil :type (or null string)
+  ((name :type (or symbol string)
+         :accessor weblocks-webapp-name
+         :initarg :name)
+   (description :type (or null string)
+                :accessor weblocks-webapp-description
+                :initarg :description 
+		:initform nil 
 		:documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
-   (public-files-path :initarg :public-files-path 
+   (public-files-path :type (or null string)
 		      :accessor weblocks-webapp-public-files-path
+                      :initarg :public-files-path 
 		      :initform nil
 		      :documentation "The filesystem directory path
 		      for public files. The final value is computed
 		      with 'compute-webapp-public-files-path'.")
-   (public-files-uri-prefix :reader weblocks-webapp-public-files-uri-prefix
-			    :initform "pub"
+   (public-files-uri-prefix :type string
+                            :reader weblocks-webapp-public-files-uri-prefix
 			    :initarg :public-files-uri-prefix
+			    :initform "pub"
 			    :documentation "The uri prefix for public
 			    files. By default, this slot is
 			    initialized to 'pub'. The final uri prefix
 			    for application public files is computed
 			    by 'compute-webapp-public-files-uri-prefix'.")
-   (public-files-cache-time :accessor weblocks-webapp-public-files-cache-time
-                            :initform 3600
+   (public-files-cache-time :type integer
+                            :accessor weblocks-webapp-public-files-cache-time
                             :initarg :public-files-cache-time
-                            :type integer
+                            :initform 3600
                             :documentation "HTTP cache time for public files in seconds.
                             When debug is on, caching is turned off.")
-   (hostnames :reader weblocks-webapp-hostnames :type list
-         :initarg :hostnames :initform nil
-         :documentation "The hostnames (a list of strings) reserved for this webapp.
-         See section 14.32 of RFC 2616.
+   (hostnames :type list
+              :reader weblocks-webapp-hostnames
+              :initarg :hostnames
+              :initform nil
+              :documentation "The hostnames (a list of strings) reserved for this webapp.
+              See section 14.32 of RFC 2616.
          
-         Example: '(\"foo.com\" \"www.foo.com\" \"shoo.bar.org\")
+              Example: '(\"foo.com\" \"www.foo.com\" \"shoo.bar.org\")
          
-         If NIL (the default), don't care about the hostname at all.
+              If NIL (the default), don't care about the hostname at all.
          
-         TODO: support regex matching or wildcards here.")
-   (prefix :reader weblocks-webapp-prefix :initarg :prefix :type string
+              TODO: support regex matching or wildcards here.")
+   (prefix :type string
+           :reader weblocks-webapp-prefix
+           :initarg :prefix
 	   :documentation "The subtree of the URI space at this site that belongs to
            the webapp.")
-   (application-dependencies :accessor weblocks-webapp-application-dependencies 
-			     :initarg :dependencies :initform nil :type list
+   (application-dependencies :type list
+                             :accessor weblocks-webapp-application-dependencies 
+			     :initarg :dependencies
+                             :initform nil
 			     :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
-   (bundle-dependency-types :accessor bundle-dependency-types :initarg :bundle-dependency-types
+   (bundle-dependency-types :type list
+                            :accessor bundle-dependency-types
+                            :initarg :bundle-dependency-types
 			    :initform '(:stylesheet :script)
 			    :documentation "This enables bundling of css, js files.
        If you only want js files to get bundled, set this to '(script-dependency).
@@ -83,19 +113,24 @@
        TIPS:You can also prevent files from being bundled, for example,
        '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
        These two files however, will come after the bundled ones in HTML.")
-   (version-dependency-types :accessor version-dependency-types :initarg :version-dependency-types
+   (version-dependency-types :type list
+                             :accessor version-dependency-types
+                             :initarg :version-dependency-types
 			     :initform '(:stylesheet :script)
 			     :documentation "This enables versioning of css, js files. The purpose
        of versioning is to serve modified static files that have been cached permanently, and gziping.
        Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)
        file will get created. This way, you only need to work on the unversioned file and not keep
        track of the versioned ones. When debug is t, versioning is turned off.")
-   (gzip-dependency-types :accessor gzip-dependency-types :initarg :gzip-dependency-types
+   (gzip-dependency-types :type list
+                          :accessor gzip-dependency-types
+                          :initarg :gzip-dependency-types
 			  :initform '(:stylesheet :script)
 			  :documentation "This enables gziping of css, js files.
                                           When debug is on, gzip is turned off.")
-   (init-user-session :accessor weblocks-webapp-init-user-session :initarg :init-user-session
-		      :type (or symbol function)
+   (init-user-session :type (or symbol function)
+                      :accessor weblocks-webapp-init-user-session
+                      :initarg :init-user-session
 		      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
                          widget at the root of the application. 'init-user-session' is
