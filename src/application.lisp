@@ -16,7 +16,12 @@
 	  compute-webapp-public-files-path
 	  compute-webapp-public-files-uri-prefix
 	  compute-webapp-public-files-uri-prefix-util
-          current-webapp))
+          current-webapp
+          webapp-update-thread-status
+          update-thread-status
+          *registered-webapps*
+          ))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *registered-webapps* nil
     "A list of applications that the system knows about"))
@@ -510,6 +515,15 @@ provider URI)."
   (compute-webapp-public-files-uri-prefix app))
 
 
+(defgeneric update-thread-status (app status)
+  (:documentation "Specialize this function to use some other means
+                  to communicate a request's status.
+
+                  The default implementation updates the thread's name
+                  (currently only on SBCL).")
+  (:method (app (status string))
+    #+sbcl(setf (sb-thread:thread-name sb-thread:*current-thread*) status)))
+
 ;;; Convenience accessors
 ;;; These procedures are relative to the current request's selected webapp
 (defvar *current-webapp*)
@@ -594,3 +608,7 @@ this app, with regard to WEBAPP."
     (etypecase init
       (function init)
       (symbol (symbol-function init)))))
+
+(defun webapp-update-thread-status (status &optional (app (ignore-errors *current-webapp*)))
+  (update-thread-status app status))
+
