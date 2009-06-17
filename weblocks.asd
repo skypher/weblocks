@@ -22,6 +22,7 @@
 		 (:file "weblocks" :depends-on ("package"))
 		 (:module utils
 			  :components ((:file "misc")
+                                       (:file "timing")
 				       (:file "runtime-class"))
 			  :depends-on ("weblocks"))
 		 (:file "versioning"

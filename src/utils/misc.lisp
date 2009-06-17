@@ -577,3 +577,4 @@ answering its result."
 			       :if-exists if-exists)
 	(salza2:gzip-stream istream ostream)))
     (probe-file output)))
+
