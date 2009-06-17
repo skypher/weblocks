@@ -120,7 +120,12 @@ when new dependencies appeared in AJAX page updates.")
   dependencies. By adding :before, :after or :around methods one could
   do more interesting things, such as combining differences.")
   (:method (dependency-list)
-    (sort-dependencies-by-type (bundle-dependencies (prune-dependencies dependency-list)))))     
+    (timing "sort-deps"
+      (sort-dependencies-by-type
+        (timing "bundle-deps"
+          (bundle-dependencies
+            (timing "prune-deps"
+              (prune-dependencies dependency-list))))))))
 
 ;; Dependency rendering protocol
 

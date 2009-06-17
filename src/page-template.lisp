@@ -1,7 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(render-page render-page-body render-page-headers application-page-title
+(export '(render-page
+          render-page-body
+          render-page-headers
+          application-page-title
 	  *current-page-description*))
 
 (defvar *page-dependencies*)
@@ -43,12 +46,13 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
   (declare (special *page-dependencies*))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
-	(all-dependencies (compact-dependencies (append (webapp-application-dependencies)
-							*page-dependencies*
-							(when (weblocks-webapp-debug app)
-							  (build-local-dependencies
-							   '((:script "weblocks-debug")
-							     (:stylesheet "debug-toolbar"))))))))
+	(all-dependencies (timing "compact-dependencies"
+                            (compact-dependencies (append (webapp-application-dependencies)
+                                                          *page-dependencies*
+                                                          (when (weblocks-webapp-debug app)
+                                                            (build-local-dependencies
+                                                              '((:script "weblocks-debug")
+                                                                (:stylesheet "debug-toolbar")))))))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head

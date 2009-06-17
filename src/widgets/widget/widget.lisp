@@ -523,3 +523,8 @@ Slots will be copied shallowly except for CHILDREN."
        (every #'widget-tree-equal
               (widget-children tree1) (widget-children tree2))))
 
+(defmethod render-widget-body :around ((widget widget) &rest args)
+  (webapp-update-thread-status (concatenate 'string "rendering widget " (princ-to-string widget)))
+  (timing (concatenate 'string "render-widget " (princ-to-string widget))
+    (call-next-method)))
+
