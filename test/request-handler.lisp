@@ -501,8 +501,8 @@ onclick='disableIrrelevantButtons(this);' />~
 {~
 \"widgets\":~
 {~
-\"id-123\":\"<div class='widget composite' id='id-123'></div>\",~
-\"foo-bar\":\"<div class='widget composite' id='foo-bar'></div>\"~
+\"id-123\":\"<div class='widget composite' id='id-123'><\\/div>\",~
+\"foo-bar\":\"<div class='widget composite' id='foo-bar'><\\/div>\"~
 },~
 \"before-load\":null,~
 \"on-load\":[\"testjs\"]~
@@ -531,8 +531,8 @@ onclick='disableIrrelevantButtons(this);' />~
 {~
 \"widgets\":~
 {~
-\"a\":\"<div class='widget dirtier' id='a'>42</div>\",~
-\"b\":\"<div class='widget dirtier' id='b'>42</div>\"~
+\"a\":\"<div class='widget dirtier' id='a'>42<\\/div>\",~
+\"b\":\"<div class='widget dirtier' id='b'>42<\\/div>\"~
 },~
 \"before-load\":null,~
 \"on-load\":null~
