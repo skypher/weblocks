@@ -25,7 +25,9 @@
 
 (defvar *request-timeout* 10
   "Seconds until we abort a request because it took too long.
-  This prevents threads from hogging the CPU indefinitely.")
+  This prevents threads from hogging the CPU indefinitely.
+  
+  You can set this to NIL to disable timeouts (not recommended).")
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -56,7 +58,7 @@ at different points before and after request. See 'request-hook'.
 Override this method (along with :before and :after specifiers) to
 customize behavior."))
 
-(defmethod handle-client-request :around (app)
+(defmethod handle-client-request :around ((app weblocks-webapp))
   (handler-bind ((error (lambda (c)
                           (if *catch-errors-p*
                             (return-from handle-client-request
@@ -64,7 +66,7 @@ customize behavior."))
                             (invoke-debugger c)))))
     (in-webapp app (call-next-method))))
 
-(defmethod handle-client-request :around ((app weblocks-webapp))
+(defmethod handle-client-request :around (app)
   (handler-bind ((timeout-error (lambda (c)
                                   ;; TODO: let the user customize this
                                   (error "Your request timed out."))))
