@@ -205,7 +205,7 @@ association list. This function is normally called by
 	      (encode-json-to-string
                 `(("widgets" . ,widgets)
                   ("before-load" . ,*before-ajax-complete-scripts*)
-                  ("on-load" . ,*on-ajax-complete-scripts*))))))))
+                  ("on-load" . ,*on-ajax-complete-scripts*)))))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
