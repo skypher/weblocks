@@ -38,10 +38,10 @@
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
 		(send-script
-		  (ps* `(new (*effect.*pulsate ,(dom-id obj)
-                                               (create :pulses 3 :duration 0.5)))))
+		  (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
+                                                             (create :pulses 3 :duration 0.5)))))
 		(send-script
-                  (ps* `(new (*effect.*blind-up ,(dom-id obj))))))))
+                  (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj))))))))
 	(request-hook :session :post-action))
   (push (lambda ()
 	  (declare (special *on-ajax-complete-scripts*))

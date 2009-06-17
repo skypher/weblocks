@@ -304,8 +304,7 @@ on the client only if client-side scripting is enabled."
        (if (ajax-request-p)
 	   (write-string ,output *weblocks-output-stream*)
 	   (with-javascript
-	       "document.write(~A);"
-	     (encode-json-to-string ,output))))))
+             (ps:ps* `(funcall (slot-value document 'write) ,,output)))))))
 
 (defmacro noscript (&body body)
   "Outputs HTML in a way that it takes effect on the client only if

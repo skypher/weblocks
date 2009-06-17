@@ -423,7 +423,7 @@
     (with-request :get nil
       (scriptonly "test"))
   #.(format nil
-	    "<script type='text/javascript'>~%// <![CDATA[~%document.write(\"test\");~%// ]]>~%</script>"))
+	    "<script type='text/javascript'>~%// <![CDATA[~%document.write('test');~%// ]]>~%</script>"))
 
 ;;; test noscript
 (deftest-html noscript-1
