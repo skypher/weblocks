@@ -203,7 +203,7 @@ association list. This function is normally called by
 		     nconc (render-enqueued dirty))))
       (format *weblocks-output-stream*
 	      (encode-json-to-string
-                `(("widgets" . ,widgets)
+                `(("widgets" . ,(absorb-dirty-widgets))
                   ("before-load" . ,*before-ajax-complete-scripts*)
                   ("on-load" . ,*on-ajax-complete-scripts*)))))))
 
