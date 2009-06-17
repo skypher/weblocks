@@ -25,7 +25,6 @@
 	  widget-css-classes
 	  mark-dirty
           widget-dirty-p
-          slot-equal
           widget-equal
           widget-tree-equal
           copy-widget-tree
@@ -488,32 +487,6 @@ Slots will be copied shallowly except for CHILDREN."
             (slot-makunbound root slotname)))
         copy))))
 
-(defun slot-equal (o1 o2 &key exclude (test #'equal))
-  "Whether O1 and O2 have identical slot contents, excluding
-  slot names in EXCLUDE.
-
-  Two slots are considered equal if they are either both unbound
-  or if they are both bound and pass TEST.
-
-  Signals an error when the slot names of O1 and O2 don't match."
-  (let* ((slotnames-o1 (mapcar #'slot-definition-name (class-slots (class-of o1))))
-         (slotnames-o2 (mapcar #'slot-definition-name (class-slots (class-of o2))))
-         (diff (set-difference slotnames-o1 slotnames-o2)))
-    (when diff
-      (error "Objects with differing slot names detected. Difference: ~S~%" diff))
-    (dolist (slotname slotnames-o1 t)
-      (unless (member slotname (ensure-list exclude) :test #'eq)
-        (cond
-          ((or (and (slot-boundp o1 slotname) (not (slot-boundp o2 slotname)))
-               (and (slot-boundp o2 slotname) (not (slot-boundp o1 slotname))))
-           (return-from slot-equal nil))
-          ((and (not (slot-boundp o1 slotname)) (not (slot-boundp o2 slotname)))
-           t)
-          ((funcall test (slot-value o1 slotname) (slot-value o2 slotname))
-           t)
-          (t
-           (return-from slot-equal nil)))))))
-
 (defun widget-equal (w1 w2)
   ;; TODO: ensure parental sanity
   (slot-equal w1 w2 :exclude '(children parent)))
@@ -524,6 +497,7 @@ Slots will be copied shallowly except for CHILDREN."
               (widget-children tree1) (widget-children tree2))))
 
 (defmethod render-widget-body :around ((widget widget) &rest args)
+  "Record profiling information."
   (webapp-update-thread-status (concatenate 'string "rendering widget " (princ-to-string widget)))
   (timing (concatenate 'string "render-widget " (princ-to-string widget))
     (call-next-method)))

@@ -22,8 +22,17 @@
 		 (:file "weblocks" :depends-on ("package"))
 		 (:module utils
 			  :components ((:file "misc")
-                                       (:file "timing")
-				       (:file "runtime-class"))
+                                       (:file "clos")
+                                       (:file "runtime-class")
+                                       (:file "string")
+                                       (:file "list")
+                                       (:file "uri")
+                                       (:file "html")
+                                       (:file "isearch")
+                                       (:file "menu"
+                                              :depends-on ("html"))
+                                       (:file "suggest")
+                                       (:file "timing"))
 			  :depends-on ("weblocks"))
 		 (:file "versioning"
 			:depends-on ("weblocks" utils))
@@ -52,14 +61,6 @@
 					   "actions" "request-hooks" "application"
 					   "request" "dependencies" "uri-tokens"
                                            "error-handler" store))
-		 (:module snippets
-			  :components ((:file "suggest")
-				       (:file "menu")
-				       (:file "isearch"
-					      :depends-on ("html-utils"))
-				       (:file "html-utils"))
-			  :depends-on (utils "weblocks" "request" "server"
-				       "actions" "dom-object"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
@@ -121,7 +122,7 @@
 						      parsers
 						      :components ((:file "common"))))
 					:depends-on (view formview dataview)))
-			  :depends-on ("weblocks" "dependencies" utils snippets))
+			  :depends-on ("weblocks" "dependencies" utils))
 		 (:module store
 			  :components ((:file "store-api")
 				       (:file "store-utils"))
@@ -183,7 +184,7 @@
 					      :depends-on ("selector" widget))
 				       (:file "breadcrumbs"
 					      :depends-on ("navigation")))
-			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
+			  :depends-on (views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
 			  :components ((:file "call-answer")
@@ -191,7 +192,7 @@
 					      :depends-on ("call-answer"))
 				       (:file "workflow"
 					      :depends-on ("call-answer")))
-			  :depends-on ("weblocks" "widgets" "request-handler" "snippets"))
+			  :depends-on ("weblocks" "widgets" "request-handler"))
                  (:file "acceptor"
                         :depends-on ("weblocks"))
 		 (:file "server"

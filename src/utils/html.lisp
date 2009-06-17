@@ -1,13 +1,51 @@
 
 (in-package :weblocks)
 
-(export '(*submit-control-name* *cancel-control-name* with-html-form
-	  render-link render-button render-form-and-button
-	  render-checkbox render-dropdown render-autodropdown
-	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-input-field render-password
-          render-textarea render-list scriptonly noscript render-message
+(export '(*submit-control-name*
+          *cancel-control-name*
+          with-html-form
+          render-extra-tags
+	  with-extra-tags
+	  render-link
+          render-button
+          render-form-and-button
+	  render-checkbox
+          render-dropdown
+          render-autodropdown
+	  *dropdown-welcome-message*
+          render-radio-buttons
+	  render-close-button
+          render-input-field
+          render-password
+          render-textarea
+          render-list
+          scriptonly
+          noscript
+          render-message
           send-script))
+
+(defmethod render-extra-tags (tag-class count)
+  "Renders extra tags to get around CSS limitations. 'tag-class'
+is a string that specifies the class name and 'count' is the
+number of extra tags to render.
+Ex:
+\(render-extra-tags \"extra-\" 2) =>
+\"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
+  (with-html-output (*weblocks-output-stream*)
+    (loop for i from 1 to count
+          for attr = (format nil "~A~A" tag-class i)
+       do (htm (:div :class attr "<!-- empty -->")))))
+
+(defmacro with-extra-tags (&body body)
+  "A macro used to wrap html into extra tags necessary for
+hacking CSS formatting. The macro wraps the body with three
+headers on top and three on the bottom. It uses
+'render-extra-tags' function along with 'extra-top-' and
+'extra-bottom-' arguments."
+  `(progn
+     (render-extra-tags "extra-top-" 3)
+     ,@body
+     (render-extra-tags "extra-bottom-" 3)))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
