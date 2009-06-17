@@ -1,5 +1,7 @@
 (in-package :weblocks)
 
+(declaim (optimize (speed 3) (safety 2) (debug 1) (space 1)))
+
 (export '(dependency url-dependency-mixin stylesheet-dependency script-dependency
 	  javascript-code-dependency
 	  dependency-url
@@ -11,14 +13,7 @@
 	  make-local-dependency per-class-dependencies dependencies
 	  compact-dependencies build-local-dependencies))
 
-;; Dependencies.
-;;
-;; Context: weblocks used to be very limited as to what dependencies can
-;; be specified. I've been reworking this a number of times in order to
-;; fit various new requirements and finally decided that it is time to
-;; redesign dependency tracking completely.
-;;
-;; Rationale: we need to be able to gather various kinds of dependencies
+;; we need to be able to gather various kinds of dependencies
 ;; from renderable objects (widgets, views, presentations). Dependencies
 ;; are local (to our webserver) or external (external URLs), stylesheet
 ;; or javascript code, and some could be introduced during AJAX page

@@ -109,6 +109,7 @@
 
 
 (defun bundle-some-dependencies (dependency-list dependency-type &key bundle-folder)
+  (declare (optimize (speed 3) (safety 2)))
   (let (exceptions)
     (when (listp dependency-type)
       (setf exceptions (cdr dependency-type))
@@ -133,3 +134,4 @@
 		   (when main
 		     (push (build-bundle main dependency-type :bundle-folder bundle-folder) others))
 		   others)))))
+
