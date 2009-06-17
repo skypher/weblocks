@@ -202,10 +202,10 @@ association list. This function is normally called by
 		     do (setf *dirty-widgets* '())
 		     nconc (render-enqueued dirty))))
       (format *weblocks-output-stream*
-	      "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
-	      (encode-json-to-string (absorb-dirty-widgets))
-	      (encode-json-to-string *before-ajax-complete-scripts*)
-	      (encode-json-to-string *on-ajax-complete-scripts*)))))
+	      (encode-json-to-string
+                `(("widgets" . ,widgets)
+                  ("before-load" . ,*before-ajax-complete-scripts*)
+                  ("on-load" . ,*on-ajax-complete-scripts*))))))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
