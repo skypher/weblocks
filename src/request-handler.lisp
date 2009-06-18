@@ -95,7 +95,8 @@ customize behavior."))
 	(expired-action-handler app))
       (start-session)
       (setf (webapp-session-value 'last-request-uri) :none)
-      (redirect (request-uri*)))
+      (when *rewrite-for-session-urls*
+        (redirect (request-uri*))))
     (when *maintain-last-session*
       (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
@@ -114,7 +115,8 @@ customize behavior."))
 		(setf (root-widget) nil)
 		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
-	(when (cookie-in (session-cookie-name *weblocks-server*))
+	(when (and *rewrite-for-session-urls*
+                   (cookie-in (session-cookie-name *weblocks-server*)))
 	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
