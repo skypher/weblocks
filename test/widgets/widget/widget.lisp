@@ -147,9 +147,9 @@
 (deftest composite-widgets-4
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) 1)
+	(setf (composite-widgets w) 'a)
 	(composite-widgets w)))
-  (1))
+  (a))
 
 (deftest composite-widgets-5
     (with-request :get nil
@@ -161,9 +161,9 @@
 (deftest composite-widgets-6
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) (list 1))
+	(setf (composite-widgets w) (list 'a))
 	(composite-widgets w)))
-  (1))
+  (a))
 
 ;;; render function as a widget
 (deftest-html render-function-1
