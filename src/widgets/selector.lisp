@@ -65,8 +65,8 @@
 	       "/" (uri-tokens-to-string (consumed-tokens *uri-tokens*))))))
   (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
     (if widget
-	(update-dependents selector widget)
-        (assert (signal 'http-not-found)))))
+      (update-dependents selector widget)
+      (assert (signal 'http-not-found)))))
 
 
 (defwidget static-selector (selector)
