@@ -30,7 +30,7 @@
 (defun init-user-session (comp)
   (init-sandbox-store)
   (with-flow comp
-    (yield #'initial-page)
+    (yield (make-widget #'initial-page))
     (setf (widget-prefix-fn comp) #'render-header)
     (yield (make-main-page))))
 

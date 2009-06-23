@@ -29,11 +29,11 @@ employees page and companies page."
   (make-instance 'widget :children
 		 (list
 		  (make-instance 'flash :messages
-				 (list "Welcome to weblocks demo - a
-				       technology demonstration for a
-				       continuations-based web
-				       framework written in Common
-				       Lisp."))
+				 (list (make-widget "Welcome to weblocks demo - a
+                                                    technology demonstration for a
+                                                    continuations-based web
+                                                    framework written in Common
+                                                    Lisp.")))
 		  (make-navigation "Main Menu"
 				   (list "Employees" (make-employees-page) "employees")
 				   (list "Companies" (make-companies-page) "companies")))))
