@@ -9,6 +9,8 @@
                    :initarg :fun-designator)))
 
 (defmethod render-widget-body ((widget funcall-widget) &rest args)
+  (when (widget-continuation widget)
+    (setf args (cons (widget-continuation widget) args)))
   (let ((fun-designator (funcall-widget-fun-designator widget)))
     (etypecase fun-designator
       (symbol
