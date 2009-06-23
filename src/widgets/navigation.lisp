@@ -104,7 +104,9 @@ may be NIL in which case the default pane name is provided."
                      collect arg))
   ;; initialize nav from args
   (mapc (lambda (pane-info)
-          (let ((token (or (third pane-info) (attributize-name (first pane-info))))
+          (let ((token (ecase (length pane-info)
+                         (2 (attributize-name (first pane-info)))
+                         (3 (third pane-info))))
                 (name (first pane-info))
                 (widget (make-widget (second pane-info))))
             (when (string-equal token "")
