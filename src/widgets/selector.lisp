@@ -93,15 +93,7 @@
       ;; found pane
       (pane
         (select-pane selector (first (pop-tokens uri-tokens)))
-        (cdr pane))
-      ;; no default pane -- redirect to the first pane's URI
-      ((and (static-selector-panes selector)
-            (null token))
-       ;; FIXME: doesn't cope well with the Flash widget
-       (redirect (concatenate 'string
-                              (string-right-trim "/" (selector-base-uri selector))
-                              "/"
-                              (car (first (static-selector-panes selector)))))))))
+        (cdr pane)))))
 
 (defgeneric select-pane (selector token)
   (:documentation "Called by GET-WIDGET-FOR-TOKENS when a pane is found
