@@ -88,12 +88,18 @@
   ;; we peek at the token first, because if it isn't found we won't
   ;; consume it, to give others a chance to process it
   (let* ((token (peek-at-token uri-tokens))
-	 (pane (assoc token (static-selector-panes selector) :test #'equalp)))
-    (cond
-      ;; found pane
-      (pane
-        (select-pane selector (first (pop-tokens uri-tokens)))
-        (cdr pane)))))
+         (panes (static-selector-panes selector))
+	 (pane (assoc token panes :test #'equalp))
+         (selected-pane (cond
+                          (pane
+                           ;; found pane
+                           (assert (equalp (first (pop-tokens uri-tokens)) (car pane)))
+                           pane)
+                          ((and (null token) panes)
+                           ;; looking for default pane?
+                           (first panes)))))
+    (select-pane selector (car selected-pane))
+    (cdr selected-pane)))
 
 (defgeneric select-pane (selector token)
   (:documentation "Called by GET-WIDGET-FOR-TOKENS when a pane is found
