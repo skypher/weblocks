@@ -53,19 +53,17 @@
       ((or string pathname) (setf url (puri:uri url)))
       (puri:uri url))))
 
+(defmethod print-object ((obj url-dependency-mixin) stream)
+  (print-unreadable-object (obj stream :type t :identity nil)
+    (format stream "~A" (dependency-url obj))))
+
 (defclass stylesheet-dependency (dependency url-dependency-mixin)
   ((media :accessor stylesheet-media :initarg :media :initform nil))
   (:documentation "A CSS stylesheet dependency"))
 
-(defmethod print-object ((obj stylesheet-dependency) stream)
-  (format stream "#<~A '~A'>" 'stylesheet-dependency (slot-value obj 'url)))
-
 (defclass script-dependency (dependency url-dependency-mixin)
   ()
   (:documentation "A JavaScript file dependency"))
-
-(defmethod print-object ((obj script-dependency) stream)
-  (format stream "#<~A '~A'>" 'script-dependency (slot-value obj 'url)))
 
 (defclass javascript-code-dependency (dependency)
  ((code :accessor javascript-code :initarg :code

@@ -30,6 +30,10 @@
   (setf (remaining-tokens obj) tokens)
   (apply #'call-next-method obj initargs))
 
+(defmethod print-object ((obj uri-tokens) stream)
+  (print-unreadable-object (obj stream :type t :identity nil)
+    (format stream "~A" (remaining-tokens obj))))
+
 (defgeneric all-tokens (tokens)
   (:method ((tokens list)) tokens)
   (:method ((tokens uri-tokens))
