@@ -427,10 +427,12 @@ PUTP is a legacy argument. Do not use it in new code."))
   (print-unreadable-object (obj stream :type t)
     (format stream "~S" (ensure-dom-id obj))))
 
-(defmethod get-widgets-by-type (type &key (include-subtypes-p t))
-  "Find all widgets of a specific type in the widget tree."
+(defmethod get-widgets-by-type (type &key (include-subtypes-p t) (root (root-widget)))
+  "Find all widgets of a specific type (or one of its subtypes
+if INCLUDE-SUBTYPES-P) in the widget tree starting at ROOT
+(defaults to the current root widget)."
   (let (widgets)
-    (walk-widget-tree (root-widget)
+    (walk-widget-tree root
                       (lambda (widget d)
                         (declare (ignore d))
                         (when (or (eq (type-of widget) type)
