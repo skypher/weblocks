@@ -30,6 +30,10 @@
           copy-widget-tree
           *current-widget*))
 
+(defvar *tree-update-pending* nil
+  "T if we're currently updating the widget tree.
+  Used as recursion guard in (SETF WIDGET-CHILDREN).")
+
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
 defclass, except adds 'widget-class' metaclass specification and
@@ -163,10 +167,6 @@ children of w (e.g. may be rendered when w is rendered).")
 ;; should see the docstring for `map-subwidgets' to take care of
 ;; additional complexities.
 
-(defvar *tree-update-pending* nil
-  "T if we're currently updating the widget tree.
-  Used as recursion guard in (SETF WIDGET-CHILDREN).")
-
 (defgeneric (setf widget-children) (widgets obj &optional type)
   (:documentation "Set the list of children of type TYPE for OBJ to be
   WIDGETS. TYPE is a symbol (usually a keyword) and serves as a handle
@@ -190,10 +190,9 @@ children of w (e.g. may be rendered when w is rendered).")
                (cons (cons type (ensure-list widgets)) children))))
       (when (and (not *tree-update-pending*)
                  (get-widgets-by-type 'selector :root obj))
-        (let ((*tree-update-pending* t))
-          (handler-case (update-widget-tree)
-            (http-not-found () (throw 'hunchentoot::handler-done
-                                      (page-not-found-handler *current-webapp*))))))
+        (handler-case (update-widget-tree)
+          (http-not-found () (throw 'hunchentoot::handler-done
+                                    (page-not-found-handler *current-webapp*)))))
       (update-parent-for-children obj))))
 
 (defgeneric map-subwidgets (function widget)
