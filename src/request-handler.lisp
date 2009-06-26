@@ -180,6 +180,16 @@ customize behavior."))
     (when page-title
       (setf *current-page-description* page-title))))
 
+(defvar *session-locks* (make-hash-table :test #'eq)
+  "Per-session locks to avoid having unrelated threads
+  waiting.")
+
+(defun session-lock ()
+  (unless (gethash *session* *session-locks*)
+    (setf (gethash *session* *session-locks*) 
+          (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
+  (gethash *session* *session-locks*))
+
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
                     *uri-tokens*))
@@ -187,7 +197,7 @@ customize behavior."))
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
   (webapp-update-thread-status "Handling normal request [tree shakedown]")
-  (bordeaux-threads:with-lock-held (*dispatch/render-lock*)
+  (bordeaux-threads:with-lock-held ((session-lock))
     (handler-case (timing "tree shakedown"
                     (update-widget-tree))
       (http-not-found () (return-from handle-normal-request
