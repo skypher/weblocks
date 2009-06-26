@@ -51,7 +51,8 @@
   a widget. Note that we do not update the widget-parent relations:
   those are handled by (SETF WIDGET-CHILDREN).")
   (:method ((obj selector) children)
-    (setf (widget-children obj :selector) children)))
+    (let ((*tree-update-pending* t))
+      (setf (widget-children obj :selector) children))))
 
 ;; Functionality common to all selectors: all selectors process
 ;; *uri-tokens* by calling (get-widget-for-tokens) and update
