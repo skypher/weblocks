@@ -19,8 +19,7 @@ flow, it accepts K - the continuation parameter."
 			 (answer k))
 		       "Start Demo"
 		       :ajaxp nil)
-	  (:p "(You can also try it with Javascript disabled.)")
-	  )))
+	  (:p "(You can also try it with Javascript disabled.)"))))
 
 (defun make-main-page ()
   "Lays out the main page. It consists of a FLASH widget for showing
