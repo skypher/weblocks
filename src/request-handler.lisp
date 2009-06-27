@@ -180,9 +180,12 @@ customize behavior."))
     (when page-title
       (setf *current-page-description* page-title))))
 
-(defvar *session-locks* (make-hash-table :test #'eq)
+(defvar *session-locks* (make-hash-table :test #'eq
+                                         #+sbcl :weakness #+sbcl :key)
   "Per-session locks to avoid having unrelated threads
   waiting.")
+#-sbcl(warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
+            Expect a tiny memory leak until fixed.")
 
 (defun session-lock ()
   (unless (gethash *session* *session-locks*)
