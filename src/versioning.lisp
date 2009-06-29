@@ -40,14 +40,13 @@
 (defun write-to-mod-record (mod-time version record-path)
   (write-to-file `',(cons mod-time version) record-path))
 
-(defun make-versioned-name (original-name-without-extention version)
-  (concatenate 'string original-name-without-extention "." (write-to-string version)))
-
 (defun make-versioned-path (path version)
   (let ((dir-list (pathname-directory path)))
     (princ-to-string (make-pathname :directory (push-end "vzn" dir-list)
-				    :name (make-versioned-name (pathname-name path) version)
-				    :type (pathname-type path)))))
+				    :name (pathname-name path)
+				    :type (concatenate 'string (princ-to-string version)
+                                                       "."
+                                                       (pathname-type path))))))
 
 (defun create-versioned-file (original-path version)
   (let ((new-path (make-versioned-path original-path version)))
