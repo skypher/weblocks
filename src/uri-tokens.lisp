@@ -5,7 +5,9 @@
           uri-tokens-to-string uri-tokens-start-with
 	  *uri-tokens*))
 
-(defvar *uri-tokens* "Bound to an URI-TOKENS object in a request.")
+(defvar *uri-tokens*)
+(setf (documentation '*uri-tokens* 'variable)
+      "Bound to an URI-TOKENS object in a request.")
 
 (defclass uri-tokens ()
   ((remaining-tokens :accessor remaining-tokens
