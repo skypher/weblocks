@@ -31,10 +31,10 @@
   (:documentation "Holds the modification record of a file."))
 
 (defun make-record-path (original-path &key (system :weblocks)
-			 (record-folder "mod-record/") (extention ".mod"))
+			 (record-folder "mod-record/") (extension ".mod"))
   (let ((system-folder (asdf-system-directory system)))
     (merge-pathnames (concatenate 'string (relative-path original-path system-folder)
-				  extention)
+				  extension)
 		     (merge-pathnames record-folder system-folder))))
 
 (defun write-to-mod-record (mod-time version record-path)
