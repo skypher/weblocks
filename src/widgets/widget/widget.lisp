@@ -188,7 +188,8 @@ children of w (e.g. may be rendered when w is rendered).")
                (remove type children :key #'car))
               (widgets
                (cons (cons type (ensure-list widgets)) children))))
-      (when (and (not *tree-update-pending*)
+      (when (and (ajax-request-p)
+                 (not *tree-update-pending*)
                  (get-widgets-by-type 'selector :root obj))
         (handler-case (update-widget-tree)
           (http-not-found () (throw 'hunchentoot::handler-done
