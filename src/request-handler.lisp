@@ -70,7 +70,8 @@ customize behavior."))
   (handler-bind ((timeout-error (lambda (c)
                                   ;; TODO: let the user customize this
                                   (error "Your request timed out."))))
-    (with-timeout (*request-timeout*)
+    (#+ccl progn ; TRIVIAL-TIMEOUT seems to be broken on CCL
+     #-ccl with-timeout #-ccl (*request-timeout*)
       (webapp-update-thread-status "Request prelude")
       (unwind-protect
         (let* ((timings nil)
