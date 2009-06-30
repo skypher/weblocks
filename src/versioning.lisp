@@ -43,10 +43,12 @@
 (defun make-versioned-path (path version)
   (let ((dir-list (pathname-directory path)))
     (princ-to-string (make-pathname :directory (push-end "vzn" dir-list)
-				    :name (pathname-name path)
-				    :type (concatenate 'string (princ-to-string version)
-                                                       "."
-                                                       (pathname-type path))))))
+                                    ;; not sure if there's a proper way to make this
+                                    ;; work on both CCL and other Lisps...
+				    :name #+ccl(pathname-name path)
+                                          #-ccl(concatenate 'string (pathname-name path) "." (princ-to-string version))
+				    :type #+ccl(concatenate 'string (princ-to-string version) "." (pathname-type path))
+                                          #-ccl(pathname-type path)))))
 
 (defun create-versioned-file (original-path version)
   (let ((new-path (make-versioned-path original-path version)))
