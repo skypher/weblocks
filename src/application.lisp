@@ -425,28 +425,32 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
-(defun webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
-  "Get a session value from the currently running webapp"
-  
+(defun webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
+  "Get a session value from the currently running webapp.
+KEY is compared using EQUAL."
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (cond (webapp-session
-	   (gethash symbol webapp-session))
-	  (webapp (values nil nil))
-	  (t nil))))
+	   (gethash key webapp-session))
+	  (webapp
+           (values nil nil))
+	  (t
+           nil))))
 
-(defun (setf webapp-session-value) (value symbol &optional (session *session*) (webapp (current-webapp)))
-  "Set a session value for the currently running webapp" 
+(defun (setf webapp-session-value) (value key &optional (session *session*) (webapp (current-webapp)))
+  "Set a session value for the currently running webapp.
+KEY is compared using EQUAL."
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (unless webapp-session
-      (setf webapp-session (make-hash-table :test 'equal)
+      (setf webapp-session (make-hash-table :test #'equal)
 	    (session-value (class-name (class-of webapp))) webapp-session))
-    (setf (gethash symbol webapp-session) value)))
+    (setf (gethash key webapp-session) value)))
 
-(defun delete-webapp-session-value (symbol &optional (session *session*) (webapp (current-webapp)))
-  "Clear the session value for the currently running webapp" 
+(defun delete-webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
+  "Clear the session value for the currently running webapp.
+KEY is compared using EQUAL."
   (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
     (when webapp-session
-      (remhash symbol webapp-session))))
+      (remhash key webapp-session))))
 
 ;;
 ;; Permanent actions
