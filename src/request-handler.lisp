@@ -268,11 +268,12 @@ association list. This function is normally called by
 		       do (late-propagation-warn dirty)
 		     do (setf *dirty-widgets* '())
 		     nconc (render-enqueued dirty))))
-      (format *weblocks-output-stream*
-	      (encode-json-to-string
-                `(("widgets" . ,(absorb-dirty-widgets))
-                  ("before-load" . ,*before-ajax-complete-scripts*)
-                  ("on-load" . ,*on-ajax-complete-scripts*)))))))
+      (let ((rendered-widgets (absorb-dirty-widgets)))
+        (format *weblocks-output-stream*
+                (encode-json-alist-to-string
+                  `(("widgets" . ,rendered-widgets)
+                    ("before-load" . ,*before-ajax-complete-scripts*)
+                    ("on-load" . ,*on-ajax-complete-scripts*))))))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
