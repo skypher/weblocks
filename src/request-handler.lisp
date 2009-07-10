@@ -70,8 +70,10 @@ customize behavior."))
   (handler-bind ((timeout-error (lambda (c)
                                   ;; TODO: let the user customize this
                                   (error "Your request timed out."))))
-    (#+ccl progn ; TRIVIAL-TIMEOUT seems to be broken on CCL
-     #-ccl with-timeout #-ccl (*request-timeout*)
+    ;; TRIVIAL-TIMEOUT seems to be broken on CCL and in yet another way on
+    ;; Lispworks. For now let's only enable it on SBCL.
+    (#-sbcl progn 
+     #+sbcl with-timeout #+sbcl (*request-timeout*)
       (webapp-update-thread-status "Request prelude")
       (unwind-protect
         (let* ((timings nil)
