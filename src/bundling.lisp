@@ -120,7 +120,7 @@
        if (and path
 	       (typep dep dependency-type)
 	       (null (find path exceptions :test #'string-equal)))
-          if (cl-ppcre:scan "-import(?:\\.\\d\\d*?|)\\.css$" path)
+          if (cl-ppcre:scan "-import(?:\\.\\d\\d*?|)\\.css$" (namestring path))
              collect path into imports
           else
 	     collect path into main
