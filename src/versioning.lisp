@@ -44,13 +44,8 @@
   (let ((dir-list (pathname-directory path)))
     (assert dir-list)
     (make-pathname :directory (push-end "vzn" dir-list)
-                   ;; SBCL doesn't like dots in the NAME while CCL
-                   ;; barfs at them in the TYPE. Lispworks takes it
-                   ;; both ways. Not sure how other Lisps handle this.
-                   :name #+ccl(pathname-name path)
-                   #-ccl(concatenate 'string (pathname-name path) "." (princ-to-string version))
-                   :type #+ccl(concatenate 'string (princ-to-string version) "." (pathname-type path))
-                   #-ccl(pathname-type path))))
+                   :name (concatenate 'string (pathname-name path) "." (princ-to-string version))
+                   :type (pathname-type path))))
 
 (defun create-versioned-file (original-path version)
   (let ((new-path (make-versioned-path original-path version)))
