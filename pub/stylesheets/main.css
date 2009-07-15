@@ -71,8 +71,7 @@ a
 .view fieldset div.submit, .view div.submit,
 .long-form fieldset .validation-errors-summary h2.error-count
 {
-  border-left: 2px solid #dbeac1;
-  border-right: 2px solid #dbeac1;
+  background:#ecf8d7;
 }
 
 h1, h2

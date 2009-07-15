@@ -9,6 +9,7 @@ form fieldset
   border: none;
   padding: 0;
   margin: 0;
+  background:#ecf8d7;
 }
 
 .form fieldset .validation-errors-summary .error-count,
