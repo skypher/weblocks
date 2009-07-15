@@ -27,7 +27,7 @@
 ;;; Set outgoing encoding to utf-8
 (setf *default-content-type* "text/html; charset=utf-8")
 
-(defun start-weblocks (&rest keys &key (debug nil) (port 8080)
+(defun start-weblocks (&rest keys &key (debug t) (port 8080)
                                        (acceptor-class 'weblocks-acceptor)
 		       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server.
