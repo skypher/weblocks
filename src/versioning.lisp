@@ -30,12 +30,13 @@
 		 :documentation "Last version of the file. (Currently implemented as an integer)"))
   (:documentation "Holds the modification record of a file."))
 
-(defun make-record-path (original-path &key (system :weblocks)
+(defun make-record-path (original-path &key 
 			 (record-folder "mod-record/") (extension ".mod"))
-  (let ((system-folder (asdf-system-directory system)))
-    (merge-pathnames (concatenate 'string (relative-path original-path system-folder)
+  (let ((app-pub-folder (compute-webapp-public-files-path *current-webapp*)))
+    (merge-pathnames (concatenate 'string (relative-path original-path 
+							 app-pub-folder)
 				  extension)
-		     (merge-pathnames record-folder system-folder))))
+		     (merge-pathnames record-folder app-pub-folder))))
 
 (defun write-to-mod-record (mod-time version record-path)
   (write-to-file `',(cons mod-time version) record-path))
