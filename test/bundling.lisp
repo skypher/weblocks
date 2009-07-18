@@ -1,12 +1,14 @@
 (in-package :weblocks-test)
 
 (deftestsuite bundling-suite (weblocks-suite print-upcase-suite)
-  ())
+  ()
+  (:setup 
+    (cl-fad:delete-directory-and-files *temp-bundles-folder*
+                                       :if-does-not-exist :ignore)))
 
 (defparameter *temp-bundles-folder* (princ-to-string (compute-public-files-path "weblocks" "test/temp-bundles")))
 
 (addtest merge-files-with-newline
-  (cl-fad:delete-directory-and-files *temp-bundles-folder* :if-does-not-exist :ignore)
   (let ((path1 (merge-pathnames "test1" *temp-bundles-folder*))
 	(path2 (merge-pathnames "test2" *temp-bundles-folder*))
 	(path3 (merge-pathnames "test3" *temp-bundles-folder*)))
@@ -63,58 +65,83 @@ test2")))
 	    (1- (length part-paths)))
 	 (zerop (length (remove #\Newline result))))))
 
-(addtest bundling-test-1
-  (cl-fad:delete-directory-and-files *temp-bundles-folder* :if-does-not-exist :ignore)
-  (let* ((test-deps (make-test-dependencies-1))
-	 (temp-bundles (make-temp-bundles test-deps)))
-    ;; uri test
+(defmacro with-bundle-setup (&body body)
+  `(let* ((test-deps (make-test-dependencies-1))
+          (temp-bundles (make-temp-bundles test-deps)))
+     ,@body))
+
+(addtest bundling.uri
+  (with-bundle-setup
     (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-				      temp-bundles))
-		 (values "/pub/bundles/2.js" "/pub/bundles/1.css"
-			 "/external.js" "/external.css"))
-    ;; local-path test
+                                      temp-bundles))
+                 (values "/pub/bundles/2.js" "/pub/bundles/1.css"
+                         "/external.js" "/external.css"))))
+
+(addtest bundling.local-path
+  (with-bundle-setup
     (ensure-same (values-list (mapcar #'weblocks::local-path temp-bundles))
 		 (values (concatenate 'string *temp-bundles-folder* "2.js")
 			 (concatenate 'string *temp-bundles-folder* "1.css")
-			 nil nil))
-    (let ((tally (weblocks::get-bundle-tally :bundle-folder *temp-bundles-folder*)))
-      (destructuring-bind ((js-merged . js-parts) (css-merged . css-parts))
-	  (weblocks::composition-list tally)
-	;; composition-list test
-	(ensure-same js-merged "2.js")
-	(ensure-same css-merged "1.css")
-	(ensure-same (values-list (append js-parts css-parts))
-		     (values '("weblocks-debug" "js")
-			     '("sound" "js")
-			     '("datagrid-import" "css")
-			     '("isearch" "css")
-			     '("datagrid" "css"))
-		     :test (lambda (x y) (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
-							x)))
-	;; merged file test
-	(ensure-same (values js-parts css-parts)
-		     (values js-merged css-merged)
-		     :test (lambda (x y)
-			     (merged-with-newline-equal x
-							(merge-pathnames y (weblocks::bundle-folder tally)))))
-	;; import rule first test
-	(ensure-same (cl-ppcre:scan (list :sequence (weblocks::slurp-file (car css-parts)))
-				    (weblocks::slurp-file (merge-pathnames css-merged
-									   (weblocks::bundle-folder tally))))
-		     0)))
+			 nil nil))))
 
-    ;; bundling different files
+(defmacro with-tally-setup (&body body)
+  `(with-bundle-setup
+     (let ((tally (weblocks::get-bundle-tally :bundle-folder *temp-bundles-folder*)))
+       (destructuring-bind ((js-merged . js-parts) (css-merged . css-parts))
+           (weblocks::composition-list tally)
+         ,@body))))
+
+
+(addtest bundling.tally.composition-list
+  (with-tally-setup
+    (ensure-same js-merged "2.js")
+    (ensure-same css-merged "1.css")
+    (ensure-same (values-list (append js-parts css-parts))
+                 (values '("weblocks-debug" "js")
+                         '("sound" "js")
+                         '("datagrid-import" "css")
+                         '("isearch" "css")
+                         '("datagrid" "css"))
+                 :test (lambda (x y)
+                         (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
+                                        (namestring x))))))
+
+(addtest bundling.tally.merged-file
+  (with-tally-setup
+    (ensure-same (values js-parts css-parts)
+                 (values js-merged css-merged)
+                 :test (lambda (x y)
+                         (merged-with-newline-equal x
+                                                    (merge-pathnames y (weblocks::bundle-folder tally)))))))
+
+(addtest bundling.tally.import-rule
+  (with-tally-setup
+    (ensure-same (cl-ppcre:scan (list :sequence (weblocks::slurp-file (car css-parts)))
+                                (weblocks::slurp-file (merge-pathnames css-merged
+                                                                       (weblocks::bundle-folder tally))))
+                 0)))
+
+(addtest bundling.tally.bundle-different.uri-test
+  (with-tally-setup
     (setf test-deps (make-test-dependencies-2))
     (setf temp-bundles (make-temp-bundles test-deps))
     ;; uri test
     (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
 				      temp-bundles))
-		 (values "/pub/bundles/4.js" "/pub/bundles/3.css"))
-    ;; local-path test
+		 (values "/pub/bundles/4.js" "/pub/bundles/3.css"))))
+
+(addtest bundling.tally.bundle-different.local-path
+  (with-tally-setup
+    (setf test-deps (make-test-dependencies-2))
+    (setf temp-bundles (make-temp-bundles test-deps))
     (ensure-same (values-list (mapcar #'weblocks::local-path temp-bundles))
 		 (values (concatenate 'string *temp-bundles-folder* "4.js")
-			 (concatenate 'string *temp-bundles-folder* "3.css")))
-    ;; composition-list test
+			 (concatenate 'string *temp-bundles-folder* "3.css")))))
+
+(addtest bundling.tally.bundle-different.composition-list
+  (with-tally-setup
+    (setf test-deps (make-test-dependencies-2))
+    (setf temp-bundles (make-temp-bundles test-deps))
     (destructuring-bind (js-parts css-parts)
 	(loop for bundle in (weblocks::composition-list (weblocks::get-bundle-tally :bundle-folder *temp-bundles-folder*))
 	   if (or (string= (car bundle) "4.js")
@@ -125,19 +152,22 @@ test2")))
 			   '("sound" "js")
 			   '("suggest" "css")
 			   '("isearch" "css"))
-		   :test (lambda (x y) (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
-							x))))
+		   :test (lambda (x y)
+                           (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
+                                          (namestring x)))))))
 
-    ;; no css bundle
+(addtest bundling.tally.bundle-different.no-css-bundling.uri-test
+  (with-tally-setup
     (setf test-deps (make-test-dependencies-3))
     (setf temp-bundles (make-temp-bundles test-deps))
-    ;; uri test
     (ensure-same (puri:uri-path (dependency-url (car temp-bundles)))
-		 "/pub/bundles/5.js")
+		 "/pub/bundles/3.js")))
 
-    ;; no js bundle
+
+(addtest bundling.tally.bundle-different.no-js-bundling.uri-test
+  (with-tally-setup
     (setf test-deps (make-test-dependencies-4))
     (setf temp-bundles (make-temp-bundles test-deps))
-    ;; uri test
     (ensure-same (puri:uri-path (dependency-url (car temp-bundles)))
-		 "/pub/bundles/6.css")))
+		 "/pub/bundles/3.css")))
+
