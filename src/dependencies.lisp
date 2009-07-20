@@ -205,8 +205,9 @@ returns a dependency object."
 	 (physical-path (princ-to-string (merge-pathnames relative-path
 							  (compute-webapp-public-files-path webapp)))))
     (when (or do-not-probe (probe-file physical-path))
-      (let ((virtual-path (merge-pathnames relative-path
-					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp)))))
+      (let ((virtual-path (concatenate 'string
+                                       (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
+                                       relative-path)))
 	(unless do-not-probe
 	  (when (find type (version-dependency-types* webapp))
 	    (multiple-value-setq (physical-path virtual-path)
