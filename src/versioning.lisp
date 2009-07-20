@@ -32,6 +32,7 @@
 
 (defun make-record-path (original-path &key 
 			 (record-folder "mod-record/") (extension ".mod"))
+  (declare (special *current-webapp*))
   (let ((app-pub-folder (compute-webapp-public-files-path *current-webapp*)))
     (merge-pathnames (concatenate 'string (relative-path original-path 
 							 app-pub-folder)
