@@ -53,22 +53,16 @@ the body of the request. Otherwise, an error is signalled."
     (:post (post-parameters*))))
 
 (defun public-file-relative-path (type filename)
-  "Constructs a relative path to a public file from the \"/pub\" directory.
+  "Infer FILENAME's relative path and extension from TYPE.
 
-'type' - currently either :stylesheet or :script
-'filename' the name of the file or 'reldir/filename'
+Example:
 
-Ex:
 \(public-file-relative-path :stylesheet \"navigation\")
-=> #P\"stylesheets/navigation.css\""
-  (merge-pathnames (make-pathname :defaults filename)
-		   (make-pathname :directory `(:relative
-					       ,(ecase type
-						       (:stylesheet "stylesheets")
-						       (:script "scripts")))
-				  :type (ecase type
-					  (:stylesheet "css")
-					  (:script "js")))))
+=> \"stylesheets/navigation.css\""
+  (multiple-value-bind (folder ext) (ecase type
+                                      (:stylesheet (values "stylesheets" "css"))
+                                      (:script (values "scripts" "js")))
+    (concatenate 'string folder "/" filename "." ext)))
 
 (defun public-files-relative-paths (&rest args)
   "A helper function that returns a list of paths for files provided
