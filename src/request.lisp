@@ -66,8 +66,8 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
            (if (ajax-request-p)
              (progn
                (setf (content-type*) *json-content-type*)
-               (throw 'hunchentoot::handler-done
-                      (format nil "{\"redirect\":\"~A\"}" uri)))
+               (abort-request-handler
+                 (format nil "{\"redirect\":\"~A\"}" uri)))
              (hunchentoot:redirect uri))))
     (cond
       (new-window-p

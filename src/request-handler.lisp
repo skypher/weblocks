@@ -132,7 +132,7 @@ customize behavior."))
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
 
 	(when (pure-request-p)
-	  (throw 'hunchentoot::handler-done (eval-action))) ; FIXME: what about the txn hook?
+	  (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
 
         (webapp-update-thread-status "Processing action")
         (timing "action processing (w/ hooks)"

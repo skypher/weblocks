@@ -192,8 +192,8 @@ children of w (e.g. may be rendered when w is rendered).")
                  (not *tree-update-pending*)
                  (get-widgets-by-type 'selector :root obj))
         (handler-case (update-widget-tree)
-          (http-not-found () (throw 'hunchentoot::handler-done
-                                    (page-not-found-handler *current-webapp*)))))
+          (http-not-found () (abort-request-handler
+                               (page-not-found-handler *current-webapp*)))))
       (update-parent-for-children obj))))
 
 (defgeneric map-subwidgets (function widget)
