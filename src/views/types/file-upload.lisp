@@ -40,7 +40,13 @@
   (flet ((octet-string->utf-8 (s)
            "Kludge to fix librfc2388 bug."
            (hunchentoot::octets-to-string
-            (map '(vector (unsigned-byte 8)) #'char-int s))))
+	     (map 'vector
+		  (lambda (c)
+		    (let ((x (char-int c)))
+		      (assert (and (not (minusp x))
+				   (< x 256)))
+		      x))
+		  s))))
     (let* ((temp-path (first value))
            (browser-name (octet-string->utf-8 (second value)))
            (file-name (etypecase (file-upload-parser-file-name parser)
