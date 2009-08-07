@@ -29,10 +29,9 @@
 
 
 ;;; 500 errors deserve special attention
+#-sbcl
 (defun print-trivial-backtrace (c)
-  (if (not (nth-value 1 (ignore-errors (asdf:oos 'asdf:load-op :trivial-backtrace))))
-    (funcall (find-symbol "PRINT-BACKTRACE" :trivial-backtrace) c :output nil)
-    "Please install TRIVIAL-BACKTRACE to get a simple backtrace on your platform."))
+  (trivial-backtrace:print-backtrace c :output nil))
 
 (defmethod handle-error-condition ((app weblocks-webapp) c)
   "Print a pretty platform-specific backtrace if possible;
