@@ -51,7 +51,8 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
         #-sbcl
         (:pre (esc (format nil "~A" (print-trivial-backtrace c))))
         #+sbcl
-        (let ((frames (sb-debug:backtrace-as-list)))
+        (let ((frames (sb-debug:backtrace-as-list))
+              (*print-circle* t))
           (htm
             (:table
               (:thead
