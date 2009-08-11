@@ -8,6 +8,12 @@
           authenticated-server-users login-class-store login-data
           anonymous-user-count print-user-stats))
 
+(defparameter *default-login-title* "Please Log In"
+  "Default title to be used in 'do-login'.")
+
+(defparameter *authentication-key* 'authentication-object
+  "A key used to store the authentication object in the session.")
+
 ;;; A wrapper function to quickly present a login dialog
 (defun/cc do-login (on-login &key (view 'default-login-view) (title *default-login-title*))
   (do-dialog title (make-instance 'login :on-login on-login :view view)))
@@ -38,14 +44,8 @@ returned."
   "Returns a one way hash of a plain-text password."
   (hunchentoot::md5-hex (copy-seq password)))
 
-(defparameter *default-login-title* "Please Log In"
-  "Default title to be used in 'do-login'.")
-
 (defparameter *default-login-failure-error* "Invalid credentials."
   "Default message in case of login failure.")
-
-(defparameter *authentication-key* 'authentication-object
-  "A key used to store the authentication object in the session.")
 
 (defview default-login-view (:type form :persistp nil
 			     :buttons '((:submit . "Login") :cancel)
