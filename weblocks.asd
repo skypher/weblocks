@@ -17,7 +17,7 @@
                :hunchentoot :puri :cl-json
                :cl-who :parenscript
                :cl-fad :fare-matcher :cl-cont
-               :metatilities :cl-ppcre:md5
+               :metatilities :cl-ppcre :md5
                :anaphora :f-underscore
                :bordeaux-threads :salza2
                :trivial-timeout #-sbcl :trivial-backtrace)
