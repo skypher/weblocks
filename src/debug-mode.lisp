@@ -3,7 +3,7 @@
 
 (export '(disable-global-debugging enable-global-debugging))
 
-(declaim (special *maintain-last-session*))
+(declaim (special *current-webapp* *maintain-last-session*))
 
 (defvar *weblocks-global-debug* nil)
 

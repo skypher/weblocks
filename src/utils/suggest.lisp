@@ -3,6 +3,8 @@
 
 (export '(render-suggest))
 
+(declaim (special *max-raw-input-length*)) ;early
+
 (defun render-suggest (input-name resultset &key
 		       default-value
 		       (input-id (gensym))
