@@ -89,8 +89,8 @@
 	(setf bundle-name (create-bundle-file file-list type tally)))
       (store-bundle-tally tally)
       ;; make new dependency object for the bundle file
-      (let ((physical-path (princ-to-string (merge-pathnames bundle-name (bundle-folder tally))))
-	    (virtual-path (merge-pathnames (format nil "bundles/~A" bundle-name)
+      (let ((physical-path (merge-pathnames bundle-name (bundle-folder tally)))
+	    (virtual-path (puri:merge-uris (format nil "bundles/~A" bundle-name)
 					   (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix app)))))
 	(let ((keys (gzip-dependency-types* app)))
 	  (when (or (and (eq type 'script-dependency)
@@ -120,7 +120,8 @@
        if (and path
 	       (typep dep dependency-type)
 	       (null (find path exceptions :test #'string-equal)))
-          if (cl-ppcre:scan "-import(?:\\.\\d\\d*?|)\\.css$" (namestring path))
+          if (and (cl-ppcre:scan "-import(?:\\.\\d\\d*?|)$" (pathname-name path))
+		  (string= "css" (pathname-type path)))
              collect path into imports
           else
 	     collect path into main

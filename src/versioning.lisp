@@ -116,11 +116,11 @@
   (let* ((name (pathname-name url))
 	 (relative (public-file-relative-path type name))
 	 (webapp (current-webapp))
-	 (local (princ-to-string (merge-pathnames relative
-						  (compute-webapp-public-files-path webapp)))))
+	 (local (merge-pathnames relative
+				 (compute-webapp-public-files-path webapp))))
     (when (cl-fad:file-exists-p local)
       (values local
-	      (princ-to-string (merge-pathnames relative
+	      (princ-to-string (puri:merge-uris relative
 						(maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
 
 (defun update-import-css-content (import-path &key (version-types (version-dependency-types* (current-webapp)))
@@ -136,5 +136,5 @@
 		    (update-versioned-dependency-path physical-path virtual-path)))
 		(when (find :stylesheet gzip-types)
 		  (create-gziped-dependency-file physical-path))
-		(write-import-css virtual-path stream))
+		(write-import-css (puri:uri virtual-path) stream))
 	      (write-import-css url stream)))))))

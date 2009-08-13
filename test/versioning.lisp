@@ -26,15 +26,15 @@
       (write-string "test-text" stream))
   ;; version file initialization
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
-	       (values (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.0.test")
-		       "/www/vzn/temp.0.test"))
+	       (values (pathname (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.0.test"))
+		       (pathname "/www/vzn/temp.0.test")))
 
   (sleep 1) ;; so that modified time of temp.test will change
   (weblocks::with-file-write (stream *temp-version-file*)
       (write-string "new-test-text" stream))
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
-	       (values (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.1.test")
-		       "/www/vzn/temp.1.test"))
+	       (values (pathname (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.1.test"))
+		       (pathname "/www/vzn/temp.1.test")))
 
   ;; import rule versioning
   (let ((import-path (concatenate 'string *temp-version-folder* "import.css")))

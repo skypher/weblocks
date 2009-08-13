@@ -80,8 +80,8 @@ test2")))
 (addtest bundling.local-path
   (with-bundle-setup
     (ensure-same (values-list (mapcar #'weblocks::local-path temp-bundles))
-		 (values (concatenate 'string *temp-bundles-folder* "2.js")
-			 (concatenate 'string *temp-bundles-folder* "1.css")
+		 (values (merge-pathnames "2.js" *temp-bundles-folder*)
+			 (merge-pathnames "1.css" *temp-bundles-folder*)
 			 nil nil))))
 
 (defmacro with-tally-setup (&body body)
@@ -104,7 +104,7 @@ test2")))
                          '("datagrid" "css"))
                  :test (lambda (x y)
                          (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
-                                        (namestring x))))))
+                                        (puri:uri-path (puri:uri x)))))))
 
 (addtest bundling.tally.merged-file
   (with-tally-setup
@@ -135,8 +135,8 @@ test2")))
     (setf test-deps (make-test-dependencies-2))
     (setf temp-bundles (make-temp-bundles test-deps))
     (ensure-same (values-list (mapcar #'weblocks::local-path temp-bundles))
-		 (values (concatenate 'string *temp-bundles-folder* "4.js")
-			 (concatenate 'string *temp-bundles-folder* "3.css")))))
+		 (values (merge-pathnames "4.js" *temp-bundles-folder*)
+			 (merge-pathnames "3.css" *temp-bundles-folder*)))))
 
 (addtest bundling.tally.bundle-different.composition-list
   (with-tally-setup
@@ -154,7 +154,7 @@ test2")))
 			   '("isearch" "css"))
 		   :test (lambda (x y)
                            (cl-ppcre:scan (subseq (apply #'make-versioned-regex y) 1)
-                                          (namestring x)))))))
+                                          (puri:uri-path (puri:uri x))))))))
 
 (addtest bundling.tally.bundle-different.no-css-bundling.uri-test
   (with-tally-setup
