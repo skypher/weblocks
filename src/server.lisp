@@ -77,8 +77,10 @@ declared AUTOSTART."
   "Computes the directory of public files. The function uses the
 following protocol: it finds the canonical path of the '.asd' file of
 the system specified by 'asdf-system-name', and goes into 'pub'."
+  (setf suffix (fad:pathname-as-directory suffix))
+  (assert (eq :relative (first (pathname-directory suffix))))
   (merge-pathnames
-   (make-pathname :directory `(:relative ,suffix))
+   suffix
    (asdf-system-directory asdf-system-name)))
 
 
