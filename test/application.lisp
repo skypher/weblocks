@@ -89,11 +89,15 @@
            :public-files-path "./pub") 
 (defwebapp hello9-webapp
            :public-files-path "./pub/") 
+(defwebapp hello10-webapp
+    :public-files-path #P"pub")
 
 (addtest defwebapp-pub-path
   (dolist (app '(hello8-webapp hello9-webapp))
     (with-webapp (:class-name app)
-      (ensure-same (webapp-public-files-path) "./pub/"))))
+      (ensure-same (webapp-public-files-path) "./pub/")))
+  (with-webapp (:class-name 'hello10-webapp)
+    (ensure-same (webapp-public-files-path) #P"pub/")))
 
 ;;; interaction of hostname and prefix dispatching
 (defwebapp host-1

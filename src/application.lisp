@@ -53,7 +53,7 @@
 		:initform nil 
 		:documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
-   (public-files-path :type (or null string)
+   (public-files-path :type (or null string pathname)
 		      :accessor weblocks-webapp-public-files-path
                       :initarg :public-files-path 
 		      :initform nil
