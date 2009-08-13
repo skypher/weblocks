@@ -15,8 +15,8 @@
 (deftestsuite versioning-suite (weblocks-suite print-upcase-suite)
   ())
 
-(defparameter *temp-mod-record-folder* (princ-to-string (compute-public-files-path "weblocks" "mod-record/test/temp-vzn")))
-(defparameter *temp-version-folder* (princ-to-string (compute-public-files-path "weblocks" "test/temp-vzn")))
+(defparameter *temp-mod-record-folder* (princ-to-string (compute-public-files-path "weblocks" "pub/mod-record/test/temp-vzn")))
+(defparameter *temp-version-folder* (princ-to-string (compute-public-files-path "weblocks" "pub/test/temp-vzn")))
 (defparameter *temp-version-file* (concatenate 'string *temp-version-folder* "temp.test"))
 
 (addtest versioning-test-1
