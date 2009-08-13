@@ -53,13 +53,13 @@ inserted into the page to redraw the dialog."
     (when (and current-dialog
 	       (refresh-request-p))
       (with-javascript
-	(ps* `(.observe *Event
-			window "load"
-			(lambda ()
-			  ,(make-dialog-js (dialog-title current-dialog)
-					   (dialog-widget current-dialog)
-					   (dialog-css-class current-dialog)
-					   (dialog-close current-dialog)))))))))
+	(ps* `(funcall (slot-value *Event 'observe)
+                       window "load"
+                       (lambda ()
+                         ,(make-dialog-js (dialog-title current-dialog)
+                                          (dialog-widget current-dialog)
+                                          (dialog-css-class current-dialog)
+                                          (dialog-close current-dialog)))))))))
 
 (defun/cc do-dialog (title callee &key css-class close)
   (declare (special *on-ajax-complete-scripts*))
