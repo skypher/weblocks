@@ -18,6 +18,7 @@
 	  bundle-dependency-types
           version-dependency-types
 	  webapp-description
+          *default-public-files-path*
           weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix
@@ -514,6 +515,8 @@ KEY is compared using EQUAL."
 				(lambda/cc ,action-params
 				  ,@body)))
 
+(defvar *default-public-files-path* (compute-public-files-path :weblocks))
+
 (let (warned)
   (defgeneric compute-webapp-public-files-path (app)
     (:documentation "If 'weblocks-webapp-public-files-path' is
@@ -522,8 +525,9 @@ KEY is compared using EQUAL."
   application ('weblocks-webapp-name') is searched for. If found, a
   directory 'pub' is searched for in the parent directory of the asdf
   file. If found, this directory is returned as the physical
-  value. Otherwise, 'weblocks.asd' is found, and the 'pub' folder in
-  that directory is returned.")
+  value. As a last resort the value of *DEFAULT-PUBLIC-FILES-PATH* is
+  used which in turn defaults on the 'pub' folder below the directory
+  containing weblocks.asd.")
     (:method (app)
       (if (weblocks-webapp-public-files-path app)
           (weblocks-webapp-public-files-path app)
@@ -537,7 +541,7 @@ KEY is compared using EQUAL."
                   (and (weblocks-webapp-debug app) (not warned)
                     (setf warned t)
                     (warn "Couldn't determine application's public files folder, using standard Weblocks files."))
-                  (compute-public-files-path :weblocks))))))))
+                  *default-public-files-path*)))))))
 
 (defgeneric compute-webapp-public-files-uri-prefix (app)
   (:documentation "Computes a virtual uri for public files of an
