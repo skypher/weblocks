@@ -335,7 +335,9 @@ that will be applied before and after the body is rendered.")
   (:method ((obj widget) &rest args)
     ;; leave out the other `map-subwidgets' subjects, as they should
     ;; be rendered manually
-    (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj :widget))))
+    (mapc (lambda (child)
+            (apply #'render-widget child args))
+          (widget-children obj))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
