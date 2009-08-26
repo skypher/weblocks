@@ -328,13 +328,13 @@ that will be applied before and after the body is rendered.")
 	    (safe-apply widget-suffix-fn obj args)))))
 
 (defgeneric render-widget-children (obj &rest args)
-  (:documentation "Renders the widget's children")
+  (:documentation "Renders the widget's children.")
   (:method (obj &rest args)
     (warn "Cannot update the widget children of ~S because it is not a widget."
           obj))
   (:method ((obj widget) &rest args)
-    ;; leave out the other `map-subwidgets' subjects, as they should
-    ;; be rendered manually
+ "Render all children. Specialize this method if you only want
+to render widgets of a certain type."
     (mapc (lambda (child)
             (apply #'render-widget child args))
           (widget-children obj))))
