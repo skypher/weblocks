@@ -148,11 +148,14 @@ answering its result."
 	    `(funcall ',function ,@reqs)))))
 
 
-(defmacro with-file-write ((stream-name path &key (element-type ``base-char)) &body body)
+(defmacro with-file-write ((stream-name path &key (element-type ''base-char))
+                           &body body)
   `(progn
      (ensure-directories-exist ,path)
-     (with-open-file (,stream-name ,path :direction :output :element-type ,element-type
-				   :if-exists :supersede :if-does-not-exist :create)
+     (with-open-file (,stream-name ,path :direction :output
+                                         :element-type ,element-type
+				         :if-exists :supersede
+                                         :if-does-not-exist :create)
        ,@body)))
 
 (defun write-to-file (object path)
