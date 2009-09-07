@@ -30,6 +30,12 @@
 		 :documentation "Last version of the file. (Currently implemented as an integer)"))
   (:documentation "Holds the modification record of a file."))
 
+(defmethod print-object ((obj mod-record) stream)
+  (print-unreadable-object (obj stream :identity t :type t)
+    (with-slots (original-path mod-record-path last-mod-time last-version) obj
+      (format stream "opath: ~A, mpath: ~A, mtime: ~A, version: ~A"
+              original-path mod-record-path last-mod-time last-version))))
+
 (defun make-record-path (original-path &key 
 			 (record-folder "mod-record/") (extension ".mod"))
   (declare (special *current-webapp*))
