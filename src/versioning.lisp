@@ -51,7 +51,7 @@
 (defun make-versioned-path (path version)
   (let ((dir-list (pathname-directory path)))
     (assert dir-list)
-    (make-pathname :directory (push-end "vzn" dir-list)
+    (make-pathname :directory (append dir-list (list "vzn"))
                    :name (concatenate 'string (pathname-name path) "." (princ-to-string version))
                    :type (pathname-type path))))
 
