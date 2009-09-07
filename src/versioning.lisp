@@ -91,13 +91,18 @@
 (defvar *version-dependencies-lock* (bordeaux-threads:make-lock))
 
 (defun update-versioned-dependency-path (original-path &optional other-path)
-  "If the file has been modified, it is copied and renamed with the correct version number in the same directory. If the file has never being modified before, its name is kept the same."
+  "If the file has been modified, it is copied and renamed with the
+correct version number in the same directory. If the file has never
+been modified before, its name is kept the same."
   (bordeaux-threads:with-lock-held (*version-dependencies-lock*)
-    (let ((mod-record (get-mod-record original-path :versioning-p t)))
-      (when (file-modified-p mod-record) (update-mod-record mod-record :versioning-p t))
-      (with-slots (last-version) mod-record
-	(values (make-versioned-path original-path last-version)
-		(make-versioned-path other-path last-version))))))
+    (let* ((mod-record (get-mod-record original-path :versioning-p t))
+           (last-version (slot-value mod-record 'last-version)))
+      (when (or (file-modified-p mod-record)
+                (not (probe-file (make-versioned-path original-path last-version))))
+        (update-mod-record mod-record :versioning-p t)
+        (incf last-version))
+        (values (make-versioned-path original-path last-version)
+                (make-versioned-path other-path last-version)))))
 
 
 ;;; Dealing with CSS import rules
@@ -144,3 +149,4 @@
 		  (create-gziped-dependency-file physical-path))
 		(write-import-css (puri:uri virtual-path) stream))
 	      (write-import-css url stream)))))))
+
