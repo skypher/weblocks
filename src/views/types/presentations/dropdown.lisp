@@ -33,6 +33,6 @@
 		     :selected-value (if intermediate-value-p
 					 intermediate-value
 					 (when value
-					   (attributize-name value)))
+					   (presentation-choices-default-value-key value)))
 		     :id *presentation-dom-id*)))
 
