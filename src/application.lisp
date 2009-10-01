@@ -38,6 +38,7 @@
           webapp-update-thread-status
           update-thread-status
           *registered-webapps*
+          with-webapp
           ))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -595,11 +596,18 @@ KEY is compared using EQUAL."
 	   (funcall proc))
 	 (funcall proc))))
 
-(defmacro in-webapp (webapp &body forms)
+(defmacro with-webapp (webapp &body forms)
   "Bind variables that are both webapp-specific, or applicable to just
 this app, and webapp-general, or not particular to some request to
 this app, with regard to WEBAPP."
   `(call-in-webapp ,webapp (f0 . ,forms)))
+
+(defun in-webapp (&optional name)
+  "Set the current webapp to NAME, or the last webapp registered if NAME is
+not supplied. Returns the selected webapp. Convenience function for the REPL."
+  (setf *current-webapp*
+        (get-webapp (or name
+                        (first *registered-webapps*)))))
 
 (defun reset-webapp-session (&optional (app (current-webapp)))
   "Reset sessions on a per-webapp basis"

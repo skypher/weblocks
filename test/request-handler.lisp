@@ -21,7 +21,7 @@
 
 #+(or) ;; TODO refactor for cl-who
 (deftest handle-client-request-1
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil
 	(let (result1 result2 result3
 	      (app (weblocks::current-webapp)))
@@ -111,7 +111,7 @@ onclick='disableIrrelevantButtons(this);' />~
 ;;; make sure debug toolbar is rendered when appropriate
 #+(or) ;; TODO
 (deftest handle-client-request-2
-    (with-webapp (:class-name 'hcr2-hello-webapp)
+    (with-test-webapp (:class-name 'hcr2-hello-webapp)
       (with-request :get nil
 	(let (result1 result2
 	      (app (weblocks::current-webapp)))
@@ -140,7 +140,7 @@ onclick='disableIrrelevantButtons(this);' />~
 ;;; make sure navigation controls are modified by request uri
 #+(or) ;; TODO refactor for cl-who
 (deftest handle-client-request-3
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil
 	(let (result (app (weblocks::current-webapp)))
 	  ;; set up our mini-application with one navigation widget
@@ -195,7 +195,7 @@ onclick='disableIrrelevantButtons(this);' />~
   "http://nil/?weblocks-session=1%3atest")
 
 (deftest handle-client-request-5
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let* ((res 0) (inc-res (lambda () (incf res)))
 	       pushed-pre pushed-post)
@@ -221,7 +221,7 @@ onclick='disableIrrelevantButtons(this);' />~
   2)
 
 (deftest handle-client-request-6
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let ((res 0))
 	  ;; set up our mini-application
@@ -243,7 +243,7 @@ onclick='disableIrrelevantButtons(this);' />~
   2)
 
 (deftest handle-client-request-7
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let ((res 0))
 	  ;; start the session
@@ -264,7 +264,7 @@ onclick='disableIrrelevantButtons(this);' />~
   2)
 
 (deftest handle-client-request-8
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
 	  :uri "/hcr-hello-webapp/"
 	(let ((res 0))
@@ -291,7 +291,7 @@ onclick='disableIrrelevantButtons(this);' />~
 
 #+(or)
 (deftest handle-client-request-9
-    (with-webapp (:class-name 'hcr-hello-webapp)
+    (with-test-webapp (:class-name 'hcr-hello-webapp)
       (with-request :get nil :uri "/hcr-hello-webapp/"
 	(let (result1)
 	  ;; set up our mini-application with one dataform widget
@@ -446,7 +446,7 @@ onclick='disableIrrelevantButtons(this);' />~
 
 #+(or) ; disabled until Andrea's error handling patch is applied.
 (addtest allow-restart-in-sessinit
-  (with-webapp (:class-name 'broken-init)
+  (with-test-webapp (:class-name 'broken-init)
     (with-request :get nil :uri "/broken-init/"
       (let ((finished-handler 0)
             (*catch-errors-p* nil))

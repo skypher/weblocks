@@ -11,7 +11,7 @@
 
 ;;; test defwebapp
 (addtest defwebapp-simple
-  (with-webapp (:class-name 'hello-webapp)
+  (with-test-webapp (:class-name 'hello-webapp)
     (ensure-same (webapp-name) "hello-webapp" :test string-equal)
     (ensure-same (mapcar #'dependency-url (webapp-application-dependencies))
 		 '(#U"/hello-webapp/pub/stylesheets/layout.css"
@@ -28,7 +28,7 @@
 
 ;;; webapp session values
 (addtest session-value
-  (with-webapp ()
+  (with-test-webapp ()
     (setf (webapp-session-value 'foo) 'bar)
     (ensure-same (webapp-session-value 'foo) 'bar)))
 
@@ -39,7 +39,7 @@
 
 (addtest defwebapp-prefix
   (dolist (app '(hello2-webapp))
-    (with-webapp (:class-name app)
+    (with-test-webapp (:class-name app)
       (ensure-same (webapp-prefix) "/")
       (ensure-same (make-webapp-uri "foo") "/foo"))))
 
@@ -51,7 +51,7 @@
 
 (addtest defwebapp-prefix-2
   (dolist (app '(hello3-webapp hello4-webapp))
-    (with-webapp (:class-name app)
+    (with-test-webapp (:class-name app)
       (ensure-same (webapp-prefix) "/foo")
       (ensure-same (make-webapp-uri "bar") "/foo/bar"))))
 
@@ -66,7 +66,7 @@
 
 (addtest defwebapp-pub-prefix
   (dolist (app '(hello5-webapp hello6-webapp))
-    (with-webapp (:class-name app)
+    (with-test-webapp (:class-name app)
       (ensure-same (webapp-public-files-uri-prefix) "/pub")
       (ensure-same (make-webapp-public-file-uri "foo.css") "/pub/foo.css"))))
 
@@ -76,7 +76,7 @@
            :public-files-uri-prefix "/pub")
 
 (addtest defwebapp-pub-prefix-2
-  (with-webapp (:class-name 'hello7-webapp)
+  (with-test-webapp (:class-name 'hello7-webapp)
     (ensure-same (webapp-prefix) "/foo")
     (ensure-same (webapp-public-files-uri-prefix) "/pub")
     (ensure-same (compute-webapp-public-files-uri-prefix
@@ -94,9 +94,9 @@
 
 (addtest defwebapp-pub-path
   (dolist (app '(hello8-webapp hello9-webapp))
-    (with-webapp (:class-name app)
+    (with-test-webapp (:class-name app)
       (ensure-same (webapp-public-files-path) "./pub/")))
-  (with-webapp (:class-name 'hello10-webapp)
+  (with-test-webapp (:class-name 'hello10-webapp)
     (ensure-same (webapp-public-files-path) #P"pub/")))
 
 ;;; interaction of hostname and prefix dispatching

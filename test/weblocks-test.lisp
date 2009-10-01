@@ -159,8 +159,8 @@ and then compares the string to the expected result."
 (defparameter *dummy-action* "abc"
   "A dummy action code for unit tests.")
 
-(defun call-with-webapp (thunk &rest initargs &key full class-name &allow-other-keys)
-  "Helper for `with-webapp''s expansion."
+(defun call-with-test-webapp (thunk &rest initargs &key full class-name &allow-other-keys)
+  "Helper for WITH-TEST-WEBAPP's expansion."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
@@ -177,7 +177,7 @@ and then compares the string to the expected result."
            (stop-webapp class-name)))
        (funcall thunk))))
 
-(defmacro with-webapp ((&rest initargs &key full class-name &allow-other-keys) &body body)
+(defmacro with-test-webapp ((&rest initargs &key full class-name &allow-other-keys) &body body)
   "A helper macro (and marker) for test cases calling functions that
 only work with a current webapp, in which BODY is evaluated in the
 context of a temporary `weblocks-webapp'.  INITARGS are passed through
@@ -191,7 +191,7 @@ webapp in my context."
   ;; rest list. They are mentioned explicitly in the lambda list
   ;; for documentation purposes.
   (declare (ignore full class-name))
-  `(call-with-webapp (lambda () ,@body) ,@initargs))
+  `(call-with-test-webapp (lambda () ,@body) ,@initargs))
 
 (defun call-with-request-in-webapp-context (thunk method parameters
 					    &key (uri nil uri?))
@@ -253,7 +253,7 @@ webapp in my context."
 		 (equalp "WEBLOCKS-TEST"
 			 (package-name (symbol-package app-type))))))
       (apply #'call-with-request-in-webapp-context args)
-      (with-webapp ()
+      (with-test-webapp ()
 	(apply #'call-with-request-in-webapp-context args))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -313,7 +313,7 @@ AJAX request."
 
 (defvar *recovery-strategies*
   `((with-plain-webapp . ,(lambda (thunk)
-			    (with-webapp () (funcall thunk))))
+			    (with-test-webapp () (funcall thunk))))
     (with-simple-request . ,(lambda (thunk)
 			      (with-request :get nil (funcall thunk)))))
   "Alist of strategies to try in turn when a test fails in `do-test'.

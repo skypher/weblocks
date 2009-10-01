@@ -65,7 +65,7 @@ customize behavior."))
                                          (handle-error-condition app c))
                             (invoke-debugger c)))))
     (let ((*print-pretty* t))
-      (in-webapp app (call-next-method)))))
+      (with-webapp app (call-next-method)))))
 
 (defmethod handle-client-request :around (app)
   (handler-bind ((timeout-error (lambda (c)

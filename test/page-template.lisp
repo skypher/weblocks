@@ -9,7 +9,7 @@
 
 ;;; test with-page
 (deftest-html with-page-1
-    (with-webapp (:class-name 'some-name)
+    (with-test-webapp (:class-name 'some-name)
       (let ((weblocks::*page-dependencies*
 	     (mapcar (curry #'apply
 			    (curry-after #'make-local-dependency :do-not-probe t))
