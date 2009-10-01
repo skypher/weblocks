@@ -147,6 +147,7 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
+         (no-cache) ; disable caching for dynamic pages
          (return-from weblocks-dispatcher (f0 (handle-client-request app)))))))
       (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
