@@ -75,6 +75,10 @@
 	  widgets. The default item (widget) should have nil as the
 	  key. Not providing a default item will cause a redirect to
           the first item's URI.")
+   (cached-panes :accessor static-selector-cached-panes
+                 :initform nil
+                 :documentation "Remember the state of the statically
+                 selected pane here.")
    (current-pane :accessor static-selector-current-pane :initform nil
 		 :documentation "The uri-tokens corresponding to the
 		 currently selected pane, or an empty string if the
@@ -84,20 +88,43 @@
   selected at any given time. This forms the base for most static
   navigation systems."))
 
+(defmethod make-widget-place-writer :around ((selector static-selector) widget)
+  "Make sure the pane cache is up to date."
+  (let ((place-writer (call-next-method)))
+    (lambda (&optional (callee nil callee-supplied-p))
+      (let ((result (apply place-writer (when callee-supplied-p (list callee)))))
+        (when callee
+          ;; replace all occurrences of WIDGET in the cache;
+          ;; this is a stab at sensible semantics that might
+          ;; be changed or amended later.
+          (setf (static-selector-cached-panes selector)
+                (mapcar (lambda (pane)
+                          (cons (car pane)
+                                (if (eq (cdr pane) widget)
+                                  callee
+                                  (cdr pane))))
+                        (static-selector-cached-panes selector))))
+        result))))
+
 (defmethod get-widget-for-tokens ((selector static-selector) uri-tokens)
   ;; we peek at the token first, because if it isn't found we won't
   ;; consume it, to give others a chance to process it
   (let* ((token (peek-at-token uri-tokens))
          (panes (static-selector-panes selector))
+         (cached-panes (static-selector-cached-panes selector))
 	 (pane (assoc token panes :test #'equalp))
+         (cached-pane (assoc token cached-panes :test #'equalp))
+         (effective-pane (or cached-pane pane))
          (selected-pane (cond
-                          (pane
+                          (effective-pane
                            ;; found pane
-                           (assert (equalp (first (pop-tokens uri-tokens)) (car pane)))
-                           pane)
+                           (assert (equalp (first (pop-tokens uri-tokens)) (car effective-pane)))
+                           effective-pane)
                           ((and (null token) panes)
                            ;; looking for default pane?
                            (first panes)))))
+    (unless cached-pane ; already in cache? add if not
+      (push (cons token (cdr selected-pane)) (static-selector-cached-panes selector)))
     (select-pane selector (car selected-pane))
     (cdr selected-pane)))
 
