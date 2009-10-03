@@ -1,8 +1,12 @@
 
 (in-package :weblocks)
 
-(export '(*last-session* start-weblocks stop-weblocks *weblocks-server*
-	  compute-public-files-path server-type server-version
+(export '(*last-session*
+          start-weblocks
+          stop-weblocks
+          *weblocks-server*
+	  server-type
+          server-version
           session-name-string-pair))
 
 (defvar *weblocks-server* nil
@@ -72,16 +76,6 @@ declared AUTOSTART."
     (when *weblocks-server*
       (stop *weblocks-server*))
     (setf *weblocks-server* nil)))
-
-(defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
-  "Computes the directory of public files. The function uses the
-following protocol: it finds the canonical path of the '.asd' file of
-the system specified by 'asdf-system-name', and goes into 'pub'."
-  (setf suffix (fad:pathname-as-directory suffix))
-  (assert (eq :relative (first (pathname-directory suffix))))
-  (merge-pathnames
-   suffix
-   (asdf-system-directory asdf-system-name)))
 
 
 ;;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age

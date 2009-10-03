@@ -19,6 +19,7 @@
           version-dependency-types
 	  webapp-description
           *default-public-files-path*
+          compute-public-files-path
           weblocks-webapp-public-files-path
           webapp-public-files-path
 	  webapp-public-files-uri-prefix
@@ -515,6 +516,17 @@ KEY is compared using EQUAL."
   `(add-webapp-permanent-action ',webapp-class ',name
 				(lambda/cc ,action-params
 				  ,@body)))
+
+;;; finding public files
+(defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
+  "Computes the directory of public files. The function uses the
+following protocol: it finds the canonical path of the '.asd' file of
+the system specified by 'asdf-system-name', and goes into 'pub'."
+  (setf suffix (fad:pathname-as-directory suffix))
+  (assert (eq :relative (first (pathname-directory suffix))))
+  (merge-pathnames
+   suffix
+   (asdf-system-directory asdf-system-name)))
 
 (defvar *default-public-files-path* (compute-public-files-path :weblocks))
 
