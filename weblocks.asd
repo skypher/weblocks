@@ -38,7 +38,8 @@
                                        (:file "menu"
                                               :depends-on ("html"))
                                        (:file "suggest")
-                                       (:file "timing"))
+                                       (:file "timing")
+                                       (:file "repl"))
 			  :depends-on ("weblocks"))
 		 (:file "versioning"
 			:depends-on ("weblocks" utils))
