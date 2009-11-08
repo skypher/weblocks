@@ -191,11 +191,15 @@ customize behavior."))
 #-sbcl(warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
             Expect a tiny memory leak until fixed.")
 
+(defvar *session-lock-table-lock* (bordeaux-threads:make-lock
+                                    "*session-lock-table-lock*"))
+
 (defun session-lock ()
-  (unless (gethash *session* *session-locks*)
-    (setf (gethash *session* *session-locks*) 
-          (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
-  (gethash *session* *session-locks*))
+  (bordeaux-threads:with-lock-held (*session-lock-table-lock*)
+    (unless (gethash *session* *session-locks*)
+      (setf (gethash *session* *session-locks*) 
+            (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
+    (gethash *session* *session-locks*)))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
