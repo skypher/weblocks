@@ -110,10 +110,11 @@ form buttons in a POST form."
 ;;; Presents a user with a message and a choice of elements
 (defun/cc do-choice (msg choices &key (method :post) (css-class "") (title "Select Option"))
   (do-dialog title
-             (curry (ecase method
-		      (:get #'render-choices-get)
-		      (:post #'render-choices-post))
-		    msg choices)
+             (make-widget
+               (curry (ecase method
+                        (:get #'render-choices-get)
+                        (:post #'render-choices-post))
+                      msg choices))
              :css-class (format nil "choice ~A" css-class)))
 
 ;;; Presents a user with a confirmation dialog
