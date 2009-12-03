@@ -266,7 +266,7 @@ association list. This function is normally called by
 	     (late-propagation-warn (ws)
 	       (style-warn 'non-idempotent-rendering
 		:change-made
-		(format nil "~A widgets were marked dirty" (length ws))))
+		(format nil "~A widgets were marked dirty: ~S" (length ws) ws)))
 	     (absorb-dirty-widgets ()
 	       (loop for dirty = *dirty-widgets*
 		     while dirty
