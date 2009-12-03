@@ -74,7 +74,7 @@ messages that need to be shown for AJAX effects."
   "Add a 'msg' to a list of messages to show on this request in the
 'flash' object."
   (check-type flash flash)
-  (push-end msg (flash-messages flash)))
+  (push-end (make-widget msg) (flash-messages flash)))
 
 (defmethod render-widget-body ((obj flash) &rest args)
   (declare (special *on-ajax-complete-scripts* *dirty-widgets*))
