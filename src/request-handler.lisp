@@ -23,7 +23,7 @@
 ;; remove this when Hunchentoot reintroduces *catch-errors-p*
 (defvar *catch-errors-p* t)
 
-(defvar *request-timeout* 10
+(defvar *request-timeout* 180
   "Seconds until we abort a request because it took too long.
   This prevents threads from hogging the CPU indefinitely.
   
