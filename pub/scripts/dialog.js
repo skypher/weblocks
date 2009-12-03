@@ -50,7 +50,7 @@ function showDialog(title, body, cssClass, close) {
     dialogBody.innerHTML = body;
 
     var titleTextCell = Builder.node('td', {className : 'title-text-cell'},   
-                                     [ Builder.node('h1',  {className : 'title-text'}, [title])]);
+                                     [ Builder.node('h2',  {className : 'title-text'}, [title])]);
 
     var titleButtonCell = null;
     var titleRow = null;
@@ -65,7 +65,7 @@ function showDialog(title, body, cssClass, close) {
         titleRow = Builder.node('tr', [ titleTextCell ]);
     }
 
-    var titleBar = Builder.node('table', {className : 'title-bar'}, [titleRow]);
+    var titleBar = Builder.node('table', {className : 'title-bar', cellpadding: '0', cellspacing: '0'}, [titleRow]);
 
     var dialog = Builder.node('div', { className : ('dialog ' + cssClass) },
 			      [ Builder.node('div', { className : 'dialog-extra-top-1' }),

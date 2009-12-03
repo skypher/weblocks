@@ -29,7 +29,8 @@
   position: fixed;
   _position: absolute; /* Degrade to this in IE for now */
   z-index: 725;
-  width: 10em;
+  min-width:200px;
+  max-width: 50%;
 }
 
 .dialog-body
@@ -45,9 +46,8 @@
 /*  background: white url(/weblocks-common/pub/images/dialog/question.png) no-repeat 0.5em center;*/
 }
 
-.dialog h1, .modal h1
+.dialog h2, .modal h2
 {
-  background-color: white;
   padding: 0;
   margin: 0;
   text-align: left;
@@ -114,5 +114,13 @@
   background-position: left center;
   padding-top: 1em;
   padding-bottom: 1em;
+}
+
+.title-text-cell {
+  background:white;
+  border-top:1px solid black;
+  border-left:1px solid black;
+  padding:0 5px;
+  padding-top:3px;
 }
 
