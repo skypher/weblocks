@@ -89,7 +89,9 @@ RENDER-FN is an optional function of one argument that is reponsible
 for rendering the link's content (i.e. its label). The default rendering
 function just calls PRINC-TO-STRING on the label and renders it
 without escaping."
-  (let* ((action-code (function-or-action->action action))
+  (declare (optimize (speed 3) (space 2)))
+  (let* ((*print-pretty* nil)
+         (action-code (function-or-action->action action))
 	 (url (make-action-url action-code)))
     (with-html
       (:a :id id :class class
