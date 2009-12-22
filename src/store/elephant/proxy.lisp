@@ -74,7 +74,9 @@
    of the persistent-object"
   (with-store-controller store
     (if (proxy-oid object)
-        (elephant::controller-recreate-instance *store-controller* (proxy-oid object))
+        (let ((instance (elephant::controller-recreate-instance *store-controller* (proxy-oid object))))
+	  (ele::maybe-persistent-sync instance)
+	  instance)
         (let ((instance (make-instance (base-class object))))
           (loop for slot in (weblocks::class-slots (class-of object)) do
                (let ((slotname (weblocks::slot-definition-name slot)))

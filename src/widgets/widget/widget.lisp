@@ -1,14 +1,27 @@
 
 (in-package :weblocks)
 
-(export '(defwidget widget widget-name ensure-widget-methods
-          widget-propagate-dirty widget-rendered-p widget-continuation
-          widget-parent widget-children widget-prefix-fn widget-suffix-fn
-          with-widget-header update-widget-parameters
+(export '(defwidget
+          widget
+          make-widget
+          widget-name
+          widget-propagate-dirty
+          widget-continuation
+          widget-parent
+          widget-parents
+          widgets-roots
+          widget-children
+          widget-prefix-fn
+          widget-suffix-fn
+          with-widget-header
+	  update-children
+          update-parent-for-children
+	  map-subwidgets
+          walk-widget-tree page-title
+          render-widget
+          render-widget-body
+          render-widget-children
 	  update-widget-slots-with-map
-	  update-children update-parent-for-children
-	  walk-widget-tree page-title
-          render-widget render-widget-body render-widget-children
           get-widgets-by-type
 	  widget-css-classes
 	  mark-dirty
@@ -214,11 +227,7 @@ children of w (e.g. may be rendered when w is rendered).")
   PARENT-WIDGET.")
   (:method (w) "NIL unless defined otherwise" nil)
   (:method ((w widget))
-<<<<<<< local
     (map-subwidgets (lambda (child) (setf (widget-parent child) w)) w)))
-=======
-    (mapc (lambda (child) (setf (widget-parent child) w))
-	  (widget-children w))))
 
 (defgeneric update-widget-parameters (widget request-method uri-parameters)
   (:documentation "Given an alist of parameters, widget updates its state
@@ -241,7 +250,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	 for param = (assoc pname uri-params :test #'equalp)
 	 when param
          do (setf (slot-value w sname) (cdr param))))
->>>>>>> other
 
 (defgeneric walk-widget-tree (obj fn &optional depth)
   (:documentation "Walk the widget tree starting at obj and calling fn

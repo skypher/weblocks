@@ -100,6 +100,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod persist-object ((store elephant-store) (object elephant:persistent-object) &key)
+  (ele::maybe-persistent-sync object)
   object)
 
 (defmethod delete-persistent-object ((store elephant-store) (object elephant:persistent-object))

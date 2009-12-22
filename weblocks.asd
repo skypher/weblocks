@@ -136,13 +136,15 @@
 			  :depends-on (weblocks utils))
 		 (:module widgets
 			  :components ((:module widget
-						:components ((:file "widget"
-								    :depends-on ("widget-mop"))
+						:components ((:file "widget-mop")
+							     (:file "uri-parameters-mixin")
+							     (:file "widget"
+								    :depends-on ("widget-mop"
+										 "uri-parameters-mixin"))
                                                              (:file "string-widget"
                                                                     :depends-on ("widget"))
                                                              (:file "funcall-widget"
-                                                                    :depends-on ("widget"))
-							     (:file "widget-mop")))
+                                                                    :depends-on ("widget"))))
                                        (:file "composite"
 					      :depends-on (widget))
 				       (:file "flash"
