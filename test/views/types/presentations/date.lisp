@@ -19,7 +19,7 @@
    #.(data-header-template
       nil '((:li :class "x"
 	     (:span :class "label date" "X:&nbsp;")
-	     (:span :class "value" "10/01/1984"))
+	     (:span :class "value" "1984-01-10"))
 	    (:li :class "y"
 	     (:span :class "label date" "Y:&nbsp;")
 	     (:span :class "value" "04/03/1983"))

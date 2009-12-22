@@ -6,7 +6,11 @@
 (defclass webapp-class (standard-class)
   ((home-package
     :accessor webapp-class-home-package :initform *package*
-    :documentation "The current package when I was defined."))
+    :documentation "The current package when I was defined.")
+   (default-store-name
+    :accessor webapp-default-store-name :initform nil
+    :documentation "If non-nil, the name of the `*default-store*'
+    bound during request handlers."))
   (:documentation "The class of all webapp classes."))
 
 (defmethod validate-superclass ((self webapp-class) (super standard-class))

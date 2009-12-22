@@ -44,12 +44,14 @@
 
 (defmethod render-view-field-value (value (presentation checkbox-presentation)
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (ignore args)
 	   (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
-    (render-checkbox (view-field-slot-name field)
+    (render-checkbox (if field-info
+                       (attributize-view-field-name field-info)
+                       (attributize-name (view-field-slot-name field)))
 		     (if intermediate-value-p
 			 intermediate-value
 			 value)

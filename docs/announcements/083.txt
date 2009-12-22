@@ -1,0 +1,81 @@
+Weblocks 0.8.3 released
+=======================
+
+Weblocks is an advanced web framework written in Common Lisp.
+
+It is designed to make Agile web application development as
+effective and simple as possible.
+
+
+WHY YET ANOTHER WEB FRAMEWORK?
+
+This is not your ordinary run-of-the-mill web framework in PHP,
+Python or Ruby.
+
+Weblocks uses powerful Lisp features like multiple dispatch, the
+metaobject protocol, lexical closures, keyword arguments, and macros
+to build abstractions that make web development easy, intuitive, and
+free of boilerplate. In addition, control flow is easily expressed
+using continuations.
+
+Things that are hard or mundane in other frameworks become easy and
+fun in Weblocks. A fine example of this are Weblocks' AJAX capabilities
+which relieves you from writing Javascript in a lot of situations.
+
+
+AUDIENCE
+
+People who want to get their real-life web programming done
+as effectively as possible.
+
+Weblocks is especially targeted at newcomers to Lisp
+and Lisp web programming.
+
+It offers a helpful community and code that prevents you
+from shooting yourself too easily in the foot.
+
+
+IS IT USABLE? CAN I SEE SOME DEMOS?
+
+Weblocks is well-tested and has proven its worth in daily usage.
+It is used by a community of developers all over the world.
+
+Public applications running Weblocks include
+
+  * LAMsight https://www.lamsight.org/
+  * Aula Polska http://aulapolska.pl/
+  * Thanandar http://www.thanandar.de/
+
+
+CHANGES IN 0.8.3
+
+* Greatly enhanced performance in the request handler
+* Support for request timeouts
+* Automatic bundling/versioning of static files
+* Rudimentary profiling
+* Fundamentally overhauled nav system
+* CLSQL demo fixed
+* Updated Simple Blog example
+* New HTML error handler
+* More flexible debugger configuration with additional restarts
+* The usual assortment of fixes and contrib/ additions 
+
+
+MORE INFORMATION
+
+Platforms:
+  Well-tested on SBCL and Clozure CL.
+  Partially tested on CMUCL, Lispworks, AllegroCL, and OpenMCL.
+
+Official site (with detailed installation guide):
+  http://weblocks.viridian-project.de/
+
+Demo:
+  http://weblocks.viridian-project.de/weblocks-demo 
+
+
+CONTRIBUTORS
+
+This release has been made possible by Nandan Bagchee, Benjamin Collins,
+Stephen Compall, Chris Hallwright, Jan Rychter and yours truly.
+

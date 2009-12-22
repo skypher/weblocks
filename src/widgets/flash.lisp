@@ -38,10 +38,10 @@
 		     (flash-old-messages obj))
 	    (if (flash-messages obj)
 		(send-script
-		  (ps* `(new (*effect.*pulsate ,(dom-id obj)
-                                               (create :pulses 3 :duration 0.5)))))
+		  (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
+                                                             (create :pulses 3 :duration 0.5)))))
 		(send-script
-                  (ps* `(new (*effect.*blind-up ,(dom-id obj))))))))
+                  (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj))))))))
 	(request-hook :session :post-action))
   (push (lambda ()
 	  (declare (special *on-ajax-complete-scripts*))
@@ -74,7 +74,7 @@ messages that need to be shown for AJAX effects."
   "Add a 'msg' to a list of messages to show on this request in the
 'flash' object."
   (check-type flash flash)
-  (push-end msg (flash-messages flash)))
+  (push-end (make-widget msg) (flash-messages flash)))
 
 (defmethod render-widget-body ((obj flash) &rest args)
   (declare (special *on-ajax-complete-scripts* *dirty-widgets*))

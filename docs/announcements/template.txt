@@ -1,0 +1,55 @@
+Weblocks <VERSION> released
+===========================
+
+Weblocks is an advanced web framework written in Common Lisp.
+
+It is designed to make Agile web application development as
+effective and simple as possible.
+
+Weblocks uses powerful Lisp features like multiple dispatch, the
+metaobject protocol, lexical closures, keyword arguments, and macros
+to build abstractions that make web development easy, intuitive, and
+free of boilerplate. In addition, control flow is easily expressed
+using continuations.
+
+Things that are hard or mundane in other frameworks become easy and
+fun in Weblocks.
+
+
+AUDIENCE
+
+People who want to get their real-life web programming done
+as effectively as possible.
+
+Weblocks is not only targeted at old hands but also at
+newcomers to Lisp and Lisp web programming.
+
+It offers a helpful community and code that prevents you
+from shooting yourself too easily in the foot.
+
+
+CHANGES IN <VERSION>
+
+<list changes here>
+
+
+MORE INFORMATION
+
+Platforms:
+  Well-tested on SBCL and Clozure.
+  Partially tested on CMUCL, Lispworks, AllegroCL, and OpenMCL.
+
+Official site (with detailed installation guide):
+  http://weblocks.viridian-project.de/
+
+Demo:
+  http://weblocks.viridian-project.de/weblocks-demo 
+
+
+CONTRIBUTORS
+
+This release has been made possible by
+
+<list of contributors for this release; use 'hg churn -r LASTVERSION:tip' to
+ get them>
+

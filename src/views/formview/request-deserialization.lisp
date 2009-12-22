@@ -38,14 +38,14 @@ Specialize this function to parse given objects differently.")
 			(lambda (field-info)
 			  (let* ((field (field-info-field field-info))
 				 (obj (field-info-object field-info))
-				 (field-key (attributize-name (view-field-slot-name field)))
+				 (field-key (attributize-view-field-name field-info))
 				 (field-value (request-parameter-for-presentation field-key
                                                                                   (view-field-presentation field))))
 			    (when (typep (view-field-presentation field) 'form-presentation)
 			      (multiple-value-bind (parsedp presentp parsed-value)
 				  (apply #'parse-view-field-value (form-view-field-parser field)
 					 field-value obj view field
-					 args)
+					 :field-info field-info args)
 				(if parsedp
 				    (if (not presentp)
 					(if (form-view-field-required-p field)
@@ -140,7 +140,7 @@ request.
 	   (let ((field (field-info-field field-info)))
 	     (when (typep (view-field-presentation field) 'form-presentation)
 	       (let* ((slot-name (view-field-slot-name field))
-		      (slot-key (attributize-name slot-name))
+		      (slot-key (attributize-view-field-name field-info))
 		      (request-slot-value (request-parameter-for-presentation
 					   slot-key (view-field-presentation field))))
 		 (cons field request-slot-value)))))

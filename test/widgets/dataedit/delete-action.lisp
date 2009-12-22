@@ -35,7 +35,6 @@
       (let ((grid (make-instance 'gridedit
 				 :data-class 'employee
 				 :allow-pagination-p nil)))
-	(setf (widget-rendered-p grid) t)
 	(dataedit-delete-items-flow grid (cons :none (list (object-id *joe*))))
 	(do-request `(("yes" . "Yes")
 		      (,weblocks::*action-string* . "abc123")))

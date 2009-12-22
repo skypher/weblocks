@@ -8,23 +8,45 @@
 
 (defsystem weblocks
   :name "weblocks"
-  :version "0.0.1"
+  :version "0.8.3"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
-  :depends-on (:closer-mop :metatilities :hunchentoot :cl-who :cl-ppcre :cl-json :puri :md5
-	       :cl-fad :fare-matcher :cl-cont :parenscript :anaphora :f-underscore
-               :bordeaux-threads)
+  :depends-on (:closer-mop
+               :hunchentoot :puri :cl-json
+               :cl-who :parenscript
+               :cl-fad :fare-matcher :cl-cont
+               :metatilities :cl-ppcre :md5
+               :anaphora :f-underscore
+               :bordeaux-threads :salza2
+               :trivial-timeout #-sbcl :trivial-backtrace)
   :components ((:module src
 		:components (
-		 (:file "weblocks")
+		 (:file "package")
+		 (:file "weblocks" :depends-on ("package"))
 		 (:module utils
 			  :components ((:file "misc")
-				       (:file "runtime-class"))
+                                       (:file "clos")
+                                       (:file "runtime-class")
+                                       (:file "string")
+                                       (:file "list")
+                                       (:file "uri")
+                                       (:file "html")
+                                       (:file "isearch"
+                                              :depends-on ("html"))
+                                       (:file "menu"
+                                              :depends-on ("html"))
+                                       (:file "suggest")
+                                       (:file "timing")
+                                       (:file "repl"))
 			  :depends-on ("weblocks"))
+		 (:file "versioning"
+			:depends-on ("weblocks" utils))
+		 (:file "bundling"
+			:depends-on ("weblocks" utils))
 		 (:file "dependencies"
-			:depends-on ("weblocks" "server" utils))
+			:depends-on ("weblocks" "server" "bundling" "versioning" utils))
 		 (:file "dom-object"
 			:depends-on ("weblocks" utils))
 		 (:file "page-template"
@@ -46,14 +68,6 @@
 					   "actions" "request-hooks" "application"
 					   "request" "dependencies" "uri-tokens"
                                            "error-handler" store))
-		 (:module snippets
-			  :components ((:file "suggest")
-				       (:file "menu")
-				       (:file "isearch"
-					      :depends-on ("html-utils"))
-				       (:file "html-utils"))
-			  :depends-on (utils "weblocks" "request" "server"
-				       "actions" "dom-object"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
@@ -115,7 +129,7 @@
 						      parsers
 						      :components ((:file "common"))))
 					:depends-on (view formview dataview)))
-			  :depends-on ("weblocks" "dependencies" utils snippets))
+			  :depends-on ("weblocks" "dependencies" utils))
 		 (:module store
 			  :components ((:file "store-api")
 				       (:file "store-utils"))
@@ -123,8 +137,11 @@
 		 (:module widgets
 			  :components ((:module widget
 						:components ((:file "widget"
-								    :depends-on ("widget-mop" "uri-parameters-mixin"))
-							     (:file "uri-parameters-mixin")
+								    :depends-on ("widget-mop"))
+                                                             (:file "string-widget"
+                                                                    :depends-on ("widget"))
+                                                             (:file "funcall-widget"
+                                                                    :depends-on ("widget"))
 							     (:file "widget-mop")))
                                        (:file "composite"
 					      :depends-on (widget))
@@ -174,7 +191,7 @@
 					      :depends-on ("selector" widget))
 				       (:file "breadcrumbs"
 					      :depends-on ("navigation")))
-			  :depends-on (snippets views utils "dependencies" "actions" "server" "request"
+			  :depends-on (views utils "dependencies" "actions" "server" "request"
 						"request-hooks" "dom-object" linguistic store))
 		 (:module control-flow
 			  :components ((:file "call-answer")
@@ -182,7 +199,7 @@
 					      :depends-on ("call-answer"))
 				       (:file "workflow"
 					      :depends-on ("call-answer")))
-			  :depends-on ("weblocks" "widgets" "request-handler" "snippets"))
+			  :depends-on ("weblocks" "widgets" "request-handler"))
                  (:file "acceptor"
                         :depends-on ("weblocks"))
 		 (:file "server"
@@ -190,9 +207,9 @@
 		 (:file "request"
 			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"
-			:depends-on ("weblocks"))
+			:depends-on ("weblocks" "server"))
 		 (:file "application"
-			:depends-on ("weblocks" "application-mop"))
+			:depends-on ("weblocks" "application-mop" store))
 		 (:file "default-application"
 			:depends-on ("server" "weblocks" utils "request-handler")))))
   :in-order-to ((asdf:test-op (load-op "weblocks-test"))

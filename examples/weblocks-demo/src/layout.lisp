@@ -6,17 +6,20 @@
 it and use it as a widget. Since it will be used in a continuation
 flow, it accepts K - the continuation parameter."
   (with-html
-    (:div :style "text-align: center; margin-top: 25em;"
-	  (:p :style "font-style: italic;"
-	      "Roses are red," (:br)
-	      "Violets are blue," (:br)
-	      (:a :href "http://en.wikipedia.org/wiki/Steve_Russell" "Steve Russell") " rocks," (:br)
-	      "Homage to you!" (:br))
+    (:div :style "text-align: center; font-size:1.4em; margin-top: 4em;"
+	  (:p "This demo application was coded in" (:br)
+	      (:a :href "http://weblocks.viridian-project.de/" "Weblocks")
+	      " - a Lisp web framework." (:br) (:br)
+	      "The source of the demo contains" (:br)
+	      "200 lines of Lisp" (:br)
+	      "and" (:br)
+	      "0 line of HTML or Javascript." (:br))
 	  (render-link (lambda (&rest args)
 			 (declare (ignore args))
 			 (answer k))
-		       "Next"
-		       :ajaxp nil))))
+		       "Start Demo"
+		       :ajaxp nil)
+	  (:p "(You can also try it with Javascript disabled.)"))))
 
 (defun make-main-page ()
   "Lays out the main page. It consists of a FLASH widget for showing
@@ -25,11 +28,11 @@ employees page and companies page."
   (make-instance 'widget :children
 		 (list
 		  (make-instance 'flash :messages
-				 (list "Welcome to weblocks demo - a
-				       technology demonstration for a
-				       continuations-based web
-				       framework written in Common
-				       Lisp."))
+				 (list (make-widget "Welcome to weblocks demo - a
+                                                    technology demonstration for a
+                                                    continuations-based web
+                                                    framework written in Common
+                                                    Lisp.")))
 		  (make-navigation "Main Menu"
 				   (list "Employees" (make-employees-page) "employees")
 				   (list "Companies" (make-companies-page) "companies")))))

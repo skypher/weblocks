@@ -41,7 +41,7 @@
 	 (:fieldset (:label (:span :class "label" "Sort&nbsp;")
 			    (:script :type "text/javascript"
 				     #.(format nil "~%// <![CDATA[
-document.write(\"<a class='sort-asc' href='/foo/bar?action=abc124' onclick='initiateAction(&quot;abc124&quot;, &quot;weblocks-session=1%3ATEST&quot;); return false;'><span class='direction'>Ascending</span></a>\");
+document.write('<a class=\\'sort-asc\\' href=\\'/foo/bar?action=abc124\\' onclick=\\'initiateAction(&quot;abc124&quot;, &quot;weblocks-session=1%3ATEST&quot;); return false;\\'><span class=\\'direction\\'>Ascending</span></a>');
 // ]]>~%"))
 			    (:noscript (:span :class "sort-asc"
 					      (:span :class "direction" "Ascending")))

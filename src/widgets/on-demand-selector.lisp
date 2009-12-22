@@ -7,11 +7,14 @@
   ((lookup-function :accessor on-demand-lookup-function
 		    :initarg :lookup-function
 		    :initform nil
-		    :documentation "Lookup function should return
-		    multiple values: the created widget, consumed
-		    tokens, remaining tokens and an optional
-		    fourth :no-cache value, indicating that the result
-		    is not to be cached.")
+		    :documentation "The function stored here
+                    gets called with two arguments, the selector object
+                    and a list of remaining tokens.
+                    It must return either NIL (if it cannot create a
+                    widget from the passed tokens or) multiple values:
+                    the created widget, consumed tokens, remaining tokens
+                    and an optional fourth :no-cache value, indicating that
+                    the result is not to be cached in this session.")
    (make-if-missing :accessor on-demand-make-if-missing
 		    :initarg :make-if-missing-p
 		    :initform t)

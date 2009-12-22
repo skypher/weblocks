@@ -1,7 +1,10 @@
 
 (in-package :weblocks)
 
-(export '(render-isearch *isearch-input-delay* *isearch-max-input-length*))
+(export '(*isearch-input-delay* 
+          *isearch-max-input-length*
+          render-isearch
+          make-isearch-regex))
 
 (defparameter *isearch-input-delay* 0.4
   "Delay in seconds after keystrokes a client should wait before it
@@ -57,3 +60,11 @@ initiateFormAction('~A', $('~A'), '~A');
     (unless (ajax-request-p)
       (with-javascript "$('~A').remove();"
 	search-id))))
+
+(defun make-isearch-regex (search)
+  "Create a regular expression from the user's input that tries to be
+faithful to Emacs' isearch."
+  (if (some #'upper-case-p search)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode nil)
+      (ppcre:create-scanner (ppcre:quote-meta-chars search) :case-insensitive-mode t)))
+

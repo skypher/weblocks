@@ -5,7 +5,9 @@
           uri-tokens-to-string uri-tokens-start-with
 	  *uri-tokens*))
 
-(defvar *uri-tokens* "Bound to an URI-TOKENS object in a request.")
+(defvar *uri-tokens*)
+(setf (documentation '*uri-tokens* 'variable)
+      "Bound to an URI-TOKENS object in a request.")
 
 (defclass uri-tokens ()
   ((remaining-tokens :accessor remaining-tokens
@@ -29,6 +31,10 @@
   (remf initargs :tokens)
   (setf (remaining-tokens obj) tokens)
   (apply #'call-next-method obj initargs))
+
+(defmethod print-object ((obj uri-tokens) stream)
+  (print-unreadable-object (obj stream :type t :identity nil)
+    (format stream "~A" (remaining-tokens obj))))
 
 (defgeneric all-tokens (tokens)
   (:method ((tokens list)) tokens)

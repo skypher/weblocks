@@ -53,12 +53,13 @@ inserted into the page to redraw the dialog."
     (when (and current-dialog
 	       (refresh-request-p))
       (with-javascript
-	(ps* `(*Event.observe window "load"
-                                 (lambda ()
-                                   ,(make-dialog-js (dialog-title current-dialog)
-                                                    (dialog-widget current-dialog)
-                                                    (dialog-css-class current-dialog)
-                                                    (dialog-close current-dialog)))))))))
+	(ps* `(funcall (slot-value *Event 'observe)
+                       window "load"
+                       (lambda ()
+                         ,(make-dialog-js (dialog-title current-dialog)
+                                          (dialog-widget current-dialog)
+                                          (dialog-css-class current-dialog)
+                                          (dialog-close current-dialog)))))))))
 
 (defun/cc do-dialog (title callee &key css-class close)
   (declare (special *on-ajax-complete-scripts*))
@@ -109,10 +110,11 @@ form buttons in a POST form."
 ;;; Presents a user with a message and a choice of elements
 (defun/cc do-choice (msg choices &key (method :post) (css-class "") (title "Select Option"))
   (do-dialog title
-             (curry (ecase method
-		      (:get #'render-choices-get)
-		      (:post #'render-choices-post))
-		    msg choices)
+             (make-widget
+               (curry (ecase method
+                        (:get #'render-choices-get)
+                        (:post #'render-choices-post))
+                      msg choices))
              :css-class (format nil "choice ~A" css-class)))
 
 ;;; Presents a user with a confirmation dialog

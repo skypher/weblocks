@@ -28,8 +28,12 @@
 			  :components ((:file "misc")
 				       (:file "runtime-class"))
 			  :depends-on ("test-code"))
-		 (:file "dependencies"
+		 (:file "versioning"
 			:depends-on ("test-code" utils-test))
+		 (:file "bundling"
+			:depends-on ("test-code" "versioning" utils-test))
+		 (:file "dependencies"
+			:depends-on ("test-code" "versioning" utils-test))
 		 (:file "actions"
 			:depends-on ("test-code"))
                  (:file "uri-tokens"
@@ -143,7 +147,7 @@
 				       (:file "pagination"
 					      :depends-on ("pagination-utils"))
 				       (:file "composite"))
-			  :depends-on ("test-code" fixtures views))
+			  :depends-on ("versioning" "test-code" fixtures views))
 		 (:module control-flow
 			  :components ((:file "call-answer")
 				       (:file "dialog")

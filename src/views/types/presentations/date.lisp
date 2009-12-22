@@ -14,8 +14,9 @@
   (:documentation ""))
 
 ;; Note: this is a very simple parser -- it will try to match three
-;; numbers separated by one of ./- and make them into a date assuming it
-;; is in the format DD.MM.YYYY. If there is a HH:MM after the date, it will get parsed as well.
+;; numbers separated by one of ./- and make them into a date assuming
+;; it is in the format YYYY.MM.DD. If there is a HH:MM after the date,
+;; it will get parsed as well.
 (defmethod parse-view-field-value ((parser date-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
@@ -23,9 +24,9 @@
       (multiple-value-bind (matched elements)
 	  (cl-ppcre:scan-to-strings "(\\d+)[\\-/\\.](\\d+)[\\-/\\.](\\d+)(\\s+(\\d+)[:\\.](\\d+))?" value)
 	(when matched
-	  (let ((date (date->utime (parse-integer (aref elements 0) :junk-allowed t)
+	  (let ((date (date->utime (parse-integer (aref elements 2) :junk-allowed t)
 				   (parse-integer (aref elements 1) :junk-allowed t)
-				   (parse-integer (aref elements 2) :junk-allowed t)
+				   (parse-integer (aref elements 0) :junk-allowed t)
 				   (or (and (aref elements 4) (parse-integer (aref elements 4) :junk-allowed t)) 0)
 				   (or (and (aref elements 5) (parse-integer (aref elements 5) :junk-allowed t)) 0))))
 	    (when date (values t t date)))))
@@ -34,8 +35,9 @@
 
 (defclass date-printing-mixin ()
   ((format :accessor date-printing-format :initarg :format
-	   :initform "%d/%m/%Y"
-	   :documentation "`format-date' format string to use."))
+	   :initform "%Y-%m-%d"
+	   :documentation "`format-date' format string to use. Default
+	   is YYYY-MM-DD (ISO 8601 extended format)."))
   (:documentation "Show a universal time in a friendly
   `format-date'-generated form."))
 

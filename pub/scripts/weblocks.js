@@ -85,6 +85,7 @@ function execJsonCalls (calls) {
 	calls.each(function(item)
 			 {
 			     try {
+                                 //console.log("evalScript: %o", item);
                                  item.evalScripts();
 			     } catch(e) {
                                  //console.log("Error evaluating AJAX script %o: %s", item, e);

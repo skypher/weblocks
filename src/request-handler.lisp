@@ -2,8 +2,10 @@
 
 
 (export '(handle-client-request
-          *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-	  *current-page-description* *catch-errors-p*))
+          *before-ajax-complete-scripts*
+          *on-ajax-complete-scripts*
+	  *catch-errors-p*
+          *request-timeout*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -20,6 +22,12 @@
 
 ;; remove this when Hunchentoot reintroduces *catch-errors-p*
 (defvar *catch-errors-p* t)
+
+(defvar *request-timeout* 180
+  "Seconds until we abort a request because it took too long.
+  This prevents threads from hogging the CPU indefinitely.
+  
+  You can set this to NIL to disable timeouts (not recommended).")
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -50,23 +58,49 @@ at different points before and after request. See 'request-hook'.
 Override this method (along with :before and :after specifiers) to
 customize behavior."))
 
-(defmethod handle-client-request :around (app)
+(defmethod handle-client-request :around ((app weblocks-webapp))
   (handler-bind ((error (lambda (c)
                           (if *catch-errors-p*
                             (return-from handle-client-request
                                          (handle-error-condition app c))
-                            (signal c)))))
-    (call-next-method)))
+                            (invoke-debugger c)))))
+    (let ((*print-pretty* t))
+      (with-webapp app (call-next-method)))))
+
+(defmethod handle-client-request :around (app)
+  (handler-bind ((timeout-error (lambda (c)
+                                  ;; TODO: let the user customize this
+                                  (error "Your request timed out."))))
+    ;; TRIVIAL-TIMEOUT seems to be broken on CCL and in yet another way on
+    ;; Lispworks. For now let's only enable it on SBCL.
+    (#-sbcl progn 
+     #+sbcl with-timeout #+sbcl (*request-timeout*)
+      (webapp-update-thread-status "Request prelude")
+      (unwind-protect
+        (let* ((timings nil)
+               (*timing-level* 0)
+               (*timing-report-fn* (lambda (name real cpu)
+                                     (setf timings (acons name (list real cpu *timing-level*) timings))))
+               (result (timing "handle-client-request"
+                         (call-next-method))))
+          (dolist (timing timings)
+            (dotimes (i (cadddr timing))
+              (write "  " :escape nil))
+            (finish-output)
+            (format t "~A time (real/cpu): ~F/~F~%" (car timing)
+                    (cadr timing) (caddr timing)))
+          result)
+        (webapp-update-thread-status "Request complete/idle")))))
 
 (defmethod handle-client-request ((app weblocks-webapp))
-  (let ((*current-webapp* app))
-    (declare (special *current-webapp*))
+  (progn				;save it for splitting this up
     (when (null *session*)
       (when (get-request-action-name)
 	(expired-action-handler app))
       (start-session)
       (setf (webapp-session-value 'last-request-uri) :none)
-      (redirect (request-uri*)))
+      (when *rewrite-for-session-urls*
+        (redirect (request-uri*))))
     (when *maintain-last-session*
       (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
@@ -85,7 +119,8 @@ customize behavior."))
 		(setf (root-widget) nil)
 		(reset-webapp-session))))
 	  (push 'update-dialog-on-request (request-hook :session :post-action)))
-	(when (cookie-in (session-cookie-name *weblocks-server*))
+	(when (and *rewrite-for-session-urls*
+                   (cookie-in (session-cookie-name *weblocks-server*)))
 	  (redirect (remove-session-from-uri (request-uri*)))))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
@@ -95,62 +130,94 @@ customize behavior."))
 	    *page-dependencies* *current-page-description*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 	(declare (special *weblocks-output-stream* *dirty-widgets*
-			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-			  *current-page-description*))
+			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
+
 	(when (pure-request-p)
-	  (throw 'hunchentoot::handler-done (eval-action)))
-	;; a default dynamic-action hook function wraps get operations in a transaction
-	(eval-hook :pre-action)
-	(with-dynamic-hooks (:dynamic-action)
-	  (eval-action))
-	(eval-hook :post-action)
+	  (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
+
+        (webapp-update-thread-status "Processing action")
+        (timing "action processing (w/ hooks)"
+          (eval-hook :pre-action)
+          (with-dynamic-hooks (:dynamic-action)
+            (eval-action))
+          (eval-hook :post-action))
+
 	(when (and (not (ajax-request-p))
 		   (find *action-string* (get-parameters*)
 			 :key #'car :test #'string-equal))
 	  (redirect (remove-action-from-uri (request-uri*))))
-	(eval-hook :pre-render)
-	(with-dynamic-hooks (:dynamic-render)
-	  (if (ajax-request-p)
-            (handle-ajax-request app)
-            (handle-normal-request app)))
-        (eval-hook :post-render)
+
+        (timing "rendering (w/ hooks)"
+          (eval-hook :pre-render)
+          (with-dynamic-hooks (:dynamic-render)
+            (if (ajax-request-p)
+              (handle-ajax-request app)
+              (handle-normal-request app)))
+          (eval-hook :post-render))
+
 	(unless (ajax-request-p)
 	  (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
+
         (if (member (return-code*) *approved-return-codes*)
           (get-output-stream-string *weblocks-output-stream*)
           (handle-http-error app (return-code*)))))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream* *dirty-widgets*
-                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*
-                    *current-page-description*))
-  (render-dirty-widgets))
+                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
+  (webapp-update-thread-status "Handling AJAX request")
+  (timing "handle-ajax-request"
+    (render-dirty-widgets)))
 
 (defun update-widget-tree ()
-  (declare (special *current-page-description*))
-  (let ((depth 0) page-title)
+  (let ((*tree-update-pending* t)
+        (depth 0)
+        page-title)
+    (declare (special *tree-update-pending*))
     (walk-widget-tree (root-widget)
-		      (lambda (widget d)
-			(update-widget-parameters 
-			 widget (request-method*) (request-parameters))
-			(update-children widget)
-			(let ((title (page-title widget)))
-			  (when (and title (> d depth))
-			    (setf page-title title)))))
-    (when page-title (setf *current-page-description* page-title))))
+                      (lambda (widget d)
+                        (update-children widget)
+                        (let ((title (page-title widget)))
+                          (when (and title (> d depth))
+                            (setf page-title title
+                                  depth d)))))
+    (when page-title
+      (setf *current-page-description* page-title))))
+
+(defvar *session-locks* (make-hash-table :test #'eq
+                                         #+sbcl :weakness #+sbcl :key
+					 #+ccl :weak #+ccl :key)
+  "Per-session locks to avoid having unrelated threads
+  waiting.")
+#-sbcl (warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
+            Expect a tiny memory leak until fixed.")
+
+(defvar *session-lock-table-lock* (bordeaux-threads:make-lock
+                                    "*session-lock-table-lock*"))
+
+(defun session-lock ()
+  (bordeaux-threads:with-lock-held (*session-lock-table-lock*)
+    (unless (gethash *session* *session-locks*)
+      (setf (gethash *session* *session-locks*) 
+            (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
+    (gethash *session* *session-locks*)))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
   (declare (special *weblocks-output-stream*
-                    *uri-tokens*
-                    *current-page-description*))
+                    *uri-tokens*))
   ; we need to render widgets before the boilerplate HTML
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
-  (bordeaux-threads:with-lock-held (*dispatch/render-lock*)
-    (handler-case (update-widget-tree)
+  (webapp-update-thread-status "Handling normal request [tree shakedown]")
+  (bordeaux-threads:with-lock-held ((session-lock))
+    (handler-case (timing "tree shakedown"
+                    (update-widget-tree))
       (http-not-found () (return-from handle-normal-request
                                       (page-not-found-handler app))))
-    (render-widget (root-widget)))
+
+    (webapp-update-thread-status "Handling normal request [rendering widgets]")
+    (timing "widget tree rendering"
+      (render-widget (root-widget))))
   ; set page title if it isn't already set
   (when (and (null *current-page-description*)
              (last (all-tokens *uri-tokens*)))
@@ -158,7 +225,9 @@ customize behavior."))
           (humanize-name (last-item (all-tokens *uri-tokens*)))))
   ; render page will wrap the HTML already rendered to
   ; *weblocks-output-stream* with necessary boilerplate HTML
-  (render-page app)
+  (webapp-update-thread-status "Handling normal request [rendering page]")
+  (timing "page render"
+    (render-page app))
   ;; make sure all tokens were consumed (FIXME: still necessary?)
   (unless (or (tokens-fully-consumed-p *uri-tokens*)
               (null (all-tokens *uri-tokens*)))
@@ -198,7 +267,7 @@ association list. This function is normally called by
 	     (late-propagation-warn (ws)
 	       (style-warn 'non-idempotent-rendering
 		:change-made
-		(format nil "~A widgets were marked dirty" (length ws))))
+		(format nil "~A widgets were marked dirty: ~S" (length ws) ws)))
 	     (absorb-dirty-widgets ()
 	       (loop for dirty = *dirty-widgets*
 		     while dirty
@@ -207,11 +276,12 @@ association list. This function is normally called by
 		       do (late-propagation-warn dirty)
 		     do (setf *dirty-widgets* '())
 		     nconc (render-enqueued dirty))))
-      (format *weblocks-output-stream*
-	      "{\"widgets\":~A,\"before-load\":~A,\"on-load\":~A}"
-	      (encode-json-to-string (absorb-dirty-widgets))
-	      (encode-json-to-string *before-ajax-complete-scripts*)
-	      (encode-json-to-string *on-ajax-complete-scripts*)))))
+      (let ((rendered-widgets (absorb-dirty-widgets)))
+        (format *weblocks-output-stream*
+                (encode-json-alist-to-string
+                  `(("widgets" . ,rendered-widgets)
+                    ("before-load" . ,*before-ajax-complete-scripts*)
+                    ("on-load" . ,*on-ajax-complete-scripts*))))))))
 
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
@@ -244,6 +314,7 @@ association list. This function is normally called by
 		(mapc #'commit-transaction non-dynamic-stores))))))
       (eval-dynamic-hooks hooks)))
   
+;; a default dynamic-action hook function wraps actions in a transaction
 (eval-when (:load-toplevel)
   (pushnew 'action-txn-hook
 	   (request-hook :application :dynamic-action)))

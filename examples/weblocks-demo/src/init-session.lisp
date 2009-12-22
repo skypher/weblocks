@@ -4,7 +4,7 @@
 ;; Define our application
 (defwebapp weblocks-demo
     :description "A web application based on Weblocks"
-    :init-user-session	'init-user-session
+    :init-user-session	'init-user-session :public-files-cache-time 100000
     :dependencies
     '((:stylesheet "suggest")))
 
@@ -30,7 +30,7 @@
 (defun init-user-session (comp)
   (init-sandbox-store)
   (with-flow comp
-    (yield #'initial-page)
+    (yield (make-widget #'initial-page))
     (setf (widget-prefix-fn comp) #'render-header)
     (yield (make-main-page))))
 

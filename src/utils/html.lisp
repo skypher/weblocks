@@ -1,13 +1,53 @@
 
 (in-package :weblocks)
 
-(export '(*submit-control-name* *cancel-control-name* with-html-form
-	  render-link render-button render-form-and-button
-	  render-checkbox render-dropdown render-autodropdown
-	  *dropdown-welcome-message* render-radio-buttons
-	  render-close-button render-input-field render-password
-          render-textarea render-list scriptonly noscript render-message
+(export '(*submit-control-name*
+          *cancel-control-name*
+          with-html-form
+          render-extra-tags
+	  with-extra-tags
+	  render-link
+          render-button
+          render-form-and-button
+	  render-checkbox
+          render-dropdown
+          render-autodropdown
+	  *dropdown-welcome-message*
+          render-radio-buttons
+	  render-close-button
+          render-input-field
+          render-password
+          render-textarea
+          render-list
+          scriptonly
+          noscript
+          render-message
           send-script))
+
+(declaim (special *action-string*))	;early
+
+(defmethod render-extra-tags (tag-class count)
+  "Renders extra tags to get around CSS limitations. 'tag-class'
+is a string that specifies the class name and 'count' is the
+number of extra tags to render.
+Ex:
+\(render-extra-tags \"extra-\" 2) =>
+\"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
+  (with-html-output (*weblocks-output-stream*)
+    (loop for i from 1 to count
+          for attr = (format nil "~A~A" tag-class i)
+       do (htm (:div :class attr "<!-- empty -->")))))
+
+(defmacro with-extra-tags (&body body)
+  "A macro used to wrap html into extra tags necessary for
+hacking CSS formatting. The macro wraps the body with three
+headers on top and three on the bottom. It uses
+'render-extra-tags' function along with 'extra-top-' and
+'extra-bottom-' arguments."
+  `(progn
+     (render-extra-tags "extra-top-" 3)
+     ,@body
+     (render-extra-tags "extra-bottom-" 3)))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -49,7 +89,9 @@ RENDER-FN is an optional function of one argument that is reponsible
 for rendering the link's content (i.e. its label). The default rendering
 function just calls PRINC-TO-STRING on the label and renders it
 without escaping."
-  (let* ((action-code (function-or-action->action action))
+  (declare (optimize (speed 3) (space 2)))
+  (let* ((*print-pretty* nil)
+         (action-code (function-or-action->action action))
 	 (url (make-action-url action-code)))
     (with-html
       (:a :id id :class class
@@ -304,8 +346,7 @@ on the client only if client-side scripting is enabled."
        (if (ajax-request-p)
 	   (write-string ,output *weblocks-output-stream*)
 	   (with-javascript
-	       "document.write(~A);"
-	     (encode-json-to-string ,output))))))
+             (ps:ps* `(funcall (slot-value document 'write) ,,output)))))))
 
 (defmacro noscript (&body body)
   "Outputs HTML in a way that it takes effect on the client only if
@@ -320,16 +361,22 @@ in addition."
 (defun send-script (script &optional (place :after-load))
   "Send JavaScript to the browser. The way of sending depends
   on whether the current request is via AJAX or not.
+
+  Script may be either a string or a list; if it is a list
+  it will be compiled through Parenscript first.
   
   FIXME: is using PUSH or PUSHLAST correct?"
-  (if (ajax-request-p)
-    (let ((code (with-javascript-to-string script)))
-      (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
-      (ecase place
-        (:before-load (push code *before-ajax-complete-scripts*))
-        (:after-load (push code *on-ajax-complete-scripts*))))
-    (with-javascript
-      script)))
+  (let ((script (etypecase script
+                  (string script)
+                  (list (ps* script)))))
+    (if (ajax-request-p)
+      (let ((code (with-javascript-to-string script)))
+        (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+        (ecase place
+          (:before-load (push code *before-ajax-complete-scripts*))
+          (:after-load (push code *on-ajax-complete-scripts*))))
+      (with-javascript
+        script))))
 
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."

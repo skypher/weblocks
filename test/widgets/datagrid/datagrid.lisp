@@ -367,10 +367,10 @@
 (deftest datagrid-dependencies-1
     (with-request :get nil
       (not (null
-	    (member "/pub/stylesheets/pagination.css"
+	    (member (make-versioned-regex "pagination" "css")
 		    (dependencies (make-instance 'datagrid :data-class 'employee))
 		    :key (lambda (e)
 			   (format nil "~A" (dependency-url e)))
-		    :test #'string-equal))))
+		    :test #'cl-ppcre:scan))))
   t)
 

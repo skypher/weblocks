@@ -72,17 +72,18 @@
 (defmethod persist-object ((store elephant-store) (object persistent-proxy) &key)
   "Catch when weblocks tries to persist a proxy object and create an instance
    of the persistent-object"
-  (if (proxy-oid object)
-      (elephant::controller-recreate-instance *store-controller* (proxy-oid object))
-      (let ((instance (make-instance (base-class object))))
-	(loop for slot in (weblocks::class-slots (class-of object)) do
-	     (let ((slotname (weblocks::slot-definition-name slot)))
-	       (unless (or (eq slotname 'base-class)
-			   (eq slotname 'proxy-oid))
-		 (setf (slot-value instance slotname)
-		       (slot-value object slotname)))))
-	(setf (proxy-oid object) (elephant::oid instance))
-	instance)))
+  (with-store-controller store
+    (if (proxy-oid object)
+        (elephant::controller-recreate-instance *store-controller* (proxy-oid object))
+        (let ((instance (make-instance (base-class object))))
+          (loop for slot in (weblocks::class-slots (class-of object)) do
+               (let ((slotname (weblocks::slot-definition-name slot)))
+                 (unless (or (eq slotname 'base-class)
+                             (eq slotname 'proxy-oid))
+                   (setf (slot-value instance slotname)
+                         (slot-value object slotname)))))
+          (setf (proxy-oid object) (elephant::oid instance))
+          instance))))
 
 (defmethod object-class-name ((obj persistent-proxy))
   (base-class obj))

@@ -12,7 +12,7 @@
   (progn
     (defclass foo (bar)
       ((slot1 :initarg :slot1)
-       (slot2 :initform nil))
+      (slot2 :initform nil))
       (:metaclass widget-class))
     (defmethod per-class-dependencies append ((weblocks::obj foo))
        (declare (ignore weblocks::obj))
@@ -36,23 +36,27 @@
 
 ;;; test widget-dependencies
 (addtest widget-dependencies-1
-  (ensure-same (values-list
-		(mapcar #'dependency-url
-			(dependencies (make-instance 'navigation))))
-	       (values (puri:uri "/pub/stylesheets/menu.css")
-		       (puri:uri "/pub/stylesheets/navigation.css"))
-	       :test puri:uri=))
+  (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+				    (dependencies (make-instance 'navigation))))
+	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+				    '(("menu" "css")
+				      ("navigation" "css"))))
+	       :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest widget-dependencies-2
   (ensure-same
-   (mapcar #'dependency-url
-	   (dependencies (make-instance 'gridedit :data-class 'employee)))
+   (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+					    (dependencies (make-instance 'gridedit
+									 :data-class 'employee)))))
    ;; note, pagination and dataform are there because for gridedit and
    ;; datagrid widget-dependencies is specialized
-   '(#U"/pub/stylesheets/dataform.css" #U"/pub/stylesheets/pagination.css"
-     #U"/pub/stylesheets/datagrid.css" #U"/pub/scripts/datagrid.js"
-     #U"/pub/stylesheets/dataseq.css")
-   :test set-equal-uri=))
+   (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+			'(("dataseq" "css")
+			  ("datagrid" "js")
+			  ("datagrid" "css")
+			  ("pagination" "css")
+			  ("dataform" "css"))))
+   :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (deftest widget-dependencies-3
     (with-request :get nil
@@ -126,62 +130,6 @@
     (widget-name 'identity)
   identity)
 
-;;; test ensure-widget-methods
-
-(defgeneric ewm-g0 ())
-(defgeneric ewm-g1 (a &optional b))
-(defgeneric ewm-g2 (a b &rest c))
-(defgeneric ewm-g5 (a b c d e))
-
-(defun widget-class-count ()
-  (length weblocks::*widget-classes*))
-
-(addtest ensure-widget-methods-0
-  (remove-all-methods #'ewm-g0)
-  (ensure-widget-methods #'ewm-g0 '() (constantly 42))
-  (ensure-same (generic-function-methods #'ewm-g0) '()))
-
-(addtest ensure-widget-methods-1
-  (remove-all-methods #'ewm-g1)
-  (ensure-widget-methods #'ewm-g1 0 (lambda (n &optional m)
-				      (declare (ignore n m))
-				      42))
-  (ensure-same (ewm-g1 (make-instance 'composite)) 42)
-  (ensure-same (length (generic-function-methods #'ewm-g1))
-	       (widget-class-count)))
-
-(addtest ensure-widget-methods-2
-  (remove-all-methods #'ewm-g2)
-  (ensure-widget-methods #'ewm-g2 1 (lambda (a b &rest c)
-				      (declare (ignore a b c))
-				      84))
-  (ensure-same (ewm-g2 t (make-instance 'composite)) 84)
-  (ensure-same (length (generic-function-methods #'ewm-g2))
-	       (widget-class-count)))
-
-(addtest ensure-widget-methods-5
-  (remove-all-methods #'ewm-g5)
-  (ensure-widget-methods #'ewm-g5 '(3 1)
-			 (lambda (a b c d e)
-			   (list b a c d e)))
-  (ensure-same (ewm-g5 1 'two 3 'four 5)
-	       '(two 1 3 four 5))
-  (ensure-same (length (generic-function-methods #'ewm-g5))
-	       (expt (widget-class-count) 2)))
-
-;;; widget-designator typechecking
-(addtest nil-is-not-valid
-  (ensure-same (typep nil 'weblocks::widget-designator)
-	       (values nil t))
-  (ensure-null (weblocks::widget-designator-p nil)))
-
-(addtest widget-designator-export-status-same
-  (ensure-same (symbol-status 'weblocks::widget-designator)
-	       (symbol-status 'weblocks::widget-designator-p)))
-
-(addtest widget-designator-type-not-extensible
-  (ensure-null
-   (typep #'weblocks::widget-designator-p 'generic-function)))
 
 ;;; test composite-widgets specialization for widgets
 (deftest composite-widgets-1
@@ -199,9 +147,9 @@
 (deftest composite-widgets-4
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) 1)
+	(setf (composite-widgets w) 'a)
 	(composite-widgets w)))
-  (1))
+  (a))
 
 (deftest composite-widgets-5
     (with-request :get nil
@@ -213,9 +161,9 @@
 (deftest composite-widgets-6
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) (list 1))
+	(setf (composite-widgets w) (list 'a))
 	(composite-widgets w)))
-  (1))
+  (a))
 
 ;;; render function as a widget
 (deftest-html render-function-1
@@ -255,25 +203,17 @@
        (:li :class "manager" (:span :class "label text" "Manager:&nbsp;") (:span :class "value" "Jim")))))
 
 (deftest render-widget-4
-    (let ((*weblocks-output-stream* (make-string-output-stream)))
-      (declare (special *weblocks-output-stream*))
-      (with-request :get nil
-	(render-widget (make-instance 'dataform :data *joe*))
-	(format nil "~A" (mapcar #'dependency-url weblocks::*page-dependencies*))))
-  "(/pub/stylesheets/dataform.css)")
+    (ensure-same
+     (let ((*weblocks-output-stream* (make-string-output-stream)))
+       (declare (special *weblocks-output-stream*))
+       (with-request :get nil
+	 (render-widget (make-instance 'dataform :data *joe*))
+	 (format nil "~A" (car (mapcar #'dependency-url weblocks::*page-dependencies*)))))
+     (make-versioned-regex "dataform-import" "css")
+     :test (lambda (x y) (cl-ppcre:scan y x))))
 
-(deftest render-widget-5
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((w (make-instance 'dataform :data *joe*))
-	      res1 res2)
-	  (setf res1 (widget-rendered-p w))
-	  (render-widget w :inlinep t)
-	  (setf res2 (widget-rendered-p w))
-	  (values res1 res2))))
-  nil t)
 
-;;; test mark-dirty
+;;; mark-dirty
 (deftest mark-dirty-1
     (multiple-value-bind (res errors)
 	(ignore-errors (mark-dirty (lambda () nil)))
@@ -291,55 +231,11 @@
 	  (widget-name (car weblocks::*dirty-widgets*)))))
   "test")
 
-(deftest mark-dirty-3
-    (with-request :get nil
-      (let ((weblocks::*dirty-widgets* nil)
-	    (w (make-instance 'composite :name "test")))
-	(declare (special weblocks::*dirty-widgets*))
-	(mark-dirty w)
-	(widget-name (car weblocks::*dirty-widgets*))))
-  nil)
-
-(deftest mark-dirty-4
-    (with-request :get nil
-      (setf (session-value 'weblocks::root-composite) (create-site-layout))	
-      (let ((weblocks::*dirty-widgets* nil))
-	(declare (special weblocks::*dirty-widgets*))
-	(mark-dirty (make-instance 'composite :name "test"
-				   :propagate-dirty '((root-inner test-nav-1 test2 test2-leaf)))
-		    :propagate t)
-	(mapcar #'widget-name weblocks::*dirty-widgets*)))
-  nil)
-
-#+(or)
-(deftest mark-dirty-5
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(setf (root-composite) (create-site-layout))	
-	(let* ((weblocks::*dirty-widgets* nil)
-	       (path '((root-inner test-nav-1 test2 test2-leaf)))
-	       (w (make-instance 'composite :name "test"
-					    :propagate-dirty path)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (render-widget (find-widget-by-path (car path)))
-	  (mark-dirty w :propagate t)
-	  (mapcar #'widget-name weblocks::*dirty-widgets*))))
-  (test2-leaf "test"))
-
-(deftest mark-dirty-6
-    (with-request :get nil
-      (let ((weblocks::*dirty-widgets* nil)
-	    (w (make-instance 'composite :name "test")))
-	(declare (special weblocks::*dirty-widgets*))
-	(setf (widget-rendered-p w) t)
-	(widget-name (car weblocks::*dirty-widgets*))))
-  nil)
-
 (addtest mark-dirty-both-propagate-and-putp-supplied
   (ensure-error (mark-dirty (make-instance 'widget) :propagate t :putp t)))
 
-;;; test widget-dirty-p
+
+;;; widget-dirty-p
 (deftest widget-dirty-p-1
     (let ((weblocks::*dirty-widgets* nil)
 	  (w (make-instance 'composite :name "test")))
@@ -358,28 +254,13 @@
 	  (not (null (widget-dirty-p w))))))
   t)
 
-;;; test that (setf slot-value-using-class) method is modified for
-;;; widgets to automatically mark them as dirty
-(deftest setf-slot-value-using-class-1
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'dataform)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (setf (dataform-ui-state w) :form)
-	  (widget-name (car weblocks::*dirty-widgets*)))))
-  "id-123")
-
-(deftest setf-slot-value-using-class-2
-    (with-request :get nil
-      (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'dataform)))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  weblocks::*dirty-widgets*)))
-  nil)
+(addtest setf-slot-value-using-class-marks-dirty
+  (with-request :get nil
+    (let ((weblocks::*dirty-widgets* nil)
+          (w (make-instance 'dataform)))
+      (declare (special weblocks::*dirty-widgets*))
+      (setf (dataform-ui-state w) :form)
+      (ensure (widget-dirty-p w)))))
 
 
 ;;; test get-widgets-by-type
@@ -415,3 +296,157 @@
       (progv '(*package*) (list (find-package :weblocks-test))
 	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
   "#<NAVIGATION \"id-234\">")
+
+
+;;; widget-parents
+(addtest widget-parents.simple
+  (ensure-same (widget-parents (make-instance 'widget)) nil))
+
+(addtest widget-parents-2
+  (let* ((w1 (make-instance 'widget))
+         (w2 (make-instance 'widget :parent w1))
+         (w3 (make-instance 'widget :parent w2)))
+  (ensure-same (widget-parents w3) (list w2 w1))))
+
+
+;;; widgets-roots
+(addtest widgets-roots.simple
+  (let ((w (make-instance 'widget)))
+    (ensure-same (widgets-roots (list w)) (list w))))
+
+(addtest widgets-roots.straight-parent-chain-1
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3)) (list w3))))
+
+(addtest widgets-roots.straight-parent-chain-2
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2)) (list w2))))
+
+(addtest widgets-roots.straight-parent-chain-3
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w2 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2 w1)) (list w1))))
+
+(addtest widgets-roots.common-root
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2)) (list w2 w3))))
+
+(addtest widgets-roots.common-root-with-root
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3")))
+    (ensure-same (widgets-roots (list w3 w2 w1)) (list w1))))
+
+(addtest widgets-roots.multiple-roots
+  (let* ((w1 (make-instance 'widget :dom-id "w1"))
+         (w2 (make-instance 'widget :parent w1 :dom-id "w2"))
+         (w3 (make-instance 'widget :parent w1 :dom-id "w3"))
+         (w4 (make-instance 'widget :parent w3 :dom-id "w4")))
+    (ensure-same (widgets-roots (list w4)) (list w4))
+    (ensure-same (widgets-roots (list w3)) (list w3))
+    (ensure-same (widgets-roots (list w4 w2)) (list w2 w4))
+    (ensure-same (widgets-roots (list w4 w2 w1)) (list w1))))
+
+
+;;; slot-equal
+(defclass slot-equal-test-class nil
+  ((s1 :initarg :s1)
+   (s2 :initarg :s2)))
+
+(addtest slot-equal-both-unbound
+  (ensure (slot-equal (make-instance 'slot-equal-test-class)
+                      (make-instance 'slot-equal-test-class))))
+
+(addtest slot-equal-one-unbound
+  (ensure-null
+    (slot-equal (make-instance 'slot-equal-test-class :s1 t)
+                (make-instance 'slot-equal-test-class))))
+
+(addtest slot-equal-unbound-equal-mix
+  (ensure (slot-equal (make-instance 'slot-equal-test-class :s1 t)
+                      (make-instance 'slot-equal-test-class :s1 t))))
+
+(addtest slot-equal-all-bound
+  (ensure (slot-equal (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                      (make-instance 'slot-equal-test-class :s1 t :s2 nil))))
+
+(addtest slot-equal-custom-test
+  (let ((test (lambda (x y) (and (integerp x) (= x y)))))
+    (ensure-null
+      (slot-equal (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                  (make-instance 'slot-equal-test-class :s1 t :s2 nil)
+                  :test test))
+    (ensure
+      (slot-equal (make-instance 'slot-equal-test-class :s1 5 :s2 1)
+                  (make-instance 'slot-equal-test-class :s1 5 :s2 1)
+                  :test test))
+    (ensure
+      (slot-equal (make-instance 'slot-equal-test-class :s1 5)
+                  (make-instance 'slot-equal-test-class :s1 5)
+                  :test test))))
+
+(addtest widget-tree-equal.root-only
+  (let ((w1 (make-instance 'widget :dom-id "w"))
+        (w2 (make-instance 'widget :dom-id "w")))
+  (ensure (widget-tree-equal w1 w2))))
+
+(addtest widget-tree-equal.unrelated
+  (let ((w1 (make-instance 'widget :dom-id "w1"))
+        (w2 (make-instance 'widget :dom-id "w2")))
+  (ensure-null (widget-tree-equal w1 w2))))
+
+(addtest widget-tree-equal.straight
+  (let ((t1-w1 (make-instance 'widget :dom-id "w1"))
+        (t1-w2 (make-instance 'widget :dom-id "w2"))
+        (t2-w1 (make-instance 'widget :dom-id "w1"))
+        (t2-w2 (make-instance 'widget :dom-id "w2")))
+    (setf (widget-children t1-w1) (list t1-w2))
+    (setf (widget-children t2-w1) (list t2-w2))
+  (ensure (widget-tree-equal t1-w1 t2-w1))))
+
+(addtest widget-tree-equal.hierarchy
+  (let ((t1-w1 (make-instance 'widget :dom-id "w1"))
+        (t1-w1-a (make-instance 'widget :dom-id "w1a"))
+        (t1-w2 (make-instance 'widget :dom-id "w2"))
+        (t1-w2-a (make-instance 'widget :dom-id "w2a"))
+        (t1-w2-b (make-instance 'widget :dom-id "w2b"))
+        (t2-w1 (make-instance 'widget :dom-id "w1"))
+        (t2-w1-a (make-instance 'widget :dom-id "w1a"))
+        (t2-w2 (make-instance 'widget :dom-id "w2"))
+        (t2-w2-a (make-instance 'widget :dom-id "w2a"))
+        (t2-w2-b (make-instance 'widget :dom-id "w2b")))
+    (setf (widget-children t1-w1) (list t1-w1-a t1-w2))
+    (setf (widget-children t1-w2) (list t1-w2-a t1-w2-b))
+    (setf (widget-children t2-w1) (list t2-w1-a t2-w2))
+    (setf (widget-children t2-w2) (list t2-w2-a t2-w2-b))
+  (ensure (widget-tree-equal t1-w1 t2-w1))))
+
+#+(or) ; to be finished
+(addtest copy-widget-tree.simple
+  (let ((*lift-equality-test* #'widget-tree-equal))
+    (let* ((w1 (make-instance 'widget :dom-id "w1")))
+      (ensure-same (copy-widget-tree w4) w4))))
+
+#+(or) ; to be finished
+(addtest copy-widget-tree.straight
+  (let ((*lift-equality-test* #'widget-tree-equal))
+    (let* ((w1 (make-instance 'widget :dom-id "w1"))
+           (w2 (make-instance 'widget :parent w1 :dom-id "w2")))
+      (ensure-same (copy-widget-tree w1) 5))))
+
+
+;;; make-widget
+(addtest make-widget.funcall
+  (ensure (typep (make-widget (lambda nil)) 'funcall-widget))
+  (ensure (typep (make-widget 'foo) 'funcall-widget)))
+
+(addtest make-widget.string
+  (ensure (typep (make-widget "foo") 'string-widget)))
+

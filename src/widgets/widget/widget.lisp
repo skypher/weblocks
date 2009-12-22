@@ -11,8 +11,16 @@
           render-widget render-widget-body render-widget-children
           get-widgets-by-type
 	  widget-css-classes
-	  mark-dirty widget-dirty-p
+	  mark-dirty
+          widget-dirty-p
+          widget-equal
+          widget-tree-equal
+          copy-widget-tree
           *current-widget*))
+
+(defvar *tree-update-pending* nil
+  "T if we're currently updating the widget tree.
+  Used as recursion guard in (SETF WIDGET-CHILDREN).")
 
 (defmacro defwidget (name direct-superclasses &body body)
   "A macro used to define new widget classes. Behaves exactly as
@@ -40,14 +48,6 @@ inherits from 'widget' if no direct superclasses are provided."
                     request. This slot allows setting up dependencies
                     between widgets that will make multiple widgets
                     update automatically during AJAX requests.")
-   (renderedp :accessor widget-rendered-p
-	      :initform nil
-	      :affects-dirty-status-p nil
-	      :documentation "This slot holds a boolean flag
-              indicating whether the widget has been rendered at least
-              once. Because marking unrendered widgets as dirty may
-              cause JS problems, 'mark-dirty' will use this flag to
-              determine the status of a widget.")
    (continuation :accessor widget-continuation
 		 :initform nil
 		 :documentation "Stores the continuation object for
@@ -56,6 +56,7 @@ inherits from 'widget' if no direct superclasses are provided."
                  on a widget, this value is used to resume the
                  computation.")
    (parent :accessor widget-parent
+           :initarg :parent 
 	   :initform nil
 	   :documentation "Stores the 'parent' of a widget, i.e. the
 	   widget in which this widget is located, if any. This value is
@@ -90,6 +91,17 @@ inherits from 'widget' if no direct superclasses are provided."
   (when name (setf (dom-id obj) name))
   (when children (setf (widget-children obj :widget) children)))
 
+(defgeneric make-widget (obj)
+  (:documentation "Create a widget from OBJ.")
+  (:method (obj)
+    "Create a widget from the printable (PRINC-TO-STRING) representation
+     of OBJ."
+    (warn "Fallback: Creating widget from printable representation of ~S" obj)
+    (make-instance 'string-widget :content (princ-to-string obj)))
+  (:method ((obj widget))
+    "MAKE-WIDGET is idempotent."
+    obj))
+
 (defgeneric widget-name (obj)
   (:documentation "An interface to the DOM id of a widget. Provides
   access to the underlying implementation, can return either a symbol, a
@@ -110,24 +122,6 @@ inherits from 'widget' if no direct superclasses are provided."
   ;;       when this is implemented.
   (setf (slot-value obj 'parent) val))
 
-(deftype widget-designator ()
-  "The supertype of all widgets.  Check against this type instead of
-`widget' unless you know what you're doing."
-  '(or widget (and symbol (not null)) string function))
-
-(defun widget-designator-p (widget)
-  "Returns t when widget is a valid, renderable widget; this includes
-strings, function, etc."
-  (identity (typep widget 'widget-designator)))
-
-;;; Define widget-rendered-p for objects that don't derive from
-;;; 'widget'
-(defmethod widget-rendered-p (obj)
-  nil)
-
-(defmethod (setf widget-rendered-p) (val obj)
-  nil)
-
 (defgeneric widget-children (w &optional type)
   (:documentation "Return a list of all widgets (all types) who are
 children of w (e.g. may be rendered when w is rendered).")
@@ -135,7 +129,7 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((w widget) &optional type)
     (if type
       (cdr (assoc type (slot-value w 'children)))
-      (reduce #'append (slot-value w 'children) :key #'cdr))))
+      (reduce #'append (slot-value w 'children) :from-end t :key #'cdr))))
 
 ;; Rationale: yes, I realize it would be nicer to use methods (and
 ;; possibly generators) to functionally enumerate the children of
@@ -160,13 +154,9 @@ children of w (e.g. may be rendered when w is rendered).")
 ;; we get one make-widget-place-writer function which works for nearly
 ;; all cases, so you will very rarely need to write your own. --jwr
 
-;; One caveat: if your widget stores some of its children in its own
-;; slots, you should still call (SETF WIDGET-CHILDREN), so that they
-;; become a part of the widget tree, and when you render, you should
-;; call render-widget on WIDGET-CHILDREN, not on your slot. The
-;; reason for this is that someone might have replaced your child with
-;; do-widget. WIDGET-CHILDREN will give you the current list of
-;; children, your slot will not. --jwr
+;; If your widget stores some of its children in its own slots, you
+;; should see the docstring for `map-subwidgets' to take care of
+;; additional complexities.
 
 (defgeneric (setf widget-children) (widgets obj &optional type)
   (:documentation "Set the list of children of type TYPE for OBJ to be
@@ -189,7 +179,27 @@ children of w (e.g. may be rendered when w is rendered).")
                (remove type children :key #'car))
               (widgets
                (cons (cons type (ensure-list widgets)) children))))
+      (when (and (ajax-request-p)
+                 (not *tree-update-pending*)
+                 (get-widgets-by-type 'selector :root obj))
+        (handler-case (update-widget-tree)
+          (http-not-found () (abort-request-handler
+                               (page-not-found-handler *current-webapp*)))))
       (update-parent-for-children obj))))
+
+(defgeneric map-subwidgets (function widget)
+  (:argument-precedence-order widget function)
+  (:method-combination progn :most-specific-last)
+  (:documentation "Call FUNCTION once for every direct child of
+  WIDGET.  The return value is unspecified.
+
+  You should define a method for your widget class if it introduces
+  child widgets that should be seen by `walk-widget-tree', but are not
+  included in `widget-children', and are not rendered by
+  `render-widget-children'.  You should also define a method on
+  `make-widget-place-writer' in that case.")
+  (:method progn (function widget)
+    (mapc function (widget-children widget))))
 
 (defgeneric update-children (widget)
   (:documentation "Called during the tree shakedown phase (before
@@ -204,6 +214,9 @@ children of w (e.g. may be rendered when w is rendered).")
   PARENT-WIDGET.")
   (:method (w) "NIL unless defined otherwise" nil)
   (:method ((w widget))
+<<<<<<< local
+    (map-subwidgets (lambda (child) (setf (widget-parent child) w)) w)))
+=======
     (mapc (lambda (child) (setf (widget-parent child) w))
 	  (widget-children w))))
 
@@ -228,6 +241,7 @@ children of w (e.g. may be rendered when w is rendered).")
 	 for param = (assoc pname uri-params :test #'equalp)
 	 when param
          do (setf (slot-value w sname) (cdr param))))
+>>>>>>> other
 
 (defgeneric walk-widget-tree (obj fn &optional depth)
   (:documentation "Walk the widget tree starting at obj and calling fn
@@ -242,7 +256,7 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((obj symbol) fn &optional (depth 0)) (funcall fn obj depth))
   (:method ((obj widget) fn &optional (depth 0))
     (funcall fn obj depth)
-    (mapc (curry-after #'walk-widget-tree fn (+ depth 1)) (widget-children obj))))
+    (map-subwidgets (curry-after #'walk-widget-tree fn (+ depth 1)) obj)))
 
 
 (defgeneric page-title (w)
@@ -299,8 +313,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	    (assert (place-in-children-p place (slot-value obj 'children)))
 	    (cond
 	      (callee-supplied-p
-	       (check-type callee widget-designator
-			   "a potential child of a widget")
 	       (rplaca place callee)
 	       (setf (widget-parent callee) obj)
 	       (mark-dirty obj))
@@ -310,53 +322,6 @@ children of w (e.g. may be rendered when w is rendered).")
 	    (style-warn 'widget-not-in-parent :widget child :parent obj)
 	    (mark-dirty obj))))))
 
-
-(defparameter *widget-classes*
-  (mapcar #'find-class '(widget symbol string function))
-  "The classes that widgets can be.")
-
-(defun ensure-widget-methods (gf args function &optional (replace? t))
-  "Define a set of methods on GF for each of the 4 standard classes
-that represent widgets, in locations indicated by ARGS (a designator
-for a list of 0-indices into the lambda list), where the specializers
-for the remaining args are all T, calling FUNCTION with the arguments
-given to the GF.  This means that for 3 widget args, 64 methods will
-be defined, and so on.
-
-When REPLACE?, the default, always replace whatever methods with equal
-signatures are already defined."
-  (unless args				;avoid (*)=1 case
-    (return-from ensure-widget-methods nil))
-  (when (typep gf '(or symbol list))
-    (setf gf (fdefinition gf)))
-  (setf args (sort (copy-list (ensure-list args)) #'>))
-  (let* ((old-methods (generic-function-methods gf))
-	 (gfll (generic-function-lambda-list gf))
-	 (function-lambda (congruent-lambda-expression gfll function)))
-    (labels ((descend-combination (proc specializers pos args)
-	       (let ((next-arg (or (first args) -1)))
-		 (cond ((= -1 pos)
-			(funcall proc specializers))
-		       ((/= pos next-arg)
-			(descend-combination
-			 proc (nconc (make-list (- pos next-arg)
-						:initial-element (find-class 't))
-				     specializers)
-			 next-arg args))
-		       (t
-			(dolist (wclass *widget-classes*)
-			  (descend-combination proc (cons wclass specializers)
-					       (1- pos) (rest args)))))))
-	     (maybe-ensure-method (specializers)
-	       (when (or replace?
-			 (not (position specializers old-methods
-					:key #'method-specializers :test #'equal)))
-		 (ensure-method gf function-lambda :specializers specializers))))
-      (descend-combination
-       #'maybe-ensure-method '()
-       (1- (or (position-if (f_ (member _ lambda-list-keywords)) gfll)
-	       (length gfll)))
-       args))))
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
 				    widget-prefix-fn widget-suffix-fn
@@ -381,44 +346,33 @@ that will be applied before and after the body is rendered.")
 	    (safe-apply widget-suffix-fn obj args)))))
 
 (defgeneric render-widget-children (obj &rest args)
-  (:documentation "Renders the widget's children")
-  (:method ((obj symbol) &rest args) nil)
-  (:method ((obj function) &rest args) nil)
-  (:method ((obj string) &rest args) nil)
+  (:documentation "Renders the widget's children.")
+  (:method (obj &rest args)
+    (warn "Cannot update the widget children of ~S because it is not a widget."
+          obj))
   (:method ((obj widget) &rest args)
-    (mapc (lambda (child) (apply #'render-widget child args)) (widget-children obj :widget))))
+ "Render all children. Specialize this method if you only want
+to render widgets of a certain type."
+    (mapc (lambda (child)
+            (apply #'render-widget child args))
+          (widget-children obj))))
 
 (defgeneric render-widget-body (obj &rest args &key &allow-other-keys)
   (:documentation
    "A generic function that renders a widget in its current state. In
 order to actually render the widget, call 'render-widget' instead.
 
-'obj' - widget object to render.
-
-One of the implementations allows \"rendering\" functions. When
-'render-widget' is called on a function, the function is simply
-called. This allows to easily add functions to widgets that
-can do custom rendering without much boilerplate. Similarly symbols
-that are fbound to functions can be treated as widgets.
-
-Another implementation allows rendering strings.")
+'obj' - widget object to render.")
+  (:method (obj &rest args)
+    (typecase obj
+      ((or string symbol function)
+       (warn "Implicitly calling MAKE-WIDGET to render ~S." obj)
+       (apply #'render-widget-body (make-widget obj) args))
+      (t
+       (error "I don't know how to render ~S.~%" obj))))
   (:method ((obj widget) &rest args)
     (declare (ignore args))
     "By default this method does nothing."))
-
-(defmethod render-widget-body ((obj symbol) &rest args)
-  (if (fboundp obj)
-      (apply obj args)
-      (error "Cannot render ~A as widget. Symbol not bound to a
-      function." obj)))
-
-(defmethod render-widget-body ((obj function) &rest args)
-  (apply obj args))
-
-(defmethod render-widget-body ((obj string) &rest args &key id class &allow-other-keys)
-  (declare (ignore args))
-  (with-html
-    (:p :id id :class class (str obj))))
 
 (defmethod widget-prefix-fn (obj)
   nil)
@@ -457,8 +411,7 @@ stylesheets and javascript links in the page header."))
                  (list :widget-prefix-fn (widget-prefix-fn obj)))
                (when (widget-suffix-fn obj)
                  (list :widget-suffix-fn (widget-suffix-fn obj)))
-               args)))
-    (setf (widget-rendered-p obj) t)))
+               args)))))
 
 (defgeneric mark-dirty (w &key propagate putp)
   (:documentation
@@ -470,25 +423,26 @@ widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
 Note that this function is automatically called when widget slots are
 modified, unless slots are marked with affects-dirty-status-p.
 
+Returns NIL if the widget is already dirty or T and the results
+of calling MARK-DIRTY on the list of dependents (propagate-dirty).
+
 PUTP is a legacy argument. Do not use it in new code."))
 
 (defmethod mark-dirty ((w widget) &key (propagate t propagate-supplied)
                                        (putp nil putp-supplied))
   (declare (special *dirty-widgets*))
-  (when (functionp w)
-    (error "AJAX is not supported for functions. Convert the function
-    into a CLOS object derived from 'widget'."))
   (and propagate-supplied putp-supplied
        (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
-  (ignore-errors
-    (when (widget-rendered-p w)
-      (setf *dirty-widgets* (adjoin w *dirty-widgets*)))
-    (when propagate
-      (mapc #'mark-dirty (remove nil (widget-propagate-dirty w))))))
+  (unless (widget-dirty-p w)
+    (push w *dirty-widgets*)
+    ;; NOTE: we have to check for unbound slots because this function
+    ;; may get called at initialization time before those slots are bound
+    (values t (when (and propagate (slot-boundp w 'propagate-dirty))
+                (mapc #'mark-dirty (remove nil (widget-propagate-dirty w)))))))
 
 (defun widget-dirty-p (w)
   "Returns true if the widget 'w' has been marked dirty."
-  (member w *dirty-widgets*))
+  (member w *dirty-widgets* :test #'eq))
 
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
@@ -503,10 +457,12 @@ PUTP is a legacy argument. Do not use it in new code."))
   (print-unreadable-object (obj stream :type t)
     (format stream "~S" (ensure-dom-id obj))))
 
-(defmethod get-widgets-by-type (type &key (include-subtypes-p t))
-  "Find all widgets of a specific type in the widget tree."
+(defmethod get-widgets-by-type (type &key (include-subtypes-p t) (root (root-widget)))
+  "Find all widgets of a specific type (or one of its subtypes
+if INCLUDE-SUBTYPES-P) in the widget tree starting at ROOT
+(defaults to the current root widget)."
   (let (widgets)
-    (walk-widget-tree (root-widget)
+    (walk-widget-tree root
                       (lambda (widget d)
                         (declare (ignore d))
                         (when (or (eq (type-of widget) type)
@@ -524,4 +480,57 @@ PUTP is a legacy argument. Do not use it in new code."))
                         (when (funcall test id (dom-id widget))
                           (push widget widgets))))
     widgets))
+
+(defun widget-parents (widget)
+  "Return the parent chain of a widget."
+  (let ((parent (widget-parent widget)))
+    (when parent
+      (cons parent (widget-parents parent)))))
+
+(defun widgets-roots (widgets)
+  "Find the common roots of the passed list of WIDGETS
+  that are still part of the list."
+  (declare (list widgets))
+  (let (roots)
+    (dolist (widget widgets)
+      (setf widgets (remove widget widgets))
+      (let ((parents (widget-parents widget)))
+        (unless (some (curry-after #'member (union roots widgets)) parents)
+          (push widget roots))))
+    roots))
+
+(defun copy-widget-tree (root)
+  "Copy the widget tree at ROOT including all widgets below.
+Slots will be copied shallowly except for CHILDREN."
+  (declare (type (or widget string function) root))
+  (etypecase root
+    ((or string function)
+      root)
+    (widget
+      (let ((slotnames (mapcar #'slot-definition-name (class-slots (class-of root))))
+            ;; we use MAKE-INSTANCE in case side effects are attached
+            ;; to the INITIALIZE-INSTANCE stage.
+            (copy (make-instance (type-of root))))
+        (dolist (slotname slotnames)
+          (if (slot-boundp root slotname)
+            (case slotname
+              (children (mapc #'copy-widget-tree slotname))
+              (t (setf (slot-value copy slotname) (slot-value root slotname))))
+            (slot-makunbound root slotname)))
+        copy))))
+
+(defun widget-equal (w1 w2)
+  ;; TODO: ensure parental sanity
+  (slot-equal w1 w2 :exclude '(children parent)))
+
+(defun widget-tree-equal (tree1 tree2)
+  (and (widget-equal tree1 tree2)
+       (every #'widget-tree-equal
+              (widget-children tree1) (widget-children tree2))))
+
+(defmethod render-widget-body :around ((widget widget) &rest args)
+  "Record profiling information."
+  (webapp-update-thread-status (concatenate 'string "rendering widget " (princ-to-string widget)))
+  (timing (concatenate 'string "render-widget " (princ-to-string widget))
+    (call-next-method)))
 

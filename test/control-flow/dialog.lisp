@@ -90,11 +90,12 @@
       (with-output-to-string (*weblocks-output-stream*)
         (weblocks::update-dialog-on-request)))
     (with-javascript-to-string
-      (ps:ps (*Event.observe window "load"
-                                (lambda ()
-                                  (setf ID-123 "<div class='widget function'><p>bar</p></div>")
-                                  (setf ID-123 nil)
-                                  (weblocks::show-dialog "foo" ID-123 "baz" ID-123)))))))
+      (ps:ps (funcall (slot-value *Event 'observe)
+                      window "load"
+                      (lambda ()
+                        (setf ID-123 "<div class='widget function'><p>bar</p></div>")
+                        (setf ID-123 nil)
+                        (weblocks::show-dialog "foo" ID-123 "baz" ID-123)))))))
 
 ;;; test do-dialog
 (deftest do-dialog-1

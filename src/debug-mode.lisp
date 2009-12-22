@@ -3,8 +3,13 @@
 
 (export '(disable-global-debugging enable-global-debugging))
 
+(declaim (special *current-webapp* *maintain-last-session*))
+
+(defvar *weblocks-global-debug* nil)
+
 (defun enable-global-debugging ()
   "Setup hooks for session maintenance and showing backtraces"
+  (setf *weblocks-global-debug* t)
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
   ;(setf *show-lisp-backtraces-p* t)
@@ -15,6 +20,7 @@
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
+  (setf *weblocks-global-debug* nil)
   (setf *show-lisp-errors-p* nil)
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
@@ -88,3 +94,17 @@ seem to be implemented correctly."))
   (format stream "A webapp user did: \"~A\"
 But it was handled incorrectly; this is probably an issue with ~A"
 	  (misunderstood-action c) (missing-action-handler-part c)))
+
+(define-condition missing-default-store (webapp-style-warning)
+  ((webapp :initarg :webapp :reader webapp-missing-default-store
+	   :documentation "The webapp lacking one at start-time."))
+  (:report report-missing-default-store)
+  (:documentation "Signalled when a webapp lacking a `*default-store*'
+  is started."))
+
+(defun report-missing-default-store (c stream)
+  "Describe a `missing-default-store'."
+  (format stream "~A has no default store defined ~
+		  (try ~S or moving ~S after ~S)"
+	  (webapp-missing-default-store c)
+	  :default-store 'defstore 'defwebapp))
