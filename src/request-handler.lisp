@@ -185,10 +185,11 @@ customize behavior."))
       (setf *current-page-description* page-title))))
 
 (defvar *session-locks* (make-hash-table :test #'eq
-                                         #+sbcl :weakness #+sbcl :key)
+                                         #+sbcl :weakness #+sbcl :key
+					 #+ccl :weak #+ccl :key)
   "Per-session locks to avoid having unrelated threads
   waiting.")
-#-sbcl(warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
+#-sbcl (warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
             Expect a tiny memory leak until fixed.")
 
 (defvar *session-lock-table-lock* (bordeaux-threads:make-lock

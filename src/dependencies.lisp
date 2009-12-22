@@ -99,7 +99,7 @@ when new dependencies appeared in AJAX page updates.")
   (remove-duplicates dependency-list :test #'dependencies-equalp :from-end t))
 
 (defun sort-dependencies-by-type (dependency-list)
-  (sort dependency-list #'dependencies-lessp))
+  (stable-sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list &key bundle-folder
 			    (bundle-types (bundle-dependency-types* (current-webapp))))

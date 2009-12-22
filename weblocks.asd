@@ -207,7 +207,7 @@
 		 (:file "request"
 			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"
-			:depends-on ("weblocks"))
+			:depends-on ("weblocks" "server"))
 		 (:file "application"
 			:depends-on ("weblocks" "application-mop" store))
 		 (:file "default-application"
