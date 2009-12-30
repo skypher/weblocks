@@ -11,10 +11,12 @@
     :licence "Public Domain"
     :description "weblocks-demo"
     :depends-on (:weblocks :metatilities)
-    :components ((:file "weblocks-demo")
-		 (:module conf
+    :components ((:file "package")
+                 (:module conf
 		  :components ((:file "stores"))
-		  :depends-on ("weblocks-demo"))
+                  :depends-on ("package"))
+                 (:file "weblocks-demo"
+		  :depends-on ("conf" "package"))
 		 (:module src
 		  :components ((:file "layout"
 				      :depends-on (model))
@@ -30,5 +32,5 @@
 							    :depends-on ("address"))
 						     (:file "employee"
 							    :depends-on ("person" "company")))))
-		  :depends-on ("weblocks-demo" conf))))
+		  :depends-on ("weblocks-demo" conf package))))
 
