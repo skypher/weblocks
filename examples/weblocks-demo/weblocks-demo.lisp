@@ -11,8 +11,7 @@
 (defun start-weblocks-demo (&rest args)
   "Starts the application by calling 'start-weblocks' with appropriate
   arguments."
-  (apply #'start-weblocks args)
-  (start-webapp 'weblocks-demo))
+  (apply #'start-weblocks args))
 
 (defun stop-weblocks-demo ()
   "Stops the application by calling 'stop-weblocks'."
@@ -25,8 +24,9 @@
   `(hunchentoot:session-value 'sandbox-store))
 
 ;; Define our application
-(defwebapp weblocks-demo
-    :prefix "" :public-files-cache-time 100000
+(defwebapp weblocks-demo :prefix ""
+           :autostart t
+           :public-files-cache-time 100000
 	   :description "A web application based on Weblocks"
 	   :dependencies '((:stylesheet "suggest")))
 
