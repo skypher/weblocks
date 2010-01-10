@@ -143,11 +143,7 @@ declared AUTOSTART."
                                 :test #'string=))
          (no-cache) ; disable caching for dynamic pages
 	 (return-from weblocks-dispatcher 
-	   #'(lambda ()
-	       (handler-bind 
-		   ((error (f (e) (safe-funcall *debugger-hook* 
-						e *debugger-hook*))))
-		 (handle-client-request app))))))))
+	   (handle-client-request app))))))
   (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
