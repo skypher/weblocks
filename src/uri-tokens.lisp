@@ -1,9 +1,17 @@
 (in-package :weblocks)
 
-(export '(uri-tokens all-tokens remaining-tokens consumed-tokens
-	  peek-at-token tokens-fully-consumed-p pop-tokens consume-tokens
-          uri-tokens-to-string uri-tokens-start-with
-	  *uri-tokens*))
+(export '(uri-tokens
+          all-tokens
+          remaining-tokens
+          consumed-tokens
+          peek-at-token
+          tokens-fully-consumed-p
+          pop-tokens
+          pop-token
+          consume-tokens
+          uri-tokens-to-string
+          uri-tokens-start-with
+          *uri-tokens*))
 
 (defvar *uri-tokens*)
 (setf (documentation '*uri-tokens* 'variable)
@@ -60,6 +68,10 @@
           (setf consumed-tokens (append consumed-tokens current-tokens))
           (setf remaining-tokens (safe-subseq remaining-tokens how-many)))
         current-tokens))))
+
+(defun pop-token (tokens)
+  "Convenience function -- pop exactly one token to be returned as an atom."
+  (car (pop-tokens tokens 1)))
 
 (defgeneric consume-tokens (tokens token-list)
   (:method ((tokens uri-tokens) token-list)
