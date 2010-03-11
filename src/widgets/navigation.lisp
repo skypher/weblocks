@@ -60,7 +60,7 @@ may be NIL in which case the default pane name is provided."
            :base (selector-base-uri obj)
            :selected-pane (static-selector-current-pane obj)
            :header (navigation-header obj)
-           :container-id (ensure-dom-id obj)
+           :container-id (dom-id obj)
            :empty-message "No navigation entries"
            menu-args)))
 

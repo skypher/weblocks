@@ -46,6 +46,9 @@ tokens."
       (when (on-demand-make-if-missing obj)
 	(multiple-value-bind (widget consumed-tokens remaining-tokens caching)
 	    (funcall (on-demand-lookup-function obj) obj (remaining-tokens tokens))
+          (check-type widget (or widget null))
+          (check-type consumed-tokens list)
+          (check-type remaining-tokens list)
 	  ;; discard the tokens we have decided to consume
 	  (pop-tokens tokens (length consumed-tokens))
 	  (unless widget
