@@ -315,9 +315,9 @@ to my `application-dependencies' slot."
   (let ((app (find (if (symbolp name) (attributize-name name) name)
 		   *active-webapps*
 		   :key #'weblocks-webapp-name :test #'equal)))
-    (if app app
-	(when error-p
-	  (error "Argument ~a is not a running weblocks application." name)))))
+    (or app
+        (when error-p
+          (error "Argument ~a is not a running weblocks application." name)))))
 
 (defun get-webapps-for-class (name)
   (let ((class (or (and (symbolp name) (find-class name nil))
