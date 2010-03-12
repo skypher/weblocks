@@ -6,7 +6,8 @@
            string-whitespace-p
            string-remove-left
            string-remove-right
-	   string-invert-case)
+	   string-invert-case
+           remove-spurious-slashes)
          '(t util))
 
 (defgeneric humanize-name (name)
