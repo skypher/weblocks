@@ -155,6 +155,8 @@
 					      :depends-on (widget "data-editor"))
 				       (:file "quickform"
 					      :depends-on (widget "dataform"))
+				       (:file "simpleform"
+					      :depends-on (widget "quickform"))
 				       (:file "login"
 					      :depends-on (widget "quickform"))
 				       (:module dataseq
