@@ -48,19 +48,19 @@ Example:
   (username :requiredp t))
 
 (defun make-password-reminder ()
-  (mystic::make-simpleform 'password-reminder-view
-                           :submit-label \"Request password\"
-                           :satisfies (lambda (widget data)
-                                        (if (find-user (slot-value data 'username))
-                                          t
-                                          (values nil `((username . \"User not found.\")))))
-                           :on-success (lambda (widget) (let ((user (find-user
-                                                                        (slot-value (dataform-data widget) 'username))))
-                                                          (mail (email user)
-                                                                \"Your password\"
-                                                                (format nil \"Your password is ~S\"
-                                                                        (password user)))))
-                           :success-widget \"Your password has been sent to your email address.\"))
+  (make-simpleform 'password-reminder-view
+                   :submit-label \"Request password\"
+                   :satisfies (lambda (widget data)
+                                (if (find-user (slot-value data 'username))
+                                  t
+                                  (values nil `((username . \"User not found.\")))))
+                   :on-success (lambda (widget) (let ((user (find-user
+                                                                (slot-value (dataform-data widget) 'username))))
+                                                  (mail (email user)
+                                                        \"Your password\"
+                                                        (format nil \"Your password is ~S\"
+                                                                (password user)))))
+                   :success-widget \"Your password has been sent to your email address.\"))
 "
   (apply #'make-instance 'simpleform
                          :form-view view
@@ -131,21 +131,20 @@ Example:
                              (declare (ignore args))
                              (with-html
                                (:div :class "back"
-                                     (mystic::render-button-link (make-action
-                                                           (lambda (&rest args)
-                                                             (declare (ignore args))
-                                                             (setf (slot-value widget 'ui-state) :form)))
-                                                  "Back"
-                                                  :class "modify"))
+                                     (render-link
+                                       (lambda (&rest args)
+                                         (declare (ignore args))
+                                         (setf (slot-value widget 'ui-state) :form))
+                                       "Back"
+                                       :class "button modify"))
                                (:div :class "next"
-                                     (mystic::render-button-link
-                                       (make-action
-                                         (lambda (&rest args)
-                                           (declare (ignore args))
-                                           (setf (slot-value widget 'ui-state) :success)
-                                           (safe-funcall (dataform-on-success widget) widget)))
+                                     (render-link
+                                       (lambda (&rest args)
+                                         (declare (ignore args))
+                                         (setf (slot-value widget 'ui-state) :success)
+                                         (safe-funcall (dataform-on-success widget) widget))
                                        "Confirm"
-                                       :class "modify"))))
+                                       :class "button modify"))))
          :widget widget
          args))
 
