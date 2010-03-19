@@ -78,11 +78,12 @@
 			    (make-instance 'persistent-objects-of-class))))
 	 (object-id (object-id object)))
     ; assign object id
-    (if object-id
-	(when (< (persistent-objects-of-class-next-id objects) object-id)
-	  (setf (persistent-objects-of-class-next-id objects) (1+ object-id)))
-	(setf (object-id object)
-	      (incf (persistent-objects-of-class-next-id objects))))
+    (when (typep object-id '(or number null))
+      (if object-id
+          (when (< (persistent-objects-of-class-next-id objects) object-id)
+            (setf (persistent-objects-of-class-next-id objects) (1+ object-id)))
+          (setf (object-id object)
+                (incf (persistent-objects-of-class-next-id objects)))))
     ; store the object
     (setf (gethash (object-id object) (persistent-objects-of-class-by-id objects))
 	  object)))
