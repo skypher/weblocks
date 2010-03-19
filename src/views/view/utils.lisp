@@ -221,7 +221,13 @@ header."
     ;; view rendering --jwr
     (apply #'render-object-view-impl obj (find-view view) widget args)))
 
-(defmethod class-from-view (view &optional (class-name (gensym)))
+(defun default-class-from-view-name (view)
+  (if (symbolp view)
+    (make-symbol (concatenate 'string (string view) "-OBJ-" (symbol-name (gensym))))
+    (gensym)))
+
+(defmethod class-from-view (view &optional (class-name
+                                             (default-class-from-view-name view)))
   "A helper function that generates a class object from a view. The
 view fields are enumerated and a CLOS class with slots based on field
 names is generated.  This was made a method so the elephant backend
