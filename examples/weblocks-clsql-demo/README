@@ -5,7 +5,7 @@
 3. Run (START-WEBLOCKS) command.
 4. Create appropriate tables in the database by evaluating the
    following expressions:
-     (clsql-sys:create-view-from-class 'employee)
-     (clsql-sys:create-view-from-class 'company)
-     (clsql-sys:create-view-from-class 'address)
-
+   (in-package :weblocks-clsql-demo)
+   (clsql-sys:create-view-from-class 'employee :database *default-store*)
+   (clsql-sys:create-view-from-class 'company :database *default-store*)
+   (clsql-sys:create-view-from-class 'address :database *default-store*)
