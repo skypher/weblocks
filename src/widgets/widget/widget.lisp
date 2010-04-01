@@ -388,6 +388,9 @@ order to actually render the widget, call 'render-widget' instead.
 (defmethod widget-suffix-fn (obj)
   nil)
 
+(defvar *current-widget* nil
+  "The widget being rendered right now.")
+
 (defgeneric render-widget (obj &key inlinep &allow-other-keys)
   (:documentation
   "Renders a widget ('render-widget-body') wrapped in a
@@ -405,7 +408,6 @@ stylesheets and javascript links in the page header."))
     (setf *page-dependencies*
 	  (append *page-dependencies* (dependencies obj))))
   (let ((*current-widget* obj))
-    (declare (special *current-widget*))
     (if inlinep
       (progn (apply #'render-widget-body obj args)
 	     (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
