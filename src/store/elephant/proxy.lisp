@@ -65,7 +65,7 @@
 
 (defmethod weblocks::class-from-view :around (view &optional class-name)
   "Part of the quickview / dataform method for creating anonymous instances"
-  (if (subtypep class-name 'persistent)
+  (if (and class-name (subtypep class-name 'persistent))
       (find-class (return-proxy-classname class-name))
       (call-next-method)))
 
