@@ -10,6 +10,7 @@
 	   find-all
            list-starts-with
            stable-set-difference
+           safe-getf
 	   remove-keyword-parameter
            remove-keyword-parameters)
 	 '(t util))
@@ -93,6 +94,13 @@ item before passing it to 'predicate'."
   (loop for i in list-1
        unless (find (funcall key i) list-2 :test test :key key)
        collect i))
+
+(defun safe-getf (list name)
+  "Like GETF but copes with odd argument lists.
+Extracts the first value whose predecessor matches NAME."
+  (if (evenp (length list))
+    (getf list name)
+    (second (member name list :test #'eq))))
 
 (defun remove-keyword-parameter (parameter-list keyword)
   "Removes a keyword parameter from a parameter-list.

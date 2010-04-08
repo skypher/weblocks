@@ -123,11 +123,10 @@ may be NIL in which case the default pane name is provided."
   "Instantiates the default navigation widget via 'make-instance' and
 forwards it along with 'args' to 'init-navigation'. The navigation
 widgets bears the title NAME."
-  (let ((nav (apply #'make-instance (or (getf args :navigation-class) 'navigation)
+  (let ((nav (apply #'make-instance (or (safe-getf args :navigation-class) 'navigation)
                                     :name name
-                                    (getf args :extra-args))))
-    (remf args :navigation-class)
-    (remf args :extra-args)
+                                    (safe-getf args :extra-args))))
+    (setf args (remove-keyword-parameters args :navigation-class :extra-args))
     (apply #'init-navigation nav args)
     nav))
 
