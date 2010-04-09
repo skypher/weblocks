@@ -8,6 +8,9 @@
 (defclass persistent-proxy ()
   ((proxy-oid :accessor proxy-oid :initarg :oid :initform nil)))
 
+(defmethod object-id ((obj persistent-proxy))
+  (proxy-oid obj))
+
 (defun make-proxy-instance (class-name &rest args)
   "Creates an instance of the proxy."
   (apply #'make-instance (return-proxy-classname class-name) args))
