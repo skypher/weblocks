@@ -148,9 +148,8 @@ widget will get cached instead of the generator."
       (if (functionp (cdr pane)) (funcall (cdr pane)) (cdr pane)))))
 
 (defun make-lazy-navigation (name &rest args)
-  (let ((nav (make-instance 'lazy-navigation :name name)))
-    (apply #'init-navigation nav args)
-    nav))
+  "Convenience function to create a lazy navigation."
+  (apply #'make-navigation (append args '(:navigation-class lazy-navigation))))
 
 
 (export '(teleport teleport-source teleport-key))
