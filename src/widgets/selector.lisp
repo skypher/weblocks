@@ -1,8 +1,15 @@
 
 (in-package :weblocks)
 
-(export '(selector get-widget-for-tokens selector-base-uri
-	  static-selector select-pane static-selector-panes static-selector-current-pane
+(export '(selector
+          get-widget-for-tokens
+          selector-base-uri
+          static-selector
+          static-selector-select-pane
+          static-selector-panes
+          static-selector-get-pane
+          static-selector-cached-panes
+          static-selector-current-pane
 	  http-not-found))
 
 (define-condition http-not-found (condition) ())
@@ -106,13 +113,22 @@
                         (static-selector-cached-panes selector))))
         result))))
 
+(defgeneric static-selector-get-pane (selector token)
+  (:documentation "Get the dotted pair (pane-name . pane-content)
+  associated with TOKEN from the list of panes. This function is
+  called by static-selector's get-widget-for-tokens. The default
+  implementation just returns the pair found by ASSOC."))
+
+(defmethod static-selector-get-pane ((selector static-selector) token)
+  (assoc token (static-selector-panes selector) :test #'equalp))
+
 (defmethod get-widget-for-tokens ((selector static-selector) uri-tokens)
   ;; we peek at the token first, because if it isn't found we won't
   ;; consume it, to give others a chance to process it
   (let* ((token (peek-at-token uri-tokens))
          (panes (static-selector-panes selector))
          (cached-panes (static-selector-cached-panes selector))
-	 (pane (assoc token panes :test #'equalp))
+	 (pane (static-selector-get-pane selector token))
          (cached-pane (assoc token cached-panes :test #'equalp))
          (effective-pane (or cached-pane pane))
          (selected-pane (cond
@@ -125,10 +141,10 @@
                            (first panes)))))
     (unless cached-pane ; already in cache? add if not
       (push (cons token (cdr selected-pane)) (static-selector-cached-panes selector)))
-    (select-pane selector (car selected-pane))
+    (static-selector-select-pane selector (car selected-pane))
     (cdr selected-pane)))
 
-(defgeneric select-pane (selector token)
+(defgeneric static-selector-select-pane (selector token)
   (:documentation "Called by GET-WIDGET-FOR-TOKENS when a pane is found
    and selected. Subclasses may use this method to maintain information
    about what is currently selected.")
