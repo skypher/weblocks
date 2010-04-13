@@ -137,16 +137,15 @@ widgets bears the title NAME."
   ()
   (:documentation "Lazy navigation does not create the entire widget
   tree immediately. Instead, parts of the widget tree are created as
-  they are needed. Note that in the current implementation parts of the
-  tree that are not selected are forgotten."))
+  they are needed."))
 
-(defmethod update-dependents ((obj lazy-navigation) children)
-  "Lazily resolve our new children -- if any of them are functions, call
-them to get the real widgets."
-  (setf (widget-children obj :selector)
-			(mapcar (lambda (child)
-				  (if (functionp child) (funcall child) child))
-				(ensure-list children))))
+(defmethod static-selector-get-pane ((navigation lazy-navigation) token)
+  "Lazily resolve the pane. Also ensures that the resulting
+widget will get cached instead of the generator."
+  (let ((pane (call-next-method)))
+    (cons
+      (car pane)
+      (if (functionp (cdr pane)) (funcall (cdr pane)) (cdr pane)))))
 
 (defun make-lazy-navigation (name &rest args)
   (let ((nav (make-instance 'lazy-navigation :name name)))
