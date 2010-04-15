@@ -4,7 +4,7 @@
 (export '(number-parser number-parser-min number-parser-max
 	  integer-parser integer-parser-radix float-parser
 	  symbol-parser keyword-parser object-id object-id-parser
-	  object-id-parser-class-name))
+	  object-id-parser-class-name object-id-parser-test))
 
 ;;; Numeric base
 (defclass number-parser (parser)
@@ -143,11 +143,18 @@ on 'symbol' and 'keyword'."
 
 ;;; Object id
 (defclass object-id-parser (parser)
-  ((class-name :initform nil
+  ((class-name :type (or symbol null)
+               :initform nil
 	       :initarg :class-name
 	       :accessor object-id-parser-class-name
 	       :documentation "A class of the object whose id is being
-	       parsed."))
+	       parsed.")
+   (test :type function
+         :initform (constantly t)
+         :initarg :test
+         :accessor object-id-parser-test
+         :documentation "A function of one argument that determines
+         whether the parsed object is valid."))
   (:default-initargs :error-message nil)
   (:documentation "A parser designed to convert an object id into an
   object instance."))
@@ -169,6 +176,6 @@ on 'symbol' and 'keyword'."
 	 (find-persistent-object-by-id (class-store (object-id-parser-class-name parser))
 				       (object-id-parser-class-name parser)
 				       (parse-integer value :junk-allowed nil))))
-    (when object
+    (when (and object (funcall (object-id-parser-test parser) object))
       (values t t object))))
 
