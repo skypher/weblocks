@@ -48,6 +48,7 @@ answers with its return value. Otherwise, returns the data object.
 
 'data-class-name' - if 'data' isn't provided, the name of the class to
 be generated from the view."
+  (assert (subtypep class 'quickform))
   (make-instance class
 		 :data (or data (make-instance (class-from-view view data-class-name)))
 		 :ui-state :form

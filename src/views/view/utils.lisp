@@ -100,7 +100,9 @@ result list, instead calling PROC on each resulting `field-info'."
 			       (map-level
 				(and obj
 				     (or (obtain-view-field-value vfield obj)
-					 (funcall (mixin-view-field-init-form vfield))))
+					 (aif (mixin-view-field-init-form vfield)
+                                           (funcall it)
+                                           (error "Slot for mixin field ~S has neither value nor initform!" vfield))))
 				(mixin-view-field-view vfield) vfield-info)
 			       (funcall proc vfield-info)))))
 		    ;; avoid duplicates
