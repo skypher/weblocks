@@ -216,3 +216,56 @@ function include_dom(script_filename) {
   return false;
 }
 
+/* working with CSS classes */
+function addClass(el,class){
+  if ((hasClass(el,class)) || (typeof el == 'undefined'))
+    return;
+  el.className += " " + class;
+}
+
+function removeClass(el,class){
+  if (typeof el=='undefined')
+    return;
+  if (el.getAttribute('class') === null)
+    return;
+
+  var classes = el.getAttribute('class').split(" ");
+  var result=[];
+
+  for (i=classes.length;i>=0;i--) {
+    if (classes[i] != class)
+      result.push(classes[i]);
+  }
+
+  el.setAttribute('class', result.join(" ")); /* FIXME: ie6/7 need className here */
+}
+
+function hasClass(el, class){
+  if ((el.className === null) || (typeof el == 'undefined'))
+    return false;
+
+  var classes = el.className.split(" ");
+
+  for (i=classes.length;i>=0;i--) {
+    if (classes[i] == class)
+      return true;
+  }
+
+  return false;
+}
+
+/* collapsible sections */
+function toggleExpandCollapse (heading,container) {
+  if (hasClass(heading,"collapsed")) {
+    removeClass(heading,"collapsed");
+    removeClass(container,"collapsed");
+    addClass(heading,"expanded");
+    addClass(container,"expanded");
+  } else {
+    removeClass(heading,"expanded");
+    removeClass(container,"expanded");
+    addClass(heading,"collapsed");
+    addClass(container,"collapsed");
+  }
+}
+

@@ -33,6 +33,7 @@
                                        (:file "list")
                                        (:file "uri")
                                        (:file "html")
+                                       (:file "javascript")
                                        (:file "isearch"
                                               :depends-on ("html"))
                                        (:file "menu"

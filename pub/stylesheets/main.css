@@ -235,3 +235,28 @@ div.empty p span.caption
   font-family: Garamond, New York, serif;
 }
 
+.collapsible-heading {
+  cursor:default;
+}
+
+.collapsible-container.expanded {
+  display:block;
+}
+
+.collapsible-heading.expanded:after {
+  content:" (click to collapse)";
+  font-size:small;
+  color:gray;
+
+}
+
+.collapsible-container.collapsed {
+  display:none;
+}
+
+.collapsible-heading.collapsed:after {
+  content:" (click to expand)";
+  font-size:small;
+  color:gray;
+}
+
