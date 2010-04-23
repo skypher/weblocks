@@ -4,12 +4,12 @@
 (export '(wizard
 
           wizard-data
-          wizard-cursor
+          wizard-data-cursor
+          wizard-current-step
           wizard-status-type
           wizard-current-widget
           wizard-on-complete
 
-          wizard-current-step
           wizard-total-steps
           wizard-processed-data
           wizard-current-datum
@@ -40,30 +40,39 @@
          :accessor wizard-data
          :initarg :data
          :initform nil
-         :documentation "The list of data held by this wizard. Elements will be
-         presented in an ordered fashion with one element per step.")
-   (cursor :type integer
-           :accessor wizard-cursor
-           :initarg :cursor
-           :initform 0
-           :documentation "Offset of the current position in the data list.
-           Not to be used directly; use the WIZARD-CURRENT-STEP function instead.")
+         :documentation "The list of data held by this wizard. By default
+         elements will be presented in an ordered fashion with one element
+         per step.")
+   (data-cursor :type integer
+                :accessor wizard-data-cursor
+                :initarg :data-cursor
+                :initform 0
+                :documentation "Offset of the current position in the data list.")
+   (current-step :type integer
+                :accessor wizard-current-step
+                :initarg :current-step
+                :initform 1
+                :documentation "The current wizard step.")
    (status-type :type symbol
                 :accessor wizard-status-type
                 :initarg :status-type
                 :initform :simple
                 :documentation "The type of status display rendered before the form.
-                Currently only :SIMPLE is supported.")
+                Currently supported are :SIMPLE and :SIMPLE-WITH-GOAL.")
+   ;; TODO integrate the current widget into the proper children mechanism
    (current-widget :type widget
                    :accessor wizard-current-widget
                    :initarg :current-widget
                    :documentation "The widget currently displayed by the wizard.")
-   (on-complete :type (or function symbol null)
+   (on-complete :type (or function symbol)
                 :accessor wizard-on-complete
                 :initarg :on-complete
-                :initform nil
-                :documentation "A function designator (or NIL) holding the function
-                that is to be called after the completion of the wizard."))
+                :documentation "A function designator holding the function
+                that is to be called after the completion of the wizard.
+
+                The function will be called with one argument, the wizard.
+
+                Must be provided."))
   (:documentation "A widget that displays a series of data objects in separate steps.
                   The default implementation renders a dataform for each step.
 
@@ -73,19 +82,20 @@
   "Initialize the wizard's first page."
   (wizard-update-current-widget inst))
 
-(defmethod (setf wizard-cursor) :after (value (wizard wizard))
+(defmethod (setf wizard-data-cursor) :after (value (wizard wizard))
   "Updates the current widget when the data item changes."
   (declare (ignore value))
   (wizard-update-current-widget wizard))
 
-(defmethod wizard-current-step ((wizard wizard))
-  "Returns the current step of the wizard, starting from 1."
-  (1+ (wizard-cursor wizard)))
+(defmethod (setf wizard-current-step) :after (value (wizard wizard))
+  "Updates the current widget when the data item changes."
+  (declare (ignore value))
+  (wizard-update-current-widget wizard))
 
 (defmethod wizard-total-steps ((wizard wizard))
-  "Returns the total steps of the wizard, which is the number
-  of data items plus one for the final confirmation page by
-  default."
+  "Returns the total steps of the wizard, which is by default
+  the number of data items plus one for the final confirmation
+  page."
   (1+ (length (wizard-data wizard))))
 
 (defmethod wizard-processed-data ((wizard wizard))
@@ -94,29 +104,30 @@
   This is not a guarantee that the other items haven't been shown
   to the user but rather an indicator of which data contents can currently
   be considered valid."
-  (safe-subseq (wizard-data wizard) 0 (wizard-cursor wizard)))
+  (safe-subseq (wizard-data wizard) 0 (wizard-data-cursor wizard)))
 
 (defmethod wizard-current-datum ((wizard wizard))
-  "Returns the current data object shows to the user."
+  "Returns the data object associated with the current wizard state."
   (car (wizard-remaining-data wizard)))
 
 (defmethod wizard-remaining-data ((wizard wizard))
   "Returns the data objects still remaining to be processed.
 
   The notes from WIZARD-PROCESSED-DATA hold here, too."
-  (nthcdr (wizard-cursor wizard) (wizard-data wizard)))
+  (nthcdr (wizard-data-cursor wizard) (wizard-data wizard)))
 
 (defmethod wizard-proceed ((wizard wizard))
-  "Proceed to the next step. You mustn't go beyond the final step."
+  "Proceed to the next step. Callers mustn't attempt to go
+  beyond the final step."
   (prog1
-    (incf (wizard-cursor wizard))
+    (incf (wizard-current-step wizard))
     (assert (<= (wizard-current-step wizard) (wizard-total-steps wizard)))))
 
 (defmethod wizard-recede ((wizard wizard))
-  "Recede to the previous step. You mustn't go beyond the first step
-  (i.e. to step zero)."
+  "Recede to the previous step. Callers mustn't attempt to go
+  beyond the first step (i.e. to step zero)."
   (prog1
-    (decf (wizard-cursor wizard))
+    (decf (wizard-current-step wizard))
     (assert (> (wizard-current-step wizard) 0))))
 
 (defmethod wizard-render-no-data ((wizard wizard))
@@ -127,9 +138,18 @@
 
 (defmethod wizard-render-status ((wizard wizard) (type (eql :simple)))
   "Render the current status of the wizard as a simple text string
-  displaying the current step and the number of total steps."
+  displaying just the current step."
+  (declare (ignore type))
   (with-html
-    (:div :class "state"
+    (:div :class "status"
+      (esc (format nil "Step ~D" (wizard-current-step wizard))))))
+
+(defmethod wizard-render-status ((wizard wizard) (type (eql :simple-with-total)))
+  "Render the current status of the wizard as a simple text string
+  displaying the current step and the number of total steps."
+  (declare (ignore type))
+  (with-html
+    (:div :class "status"
       (esc (format nil "Step ~D/~D" (wizard-current-step wizard)
                                     (wizard-total-steps wizard))))))
 
@@ -143,9 +163,13 @@
   (with-html
     (:p "You have completed all steps.")
     (:p :class "wizard-summary-back"
-      (render-link (f_% (wizard-recede wizard)) "Back"))
+      (render-link
+        (f_% (wizard-recede wizard))
+        "Back"))
     (:p :class "wizard-summary-confirm"
-      (render-link (f_% (safe-funcall (wizard-on-complete wizard))) "Confirm"))))
+      (render-link
+        (f_% (funcall (wizard-on-complete wizard) wizard))
+        "Confirm"))))
 
 (defmethod wizard-render-step ((wizard wizard) (step integer) data)
   "Render a specific step. The default implementation either
@@ -167,8 +191,13 @@
 
 (defmethod initialize-instance :after ((form wizard-dataform) &rest initargs)
   (let ((wizard (wizard-dataform-wizard form)))
-    (setf (dataform-on-cancel form) (f_% (wizard-recede wizard)))
-    (setf (dataform-on-success form) (f_% (wizard-proceed wizard)))))
+    (setf (dataform-on-cancel form) (f_% (if (> (wizard-current-step wizard) 1)
+                                           (wizard-recede wizard)
+                                           (mark-dirty wizard))))
+    (setf (dataform-on-success form) (f_% (if (< (wizard-current-step wizard)
+                                                 (wizard-total-steps wizard))
+                                            (wizard-proceed wizard)
+                                            (mark-dirty wizard))))))
 
 (defmethod render-form-view-buttons ((view form-view) obj (widget wizard-dataform) &rest args)
   "Render the buttons to recede and proceed with the wizard."
@@ -186,7 +215,8 @@
                                :class "submit cancel"
                                :value (or (cdr cancel)
                                           (humanize-name (car cancel))))))
-            (when (wizard-remaining-data (wizard-dataform-wizard widget))
+            (when (< (wizard-current-step (wizard-dataform-wizard widget))
+                     (wizard-total-steps (wizard-dataform-wizard widget)))
               (let ((submit (or (find-button :next) '(:next))))
                 (render-button *submit-control-name*
                                :value (or (cdr submit)
@@ -208,6 +238,7 @@
 
 (defmethod render-widget-body ((wizard wizard) &rest args)
   "Render the wizard."
+  (declare (ignore args))
   (cond
     ((null (wizard-data wizard))
      (wizard-render-no-data wizard))
