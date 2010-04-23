@@ -1,10 +1,19 @@
 
 (in-package :weblocks)
 
-(export '(number-parser number-parser-min number-parser-max
-	  integer-parser integer-parser-radix float-parser
-	  symbol-parser keyword-parser object-id object-id-parser
-	  object-id-parser-class-name object-id-parser-test))
+(export '(number-parser
+          number-parser-min
+          number-parser-max
+	  integer-parser
+          integer-parser-radix
+          float-parser
+          float-parser-round
+	  symbol-parser
+          keyword-parser
+          object-id
+          object-id-parser
+	  object-id-parser-class-name
+          object-id-parser-test))
 
 ;;; Numeric base
 (defclass number-parser (parser)
@@ -66,7 +75,12 @@
 
 ;;; Float
 (defclass float-parser (number-parser)
-  ()
+  ((round :type (or boolean null integer)
+          :accessor float-parser-round
+          :initarg :round
+          :initform nil
+          :documentation "If non-NIL, round the parsed float to ROUND decimals
+          (0 if T is passed)."))
   (:default-initargs :error-message nil)
   (:documentation "A parser designed to parse strings into
   floats."))
@@ -75,7 +89,7 @@
   (with-slots (error-message) parser
     (or error-message
 	(concatenate 'string
-		     "This value must be an decimal"
+		     "This value must be a decimal"
 		     (when (number-parser-min parser)
 		       (format nil " greater than ~A" (- (number-parser-min parser) 1)))
 		     (when (and (number-parser-min parser)
@@ -91,14 +105,18 @@
   (ignore-errors
     (let* ((presentp (text-input-present-p value))
 	   (float-value (when presentp
-                          (float (read-from-string value)))))
+                          (float (read-from-string value))))
+           (round-factor (awhen (float-parser-round parser)
+                           (expt 10 (if (eq it t) 0 it)))))
       (unless (floatp float-value)
         (error 'parse-error))
       (when (and float-value (number-parser-min parser))
 	(assert (>= float-value (number-parser-min parser))))
       (when (and float-value (number-parser-max parser))
 	(assert (<= float-value (number-parser-max parser))))
-      (values t presentp float-value))))
+      (values t presentp (if round-factor
+                           (/ (round (* float-value round-factor)) round-factor)
+                           float-value)))))
 
 (defmethod typespec->form-view-field-parser ((scaffold form-scaffold)
 					     (typespec (eql 'float)) args)
