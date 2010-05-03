@@ -58,7 +58,7 @@
                 :initarg :status-type
                 :initform :simple
                 :documentation "The type of status display rendered before the form.
-                Currently supported are :SIMPLE and :SIMPLE-WITH-GOAL.")
+                Currently supported are :SIMPLE and :SIMPLE-WITH-TOTAL.")
    ;; TODO integrate the current widget into the proper children mechanism
    (current-widget :type widget
                    :accessor wizard-current-widget
