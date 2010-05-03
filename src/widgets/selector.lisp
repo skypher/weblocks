@@ -134,7 +134,6 @@
          (selected-pane (cond
                           (effective-pane
                            ;; found pane
-                           (assert (equalp (first (pop-tokens uri-tokens)) (car effective-pane)))
                            effective-pane)
                           ((and (null token) panes)
                            ;; looking for default pane?
