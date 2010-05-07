@@ -217,13 +217,13 @@ function include_dom(script_filename) {
 }
 
 /* working with CSS classes */
-function addClass(el,class){
-  if ((hasClass(el,class)) || (typeof el == 'undefined'))
+function addClass(el,myClass){
+  if ((hasClass(el,myClass)) || (typeof el == 'undefined'))
     return;
-  el.className += " " + class;
+  el.className += " " + myClass;
 }
 
-function removeClass(el,class){
+function removeClass(el,myClass){
   if (typeof el=='undefined')
     return;
   if (el.getAttribute('class') === null)
@@ -233,21 +233,21 @@ function removeClass(el,class){
   var result=[];
 
   for (i=classes.length;i>=0;i--) {
-    if (classes[i] != class)
+    if (classes[i] != myClass)
       result.push(classes[i]);
   }
 
   el.setAttribute('class', result.join(" ")); /* FIXME: ie6/7 need className here */
 }
 
-function hasClass(el, class){
+function hasClass(el, myClass){
   if ((el.className === null) || (typeof el == 'undefined'))
     return false;
 
   var classes = el.className.split(" ");
 
   for (i=classes.length;i>=0;i--) {
-    if (classes[i] == class)
+    if (classes[i] == myClass)
       return true;
   }
 
