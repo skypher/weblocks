@@ -9,7 +9,7 @@
           :anaphora :f-underscore :trivial-timeout)
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function
-                            #:standard-class #:typep #:subtypep)
+                            #:standard-class #:typep #:subtypep #:standard-method)
     (:shadowing-import-from :f-underscore #:f #:_)
     (:shadowing-import-from :fare-matcher #:match)
     (:shadowing-import-from :metabang.utilities #:with-array)
