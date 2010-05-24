@@ -16,19 +16,18 @@
   (apply #'make-instance (return-proxy-classname class-name) args))
 
 (defun return-proxy-classname (classname)
-  (aif (gethash classname *proxies*) 
-       it
-       (let* ((persistent-class (find-class classname))
-              (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
-              (visible-slot-defs (class-visible-slots-impl persistent-class))
-              (class-def `(defclass ,new-name (persistent-proxy)
-                            ((base-class :accessor base-class :allocation :class
-                                         :initform ',classname)
-                             ,@(mapcar #'def-to-proxy-slot
-                                       visible-slot-defs)))))
-         (eval class-def)
-         (setf (gethash classname *proxies* new-name)
-               new-name))))
+  (or (gethash classname *proxies*)
+      (let* ((persistent-class (find-class classname))
+             (new-name (intern (format nil "~A-~A" classname (gensym)) *package*))
+             (visible-slot-defs (class-visible-slots-impl persistent-class))
+             (class-def `(defclass ,new-name (persistent-proxy)
+                           ((base-class :accessor base-class :allocation :class
+                                        :initform ',classname)
+                            ,@(mapcar #'def-to-proxy-slot
+                                      visible-slot-defs)))))
+        (eval class-def)
+        (setf (gethash classname *proxies* new-name)
+              new-name))))
 
 (defun def-to-proxy-slot (def)
   `(,(weblocks::slot-definition-name def)
