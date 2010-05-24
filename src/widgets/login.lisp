@@ -117,7 +117,7 @@ returned."
               :initarg :on-cancel
               :initform nil
               :documentation
-     		"A function that accepts one paramets: a registration widget.
+     		"A function that accepts one parameter a registration widget.
 		It is called when the registration was cancelled. "))
   (:documentation "A widget that provides basic login
   functionality. Based on a view to be rendered (or a default of email
