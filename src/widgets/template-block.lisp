@@ -28,3 +28,7 @@ HTML-TEMPLATE using 'vars'."))
                                          (template-block-vars obj)
                                          :stream *weblocks-output-stream*))
 
+(defmethod render-widget-body ((widget template-block) &rest args)
+  (declare (ignore args))
+  (render-template widget))
+
