@@ -20,7 +20,8 @@ HTML-TEMPLATE using 'vars'."))
           (html-template:create-template-printer (template-block-source obj)))))
 
 (defmethod ensure-printer-exists ((obj template-block))
-  (or (template-printer-of obj) (recreate-template-printer obj)))
+  (handler-bind ((warning #'muffle-warning))
+    (or (template-printer-of obj) (recreate-template-printer obj))))
 
 (defmethod render-template ((obj template-block))
   (ensure-printer-exists obj)
