@@ -1,6 +1,9 @@
 (in-package :weblocks)
 
-(export '(template-block template-block-source template-block-vars recreate-template-printer
+(export '(template-block
+          template-block-source
+          template-block-vars
+          recreate-template-printer
 	  render-template))
 
 (defwidget template-block ()
