@@ -12,21 +12,16 @@
 HTML-TEMPLATE using 'vars'."))
 
 (defmethod recreate-template-printer ((obj template-block))
-  (if (template-block-source obj)
-      (progn
-	(setf (template-printer-of obj)
-	      (html-template:create-template-printer (template-block-source obj)))
-	t)
-      nil))
+  (when (template-block-source obj)
+    (setf (template-printer-of obj)
+          (html-template:create-template-printer (template-block-source obj)))))
 
 (defmethod ensure-printer-exists ((obj template-block))
-  (if (template-printer-of obj)
-      t
-      (recreate-template-printer obj)))
+  (or (template-printer-of obj) (recreate-template-printer obj)))
 
 (defmethod render-template ((obj template-block))
-  (when (ensure-printer-exists obj)
-    (html-template:fill-and-print-template (template-printer-of obj)
-					   (template-block-vars obj)
-					   :stream *weblocks-output-stream*)))
+  (ensure-printer-exists obj)
+  (html-template:fill-and-print-template (template-printer-of obj)
+                                         (template-block-vars obj)
+                                         :stream *weblocks-output-stream*))
 
