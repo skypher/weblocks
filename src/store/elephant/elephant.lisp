@@ -6,7 +6,7 @@
   (:shadowing-import-from :elephant #:find-item #:insert-item #:add-index)
   (:export #:defpclass)
   (:documentation
-   "A driver for weblocks backend store API that connects to CL-Prevalence."))
+   "A driver for weblocks backend store API that connects to Elephant."))
 
 (in-package :weblocks-elephant)
 
