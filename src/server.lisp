@@ -54,8 +54,8 @@ declared AUTOSTART."
             "You're trying to start Weblocks without threading ~
             support. Recompile your Lisp with threads enabled."))
   (if debug
-      (enable-global-debugging)
-      (disable-global-debugging))
+    (enable-global-debugging)
+    (disable-global-debugging))
   (when (null *weblocks-server*)
     (values
       (start (setf *weblocks-server*

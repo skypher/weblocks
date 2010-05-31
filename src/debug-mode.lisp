@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(disable-global-debugging enable-global-debugging))
+(export '(disable-global-debugging enable-global-debugging *weblocks-global-debug*))
 
 (declaim (special *current-webapp* *maintain-last-session*))
 
