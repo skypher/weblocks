@@ -24,7 +24,9 @@
           webapp-public-files-path
 	  webapp-public-files-uri-prefix
           webapp-prefix
-	  running-webapp make-webapp-uri
+          webapp-debug
+	  running-webapp
+          make-webapp-uri
           make-webapp-public-file-uri
           reset-webapp-session
 	  webapp-session-value
@@ -658,6 +660,10 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
 (defun webapp-prefix (&optional (app (current-webapp)))
   "Returns the URL prefix of the application."
   (weblocks-webapp-prefix app))
+
+(defun webapp-debug (&optional (app (current-webapp)))
+  "Whether APP is in debug mode."
+  (weblocks-webapp-debug app))
 
 (defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
   (weblocks-webapp-public-files-uri-prefix app))
