@@ -5,7 +5,8 @@
           *before-ajax-complete-scripts*
           *on-ajax-complete-scripts*
 	  *catch-errors-p*
-          *request-timeout*))
+          *request-timeout*
+          *style-warn-on-circular-dirtying*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -241,6 +242,10 @@ customize behavior."))
   "Removes the action info from a URI."
   (remove-parameter-from-uri uri *action-string*))
 
+(defparameter *style-warn-on-circular-dirtying* nil
+  "Whether to emit a style-warning when widgets are
+marked dirty in the rendering phase.")
+
 (defun render-dirty-widgets ()
   "Renders widgets that have been marked as dirty into a JSON
 association list. This function is normally called by
@@ -250,10 +255,11 @@ association list. This function is normally called by
   (setf (content-type*) *json-content-type*)
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)
-	       (style-warn 'non-idempotent-rendering
-		:change-made
-		(format nil "~A was marked dirty and skipped after ~
-			     already being rendered" w)))
+               (when *warn-on-circular-dirtying*
+                 (style-warn 'non-idempotent-rendering
+                  :change-made
+                  (format nil "~A was marked dirty and skipped after ~
+                               already being rendered" w))))
 	     (render-enqueued (dirty)
 	       (loop for w in dirty
 		     if (gethash w render-state)
