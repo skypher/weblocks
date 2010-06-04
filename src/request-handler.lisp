@@ -6,7 +6,8 @@
           *on-ajax-complete-scripts*
 	  *catch-errors-p*
           *request-timeout*
-          *style-warn-on-circular-dirtying*))
+          *style-warn-on-circular-dirtying*
+          *style-warn-on-late-propagation*))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -244,6 +245,10 @@ customize behavior."))
 
 (defparameter *style-warn-on-circular-dirtying* nil
   "Whether to emit a style-warning when widgets are
+marked dirty after the rendering phase.")
+
+(defparameter *style-warn-on-late-propagation* nil
+  "Whether to emit a style-warning when widgets are
 marked dirty in the rendering phase.")
 
 (defun render-dirty-widgets ()
@@ -255,7 +260,7 @@ association list. This function is normally called by
   (setf (content-type*) *json-content-type*)
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)
-               (when *warn-on-circular-dirtying*
+               (when *style-warn-on-circular-dirtying*
                  (style-warn 'non-idempotent-rendering
                   :change-made
                   (format nil "~A was marked dirty and skipped after ~
@@ -271,9 +276,10 @@ association list. This function is normally called by
 					 (get-output-stream-string
 					     *weblocks-output-stream*))))
 	     (late-propagation-warn (ws)
-	       (style-warn 'non-idempotent-rendering
-		:change-made
-		(format nil "~A widgets were marked dirty: ~S" (length ws) ws)))
+               (when *style-warn-on-late-propagation*
+                 (style-warn 'non-idempotent-rendering
+                  :change-made
+                  (format nil "~A widgets were marked dirty: ~S" (length ws) ws))))
 	     (absorb-dirty-widgets ()
 	       (loop for dirty = *dirty-widgets*
 		     while dirty
