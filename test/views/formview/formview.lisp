@@ -180,6 +180,37 @@ $('id-123').focusFirstElement();
            (:em (:span :class "validation-error-heading" "Error:&nbsp;")
                 "Some Error!"))))
 
+(deftest-html render-view-field-3
+    (render-view-field (make-instance 'form-view-field
+				      :slot-name 'name
+				      :requiredp t
+				      :show-required-indicator-p nil)
+		       (make-instance 'form-view)
+		       nil
+		       (make-instance 'input-presentation)
+		       "Joe" *joe*)
+  (:li :class "name"
+       (:label :class "input" :for "id-123"
+	       (:span :class "slot-name"
+		      (:span :class "extra" "Name:&nbsp;")))
+       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
+
+(deftest-html render-view-field-4
+    (render-view-field (make-instance 'form-view-field
+				      :slot-name 'name
+				      :requiredp t
+				      :show-required-indicator-p t)
+		       (make-instance 'form-view)
+		       nil
+		       (make-instance 'input-presentation)
+		       "Joe" *joe*)
+  (:li :class "name"
+       (:label :class "input" :for "id-123"
+	       (:span :class "slot-name"
+		      (:span :class "extra" "Name:&nbsp;"
+			     (:em :class "required-slot" "(required)&nbsp;"))))
+       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
+
 ;;; Test form view render-view-field-value
 (deftest-html form-view-render-view-field-value-1
     (render-view-field-value "Joe" (make-instance 'input-presentation)

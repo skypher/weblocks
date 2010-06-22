@@ -136,6 +136,12 @@ before relations can be updated."))
 	      :accessor form-view-field-required-p
 	      :documentation "A predicate which determines whether the
 	      field is required.")
+   (show-required-indicator-p :initform t
+			      :initarg :show-required-indicator-p
+			      :accessor form-view-field-show-required-indicator-p
+			      :documentation "A predicate which determines
+                              whether to show the required indicator if this
+                              field is required.")
    (required-error-msg :initform nil
                        :initarg :required-error-msg
                        :accessor form-view-field-required-error-msg
@@ -328,7 +334,9 @@ form-view-buttons for a given view.")
 				 (unless (empty-p (view-field-label field))
 				   (str (view-field-label field))
 				   (str ":&nbsp;"))
-				 (when (form-view-field-required-p field)
+				 (when (and
+					(form-view-field-required-p field)
+					(form-view-field-show-required-indicator-p field))
 				   (htm (:em :class "required-slot" "(required)&nbsp;"))))))
            (apply #'render-view-field-value
                   value presentation
