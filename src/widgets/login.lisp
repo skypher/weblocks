@@ -51,10 +51,10 @@ returned."
 			     :buttons '((:submit . "Login") :cancel)
 			     :caption "Login"
 			     :focusp t)
-  (email :requiredp t :show-required-indicator-p nil)
+  (email :requiredp t :required-indicator nil)
   (password :requiredp t
 	    :present-as password
-	    :show-required-indicator-p nil
+	    :required-indicator nil
 	    :writer (lambda (pwd obj)
 		      (setf (slot-value obj 'password)
 			    (hash-password pwd)))))

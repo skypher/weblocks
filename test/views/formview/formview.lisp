@@ -184,7 +184,7 @@ $('id-123').focusFirstElement();
     (render-view-field (make-instance 'form-view-field
 				      :slot-name 'name
 				      :requiredp t
-				      :show-required-indicator-p nil)
+				      :required-indicator nil)
 		       (make-instance 'form-view)
 		       nil
 		       (make-instance 'input-presentation)
@@ -199,7 +199,7 @@ $('id-123').focusFirstElement();
     (render-view-field (make-instance 'form-view-field
 				      :slot-name 'name
 				      :requiredp t
-				      :show-required-indicator-p t)
+				      :required-indicator t)
 		       (make-instance 'form-view)
 		       nil
 		       (make-instance 'input-presentation)
@@ -209,6 +209,22 @@ $('id-123').focusFirstElement();
 	       (:span :class "slot-name"
 		      (:span :class "extra" "Name:&nbsp;"
 			     (:em :class "required-slot" "(required)&nbsp;"))))
+       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
+
+(deftest-html render-view-field-5
+    (render-view-field (make-instance 'form-view-field
+				      :slot-name 'name
+				      :requiredp t
+				      :required-indicator "Required")
+		       (make-instance 'form-view)
+		       nil
+		       (make-instance 'input-presentation)
+		       "Joe" *joe*)
+  (:li :class "name"
+       (:label :class "input" :for "id-123"
+	       (:span :class "slot-name"
+		      (:span :class "extra" "Name:&nbsp;"
+			     (:em :class "required-slot" "Required&nbsp;"))))
        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 ;;; Test form view render-view-field-value

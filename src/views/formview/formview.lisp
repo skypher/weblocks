@@ -13,7 +13,7 @@
           mixin-form-view-field-persist-p *max-raw-input-length*
           input-presentation-max-length form-presentation input
           input-presentation render-validation-summary render-form-view-buttons
-          form-field-intermediate-value))
+          form-field-intermediate-value *default-required-indicator*))
 
 ;;; Default initialization parameters
 (defparameter *form-default-error-summary-threshold* 15
@@ -136,12 +136,13 @@ before relations can be updated."))
 	      :accessor form-view-field-required-p
 	      :documentation "A predicate which determines whether the
 	      field is required.")
-   (show-required-indicator-p :initform t
-			      :initarg :show-required-indicator-p
-			      :accessor form-view-field-show-required-indicator-p
-			      :documentation "A predicate which determines
-                              whether to show the required indicator if this
-                              field is required.")
+   (required-indicator :initform t
+		       :initarg :required-indicator
+		       :accessor form-view-field-required-indicator
+		       :documentation "A string, t or nil. When this 
+                       field is required, this value is rendered after
+                       the field's label. A value of t will render 
+                       *default-required-indicator*.")
    (required-error-msg :initform nil
                        :initarg :required-error-msg
                        :accessor form-view-field-required-error-msg
@@ -159,6 +160,9 @@ before relations can be updated."))
       (format nil *required-field-message*
               (humanize-name
                (view-field-label form-view-field)))))
+
+(defparameter *default-required-indicator* "(required)"
+  "Default string to render after a field's label if the field is required.")
 
 (defclass mixin-form-view-field (mixin-view-field form-view-field-writer-mixin)
   ((persistp :initarg :persistp
@@ -334,10 +338,14 @@ form-view-buttons for a given view.")
 				 (unless (empty-p (view-field-label field))
 				   (str (view-field-label field))
 				   (str ":&nbsp;"))
-				 (when (and
-					(form-view-field-required-p field)
-					(form-view-field-show-required-indicator-p field))
-				   (htm (:em :class "required-slot" "(required)&nbsp;"))))))
+				 (let ((required-indicator (form-view-field-required-indicator field)))
+				   (when (and (form-view-field-required-p field)
+					      required-indicator)
+				     (htm (:em :class "required-slot"
+					       (if (eq t required-indicator)
+						   (str *default-required-indicator*)
+						   (str required-indicator))
+					       (str "&nbsp;"))))))))
            (apply #'render-view-field-value
                   value presentation
                   field view widget obj
