@@ -23,7 +23,7 @@
             "This is the " (:a :href "http://weblocks.viridian-project.de/" "Weblocks Application Framework")
             " running on " (str (hunchentoot::address-string)))))))
 
-(defmethod handle-http-error ((app weblocks-webapp) code)
+(defmethod handle-http-error ((app weblocks-webapp) code &optional condition)
   (with-error-page-html ((escape-string (format nil "~A ~A" code (reason-phrase code)))
                          (escape-string (format nil "~A ~A" code (reason-phrase code))))))
 
