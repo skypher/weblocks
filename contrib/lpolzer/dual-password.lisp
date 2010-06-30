@@ -14,6 +14,7 @@
          (name1 (format nil "~A-1" basename))
          (name2 (format nil "~A-2" basename))
          (status-name (format nil "~A-status" basename)))
+    (declare (ignorable status-name))
     (with-html
       (:div
         (render-password name1 (or value "") :id name1 :maxlength maxlength
@@ -49,7 +50,7 @@
 				    (field form-view-field) (view form-view)
 				    widget obj &rest args
                                     &key intermediate-values &allow-other-keys)
-  (declare (ignore args))
+  (declare (ignorable args widget obj))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (render-dual-password-fields (view-field-slot-name field) (if intermediate-value-p
@@ -61,7 +62,7 @@
 				    (field form-view-field) (view form-view)
 				    widget obj &rest args
                                     &key intermediate-values &allow-other-keys)
-  (declare (ignore args))
+  (declare (ignorable args widget obj))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (render-dual-password-fields (view-field-slot-name field) (if intermediate-value-p
@@ -80,7 +81,7 @@
 
 (defmethod parse-view-field-value ((parser dual-password-parser) value obj
 				   (view form-view) (field form-view-field) &rest args)
-  (declare (ignore args))
+  (declare (ignorable args obj value))
   (let* ((val1 (hunchentoot:parameter (format nil "~A-weblocks-1" (attributize-name (view-field-slot-name field)))))
          (val2 (hunchentoot:parameter (format nil "~A-weblocks-2" (attributize-name (view-field-slot-name field)))))
          (present-p (and val1 val2 (text-input-present-p val1) (text-input-present-p val2)))
