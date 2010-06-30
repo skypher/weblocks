@@ -4,7 +4,10 @@
           template-block-source
           template-block-vars
           recreate-template-printer
-	  render-template))
+	  render-template
+          *always-recreate-template-printer*))
+
+(defparameter *always-recreate-template-printer* t)
 
 (defwidget template-block ()
   ((template-printer :accessor template-printer-of :initform nil
@@ -21,7 +24,9 @@ HTML-TEMPLATE using 'vars'."))
 
 (defmethod ensure-printer-exists ((obj template-block))
   (handler-bind ((warning #'muffle-warning))
-    (or (template-printer-of obj) (recreate-template-printer obj))))
+    (if *always-recreate-template-printer*
+      (recreate-template-printer obj)
+      (or (template-printer-of obj) (recreate-template-printer obj)))))
 
 (defmethod render-template ((obj template-block))
   (ensure-printer-exists obj)
