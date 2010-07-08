@@ -129,7 +129,8 @@ customize behavior."))
 	    (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
 	     *dirty-widgets*
 	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
-	    *page-dependencies* *current-page-description*
+	    *page-dependencies*
+            *current-page-description* *current-page-keywords*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 	(declare (special *weblocks-output-stream* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
@@ -174,17 +175,27 @@ customize behavior."))
 (defun update-widget-tree ()
   (let ((*tree-update-pending* t)
         (depth 0)
-        page-title)
+        page-title
+        page-keywords)
     (declare (special *tree-update-pending*))
     (walk-widget-tree (root-widget)
                       (lambda (widget d)
                         (update-children widget)
-                        (let ((title (page-title widget)))
-                          (when (and title (> d depth))
-                            (setf page-title title
-                                  depth d)))))
+                        (let ((title (page-title widget))
+                              (keywords (page-keywords widget)))
+                          (when (and (> d depth) title)
+                            (setf page-title title))
+                          (cond
+                            ((and keywords *accumulate-page-keywords*)
+                             (setf page-keywords (append keywords page-keywords)))
+                            ((and keywords (> d depth))
+                             (setf page-keywords keywords)))
+                          (when (> d depth)
+                            (setf depth d)))))
     (when page-title
-      (setf *current-page-description* page-title))))
+      (setf *current-page-description* page-title))
+    (when page-keywords
+      (setf *current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
 
 (defvar *session-locks* (make-hash-table :test #'eq
                                          #+sbcl :weakness #+sbcl :key

@@ -17,7 +17,9 @@
 	  update-children
           update-parent-for-children
 	  map-subwidgets
-          walk-widget-tree page-title
+          walk-widget-tree
+          page-title
+          page-keywords
           render-widget
           render-widget-body
           render-widget-children
@@ -278,6 +280,13 @@ children of w (e.g. may be rendered when w is rendered).")
   (:method ((obj function)) nil)
   (:method ((obj symbol)) nil))
 
+(defgeneric page-keywords (w)
+  (:documentation "Meta keywords for the widget. See also
+  *accumulate-page-keywords* and application-page-title.")
+  (:method ((obj widget)) nil)
+  (:method ((obj string)) nil)
+  (:method ((obj function)) nil)
+  (:method ((obj symbol)) nil))
 
 ;;; Define widget-parent for objects that don't derive from 'widget'
 (defmethod widget-parent (obj)

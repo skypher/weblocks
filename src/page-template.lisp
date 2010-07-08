@@ -5,7 +5,11 @@
           render-page-body
           render-page-headers
           application-page-title
-	  *current-page-description*))
+          application-meta-description
+          application-page-keywords
+	  *current-page-description*
+          *current-page-keywords*
+          *accumulate-page-keywords*))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
@@ -14,10 +18,19 @@
 (defvar *current-page-description*)
 (setf (documentation '*current-page-description* 'variable)
       "Description of the currently rendered page; used for default
+      page title and meta description.")
+
+(defvar *current-page-keywords*)
+(setf (documentation '*current-page-keywords* 'variable)
+      "Keywords for the currently rendered page; used for default
       page title.")
 
+(defvar *accumulate-page-keywords* t
+  "Whether to accumulate widgets' keywords for the keywords
+  meta tag or use the most specific keywords only.")
+
 ;;
-;; Compute the webapp page title
+;; Compute the webapp page title, meta description and meta keywords
 ;;
 
 (defmethod application-page-title ((app weblocks-webapp))
@@ -30,6 +43,12 @@
 	     (*current-page-description* (list " - " *current-page-description*))
 	     (webapp-description (list " - " webapp-description))
 	     (t '("" ""))))))
+
+(defmethod application-meta-description ((app weblocks-webapp))
+  (application-page-title app))
+
+(defmethod application-page-keywords ((app weblocks-webapp))
+  *current-page-keywords*)
 
 ;;
 ;; Render the current page
@@ -76,7 +95,11 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
    here to customize header rendering on a per-request basis.  By default
    this function renders the current content type."
   (with-html 
-    (:meta :http-equiv "Content-type" :content *default-content-type*)))
+    (:meta :http-equiv "Content-type" :content *default-content-type*)
+    (awhen (application-meta-description app)
+      (htm (:meta :name "description" :value it)))
+    (awhen (application-page-keywords app)
+      (htm (:meta :name "keywords" :value (format nil "~{~A~^,~}" it))))))
 
 ;;
 ;; Render the page body
