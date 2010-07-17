@@ -93,7 +93,10 @@ result list, instead calling PROC on each resulting `field-info'."
 		      (etypecase vfield
 			(inline-view-field
 			   (when (or include-invisible-p
-				     (not (view-field-hide-p vfield)))
+				     (not (let ((hide-p-value (view-field-hide-p vfield)))
+					    (if (functionp hide-p-value)
+						(funcall hide-p-value obj)
+						hide-p-value))))
 			     (funcall proc vfield-info)))
 			(mixin-view-field
 			   (if expand-mixins
