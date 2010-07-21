@@ -167,10 +167,10 @@ answering its result."
     (eval (read stream nil nil))))
 
 (defun slurp-file (filepath &key (element-type 'base-char))
-  (let* ((stream (open filepath :element-type element-type))
-	 (seq (make-array (file-length stream) :element-type element-type)))
-    (read-sequence seq stream)
-    seq))
+  (with-open-file (stream filepath :element-type element-type)
+    (let ((seq (make-array (file-length stream) :element-type element-type)))
+      (read-sequence seq stream)
+      seq)))
 
 (defun merge-files (file-list saved-path
 		    &key (element-type '(unsigned-byte 8)) linkage-element-fn)
