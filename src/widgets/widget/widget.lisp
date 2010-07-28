@@ -19,6 +19,7 @@
 	  map-subwidgets
           walk-widget-tree
           page-title
+          page-description
           page-keywords
           render-widget
           render-widget-body
@@ -275,6 +276,14 @@ children of w (e.g. may be rendered when w is rendered).")
   set the page title should have a method defined. If multiple widgets
   provide a page title, one deepest in the widget tree (most specific)
   will be chosen.")
+  (:method ((obj widget)) nil)
+  (:method ((obj string)) nil)
+  (:method ((obj function)) nil)
+  (:method ((obj symbol)) nil))
+
+(defgeneric page-description (w)
+  (:documentation "Generate a page description. See page-title for
+  details on how this description is built.")
   (:method ((obj widget)) nil)
   (:method ((obj string)) nil)
   (:method ((obj function)) nil)

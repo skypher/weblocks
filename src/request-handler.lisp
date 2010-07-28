@@ -128,9 +128,12 @@ customize behavior."))
       (let ((*weblocks-output-stream* (make-string-output-stream))
 	    (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
 	     *dirty-widgets*
-	    *before-ajax-complete-scripts* *on-ajax-complete-scripts*
+	    *before-ajax-complete-scripts*
+            *on-ajax-complete-scripts*
 	    *page-dependencies*
-            *current-page-description* *current-page-keywords*
+            *current-page-title*
+            *current-page-description*
+            *current-page-keywords*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 	(declare (special *weblocks-output-stream* *dirty-widgets*
 			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
@@ -176,15 +179,19 @@ customize behavior."))
   (let ((*tree-update-pending* t)
         (depth 0)
         page-title
+        page-description
         page-keywords)
     (declare (special *tree-update-pending*))
     (walk-widget-tree (root-widget)
                       (lambda (widget d)
                         (update-children widget)
                         (let ((title (page-title widget))
+                              (description (page-description widget))
                               (keywords (page-keywords widget)))
                           (when (and (> d depth) title)
                             (setf page-title title))
+                          (when (and (> d depth) description)
+                            (setf page-description description))
                           (cond
                             ((and keywords *accumulate-page-keywords*)
                              (setf page-keywords (append keywords page-keywords)))
@@ -193,7 +200,9 @@ customize behavior."))
                           (when (> d depth)
                             (setf depth d)))))
     (when page-title
-      (setf *current-page-description* page-title))
+      (setf *current-page-title* page-title))
+    (when page-description
+      (setf *current-page-description* page-description))
     (when page-keywords
       (setf *current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
 
