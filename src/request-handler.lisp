@@ -19,9 +19,6 @@
       "A list of client-side scripts to be sent over to the browser at
       the end of ajax request execution.")
 
-(defvar *dispatch/render-lock* (bordeaux-threads:make-lock
-                                 "*dispatch-render-lock*"))
-
 ;; remove this when Hunchentoot reintroduces *catch-errors-p*
 (defvar *catch-errors-p* t)
 
