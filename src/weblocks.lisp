@@ -33,7 +33,7 @@ case, the symbols will be imported first if need be."
 and available to code executed within a request as a special
 variable. All html should be rendered to this stream.")
 
-(defparameter *dirty-widgets* nil
+(defvar *dirty-widgets* "Top-level value. Causes widget-dirty-p to error."
   "Contains a list of dirty widgets at the current point in rendering
   cycle. This is a special variable modified by the actions that
   change state of widgets.")

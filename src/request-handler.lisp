@@ -103,7 +103,8 @@ customize behavior."))
     (when *maintain-last-session*
       (bordeaux-threads:with-lock-held (*maintain-last-session*)
 	(setf *last-session* *session*)))
-    (let ((*request-hook* (make-instance 'request-hooks)))
+    (let ((*request-hook* (make-instance 'request-hooks))
+          *dirty-widgets*)
       (when (null (root-widget))
 	(let ((root-widget (make-instance 'widget :name "root")))
 	  (when (weblocks-webapp-debug app)
@@ -124,7 +125,6 @@ customize behavior."))
 
       (let ((*weblocks-output-stream* (make-string-output-stream))
 	    (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
-	     *dirty-widgets*
 	    *before-ajax-complete-scripts*
             *on-ajax-complete-scripts*
 	    *page-dependencies*
