@@ -113,7 +113,11 @@ customize behavior."))
 	  (let (finished?)
 	    (unwind-protect
 		 (progn
-		   (funcall (webapp-init-user-session) root-widget)
+                   (handler-case
+                       (funcall (webapp-init-user-session) root-widget)
+                     (error (c)
+                       (warn "Error initializing user session: ~A" c)
+                       (signal c)))
 		   (setf finished? t))
 	      (unless finished?
 		(setf (root-widget) nil)
