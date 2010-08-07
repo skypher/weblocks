@@ -60,7 +60,7 @@ declared AUTOSTART."
     (values
       (start (setf *weblocks-server*
                    (apply #'make-instance acceptor-class :port port
-                          (remove-keyword-parameters keys :port :debug))))
+                          (remove-keyword-parameters keys :port :debug :acceptor-class))))
       (mapcar (lambda (class)
                 (unless (get-webapps-for-class class)
                   (start-webapp class :debug debug)))
