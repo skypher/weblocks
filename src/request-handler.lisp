@@ -135,10 +135,17 @@ customize behavior."))
             *current-page-title*
             *current-page-description*
             *current-page-keywords*
+            *current-page-headers*
 	    (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
-	(declare (special *weblocks-output-stream* *dirty-widgets*
-			  *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
-
+	(declare (special *weblocks-output-stream*
+                          *dirty-widgets*
+			  *on-ajax-complete-scripts*
+                          *uri-tokens*
+                          *page-dependencies*
+                          *current-page-title*
+                          *current-page-description*
+                          *current-page-keywords*
+                          *current-page-headers*))
 	(when (pure-request-p)
 	  (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
 
@@ -182,20 +189,30 @@ customize behavior."))
         page-title
         page-description
         page-keywords)
-    (declare (special *tree-update-pending*))
+    (declare (special *tree-update-pending*
+                      *current-page-title*
+                      *current-page-description*
+                      *current-page-keywords*
+                      *current-page-headers*))
     (walk-widget-tree (root-widget)
                       (lambda (widget d)
                         (update-children widget)
                         (let ((title (page-title widget))
                               (description (page-description widget))
-                              (keywords (page-keywords widget)))
+                              (keywords (page-keywords widget))
+                              (headers (page-headers widget)))
                           (when (and (> d depth) title)
                             (setf page-title title))
                           (when (and (> d depth) description)
                             (setf page-description description))
+                          (when headers
+                            (setf *current-page-headers*
+                                  (append (page-headers widget)
+                                          *current-page-headers*)))
                           (cond
                             ((and keywords *accumulate-page-keywords*)
-                             (setf page-keywords (append keywords page-keywords)))
+                             (setf page-keywords
+                                   (append keywords page-keywords)))
                             ((and keywords (> d depth))
                              (setf page-keywords keywords)))
                           (when (> d depth)

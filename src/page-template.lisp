@@ -10,25 +10,12 @@
 	  *current-page-title*
 	  *current-page-description*
           *current-page-keywords*
+          *current-page-headers*
           *accumulate-page-keywords*))
 
 (defvar *page-dependencies*)
 (setf (documentation '*page-dependencies* 'variable)
       "A list of dependencies of the currently rendered page.")
-
-(defvar *current-page-title*)
-(setf (documentation '*current-page-title* 'variable)
-      "Title of the currently rendered page.")
-
-(defvar *current-page-description*)
-(setf (documentation '*current-page-description* 'variable)
-      "Meta description of the currently rendered page.
-      Defaults to the page title.")
-
-(defvar *current-page-keywords*)
-(setf (documentation '*current-page-keywords* 'variable)
-      "Keywords for the currently rendered page; used for default
-      page title.")
 
 (defvar *accumulate-page-keywords* t
   "Whether to accumulate widgets' keywords for the keywords
@@ -41,6 +28,7 @@
 (defmethod application-page-title ((app weblocks-webapp))
   "The default page-title method generates a page title from the 
    application name, application description, and current navigation state."
+  (declare (special *current-page-title*))
   (let ((webapp-description (webapp-description)))
     (apply #'format nil "~A~A~A"
 	   (webapp-name)
@@ -50,9 +38,11 @@
 	     (t '("" ""))))))
 
 (defmethod application-page-description ((app weblocks-webapp))
+  (declare (special *current-page-description*))
   (or *current-page-description* (application-page-title app)))
 
 (defmethod application-page-keywords ((app weblocks-webapp))
+  (declare (special *current-page-keywords*))
   *current-page-keywords*)
 
 ;;
@@ -99,12 +89,20 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
    hook on rendering you can bind special variables that are dereferenced 
    here to customize header rendering on a per-request basis.  By default
    this function renders the current content type."
+  (declare (special *current-page-headers*))
   (with-html 
     (:meta :http-equiv "Content-type" :content *default-content-type*)
     (awhen (application-page-description app)
       (htm (:meta :name "description" :value it)))
     (awhen (application-page-keywords app)
-      (htm (:meta :name "keywords" :value (format nil "~{~A~^,~}" it))))))
+      (htm (:meta :name "keywords" :value (format nil "~{~A~^,~}" it))))
+    (dolist (header *current-page-headers*)
+      (locally
+        (declare (optimize (speed 1) (safety 3) (debug 3) (space 1)))
+        (describe header)
+      (etypecase header
+        (string (htm (str header)))
+        ((or function symbol) (funcall header)))))))
 
 ;;
 ;; Render the page body

@@ -21,6 +21,7 @@
           page-title
           page-description
           page-keywords
+          page-headers
           render-widget
           render-widget-body
           render-widget-children
@@ -292,6 +293,15 @@ children of w (e.g. may be rendered when w is rendered).")
 (defgeneric page-keywords (w)
   (:documentation "Meta keywords for the widget. See also
   *accumulate-page-keywords* and application-page-title.")
+  (:method ((obj widget)) nil)
+  (:method ((obj string)) nil)
+  (:method ((obj function)) nil)
+  (:method ((obj symbol)) nil))
+
+(defgeneric page-headers (w)
+  (:documentation "Additional headers for the widget.
+  This is useful for things like RSS. The returned list
+  may contain strings and nullary functions.")
   (:method ((obj widget)) nil)
   (:method ((obj string)) nil)
   (:method ((obj function)) nil)
