@@ -97,12 +97,9 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
     (awhen (application-page-keywords app)
       (htm (:meta :name "keywords" :value (format nil "~{~A~^,~}" it))))
     (dolist (header *current-page-headers*)
-      (locally
-        (declare (optimize (speed 1) (safety 3) (debug 3) (space 1)))
-        (describe header)
       (etypecase header
         (string (htm (str header)))
-        ((or function symbol) (funcall header)))))))
+        ((or function symbol) (funcall header))))))
 
 ;;
 ;; Render the page body
