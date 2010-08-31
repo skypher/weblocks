@@ -132,7 +132,7 @@
          (cached-pane (assoc token cached-panes :test #'equalp))
          (effective-pane (or cached-pane pane))
          (selected-pane (cond
-                          (effective-pane
+                          ((cdr effective-pane)
                            ;; found pane
                            (pop-tokens uri-tokens)
                            effective-pane)
