@@ -9,10 +9,13 @@
   ((max-length :initform *max-password-length*)
    (clear-text-p :accessor dual-password-presentation-clear-text-p
                  :initarg :clear-text-p
-                 :initform nil))
+                 :initform nil)
+   (retype-render-fn :accessor dual-password-presentation-retype-render-fn
+                     :initarg :retype-render-fn
+                     :initform (f_% (with-html "Retype password"))))
   (:documentation "A presentation for passwords."))
 
-(defun render-dual-password-fields (name value maxlength &optional clear-text-p)
+(defun render-dual-password-fields (name value maxlength &key clear-text-p retype-render-fn)
   (let* ((basename (format nil "~A-weblocks" (attributize-name name)))
          (name1 (format nil "~A-1" basename))
          (name2 (format nil "~A-2" basename))
@@ -26,6 +29,10 @@
         (funcall render-fn name1 (or value "")
                  :id name1 :maxlength maxlength
                  :style (when value "border:1px solid green"))))
+    (when retype-render-fn
+      (with-html
+        (:div :class "retype-note"
+          (funcall retype-render-fn))))
     (with-html 
       (:div
         (funcall render-fn name2 (or value "")
@@ -65,7 +72,10 @@
                                                                 intermediate-value
                                                                 value)
                                  (input-presentation-max-length presentation)
-                                 (dual-password-presentation-clear-text-p presentation))))
+                                 :clear-text-p
+                                   (dual-password-presentation-clear-text-p presentation)
+                                 :retype-render-fn
+                                   (dual-password-presentation-retype-render-fn presentation))))
 
 (defmethod render-view-field-value ((value null) (presentation dual-password-presentation)
 				    (field form-view-field) (view form-view)
@@ -78,7 +88,10 @@
                                                                 intermediate-value
                                                                 value)
                                  (input-presentation-max-length presentation)
-                                 (dual-password-presentation-clear-text-p presentation))))
+                                 :clear-text-p
+                                   (dual-password-presentation-clear-text-p presentation)
+                                 :retype-render-fn
+                                   (dual-password-presentation-retype-render-fn presentation))))
 
 (defmethod request-parameter-for-presentation (name (presentation dual-password-presentation))
   (if (equal (call-next-method (format nil "~A-weblocks-1" name) presentation)
@@ -95,8 +108,11 @@
   (let* ((val1 (hunchentoot:parameter (format nil "~A-weblocks-1" (attributize-name (view-field-slot-name field)))))
          (val2 (hunchentoot:parameter (format nil "~A-weblocks-2" (attributize-name (view-field-slot-name field)))))
          (present-p (and val1 val2 (text-input-present-p val1) (text-input-present-p val2)))
-         (valid-p (and present-p (equal val1 val2)))
+         (parsed-p (equal val1 val2))
          ; XXX min-length < length < max-length
          )
-    (values valid-p present-p val1)))
+    (values parsed-p present-p val1)))
+
+(defmethod parser-error-message ((parser dual-password-parser))
+  "Your entries don't match.")
 
