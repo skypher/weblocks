@@ -7,7 +7,6 @@
            insert-at
            drop-last
            intersperse
-	   find-all
            list-starts-with
            stable-set-difference
            safe-getf
