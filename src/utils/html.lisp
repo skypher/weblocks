@@ -255,14 +255,15 @@ used instead of the default 'Close'."
     (:span :class "close-button"
 	   (render-link close-action (humanize-name button-string)))))
 
-(defun render-input-field (type name value &key id class maxlength style)
+(defun render-input-field (type name value &key id class maxlength style size)
   (with-html
     (:input :type type :name (attributize-name name) :id id
+            :size size
 	    :value value :maxlength maxlength :class class
             :style style)))
 
 (defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
-                        visibility-option-p)
+                        size visibility-option-p)
     "Renders a password in a form.
 'name' - name of the html control. The name is attributized before being rendered.
 'value' - a value on html control.
@@ -270,8 +271,8 @@ used instead of the default 'Close'."
  maxlength - maximum lentgh of the field
 'class' - a class used for styling. By default, \"password\"."
   (render-input-field "password" name value
-                      :id id :class class :maxlength maxlength
-                      :style style)
+                      :size size :id id :class class
+                      :maxlength maxlength :style style)
   (when visibility-option-p
     (send-script (ps:ps*
                    `(defun toggle-password-visibility (field)

@@ -198,7 +198,10 @@ before relations can be updated."))
   ((max-length :initform *max-raw-input-length*
 	       :initarg :max-length
 	       :accessor input-presentation-max-length
-	       :documentation "Maximum length of an input."))
+	       :documentation "Maximum length of an input.")
+   (size :accessor input-presentation-size
+         :initarg :size
+         :initform nil))
   (:documentation "A default presentation for forms renders an input
   field."))
 
@@ -372,6 +375,7 @@ form-view-buttons for a given view.")
 			     intermediate-value
 			     (apply #'print-view-field-value value presentation field view widget obj args))
 		  :maxlength (input-presentation-max-length presentation)
+                  :size (input-presentation-size presentation)
 		  :id *presentation-dom-id*)))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)

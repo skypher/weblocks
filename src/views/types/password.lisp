@@ -20,6 +20,7 @@
                      (attributize-name (view-field-slot-name field)))
                    nil
 		   :maxlength (input-presentation-max-length presentation)
+                   :size (input-presentation-size presentation)
 		   :id *presentation-dom-id*))
 
 (defmethod render-view-field-value ((value null) (presentation password-presentation)
@@ -32,6 +33,7 @@
                      (attributize-name (view-field-slot-name field)))
                    nil
 		   :maxlength (input-presentation-max-length presentation)
+                   :size (input-presentation-size presentation)
 		   :id *presentation-dom-id*))
 
 (defmethod print-view-field-value (value (presentation password-presentation)
