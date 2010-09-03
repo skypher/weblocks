@@ -13,7 +13,7 @@
     (:shadowing-import-from :f-underscore #:f #:_)
     (:shadowing-import-from :fare-matcher #:match)
     (:shadowing-import-from :metabang.utilities #:with-array)
-    (:shadow #:redirect #:reset-sessions #:errors)
+    (:shadow #:redirect #:reset-sessions #:errors #:find-all)
     (:documentation
       "Weblocks is a Common Lisp framework that eases the pain of web
       application development. It achieves its goals by standardizing on
