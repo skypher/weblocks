@@ -6,6 +6,7 @@
           *on-ajax-complete-scripts*
 	  *catch-errors-p*
           *request-timeout*
+          *backtrace-on-session-init-error*
           *style-warn-on-circular-dirtying*
           *style-warn-on-late-propagation*))
 
@@ -27,6 +28,8 @@
   This prevents threads from hogging the CPU indefinitely.
   
   You can set this to NIL to disable timeouts (not recommended).")
+
+(defvar *backtrace-on-session-init-error* nil)
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -113,11 +116,12 @@ customize behavior."))
 	  (let (finished?)
 	    (unwind-protect
 		 (progn
-                   (handler-case
-                       (funcall (webapp-init-user-session) root-widget)
-                     (error (c)
-                       (warn "Error initializing user session: ~A" c)
-                       (signal c)))
+                   (handler-bind ((error (lambda (c) 
+                                           (warn "Error initializing user session: ~A")
+                                           (when *backtrace-on-session-init-error*
+                                             (format t "~%~A~%" (print-trivial-backtrace c)))
+                                           (signal c))))
+                       (funcall (webapp-init-user-session) root-widget))
 		   (setf finished? t))
 	      (unless finished?
 		(setf (root-widget) nil)
