@@ -117,7 +117,7 @@ customize behavior."))
 	    (unwind-protect
 		 (progn
                    (handler-bind ((error (lambda (c) 
-                                           (warn "Error initializing user session: ~A")
+                                           (warn "Error initializing user session: ~A" c)
                                            (when *backtrace-on-session-init-error*
                                              (format t "~%~A~%" (print-trivial-backtrace c)))
                                            (signal c))))
