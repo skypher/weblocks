@@ -39,6 +39,8 @@ submitted via GET method, the parameter is obtained from the
 query string. If the request was submitted via POST, the
 parameter is obtained from the body of the request. Otherwise, an
 error is signalled."
+  (when (eq (request-method*) :head)
+    (warn "User agent ~S sent a HEAD request" (hunchentoot:user-agent)))
   (ecase (request-method*)
     (:get (get-parameter name))
     (:post (post-parameter name))))
