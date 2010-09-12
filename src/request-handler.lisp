@@ -29,7 +29,7 @@
   
   You can set this to NIL to disable timeouts (not recommended).")
 
-(defvar *backtrace-on-session-init-error* nil)
+(defvar *backtrace-on-session-init-error* t)
 
 (defgeneric handle-client-request (app)
   (:documentation
