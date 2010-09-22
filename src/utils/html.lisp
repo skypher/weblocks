@@ -147,7 +147,7 @@ being rendered.
   "A welcome message used by dropdowns as the first entry.")
 
 (defun render-dropdown (name selections &key id class selected-value
-			welcome-name multiple autosubmitp)
+                        disabled onchange welcome-name multiple autosubmitp)
   "Renders a dropdown HTML element (select).
 
 'name' - the name of html control. The name is attributized before
@@ -183,9 +183,11 @@ submitted."
   (with-html
     (:select :id id
 	     :class class
+             :disabled disabled
 	     :name (attributize-name name)
-	     :onchange (when autosubmitp
-			 "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }")
+	     :onchange (or onchange
+                           (when autosubmitp
+                             "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }"))
 	     :multiple (when multiple "on" "off")
 	     (mapc (lambda (i)
 		     (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
