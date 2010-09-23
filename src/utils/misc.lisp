@@ -156,7 +156,7 @@ answering its result."
      (ensure-directories-exist ,path)
      (with-open-file (,stream-name ,path :direction :output
                                          :element-type ,element-type
-				         :if-exists :supersede
+				         :if-exists #+ccl :overwrite #-ccl :supersede
                                          :if-does-not-exist :create)
        ,@body)))
 
@@ -197,7 +197,7 @@ answering its result."
 		  :name (pathname-name full-path)
 		  :type (pathname-type full-path))))
 
-(defun gzip-file (input output &key (if-exists :supersede) (if-does-not-exist :create)
+(defun gzip-file (input output &key (if-exists #+ccl :overwrite #-ccl :supersede) (if-does-not-exist :create)
 		  (minimum-length 300))
   "Redefined salsa2:gzip-file with more keywords."
   (with-open-file (istream input :element-type '(unsigned-byte 8))

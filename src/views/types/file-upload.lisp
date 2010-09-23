@@ -57,5 +57,5 @@
       (copy-file temp-path
                  (merge-pathnames file-name
                                   (file-upload-parser-upload-directory parser))
-                 :if-exists :supersede)
+                 :if-exists #+ccl :overwrite #-ccl :supersede)
       (values t value file-name))))
