@@ -407,11 +407,8 @@ to my `application-dependencies' slot."
     app))
 
 (defun restart-webapp (name)
-  (let* ((app (find-app name))
-	 (class (class-of app))
-	 (name (weblocks-webapp-name app)))
-    (stop-webapp name)
-    (start-webapp class :name name)))
+  (stop-webapp name)
+  (start-webapp name))
 
 ;;; building webapp uris
 (defun make-webapp-uri (uri &optional (app (current-webapp)))
