@@ -99,10 +99,14 @@ function onActionFailure() {
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
-    var url = location.href.sub(/\?.*/, "") + '?' + sessionString + '&action=' + actionCode;
-    if(isPure) {
-	url += '&pure=true';
-    }
+    var query = location.href.replace(/.*\?(.*)/, "$1");
+    var scriptName = location.href.replace(/\?(.*)/, "");
+    var url = scriptName + "?" + query + (query ? "&" : "")
+      + sessionString + (sessionString ? "&" : "") + "action=" + actionCode;
+
+    if(isPure)
+      url += '&pure=true';
+
     return url;
 }
 
