@@ -15,7 +15,7 @@ redirects to the root of the application.")
 
 (defgeneric expired-action-handler (app)
   (:documentation "Webapp specific protocol now used in action 
-   handler.  This method provides backwards compatability")
+   handler.  This method provides backwards compatibility.")
   (:method ((app t))
     (funcall *expired-action-handler* app)))
 
@@ -24,9 +24,8 @@ redirects to the root of the application.")
 root and sets a query parameter 'timeout' to true, so that the home
 page may display a relevant message, if necessary."
   (redirect
-   (concatenate 'string
-		(string-right-trim "/" (webapp-prefix app))
-		"/?timeout=t")))
+    (concatenate 'string (make-webapp-uri "/") "?timeout=t")
+    :defer nil))
 
 
 (defgeneric page-not-found-handler (app)
