@@ -57,7 +57,7 @@
 
 (defun create-versioned-file (original-path version)
   (let ((new-path (make-versioned-path original-path version)))
-    (copy-file original-path new-path :if-does-not-exist :ignore :if-exists #+ccl :overwrite #-ccl :supersede)))
+    (copy-file original-path new-path :if-does-not-exist :ignore :if-exists :supersede)))
 
 (defun get-mod-record (original-path &key (versioning-p nil))
   (let ((record-path (make-record-path original-path)))
