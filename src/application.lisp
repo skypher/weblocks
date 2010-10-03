@@ -29,6 +29,7 @@
           make-webapp-uri
           make-webapp-public-file-uri
           reset-webapp-session
+          webapp-session-key
 	  webapp-session-value
           delete-webapp-session-value
 	  define-permanent-action
@@ -144,6 +145,7 @@
     :accessor webapp-default-store-name :initarg :default-store :type symbol
     :documentation "If non-nil, the name of the `*default-store*'
     bound during request handlers.")
+   (session-key :type symbol :accessor weblocks-webapp-session-key :initarg :session-key)
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
 		  :documentation "Turns on indentation of HTML for easier visual inspection."))
@@ -287,6 +289,7 @@ to my `application-dependencies' slot."
                   (webapp-default-store-name (class-of self)))
     (slot-default html-indent-p (weblocks-webapp-debug self))
     (let ((class-name (class-name (class-of self))))
+      (slot-default session-key class-name)
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session
 		    (or (find-symbol (symbol-name 'init-user-session)
@@ -427,10 +430,13 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
+(defun webapp-session-key (&optional (webapp (current-webapp)))
+  (weblocks-webapp-session-key webapp))
+
 (defun webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
   "Get a session value from the currently running webapp.
 KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
+  (let ((webapp-session (session-value (webapp-session-key webapp) session)))
     (cond (webapp-session
 	   (gethash key webapp-session))
 	  (webapp
@@ -441,16 +447,16 @@ KEY is compared using EQUAL."
 (defun (setf webapp-session-value) (value key &optional (session *session*) (webapp (current-webapp)))
   "Set a session value for the currently running webapp.
 KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
+  (let ((webapp-session (session-value (webapp-session-key webapp) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test #'equal)
-	    (session-value (class-name (class-of webapp))) webapp-session))
+	    (session-value (webapp-session-key webapp)) webapp-session))
     (setf (gethash key webapp-session) value)))
 
 (defun delete-webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
   "Clear the session value for the currently running webapp.
 KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (class-name (class-of webapp)) session)))
+  (let ((webapp-session (session-value (webapp-session-key) session)))
     (when webapp-session
       (remhash key webapp-session))))
 
