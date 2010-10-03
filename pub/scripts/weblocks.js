@@ -99,9 +99,12 @@ function onActionFailure() {
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
-    var query = location.href.replace(/.*\?(.*)/, "$1");
-    var scriptName = location.href.replace(/\?(.*)/, "");
-    var url = scriptName + "?" + query + (query ? "&" : "")
+    var scriptName = location.protocol + "//"
+                   + location.hostname
+                   + (location.port ? ":" + location.port : "")
+                   + location.pathname;
+    var query = location.search;
+    var url = scriptName + query + (query ? "&" : "?")
       + sessionString + (sessionString ? "&" : "") + "action=" + actionCode;
 
     if(isPure)
