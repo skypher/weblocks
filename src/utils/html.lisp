@@ -147,7 +147,8 @@ being rendered.
   "A welcome message used by dropdowns as the first entry.")
 
 (defun render-dropdown (name selections &key id class selected-value
-                        disabled onchange welcome-name multiple autosubmitp)
+                        disabled onchange welcome-name multiple autosubmitp
+                        (frob-welcome-name t))
   "Renders a dropdown HTML element (select).
 
 'name' - the name of html control. The name is attributized before
@@ -196,7 +197,9 @@ submitted."
 			 (htm (:option :value (cdr i) (str (car i))))))
 		   (list->assoc (append (when welcome-name
 					  (list
-					   (cons (format nil *dropdown-welcome-message* (car welcome-name))
+					   (cons (if frob-welcome-name ; backwards compat
+                                                   (format nil *dropdown-welcome-message* (car welcome-name))
+                                                   (car welcome-name))
 						 (cdr welcome-name))))
 					selections)
 				:map (constantly nil))))))

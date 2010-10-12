@@ -54,7 +54,7 @@ inherits from 'widget' if no direct superclasses are provided."
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))
      ,@(awhen (maybe-generate-parameter-slot-map-fn name (car body))
-	      (list it))))
+	 (list it))))
 
 (defclass widget (dom-object-mixin)
   ((propagate-dirty :accessor widget-propagate-dirty
