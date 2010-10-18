@@ -92,7 +92,12 @@ perform validation on the entire view (possibly combining multiple fields).
 The function should expect keyword arguments corresponding to view slot
 names, each keyword argument corresponds to one of the parsed values.
 The function should either return t if the form validates properly, or
-values nil error-message if it does not."))
+values nil error-message if it does not.")
+  (instructions :type (or string null)
+                :initform nil
+                :initarg :instructions
+                :accessor form-view-instructions
+                :documentation "Instructions given to the user."))
   (:documentation "A view designed to interact with the user via input
   forms."))
 

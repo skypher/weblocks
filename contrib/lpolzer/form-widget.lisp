@@ -6,11 +6,54 @@
 ;;   presentations as part of field widgets
 ;;
 
-(asdf:oos 'asdf:load-op 'gbbopen)
-(asdf:oos 'asdf:load-op 'gbbopen-tools)
-(asdf:oos 'asdf:load-op 'weblocks)
+;; note: to use this you need to load gbbopen
+;; and gbbopen-tools (define-widget needs them)
 
 (in-package :weblocks)
+
+(export '(define-widget
+          humanize
+          serialize-for-html
+
+          form-widget
+
+          setup-fields
+          caption-of
+          fields-of
+          state-of
+          validator-of
+          on-success-of
+          reset-form-widget
+          find-field-widget-by-name
+
+          field-widget
+          parser-of
+          validators-of
+          hidep-of
+          requiredp-of
+          name-of
+          label-of
+          form-of
+          intermediate-value-of
+          pretty-intermediate-value-of
+          parsed-value-of
+          error-message-of
+          render-field
+          render-field-contents
+          update-form-field-value-from-request
+          update-field-widgets-parent
+
+          string-field-widget
+
+          dropdown-field-widget
+          choices-of
+
+          field-presentation->field-widget-class
+          field-parser->field-widget-parser
+          field-widget-from-field-info
+          form-widget-initialize-from-view
+
+          dataform2))
 
 (defmacro define-widget (name direct-superclasses &body body)
   "Synthesis of `weblocks:defwidget' and `gbbopen-tools:define-class'."
@@ -30,8 +73,34 @@
 (define-widget form-widget ()
   ((caption :type (or string null) :initform nil)
    (validator :type (or function null) :initform nil)
-   (state :type (member :form :confirmation) :initform :form)
-   (on-success :type list :initform '(:confirm :reset))))
+   (state :type t :initform :form
+          :documentation "State of this form. Out of the box the supported values
+          are :form and :confirmation. You may define others on your own as needed.")
+   (on-success :initform '(:confirm :reset)
+               :documentation "A function or symbol (or list of those) to specify
+               what happens after a successful form submit.")))
+
+(defmethod fields-of ((widget form-widget))
+  (widget-children widget))
+
+(defmethod (setf fields-of) (fields (widget form-widget))
+  ;; TODO some additional sanity checks would be nice.
+  (setf (widget-children widget) fields))
+
+(defmethod (setf widget-children) :after (fields (widget form-widget) &optional type)
+  (declare (ignore type))
+  (update-field-widgets-parent widget))
+
+(defmethod setup-fields ((widget form-widget))
+  nil)
+
+(defmethod initialize-instance :after ((widget form-widget) &rest initargs)
+  (declare (ignore initargs))
+  (setup-fields widget)
+  (update-field-widgets-parent widget))
+
+(defmethod find-field-widget-by-name ((widget form-widget) name)
+  (find name (widget-children widget) :key #'name-of :test #'string-equal))
 
 (defmethod render-confirmation ((widget form-widget))
   (with-html
@@ -71,11 +140,13 @@
           (reset-form-widget widget))
         (request-hook :request :post-render)))
 
+(defmethod update-field-widgets-parent ((widget form-widget))
+  (mapc (lambda (field) (setf (form-of field) widget)) (fields-of widget)))
+
 (defmethod render-widget-children ((widget form-widget) &rest args)
   (declare (ignore args))
   (when (eq (state-of widget) :form)
     (let ((fields (widget-children widget)))
-      (mapc (lambda (field) (setf (form-of field) widget)) fields) ; update parent pointers
       (with-html-form (:POST (lambda (&rest args)
                                (format t "submit with args: ~S~%" args)
                                (let ((results (mapcar (lambda (field)
@@ -90,7 +161,8 @@
                                                 (form-widget-act-on-success-item widget success-item))
                                                ((or symbol function)
                                                 (funcall success-item widget))))
-                                           (on-success-of widget))))))
+                                           (ensure-list
+                                             (on-success-of widget)))))))
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
@@ -105,7 +177,7 @@
    (hidep :type boolean :initform nil)
    (requiredp :type boolean :initform nil)
 
-   (name :type string :initform nil)
+   (name :type (or string null) :initform nil)
    (label :type (or string null) :initform nil)
 
    (form :type form-widget)
@@ -147,7 +219,7 @@
          (empty (equal (string-trim " " raw-value) ""))) ; FIXME other whitespace
     (setf (intermediate-value-of field) (unless empty raw-value))
     (cond
-      ((and raw-value (not )) ; present, parse it
+      ((and raw-value (not empty)) ; present, parse it
        (multiple-value-bind (parsed-successfully-p parsed-value-or-error-message)
            (funcall (parser-of field) raw-value)
          (format t "parser returned ~S~%" parsed-value-or-error-message)
@@ -183,7 +255,8 @@
 ;; dropdown/radio
 (define-widget dropdown-field-widget (field-widget)
   ((style :type (member :dropdown :radio) :initform :dropdown)
-   (choices :type list :initform nil)
+   (choices :type (or function (and symbol (not keyword)) list)
+            :initform nil)
    (welcome-name :type (or string null) :initform nil))
   (:default-initargs :parser (lambda (raw-value)
                                (values t raw-value))))
@@ -326,9 +399,6 @@
    (writers :type list :initform nil
             :documentation "Alist of (field-widget-name . data-writer-fn[value obj]).")))
 
-(defmethod find-field-widget-by-name ((widget form-widget) name)
-  (find name (widget-children widget) :key #'name-of :test #'string-equal))
-
 (defmethod update-intermediate-values-from-data ((widget dataform2))
   (mapcar (lambda (reader)
             (destructuring-bind (field-widget-name . reader-fn) reader
@@ -363,8 +433,9 @@ as reported by reader functions."
     (persist-object (or (class-store data) (object-store data)) data)))
 
 ;;; test app
-(defwebapp form-test :prefix "/")
+(defwebapp form-test :prefix "/form-test")
 
+#+(or)
 (defun init-user-session (root)
   (let* ((string-field (make-instance 'string-field-widget
                                      :label "My Label"
@@ -379,12 +450,12 @@ as reported by reader functions."
          (form-widget-1 (make-instance 'form-widget :children (list string-field
                                                                     #+(or)(make-instance 'form-submit-field :label "Send this!"))))
          (form-widget-2 (make-instance 'form-widget))
-         (dataform2-1 (make-instance 'dataform2)))
+         #+(or)(dataform2-1 (make-instance 'dataform2)))
     (form-widget-initialize-from-view form-widget-2 'test-form-view)
     (setf (widget-children root) (list form-widget-1
                                        form-widget-2))))
 
-(start-weblocks :port 9110 :debug t)
+;(start-weblocks :port 9110 :debug t)
 
 #|
 WEBLOCKS(1): (class-direct-subclasses (find-class 'presentation))
