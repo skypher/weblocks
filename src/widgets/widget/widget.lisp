@@ -27,6 +27,7 @@
           render-widget-children
 	  update-widget-slots-with-map
           get-widgets-by-type
+          get-widget-by-id
 	  widget-css-classes
 	  mark-dirty
           widget-dirty-p
@@ -511,13 +512,11 @@ if INCLUDE-SUBTYPES-P) in the widget tree starting at ROOT
 
 (defmethod get-widget-by-id (id &key (test #'string-equal))
   "Find a widget by its DOM id."
-  (let (widgets)
-    (walk-widget-tree (root-widget)
-                      (lambda (widget d)
-                        (declare (ignore d))
-                        (when (funcall test id (dom-id widget))
-                          (push widget widgets))))
-    widgets))
+  (walk-widget-tree (root-widget)
+                    (lambda (widget d)
+                      (declare (ignore d))
+                      (when (funcall test id (dom-id widget))
+                        (return-from get-widget-by-id widget)))))
 
 (defun widget-parents (widget)
   "Return the parent chain of a widget."
