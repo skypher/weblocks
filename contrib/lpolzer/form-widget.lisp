@@ -19,16 +19,16 @@
 
           setup-fields
           caption-of
+          instructions-of
           fields-of
           state-of
-          validator-of
+          validators-of
           on-success-of
           reset-form-widget
           find-field-widget-by-name
 
           field-widget
           parser-of
-          validators-of
           hidep-of
           requiredp-of
           name-of
@@ -71,8 +71,10 @@
          (list it))))
 
 (define-widget form-widget ()
-  ((caption :type (or string null) :initform nil)
-   (validator :type (or function null) :initform nil)
+  ((caption :type (or string function null) :initform nil)
+   (instructions :type (or string function null) :initform nil)
+   (validators :initform nil)
+   (error-messages :type list :initform nil)
    (state :type t :initform :form
           :documentation "State of this form. Out of the box the supported values
           are :form and :confirmation. You may define others on your own as needed.")
@@ -146,23 +148,44 @@
 (defmethod render-widget-children ((widget form-widget) &rest args)
   (declare (ignore args))
   (when (eq (state-of widget) :form)
+    ;; caption and instructions
+    (dolist (item (list (caption-of widget) (instructions-of widget)))
+      (etypecase item
+          (string (with-html
+                    (:div :class "item" (esc item))))
+          ((or function symbol)
+           (safe-funcall item widget))))
+    ;; error messages
+    (with-html
+      (:ul :class "errors"
+        (dolist (error-message (error-messages-of widget))
+          (htm
+            (:li (esc error-message))))))
+    ;; fields
     (let ((fields (widget-children widget)))
       (with-html-form (:POST (lambda (&rest args)
                                (format t "submit with args: ~S~%" args)
-                               (let ((results (mapcar (lambda (field)
-                                                        (multiple-value-list
-                                                          (update-form-field-value-from-request widget field)))
-                                                      fields)))
-                                 (when (every #'car results); every form field successfully updated?
-                                   (format t "SUCCESS!~%")
-                                   (mapcar (lambda (success-item)
-                                             (etypecase success-item
-                                               (keyword
-                                                (form-widget-act-on-success-item widget success-item))
-                                               ((or symbol function)
-                                                (funcall success-item widget))))
-                                           (ensure-list
-                                             (on-success-of widget)))))))
+                               (let ((field-results (mapcar (lambda (field)
+                                                              (multiple-value-list
+                                                                (update-form-field-value-from-request widget field)))
+                                                            fields)))
+                                 (when (every #'car field-results) ; every form field successfully updated?
+                                   ;; now call form validators, if any
+                                   (let ((form-results (mapcar (lambda (validator)
+                                                                 (multiple-value-list
+                                                                   (funcall validator widget)))
+                                                               (ensure-list
+                                                                 (validators-of widget)))))
+                                     (if (every #'car form-results)
+                                       (mapcar (lambda (success-item)
+                                                 (etypecase success-item
+                                                   (keyword
+                                                    (form-widget-act-on-success-item widget success-item))
+                                                   ((or symbol function)
+                                                    (funcall success-item widget))))
+                                               (ensure-list
+                                                 (on-success-of widget)))
+                                       (setf (error-messages-of widget) (mapcar #'cadr form-results))))))))
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
@@ -222,7 +245,7 @@
       ((and raw-value (not empty)) ; present, parse it
        (multiple-value-bind (parsed-successfully-p parsed-value-or-error-message)
            (funcall (parser-of field) raw-value)
-         (format t "parser returned ~S~%" parsed-value-or-error-message)
+         ;(format t "parser returned ~S~%" parsed-value-or-error-message)
          (if parsed-successfully-p
            (let ((validation-errors (mapcar #'cadr
                                             (remove t (mapcar (lambda (v)
@@ -230,6 +253,7 @@
                                                                   (funcall v parsed-value-or-error-message)))
                                                               (ensure-list (validators-of field)))
                                                     :key #'car))))
+             ;(format t "validation errors: ~S~%" validation-errors)
              (if validation-errors
                (values nil (setf (error-message-of field) (first validation-errors)))
                (values t (setf (parsed-value-of field) parsed-value-or-error-message
@@ -243,14 +267,16 @@
 
 ;; text field
 (define-widget string-field-widget (field-widget)
-  ()
+  ((hide-input :type boolean :initform nil
+               :documentation "Set to T to render a password field."))
   (:default-initargs :parser (lambda (raw-value)
                                (values t raw-value))))
 
-(defmethod render-field-contents ((form form-widget) (widget string-field-widget))
+(defmethod render-field-contents ((form form-widget) (field string-field-widget))
   (with-html
-    (:input :type "text" :name (name-of widget)
-            :value (esc (intermediate-value-of widget)))))
+    (:input :type (if (hide-input-of field) "password" "text")
+            :name (name-of field)
+            :value (esc (intermediate-value-of field)))))
 
 ;; dropdown/radio
 (define-widget dropdown-field-widget (field-widget)
@@ -337,16 +363,20 @@
           :satisfies (lambda (x)
                        (or (= x 2010) (values nil "Please enter the current year.")))))
 
-(defun field-presentation->field-widget-class (presentation)
-  (check-type presentation presentation)
-  (let ((presentation-name (class-name (class-of presentation))))
-    (ecase presentation-name
-      (input-presentation 'string-field-widget)
-      (dropdown-presentation `(dropdown-field-widget :style :dropdown
-                                                     :welcome-name ,(when (slot-boundp presentation 'welcome-name)
-                                                                      (dropdown-presentation-welcome-name presentation))
-                                                     :choices ,(presentation-choices presentation)))
-      (radio-presentation '(dropdown-field-widget :style :radio)))))
+(defmethod field-presentation->field-widget-class ((presentation input-presentation))
+  'string-field-widget)
+
+(defmethod field-presentation->field-widget-class ((presentation password-presentation))
+  '(string-field-widget :hide-input t))
+
+(defmethod field-presentation->field-widget-class ((presentation dropdown-presentation))
+  `(dropdown-field-widget :style :dropdown
+                          :welcome-name ,(when (slot-boundp presentation 'welcome-name)
+                                           (dropdown-presentation-welcome-name presentation))
+                          :choices ,(presentation-choices presentation)))
+
+(defmethod field-presentation->field-widget-class ((presentation radio-presentation))
+  '(dropdown-field-widget :style :radio))
 
 (defun field-parser->field-widget-parser (parser field)
   (check-type parser parser)
@@ -383,7 +413,8 @@
   ;; TODO mixins
   (let ((view (find-view view)))
     ;; form-level data
-    ; TODO
+    (setf (caption-of form) (view-caption view))
+    (setf (instructions-of form) (form-view-instructions view))
     ;; fields
     (let ((field-widgets
             (mapcar #'field-widget-from-field-info
