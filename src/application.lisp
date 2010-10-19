@@ -264,7 +264,9 @@ called (primarily for backward compatibility"
        (:default-initargs
 	. ,(remove-keyword-parameters
 	    initargs :subclasses :slots :autostart))
-       (:metaclass webapp-class))))
+       (:metaclass webapp-class))
+     (when (get-webapp ',name nil)
+       (restart-webapp ',name))))
 
 (defmethod initialize-instance :after
     ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
