@@ -20,6 +20,8 @@
           setup-fields
           caption-of
           instructions-of
+          form-id-of
+          focusp-of
           fields-of
           state-of
           validators-of
@@ -73,6 +75,8 @@
 (define-widget form-widget ()
   ((caption :type (or string function null) :initform nil)
    (instructions :type (or string function null) :initform nil)
+   (form-id :initform (gen-id))
+   (focusp :type boolean :initform t)
    (validators :initform nil)
    (error-messages :type list :initform nil)
    (state :type t :initform :form
@@ -169,6 +173,7 @@
                                                               (multiple-value-list
                                                                 (update-form-field-value-from-request widget field)))
                                                             fields)))
+                                 (format t "field results: ~S~%" field-results)
                                  (when (every #'car field-results) ; every form field successfully updated?
                                    ;; now call form validators, if any
                                    (let ((form-results (mapcar (lambda (validator)
@@ -176,6 +181,7 @@
                                                                    (funcall validator widget)))
                                                                (ensure-list
                                                                  (validators-of widget)))))
+                                     (format t "form results: ~S~%" form-results)
                                      (if (every #'car form-results)
                                        (mapcar (lambda (success-item)
                                                  (etypecase success-item
@@ -185,13 +191,20 @@
                                                     (funcall success-item widget))))
                                                (ensure-list
                                                  (on-success-of widget)))
-                                       (setf (error-messages-of widget) (mapcar #'cadr form-results))))))))
+                                       (setf (error-messages-of widget) (mapcar #'cadr form-results)))))))
+                             :id (form-id-of widget))
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
           (:input :type "submit" :value "Submit"))))))
 
-(gbbopen::define-class field-widget-onchange-mixin ()
+(defmethod render-widget-children :after ((widget form-widget) &rest args)
+  (declare (ignore args))
+  (send-script
+    `((@ ($ ,(form-id-of widget)) focus-first-element))))
+
+
+(gbbopen::define-class field-widget-onchange-mixin () ; XXX not used yet
   ((onchange :type function)))
 
 (define-widget field-widget ()
@@ -245,7 +258,7 @@
       ((and raw-value (not empty)) ; present, parse it
        (multiple-value-bind (parsed-successfully-p parsed-value-or-error-message)
            (funcall (parser-of field) raw-value)
-         ;(format t "parser returned ~S~%" parsed-value-or-error-message)
+         (format t "parser returned ~S~%" parsed-value-or-error-message)
          (if parsed-successfully-p
            (let ((validation-errors (mapcar #'cadr
                                             (remove t (mapcar (lambda (v)
@@ -253,7 +266,7 @@
                                                                   (funcall v parsed-value-or-error-message)))
                                                               (ensure-list (validators-of field)))
                                                     :key #'car))))
-             ;(format t "validation errors: ~S~%" validation-errors)
+             (format t "validation errors: ~S~%" validation-errors)
              (if validation-errors
                (values nil (setf (error-message-of field) (first validation-errors)))
                (values t (setf (parsed-value-of field) parsed-value-or-error-message
