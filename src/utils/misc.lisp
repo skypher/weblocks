@@ -89,7 +89,7 @@ etc.)"
   (nth-value 1 (find-symbol (symbol-name symbol)
 			    (symbol-package symbol))))
 
-(defvar *asdf-system-cache* (make-cache-table :test #'equalp))
+(defvar *asdf-system-cache* (make-hash-table :test #'equalp))
 
 (defun asdf-system-directory (asdf-system-name)
   "Computes the directory in which the .asdf file for a given ASDF
