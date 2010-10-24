@@ -6,10 +6,10 @@
 ;;   presentations as part of field widgets
 ;;
 
-;; note: to use this you need to load gbbopen
-;; and gbbopen-tools (define-widget needs them)
-
 (in-package :weblocks)
+
+(load (merge-pathnames "define-class.lisp" *load-truename*))
+(import 'gbbopen-tools-define-class:define-class)
 
 (export '(define-widget
           humanize
@@ -60,10 +60,10 @@
 (defmacro define-widget (name direct-superclasses &body body)
   "Synthesis of `weblocks:defwidget' and `gbbopen-tools:define-class'."
   `(progn
-     (gbbopen::define-class ,name ,(remove-duplicates
-                                         (append (or direct-superclasses '(widget))
-                                                 (when (uri-parameter-def-p (car body))
-                                                   (list 'uri-parameters-mixin))))
+     (define-class ,name ,(remove-duplicates
+                            (append (or direct-superclasses '(widget))
+                                    (when (uri-parameter-def-p (car body))
+                                      (list 'uri-parameters-mixin))))
        ,@body
        (:metaclass widget-class))
      (defmethod per-class-dependencies append ((obj ,name))
@@ -204,7 +204,7 @@
     `((@ ($ ,(form-id-of widget)) focus-first-element))))
 
 
-(gbbopen::define-class field-widget-onchange-mixin () ; XXX not used yet
+(define-class field-widget-onchange-mixin () ; XXX not used yet
   ((onchange :type function)))
 
 (define-widget field-widget ()
