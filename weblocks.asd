@@ -20,6 +20,7 @@
                :metatilities :cl-ppcre :md5
                :anaphora :f-underscore
                :bordeaux-threads :salza2
+               :html-template
                :trivial-timeout #-sbcl :trivial-backtrace)
   :components ((:module src
 		:components (
@@ -160,6 +161,8 @@
 					      :depends-on (widget "quickform"))
 				       (:file "wizard"
 					      :depends-on (widget "dataform"))
+                                       (:file "template-block"
+                                              :depends-on (widget))
 				       (:file "login"
 					      :depends-on (widget "quickform"))
 				       (:module dataseq
@@ -223,12 +226,6 @@
 		(test-op (load-op "weblocks-test"))
 		(doc-op (load-op "weblocks-scripts"))
 		(make-app-op (load-op "weblocks-scripts"))))
-
-#+asdf-system-connections
-(defsystem-connection weblocks+html-template
-  :requires (:weblocks :html-template)
-  :components ((:module src :pathname "src/widgets/"
-		:components ((:file "template-block")))))
 
 ;;; test-op
 (defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))
