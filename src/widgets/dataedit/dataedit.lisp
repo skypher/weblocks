@@ -167,14 +167,14 @@ method to provide different ways to add items to the dataedit."))
 			    :name "delete-action" :type "lisp")
 	     (asdf-system-directory :weblocks)))
 
-(defun dataedit-reset-state (obj)
+(defmethod dataedit-reset-state (obj)
   "Resets the state of the dataedit. This function should be used by
 in order to reset the state after the item widget has done its job."
   (setf (dataedit-ui-state obj) nil
 	(dataedit-item-widget obj) nil
 	(dataseq-drilled-down-item obj) nil))
 
-(defun dataedit-add-items-flow (obj sel)
+(defmethod dataedit-add-items-flow (obj sel)
   "Initializes the flow for adding items to the dataedit."
   (declare (ignore sel))
   (setf (dataedit-item-widget obj)
