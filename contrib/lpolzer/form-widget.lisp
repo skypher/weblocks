@@ -280,16 +280,22 @@
 
 ;; text field
 (define-widget string-field-widget (field-widget)
-  ((hide-input :type boolean :initform nil
-               :documentation "Set to T to render a password field."))
+  ((style :type (member :input :password :textarea) :initform :input))
   (:default-initargs :parser (lambda (raw-value)
                                (values t raw-value))))
 
 (defmethod render-field-contents ((form form-widget) (field string-field-widget))
   (with-html
-    (:input :type (if (hide-input-of field) "password" "text")
-            :name (name-of field)
-            :value (esc (intermediate-value-of field)))))
+    (let ((style (style-of field))
+          (intermediate-value (intermediate-value-of field)))
+      (if (eq style :textarea)
+        (htm
+          (:textarea :name (name-of field)
+            (esc intermediate-value)))
+        (htm
+          (:input :type (if (eq style :password) "password" "text")
+                  :name (name-of field)
+                  :value (esc (intermediate-value-of field))))))))
 
 ;; dropdown/radio
 (define-widget dropdown-field-widget (field-widget)
@@ -345,42 +351,14 @@
   ((slot1 :accessor slot1)
    (slot2)))
 
-(defview parent-form-view (:type form
-                           :inherit-from '(:scaffold test-class))
-  (base-field))
-
-(defview test-form-view (:type form
-                         :inherit-from 'parent-form-view
-                         :caption "Hello, world"
-                         :buttons '((:submit . "Go, go, go!")))
-  (field1 :label "Cat")
-  (field2 :label "Dog"
-          :requiredp nil
-          :present-as (dropdown :welcome-name "[Choose a type of dog]"
-                                :choices (list "Terrier" "Dobermann" "Chihuahua")))
-  (field3 :label "Season"
-          :requiredp t
-          :present-as (dropdown :choices (constantly
-                                           (list "Spring" "Summer" "Autumn" "Winter"))))
-  (field4 :label "Car"
-          :requiredp nil
-          :present-as (dropdown :choices (list "BMW" "Ford" "Mercedes Benz" "Mazda" "Volvo")))
-  (field5 :requiredp nil
-          :present-as dropdown)
-  #+(or)
-  (field6 :requiredp t
-          :present-as dropdown)
-  (field7 :label "Year"
-          :requiredp t
-          :parse-as integer
-          :satisfies (lambda (x)
-                       (or (= x 2010) (values nil "Please enter the current year.")))))
-
 (defmethod field-presentation->field-widget-class ((presentation input-presentation))
   'string-field-widget)
 
 (defmethod field-presentation->field-widget-class ((presentation password-presentation))
-  '(string-field-widget :hide-input t))
+  '(string-field-widget :style :password))
+
+(defmethod field-presentation->field-widget-class ((presentation textarea-presentation))
+  '(string-field-widget :style :textarea))
 
 (defmethod field-presentation->field-widget-class ((presentation dropdown-presentation))
   `(dropdown-field-widget :style :dropdown
@@ -499,7 +477,42 @@ as reported by reader functions."
     (setf (widget-children root) (list form-widget-1
                                        form-widget-2))))
 
-;(start-weblocks :port 9110 :debug t)
+(start-weblocks :port 9110 :debug t)
+
+;;; test views
+(defview parent-form-view (:type form
+                           :inherit-from '(:scaffold test-class))
+  (base-field))
+
+(defview test-form-view (:type form
+                         :inherit-from 'parent-form-view
+                         :caption "Hello, world"
+                         :buttons '((:submit . "Go, go, go!")))
+  (field1 :label "Cat")
+  (field2 :label "Dog"
+          :requiredp nil
+          :present-as (dropdown :welcome-name "[Choose a type of dog]"
+                                :choices (list "Terrier" "Dobermann" "Chihuahua")))
+  (field3 :label "Season"
+          :requiredp t
+          :present-as (dropdown :choices (constantly
+                                           (list "Spring" "Summer" "Autumn" "Winter"))))
+  (field4 :label "Car"
+          :requiredp nil
+          :present-as (dropdown :choices (list "BMW" "Ford" "Mercedes Benz" "Mazda" "Volvo")))
+  (field5 :requiredp nil
+          :present-as dropdown)
+  #+(or)
+  (field6 :requiredp t
+          :present-as dropdown)
+  (field7 :label "Year"
+          :requiredp t
+          :parse-as integer
+          :satisfies (lambda (x)
+                       (or (= x 2010) (values nil "Please enter the current year."))))
+  (field8 :label "Write something about your life"
+          :present-as textarea
+          :requiredp nil))
 
 #|
 WEBLOCKS(1): (class-direct-subclasses (find-class 'presentation))
@@ -508,7 +521,8 @@ WEBLOCKS(1): (class-direct-subclasses (find-class 'presentation))
 WEBLOCKS(1): (class-direct-subclasses (find-class 'form-presentation))
 
 (#<STANDARD-CLASS CHECKBOXES-PRESENTATION>
- #<STANDARD-CLASS DROPDOWN-PRESENTATION> #<STANDARD-CLASS RADIO-PRESENTATION>
+ #<STANDARD-CLASS DROPDOWN-PRESENTATION>
+ #<STANDARD-CLASS RADIO-PRESENTATION>
  #<STANDARD-CLASS CHECKBOX-PRESENTATION>
  #<STANDARD-CLASS FILE-UPLOAD-PRESENTATION>
  #<STANDARD-CLASS INPUT-PRESENTATION>)
