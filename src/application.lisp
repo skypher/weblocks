@@ -108,7 +108,8 @@
    (bundle-dependency-types :type list
                             :accessor bundle-dependency-types
                             :initarg :bundle-dependency-types
-			    :initform '(:stylesheet :script)
+			    ;:initform '(:stylesheet :script)
+                            :initform nil ; current bundling code is flaky
 			    :documentation "This enables bundling of css, js files.
        If you only want js files to get bundled, set this to '(script-dependency).
        Set it to nil disables bundling. When debug is on, bundling is turned off.
