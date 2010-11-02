@@ -64,7 +64,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
                             (compact-dependencies (append (webapp-application-dependencies)
                                                           *page-dependencies*
                                                           (when (weblocks-webapp-debug app)
-                                                            (build-local-dependencies
+                                                            (build-dependencies
                                                               '((:script "weblocks-debug")
                                                                 (:stylesheet "debug-toolbar")))))))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)

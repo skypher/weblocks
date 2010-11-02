@@ -637,8 +637,9 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
   "Returns a list of dependencies on scripts and/or stylesheets that
    will persist throughout the whole application. See documentation for
    'widget-application-dependencies' for more details."
-  (build-local-dependencies
-   (weblocks-webapp-application-dependencies app)))
+  (build-dependencies
+   (weblocks-webapp-application-dependencies app)
+   app))
 
 (defun webapp-name (&optional (app (current-webapp)))
   "Returns the name of the web application (also see 'defwebapp'). Please

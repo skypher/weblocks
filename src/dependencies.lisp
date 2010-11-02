@@ -11,7 +11,7 @@
 	  render-dependency-in-ajax-response
           render-form-submit-dependencies
 	  make-local-dependency per-class-dependencies dependencies
-	  compact-dependencies build-local-dependencies))
+	  compact-dependencies build-dependencies))
 
 ;; we need to be able to gather various kinds of dependencies
 ;; from renderable objects (widgets, views, presentations). Dependencies
@@ -224,16 +224,23 @@ returns a dependency object."
 				  :local-path physical-path)))))))
 
 
-(defun build-local-dependencies (dep-list)
+(defun build-dependencies (dep-list &optional (app (current-webapp)))
   "Utility function: convert a list of either dependency objects or an
 alist of dependencies into a list of dependency objects. Used mostly
 when statically specyfing application dependencies, where alists are
 more convenient."
-  (loop for dep in dep-list collect
-       (if (consp dep)
-	   (destructuring-bind (type file-name) dep
-	     (make-local-dependency type file-name))
-	   dep)))
+  (mapcar (lambda (dep)
+            (if (consp dep)
+              (destructuring-bind (type uri) dep
+                (let ((puri (puri:parse-uri uri)))
+                  (if (puri:uri-host puri)
+                    (make-instance (ecase type
+                                     (:stylesheet 'stylesheet-dependency)
+                                     (:script 'script-dependency))
+                                   :url puri)
+                    (make-local-dependency type uri :webapp app))))
+              dep))
+          dep-list))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines
