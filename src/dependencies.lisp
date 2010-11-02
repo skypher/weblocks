@@ -155,11 +155,14 @@ when new dependencies appeared in AJAX page updates.")
   (with-html
     (:script :src (dependency-url obj) :type "text/javascript" "")))
 
+(defmethod render-dependency-in-page-head ((obj javascript-code-dependency))
+  (send-script (javascript-code obj)))
+
 (defmethod render-dependency-in-page-body-top ((obj javascript-code-dependency))
-  (with-javascript obj))
+  (send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-page-body-bottom ((obj javascript-code-dependency))
-  (with-javascript obj))
+  (send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-form-submit ((obj javascript-code-dependency))
   (javascript-code obj))
