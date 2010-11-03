@@ -99,6 +99,7 @@ function onActionFailure() {
 }
 
 function getActionUrl(actionCode, sessionString, isPure) {
+    if (!sessionString) sessionString = "";
     var scriptName = location.protocol + "//"
                    + location.hostname
                    + (location.port ? ":" + location.port : "")
