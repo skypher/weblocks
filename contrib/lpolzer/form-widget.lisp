@@ -455,9 +455,9 @@ as reported by reader functions."
     (persist-object (or (class-store data) (object-store data)) data)))
 
 ;;; test app
+#|
 (defwebapp form-test :prefix "/form-test")
 
-#+(or)
 (defun init-user-session (root)
   (let* ((string-field (make-instance 'string-field-widget
                                      :label "My Label"
@@ -513,6 +513,7 @@ as reported by reader functions."
   (field8 :label "Write something about your life"
           :present-as textarea
           :requiredp nil))
+|#
 
 #|
 WEBLOCKS(1): (class-direct-subclasses (find-class 'presentation))
