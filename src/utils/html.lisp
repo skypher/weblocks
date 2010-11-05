@@ -22,7 +22,9 @@
           scriptonly
           noscript
           render-message
-          send-script))
+          send-script
+          with-table
+          render-definition-list))
 
 (declaim (special *action-string*))	;early
 
@@ -391,4 +393,32 @@ in addition."
         (when caption
           (htm (:span :class "caption" (str caption) ":&nbsp;")))
 	(:span :class "message" (str message)))))
+
+(defmacro with-table (colnames &body body)
+  `(with-html
+     (:table :cellpadding 0 :cellspacing 0
+       (:thead
+         (:tr
+           ,@(loop for colname in colnames
+                   collect `(let ((evaled-colname ,colname))
+                              (htm
+                                (:th :class (awhen evaled-colname
+                                              (attributize-name it))
+                                   (awhen evaled-colname
+                                     (esc it))))))))
+       (:tbody
+         ,@body))))
+
+(defun render-definition-list (data &key class id style)
+  "Render the definition list DATA (a flat key/value list).
+The caller is responsible for escaping all data."
+  (assert (evenp (length data)) (data))
+  (with-html
+    (:dl :class class :id id :style style
+      (loop for dt = (pop data)
+            for dd = (pop data)
+            while (and dt dd)
+            do (htm
+                 (:dt :class (attributize-name dt) (str dt))
+                 (:dd :class (attributize-name dt) (str dd)))))))
 

@@ -13,7 +13,8 @@
            asdf-system-directory
            hash-keys
 	   append-custom-fields
-	   function-designator-p)
+	   function-designator-p
+           defrender)
 	 '(t util))
 
 (defun gen-id (&optional (prefix "dom"))
@@ -214,4 +215,11 @@ answering its result."
 			       :if-exists if-exists)
 	(salza2:gzip-stream istream ostream)))
     (probe-file output)))
+
+(defmacro defrender (widget-type &body body)
+  `(defmethod render-widget-body ((widget ,widget-type) &rest args)
+     (declare (ignore args))
+     (catch 'abort-widget-rendering
+       (block nil
+         ,@body))))
 
