@@ -182,7 +182,8 @@
                                                                (ensure-list
                                                                  (validators-of widget)))))
                                      (format t "form results: ~S~%" form-results)
-                                     (if (every #'car form-results)
+                                     (if (or (null form-results)
+                                             (every #'car form-results))
                                        (mapcar (lambda (success-item)
                                                  (etypecase success-item
                                                    (keyword
