@@ -28,6 +28,7 @@
           on-success-of
           reset-form-widget
           find-field-widget-by-name
+          form-value
 
           field-widget
           parser-of
@@ -107,6 +108,16 @@
 
 (defmethod find-field-widget-by-name ((widget form-widget) name)
   (find name (widget-children widget) :key #'name-of :test #'string-equal))
+
+(defmethod form-value ((widget form-widget) field-name)
+  (parsed-value-of (find-field-widget-by-name widget field-name)))
+
+#|
+(defmacro with-form-values ((&rest names) form &body body)
+  `(let (,(loop for name in names
+                collect `(
+  ,@body)
+|#
 
 (defmethod render-confirmation ((widget form-widget))
   (with-html
@@ -262,11 +273,12 @@
          (format t "parser returned ~S~%" parsed-value-or-error-message)
          (if parsed-successfully-p
            (let ((validation-errors (mapcar #'cadr
-                                            (remove t (mapcar (lambda (v)
-                                                                (multiple-value-list
-                                                                  (funcall v parsed-value-or-error-message)))
-                                                              (ensure-list (validators-of field)))
-                                                    :key #'car))))
+                                            (remove-if #'identity ; remove passed validator results
+                                                       (mapcar (lambda (v)
+                                                                 (multiple-value-list
+                                                                   (funcall v parsed-value-or-error-message)))
+                                                               (ensure-list (validators-of field)))
+                                                       :key #'car))))
              (format t "validation errors: ~S~%" validation-errors)
              (if validation-errors
                (values nil (setf (error-message-of field) (first validation-errors)))
