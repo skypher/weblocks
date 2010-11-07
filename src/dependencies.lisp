@@ -233,9 +233,8 @@ alist of dependencies into a list of dependency objects. Used mostly
 when statically specyfing application dependencies, where alists are
 more convenient."
   (flet ((filedep-p (type)
-           (or (eql type :script)
-               (eql type :stylesheet)))
-	 (deptype->symbol (type)
+           (member type '(:script :stylesheet) :test #'eq))
+	 (deptype->classname (type)
            (ecase type
              (:stylesheet 'stylesheet-dependency)
              (:script 'script-dependency))))
@@ -245,7 +244,7 @@ more convenient."
                     (cond ((not (filedep-p type))
                            (make-instance 'javascript-code-dependency :code arg))
                           ((puri:uri-host (puri:parse-uri arg))
-                           (make-instance (deptype->symbol type) :url arg))
+                           (make-instance (deptype->classname type) :url arg))
                           (t (make-local-dependency type arg :webapp app))))
                   dep))
             dep-list)))
