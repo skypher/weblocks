@@ -232,18 +232,23 @@ returns a dependency object."
 alist of dependencies into a list of dependency objects. Used mostly
 when statically specyfing application dependencies, where alists are
 more convenient."
-  (mapcar (lambda (dep)
-            (if (consp dep)
-              (destructuring-bind (type uri) dep
-                (let ((puri (puri:parse-uri uri)))
-                  (if (puri:uri-host puri)
-                    (make-instance (ecase type
-                                     (:stylesheet 'stylesheet-dependency)
-                                     (:script 'script-dependency))
-                                   :url puri)
-                    (make-local-dependency type uri :webapp app))))
-              dep))
-          dep-list))
+  (flet ((filedep-p (type)
+           (or (eql type :script)
+               (eql type :stylesheet)))
+	 (deptype->symbol (type)
+           (ecase type
+             (:stylesheet 'stylesheet-dependency)
+             (:script 'script-dependency))))
+    (mapcar (lambda (dep)
+              (if (consp dep)
+                  (destructuring-bind (type arg) dep
+                    (cond ((not (filedep-p type))
+                           (make-instance 'javascript-code-dependency :code arg))
+                          ((puri:uri-host (puri:parse-uri arg))
+                           (make-instance (deptype->symbol type) :url arg))
+                          (t (make-local-dependency type arg :webapp app))))
+                  dep))
+            dep-list)))
 
 (defun dependencies-by-symbol (symbol)
   "A utility function used to help in gathering dependencies. Determines
