@@ -29,6 +29,7 @@
           reset-form-widget
           find-field-widget-by-name
           form-value
+	  with-form-values
 
           field-widget
           parser-of
@@ -112,12 +113,10 @@
 (defmethod form-value ((widget form-widget) field-name)
   (parsed-value-of (find-field-widget-by-name widget field-name)))
 
-#|
 (defmacro with-form-values ((&rest names) form &body body)
-  `(let (,(loop for name in names
-                collect `(
-  ,@body)
-|#
+  `(let ,(loop for name in names
+	       collect `(,name (form-value ,form ',name)))
+     ,@body))
 
 (defmethod render-confirmation ((widget form-widget))
   (with-html
