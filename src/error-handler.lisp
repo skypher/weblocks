@@ -29,7 +29,6 @@
 
 
 ;;; 500 errors deserve special attention
-#-sbcl
 (defun print-trivial-backtrace (c)
   (trivial-backtrace:print-backtrace c :output nil))
 
