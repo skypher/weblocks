@@ -14,14 +14,24 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :depends-on (:closer-mop
-               :hunchentoot :puri :cl-json
-               :cl-who :parenscript
-               :cl-fad :fare-matcher :cl-cont
-               :metatilities :cl-ppcre :md5
-               :anaphora :f-underscore
-               :bordeaux-threads :salza2
+               :hunchentoot
+               :puri
+               :cl-json
+               :cl-who
+               :parenscript
+               :cl-fad
+               :fare-matcher
+               :cl-cont
+               :metatilities
+               :cl-ppcre
+               :md5
+               :anaphora
+               :f-underscore
+               :bordeaux-threads
+               :salza2
                :html-template
-               :trivial-timeout #-sbcl :trivial-backtrace)
+               :trivial-timeout
+               :trivial-backtrace)
   :components ((:module src
 		:components (
 		 (:file "package")
