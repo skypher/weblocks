@@ -15,6 +15,8 @@
     (hunchentoot:reset-session-secret)))
 
 (defmethod process-connection ((acceptor weblocks-acceptor) socket)
+  ;; CCL uses predictable random states for new threads
+  #+ccl(setf *random-state* (make-random-state t))
   (let ((*print-readably* nil))
     (call-next-method)))
 
