@@ -655,10 +655,16 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
 
 (defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
   "Does APP serve requests for HOSTNAME?"
+  (let ((hostname (car (cl-ppcre:split ":" hostname)))) ; ignore port
   (or (null (webapp-hostnames app))
-      (member (car (cl-ppcre:split ":" hostname))
-              (webapp-hostnames app)
-              :test #'equalp)))
+	(member hostname (webapp-hostnames app) :test #'equalp)
+	(loop for pattern in (webapp-hostnames app)
+	      thereis (hostname-match-p pattern hostname)))))
+
+(defun hostname-match-p (pattern hostname)
+  (values (cl-ppcre:scan-to-strings
+	   (cl-ppcre:regex-replace-all "\\*" pattern ".*")
+	   hostname)))
 
 (defun webapp-hostnames (&optional (app (current-webapp)))
   "Returns the hostnames this application will serve requests for."
