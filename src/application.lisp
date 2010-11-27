@@ -90,9 +90,11 @@
          
               Example: '(\"foo.com\" \"www.foo.com\" \"shoo.bar.org\")
          
+              Wildcard patterns are also allowed. Example: '(\"foo.*.com\")
+         
               If NIL (the default), don't care about the hostname at all.
          
-              TODO: support regex matching or wildcards here.")
+              TODO: support regex matching here.")
    (prefix :type string
            :reader weblocks-webapp-prefix
            :initarg :prefix
