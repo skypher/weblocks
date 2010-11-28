@@ -116,7 +116,7 @@ declared AUTOSTART."
 	 (let ((virtual-folder "/weblocks-common/pub/")
 	       (physical-folder (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
 				       it
-				       #p"./pub")))
+				       #p"./pub/")))
 	   (unless *weblocks-global-debug*
 	     (send-cache-rules 100000)
 	     (setf content-type
