@@ -9,17 +9,26 @@
 
 (export '())
 
-(defvar *transaction* nil)
+(defvar *transactions* (make-hash-table))
+(defvar *nested-transaction-mode* :warn
+  "Should be one of :warn, :error or :ignore.
+Defines how the system responds when an attempt is made
+to nest transactions. :warn and :ignore do not initiate
+a transaction via SQL BEGIN.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initialization/finalization ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod open-store ((store-type (eql :postmodern)) &rest args)
-  ;; You /really/ want to use thread pools. They're good for you.
-  (let ((pooled-args (unless (getf args :pooled-p)
-		       (append args '(:pooled-p t)))))
-    (setf *default-store* (apply #'connect pooled-args))
-    (setf *database* *default-store*)))
+(defmethod open-store ((store-type (eql :postmodern)) &rest args
+		       &key db user pass host
+		       (pooled-p t) (port 5432) (use-ssl :no))
+  "You /really/ want to use thread pools. They're good for you
+so we use them by default. The db, user, pass and host keyword
+arguments are required."
+  (declare (ignore args))
+  (setf *default-store* (connect db user pass host
+				 :port port :pooled-p pooled-p :use-ssl use-ssl))
+  (setf *database* *default-store*))
 
 (defmethod close-store ((store database-connection))
   (when (eq *default-store* store)
@@ -40,21 +49,34 @@
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
 (defmethod begin-transaction ((store database-connection))
-  (setf *transaction* (make-instance 'postmodern::transaction-handle))
-  (execute "BEGIN"))
+  (let* ((thread-id (bordeaux-threads:current-thread))
+	 (transaction (gethash thread-id *transactions*)))
+    ;; Postgres doesn't support nested transactions
+    ;; so ensure we're not in a transaction first
+    ;; TODO: Support this via Savepoints/postmodern:with-savepoint
+    (if transaction
+	(transaction-mode-message)
+	(setf (gethash thread-id *transactions*)
+	      (make-instance 'postmodern::transaction-handle)))
+    (execute "BEGIN")))
 
 (defmethod commit-transaction ((store database-connection))
-  (commit-transaction *transaction*))
+  (let* ((thread-id (bordeaux-threads:current-thread))
+	 (transaction (gethash thread-id *transactions*)))
+    (commit-transaction transaction)
+    (setf (gethash thread-id *transactions*) nil)))
 
 (defmethod rollback-transaction ((store database-connection))
-  (abort-transaction *transaction*))
+  (let* ((thread-id (bordeaux-threads:current-thread))
+	 (transaction (gethash thread-id *transactions*)))
+    (abort-transaction transaction)
+    (setf (gethash thread-id *transactions*) nil)))
 
 (defmethod dynamic-transaction ((store database-connection) proc)
   (with-transaction ()
     (funcall proc)))
 
 (defmethod use-dynamic-transaction-p ((store database-connection))
-  ;; For now...
   (declare (ignore store))
   nil)
 
@@ -63,7 +85,7 @@
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod persist-object ((store database-connection) object &key)
-  (save-dao object)) ;; use save-dao/transaction instead?
+  (save-dao/transaction object))
 
 (defmethod delete-persistent-object ((store database-connection) object)
   (delete-dao object))
@@ -78,6 +100,15 @@
 (defmethod class-id-slot-name ((class dao-class))
   ;; Returns a list of the column names which compose the primary key.
   (dao-keys class))
+
+(defun transaction-mode-message ()
+  (ecase *nested-transaction-mode*
+    (:warn
+       (warn "Could not initiate nested transaction."))
+    (:ignore
+       nil)
+    (:error
+       (error "Could not initiate nested transaction."))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
