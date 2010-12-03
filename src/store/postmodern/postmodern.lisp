@@ -10,7 +10,7 @@
 (export '())
 
 (defvar *transactions* (make-hash-table))
-(defvar *nested-transaction-behavior* :warn
+(defvar *nested-transaction-behavior* :ignore
   "Should be one of :warn, :error or :ignore.
 Defines how the system responds when an attempt is made
 to nest transactions. :warn and :ignore do not initiate
@@ -71,14 +71,16 @@ arguments are required."
 (defmethod commit-transaction ((store database-connection))
   (let* ((thread (bordeaux-threads:current-thread))
 	 (transaction (gethash thread *transactions*)))
-    (commit-transaction transaction)
-    (setf (gethash thread *transactions*) nil)))
+    (when transaction
+      (commit-transaction transaction)
+      (setf (gethash thread *transactions*) nil))))
 
 (defmethod rollback-transaction ((store database-connection))
   (let* ((thread (bordeaux-threads:current-thread))
 	 (transaction (gethash thread *transactions*)))
-    (abort-transaction transaction)
-    (setf (gethash thread *transactions*) nil)))
+    (when transaction
+      (abort-transaction transaction)
+      (setf (gethash thread *transactions*) nil))))
 
 (defmethod dynamic-transaction ((store database-connection) proc)
   (with-transaction ()
