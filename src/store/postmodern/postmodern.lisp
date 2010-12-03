@@ -10,7 +10,7 @@
 (export '())
 
 (defvar *transactions* (make-hash-table))
-(defvar *nested-transaction-mode* :warn
+(defvar *nested-transaction-behavior* :warn
   "Should be one of :warn, :error or :ignore.
 Defines how the system responds when an attempt is made
 to nest transactions. :warn and :ignore do not initiate
@@ -26,6 +26,7 @@ a transaction via SQL BEGIN.")
 so we use them by default. The db, user, pass and host keyword
 arguments are required."
   (declare (ignore args))
+  (assert (and db user pass host))
   (setf *default-store* (connect db user pass host
 				 :port port :pooled-p pooled-p :use-ssl use-ssl))
   (setf *database* *default-store*))
@@ -49,28 +50,35 @@ arguments are required."
 ;;; Transactions ;;;
 ;;;;;;;;;;;;;;;;;;;;
 (defmethod begin-transaction ((store database-connection))
-  (let* ((thread-id (bordeaux-threads:current-thread))
-	 (transaction (gethash thread-id *transactions*)))
+  (let* ((thread (bordeaux-threads:current-thread))
+	 (transaction (gethash thread *transactions*)))
     ;; Postgres doesn't support nested transactions
     ;; so ensure we're not in a transaction first
     ;; TODO: Support this via Savepoints/postmodern:with-savepoint
     (if transaction
-	(transaction-mode-message)
-	(setf (gethash thread-id *transactions*)
-	      (make-instance 'postmodern::transaction-handle)))
-    (execute "BEGIN")))
+	(ecase *nested-transaction-behavior*
+	  (:warn
+	     (warn "Could not initiate nested transaction."))
+	  (:ignore
+	     nil)
+	  (:error
+	     (error "Could not initiate nested transaction.")))
+	(progn
+	  (setf (gethash thread *transactions*)
+		(make-instance 'postmodern::transaction-handle))
+	  (execute "BEGIN")))))
 
 (defmethod commit-transaction ((store database-connection))
-  (let* ((thread-id (bordeaux-threads:current-thread))
-	 (transaction (gethash thread-id *transactions*)))
+  (let* ((thread (bordeaux-threads:current-thread))
+	 (transaction (gethash thread *transactions*)))
     (commit-transaction transaction)
-    (setf (gethash thread-id *transactions*) nil)))
+    (setf (gethash thread *transactions*) nil)))
 
 (defmethod rollback-transaction ((store database-connection))
-  (let* ((thread-id (bordeaux-threads:current-thread))
-	 (transaction (gethash thread-id *transactions*)))
+  (let* ((thread (bordeaux-threads:current-thread))
+	 (transaction (gethash thread *transactions*)))
     (abort-transaction transaction)
-    (setf (gethash thread-id *transactions*) nil)))
+    (setf (gethash thread *transactions*) nil)))
 
 (defmethod dynamic-transaction ((store database-connection) proc)
   (with-transaction ()
@@ -100,15 +108,6 @@ arguments are required."
 (defmethod class-id-slot-name ((class dao-class))
   ;; Returns a list of the column names which compose the primary key.
   (dao-keys class))
-
-(defun transaction-mode-message ()
-  (ecase *nested-transaction-mode*
-    (:warn
-       (warn "Could not initiate nested transaction."))
-    (:ignore
-       nil)
-    (:error
-       (error "Could not initiate nested transaction."))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
