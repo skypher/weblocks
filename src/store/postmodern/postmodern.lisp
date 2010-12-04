@@ -56,31 +56,37 @@ arguments are required."
     ;; so ensure we're not in a transaction first
     ;; TODO: Support this via Savepoints/postmodern:with-savepoint
     (if transaction
-	(ecase *nested-transaction-behavior*
-	  (:warn
-	     (warn "Could not initiate nested transaction."))
-	  (:ignore
-	     nil)
-	  (:error
-	     (error "Could not initiate nested transaction.")))
+	(progn
+	  (ecase *nested-transaction-behavior*
+	    (:warn
+	       (warn "Could not initiate nested transaction."))
+	    (:ignore
+	       nil)
+	    (:error
+	       (error "Could not initiate nested transaction.")))
+	  (incf (cdr (gethash thread *transactions*))))
 	(progn
 	  (setf (gethash thread *transactions*)
-		(make-instance 'postmodern::transaction-handle))
+		(cons (make-instance 'postmodern::transaction-handle) 0))
 	  (execute "BEGIN")))))
 
 (defmethod commit-transaction ((store database-connection))
   (let* ((thread (bordeaux-threads:current-thread))
 	 (transaction (gethash thread *transactions*)))
-    (when transaction
-      (commit-transaction transaction)
-      (setf (gethash thread *transactions*) nil))))
+    (if (zerop (cdr transaction))
+	(progn
+	  (commit-transaction (car transaction))
+	  (setf (gethash thread *transactions*) nil))
+	(decf (cdr (gethash thread *transactions*))))))
 
 (defmethod rollback-transaction ((store database-connection))
   (let* ((thread (bordeaux-threads:current-thread))
 	 (transaction (gethash thread *transactions*)))
-    (when transaction
-      (abort-transaction transaction)
-      (setf (gethash thread *transactions*) nil))))
+    (if (zerop (cdr transaction))
+	(progn
+	  (abort-transaction (car transaction))
+	  (setf (gethash thread *transactions*) nil))
+	(decf (cdr (gethash thread *transactions*))))))
 
 (defmethod dynamic-transaction ((store database-connection) proc)
   (with-transaction ()
