@@ -38,12 +38,14 @@ arguments are required."
     (setf *database* nil)))
 
 (defmethod clean-store ((store database-connection))
-  (dolist (seq (list-sequences))
-    (query (:drop-sequence seq)))
-  (dolist (view (list-views))
-    (query (:drop-view view)))
   (dolist (table (list-tables))
-    (query (:delete-from table))))
+    (query (:delete-from table)))
+  ;; TODO: Fix sequence handling.
+  ;; Not presently dropped as they're used implicitly by postmodern for IDs.
+  ;; (dolist (seq (list-sequences))
+  ;; (query (:drop-sequence seq)))
+  (dolist (view (list-views))
+    (query (:drop-view view))))
 
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -75,7 +77,7 @@ arguments are required."
 	 (transaction (gethash thread *transactions*)))
     (if (zerop (cdr transaction))
 	(progn
-	  (commit-transaction (car transaction))
+	  (postmodern:commit-transaction (car transaction))
 	  (setf (gethash thread *transactions*) nil))
 	(decf (cdr (gethash thread *transactions*))))))
 
@@ -101,7 +103,9 @@ arguments are required."
 ;;; Creating and deleting persistent objects ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmethod persist-object ((store database-connection) object &key)
-  (save-dao/transaction object))
+  (if (gethash (bordeaux-threads:current-thread) *transactions*)
+      (save-dao/transaction object)
+      (save-dao object)))
 
 (defmethod delete-persistent-object ((store database-connection) object)
   (delete-dao object))
