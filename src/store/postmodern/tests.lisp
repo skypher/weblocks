@@ -5,14 +5,12 @@
 
 (in-package :weblocks-postmodern-test)
 
-(defparameter *db* "")
-(defparameter *user* "")
-(defparameter *pass* "")
-(defparameter *host* "")
+(defparameter *db* nil)
+(defparameter *user* nil)
+(defparameter *pass* nil)
+(defparameter *host* nil)
 
-(defparameter *postmodern-store*
-  (open-store :postmodern :db *db* :user *user* :pass *pass* :host *host*))
-
+(defparameter *postmodern-store* nil)
 (defparameter *test-status* (list nil nil nil nil nil))
 
 ;; Let's go with an "Office Space" theme...
@@ -140,10 +138,6 @@
     (setf (fifth *test-status*) nil))
   (commit-transaction *postmodern-store*))
 
-(defun test-close ()
-  (close-store *postmodern-store*)
-  (setf *test-status* (list nil nil nil nil nil)))
-
 (defun test-all ()
   (test-creation)
   (test-retrieval)
@@ -151,11 +145,20 @@
   (test-deletion)
   (test-transactions))
 
-(defun run-all-tests ()
-  (unwind-protect (test-all)
-    (if (notevery #'null *test-status*)
-	(format t "All tests passed!~%")
-	(format t "Uh-oh! There were test failures..
+(defun run-all-tests (&key (db *db*) (user *user*) (pass *pass*) (host *host*))
+  (let ((*db* db)
+	(*user* user)
+	(*pass* pass)
+	(*host* host))
+    (setf *postmodern-store* (open-store :postmodern :db *db* :user *user*
+					 :pass *pass* :host *host*))
+    (unwind-protect (test-all)
+      (if (notevery #'null *test-status*)
+	  (format t "All tests passed!~%")
+	  (format t "Uh-oh! There were test failures..
 ~%Creation: ~A~%Retreival: ~A~%Updating: ~A~%Deletion: ~A~%Nested Transactions: ~A~%~%"
-		(first *test-status*) (second *test-status*) (third *test-status*)
-		(fourth *test-status*) (fifth *test-status*)))))
+		  (first *test-status*) (second *test-status*) (third *test-status*)
+		  (fourth *test-status*) (fifth *test-status*)))
+      (setf *test-status* (list nil nil nil nil nil))
+      (query (:drop-table 'employee))
+      (close-store *postmodern-store*))))
