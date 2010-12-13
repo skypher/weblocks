@@ -104,7 +104,7 @@ structure of type 'store-info' as value.")
 	     (asdf-system-directory :weblocks))))
     (asdf:operate 'asdf:load-op system-name)))
 
-(defmacro defstore (name type &rest args &key (load-store-system-p t))
+(defmacro defstore (name type &rest store-args &key (load-store-system-p t) &allow-other-keys)
   "A macro that helps define a store. A global variable 'name' is
 defined, and 'open-store' is called with appropriate store type and
 arguments. Note that the last store will also be the default (see
@@ -114,7 +114,7 @@ is called. If 'load-store-system-p' is T then the store's ASDF system
 (`weblocks-STORENAME') will be loaded afterwards. Turning this off
 is useful for binary images."
   `(progn
-     (%defstore-predefine ',name ,type ,@(remove-keyword-parameter args :load-store-system-p))
+     (%defstore-predefine ',name ,type ,@(remove-keyword-parameter store-args :load-store-system-p))
      (defvar ,name nil)
      ,(when load-store-system-p
             `(%defstore-postdefine ',name ,type))))
