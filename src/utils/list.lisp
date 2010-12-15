@@ -96,10 +96,18 @@ item before passing it to 'predicate'."
 
 (defun safe-getf (list name)
   "Like GETF but copes with odd argument lists.
-Extracts the first value whose predecessor matches NAME."
-  (if (evenp (length list))
-    (getf list name)
-    (second (member name list :test #'eq))))
+Extracts the first value whose predecessor matches NAME.
+Returns NIL as second value if the key wasn't found at
+all."
+  (let* ((result (if (evenp (length list))
+                   (getf list name :not-found)
+                   (aif (member name list :test #'eq)
+                        (second it)
+                        :not-found)))
+         (foundp (not (eq result :not-found))))
+    (if foundp
+      (values result t)
+      (values nil nil))))
 
 (defun remove-keyword-parameter (parameter-list keyword)
   "Removes a keyword parameter from a parameter-list.
