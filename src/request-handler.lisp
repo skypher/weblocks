@@ -190,9 +190,10 @@ customize behavior."))
 
 (defun update-location-hash-dependents ()
   (let ((hash (parse-location-hash)))
-    (mapc (lambda (w)
-            (update-state-from-location-hash w hash))
-         (get-widgets-by-type 'location-hash-dependent))))
+    (when hash
+      (mapc (lambda (w)
+              (update-state-from-location-hash w hash))
+           (get-widgets-by-type 'location-hash-dependent)))))
 
 (defun update-widget-tree ()
   (let ((*tree-update-pending* t)
