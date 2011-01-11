@@ -571,3 +571,16 @@ Slots will be copied shallowly except for CHILDREN."
   (timing (concatenate 'string "render-widget " (princ-to-string widget))
     (call-next-method)))
 
+
+;;; Widgets that depend on the location hash to
+;;; set their state. This is a draft that doesn't
+;;; offer much convenience.
+(export '(location-hash-dependent update-state-from-location-hash))
+
+(defwidget location-hash-dependent ()
+  ())
+
+(defmethod update-state-from-location-hash ((widget location-hash-dependent) hash)
+  (declare (ignore widget hash))
+  nil)
+

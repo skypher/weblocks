@@ -277,3 +277,12 @@ function toggleExpandCollapse (heading,container) {
   }
 }
 
+function updateWidgetStateFromHash() {
+  // http://stackoverflow.com/questions/680785/on-window-location-hash-change
+  // TODO need to detect if the hash has been changed but the page hasn't been reloaded
+  // TODO only call this if the hash is actually different from the last recorded hash
+  var hash = window.location.hash;
+  if (hash)
+    initiateActionWithArgs(null, null, {'weblocks-internal-location-hash':hash}, "GET", "/");
+}
+

@@ -185,7 +185,14 @@ customize behavior."))
                     *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
   (webapp-update-thread-status "Handling AJAX request")
   (timing "handle-ajax-request"
+    (update-location-hash-dependents)
     (render-dirty-widgets)))
+
+(defun update-location-hash-dependents ()
+  (let ((hash (parse-location-hash)))
+    (mapc (lambda (w)
+            (update-state-from-location-hash w hash))
+         (get-widgets-by-type 'location-hash-dependent))))
 
 (defun update-widget-tree ()
   (let ((*tree-update-pending* t)

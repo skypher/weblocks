@@ -77,7 +77,8 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 	      (render-page-body app rendered-html)
 	      (when (weblocks-webapp-debug app)
 		(render-debug-toolbar))
-	      (:div :id "ajax-progress" "&nbsp;"))))))
+	      (:div :id "ajax-progress" "&nbsp;")
+              (with-javascript "updateWidgetStateFromHash();"))))))
 
 ;;
 ;; Render header entries

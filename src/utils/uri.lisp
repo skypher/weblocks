@@ -3,7 +3,8 @@
 
 (wexport '(request-uri-path
            add-get-param-to-url
-	   remove-parameter-from-uri)
+	   remove-parameter-from-uri
+           parse-location-hash)
 	 '(t util))
 
 ;;; URI from pathname
@@ -65,4 +66,19 @@ ex:
 							     ""))
      unless (string-equal "" token)
        collect (url-decode token)))
+
+(defun query-string->alist (query-string)
+  ;; stolen from cl-oauth -- does one of ours deps already offer this?
+  ;; TODO: doesn't handle leading ? or #
+  (check-type query-string string)
+  (let* ((kv-pairs (remove "" (cl-ppcre:split "&" query-string) :test #'equal))
+         (alist (mapcar (lambda (kv-pair)
+                          (let ((kv (cl-ppcre:split "=" kv-pair)))
+                            (cons (first kv) (second kv))))
+                        kv-pairs)))
+    alist))
+
+(defun parse-location-hash ()
+  (let ((raw-hash (hunchentoot:get-parameter "weblocks-internal-location-hash")))
+    (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash ""))))
 
