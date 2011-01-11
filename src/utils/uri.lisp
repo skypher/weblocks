@@ -80,5 +80,6 @@ ex:
 
 (defun parse-location-hash ()
   (let ((raw-hash (hunchentoot:get-parameter "weblocks-internal-location-hash")))
-    (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash ""))))
+    (when raw-hash
+      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 
