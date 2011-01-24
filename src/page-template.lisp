@@ -62,11 +62,7 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
 	(all-dependencies (timing "compact-dependencies"
                             (compact-dependencies (append (webapp-application-dependencies)
-                                                          *page-dependencies*
-                                                          (when (weblocks-webapp-debug app)
-                                                            (build-dependencies
-                                                              '((:script "weblocks-debug")
-                                                                (:stylesheet "debug-toolbar")))))))))
+                                                          *page-dependencies*)))))
     (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
 	     (:head
@@ -75,8 +71,6 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 	      (mapc #'render-dependency-in-page-head all-dependencies))
 	     (:body
 	      (render-page-body app rendered-html)
-	      (when (weblocks-webapp-debug app)
-		(render-debug-toolbar))
 	      (:div :id "ajax-progress" "&nbsp;")
               (with-javascript "updateWidgetStateFromHash();"))))))
 

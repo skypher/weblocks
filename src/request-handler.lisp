@@ -110,8 +110,6 @@ customize behavior."))
           *dirty-widgets*)
       (when (null (root-widget))
 	(let ((root-widget (make-instance 'widget :name "root")))
-	  (when (weblocks-webapp-debug app)
-	    (initialize-debug-actions))
 	  (setf (root-widget) root-widget)
 	  (let (finished?)
 	    (unwind-protect

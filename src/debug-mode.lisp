@@ -25,26 +25,6 @@
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
 
-(defun render-debug-toolbar ()
-  "When weblocks is started in debug mode, called on every request to
-present the user with a toolbar that aids development."
-  (with-html
-    (:div :class "debug-toolbar"
-	  (:a :href (make-action-url "debug-reset-sessions")
-	      :title "Reset Sessions"
-	      (:img :src (make-webapp-public-file-uri "images/reset.png")
-		    :alt "Reset Sessions")))))
-
-(defun initialize-debug-actions ()
-  "When weblocks is started in debug mode, called on session
-initalization so that appropriate actions that aid development can be
-created."
-  (make-action (lambda (&rest args)
-		 (declare (ignore args))
-		 (reset-sessions)
-		 (redirect (make-webapp-uri "/")))
-	       "debug-reset-sessions"))
-
 ;;; Further aid in debugging by reporting potential problems
 
 (defun style-warn (condition &rest warn-args)
