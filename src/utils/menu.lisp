@@ -32,33 +32,36 @@ the navigation as disabled."
                    (let* ((label (car option))
                           (target (cdr option))
 			  (pane-selected-p (equalp target (or selected-pane "")))
-                          (pane-disabled-p (member (attributize-name (car option))
-                                                   disabled-pane-names
-                                                   :key #'attributize-name
-                                                   :test #'string-equal))
+                          (pane-disabled-p (unless (functionp label)
+                                             (member (attributize-name label)
+                                                     disabled-pane-names
+                                                     :key #'attributize-name
+                                                     :test #'string-equal)))
                           (pane-class (cond
                                         (pane-selected-p "selected-item")
                                         (pane-disabled-p "disabled-item"))))
-                     (with-html
-                       (:li :id (unattributized-name (format nil "~A-~A" container-id label)
-                                                     'menu-item)
-                            :class pane-class
-                            (:span :class (concatenate 'string
-                                                       "item-wrapper"
-                                                       (when orderedp
-                                                         (format nil " item-number-~A" item-number)))
-                                   (etypecase target
-                                     (string
-                                      (if (or pane-selected-p pane-disabled-p)
-                                        (htm (:span :class "label" (str label)))
-                                        (htm (:a :href
-                                                 (concatenate 'string
-                                                              (string-right-trim "/" base)
-                                                              "/"
-                                                              (string-left-trim "/" target))
-                                                 (str label)))))
-                                     (function
-				      (funcall target label pane-selected-p)))))))))))
+                     (if (functionp label)
+                       (funcall label)
+                       (with-html
+                         (:li :id (unattributized-name (format nil "~A-~A" container-id label)
+                                                       'menu-item)
+                              :class pane-class
+                              (:span :class (concatenate 'string
+                                                         "item-wrapper"
+                                                         (when orderedp
+                                                           (format nil " item-number-~A" item-number)))
+                                     (etypecase target
+                                       (string
+                                        (if (or pane-selected-p pane-disabled-p)
+                                          (htm (:span :class "label" (str label)))
+                                          (htm (:a :href
+                                                   (concatenate 'string
+                                                                (string-right-trim "/" base)
+                                                                "/"
+                                                                (string-left-trim "/" target))
+                                                   (str label)))))
+                                       (function
+                                        (funcall target label pane-selected-p))))))))))))
 ;;                                      (render-link target label)))))))))))
     (with-html
       (:div :class "view menu" ; should probably be 'rendered-menu' but I'm not going to be
@@ -68,9 +71,9 @@ the navigation as disabled."
               (when header
                 (htm (:h1 (str header))))
               (if (null options)
-                  (htm
-                   (:div :class "empty-menu" (str empty-message)))
-                  (if ordered-list-p
-                      (htm (:ol (render-menu-items t)))
-                      (htm (:ul (render-menu-items))))))))))
+                (htm
+                 (:div :class "empty-menu" (str empty-message)))
+                (if ordered-list-p
+                  (htm (:ol (render-menu-items t)))
+                  (htm (:ul (render-menu-items))))))))))
 
