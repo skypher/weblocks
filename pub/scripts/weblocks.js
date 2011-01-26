@@ -50,12 +50,8 @@ Ajax.Responders.register({
 function onActionSuccess(transport) {
     // Grab json value
     var json;
-    if(Prototype.Browser.WebKit) {
-	// We should sanitize JSON, but at the moment it crashes Safari
-        json = transport.responseText.evalJSON();
-    } else {
-        json = transport.responseText.evalJSON(true);
-    }
+
+    json = transport.responseText.evalJSON(false);
 
     // See if there are redirects
     var redirect = json['redirect'];
