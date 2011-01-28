@@ -285,7 +285,7 @@ used instead of the default 'Close'."
                       :onfocus (when default-value
                                  (format nil "if (this.value==\"~A\") this.value=\"\";" default-value))
                       :onblur (when default-value
-                                (format nil "if (this.value==\"~A\") this.value=\"\";" default-value)))
+                                (format nil "if (this.value==\"\") this.value=\"~A\";" default-value)))
   (when visibility-option-p
     (send-script (ps:ps*
                    `(defun toggle-password-visibility (field)
