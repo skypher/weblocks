@@ -306,8 +306,8 @@ form-view-buttons for a given view.")
     (let ((form-body
 	   (let ((*weblocks-output-stream* (make-string-output-stream)))
 	     (with-html
-	       (:h1 (fmt (view-caption view)
-			 (humanize-name (object-class-name obj))))
+               (awhen (view-caption view)
+                 (htm (:h1 (fmt (view-caption view) (humanize-name (object-class-name obj))))))
 	       (render-validation-summary view obj widget validation-errors)
 	       (:h2 :class "form-fields-title" "Form fields:")
 	       (safe-apply fields-prefix-fn view obj args)
