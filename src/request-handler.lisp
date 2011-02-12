@@ -1,5 +1,8 @@
 (in-package :weblocks)
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (when (find-symbol "*APPROVED-RETURN-CODES*" 'hunchentoot)
+    (pushnew 'hunchentoot-approved-return-codes *features*)))
 
 (export '(handle-client-request
           *before-ajax-complete-scripts*
@@ -8,7 +11,12 @@
           *request-timeout*
           *backtrace-on-session-init-error*
           *style-warn-on-circular-dirtying*
-          *style-warn-on-late-propagation*))
+          *style-warn-on-late-propagation*
+          #-hunchentoot-approved-return-codes
+            *approved-return-codes*))
+
+#-hunchentoot-approved-return-codes
+  (defvar *approved-return-codes* (list +http-ok+))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)

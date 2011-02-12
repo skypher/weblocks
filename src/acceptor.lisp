@@ -3,7 +3,9 @@
 
 (export '(weblocks-acceptor))
 
-(defclass weblocks-acceptor (acceptor)
+(defclass weblocks-acceptor (#.(if (find-class 'easy-acceptor nil)
+                                 'easy-acceptor
+                                 'acceptor))
   ((session-cookie-name :type string :accessor session-cookie-name
                         :initarg :session-cookie-name
                         :initform (format nil "weblocks-~(~A~)" (gensym)))))
