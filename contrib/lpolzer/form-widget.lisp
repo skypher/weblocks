@@ -96,7 +96,7 @@
   (setf (widget-children widget) fields))
 
 (defmethod (setf widget-children) :after (fields (widget form-widget) &optional type)
-  (declare (ignore type))
+  (declare (ignore fields type))
   (update-field-widgets-parent widget))
 
 (defmethod setup-fields ((widget form-widget))
@@ -178,12 +178,12 @@
     ;; fields
     (let ((fields (widget-children widget)))
       (with-html-form (:POST (lambda (&rest args)
-                               (format t "submit with args: ~S~%" args)
+                               #+leslie(format t "submit with args: ~S~%" args)
                                (let ((field-results (mapcar (lambda (field)
                                                               (multiple-value-list
                                                                 (update-form-field-value-from-request widget field)))
                                                             fields)))
-                                 (format t "field results: ~S~%" field-results)
+                                 #+leslie(format t "field results: ~S~%" field-results)
                                  (when (every #'car field-results) ; every form field successfully updated?
                                    ;; now call form validators, if any
                                    (let ((form-results (mapcar (lambda (validator)
@@ -191,7 +191,7 @@
                                                                    (funcall validator widget)))
                                                                (ensure-list
                                                                  (validators-of widget)))))
-                                     (format t "form results: ~S~%" form-results)
+                                     #+leslie(format t "form results: ~S~%" form-results)
                                      (if (or (null form-results)
                                              (every #'car form-results))
                                        (mapcar (lambda (success-item)
@@ -269,7 +269,7 @@
       ((and raw-value (not empty)) ; present, parse it
        (multiple-value-bind (parsed-successfully-p parsed-value-or-error-message)
            (funcall (parser-of field) raw-value)
-         (format t "parser returned ~S~%" parsed-value-or-error-message)
+         #+leslie(format t "parser returned ~S~%" parsed-value-or-error-message)
          (if parsed-successfully-p
            (let ((validation-errors (mapcar #'cadr
                                             (remove-if #'identity ; remove passed validator results
@@ -278,7 +278,7 @@
                                                                    (funcall v parsed-value-or-error-message)))
                                                                (ensure-list (validators-of field)))
                                                        :key #'car))))
-             (format t "validation errors: ~S~%" validation-errors)
+             #+leslie(format t "validation errors: ~S~%" validation-errors)
              (if validation-errors
                (values nil (setf (error-message-of field) (first validation-errors)))
                (values t (setf (parsed-value-of field) parsed-value-or-error-message
