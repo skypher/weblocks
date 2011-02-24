@@ -150,7 +150,7 @@ being rendered.
 
 (defun render-dropdown (name selections &key id class selected-value
                         disabled onchange welcome-name multiple autosubmitp
-                        (frob-welcome-name t))
+                        tabindex (frob-welcome-name t))
   "Renders a dropdown HTML element (select).
 
 'name' - the name of html control. The name is attributized before
@@ -186,6 +186,7 @@ submitted."
   (with-html
     (:select :id id
 	     :class class
+             :tabindex tabindex
              :disabled disabled
 	     :name (attributize-name name)
 	     :onchange (or onchange
