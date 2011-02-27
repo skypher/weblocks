@@ -27,6 +27,8 @@
           validators-of
           on-success-of
           reset-form-widget
+          render-confirmation
+          render-form-controls
           find-field-widget-by-name
           form-value
 	  with-form-values
@@ -42,6 +44,7 @@
           pretty-intermediate-value-of
           parsed-value-of
           error-message-of
+          error-messages-of
           render-field
           render-field-contents
           update-form-field-value-from-request
@@ -131,10 +134,8 @@
 (defmethod reset-form-widget ((widget form-widget))
   ;; This can get complicated when fields are modified
   ;; dynamically. In that case specialize this method.
-  (mapcar (lambda (field)
-            (setf (intermediate-value-of field) nil)
-            (setf (parsed-value-of field) nil))
-          (widget-children widget)))
+  (setf (state-of widget) :form)
+  (setup-fields widget))
 
 (defmethod render-widget-body ((widget form-widget) &rest args)
   (declare (ignore args))
@@ -158,6 +159,10 @@
 
 (defmethod update-field-widgets-parent ((widget form-widget))
   (mapc (lambda (field) (setf (form-of field) widget)) (fields-of widget)))
+
+(defmethod render-form-controls ((widget form-widget))
+  (with-html
+    (:input :type "submit" :value "Submit")))
 
 (defmethod render-widget-children ((widget form-widget) &rest args)
   (declare (ignore args))
@@ -207,7 +212,7 @@
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
-          (:input :type "submit" :value "Submit"))))))
+          (render-form-controls widget))))))
 
 (defmethod render-widget-children :after ((widget form-widget) &rest args)
   (declare (ignore args))
@@ -269,7 +274,7 @@
       ((and raw-value (not empty)) ; present, parse it
        (multiple-value-bind (parsed-successfully-p parsed-value-or-error-message)
            (funcall (parser-of field) raw-value)
-         #+leslie(format t "parser returned ~S~%" parsed-value-or-error-message)
+         #+leslie(format t "parser ~S returned ~S~%" (parser-of field) parsed-value-or-error-message)
          (if parsed-successfully-p
            (let ((validation-errors (mapcar #'cadr
                                             (remove-if #'identity ; remove passed validator results
