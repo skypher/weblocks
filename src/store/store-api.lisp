@@ -123,7 +123,7 @@
   Other implementation dependent keys may be defined by a given
   store."))
 
-(defgeneric count-persistent-objects (store class-name &key)
+(defgeneric count-persistent-objects (store class-name &key &allow-other-keys)
   (:documentation "Returns the number of persistent objects stored in
   'store' of 'class-name', bound by the given keyword parameters. For
   documentation of keyword parameters, see
