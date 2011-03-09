@@ -183,6 +183,7 @@
     ;; fields
     (let ((fields (widget-children widget)))
       (with-html-form (:POST (lambda (&rest args)
+                               (declare (ignorable args))
                                #+leslie(format t "submit with args: ~S~%" args)
                                (let ((field-results (mapcar (lambda (field)
                                                               (multiple-value-list
