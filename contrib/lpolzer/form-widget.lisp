@@ -32,6 +32,7 @@
           find-field-widget-by-name
           form-value
 	  with-form-values
+          handle-form-submission
 
           field-widget
           parser-of
@@ -164,6 +165,34 @@
   (with-html
     (:input :type "submit" :value "Submit")))
 
+(defmethod handle-form-submission ((widget form-widget) &rest args)
+  #+leslie(format t "submit with args: ~S~%" args)
+  (let* ((fields (fields-of widget))
+         (field-results (mapcar (lambda (field)
+                                  (multiple-value-list
+                                    (update-form-field-value-from-request widget field)))
+                                fields)))
+    #+leslie(format t "field results: ~S~%" field-results)
+    (when (every #'car field-results) ; every form field successfully updated?
+      ;; now call form validators, if any
+      (let ((form-results (mapcar (lambda (validator)
+                                    (multiple-value-list
+                                      (funcall validator widget)))
+                                  (ensure-list
+                                    (validators-of widget)))))
+        #+leslie(format t "form results: ~S~%" form-results)
+        (if (or (null form-results)
+                (every #'car form-results))
+          (mapcar (lambda (success-item)
+                    (etypecase success-item
+                      (keyword
+                        (form-widget-act-on-success-item widget success-item))
+                      ((or symbol function)
+                       (funcall success-item widget))))
+                  (ensure-list
+                    (on-success-of widget)))
+          (setf (error-messages-of widget) (mapcar #'cadr form-results)))))))
+
 (defmethod render-widget-children ((widget form-widget) &rest args)
   (declare (ignore args))
   (when (eq (state-of widget) :form)
@@ -182,34 +211,8 @@
             (:li (esc error-message))))))
     ;; fields
     (let ((fields (widget-children widget)))
-      (with-html-form (:POST (lambda (&rest args)
-                               (declare (ignorable args))
-                               #+leslie(format t "submit with args: ~S~%" args)
-                               (let ((field-results (mapcar (lambda (field)
-                                                              (multiple-value-list
-                                                                (update-form-field-value-from-request widget field)))
-                                                            fields)))
-                                 #+leslie(format t "field results: ~S~%" field-results)
-                                 (when (every #'car field-results) ; every form field successfully updated?
-                                   ;; now call form validators, if any
-                                   (let ((form-results (mapcar (lambda (validator)
-                                                                 (multiple-value-list
-                                                                   (funcall validator widget)))
-                                                               (ensure-list
-                                                                 (validators-of widget)))))
-                                     #+leslie(format t "form results: ~S~%" form-results)
-                                     (if (or (null form-results)
-                                             (every #'car form-results))
-                                       (mapcar (lambda (success-item)
-                                                 (etypecase success-item
-                                                   (keyword
-                                                    (form-widget-act-on-success-item widget success-item))
-                                                   ((or symbol function)
-                                                    (funcall success-item widget))))
-                                               (ensure-list
-                                                 (on-success-of widget)))
-                                       (setf (error-messages-of widget) (mapcar #'cadr form-results)))))))
-                             :id (form-id-of widget))
+      (with-html-form (:POST #'handle-form-submission
+                       :id (form-id-of widget))
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
@@ -302,16 +305,21 @@
   (:default-initargs :parser (lambda (raw-value)
                                (values t raw-value))))
 
-(defmethod render-field-contents ((form form-widget) (field string-field-widget))
+(defmethod render-field-contents ((form form-widget) (field string-field-widget) &key id &allow-other-keys)
   (with-html
     (let ((style (style-of field))
           (intermediate-value (intermediate-value-of field)))
       (if (eq style :textarea)
         (htm
-          (:textarea :name (name-of field)
+          (:textarea :id id :name (name-of field)
+                     :class (if (error-message-of field) "invalid" "valid")
             (esc intermediate-value)))
         (htm
-          (:input :type (if (eq style :password) "password" "text")
+          (:input :id id
+                  :class (concatenate 'string "text "
+                                      (when (eq style :password) "password ")
+                                      (if (error-message-of field) "invalid" "valid"))
+                  :type (if (eq style :password) "password" "text")
                   :name (name-of field)
                   :value (esc (intermediate-value-of field))))))))
 
@@ -347,7 +355,7 @@
       (car choice))
     "-"))
 
-(defmethod render-field-contents ((form form-widget) (widget dropdown-field-widget))
+(defmethod render-field-contents ((form form-widget) (widget dropdown-field-widget) &key id &allow-other-keys)
   (let ((choices (choices-of widget)))
     (ecase (style-of widget)
       (:dropdown
@@ -358,7 +366,9 @@
                          :welcome-name (unless (requiredp-of widget)
                                          (welcome-name-of widget))
                          :frob-welcome-name nil
-                         :selected-value (intermediate-value-of widget)))
+                         :selected-value (intermediate-value-of widget)
+                         :class (if (error-message-of field) "invalid" "valid")
+                         :id id))
       (:radio
         ;; TODO
       ))))
