@@ -223,8 +223,9 @@
 
 (defmethod render-widget-children :after ((widget form-widget) &rest args)
   (declare (ignore args))
-  (send-script
-    `((@ ($ ,(form-id-of widget)) focus-first-element))))
+  (when (focusp-of widget)
+    (send-script
+      `((@ ($ ,(form-id-of widget)) focus-first-element)))))
 
 
 (define-class field-widget-onchange-mixin () ; XXX not used yet
