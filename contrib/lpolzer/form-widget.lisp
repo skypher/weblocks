@@ -56,6 +56,8 @@
           dropdown-field-widget
           choices-of
 
+          funcall-field-widget
+
           field-presentation->field-widget-class
           field-parser->field-widget-parser
           field-widget-from-field-info
@@ -166,6 +168,7 @@
     (:input :type "submit" :value "Submit")))
 
 (defmethod handle-form-submission ((widget form-widget) &rest args)
+  (declare (ignorable args))
   #+leslie(format t "submit with args: ~S~%" args)
   (let* ((fields (fields-of widget))
          (field-results (mapcar (lambda (field)
@@ -367,7 +370,7 @@
                                          (welcome-name-of widget))
                          :frob-welcome-name nil
                          :selected-value (intermediate-value-of widget)
-                         :class (if (error-message-of field) "invalid" "valid")
+                         :class (if (error-message-of widget) "invalid" "valid")
                          :id id))
       (:radio
         ;; TODO
@@ -556,4 +559,11 @@ WEBLOCKS(1): (class-direct-subclasses (find-class 'form-presentation))
  #<STANDARD-CLASS FILE-UPLOAD-PRESENTATION>
  #<STANDARD-CLASS INPUT-PRESENTATION>)
 |#
+
+;; funcall field
+(define-widget funcall-field-widget (field-widget)
+  ((function :type (or symbol function))))
+
+(defmethod render-field-contents ((form form-widget) (field funcall-field-widget) &key id &allow-other-keys)
+  (funcall (function-of field) form field))
 
