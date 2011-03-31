@@ -633,7 +633,7 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
 
 (defun reset-webapp-session (&optional (app (current-webapp)))
   "Reset sessions on a per-webapp basis"
-  (setf (session-value (class-name (class-of app))) nil))
+  (setf (session-value (webapp-session-key app)) nil))
 
 (defun webapp-application-dependencies (&optional (app (current-webapp)))
   "Returns a list of dependencies on scripts and/or stylesheets that
