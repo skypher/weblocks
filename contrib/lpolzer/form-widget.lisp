@@ -566,5 +566,6 @@ WEBLOCKS(1): (class-direct-subclasses (find-class 'form-presentation))
   ((function :type (or symbol function))))
 
 (defmethod render-field-contents ((form form-widget) (field funcall-field-widget) &key id &allow-other-keys)
+  (declare (ignore id))
   (funcall (function-of field) form field))
 
