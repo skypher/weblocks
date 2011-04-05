@@ -214,7 +214,8 @@
             (:li (esc error-message))))))
     ;; fields
     (let ((fields (widget-children widget)))
-      (with-html-form (:POST #'handle-form-submission
+      (with-html-form (:POST (lambda (&rest args)
+                               (apply #'handle-form-submission widget args))
                        :id (form-id-of widget))
         (:div :class "fields"
           (mapc #'render-widget fields))
