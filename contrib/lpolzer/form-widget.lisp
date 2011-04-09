@@ -113,8 +113,9 @@
   (setup-fields widget)
   (update-field-widgets-parent widget))
 
-(defmethod find-field-widget-by-name ((widget form-widget) name)
-  (find name (widget-children widget) :key #'name-of :test #'string-equal))
+(defmethod find-field-widget-by-name ((widget form-widget) name &key (errorp t))
+  (or (find name (widget-children widget) :key #'name-of :test #'string-equal)
+      (when errorp (error "Couldn't find field named ~S in form ~S" name widget))))
 
 (defmethod form-value ((widget form-widget) field-name)
   (parsed-value-of (find-field-widget-by-name widget field-name)))
