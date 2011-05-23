@@ -92,7 +92,8 @@
           are :form and :confirmation. You may define others on your own as needed.")
    (on-success :initform '(:confirm :reset)
                :documentation "A function or symbol (or list of those) to specify
-               what happens after a successful form submit.")))
+               what happens after a successful form submit.")
+   (use-ajax-p :initform t)))
 
 (defmethod fields-of ((widget form-widget))
   (widget-children widget))
@@ -217,7 +218,8 @@
     (let ((fields (widget-children widget)))
       (with-html-form (:POST (lambda (&rest args)
                                (apply #'handle-form-submission widget args))
-                       :id (form-id-of widget))
+                       :id (form-id-of widget)
+                       :use-ajax-p (use-ajax-p-of widget))
         (:div :class "fields"
           (mapc #'render-widget fields))
         (:div :class "controls"
