@@ -235,7 +235,7 @@
 		     (incf count))))
 	    (map-class #'counter class-name :oids t))
 	  count))
-      (count-persistent-objects store class-name)))
+      (count-persistent-standard-objects store class-name)))
 
 (defun make-ranged-collector (collector range)
   (let ((offset 0)
