@@ -45,11 +45,12 @@
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (render-checkboxes (view-field-slot-name field)
-                          (obtain-presentation-choices presentation obj)
-                          :selected-values (if intermediate-value-p
-                                             intermediate-value
-                                             (when value
-                                               (mapcar (compose (curry-after #'intern :keyword) #'string-upcase) value))))))
+                       (obtain-presentation-choices presentation obj)
+                       :selected-values (when (or value intermediate-value)
+                                          (mapcar (compose (curry-after #'intern :keyword) #'string-upcase)
+                                                  (if intermediate-value-p
+                                                      intermediate-value
+                                                      value))))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args
