@@ -387,7 +387,9 @@ in addition."
                   (string script)
                   (list (ps* script)))))
     (if (ajax-request-p)
-      (let ((code (with-javascript-to-string script)))
+      (let ((code (if (equalp (hunchentoot:header-in* "X-Weblocks-Client") "JQuery")
+                    script
+                    (with-javascript-to-string script))))
         (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
         (ecase place
           (:before-load (push code *before-ajax-complete-scripts*))
