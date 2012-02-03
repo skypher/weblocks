@@ -147,6 +147,8 @@ declared AUTOSTART."
   (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
+;; *** removed from Hunchentoot; find another way to implement this.
+#|
 (setf hunchentoot:*default-handler*
       (lambda ()
 	(if (null (tokenize-uri (script-name*) nil))
@@ -155,6 +157,7 @@ declared AUTOSTART."
 		(start-webapp 'weblocks-default))
 	      (redirect "/weblocks-default"))
 	    (setf (return-code*) +http-not-found+))))
+|#
 
 ;; install weblocks-dispatcher
 (eval-when (:load-toplevel)

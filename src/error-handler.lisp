@@ -3,8 +3,6 @@
 
 (export '(handle-http-error handle-error-condition print-trivial-backtrace))
 
-(setf hunchentoot:*handle-http-errors-p* nil)
-
 (defmacro with-error-page-html ((title heading &optional description) &body body)
   `(with-html-to-string
     (:html
