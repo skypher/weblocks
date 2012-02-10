@@ -144,7 +144,7 @@ declared AUTOSTART."
          (no-cache) ; disable caching for dynamic pages
 	 (return-from weblocks-dispatcher 
 	   (f0 (handle-client-request app)))))))
-  (log-message :debug "Application dispatch failed for '~A'" (script-name request)))
+  (hunchentoot:log-message* :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
 ;; *** removed from Hunchentoot; find another way to implement this.
