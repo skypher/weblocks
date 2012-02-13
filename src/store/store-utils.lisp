@@ -38,7 +38,8 @@ object identification schemes.")
       (handler-case (when (slot-boundp obj object-id-slot-name)
 		      (slot-value obj object-id-slot-name))
 	(error ()
-          (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))))
+          (error "Cannot determine object ID. Object ~A has no slot '~A'."
+		 obj object-id-slot-name))))))
 
 (defgeneric (setf object-id) (id obj)
   (:documentation
@@ -51,7 +52,8 @@ object identification schemes."))
 (defmethod (setf object-id) (id (obj standard-object))
   (handler-case (setf (slot-value obj (object-id-slot-name obj)) id)
     (error ()
-      (error "Cannot determine object ID. Object ~A has no slot 'id'." obj))))
+      (error "Cannot determine object ID. Object ~A has no slot '~A'."
+	     obj (object-id-slot-name obj)))))
 
 ;;; Object store location
 (defgeneric class-store (class-name)
