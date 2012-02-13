@@ -3,6 +3,7 @@
   (:use :cl :metabang.utilities :clsql :weblocks)
   (:shadowing-import-from :metabang.utilities #:format-date #:filter
 			  #:print-date)
+  (:shadowing-import-from :weblocks #:with-transaction)
   (:documentation
    "A driver for weblocks backend store API that connects to CLSQL."))
 
