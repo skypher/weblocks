@@ -11,7 +11,7 @@
 (defgeneric class-id-slot-name (class)
   (:documentation
    "Must return the symbol that identifies the slot name which
-represents the unique ID of the class 'class'. Default
+represents the unique ID of the class named 'class'. Default
 implementation returns 'ID'. Specialize this function if you want to
 name the slot that holds the class' unique ID differently."))
 
@@ -22,7 +22,7 @@ name the slot that holds the class' unique ID differently."))
   "Returns the slot name of the slot that holds the unique identifier
 of 'obj'. This information is obtained via calling
 'class-id-slot-name'."
-  (class-id-slot-name (class-of obj)))
+  (class-id-slot-name (class-name (class-of obj))))
 
 (defgeneric object-id (obj)
   (:documentation
