@@ -259,14 +259,13 @@ form-view-buttons for a given view.")
     (declare (ignore obj args))
     (flet ((find-button (name)
 	     (ensure-list
-	      (and (if form-view-buttons
-                       (find name form-view-buttons
-                             :key (lambda (item)
-                                    (car (ensure-list item))))
-                       t)
-                   (find name (form-view-buttons view)
-                         :key (lambda (item)
-                                (car (ensure-list item))))))))
+	       (if form-view-buttons
+		   (find name form-view-buttons
+			 :key (lambda (item)
+				(car (ensure-list item))))
+		 (find name (form-view-buttons view)
+		       :key (lambda (item)
+			      (car (ensure-list item))))))))
       (with-html
 	(:div :class "submit"
 	      (let ((submit (find-button :submit)))
