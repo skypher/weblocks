@@ -6,7 +6,7 @@
           request-parameter-for-presentation))
 
 (defgeneric update-object-view-from-request (obj view &rest args
-						 &key class-store
+						 &key class-store satisfies
 						 &allow-other-keys)
   (:documentation "Parses view fields from request into a given
 object. The 'form-view-field-parser' slot of each field is used to
@@ -24,7 +24,7 @@ object is to be persisted. If so, it calls 'persist-object'.
 
 Specialize this function to parse given objects differently.")
   (:method (obj view &rest args
-	    &key class-store
+	    &key class-store satisfies
 	    &allow-other-keys)
     (labels ((parse-object-view-from-request (obj view)
 	       "Parses an object from request. If parsed successfully,
@@ -119,11 +119,16 @@ Specialize this function to parse given objects differently.")
 	      (if validatesp
 		  (progn
 		    (deserialize-object-from-parsed-values results)
-		    (when (form-view-persist-p view)
-		      (persist-object-view obj view (mapcar #'car results)))
-		    (deserialize-object-from-parsed-values results :write-delayed t)
-		    t)
-		  (values nil errors)))
+		    (multiple-value-bind (success errors)
+			(or (null satisfies) (funcall satisfies obj))
+		      (if success
+			  (progn
+			    (when (form-view-persist-p view)
+			      (persist-object-view obj view (mapcar #'car results)))
+			    (deserialize-object-from-parsed-values results :write-delayed t)
+			    t)
+			(values nil errors))))
+		(values nil errors)))
 	    (values nil results))))))
 
 (defun request-parameters-for-object-view (view &rest args)
