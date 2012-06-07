@@ -51,9 +51,10 @@
   ;; optimized into a single query later
   (let* ((class-name (class-name (class-of object)))
 	 (current-id (object-id object))
-	 (sequence-name (make-symbol (concatenate 'string
-						  (symbol-name class-name)
-						  (symbol-name '#:-seq)))))
+	 (sequence-name (intern (concatenate 'string
+					     (symbol-name class-name)
+					     (symbol-name '#:-seq))
+				(symbol-package class-name))))
     (unless current-id
       ;; Create sequence if necessary
       (unless (sequence-exists-p sequence-name :database store :owner :all)
