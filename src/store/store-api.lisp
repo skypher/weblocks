@@ -2,7 +2,7 @@
 (in-package :weblocks)
 
 (export '(open-store close-store clean-store *default-store*
-	  begin-transaction commit-transaction rollback-transaction
+	  begin-transaction commit-transaction rollback-transaction with-transaction
 	  dynamic-transaction use-dynamic-transaction-p
 	  persist-object delete-persistent-object
 	  delete-persistent-object-by-id find-persistent-objects
@@ -51,30 +51,34 @@
   isn't in a transaction, this function should return NIL without
   signalling errors."))
 
+(defmacro with-transaction ((store) &body body)
+  "Executes 'body' inside a transaction on 'store', committing if 'body'
+completes normally, or rolling back if it does a nonlocal exit."
+  (let ((store-var (gensym))
+	(success-var (gensym)))
+    `(let ((,store-var ,store)
+	   (,success-var nil))
+       (unwind-protect
+	    (progn
+	      (begin-transaction ,store-var)
+	      ,@body
+	      (setq ,success-var t))
+	 (if ,success-var
+	     (commit-transaction ,store-var)
+	   (rollback-transaction ,store-var))))))
+
 (defgeneric dynamic-transaction (store proc)
   (:documentation "Call PROC, a thunk, while in a transaction of
   STORE.  See `use-dynamic-transaction-p' for details.")
   (:method (store proc)
-    (warn "~S should not be called when the other transaction ~
-	   interface is available" 'dynamic-transaction)
-    (let (tx-error-occurred-p)
-      (unwind-protect
-	   (handler-bind ((error #'(lambda (error)
-				     (declare (ignore error))
-				     (rollback-transaction store)
-				     (setf tx-error-occurred-p t))))
-	     (begin-transaction store)
-	     (funcall proc))
-	(unless tx-error-occurred-p
-	  (commit-transaction store))))))
+    (with-transaction (store)
+      (funcall proc))))
 
 (defgeneric use-dynamic-transaction-p (store)
   (:documentation "Answer whether `action-txn-hook' and equivalents
   should use GF `dynamic-transaction' for transaction control rather
   than the `begin-transaction', `commit-transaction', and
-  `rollback-transaction' GFs.  Be warned that non-local exit behavior
-  for stores that answer true for this may have unique non-local exit
-  unwind behavior.")
+  `rollback-transaction' GFs.")
   (:method (store)
     (declare (ignore store))
     nil))
