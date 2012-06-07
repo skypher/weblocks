@@ -71,17 +71,10 @@ be generated from the view."
 		 :satisfies satisfies))
 
 (defmethod dataform-submit-action ((obj quickform) data &rest args)
-  (declare (ignore args))
-  (multiple-value-bind (success errors)
-      (call-next-method)
-    (if success
-	(multiple-value-bind (success errors)
-	    (if (quickform-satisfies obj)
-		(funcall (quickform-satisfies obj) obj data)
-		t)
-	  (if success
-	      t
-	      (values nil errors)))
-	(values nil errors))))
+  (if (quickform-satisfies obj)
+      (apply #'call-next-method obj data
+	     :satisfies (curry (quickform-satisfies obj) obj)
+	     args)
+    (call-next-method)))
 
 
