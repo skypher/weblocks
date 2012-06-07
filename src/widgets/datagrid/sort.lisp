@@ -20,7 +20,8 @@
                                      (attributize-view-field-name field-info)
                                      (attributize-name slot-name))
                                    th-class)
-	       (:span (render-link
+	       (:span :class "label"
+		      (render-link
 		       (make-action
 			(lambda (&rest args)
 			  (declare (ignore args))

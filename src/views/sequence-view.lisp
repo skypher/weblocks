@@ -45,7 +45,7 @@ is no information available.")
 	     :documentation "If set to a symbol or a list of symbols,
 	     this slot will be used to build an order-by path that is
 	     later passed to the backend store for ordering the
-	     entires of the sequence. If this slot is unbound (the
+	     entries of the sequence. If this slot is unbound (the
 	     default), the 'slot-name' slot of the field will be used
 	     instead.")
    (allow-sorting-p :initform t
@@ -56,6 +56,15 @@ is no information available.")
   (:documentation "This is a class that can be mixed into field
   definitions in order to provide functionality necessary to support
   dataseq widgets."))
+
+;;; By default, turn off sorting on any field with a `reader', unless it also has
+;;; an `order-by'.
+(defmethod initialize-instance :after ((field view-field-sorting-mixin)
+				       &key allow-sorting-p &allow-other-keys)
+  (when (and (not allow-sorting-p)
+	     (slot-boundp field 'reader)
+	     (not (slot-boundp field 'order-by)))
+    (setf (view-field-sorting-mixin-allow-sorting-p field) nil)))
 
 
 ;;; Sequence view field
