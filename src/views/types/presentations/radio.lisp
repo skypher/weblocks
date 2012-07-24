@@ -13,7 +13,7 @@
   (let* ((attribute-slot-name (if field-info
                                 (attributize-view-field-name field-info)
                                 (attributize-name (view-field-slot-name field))))
-	 (validation-error (assoc attribute-slot-name validation-errors
+	 (validation-error (assoc attribute-slot-name (remove-if (lambda (item) (null (car item))) validation-errors)
 				  :test #'string-equal
 				  :key #'view-field-slot-name))
 	 (field-class (concatenate 'string attribute-slot-name
