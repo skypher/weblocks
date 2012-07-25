@@ -227,6 +227,17 @@ $('id-123').focusFirstElement();
 			     (:em :class "required-slot" "Required&nbsp;"))))
        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
+; Bug: error in checkbox render-view-field on view validation error (when using "satisfies")
+(deftest render-view-field-value-6 
+         (ensure 
+           (progn 
+             (render-view-field (make-instance 'form-view-field :slot-name 'name)
+                                (make-instance 'form-view)
+                                nil
+                                (make-instance 'radio-presentation :choices (list :choice1 :choice2))
+                                nil *joe* :validation-errors (list (cons nil "Some error"))) 
+             t)))
+
 ;;; Test form view render-view-field-value
 (deftest-html form-view-render-view-field-value-1
     (render-view-field-value "Joe" (make-instance 'input-presentation)
