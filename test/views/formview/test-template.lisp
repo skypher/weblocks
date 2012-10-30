@@ -29,7 +29,6 @@
 	   (:h1 (:span :class "action" (str ,title-action))
 		(:span :class "object" ,(humanize-name data-class-name)))
 	   ,@preslots
-	   (:h2 :class "form-fields-title" "Form fields:")
 	   (:ul ,@body)
 	   ,@postslots
 	  (:input :name "action" :type "hidden" :value ,action))
