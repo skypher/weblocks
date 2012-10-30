@@ -32,24 +32,27 @@
 
 ;;; A suite that sets up a web request environment
 (deftestsuite request-suite ()
-  (make-action-orig
-   generate-widget-id-orig)
-  (:dynamic-variables (*acceptor* (make-instance 'unittest-server))
-                      (*weblocks-server* *acceptor*)
-                      (*request* (make-instance 'unittest-request :acceptor *acceptor*))
-		      (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-		      (weblocks::*dirty-widgets* nil)
-		      (*weblocks-output-stream* (make-string-output-stream))
-		      *uri-tokens* *on-ajax-complete-scripts*
-		      *before-ajax-complete-scripts*
-		      weblocks::*page-dependencies*)
-  (:setup (setf (slot-value *request* 'method) :get)
-          (setf generate-widget-id-orig #'gen-id)
-          (setf (symbol-function 'gen-id)
-			      (lambda (&optional prefix)
-                                (declare (ignore prefix))
-                                "id-123")))
-  (:teardown (setf (symbol-function 'gen-id) generate-widget-id-orig)))
+              (make-action-orig
+                generate-widget-id-orig)
+              (:dynamic-variables (*acceptor* (make-instance 'unittest-server))
+               (*weblocks-server*)
+               (*request*)
+               (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+               (weblocks::*dirty-widgets* nil)
+               (*weblocks-output-stream* (make-string-output-stream))
+               *uri-tokens* *on-ajax-complete-scripts*
+               *before-ajax-complete-scripts*
+               weblocks::*page-dependencies*)
+              (:setup 
+                (setf *weblocks-server* *acceptor*)
+                (setf *request* (make-instance 'unittest-request :acceptor *acceptor*))
+                (setf (slot-value *request* 'method) :get)
+                (setf generate-widget-id-orig #'gen-id)
+                (setf (symbol-function 'gen-id)
+                      (lambda (&optional prefix)
+                        (declare (ignore prefix))
+                        "id-123")))
+              (:teardown (setf (symbol-function 'gen-id) generate-widget-id-orig)))
 
 ;;; WEBLOCKS-SUITE must set up an environment for all weblocks tests
 ;;; to run in. This includes setting up an application, a web session,
