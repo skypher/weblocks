@@ -23,10 +23,10 @@ widget."
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Hello World!")))
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Foo"))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
