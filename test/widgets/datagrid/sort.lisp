@@ -15,7 +15,7 @@
 	(render-view-field-header field view grid presentation value *joe*
 				  :field-info field-info)))
   (:th :class "name sort-asc"
-       (:span #.(link-action-template "abc123" "Name"))))
+       (:span :class "label" #.(link-action-template "abc123" "Name"))))
 
 (deftest-html datagrid-render-view-field-header-sort-2
     (with-request :get nil
@@ -30,5 +30,5 @@
 	(render-view-field-header field view grid presentation value *joe*
 				  :field-info field-info)))
   (:th :class "name"
-       (:span #.(link-action-template "abc123" "Name"))))
+       (:span :class "label" #.(link-action-template "abc123" "Name"))))
 

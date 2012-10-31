@@ -93,6 +93,7 @@ package. This function tests weblocks in a clean environment. See
 Pass NIL as the optional arg to just return the results instead of
 DESCRIBE-ing them."
   ;; XXX better results combination
+  (setf weblocks::*dirty-widgets* nil)
   (let ((results (list (run-tests :suite 'weblocks-suite)
 		       (run-tests :suite 'weblocks-store-test::store-suite))))
     (when verbose
