@@ -99,22 +99,22 @@ document.write('<a class=\\'sort-asc\\' href=\\'/foo/bar?action=abc124\\' onclic
 
 ;;; Test dataseq-render-operations for datalist
 (deftest-html dataseq-render-operations-datalist-1
-    (with-request :get nil
-      (let ((list (make-instance 'datalist :data-class 'employee
-				 :item-ops '(("foo" . nil))
-				 :common-ops '(("bar" . nil)))))
-	(dataseq-render-operations list)))
-  (:form :class "operations-form" :action "/foo/bar" :method "get"
-	 :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
-	 (:div :class "extra-top-1" "<!-- empty -->")
-	 (:div :class "extra-top-2" "<!-- empty -->")
-	 (:div :class "extra-top-3" "<!-- empty -->")
-	 (:fieldset
-	  (:div :class "operations"
-		(:input :name "bar" :type "submit" :class "submit" :value "Bar"
-			:onclick "disableIrrelevantButtons(this);"))
-	  (:input :name "action" :type "hidden" :value "abc123"))
-	 (:div :class "extra-bottom-1" "<!-- empty -->")
-	 (:div :class "extra-bottom-2" "<!-- empty -->")
-	 (:div :class "extra-bottom-3" "<!-- empty -->")))
+              (with-request :get nil
+                            (let ((list (make-instance 'datalist :data-class 'employee
+                                                       :item-ops '(("foo" . nil))
+                                                       :common-ops '(("bar" . nil)))))
+                              (dataseq-render-operations list)))
+              (:form :class "operations-form" :action "/foo/bar" :method "get"
+                     :onsubmit "initiateFormAction(\"abc123\", $(this), \"weblocks-session=1%3ATEST\"); return false;"
+                     (:div :class "extra-top-1" "<!-- empty -->")
+                     (:div :class "extra-top-2" "<!-- empty -->")
+                     (:div :class "extra-top-3" "<!-- empty -->")
+                     (:fieldset
+                       (:div :class "operations"
+                             (:input :name "bar" :type "submit" :class "submit" :value "Bar"
+                                     :onclick "disableIrrelevantButtons(this);"))
+                       (:input :name "action" :type "hidden" :value "abc123"))
+                     (:div :class "extra-bottom-1" "<!-- empty -->")
+                     (:div :class "extra-bottom-2" "<!-- empty -->")
+                     (:div :class "extra-bottom-3" "<!-- empty -->")))
 		

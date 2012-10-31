@@ -298,6 +298,6 @@
 	; go to invalid page
 	(do-request `(("page-number" . "10")
 		      (,weblocks::*action-string* . "abc124")))
-	(flash-messages f)))
+	(mapcar #'weblocks::string-widget-content (flash-messages f))))
   ("Page number must be an integer between 1 and 4."))
 

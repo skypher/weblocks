@@ -263,11 +263,11 @@
 
 ;;; test find-all
 (deftest find-all-1
-    (find-all '(1 2 3 4 5 6) #'oddp)
+    (weblocks::find-all '(1 2 3 4 5 6) #'oddp)
   (1 3 5))
 
 (deftest find-all-2
-    (find-all '(1 2 3 4 5 6) #'oddp :key #'1+)
+    (weblocks::find-all '(1 2 3 4 5 6) #'oddp :key #'1+)
   (2 4 6))
 
 ;;; test stable-set-difference
