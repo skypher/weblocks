@@ -213,7 +213,7 @@ It defines both a class with name 'name' and registers an instance of that class
 It also instantiates a defvar with an instance of this class.  This is intended
 to be the primary way a web application is defined.
 
-:subclasses - if you want to inherit subclass behvior from other webapps, you
+:subclasses - if you want to inherit subclass behavior from other webapps, you
 can.  It's not likely to be needed much
 
 :slots - webapps are class so slots are a list of definitions just as in defclass,
