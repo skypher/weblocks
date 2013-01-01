@@ -21,7 +21,7 @@ autocompletions cashed on the client. Otherwise, completion will be
 done via an asynchronious call to the server ('resultset' must be set
 to a function that accepts a search parameter and returns a list of
 itmes that match). Note, if JavaScript is turned off local
-autocompletion will degrade to a simple drowdown.
+autocompletion will degrade to a simple dropdown.
 
 'default-value' - can be used to set the value of the input box and/or
 dropdown. If 'default-value' is a list, car of the list will be used
