@@ -52,7 +52,10 @@
            (file-name (etypecase (file-upload-parser-file-name parser)
                         (symbol (ecase (file-upload-parser-file-name parser)
                                   (:browser browser-name)
-                                  (:unique (hunchentoot::create-random-string))))
+                                  (:unique (concatenate 'string 
+                                                        (hunchentoot::create-random-string)
+                                                        (or (cl-ppcre:scan-to-strings "\\..*$" browser-name) 
+                                                            "")))))
                         (string (file-upload-parser-file-name parser)))))
       (copy-file temp-path
                  (merge-pathnames file-name
