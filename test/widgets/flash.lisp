@@ -23,10 +23,10 @@ widget."
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Hello World!")))
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Foo"))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
@@ -91,7 +91,7 @@ widget."
 	(flash-message w "Test2")
 	(render-widget-body w)
 	(evaluate-flash-hooks)
-	(flash-messages w)))
+	(mapcar #'weblocks::string-widget-content (flash-messages w))))
   ("Test" "Test2"))
 
 ;; test flash-messages-to-show
@@ -100,7 +100,7 @@ widget."
       (let ((w (make-instance 'flash)))
 	(flash-message w "Hello World!")
 	(flash-message w "Foo")
-	(weblocks::flash-messages-to-show w)))
+	(mapcar #'weblocks::string-widget-content (weblocks::flash-messages-to-show w))))
   ("Hello World!" "Foo"))
 
 (deftest flash-messages-to-show-2
@@ -120,7 +120,7 @@ widget."
 	(funcall (car (request-hook :session :pre-action)))
 	(funcall (car (request-hook :session :post-action)))
 	(make-request-ajax)
-	(weblocks::flash-messages-to-show w)))
+	(mapcar #'weblocks::string-widget-content (weblocks::flash-messages-to-show w))))
   ("Hello World!" "Foo"))
 
 ;; test with-widget-header for flash
@@ -132,9 +132,11 @@ widget."
 
 ;; test flash-message
 (deftest flash-message-1
-    (with-request :post nil
-      (let ((w (make-instance 'flash)))
-	(flash-message w "test")
-	(flash-message w "bar")
-	(flash-messages w)))
-  ("test" "bar"))
+         (with-request :post nil
+                       (let ((w (make-instance 'flash)))
+                         (declare (special weblocks::*dirty-widgets*))
+                         (setf weblocks::*dirty-widgets* nil)
+                         (flash-message w "test")
+                         (flash-message w "bar")
+                         (mapcar #'weblocks::string-widget-content (flash-messages w))))
+         ("test" "bar"))

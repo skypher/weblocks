@@ -390,7 +390,7 @@
 	:id "id-123"))
 
 (deftest-html dataseq-render-pagination-widget-2
-    (with-request :get nil
-      (dataseq-render-pagination-widget (make-instance 'dataseq :data-class 'employee
-							:allow-pagination-p nil)))
-  (:div :class "widget pagination" :id "id-123" ""))
+              (with-request :get nil
+                            (dataseq-render-pagination-widget (make-instance 'dataseq :data-class 'employee
+                                                                             :allow-pagination-p nil)))
+              (:div :class "widget pagination" :id "id-123" ""))
