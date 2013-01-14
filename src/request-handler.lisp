@@ -179,11 +179,13 @@ customize behavior."))
               (handle-normal-request app)))
           (eval-hook :post-render))
 
-	(unless (ajax-request-p)
-	  (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
+	
 
         (if (member (return-code*) *approved-return-codes*)
-          (get-output-stream-string *weblocks-output-stream*)
+          (progn 
+            (unless (ajax-request-p)
+              (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
+            (get-output-stream-string *weblocks-output-stream*))
           (handle-http-error app (return-code*)))))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
