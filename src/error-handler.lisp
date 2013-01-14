@@ -41,7 +41,22 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
         (:ul
           (:li (render-link (f_% (reset-webapp-session)) "Reset this web application's session")))
         (:h2 "Session data")
-        (:p "TODO")
+        (:table
+          (:thead
+            (:tr
+              (:th "") (:th "Key") (:th "Value")))
+          (:tbody
+            (let ((session-data (webapp-session-hash)))
+              (loop for i from 1
+                    for key being the hash-key of session-data 
+                    for value being the hash-value of session-data 
+                    for parity = (if (oddp i) "odd" "even")
+                    do 
+                    (htm 
+                      (:tr :class parity
+                       (:td (str i))
+                       (:td (str key))
+                       (:td (esc (prin1-to-string value)))))))))
         (:h2 "Restarts")
         (:p "TODO")
         (:h2 "Backtrace")
