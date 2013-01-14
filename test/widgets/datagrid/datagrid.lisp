@@ -49,8 +49,8 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc124" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+		    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc124" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc125" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim")))
@@ -88,8 +88,8 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc124" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+		    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc124" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc125" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Joe"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
@@ -130,8 +130,8 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc124" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+		    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc124" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc125" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Bob"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
@@ -156,8 +156,8 @@
 	  (:fieldset
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
-		    '((:th :class "name sort-asc" (:span #.(link-action-template "abc129" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc130" "Manager"))))
+		    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc129" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc130" "Manager"))))
 		    '((:tr
 		       (:td :class "name" (:span :class "value" "Guy"))
 		       (:td :class "manager" (:span :class "value" "Jim"))))
@@ -209,8 +209,8 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc124" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -220,8 +220,8 @@
 	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc125" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
+	    '((:th :class "name sort-desc" (:span :class "label" #.(link-action-template "abc125" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc126" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -231,8 +231,8 @@
 	    :summary "Ordered by name, descending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc127" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
+	    '((:th :class "name sort-desc" (:span :class "label" #.(link-action-template "abc127" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -256,7 +256,7 @@
    (:div :class "datagrid-body"
 	 #.(table-header-template
 	    '((:th :class "name" "Name")
-	      (:th :class "manager sort-asc" (:span #.(link-action-template "abc123" "Manager"))))
+	      (:th :class "manager sort-asc" (:span :class "label" #.(link-action-template "abc123" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -299,8 +299,8 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager"))))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc124" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -310,8 +310,8 @@
 	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc125" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc126" "Manager"))))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc125" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc126" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "manager" (:span :class "value" "Jim")))
@@ -336,9 +336,9 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "address" (:span #.(link-action-template "abc124" "Address")))
-	      (:th :class "manager" (:span #.(link-action-template "abc125" "Manager"))))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+	      (:th :class "address" (:span :class "label" #.(link-action-template "abc124" "Address")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc125" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Bob"))
 	       (:td :class "address" (:span :class "value" "Address"))
@@ -350,9 +350,9 @@
 	    :summary "Ordered by name, ascending."))
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-desc" (:span #.(link-action-template "abc126" "Name")))
-	      (:th :class "address" (:span #.(link-action-template "abc127" "Address")))
-	      (:th :class "manager" (:span #.(link-action-template "abc128" "Manager"))))
+	    '((:th :class "name sort-desc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+	      (:th :class "address" (:span :class "label" #.(link-action-template "abc127" "Address")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc128" "Manager"))))
 	    '((:tr
 	       (:td :class "name" (:span :class "value" "Joe"))
 	       (:td :class "address" (:span :class "value" "Address"))

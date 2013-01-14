@@ -82,8 +82,8 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc124" "Manager")))
 	      (:th :class "drilldown edit" ""))
 	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
 	           :onmouseover "this.style.cursor = \"pointer\";"
@@ -129,8 +129,8 @@
        (htm
 	(:div :class "datagrid-body"
 	      #.(table-header-template
-		 '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-		   (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
+		 '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+		   (:th :class "manager" (:span :class "label" #.(link-action-template "abc124" "Manager")))
 		   (:th :class "drilldown edit" ""))
 		 '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
 		    :onmouseover "this.style.cursor = \"pointer\";"
@@ -177,8 +177,8 @@
   (htm
    (:div :class "datagrid-body"
 	 #.(table-header-template
-	    '((:th :class "name sort-asc" (:span #.(link-action-template "abc123" "Name")))
-	      (:th :class "manager" (:span #.(link-action-template "abc124" "Manager")))
+	    '((:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc123" "Name")))
+	      (:th :class "manager" (:span :class "label" #.(link-action-template "abc124" "Manager")))
 	      (:th :class "drilldown edit" ""))
 	    '((:tr :onclick "initiateActionOnEmptySelection(\"abc125\", \"weblocks-session=1%3ATEST\");"
 	           :onmouseover "this.style.cursor = \"pointer\";"

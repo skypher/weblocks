@@ -15,9 +15,12 @@
 			    (curry-after #'make-local-dependency :do-not-probe t))
 		     '((:stylesheet "foo")
 		       (:stylesheet "bar"))))
-	    (*current-page-description* "Some Page"))
+	    (*current-page-description* "Some Page")
+      (*current-page-title*  "Some Page")
+      (*current-page-keywords* nil)
+      (*current-page-headers* nil))
 	(declare (special weblocks::*page-dependencies*
-			  *current-page-description*))
+			  *current-page-description* *current-page-title* *current-page-keywords* *current-page-headers*))
 	(with-html
 	  (:div "test"))
 	(weblocks::render-page (weblocks::current-webapp))))
@@ -29,6 +32,7 @@
     (:head
      (:title "some-name - Some Page")
      (:meta :http-equiv "Content-type" :content "text/html; charset=utf-8")
+     (:meta :name "description" :value "Some Page")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/layout.css")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/main.css")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/dialog.css")
@@ -48,4 +52,8 @@
 	   (:div :class "page-extra-bottom-1" "<!-- empty -->")
 	   (:div :class "page-extra-bottom-2" "<!-- empty -->")
 	   (:div :class "page-extra-bottom-3" "<!-- empty -->"))
-     (:div :id "ajax-progress" "&nbsp;")))))
+     (:div :id "ajax-progress" "&nbsp;")
+     (:script :type "text/javascript"
+      (fmt "~%// <![CDATA[~%")
+      (fmt "updateWidgetStateFromHash();")
+      (fmt "~%// ]]>~%"))))))

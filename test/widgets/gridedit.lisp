@@ -224,8 +224,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
@@ -265,8 +265,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -308,7 +308,7 @@
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
@@ -326,8 +326,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc137" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc137" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-3" :type "checkbox" :value "f")))
@@ -391,8 +391,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -416,7 +416,7 @@
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Deleted 1 Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
@@ -489,8 +489,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
@@ -535,8 +535,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc132" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc133" "Manager")))
 		(:th :class "drilldown modify" ""))
 	      '((:tr :class "drilled-down"
 		     :onclick "initiateActionOnEmptySelection(\"abc134\", \"weblocks-session=1%3ATEST\");"
@@ -585,7 +585,7 @@
 		(:div :class "extra-top-1" "<!-- empty -->")
 		(:div :class "extra-top-2" "<!-- empty -->")
 		(:div :class "extra-top-3" "<!-- empty -->")
-		(:ul :class "messages" (:li (:div :class "widget string" (:p "Modified Employee."))))
+		(:ul :class "messages" (:li (:div :class "widget string-widget" :id "id-123" (:p "Modified Employee."))))
 		(:div :class "extra-bottom-1" "<!-- empty -->")
 		(:div :class "extra-bottom-2" "<!-- empty -->")
 		(:div :class "extra-bottom-3" "<!-- empty -->"))
@@ -602,8 +602,8 @@
       (:div :class "datagrid-body"
 	    #.(table-header-template
 	       '((:th :class "select" "")
-		 (:th :class "name sort-asc" (:span #.(link-action-template "abc139" "Name")))
-		 (:th :class "manager" (:span #.(link-action-template "abc140" "Manager")))
+		 (:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc139" "Name")))
+		 (:th :class "manager" (:span :class "label" #.(link-action-template "abc140" "Manager")))
 		 (:th :class "drilldown modify" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc141\", \"weblocks-session=1%3ATEST\");"
 		  :onmouseover "this.style.cursor = \"pointer\";"
@@ -667,8 +667,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
@@ -713,8 +713,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc132" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc133" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc132" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc133" "Manager")))
 		(:th :class "drilldown modify" ""))
 	      '((:tr :class "drilled-down"
 		     :onclick "initiateActionOnEmptySelection(\"abc134\", \"weblocks-session=1%3ATEST\");"
@@ -765,8 +765,8 @@
       (:div :class "datagrid-body"
 	    #.(table-header-template
 	       '((:th :class "select" "")
-		 (:th :class "name sort-asc" (:span #.(link-action-template "abc140" "Name")))
-		 (:th :class "manager" (:span #.(link-action-template "abc141" "Manager")))
+		 (:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc140" "Name")))
+		 (:th :class "manager" (:span :class "label" #.(link-action-template "abc141" "Manager")))
 		 (:th :class "drilldown modify" ""))
 	       '((:tr :onclick "initiateActionOnEmptySelection(\"abc142\", \"weblocks-session=1%3ATEST\");"
 		  :onmouseover "this.style.cursor = \"pointer\";"
@@ -824,8 +824,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th :class "drilldown modify" ""))
 	      '((:tr :onclick "initiateActionOnEmptySelection(\"abc128\", \"weblocks-session=1%3ATEST\");"
 		     :onmouseover "this.style.cursor = \"pointer\";"
@@ -890,8 +890,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
@@ -933,8 +933,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc132" "Manager")))
 		(:th :class "test" (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
@@ -1008,8 +1008,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc127" "Manager")))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager")))
 		(:th (:span :class "label" "Test")))
 	      '((:tr
 		 (:td :class "select"
@@ -1049,8 +1049,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc131" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc132" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-1" :type "checkbox" :value "f")))
@@ -1092,7 +1092,7 @@
 	 (:div :class "extra-top-3" "<!-- empty -->")
 	 (:ul :class "messages"
 	      (:li
-	       (:div :class "widget string"
+	       (:div :class "widget string-widget" :id "id-123"
 		     (:p "Added Employee."))))
 	 (:div :class "extra-bottom-1" "<!-- empty -->")
 	 (:div :class "extra-bottom-2" "<!-- empty -->")
@@ -1110,8 +1110,8 @@
      (:div :class "datagrid-body"
 	   #.(table-header-template
 	      '((:th :class "select" "")
-		(:th :class "name sort-asc" (:span #.(link-action-template "abc137" "Name")))
-		(:th :class "manager" (:span #.(link-action-template "abc138" "Manager"))))
+		(:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc137" "Name")))
+		(:th :class "manager" (:span :class "label" #.(link-action-template "abc138" "Manager"))))
 	      '((:tr
 		 (:td :class "select"
 		  (:div (:input :name "item-3" :type "checkbox" :value "f")))

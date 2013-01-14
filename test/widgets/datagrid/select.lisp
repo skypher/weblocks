@@ -100,8 +100,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc126" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc127" "Manager"))))
+		      (:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc126" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc127" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "f")))
@@ -139,8 +139,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc131" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc132" "Manager"))))
+		      (:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc131" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc132" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "t" :checked "checked")))
@@ -178,8 +178,8 @@
 	   (:div :class "datagrid-body"
 		 #.(table-header-template
 		    '((:th :class "select" "")
-		      (:th :class "name sort-asc" (:span #.(link-action-template "abc136" "Name")))
-		      (:th :class "manager" (:span #.(link-action-template "abc137" "Manager"))))
+		      (:th :class "name sort-asc" (:span :class "label" #.(link-action-template "abc136" "Name")))
+		      (:th :class "manager" (:span :class "label" #.(link-action-template "abc137" "Manager"))))
 		    '((:tr
 		       (:td :class "select"
 			(:div (:input :name "item-2" :type "checkbox" :value "f")))

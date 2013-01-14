@@ -32,18 +32,18 @@
 
 ;;; test login flow
 (deftest login-1
-    (with-request :get nil
-      (let ((*weblocks-output-stream* (make-string-output-stream))
-	    (login (make-instance 'login
-				  :on-login (lambda (w o)
-					      (declare (ignore w))
-					      (slot-value o 'email)))))
-	(declare (special *weblocks-output-stream*))
-	(render-widget-body login)
-	(do-request `(("submit" . "Login")
-		      ("email" . "Foo")
-		      ("password" . "Bar")
-		      (,weblocks::*action-string* . "abc123")))
-	(authenticatedp)))
-  "Foo")
+         (with-request :get nil
+                       (let ((*weblocks-output-stream* (make-string-output-stream))
+                             (login (make-instance 'login
+                                                   :on-login (lambda (w o)
+                                                               (declare (ignore w))
+                                                               (slot-value o 'email)))))
+                         (declare (special *weblocks-output-stream*))
+                         (render-widget-body login)
+                         (do-request `(("submit" . "Login")
+                                       ("email" . "Foo")
+                                       ("password" . "Bar")
+                                       (,weblocks::*action-string* . "abc123")))
+                         (authenticatedp)))
+         "Foo")
 
