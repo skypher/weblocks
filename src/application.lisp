@@ -438,10 +438,13 @@ provider URI)."
 (defun webapp-session-key (&optional (webapp (current-webapp)))
   (weblocks-webapp-session-key webapp))
 
+(defun webapp-session-hash (&optional (session *session*) (webapp (current-webapp)))
+  (session-value (webapp-session-key webapp) session))
+
 (defun webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
   "Get a session value from the currently running webapp.
 KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (webapp-session-key webapp) session)))
+  (let ((webapp-session (webapp-session-hash session webapp )))
     (cond (webapp-session
 	   (gethash key webapp-session))
 	  (webapp
