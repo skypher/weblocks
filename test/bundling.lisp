@@ -1,12 +1,12 @@
 (in-package :weblocks-test)
 
+(defparameter *temp-bundles-folder* (princ-to-string (compute-public-files-path "weblocks" "test/temp-bundles")))
+
 (deftestsuite bundling-suite (weblocks-suite print-upcase-suite)
   ()
   (:setup 
     (cl-fad:delete-directory-and-files *temp-bundles-folder*
                                        :if-does-not-exist :ignore)))
-
-(defparameter *temp-bundles-folder* (princ-to-string (compute-public-files-path "weblocks" "test/temp-bundles")))
 
 (addtest merge-files-with-newline
   (let ((path1 (merge-pathnames "test1" *temp-bundles-folder*))

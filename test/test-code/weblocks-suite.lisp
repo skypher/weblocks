@@ -32,8 +32,8 @@
 
 ;;; A suite that sets up a web request environment
 (deftestsuite request-suite ()
-  (make-action-orig
-   generate-widget-id-orig)
+  ((make-action-orig
+   generate-widget-id-orig))
   (:dynamic-variables (*acceptor* (make-instance 'unittest-server))
                       (*weblocks-server*)
                       (*request*)

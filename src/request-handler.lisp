@@ -15,6 +15,8 @@
           #-hunchentoot-approved-return-codes
             *approved-return-codes*))
 
+(defvar *current-page-description* nil)
+
 #-hunchentoot-approved-return-codes
   (defvar *approved-return-codes* (list +http-ok+))
 

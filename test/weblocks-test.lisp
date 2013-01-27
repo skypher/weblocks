@@ -17,6 +17,8 @@
 (in-package :weblocks-test)
 
 (declaim (special *recovery-strategies*))
+(defvar *joe* nil)
+(defvar generate-widget-id-orig nil)
 
 (defun call-with-test-environment (thunk)
   "Helper for `with-test-environment'."
