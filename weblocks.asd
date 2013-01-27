@@ -20,7 +20,7 @@
                :cl-who
                :parenscript
                :cl-fad
-               :fare-matcher
+               :optima
                :cl-cont
                :metatilities
                :cl-ppcre
@@ -232,8 +232,7 @@
 			:depends-on ("weblocks" "application-mop" store))
 		 (:file "default-application"
 			:depends-on ("server" "weblocks" utils "request-handler")))))
-  :in-order-to ((asdf:test-op (load-op "weblocks-test"))
-		(test-op (load-op "weblocks-test"))
+  :in-order-to ((test-op (load-op "weblocks-test"))
 		(doc-op (load-op "weblocks-scripts"))
 		(make-app-op (load-op "weblocks-scripts"))))
 

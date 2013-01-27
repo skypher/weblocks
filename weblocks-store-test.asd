@@ -13,6 +13,5 @@
   :description "A test suite for weblocks backend stores."
   :depends-on (:rt :weblocks :lift :f-underscore)
   :components ((:module test
-                :components (
-	         (:file "weblocks-store-test")))))
-
+                :components
+                ((:file "weblocks-store-test")))))

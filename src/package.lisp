@@ -5,14 +5,14 @@
 
 (without-package-variance-warnings
   (defpackage #:weblocks
-    (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :fare-matcher :cont :parenscript
+    (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :optima :cont :parenscript
           :anaphora :f-underscore :trivial-timeout)
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function
                             #:standard-class #:typep #:subtypep #:standard-method)
     (:shadowing-import-from :cl-who #:str)
     (:shadowing-import-from :f-underscore #:f #:_)
-    (:shadowing-import-from :fare-matcher #:match)
+    (:shadowing-import-from :optima #:match)
     (:shadowing-import-from :metabang.utilities #:with-array #:size #:bind)
     (:shadowing-import-from :json #:prototype)
     (:shadow #:redirect #:reset-sessions #:errors #:find-all)
@@ -32,4 +32,3 @@
   (defpackage #:weblocks-util
     (:documentation "General Lisp utilities traditionally exported
     with Weblocks.")))
-
