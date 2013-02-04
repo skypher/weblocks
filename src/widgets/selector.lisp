@@ -123,8 +123,45 @@
   (assoc token (static-selector-panes selector) :test #'equalp))
 
 (defmethod get-widget-for-tokens ((selector static-selector) uri-tokens)
-  ;; we peek at the token first, because if it isn't found we won't
-  ;; consume it, to give others a chance to process it
+  ;;
+  ;; Note that here we are carefully managing the uri-tokens instance.
+  ;; The uri-tokens keep track of what we have traversed upto now and
+  ;; this method will remove (modify) tokens that are used when making the selection.
+  ;;
+  ;; The behaviour is slightly tricky because we handle a few cases.
+  ;; 
+  ;; 1 - the token to be consumed (token) is indeed selecting a widget.
+  ;;     This is the normal case, and we pop the token from the uri-tokens
+  ;;     and return the selected pane.
+  ;;     
+  ;; 2 - There are no tokens left anymore.
+  ;;     In that case we select and return the default pane.
+  ;;     now the default pane comes into 2 flavours:
+  ;;       2a. explicitly associated with the nil token
+  ;;       2b. The first pane available if there is pane associated with the
+  ;;           default token.
+  ;;     In both case we return the default pane, but in case 2a.
+  ;;     we add the token to the consumed list.
+  ;;     The reason that this is needed is for nested selectors.
+  ;;     Because the child selectors need to have the selector token
+  ;;     in their base path, otherwise selecting a sub navigationwidget
+  ;;     will create the wrong path (it is missing the selection token
+  ;;     for this SELECTOR.
+  ;;     
+  ;;
+  ;; 3 - There are tokens left, but the token does not select a pane AND
+  ;;     there is a default pane associated with NIL.
+  ;;
+  ;;     In that case it should return the child pane.
+  ;;
+  ;;
+  ;; Upshot of this all is that this code will, if possible,
+  ;;
+  ;;  1 - Return the selected pane.
+  ;;  2 - Remove the token used to select this pane, if a token was used.
+  ;;  3 - Make sure that if the selected pane has a token associated to it, it
+  ;;      is added to the consumed token list.
+  ;;
   (let* ((token (peek-at-token uri-tokens))
          (panes (static-selector-panes selector))
          (cached-panes (static-selector-cached-panes selector))
@@ -133,14 +170,16 @@
          (effective-pane (or cached-pane pane))
          (selected-pane (cond
                           ((cdr effective-pane)
-                           ;; found pane
-                           (pop-tokens uri-tokens)
+			   (when (car effective-pane)
+			     (pop-tokens uri-tokens))
                            effective-pane)
-                          ((and (null token) panes)
-                           ;; looking for default pane?
-                           (first panes)))))
+                          (panes
+			   (let ((default-pane (or (static-selector-get-pane selector nil) (first panes))))
+			     (when (car default-pane)
+			       (consume-tokens uri-tokens (list (car default-pane))))
+			     default-pane)))))
     (unless cached-pane ; already in cache? add if not
-      (push (cons token (cdr selected-pane)) (static-selector-cached-panes selector)))
+      (push (cons (car selected-pane) (cdr selected-pane)) (static-selector-cached-panes selector)))
     (static-selector-select-pane selector (car selected-pane))
     (cdr selected-pane)))
 
