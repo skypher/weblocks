@@ -16,6 +16,7 @@
 
 (defwidget selector ()
   ((base-uri :accessor selector-base-uri
+             :initform nil
 	     :documentation "The base URI for this selector, set during
 	     the tree shakedown phase before rendering. Used during
 	     rendering to compute URL paths."))
