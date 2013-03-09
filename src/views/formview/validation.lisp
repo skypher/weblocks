@@ -24,6 +24,8 @@ messages if any of the functions failed."
 	t
 	(values nil errors))))
 
+(defparameter *form-view-validation-max-validation-loops* 5)
+
 (defgeneric validate-object-form-view (object view parsed-values)
   (:documentation "Called by the framework during form deserialization
 to validate a form view. Default implementation validates each field
@@ -35,6 +37,9 @@ true. Otherwise returns nil as the first value, and an association
 list of either fields and errors or nils and errors (for non-field-related
 validation errors) as the second value.
 
+When function returns error equal to :validate-later then validation is done
+in several iterations and function will be called again in next iteration.
+
 'object' - the object the form is being deserialized into.
 'view' - form view object being deserialized.
 'parsed-values' - an association list of field-info structures and
@@ -43,19 +48,26 @@ parsed values.")
     (let ((validates t)
 	  errors
 	  fields-values)
-      (dolist (info-value-pair parsed-values)
-	(destructuring-bind (field-info . parsed-value)
-	    info-value-pair
-	  (multiple-value-bind (validatesp error)
-	      (let ((field (field-info-field field-info))
-		    (object (field-info-object field-info)))
-		(push parsed-value fields-values)
-		(push (symbol-to-keyword (view-field-slot-name field)) fields-values)
-		(validate-form-view-field (view-field-slot-name field)
-					  object field view parsed-value))
-	    (unless validatesp
-	      (setf validates nil)
-	      (push-end (cons (field-info-field field-info) error) errors)))))
+      (loop while parsed-values for i from 1 do
+            (when (> i *form-view-validation-max-validation-loops*)
+              (error 
+                "Something went wrong, it seems like validation causes forever loop, be careful using :validate-later. You can also increase weblocks:*form-view-validation-max-validation-loops* which is ~A right now"
+                *form-view-validation-max-validation-loops*))
+            (dolist (info-value-pair parsed-values)
+              (destructuring-bind (field-info . parsed-value)
+                info-value-pair
+                (multiple-value-bind (validatesp error)
+                  (let ((field (field-info-field field-info))
+                        (object (field-info-object field-info)))
+                    (push parsed-value fields-values)
+                    (push (symbol-to-keyword (view-field-slot-name field)) fields-values)
+                    (validate-form-view-field (view-field-slot-name field)
+                                              object field view parsed-value))
+                  (unless (equal error :validate-later)
+                    (setf parsed-values (remove info-value-pair parsed-values :test #'equal))
+                    (unless validatesp
+                      (setf validates nil)
+                      (push-end (cons (field-info-field field-info) error) errors)))))))
       ;; We proceed to view-level validation only if individual fields were
       ;; successfully validated.
       (if validates
