@@ -8,7 +8,7 @@
 
 (defsystem weblocks
   :name "weblocks"
-  :version "0.8.6"
+  :version "0.8.7"
   :maintainer "Slava Akhmechet"
   :author "Slava Akhmechet"
   :licence "LLGPL"
@@ -31,7 +31,8 @@
                :salza2
                :html-template
                :trivial-timeout
-               :trivial-backtrace)
+               :trivial-backtrace 
+               :parse-number)
   :components ((:module src
 		:components (
 		 (:file "package")

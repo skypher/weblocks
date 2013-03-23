@@ -174,11 +174,11 @@
 			   (when (car effective-pane)
 			     (pop-tokens uri-tokens))
                            effective-pane)
-                          (panes
-			   (let ((default-pane (or (static-selector-get-pane selector nil) (first panes))))
-			     (when (car default-pane)
-			       (consume-tokens uri-tokens (list (car default-pane))))
-			     default-pane)))))
+                          ((and (null token) panes)
+                           (let ((default-pane (or (static-selector-get-pane selector nil) (first panes))))
+                             (when (car default-pane)
+                               (consume-tokens uri-tokens (list (car default-pane))))
+                             default-pane)))))
     (unless cached-pane ; already in cache? add if not
       (push (cons (car selected-pane) (cdr selected-pane)) (static-selector-cached-panes selector)))
     (static-selector-select-pane selector (car selected-pane))

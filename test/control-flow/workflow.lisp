@@ -1,15 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test yield->do-widget
-(deftest yield->do-widget-1
-    (weblocks::yield->do-widget '(1 two (three 4) (5 (yield 6) 7) 8) 'foo)
-  (1 two (three 4) (5 (do-widget foo 6) 7) 8))
-
-(deftest yield->do-widget-2
-    (weblocks::yield->do-widget nil 'foo)
-  nil)
-
 ;;; test with-flow
 (deftest with-flow-1
     (with-request :get nil

@@ -54,4 +54,34 @@
     (text-input-present-p "foo")
   t)
 
+(defmacro outputs-nothing-p (&body body)
+  `(zerop 
+     (length 
+       (with-output-to-string (*standard-output*)
+         ,@body))))
+
+(deftest text-parser-parse-view-field-value-1
+         (parse-view-field-value (make-instance 'float-parser)
+                                 "12312.312312313123" *joe*
+                                 (find-view '(form employee))
+                                 (make-instance 'form-view-field))
+         t t 12312.312312313123d0)
+
+(deftest float-parser-parse-view-field-value-2
+         (outputs-nothing-p 
+           (parse-view-field-value (make-instance 'float-parser)
+                                   "#.(progn (print \"Some injected code executed\") 1)" *joe*
+                                   (find-view '(form employee))
+                                   (make-instance 'form-view-field))) 
+         t)
+
+#+sbcl(deftest float-parser-parse-view-field-value-3
+         (ignore-errors 
+           (weblocks::with-timeout (3)
+             (parse-view-field-value (make-instance 'float-parser)
+                                     "1e10000000000000000000000000" *joe*
+                                     (find-view '(form employee))
+                                     (make-instance 'form-view-field))
+             t))
+         t)
 

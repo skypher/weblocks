@@ -98,22 +98,23 @@
 		     (when (number-parser-max parser)
 		       (format nil " less than ~A" (+ (number-parser-max parser) 1)))))))
 
-(defmethod parse-view-field-value ((parser float-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
+(defmethod parse-view-field-value ((parser float-parser)
+                                   value obj
+                                   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (declare (optimize safety))
   (ignore-errors
     (let* ((presentp (text-input-present-p value))
-	   (float-value (when presentp
-                          (float (read-from-string value))))
+           (float-value (when presentp
+                          (parse-number:parse-number value :float-format 'long-float)))
            (round-factor (awhen (float-parser-round parser)
-                           (expt 10 (if (eq it t) 0 it)))))
+                                (expt 10 (if (eq it t) 0 it)))))
       (unless (floatp float-value)
         (error 'parse-error))
       (when (and float-value (number-parser-min parser))
-	(assert (>= float-value (number-parser-min parser))))
+        (assert (>= float-value (number-parser-min parser))))
       (when (and float-value (number-parser-max parser))
-	(assert (<= float-value (number-parser-max parser))))
+        (assert (<= float-value (number-parser-max parser))))
       (values t presentp (if round-factor
                            (/ (round (* float-value round-factor)) round-factor)
                            float-value)))))
