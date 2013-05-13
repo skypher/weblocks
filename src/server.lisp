@@ -161,7 +161,12 @@ declared AUTOSTART."
 
 ;; install weblocks-dispatcher
 (eval-when (:load-toplevel)
-  (push 'weblocks-dispatcher *dispatch-table*))
+  (let ((easy-handlers (find 'hunchentoot:dispatch-easy-handlers *dispatch-table*)))
+    (when easy-handlers 
+      (setf *dispatch-table* (remove easy-handlers *dispatch-table*)))
+    (push 'weblocks-dispatcher *dispatch-table*)
+    (when easy-handlers 
+      (push easy-handlers *dispatch-table*))))
 
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This
