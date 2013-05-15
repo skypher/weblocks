@@ -18,7 +18,7 @@
         ,(when (or description body)
            '(:hr))
         (:div :class "footer"
-            "This is the " (:a :href "http://weblocks.viridian-project.de/" "Weblocks Application Framework")
+            "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
             " running on " (str (hunchentoot::address-string)))))))
 
 (defmethod handle-http-error ((app weblocks-webapp) code &optional condition)

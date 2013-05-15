@@ -24,7 +24,10 @@
   (let ((*print-readably* nil))
     (call-next-method)))
 
-(defmethod acceptor-status-message :around ((acceptor weblocks-acceptor) (http-status-code (eql 500)) &key &allow-other-keys)
+(defmethod acceptor-status-message :around ((acceptor weblocks-acceptor) (http-status-code (eql hunchentoot:+http-internal-server-error+)) &key &allow-other-keys)
+  nil)
+
+(defmethod acceptor-status-message :around ((acceptor weblocks-acceptor) (http-status-code (eql hunchentoot:+http-not-found+)) &key &allow-other-keys)
   nil)
 
 ;;; To support both http: and https:, call START-WEBLOCKS twice, once with
