@@ -11,7 +11,12 @@
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function #:standard-class
                             #:typep #:subtypep)
-    (:shadowing-import-from :weblocks #:redirect #:reset-sessions)
+    (:shadowing-import-from :weblocks 
+                            #:redirect #:reset-sessions 
+                            #:create-folder-dispatcher-and-handler 
+                            #:create-prefix-dispatcher 
+                            #:create-regex-dispatcher 
+                            #:create-static-file-dispatcher-and-handler)
     (:export #:test-weblocks)))
 
 (in-package :weblocks-test)

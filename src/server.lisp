@@ -5,9 +5,51 @@
           start-weblocks
           stop-weblocks
           *weblocks-server*
-	  server-type
+          server-type
           server-version
-          session-name-string-pair))
+          session-name-string-pair 
+          create-regex-dispatcher 
+          create-prefix-dispatcher 
+          create-static-file-dispatcher-and-handler 
+          create-folder-dispatcher-and-handler))
+
+(defmacro add-print-object-for-function (function (stream-var) &body body)
+  `(let ((function ,function))
+     (setf (pretty-function:get-function-printer function)
+           (lambda (,stream-var)
+             (print-unreadable-object (function ,stream-var :type t)
+               ,@body)))
+     function))
+
+(defun create-regex-dispatcher (regex handler)
+  (add-print-object-for-function 
+    (hunchentoot:create-regex-dispatcher regex handler) 
+    (stream)
+    (princ 
+      (format nil 
+              "regex-dispatcher, regexp - \"~A\"" 
+              (ppcre:regex-replace-all "\"" regex "\\\"")) stream)))
+
+(defun create-static-file-dispatcher-and-handler (uri path &optional content-type)
+  (add-print-object-for-function 
+    (hunchentoot:create-static-file-dispatcher-and-handler uri path content-type) 
+    (stream)
+    (princ (format nil "static-file-dispatcher, uri - ~A file - ~A, content-type - ~A" uri path content-type) stream)))
+
+(defun create-folder-dispatcher-and-handler (uri-prefix base-path &optional content-type)
+  (add-print-object-for-function 
+    (hunchentoot:create-folder-dispatcher-and-handler uri-prefix base-path content-type) 
+    (stream)
+    (princ (format nil "folder-dispatcher, uri - ~A path - ~A, content-type - ~A" uri-prefix base-path content-type) stream)))
+
+(defun create-prefix-dispatcher (prefix handler)
+  (add-print-object-for-function 
+    (hunchentoot:create-prefix-dispatcher prefix handler) 
+    (stream)
+    (princ 
+      (format nil 
+              "prefix-dispatcher, prefix - \"~A\"" 
+              (ppcre:regex-replace-all "\"" prefix "\\\"")) stream)))
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -33,7 +75,7 @@
 
 (defun start-weblocks (&rest keys &key (debug t) (port 8080)
                                        (acceptor-class 'weblocks-acceptor)
-		       &allow-other-keys)
+                       &allow-other-keys)
   "Starts weblocks framework hooked into Hunchentoot server.
 
 Set DEBUG to true in order for error messages and stack traces to be shown
@@ -88,15 +130,15 @@ declared AUTOSTART."
 (defun send-gzip-rules (types script-name request virtual-folder physical-folder)
   (let (content-type)
     (when (and types
-	       (search "gzip" (header-in :accept-encoding request))
-	       (cl-fad:file-exists-p (format nil "~A~A.gz" physical-folder
-					     (relative-path script-name virtual-folder)))
-	       (or (and (find :script types)
-			(cl-ppcre:scan "(?i)\\.js$" script-name)
-			(setf content-type "text/javascript"))
-		   (and (find :stylesheet types)
-			(cl-ppcre:scan "(?i)\\.css$" script-name)
-			(setf content-type "text/css"))))
+               (search "gzip" (header-in :accept-encoding request))
+               (cl-fad:file-exists-p (format nil "~A~A.gz" physical-folder
+                                             (relative-path script-name virtual-folder)))
+               (or (and (find :script types)
+                        (cl-ppcre:scan "(?i)\\.js$" script-name)
+                        (setf content-type "text/javascript"))
+                   (and (find :stylesheet types)
+                        (cl-ppcre:scan "(?i)\\.css$" script-name)
+                        (setf content-type "text/css"))))
       (setf (header-out "Content-Encoding") "gzip")
       (setf (slot-value request 'script-name) (format nil "~A.gz" script-name))
       content-type)))
@@ -108,42 +150,42 @@ declared AUTOSTART."
     (let* ((script-name (script-name* request))
            (app-prefix (webapp-prefix app))
            (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
-	   content-type)
+           content-type)
       (cond
         ((list-starts-with (tokenize-uri script-name nil)
                            (tokenize-uri "/weblocks-common" nil)
                            :test #'string=)
-	 (let ((virtual-folder "/weblocks-common/pub/")
-	       (physical-folder (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
-				       it
-				       #p"./pub/")))
-	   (unless *weblocks-global-debug*
-	     (send-cache-rules 100000)
-	     (setf content-type
-		   (send-gzip-rules '(:stylesheet :script)
-				    script-name request virtual-folder physical-folder)))
-	   (return-from weblocks-dispatcher
-	     (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-		      request))))
+         (let ((virtual-folder "/weblocks-common/pub/")
+               (physical-folder (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
+                                       it
+                                       #p"./pub/")))
+           (unless *weblocks-global-debug*
+             (send-cache-rules 100000)
+             (setf content-type
+                   (send-gzip-rules '(:stylesheet :script)
+                                    script-name request virtual-folder physical-folder)))
+           (return-from weblocks-dispatcher
+             (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+                      request))))
         ((and (webapp-serves-hostname (hunchentoot:host) app)
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-pub-prefix nil)
                                 :test #'string=))
-	 (let ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
-	       (physical-folder (compute-webapp-public-files-path app)))
-	   (send-cache-rules (weblocks-webapp-public-files-cache-time app))
-	   (setf content-type (send-gzip-rules (gzip-dependency-types* app)
-					       script-name request virtual-folder physical-folder))
-	   (return-from weblocks-dispatcher
-	     (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-		      request))))
+         (let ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
+               (physical-folder (compute-webapp-public-files-path app)))
+           (send-cache-rules (weblocks-webapp-public-files-cache-time app))
+           (setf content-type (send-gzip-rules (gzip-dependency-types* app)
+                                               script-name request virtual-folder physical-folder))
+           (return-from weblocks-dispatcher
+             (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+                      request))))
         ((and (webapp-serves-hostname (hunchentoot:host) app)
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
                                 :test #'string=))
          (no-cache) ; disable caching for dynamic pages
-	 (return-from weblocks-dispatcher 
-	   (f0 (handle-client-request app)))))))
+         (return-from weblocks-dispatcher 
+           (f0 (handle-client-request app)))))))
   (hunchentoot:log-message* :debug "Application dispatch failed for '~A'" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
@@ -151,12 +193,12 @@ declared AUTOSTART."
 #|
 (setf hunchentoot:*default-handler*
       (lambda ()
-	(if (null (tokenize-uri (script-name*) nil))
-	    (progn
-	      (unless (get-webapp 'weblocks-default nil)
-		(start-webapp 'weblocks-default))
-	      (redirect "/weblocks-default"))
-	    (setf (return-code*) +http-not-found+))))
+        (if (null (tokenize-uri (script-name*) nil))
+            (progn
+              (unless (get-webapp 'weblocks-default nil)
+                (start-webapp 'weblocks-default))
+              (redirect "/weblocks-default"))
+            (setf (return-code*) +http-not-found+))))
 |#
 
 ;; install weblocks-dispatcher
@@ -173,11 +215,11 @@ declared AUTOSTART."
 pair is passed to JavaScript because web servers don't normally do URL
 rewriting in JavaScript code."
   (if (and *rewrite-for-session-urls*
-	   (null (cookie-in (session-cookie-name *weblocks-server*)))
-	   (hunchentoot:session-cookie-value *session*))
+           (null (cookie-in (session-cookie-name *weblocks-server*)))
+           (hunchentoot:session-cookie-value *session*))
       (format nil "~A=~A"
-	      (url-encode (session-cookie-name *weblocks-server*))
-	      (string-upcase (url-encode (hunchentoot:session-cookie-value *session*))))
+              (url-encode (session-cookie-name *weblocks-server*))
+              (string-upcase (url-encode (hunchentoot:session-cookie-value *session*))))
       ""))
 
 (defun server-type ()
