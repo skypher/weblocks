@@ -7,7 +7,7 @@
 
 (defsystem weblocks-store-test
   :name "weblocks-store-test"
-  :maintainer "Slava Akhmechet"
+  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test suite for weblocks backend stores."

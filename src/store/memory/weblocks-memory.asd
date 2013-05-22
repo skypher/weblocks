@@ -7,7 +7,7 @@
 
 (defsystem weblocks-memory
   :name "weblocks-memory"
-  :maintainer "Slava Akhmechet"
+  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A weblocks backend for memory (not backed on disk)."

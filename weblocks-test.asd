@@ -6,8 +6,8 @@
 
 (defsystem weblocks-test
   :name "weblocks-test"
-  :version "0.0.1"
-  :maintainer "Slava Akhmechet"
+  :version "0.0.2"
+  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."

@@ -7,7 +7,7 @@
 
 (defsystem weblocks-prevalence
   :name "weblocks-prevalence"
-  :maintainer "Slava Akhmechet"
+  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A weblocks backend for cl-prevalence."

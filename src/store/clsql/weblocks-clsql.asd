@@ -7,7 +7,7 @@
 
 (defsystem weblocks-clsql
   :name "weblocks-clsql"
-  :maintainer "Slava Akhmechet"
+  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A weblocks backend for clsql."
