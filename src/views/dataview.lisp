@@ -38,7 +38,10 @@
 
 ;;; Presentation
 (defclass text-presentation (presentation text-presentation-mixin)
-  ()
+  ((null-string :accessor text-presentation-null-string
+		:initarg :null-string
+		:initform "Not Specified"
+		:documentation "The string to display if the value is null."))
   (:documentation "A default presentation that renders values as
   text."))
 
@@ -106,7 +109,7 @@
   (if ignore-nulls-p
       (call-next-method)
       (with-html
-	(:span :class "value missing" "Not Specified"))))
+	(:span :class "value missing" (str (text-presentation-null-string presentation))))))
 
 (defun highlight-regex-matches (item highlight &optional presentation)
   "This function highlights regex matches in text by wrapping them in

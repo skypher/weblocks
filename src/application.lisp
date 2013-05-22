@@ -10,34 +10,34 @@
           stop-webapp
           restart-webapp
           get-webapp
-	  get-webapps-for-class
+          get-webapps-for-class
           initialize-webapp
           finalize-webapp
-	  webapp-application-dependencies
+          webapp-application-dependencies
           webapp-name in-webapp
-	  bundle-dependency-types
+          bundle-dependency-types
           version-dependency-types
-	  webapp-description
+          webapp-description
           *default-public-files-path*
           compute-public-files-path
           weblocks-webapp-public-files-path
           webapp-public-files-path
-	  webapp-public-files-uri-prefix
+          webapp-public-files-uri-prefix
           webapp-prefix
           webapp-debug
-	  running-webapp
+          running-webapp
           make-webapp-uri
           make-webapp-public-file-uri
           reset-webapp-session
           webapp-session-key
-	  webapp-session-value
+          webapp-session-value
           delete-webapp-session-value
-	  define-permanent-action
-	  define-permanent-action/cc
+          define-permanent-action
+          define-permanent-action/cc
           remove-webapp-permanent-action
-	  compute-webapp-public-files-path
-	  compute-webapp-public-files-uri-prefix
-	  compute-webapp-public-files-uri-prefix-util
+          compute-webapp-public-files-path
+          compute-webapp-public-files-uri-prefix
+          compute-webapp-public-files-uri-prefix-util
           current-webapp
           webapp-update-thread-status
           update-thread-status
@@ -56,25 +56,25 @@
    (description :type (or null string)
                 :accessor weblocks-webapp-description
                 :initarg :description 
-		:initform nil 
-		:documentation "The name of the application.  This slot will be used 
+                :initform nil 
+                :documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
    (public-files-path :type (or null string pathname)
-		      :accessor weblocks-webapp-public-files-path
+                      :accessor weblocks-webapp-public-files-path
                       :initarg :public-files-path 
-		      :initform nil
-		      :documentation "The filesystem directory path
-		      for public files. The final value is computed
-		      with 'compute-webapp-public-files-path'.")
+                      :initform nil
+                      :documentation "The filesystem directory path
+                      for public files. The final value is computed
+                      with 'compute-webapp-public-files-path'.")
    (public-files-uri-prefix :type string
                             :reader weblocks-webapp-public-files-uri-prefix
-			    :initarg :public-files-uri-prefix
-			    :initform "pub"
-			    :documentation "The uri prefix for public
-			    files. By default, this slot is
-			    initialized to 'pub'. The final uri prefix
-			    for application public files is computed
-			    by 'compute-webapp-public-files-uri-prefix'.")
+                            :initarg :public-files-uri-prefix
+                            :initform "pub"
+                            :documentation "The uri prefix for public
+                            files. By default, this slot is
+                            initialized to 'pub'. The final uri prefix
+                            for application public files is computed
+                            by 'compute-webapp-public-files-uri-prefix'.")
    (public-files-cache-time :type integer
                             :accessor weblocks-webapp-public-files-cache-time
                             :initarg :public-files-cache-time
@@ -98,21 +98,21 @@
    (prefix :type string
            :reader weblocks-webapp-prefix
            :initarg :prefix
-	   :documentation "The subtree of the URI space at this site that belongs to
+           :documentation "The subtree of the URI space at this site that belongs to
            the webapp.")
    (application-dependencies :type list
                              :accessor weblocks-webapp-application-dependencies 
-			     :initarg :dependencies
+                             :initarg :dependencies
                              :initform nil
-			     :documentation "The public dependencies for all pages rendered by this 
+                             :documentation "The public dependencies for all pages rendered by this 
                                 application.  The automatic dependencies system will handle all of 
                                 the context or request specific dependencies.")
    (bundle-dependency-types :type list
                             :accessor bundle-dependency-types
                             :initarg :bundle-dependency-types
-			    ;:initform '(:stylesheet :script)
+                            ;:initform '(:stylesheet :script)
                             :initform nil ; current bundling code is flaky
-			    :documentation "This enables bundling of css, js files.
+                            :documentation "This enables bundling of css, js files.
        If you only want js files to get bundled, set this to '(script-dependency).
        Set it to nil disables bundling. When debug is on, bundling is turned off.
        ATTENTION: If your 'whatever.css' file contains import rules, please take them out,
@@ -125,8 +125,8 @@
    (version-dependency-types :type list
                              :accessor version-dependency-types
                              :initarg :version-dependency-types
-			     :initform '(:stylesheet :script)
-			     :documentation "This enables versioning of css, js files. The purpose
+                             :initform '(:stylesheet :script)
+                             :documentation "This enables versioning of css, js files. The purpose
        of versioning is to serve modified static files that have been cached permanently, and gziping.
        Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)
        file will get created. This way, you only need to work on the unversioned file and not keep
@@ -134,13 +134,13 @@
    (gzip-dependency-types :type list
                           :accessor gzip-dependency-types
                           :initarg :gzip-dependency-types
-			  :initform '(:stylesheet :script)
-			  :documentation "This enables gziping of css, js files.
+                          :initform '(:stylesheet :script)
+                          :documentation "This enables gziping of css, js files.
                                           When debug is on, gzip is turned off.")
    (init-user-session :type (or symbol function)
                       :accessor weblocks-webapp-init-user-session
                       :initarg :init-user-session
-		      :documentation "'init-user-session' must be defined by weblocks client in the
+                      :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
                          widget at the root of the application. 'init-user-session' is
                          responsible for adding initial children to this widget.")
@@ -151,7 +151,7 @@
    (session-key :type symbol :accessor weblocks-webapp-session-key :initarg :session-key)
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
-		  :documentation "Turns on indentation of HTML for easier visual inspection."))
+                  :documentation "Turns on indentation of HTML for easier visual inspection."))
   (:metaclass webapp-class)
   (:documentation 
 "A class that encapsulates a unique web application and all relevant rnesources.
@@ -169,11 +169,11 @@ layout and dependencies running on the same server."))
 (defmacro def-debug-p-slot-readers (&rest reader-symbols)
   `(progn
      ,@(loop for symbol in reader-symbols
-	  collect `(defun ,(form-symbol symbol '*) (object)
-		     "This reader will prompt debug parameters first."
-		     (unless (or *weblocks-global-debug*
-				 (weblocks-webapp-debug object))
-		       (,symbol object))))))
+          collect `(defun ,(form-symbol symbol '*) (object)
+                     "This reader will prompt debug parameters first."
+                     (unless (or *weblocks-global-debug*
+                                 (weblocks-webapp-debug object))
+                       (,symbol object))))))
 
 (def-debug-p-slot-readers
     weblocks-webapp-public-files-cache-time
@@ -205,9 +205,9 @@ layout and dependencies running on the same server."))
 
 ;; abstraction macro
 (defmacro defwebapp (name &rest initargs &key 
-		     subclasses
-		     slots
-		     (autostart t) &allow-other-keys)
+                     subclasses
+                     slots
+                     (autostart t) &allow-other-keys)
   "This macro defines the key parameters for a stand alone web application.  
 It defines both a class with name 'name' and registers an instance of that class.
 It also instantiates a defvar with an instance of this class.  This is intended
@@ -265,8 +265,8 @@ called (primarily for backward compatibility"
        ,slots
        (:autostart . ,autostart)
        (:default-initargs
-	. ,(remove-keyword-parameters
-	    initargs :subclasses :slots :autostart))
+        . ,(remove-keyword-parameters
+            initargs :subclasses :slots :autostart))
        (:metaclass webapp-class))
      (when (get-webapp ',name nil)
        (restart-webapp ',name))))
@@ -277,8 +277,8 @@ called (primarily for backward compatibility"
 IGNORE-DEFAULT-DEPENDENCIES, prepend the default Weblocks dependencies
 to my `application-dependencies' slot."
   (macrolet ((slot-default (name initform)
-	       `(unless (slot-boundp self ',name)
-		  (setf (slot-value self ',name) ,initform))))
+               `(unless (slot-boundp self ',name)
+                  (setf (slot-value self ',name) ,initform))))
     ;; special handling for prefix slots since initargs
     ;; bypass the normalizing axr
     (when (slot-boundp self 'prefix)
@@ -297,45 +297,45 @@ to my `application-dependencies' slot."
       (slot-default session-key class-name)
       (slot-default name (attributize-name class-name))
       (slot-default init-user-session
-		    (or (find-symbol (symbol-name 'init-user-session)
-				     (symbol-package class-name))
-			(error "Cannot initialize application ~A because ~
-				no init-user-session function is found."
-			       (weblocks-webapp-name self))))
+                    (or (find-symbol (symbol-name 'init-user-session)
+                                     (symbol-package class-name))
+                        (error "Cannot initialize application ~A because ~
+                                no init-user-session function is found."
+                               (weblocks-webapp-name self))))
       (slot-default prefix
                       (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
       (setf (weblocks-webapp-application-dependencies self)
-	    (append '((:stylesheet "layout")
-		      (:stylesheet "main")
-		      (:stylesheet "dialog")
-		      (:script "prototype")
-		      (:script "scriptaculous")
-		      (:script "shortcut")
-		      (:script "weblocks")
-		      (:script "dialog"))
-		    (weblocks-webapp-application-dependencies self)))))
+            (append '((:stylesheet "layout")
+                      (:stylesheet "main")
+                      (:stylesheet "dialog")
+                      (:script "prototype")
+                      (:script "scriptaculous")
+                      (:script "shortcut")
+                      (:script "weblocks")
+                      (:script "dialog"))
+                    (weblocks-webapp-application-dependencies self)))))
   (let ((pfp (weblocks-webapp-public-files-path self)))
     (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
       (warn "~S ~S includes a nondirectory component; this can break file probing"
-	    'public-files-path pfp))))
+            'public-files-path pfp))))
 
 (defun get-webapp (name &optional (error-p t))
   "Get a running web application"
   (let ((app (find (if (symbolp name) (attributize-name name) name)
-		   *active-webapps*
-		   :key #'weblocks-webapp-name :test #'equal)))
+                   *active-webapps*
+                   :key #'weblocks-webapp-name :test #'equal)))
     (or app
         (when error-p
           (error "Argument ~a is not a running weblocks application." name)))))
 
 (defun get-webapps-for-class (name)
   (let ((class (or (and (symbolp name) (find-class name nil))
-		   (find-class (intern (attributize-name name) :keyword) nil))))
+                   (find-class (intern (attributize-name name) :keyword) nil))))
     (when class
       (loop for app in *active-webapps* 
-	 when (eq (class-of app) class)
-	 collect app))))
+         when (eq (class-of app) class)
+         collect app))))
 
 
 (defun check-webapp (name)
@@ -344,13 +344,13 @@ to my `application-dependencies' slot."
     (error "~a is not a valid weblocks application class." name)))
 
 (defun start-webapp (class &rest initargs
-		     &key (name (attributize-name class)) &allow-other-keys)
+                     &key (name (attributize-name class)) &allow-other-keys)
   "Starts the web application"
   (check-webapp class)
   (let ((app (get-webapp name nil)))
     (when app
       (warn "An instance of ~A with name ~A is already running, ignoring start request"
-	    class name)
+            class name)
       (return-from start-webapp))
     ;; only pass name when truly given
     (setq app (apply #'make-instance class initargs))
@@ -358,7 +358,7 @@ to my `application-dependencies' slot."
       (declare (special *default-webapp*))
       (initialize-webapp app)
       (unless (webapp-default-store-name app)
-	(style-warn 'missing-default-store :webapp app))
+        (style-warn 'missing-default-store :webapp app))
       (enable-webapp app)
       app)))
 
@@ -407,11 +407,11 @@ to my `application-dependencies' slot."
 
 (defun find-app (name)
   (let ((app (get-webapp name nil))
-	(apps (get-webapps-for-class name)))
+        (apps (get-webapps-for-class name)))
     (when (not app)
       (if (eq (length apps) 1)
-	  (setf app (first apps))
-	  (error "App name ~A not found or no instances of class ~A found" name name)))
+          (setf app (first apps))
+          (error "App name ~A not found or no instances of class ~A found" name name)))
     app))
 
 (defun restart-webapp (name)
@@ -446,10 +446,10 @@ provider URI)."
 KEY is compared using EQUAL."
   (let ((webapp-session (webapp-session-hash session webapp )))
     (cond (webapp-session
-	   (gethash key webapp-session))
-	  (webapp
+           (gethash key webapp-session))
+          (webapp
            (values nil nil))
-	  (t
+          (t
            nil))))
 
 (defun (setf webapp-session-value) (value key &optional (session *session*) (webapp (current-webapp)))
@@ -458,7 +458,7 @@ KEY is compared using EQUAL."
   (let ((webapp-session (session-value (webapp-session-key webapp) session)))
     (unless webapp-session
       (setf webapp-session (make-hash-table :test #'equal)
-	    (session-value (webapp-session-key webapp)) webapp-session))
+            (session-value (webapp-session-key webapp)) webapp-session))
     (setf (gethash key webapp-session) value)))
 
 (defun delete-webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
@@ -482,13 +482,13 @@ KEY is compared using EQUAL."
   (when *current-webapp*
     (let ((action-table (webapp-permanent-actions *current-webapp*)))
       (when action-table
-	(gethash (if (symbolp action) (symbol-name action) action)
-		 action-table)))))
+        (gethash (if (symbolp action) (symbol-name action) action)
+                 action-table)))))
 
 (defun webapp-permanent-actions (webapp)
   (gethash (if (symbolp webapp) webapp
-	       (type-of webapp))
-	   *webapp-permanent-actions*))
+               (type-of webapp))
+           *webapp-permanent-actions*))
 
 (defun add-webapp-permanent-action (webapp-name action-name function-or-name)
   "Remove an action from a webapp.  action-name should be a string, or it
@@ -497,38 +497,38 @@ KEY is compared using EQUAL."
   (assert (symbolp webapp-name))
   (assert (or (symbolp action-name) (stringp action-name)))
   (macrolet ((action-table (appname)
-	       `(gethash ,appname *webapp-permanent-actions*)))
+               `(gethash ,appname *webapp-permanent-actions*)))
     (unless (action-table webapp-name)
       (setf (action-table webapp-name) (make-hash-table :test 'equal)))
     (setf (gethash (if (symbolp action-name)
-		       (string-downcase (symbol-name action-name))
-		       (string-downcase action-name))
-		   (action-table webapp-name)) 
-	  function-or-name)))
+                       (string-downcase (symbol-name action-name))
+                       (string-downcase action-name))
+                   (action-table webapp-name)) 
+          function-or-name)))
       
 (defun remove-webapp-permanent-action (webapp-name action-name)
   "Remove a permanent action from a webapp"
   (macrolet ((action-table (appname)
-	       `(gethash ,appname *webapp-permanent-actions*)))
+               `(gethash ,appname *webapp-permanent-actions*)))
     (let ((table (action-table webapp-name)))
       (when table
-	(remhash action-name table)))))
+        (remhash action-name table)))))
 
 (defmacro define-permanent-action (name webapp-class action-params &body body)
   "Adds a permanent action to the class's set of permanent actions"
   (assert (and (find-class webapp-class)
-	       (subtypep webapp-class 'weblocks-webapp)))
+               (subtypep webapp-class 'weblocks-webapp)))
   `(add-webapp-permanent-action ',webapp-class ',name
-				(lambda ,action-params
-				  ,@body)))
+                                (lambda ,action-params
+                                  ,@body)))
 
 (defmacro define-permanent-action/cc (name webapp-class action-params &body body)
   "Adds a permanent action to the class's set of permanent actions"
   (assert (and (find-class webapp-class)
-	       (subtypep webapp-class 'weblocks-webapp)))
+               (subtypep webapp-class 'weblocks-webapp)))
   `(add-webapp-permanent-action ',webapp-class ',name
-				(lambda/cc ,action-params
-				  ,@body)))
+                                (lambda/cc ,action-params
+                                  ,@body)))
 
 ;;; finding public files
 (defun compute-public-files-path (asdf-system-name &optional (suffix "pub"))
@@ -562,12 +562,13 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
                          (attributize-name
                           (weblocks-webapp-name app))))))
             (if (and path (probe-file path))
-                path
+              (setf (weblocks-webapp-public-files-path app) path)
                 (progn
                   (and (weblocks-webapp-debug app) (not warned)
                     (setf warned t)
                     (warn "Couldn't determine application's public files folder, using standard Weblocks files."))
-                  *default-public-files-path*)))))))
+                  (setf (weblocks-webapp-public-files-path app)
+                        *default-public-files-path*))))))))
 
 (defgeneric compute-webapp-public-files-uri-prefix (app)
   (:documentation "Computes a virtual uri for public files of an
@@ -608,18 +609,18 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
   "Answer a list of webapp classes that were defined (e.g. by
 `defwebapp') in PACKAGE, by default the current package."
   (loop for webapp-class-name in *registered-webapps*
-	for class = (find-class webapp-class-name)
-	when (eql package (webapp-class-home-package class))
-	  collect class))
+        for class = (find-class webapp-class-name)
+        when (eql package (webapp-class-home-package class))
+          collect class))
 
 (defun call-in-webapp (app proc)
   "Helper for `in-webapp'."
   (let ((*current-webapp* app))
     (aif (aand (webapp-default-store-name app)
-	       (symbol-value it))
-	 (let ((*default-store* it))
-	   (funcall proc))
-	 (funcall proc))))
+               (symbol-value it))
+         (let ((*default-store* it))
+           (funcall proc))
+         (funcall proc))))
 
 (defmacro with-webapp (webapp &body forms)
   "Bind variables that are both webapp-specific, or applicable to just
@@ -662,14 +663,14 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
   "Does APP serve requests for HOSTNAME?"
   (let ((hostname (car (cl-ppcre:split ":" hostname)))) ; ignore port
   (or (null (webapp-hostnames app))
-	(member hostname (webapp-hostnames app) :test #'equalp)
-	(loop for pattern in (webapp-hostnames app)
-	      thereis (hostname-match-p pattern hostname)))))
+        (member hostname (webapp-hostnames app) :test #'equalp)
+        (loop for pattern in (webapp-hostnames app)
+              thereis (hostname-match-p pattern hostname)))))
 
 (defun hostname-match-p (pattern hostname)
   (values (cl-ppcre:scan-to-strings
-	   (cl-ppcre:regex-replace-all "\\*" pattern ".*")
-	   hostname)))
+           (cl-ppcre:regex-replace-all "\\*" pattern ".*")
+           hostname)))
 
 (defun webapp-hostnames (&optional (app (current-webapp)))
   "Returns the hostnames this application will serve requests for."

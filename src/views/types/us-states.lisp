@@ -82,11 +82,13 @@ state."
 			  :welcome-name welcome-name
 			  :max-length (input-presentation-max-length presentation)
 			  :input-id (us-state-presentation-input-id presentation)
-			  :choices-id (us-state-presentation-choices-id presentation))
+			  :choices-id (us-state-presentation-choices-id presentation)
+			  :disabledp (form-view-field-disabled-p field obj))
 	  (render-dropdown (attributize-view-field-name field-info) selections
 			   :selected-value default-value
 			   :welcome-name welcome-name
-			   :id (us-state-presentation-input-id presentation))))))
+			   :id (us-state-presentation-input-id presentation)
+			   :disabledp (form-view-field-disabled-p field obj))))))
 
 (defclass us-state-parser (parser)
   ((error-message :initform "a valid US state"))

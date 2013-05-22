@@ -6,6 +6,6 @@
 4. Create appropriate tables in the database by evaluating the
    following expressions:
    (in-package :weblocks-clsql-demo)
-   (clsql-sys:create-view-from-class 'employee :database *default-store*)
-   (clsql-sys:create-view-from-class 'company :database *default-store*)
-   (clsql-sys:create-view-from-class 'address :database *default-store*)
+   (clsql:create-view-from-class 'employee :database *default-store*)
+   (clsql:create-view-from-class 'company :database *default-store*)
+   (clsql:create-view-from-class 'address :database *default-store*)

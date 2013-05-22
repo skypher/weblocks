@@ -3,7 +3,7 @@
 
 (export '(*menu-empty-message* render-menu))
 
-(defparameter *menu-empty-message* "No menu entires."
+(defparameter *menu-empty-message* "No menu entries."
   "A default message shown by 'render-menu' if no entries are
   available.")
 
@@ -11,7 +11,8 @@
                     ordered-list-p (empty-message *menu-empty-message*)
                     disabled-pane-names)
   "Renders a menu snippet based on given options and selected
-option. An option may be a dotted pair of a label and URL to link to,
+option. An option may be a dotted pair of a label and \(URL to link to
+or function to call on the item's label and selection state \(a boolean)),
 or a name (which will be converted to a label and a URL via
 humanize-name and attributize-name, respectively). The selected-pane
 will be compared to an option's URL via equalp. If the selected

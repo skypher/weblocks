@@ -43,4 +43,5 @@
 				field view widget obj args))
 		     (textarea-presentation-rows presentation)  
 		     (textarea-presentation-cols presentation)
+		     :disabledp (form-view-field-disabled-p field obj)
 		     :id *presentation-dom-id*)))

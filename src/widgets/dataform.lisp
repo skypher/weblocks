@@ -25,9 +25,10 @@
 	     widget. Normally :data when rendering via 'render-data'
 	     and :form when rendering via 'render-form'.")
    (validation-errors :initform nil
-		      :documentation "An association list of slot
-		      names and validation errors that occurred during
-		      the previous form submission.")
+		      :documentation "An association list of field
+		      objects and validation errors that occurred during
+		      the previous form submission.  A car of 'nil'
+		      means the error applies to the entire form.")
    (intermediate-form-values :initform nil
 			     :documentation "If user enters form
 			     values and validation fails, these values
@@ -111,7 +112,7 @@ customize form behavior.")
 						(setf (slot-value obj 'validation-errors) errors)
 						(setf (slot-value obj 'intermediate-form-values)
 						      (apply #'request-parameters-for-object-view
-							     view args))))))
+							     view data args))))))
 				      (when cancel
 					(safe-funcall (dataform-on-cancel obj) obj)
 					(setf break-out t))

@@ -17,7 +17,7 @@
   (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
          (validation-error (assoc attribute-slot-name validation-errors
                                   :test #'string-equal
-                                  :key #'view-field-slot-name))
+                                  :key (lambda (f) (and f (view-field-slot-name f)))))
          (field-class (concatenate 'string attribute-slot-name
                                    (when validation-error " item-not-validated"))))
     (with-html
@@ -26,8 +26,8 @@
                   (:span :class "slot-name"
                          (:span :class "extra"
                                 (str (view-field-label field)) ":&nbsp;"
-                                (when (form-view-field-required-p field)
-                                  (htm (:em :class "required-slot" "(required)&nbsp;"))))))
+                                (render-form-view-field-required-indicator
+				  field view widget presentation value obj))))
            (apply #'render-view-field-value
                   value presentation
                   field view widget obj
@@ -50,7 +50,8 @@
                                           (mapcar (compose (curry-after #'intern :keyword) #'string-upcase)
                                                   (if intermediate-value-p
                                                       intermediate-value
-                                                      value))))))
+                                                      value)))
+		       :disabledp (form-view-field-disabled-p field obj))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args
@@ -62,14 +63,16 @@
                   (with-html
                     (:span value))) value)))
 
-(defun render-checkboxes (name selections &key id (class "checkbox") selected-values)
+(defun render-checkboxes (name selections &key id (class "checkbox") selected-values disabledp)
+  "If `disabledp' is true, all the checkboxes are disabled."
   (dolist (val selections)
     (let ((checked-p (if (find (cdr val) selected-values :test #'equal) "checked" nil))
           (label (if (consp val) (car val) val))
           (value (if (consp val) (cdr val) val)))
     (with-html
       (:input :name (attributize-name name) :type "checkbox" :id id :class class
-	      :checked checked-p :value value (str (humanize-name label)))))))
+	      :checked checked-p :disabled (and disabledp "disabled")
+	      :value value (str (humanize-name label)))))))
 
 (defmethod request-parameter-for-presentation (name (presentation checkboxes-presentation))
   (declare (ignore presentation))

@@ -34,5 +34,6 @@
 					 intermediate-value
 					 (when value
 					   (presentation-choices-default-value-key value)))
+		     :disabledp (form-view-field-disabled-p field obj)
 		     :id *presentation-dom-id*)))
 

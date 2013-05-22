@@ -15,7 +15,7 @@
                                 (attributize-name (view-field-slot-name field))))
 	 (validation-error (assoc attribute-slot-name (remove-if (lambda (item) (null (car item))) validation-errors)
 				  :test #'string-equal
-				  :key #'view-field-slot-name))
+				  :key (lambda (f) (and f (view-field-slot-name f)))))
 	 (field-class (concatenate 'string attribute-slot-name
 				   (when validation-error " item-not-validated"))))
     (with-html
@@ -24,8 +24,8 @@
 		  (:span :class "slot-name"
 			 (:span :class "extra"
 				(str (view-field-label field)) ":&nbsp;"
-                                (when (form-view-field-required-p field)
-                                  (htm (:em :class "required-slot" "(required)&nbsp;"))))))
+				(render-form-view-field-required-indicator
+				  field view widget presentation value obj))))
 	   (apply #'render-view-field-value
 		  value presentation
 		  field view widget obj
@@ -51,5 +51,6 @@
 					      intermediate-value
 					      (when value
 						(attributize-name value)))
+			  :disabledp (form-view-field-disabled-p field obj)
 			  :id *presentation-dom-id*)))
 

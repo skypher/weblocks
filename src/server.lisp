@@ -11,7 +11,8 @@
           create-regex-dispatcher 
           create-prefix-dispatcher 
           create-static-file-dispatcher-and-handler 
-          create-folder-dispatcher-and-handler))
+          create-folder-dispatcher-and-handler 
+          active-sessions))
 
 (defmacro add-print-object-for-function (function (stream-var) &body body)
   `(let ((function ,function))

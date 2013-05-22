@@ -89,8 +89,9 @@ name of the field to inform users that the field is required.")
 	      :accessor form-view-satisfies
 	      :documentation "A function or a list of functions that
 perform validation on the entire view (possibly combining multiple fields).
-The function should expect keyword arguments corresponding to view slot
-names, each keyword argument corresponds to one of the parsed values.
+The first argument to the function is the object, still in its previous
+state, i.e. the new form values have not been stored in it yet.  The
+second argument is an alist of slot names and parsed values from the form.
 The function should either return t if the form validates properly, or
 values nil error-message if it does not.")
   (instructions :type (or string null)
@@ -155,8 +156,22 @@ before relations can be updated."))
                        presented to the user when the field is
                        required and missing from the input
                        data. Otherwise, the standard required error
-                       message is presented."))
+                       message is presented.")
+   (disabledp :initform nil
+	      :initarg :disabledp
+	      :accessor form-view-field-raw-disabled-p
+	      :documentation "A predicate that determines whether the
+	      field is disabled.  This can be either a constant
+	      't' or 'nil', or a function of one argument, the object
+	      to which the view applies."))
   (:documentation "A field class of the form view."))
+
+(defgeneric form-view-field-disabled-p (field obj)
+  (:method ((field form-view-field) obj)
+    (let ((raw-value (form-view-field-raw-disabled-p field)))
+      (if (functionp raw-value)
+	  (funcall raw-value obj)
+	raw-value))))
 
 (defun get-required-error-msg (form-view-field)
   "Returns an error message for a missing required field."
@@ -363,6 +378,19 @@ form-view-buttons for a given view.")
                         (:span :class "validation-error-heading" "Error:&nbsp;")
                         (str (format nil "~A" (cdr validation-error)))))))))))
 
+(defmethod render-form-view-field-required-indicator ((field form-view-field) (view form-view)
+						      widget presentation value obj)
+  (let ((required-indicator (form-view-field-required-indicator field)))
+    (when (and (form-view-field-required-p field)
+	       (not (form-view-field-disabled-p field obj))
+	       required-indicator)
+      (with-html
+	(:em :class "required-slot"
+	     (if (eq t required-indicator)
+		 (str *default-required-indicator*)
+		 (str required-indicator))
+	     (str "&nbsp;"))))))
+
 (defmethod render-view-field-value (value (presentation input-presentation)
 				    field view widget obj
 				    &rest args &key intermediate-values field-info &allow-other-keys)
@@ -374,6 +402,7 @@ form-view-buttons for a given view.")
 	(form-field-intermediate-value field intermediate-values)
       (with-html
 	  (:input :type "text" :name attributized-slot-name
+		  :disabled (and (form-view-field-disabled-p field obj) "disabled")
 		  :value (if intermediate-value-p
 			     intermediate-value
 			     (apply #'print-view-field-value value presentation field view widget obj args))

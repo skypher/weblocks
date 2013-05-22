@@ -7,7 +7,7 @@
   (defun symbol-to-keyword (symbol)
     (intern (symbol-name symbol) keyword-package)))
 
-(defun run-view-validators (validators fields-values)
+(defun run-view-validators (validators object fields-values)
   "Applies all of the functions in the 'validators' list to
 the 'fields-values' arglist. Returns either t if all functions
 returned t, or nil and an association list of nils and error
@@ -16,7 +16,7 @@ messages if any of the functions failed."
 	errors)
     (dolist (validator-function validators)
       (multiple-value-bind (validatesp error)
-	  (apply validator-function fields-values)
+	  (funcall validator-function object fields-values)
 	(unless validatesp
 	  (setf validates nil)
 	  (push-end (cons nil error) errors))))
@@ -49,8 +49,7 @@ parsed values.")
 	  (multiple-value-bind (validatesp error)
 	      (let ((field (field-info-field field-info))
 		    (object (field-info-object field-info)))
-		(push parsed-value fields-values)
-		(push (symbol-to-keyword (view-field-slot-name field)) fields-values)
+		(push (cons (view-field-slot-name field) parsed-value) fields-values)
 		(validate-form-view-field (view-field-slot-name field)
 					  object field view parsed-value))
 	    (unless validatesp
@@ -60,7 +59,7 @@ parsed values.")
       ;; successfully validated.
       (if validates
 	  (if (form-view-satisfies view)
-	      (run-view-validators (form-view-satisfies view) fields-values)
+	      (run-view-validators (form-view-satisfies view) object fields-values)
 	      t)
 	  (values nil errors)))))
 

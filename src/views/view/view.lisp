@@ -82,7 +82,9 @@
 	  :accessor view-field-hide-p
 	  :documentation "A predicate that determines whether the
 	  field is to be hidden from the user. If set to true, the
-	  field will not be rendered.")
+	  field will not be rendered. This can be either a constant
+	  't' or 'nil', or a function of one argument, the object
+	  to which the view applies.")
    (prefix-fn :initform nil
 	      :initarg :prefix-fn
 	      :accessor view-field-prefix-fn

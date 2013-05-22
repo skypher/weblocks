@@ -55,7 +55,8 @@
 		     (if intermediate-value-p
 			 intermediate-value
 			 value)
-		     :id *presentation-dom-id*)))
+		     :id *presentation-dom-id*
+		     :disabledp (form-view-field-disabled-p field obj))))
 
 ;;; Parser
 (defclass predicate-parser (parser)

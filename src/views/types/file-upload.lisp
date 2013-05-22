@@ -11,9 +11,10 @@
 
 (defmethod render-view-field-value (value (presentation file-upload-presentation)
 				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+				    &key &allow-other-keys)
   (with-html
-    (:input :type "file" :name (attributize-name (view-field-slot-name field)))))
+    (:input :type "file" :name (attributize-name (view-field-slot-name field))
+	    :disabled (and (form-view-field-disabled-p field obj) "disabled"))))
 
 ;;; file upload parser
 (defclass file-upload-parser (parser)

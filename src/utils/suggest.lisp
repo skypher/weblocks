@@ -11,7 +11,7 @@
 		       (choices-id (gensym))
 		       (format-fn #'format-suggest-list)
 		       (max-length *max-raw-input-length*)
-		       welcome-name)
+		       welcome-name disabledp)
   "Renders a block that provides functionality similar to google-suggest.
 
 'input-name' - the 'name' attribute of the input box.
@@ -44,14 +44,14 @@ the client. Accepts a list of results.
 	     (not (ajax-request-p)))
 	(progn
 	  (render-dropdown a-input-name resultset :id input-id :selected-value default-value
-			   :welcome-name welcome-name)
+			   :welcome-name welcome-name :disabledp disabledp)
 	  (with-javascript (if default-value
 			       "replaceDropdownWithSuggest(~A, '~A', '~A', '~A', '~A');"
 			       "replaceDropdownWithSuggest(~A, '~A', '~A', '~A');")
 	    (if welcome-name "true" "false") input-id a-input-name choices-id (car default-value)))
 	(with-html
 	  (:input :type "text" :id input-id :name a-input-name :class "suggest" :value (car default-value)
-		  :maxlength max-length)
+		  :maxlength max-length :disabled (and disabledp "disabled"))
 	  (:div :id choices-id :class "suggest" :style "display: none" "")
 	  (with-javascript "declareSuggest('~A', '~A', ~A, '~A');"
 	    input-id choices-id

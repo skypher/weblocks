@@ -46,16 +46,17 @@ Specialize this function to parse given objects differently.")
 				  (apply #'parse-view-field-value (form-view-field-parser field)
 					 field-value obj view field
 					 :field-info field-info args)
-				(if parsedp
-				    (if (not presentp)
-					(if (form-view-field-required-p field)
-					    (push (cons field (get-required-error-msg field))
-						  errors)
-					    (push (cons field-info nil) results))
-					(push (cons field-info parsed-value) results))
-				    (push (cons field (parser-error-message
-						       (form-view-field-parser field)))
-					  errors))))))
+				(unless (form-view-field-disabled-p field obj)
+				  (if parsedp
+				      (if (not presentp)
+					  (if (form-view-field-required-p field)
+					      (push (cons field (get-required-error-msg field))
+						    errors)
+					      (push (cons field-info nil) results))
+					  (push (cons field-info parsed-value) results))
+				      (push (cons field (parser-error-message
+							 (form-view-field-parser field)))
+					    errors)))))))
 			view obj args)
 		 (if errors
 		     (values nil errors)
@@ -131,7 +132,7 @@ Specialize this function to parse given objects differently.")
 		(values nil errors)))
 	    (values nil results))))))
 
-(defun request-parameters-for-object-view (view &rest args)
+(defun request-parameters-for-object-view (view obj &rest args)
   "Returns request parameters taking into account a particular view of
 an object. This function is necessary because in certain cases web
 browsers don't send some parameters (e.g. unchecked checkboxes). This
@@ -142,14 +143,14 @@ request.
 'obj' - object to take account of."
   (apply #'map-view-fields
 	 (lambda (field-info)
-	   (let ((field (field-info-field field-info)))
-	     (when (typep (view-field-presentation field) 'form-presentation)
-	       (let* ((slot-name (view-field-slot-name field))
-		      (slot-key (attributize-view-field-name field-info))
+	   (let* ((field (field-info-field field-info)))
+	     (when (and (typep (view-field-presentation field) 'form-presentation)
+			(not (form-view-field-disabled-p field obj)))
+	       (let* ((slot-key (attributize-view-field-name field-info))
 		      (request-slot-value (request-parameter-for-presentation
 					   slot-key (view-field-presentation field))))
 		 (cons field request-slot-value)))))
-	 (find-view view) nil args))
+	 (find-view view) obj args))
 
 (defgeneric request-parameter-for-presentation (name presentation)
   (:documentation "Answer HTTP request parameter NAME, but

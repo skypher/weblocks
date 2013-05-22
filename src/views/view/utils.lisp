@@ -90,24 +90,24 @@ result list, instead calling PROC on each resulting `field-info'."
 		    (let ((vfield-info (make-field-info
 					:field vfield :object obj
 					:parent-info mixin-container)))
-		      (etypecase vfield
-			(inline-view-field
-			   (when (or include-invisible-p
-				     (not (let ((hide-p-value (view-field-hide-p vfield)))
-					    (if (functionp hide-p-value)
-						(funcall hide-p-value obj)
-						hide-p-value))))
-			     (funcall proc vfield-info)))
-			(mixin-view-field
-			   (if expand-mixins
-			       (map-level
-				(and obj
-				     (or (obtain-view-field-value vfield obj)
-					 (aif (mixin-view-field-init-form vfield)
-                                           (funcall it)
-                                           (error "Slot for mixin field ~S has neither value nor initform!" vfield))))
-				(mixin-view-field-view vfield) vfield-info)
-			       (funcall proc vfield-info)))))
+		      (when (or include-invisible-p
+				(not (let ((hide-p-value (view-field-hide-p vfield)))
+				       (if (functionp hide-p-value)
+					   (funcall hide-p-value obj)
+					   hide-p-value))))
+			(etypecase vfield
+			  (inline-view-field
+			     (funcall proc vfield-info))
+			  (mixin-view-field
+			     (if expand-mixins
+				 (map-level
+				  (and obj
+				       (or (obtain-view-field-value vfield obj)
+					   (aif (mixin-view-field-init-form vfield)
+					     (funcall it)
+					     (error "Slot for mixin field ~S has neither value nor initform!" vfield))))
+				  (mixin-view-field-view vfield) vfield-info)
+				 (funcall proc vfield-info))))))
 		    ;; avoid duplicates
 		    (remhash (view-field-slot-name vfield) vfields)))
 		view))))
