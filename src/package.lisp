@@ -19,6 +19,7 @@
     (:shadowing-import-from :json #:prototype)
     (:shadowing-import-from :weblocks-util #:find-all)
     (:shadow #:redirect #:reset-sessions #:errors #:create-regex-dispatcher #:create-prefix-dispatcher #:create-folder-dispatcher-and-handler #:create-static-file-dispatcher-and-handler)
+    (:export #:defstore #:asdf-system-directory)
     (:documentation
       "Weblocks is a Common Lisp framework that eases the pain of web
       application development. It achieves its goals by standardizing on
