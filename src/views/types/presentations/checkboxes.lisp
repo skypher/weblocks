@@ -63,16 +63,28 @@
                   (with-html
                     (:span value))) value)))
 
+(defun render-checkbox-wt (&key name id class checked-p value content disabled-p)
+  (with-html-to-string
+    (:input :name name :type "checkbox" :id id :class class
+     :checked checked-p :disabled (if disabled-p "disabled")
+     :value value (str content))))
+
 (defun render-checkboxes (name selections &key id (class "checkbox") selected-values disabledp)
   "If `disabledp' is true, all the checkboxes are disabled."
   (dolist (val selections)
     (let ((checked-p (if (find (cdr val) selected-values :test #'equal) "checked" nil))
           (label (if (consp val) (car val) val))
           (value (if (consp val) (cdr val) val)))
-    (with-html
-      (:input :name (attributize-name name) :type "checkbox" :id id :class class
-	      :checked checked-p :disabled (and disabledp "disabled")
-	      :value value (str (humanize-name label)))))))
+      (write-string 
+        (render-checkbox-wt 
+          :name (attributize-name name)
+          :id id
+          :class class
+          :checked-p checked-p
+          :value value
+          :content (humanize-name label)
+          :disabled-p disabledp)
+        *weblocks-output-stream*))))
 
 (defmethod request-parameter-for-presentation (name (presentation checkboxes-presentation))
   (declare (ignore presentation))
