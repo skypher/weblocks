@@ -6,7 +6,7 @@
 
 (without-package-variance-warnings
   (defpackage #:weblocks-test
-    (:use :cl :weblocks :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+    (:use :cl :weblocks :weblocks-stores :weblocks-util :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
           :anaphora :f-underscore)
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function #:standard-class
@@ -115,8 +115,8 @@ DESCRIBE-ing them."
   :autostart nil)
 
 ; We'll use memory store for testing
-(defstore *not-searchable-store* :memory)
-(defstore *test-store* :memory)
+(weblocks-stores:defstore *not-searchable-store* :memory)
+(weblocks-stores:defstore *test-store* :memory)
 
 (defmacro deftest-html (name form value)
   "A helper macro for creating html test cases. The macro writes
@@ -251,7 +251,7 @@ webapp in my context."
 			(funcall thunk))
 	(setf (symbol-function 'weblocks::make-action) make-action-orig)
 	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
-	(weblocks::close-stores)))))
+	(weblocks-stores::close-stores)))))
 
 (defun call-with-request (&rest args)
   "Helper for `with-request''s expansion."

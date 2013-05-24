@@ -1,5 +1,5 @@
 
-(in-package :weblocks)
+(in-package :weblocks-util)
 
 (wexport '(safe-subseq
            alist->plist
@@ -10,6 +10,9 @@
            list-starts-with
            stable-set-difference
            safe-getf
+           list->assoc
+           ninsert
+           find-all
 	   remove-keyword-parameter
            remove-keyword-parameters)
 	 '(t util))

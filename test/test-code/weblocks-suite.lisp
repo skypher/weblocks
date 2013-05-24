@@ -22,7 +22,7 @@
 	 (lambda (&rest args)
 	   (declare (ignore args))))
    (weblocks::open-stores))
-  (:teardown (weblocks::close-stores)))
+  (:teardown (weblocks-stores::close-stores)))
 
 ;;; A suite that sets up a session environment
 (deftestsuite session-suite ()

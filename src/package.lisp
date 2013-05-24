@@ -6,7 +6,9 @@
 (without-package-variance-warnings
   (defpackage #:weblocks
     (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :optima :cont :parenscript
-          :anaphora :f-underscore :trivial-timeout)
+          :anaphora :f-underscore :trivial-timeout 
+          :weblocks-stores 
+          :weblocks-util)
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function
                             #:standard-class #:typep #:subtypep #:standard-method)
@@ -15,7 +17,8 @@
     (:shadowing-import-from :optima #:match)
     (:shadowing-import-from :metabang.utilities #:with-array #:size #:bind)
     (:shadowing-import-from :json #:prototype)
-    (:shadow #:redirect #:reset-sessions #:errors #:find-all #:create-regex-dispatcher #:create-prefix-dispatcher #:create-folder-dispatcher-and-handler #:create-static-file-dispatcher-and-handler)
+    (:shadowing-import-from :weblocks-util #:find-all)
+    (:shadow #:redirect #:reset-sessions #:errors #:create-regex-dispatcher #:create-prefix-dispatcher #:create-folder-dispatcher-and-handler #:create-static-file-dispatcher-and-handler)
     (:documentation
       "Weblocks is a Common Lisp framework that eases the pain of web
       application development. It achieves its goals by standardizing on
@@ -27,8 +30,4 @@
 
   (defpackage #:weblocks-cont
     (:documentation "Operators for continuation-based web development
-    with Weblocks."))
-
-  (defpackage #:weblocks-util
-    (:documentation "General Lisp utilities traditionally exported
     with Weblocks.")))

@@ -1,5 +1,5 @@
 
-(in-package :weblocks)
+(in-package :weblocks-util)
 
 (wexport '(gen-id
 	   safe-apply
@@ -9,12 +9,19 @@
 	   public-file-relative-path
            public-files-relative-paths
            symbol-status
-           ninsert
            asdf-system-directory
            hash-keys
 	   append-custom-fields
 	   function-designator-p
-           defrender)
+           defrender 
+           find-own-symbol 
+           relative-path 
+           read-from-file 
+           write-to-file
+           slurp-file
+           with-file-write
+           merge-files-with-newline
+           gzip-file)
 	 '(t util))
 
 (defun gen-id (&optional (prefix "dom"))

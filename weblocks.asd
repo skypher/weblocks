@@ -8,12 +8,13 @@
 
 (defsystem weblocks
   :name "weblocks"
-  :version "0.8.12"
+  :version "0.9.0"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
-  :depends-on (:closer-mop
+  :depends-on (:weblocks-stores
+               :closer-mop
                :hunchentoot
                :puri
                :cl-json
@@ -81,7 +82,7 @@
 			:depends-on (utils "weblocks" "page-template" "debug-mode"
 					   "actions" "request-hooks" "application"
 					   "request" "dependencies" "uri-tokens"
-                                           "error-handler" store))
+                                           "error-handler"))
 		 (:module linguistic
 			  :components ((:file "grammar"))
 			  :depends-on ("weblocks" utils))
@@ -144,10 +145,6 @@
 						      :components ((:file "common"))))
 					:depends-on (view formview dataview)))
 			  :depends-on ("weblocks" "dependencies" utils))
-		 (:module store
-			  :components ((:file "store-api")
-				       (:file "store-utils"))
-			  :depends-on (weblocks utils))
 		 (:module widgets
 			  :components ((:module widget
 						:components ((:file "widget-mop")
@@ -214,7 +211,7 @@
 				       (:file "breadcrumbs"
 					      :depends-on ("navigation")))
 			  :depends-on (views utils "dependencies" "actions" "server" "request"
-						"request-hooks" "dom-object" linguistic store))
+						"request-hooks" "dom-object" linguistic))
 		 (:module control-flow
 			  :components ((:file "call-answer")
 				       (:file "dialog"
@@ -225,13 +222,13 @@
                  (:file "acceptor"
                         :depends-on ("weblocks"))
 		 (:file "server"
-			:depends-on ("weblocks" "acceptor" "debug-mode" utils store))
+			:depends-on ("weblocks" "acceptor" "debug-mode" utils))
 		 (:file "request"
 			:depends-on ("weblocks" "request-hooks" "actions"))
 		 (:file "application-mop"
 			:depends-on ("weblocks" "server"))
 		 (:file "application"
-			:depends-on ("weblocks" "application-mop" store))
+			:depends-on ("weblocks" "application-mop"))
 		 (:file "default-application"
 			:depends-on ("server" "weblocks" utils "request-handler")))))
   :in-order-to ((test-op (load-op "weblocks-test"))

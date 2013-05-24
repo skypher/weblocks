@@ -6,12 +6,12 @@
 
 (defsystem weblocks-test
   :name "weblocks-test"
-  :version "0.0.2"
+  :version "0.1.0"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
-  :depends-on (:weblocks :weblocks-store-test :lift :closer-mop :metatilities
+  :depends-on (:weblocks :weblocks-stores :weblocks-store-test :lift :closer-mop :metatilities
 	       :anaphora :f-underscore)
   :components ((:module test
 		:components (
@@ -59,9 +59,6 @@
 			  :depends-on ("test-code"))
 		 (:module fixtures
 			  :components ((:file "shared"))
-			  :depends-on ("test-code"))
-		 (:module store
-			  :components ((:file "store-utils"))
 			  :depends-on ("test-code"))
 		 (:module snippets
 			  :components ((:file "suggest")
