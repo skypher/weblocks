@@ -86,7 +86,9 @@
 
 (defun post-parameter->list (param)
   (loop for x in (hunchentoot:post-parameters*)
-        when (equalp (car x) param)
+        when (or 
+               (equalp (car x) param)
+               (equalp (car x) (format nil "~A[]" param)))
         collect (cdr x)))
 
 (defmethod parse-view-field-value ((parser checkboxes-parser) value obj
