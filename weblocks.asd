@@ -8,12 +8,13 @@
 
 (defsystem weblocks
   :name "weblocks"
-  :version "0.9.0"
+  :version "0.9.1"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
-  :depends-on (:weblocks-stores
+  :depends-on (:weblocks-util
+               :weblocks-stores
                :closer-mop
                :hunchentoot
                :puri
