@@ -302,6 +302,19 @@ form-view-buttons for a given view.")
 	(:span :class "action" "Modifying:&nbsp;")
 	(:span :class "object" "~A"))))
 
+
+(defun form-view-body-wt (&key caption class-name validation-summary fields-prefix fields-suffix form-view-buttons content)
+  (let ((*weblocks-output-stream* (make-string-output-stream)))
+    (with-html
+      (when caption
+        (htm (:h1 (fmt caption class-name))))
+      (str validation-summary)
+      (str fields-prefix)
+      (:ul (str content))
+      (str fields-suffix)
+      (str form-view-buttons)
+      (get-output-stream-string *weblocks-output-stream*))))
+
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view form-view) obj widget body-fn &rest args &key
 			     (method (form-view-default-method view))
@@ -317,17 +330,14 @@ form-view-buttons for a given view.")
     (when (>= (count-view-fields view)
 	      (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
-    (let ((form-body
-	   (let ((*weblocks-output-stream* (make-string-output-stream)))
-	     (with-html
-               (awhen (view-caption view)
-                 (htm (:h1 (fmt (view-caption view) (humanize-name (object-class-name obj))))))
-	       (render-validation-summary view obj widget validation-errors)
-	       (safe-apply fields-prefix-fn view obj args)
-	       (:ul (apply body-fn view obj args))
-	       (safe-apply fields-suffix-fn view obj args)
-	       (apply #'render-form-view-buttons view obj widget args)
-	       (get-output-stream-string *weblocks-output-stream*)))))
+    (let ((form-body (form-view-body-wt :caption (view-caption view) 
+                                        :class-name (humanize-name (object-class-name obj))
+                                        :validation-summary (capture-weblocks-output 
+                                                              (render-validation-summary view obj widget validation-errors))
+                                        :fields-prefix (capture-weblocks-output (safe-apply fields-prefix-fn view obj args))
+                                        :fields-suffix (capture-weblocks-output (safe-apply fields-suffix-fn view obj args))
+                                        :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
+                                        :content (capture-weblocks-output (apply body-fn view obj args)))))
       (with-html-form (method action
 			      :id (when (form-view-focus-p view) form-id)
 			      :class header-class

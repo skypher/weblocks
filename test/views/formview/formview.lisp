@@ -146,13 +146,14 @@ $('id-123').focusFirstElement();
 
 ;;; Test form view render-view-field
 (deftest-html render-view-field-1
-    (render-view-field (make-instance 'form-view-field
+    (let ((weblocks::*presentation-dom-id* "id-123"))
+      (render-view-field (make-instance 'form-view-field
 				      :slot-name 'name
 				      :requiredp t)
 		       (make-instance 'form-view)
 		       nil
 		       (make-instance 'input-presentation)
-		       "Joe" *joe*)
+		       "Joe" *joe*))
   (:li :class "name"
        (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
@@ -161,34 +162,36 @@ $('id-123').focusFirstElement();
        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 (deftest-html render-view-field-2
-    (let ((field (make-instance 'form-view-field
-				:slot-name 'name
-				:requiredp t)))
-      (render-view-field field
-			 (make-instance 'form-view)
-			 nil
-			 (make-instance 'input-presentation)
-			 "Joe" *joe*
-			 :validation-errors (list (cons field "Some Error!"))))
-  (:li :class "name item-not-validated"
-       (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;"))))
-       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")
-       (:p :class "validation-error"
-           (:em (:span :class "validation-error-heading" "Error:&nbsp;")
-                "Some Error!"))))
+              (let ((field (make-instance 'form-view-field
+                                          :slot-name 'name
+                                          :requiredp t))
+                    (weblocks::*presentation-dom-id* "id-123"))
+                (render-view-field field
+                                   (make-instance 'form-view)
+                                   nil
+                                   (make-instance 'input-presentation)
+                                   "Joe" *joe*
+                                   :validation-errors (list (cons field "Some Error!"))))
+              (:li :class "name item-not-validated"
+               (:label :class "input" :for "id-123"
+                (:span :class "slot-name"
+                 (:span :class "extra" "Name:&nbsp;"
+                  (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")
+               (:p :class "validation-error"
+                (:em (:span :class "validation-error-heading" "Error:&nbsp;")
+                 "Some Error!"))))
 
 (deftest-html render-view-field-3
-    (render-view-field (make-instance 'form-view-field
+    (let ((weblocks::*presentation-dom-id* "id-123"))
+      (render-view-field (make-instance 'form-view-field
 				      :slot-name 'name
 				      :requiredp t
 				      :required-indicator nil)
 		       (make-instance 'form-view)
 		       nil
 		       (make-instance 'input-presentation)
-		       "Joe" *joe*)
+		       "Joe" *joe*))
   (:li :class "name"
        (:label :class "input" :for "id-123"
 	       (:span :class "slot-name"
@@ -196,36 +199,38 @@ $('id-123').focusFirstElement();
        (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 (deftest-html render-view-field-4
-    (render-view-field (make-instance 'form-view-field
-				      :slot-name 'name
-				      :requiredp t
-				      :required-indicator t)
-		       (make-instance 'form-view)
-		       nil
-		       (make-instance 'input-presentation)
-		       "Joe" *joe*)
-  (:li :class "name"
-       (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;"))))
-       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
+              (let ((weblocks::*presentation-dom-id* "id-123"))
+                (render-view-field (make-instance 'form-view-field
+                                                  :slot-name 'name
+                                                  :requiredp t
+                                                  :required-indicator t)
+                                   (make-instance 'form-view)
+                                   nil
+                                   (make-instance 'input-presentation)
+                                   "Joe" *joe*))
+              (:li :class "name"
+               (:label :class "input" :for "id-123"
+                (:span :class "slot-name"
+                 (:span :class "extra" "Name:&nbsp;"
+                  (:em :class "required-slot" "(required)&nbsp;"))))
+               (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 (deftest-html render-view-field-5
-    (render-view-field (make-instance 'form-view-field
-				      :slot-name 'name
-				      :requiredp t
-				      :required-indicator "Required")
-		       (make-instance 'form-view)
-		       nil
-		       (make-instance 'input-presentation)
-		       "Joe" *joe*)
-  (:li :class "name"
-       (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "Required&nbsp;"))))
-       (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
+              (let ((weblocks::*presentation-dom-id* "id-123"))
+                (render-view-field (make-instance 'form-view-field
+                                                  :slot-name 'name
+                                                  :requiredp t
+                                                  :required-indicator "Required")
+                                   (make-instance 'form-view)
+                                   nil
+                                   (make-instance 'input-presentation)
+                                   "Joe" *joe*))
+              (:li :class "name"
+               (:label :class "input" :for "id-123"
+                (:span :class "slot-name"
+                 (:span :class "extra" "Name:&nbsp;"
+                  (:em :class "required-slot" "Required&nbsp;"))))
+               (:input :type "text" :name "name" :value "Joe" :maxlength "40" :id "id-123")))
 
 ; Bug: error in checkbox render-view-field on view validation error (when using "satisfies")
 (deftest render-view-field-value-6 
@@ -275,9 +280,10 @@ $('id-123').focusFirstElement();
 ;;; Test form view render-object-view
 (deftest-html form-view-render-object-view-1
     (with-request :get nil
-      (render-object-view *joe* '(form employee)
-			  :action (lambda (&rest args)
-				    (declare (ignore args)))))
+      (let ((weblocks::*presentation-dom-id* "id-123"))
+        (render-object-view *joe* '(form employee)
+                            :action (lambda (&rest args)
+                                      (declare (ignore args))))))
   #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label :class "input" :for "id-123"
@@ -293,11 +299,12 @@ $('id-123').focusFirstElement();
 
 (deftest-html form-view-render-object-view-2
     (with-request :get nil
-      (render-object-view *joe* (defview () (:type form :inherit-from '(form employee)
+      (let ((weblocks::*presentation-dom-id* "id-123"))
+        (render-object-view *joe* (defview () (:type form :inherit-from '(form employee)
 					     :use-ajax-p nil
 					     :enctype "fooenc"))
 			  :action (lambda (&rest args)
-				    (declare (ignore args)))))
+				    (declare (ignore args))))))
   #.(form-header-template "abc123"
      '((:li :class "name"
 	(:label :class "input" :for "id-123"

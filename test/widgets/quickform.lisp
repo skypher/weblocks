@@ -18,7 +18,8 @@
 			:data-class-name 'test-quickform-class-1
 			:satisfies (lambda (&rest args)
 				     (declare (ignore args))
-				     (values nil (list (cons nil "testing")))))))
+				     (values nil (list (cons nil "testing"))))))
+           (weblocks::*presentation-dom-id* "id-123"))
 	(render-widget quickform)
 	;; click submit
 	(do-request `((,weblocks::*action-string* . "abc123")

@@ -78,11 +78,12 @@
 
 ;;; testing gridedit-create-drilldown-widget
 (deftest-html create-drilldown-widget-gridedit-1
-    (with-request :get nil
+    (let ((weblocks::*presentation-dom-id* "id-123"))
+      (with-request :get nil
       (render-widget
        (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee)
-					 *joe*)))
+					 *joe*))))
   (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
@@ -101,12 +102,13 @@
 	   :title-action "Modifying:&nbsp;")))
 
 (deftest-html create-drilldown-widget-gridedit-2
-    (with-request :get nil
+    (let ((weblocks::*presentation-dom-id* "id-123"))
+      (with-request :get nil
       (render-widget
        (dataedit-create-drilldown-widget (make-instance 'gridedit :data (list *joe*)
 								  :data-class 'employee
 								  :drilldown-type :view)
-					 *joe*)))
+					 *joe*))))
   (:div :class "widget data-editor dataform" :id "id-123"
 	#.(data-header-template
 	   "abc123"
@@ -119,7 +121,8 @@
 		   ,(link-action-template "abc124" "Close" :class "close"))))))
 
 (deftest-html create-drilldown-widget-gridedit-3
-    (with-request :get nil
+    (let ((weblocks::*presentation-dom-id* "id-123"))
+      (with-request :get nil
       (render-widget
        (dataedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
@@ -127,7 +130,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Foo"
 					       :requiredp t)))
-	*joe*)))
+	*joe*))))
   (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
@@ -147,7 +150,8 @@
 
 (deftest-html create-drilldown-widget-gridedit-4
     (with-request :get nil
-      (render-widget
+      (let ((weblocks::*presentation-dom-id* "id-123"))
+        (render-widget
        (dataedit-create-drilldown-widget
 	(make-instance 'gridedit :data (list *joe*)
 		       :data-class 'employee
@@ -156,7 +160,7 @@
 		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
 					 (name :label "Bar"
 					       :requiredp t)))
-	*joe*)))
+	*joe*))))
   (:div :class "widget data-editor dataform" :id "id-123"
 	#.(form-header-template
 	   "abc123"
@@ -187,7 +191,8 @@
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
 					   :allow-pagination-p nil
-					   :show-total-items-count-p nil)))
+					   :show-total-items-count-p nil))
+            (weblocks::*presentation-dom-id* "id-123"))
 	;; render datagrid
 	(render-widget-body grid :custom-fields (list (make-instance 'rwbg-1-dummy-field))
 			    :form-id "I1" :input-id "I2" :search-id "I3")
@@ -358,7 +363,8 @@
 					   :allow-searching-p nil
 					   :allow-drilldown-p nil
 					   :allow-pagination-p nil
-					   :show-total-items-count-p nil)))
+					   :show-total-items-count-p nil))
+            (weblocks::*presentation-dom-id* "id-123"))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; click "Delete"
@@ -454,7 +460,8 @@
 					   :forbid-sorting-on '(test)
 					   :allow-searching-p nil
 					   :allow-pagination-p nil
-					   :show-total-items-count-p nil)))
+					   :show-total-items-count-p nil))
+            (weblocks::*presentation-dom-id* "id-123"))
 	;; render datagrid
 	(render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
 	;; Drilldown
@@ -858,7 +865,8 @@
 					   :view (defview () (:type table
 								    :inherit-from '(:scaffold employee))
 						   (test :allow-sorting-p nil
-							 :reader nil)))))
+							 :reader nil))))
+            (weblocks::*presentation-dom-id* "id-123"))
 	;; set items per page
 	(setf (pagination-items-per-page (dataseq-pagination-widget grid)) 1)
 	;; render datagrid
@@ -971,7 +979,8 @@
 				 :allow-searching-p nil
 				 :allow-drilldown-p nil
 				 :allow-pagination-p nil
-				 :show-total-items-count-p nil)))
+				 :show-total-items-count-p nil))
+            (weblocks::*presentation-dom-id* "id-123"))
 	;; render datagrid
 	(render-widget-body grid :custom-fields (list (make-instance 'rwbg-1-dummy-field))
 			    :form-id "I1" :input-id "I2" :search-id "I3")
