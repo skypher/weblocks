@@ -66,21 +66,29 @@
 	      (apply body-fn view obj args)
 	      (safe-apply fields-suffix-fn view obj args))))))
 
+(defun table-view-header-wt (&key caption summary header-content content)
+  (with-html-to-string
+    (:table :summary summary 
+     (when caption
+       (htm (:caption (str caption))))
+     (htm
+       (:thead
+         (str header-content))
+       (:tbody
+         (str content))))))
+
 (defgeneric with-table-view-header (view obj widget header-fn rows-fn &rest args
-					 &key summary &allow-other-keys)
+                                         &key summary &allow-other-keys)
   (:documentation "Table specific header responsible for rendering
-table, thead, and tbody HTML.")
-  (:method ((view table-view) obj widget header-fn rows-fn &rest args
-	    &key summary &allow-other-keys)
-    (with-html
-      (:table :summary (or summary (table-view-default-summary view))
-	      (when (view-caption view)
-		(htm (:caption (str (view-caption view)))))
-	      (htm
-	       (:thead
-		(apply header-fn view (car obj) widget args))
-	       (:tbody
-		(apply rows-fn view obj widget args)))))))
+                   table, thead, and tbody HTML.")
+                   (:method ((view table-view) obj widget header-fn rows-fn &rest args
+                                               &key summary &allow-other-keys)
+                    (write-string 
+                      (table-view-header-wt :caption (view-caption view)
+                                            :summary (or summary (table-view-default-summary view))
+                                            :header-content (capture-weblocks-output (apply header-fn view (car obj) widget args))
+                                            :content (capture-weblocks-output (apply rows-fn view obj widget args)))
+                      *weblocks-output-stream*)))
 
 ;; Table header row
 (defgeneric with-table-view-header-row (view obj widget &rest args)
