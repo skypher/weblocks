@@ -237,6 +237,14 @@ presented to the user."
      (render-button *submit-control-name* :value (humanize-name submit-button-name)
 		    :id submit-id :class submit-class))))
 
+(defun radio-buttons-wt (&key name value checked disabled label id label-class)
+  (with-html-to-string 
+    (:label :id id :class label-class
+     (htm (:input :name name :type "radio" :class "radio"
+           :value value :checked checked
+           :disabled disabled))
+     (:span (str (format nil "~A&nbsp;" label))))))
+
 (defun render-radio-buttons (name selections &key id (class "radio")
                                                   (selected-value nil selected-value-supplied)
 						  disabledp)
@@ -257,14 +265,18 @@ for the value.
                                                     ((eql j 1) " first")
                                                     ((eql j count) " last")
                                                     (t "")))
-     do (with-html
-          (:label :id id :class label-class
-                  (htm (:input :name (attributize-name name) :type "radio" :class "radio"
-                               :value (cdr i) :checked (when (and selected-value-supplied
-                                                                  (equalp (cdr i) selected-value))
-                                                         "checked")
-			       :disabled (and disabledp "disabled")))
-                  (:span (str (format nil "~A&nbsp;" (car i))))))))
+     do (write-string 
+          (radio-buttons-wt 
+            :label-class label-class
+            :id id
+            :name (attributize-name name)
+            :value (cdr i)
+            :checked (when (and selected-value-supplied
+                                (equalp (cdr i) selected-value))
+                       "checked")
+            :disabled (and disabledp "disabled")
+            :label (car i))
+          *weblocks-output-stream*)))
 
 (defun render-close-button (close-action &optional (button-string "(Close)"))
   "Renders a close button. If the user clicks on the close button,
