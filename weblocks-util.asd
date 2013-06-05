@@ -6,7 +6,7 @@
 
 (defsystem weblocks-util
   :name "weblocks-util"
-  :version "0.0.2"
+  :version "0.0.3"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
