@@ -77,6 +77,8 @@
        (:tbody
          (str content))))))
 
+(deftemplate :table-view-header-wt #'table-view-header-wt)
+
 (defgeneric with-table-view-header (view obj widget header-fn rows-fn &rest args
                                          &key summary &allow-other-keys)
   (:documentation "Table specific header responsible for rendering
@@ -84,23 +86,38 @@
                    (:method ((view table-view) obj widget header-fn rows-fn &rest args
                                                &key summary &allow-other-keys)
                     (write-string 
-                      (table-view-header-wt :caption (view-caption view)
-                                            :summary (or summary (table-view-default-summary view))
-                                            :header-content (capture-weblocks-output (apply header-fn view (car obj) widget args))
-                                            :content (capture-weblocks-output (apply rows-fn view obj widget args)))
+                      (render-template-to-string 
+                        :table-view-header-wt 
+                        (list :view view :object obj :widget widget)
+                        :caption (view-caption view)
+                        :summary (or summary (table-view-default-summary view))
+                        :header-content (capture-weblocks-output (apply header-fn view (car obj) widget args))
+                        :content (capture-weblocks-output (apply rows-fn view obj widget args)))
                       *weblocks-output-stream*)))
+
+(defun table-header-row-wt (&key suffix content prefix)
+  (with-html-to-string
+    (str suffix)
+    (:tr (str content))
+    (str prefix)))
+
+(deftemplate :table-header-row-wt #'table-header-row-wt)
 
 ;; Table header row
 (defgeneric with-table-view-header-row (view obj widget &rest args)
   (:documentation
-   "Used by table view to render header rows. This functions calls
-'render-table-view-header-row' to render the header cells. Specialize
-this function to modify HTML around a given header row's cells.")
-  (:method ((view table-view) obj widget &rest args)
-    (safe-apply (table-view-header-row-prefix-fn view) view obj args)
-    (with-html
-      (:tr (apply #'render-table-view-header-row view obj widget args)))
-    (safe-apply (table-view-header-row-suffix-fn view) view obj args)))
+    "Used by table view to render header rows. This functions calls
+     'render-table-view-header-row' to render the header cells. Specialize
+     this function to modify HTML around a given header row's cells.")
+     (:method ((view table-view) obj widget &rest args)
+      (write-string 
+        (render-template-to-string 
+          :table-header-row-wt 
+          (list :view view :object obj :widget widget)
+          :suffix (capture-weblocks-output (safe-apply (table-view-header-row-prefix-fn view) view obj args))
+          :content (capture-weblocks-output (apply #'render-table-view-header-row view obj widget args))
+          :prefix (capture-weblocks-output (safe-apply (table-view-header-row-suffix-fn view) view obj args)))
+        *weblocks-output-stream*)))
 
 (defgeneric render-table-view-header-row (view obj widget &rest args)
   (:documentation
@@ -120,23 +137,27 @@ rendering.")
 		      args)))
 	   view obj args)))
 
+(defun table-view-field-header-wt (&key row-class label)
+  (with-html-to-string
+    (:th :class row-class
+     (:span :class "label" (str label)))))
+
+(deftemplate :table-view-field-header-wt #'table-view-field-header-wt)
+
 (defgeneric render-view-field-header (field view widget presentation value obj &rest args
-                                      &key field-info &allow-other-keys)
+                                            &key field-info &allow-other-keys)
   (:documentation "Renders a table header cell.")
   (:method ((field table-view-field) (view table-view) widget presentation value obj &rest args
                                      &key field-info &allow-other-keys)
-    (with-html
-      (:th :class (if field-info
+   (write-string 
+     (render-template-to-string 
+       :table-view-field-header-wt 
+       (list :view view :field field :widget widget :presentation presentation :object obj)
+       :row-class (if field-info
                     (attributize-view-field-name field-info)
                     (attributize-name (view-field-slot-name field)))
-	   (apply #'render-view-field-header-value value presentation field view widget obj args)))))
-
-(defgeneric render-view-field-header-value (value presentation field view widget obj &rest args)
-  (:documentation "Renders a table header cell value.")
-  (:method (value presentation (field table-view-field) (view table-view) widget obj &rest args)
-    (declare (ignore args))
-    (with-html
-      (:span :class "label" (str (view-field-label field))))))
+       :label (translate (view-field-label field)))
+     *weblocks-output-stream*)))
 
 ;; Table body
 (defgeneric with-table-view-body-row (view obj widget &rest args &key alternp &allow-other-keys)

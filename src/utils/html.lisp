@@ -245,6 +245,8 @@ presented to the user."
            :disabled disabled))
      (:span (str (format nil "~A&nbsp;" label))))))
 
+(deftemplate :radio-buttons-wt #'radio-buttons-wt)
+
 (defun render-radio-buttons (name selections &key id (class "radio")
                                                   (selected-value nil selected-value-supplied)
 						  disabledp)
@@ -266,7 +268,11 @@ for the value.
                                                     ((eql j count) " last")
                                                     (t "")))
      do (write-string 
-          (radio-buttons-wt 
+          (render-template-to-string 
+            :radio-buttons-wt 
+            (list 
+              :template-for :radio-buttons 
+              :radio-name name)
             :label-class label-class
             :id id
             :name (attributize-name name)

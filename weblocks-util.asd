@@ -6,7 +6,7 @@
 
 (defsystem weblocks-util
   :name "weblocks-util"
-  :version "0.0.1"
+  :version "0.0.2"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
@@ -33,23 +33,24 @@
                :parse-number 
                :pretty-function)
   :components 
-   ((:module src
-     :components (
-       (:file "util")
-       (:module utils
-        :components ((:file "misc")
-          ;(:file "clos")
-          ;(:file "runtime-class")
-          ;(:file "string")
-          (:file "list")
-          ;(:file "uri")
-          ;(:file "html")
-          ;(:file "javascript")
-          #+l(:file "isearch"
-           :depends-on ("html"))
-          #+l(:file "menu"
-           :depends-on ("html"))
-          ;(:file "suggest")
-          ;(:file "timing")
-          #+l(:file "repl"))
-        :depends-on ("util"))))))
+    ((:module src
+      :components (
+          (:file "util")
+          (:module utils
+           :components 
+           ((:file "misc")
+            ;(:file "clos")
+            ;(:file "runtime-class")
+            ;(:file "string")
+            (:file "list")
+            ;(:file "uri")
+            ;(:file "html")
+            ;(:file "javascript")
+            ;(:file "isearch" :depends-on ("html"))
+            ;(:file "menu" :depends-on ("html"))
+            ;(:file "suggest")
+            ;(:file "timing")
+            ;(:file "repl")
+            (:file "i18n")
+            (:file "templates"))
+           :depends-on ("util"))))))

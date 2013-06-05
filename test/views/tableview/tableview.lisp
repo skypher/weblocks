@@ -45,17 +45,6 @@
 			      "Joe" *joe*)
   (:th :class "name" (:span :class "label" "Name")))
 
-;;; Test table view render-view-field-header-value
-(deftest-html table-view-render-view-field-header-value-1
-    (render-view-field-header-value "Joe"
-				    (make-instance 'text-presentation)
-				    (make-instance 'table-view-field
-						   :slot-name 'name)
-				    (find-view '(table employee))
-				    nil 
-				     *joe*)
-  (:span :class "label" "Name"))
-
 ;;; Test with-table-view-body-row
 (deftest-html with-table-view-body-row-1
     (with-table-view-body-row (make-instance 'table-view)
