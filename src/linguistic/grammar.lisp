@@ -15,9 +15,12 @@
     ((string-ends-with word "y") (concatenate 'string (substring word 0 (1- (length word))) "ies"))
     (t (concatenate 'string word "s"))))
 
+(defmethod pluralize-with-locale ((locale (eql :ru)) word)
+  (translate word :plural t))
+
 (defun pluralize (word &optional (locale (current-locale)))
   "Pluralizes word. Converts 'thing' to 'things'."
-  (pluralize-with-locale (current-locale) word))
+  (pluralize-with-locale locale word))
 
 (defmethod singularize-with-locale ((locale (eql :en)) word)
   (if (string-equal word "are")

@@ -31,7 +31,11 @@
 	                 rendering the header row. The function should
 	                 expect the view object, the object being
 	                 rendered, and any additional arguments passed
-	                 to the view."))
+	                 to the view.")
+   (field-sorter 
+                           :initform nil 
+                           :initarg :sort-fields-by
+                           :accessor table-view-field-sorter))
   (:documentation "A view designed to present sequences of object in a
   table to the user."))
 
@@ -121,21 +125,21 @@
 
 (defgeneric render-table-view-header-row (view obj widget &rest args)
   (:documentation
-   "Renders the row in the 'thead' element of the table. The default
-implementation uses 'render-view-field-header' to render particular
-cells. Specialize this method to achieve customized header row
-rendering.")
-  (:method ((view table-view) obj widget &rest args)
-    (apply #'map-view-fields
-	   (lambda (field-info)
-	     (let ((field (field-info-field field-info))
-		   (obj (field-info-object field-info)))
-	       (apply #'render-view-field-header
-		      field view widget (view-field-presentation field)
-		      (obtain-view-field-value field obj) obj
-		      :field-info field-info
-		      args)))
-	   view obj args)))
+    "Renders the row in the 'thead' element of the table. The default
+     implementation uses 'render-view-field-header' to render particular
+     cells. Specialize this method to achieve customized header row
+     rendering.")
+     (:method ((view table-view) obj widget &rest args)
+      (apply #'map-sorted-view-fields 
+             (lambda (field-info)
+               (let ((field (field-info-field field-info))
+                     (obj (field-info-object field-info)))
+                 (apply #'render-view-field-header
+                        field view widget (view-field-presentation field)
+                        (obtain-view-field-value field obj) obj
+                        :field-info field-info
+                        args))) 
+             view obj (table-view-field-sorter view) args)))
 
 (defun table-view-field-header-wt (&key row-class label)
   (with-html-to-string
@@ -173,23 +177,23 @@ to modify HTML around a given row's cells.")
 
 (defgeneric render-table-view-body-row (view obj widget &rest args)
   (:documentation
-   "Renders the rows in the 'tbody' element of the table. The
-default implementation uses 'render-table-body-cell' to render
-particular cells. See 'render-table-header-row' for more
-details.")
-  (:method ((view table-view) obj widget &rest args)
-    (apply #'map-view-fields
-	   (lambda (field-info)
-	     (let ((field (field-info-field field-info))
-		   (obj (field-info-object field-info)))
-	       (safe-apply (view-field-prefix-fn field) view field obj args)
-	       (apply #'render-view-field
-		      field view widget (view-field-presentation field)
-		      (obtain-view-field-value field obj) obj
-                      :field-info field-info
-		      args)
-	       (safe-apply (view-field-suffix-fn field) view field obj args)))
-	   view obj args)))
+    "Renders the rows in the 'tbody' element of the table. The
+     default implementation uses 'render-table-body-cell' to render
+     particular cells. See 'render-table-header-row' for more
+     details.")
+     (:method ((view table-view) obj widget &rest args)
+      (apply #'map-sorted-view-fields
+             (lambda (field-info)
+               (let ((field (field-info-field field-info))
+                     (obj (field-info-object field-info)))
+                 (safe-apply (view-field-prefix-fn field) view field obj args)
+                 (apply #'render-view-field
+                        field view widget (view-field-presentation field)
+                        (obtain-view-field-value field obj) obj
+                        :field-info field-info
+                        args)
+                 (safe-apply (view-field-suffix-fn field) view field obj args)))
+             view obj (table-view-field-sorter view) args)))
 
 (defmethod render-view-field ((field table-view-field) (view table-view)
 			      widget presentation value obj

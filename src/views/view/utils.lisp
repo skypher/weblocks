@@ -152,6 +152,14 @@ type field-info."
 	   (f_ (push (funcall fn _) expansion)) obj view args)
     (nreverse expansion)))
 
+(defun map-sorted-view-fields (fn view obj sort &rest args)
+  (let ((fields (apply #'map-view-fields #'identity view obj args)))
+
+    (when sort
+      (setf fields (sort fields sort)))
+
+    (mapcar fn fields)))
+
 (defun find-field-info (name view obj &rest govf-args)
   "Finds a field-info object by name and returns it."
   (let (field)

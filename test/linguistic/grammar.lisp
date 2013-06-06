@@ -101,3 +101,13 @@
            (proper-number-form 5 "мир" :ru))
          "миров")
 
+(defmacro with-russian-translation-function-2 (&body body)
+  `(let ((weblocks::*translation-function* 
+           (lambda (string &key plural)
+             (format nil "pluralized ~A" plural))))
+     ,@body))
+
+(deftest russian-pluralize-1
+         (with-russian-translation-function-2 
+           (pluralize "test" :ru))
+         "pluralized T")
