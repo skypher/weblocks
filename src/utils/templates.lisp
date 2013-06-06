@@ -26,7 +26,7 @@
       0)))
 
 (defun render-template-to-string (template context &rest args)
-  (let* ((templates (gethash template *templates*))
+  (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
                     context 
                     (list :application (intern "CURRENT-WEBAPP" "WEBLOCKS"))))

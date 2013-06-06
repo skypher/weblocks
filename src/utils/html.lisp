@@ -106,19 +106,34 @@ without escaping."
                    label)))
     (log-link label action-code :id id :class class)))
 
-(defun render-button (name  &key (value (humanize-name name)) id (class "submit") disabledp)
+(defun button-wt (&key value name id class disabledp submitp)
+  (with-html-to-string
+    (:input :name name :type "submit" :id id :class class
+     :value value :disabled (when disabledp "disabled")
+     :onclick "disableIrrelevantButtons(this);")))
+
+(deftemplate :button-wt #'button-wt)
+
+(defun render-button (name  &key (value (translate (humanize-name name))) id (class "submit") disabledp)
   "Renders a button in a form.
 
-'name' - name of the html control. The name is attributized before
-being rendered.
-'value' - a value on html control. Humanized name is default.
-'id' - id of the html control. Default is nil.
-'class' - a class used for styling. By default, \"submit\".
-'disabledp' - button is disabled if true."
-  (with-html
-    (:input :name (attributize-name name) :type "submit" :id id :class class
-	    :value value :disabled (and disabledp "disabled")
-	    :onclick "disableIrrelevantButtons(this);")))
+   'name' - name of the html control. The name is attributized before
+   being rendered.
+   'value' - a value on html control. Humanized name is default.
+   'id' - id of the html control. Default is nil.
+   'class' - a class used for styling. By default, \"submit\".
+   'disabledp' - button is disabled if true."
+  (write-string 
+    (render-template-to-string 
+      :button-wt
+      nil
+      :value value
+      :name (attributize-name name)
+      :id id
+      :class class 
+      :disabledp disabledp 
+      :submitp (string= name "submit"))
+    *weblocks-output-stream*))
 
 (defun render-form-and-button (name action &key (value (humanize-name name))
 			       (method :get)

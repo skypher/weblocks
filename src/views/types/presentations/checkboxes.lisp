@@ -11,7 +11,28 @@
                                (intern (string-upcase (cdr cons)) :keyword)))
           (call-next-method)))
 
-(defmethod render-view-field ((field form-view-field) (view form-view)
+(defun checkboxes-view-field-wt (&key field-class content field-label show-required-indicator required-indicator-label validation-error)
+  (with-html-to-string
+    (:li :class field-class
+     (:span :class "label"
+      (:span :class "slot-name"
+       (:span :class "extra"
+        (str field-label) ":&nbsp;"
+        (when show-required-indicator
+          (:em :class "required-slot"
+           (str required-indicator-label)
+           (str "&nbsp;"))))))
+     (str content)
+     (when validation-error
+       (htm (:p :class "validation-error"
+             (:em
+               (:span :class "validation-error-heading" "Error:&nbsp;")
+               (str validation-error))))))))
+
+(deftemplate :checkboxes-view-field-wt #'checkboxes-view-field-wt)
+
+(defmethod render-view-field ((field form-view-field) 
+                              (view form-view)
                               widget (presentation checkboxes-presentation) value obj
                               &rest args &key validation-errors &allow-other-keys)
   (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
@@ -19,24 +40,28 @@
                                   :test #'string-equal
                                   :key (lambda (f) (and f (view-field-slot-name f)))))
          (field-class (concatenate 'string attribute-slot-name
-                                   (when validation-error " item-not-validated"))))
-    (with-html
-      (:li :class field-class
-           (:span :class "label"
-                  (:span :class "slot-name"
-                         (:span :class "extra"
-                                (str (view-field-label field)) ":&nbsp;"
-                                (render-form-view-field-required-indicator
-				  field view widget presentation value obj))))
-           (apply #'render-view-field-value
-                  value presentation
-                  field view widget obj
-                  args)
-           (when validation-error
-             (htm (:p :class "validation-error"
-                      (:em
-                       (:span :class "validation-error-heading" "Error:&nbsp;")
-                       (str (format nil "~A" (cdr validation-error)))))))))))
+                                   (when validation-error " item-not-validated")))
+         (show-required-indicator (and (form-view-field-required-p field)
+                                       (not (form-view-field-disabled-p field obj))
+                                       required-indicator)))
+    (write-string 
+      (render-template-to-string 
+        :checkboxes-view-field-wt 
+        (list :field field :view view :widget widget :presentation presentation :object obj)
+        :field-class field-class 
+        :field-label (translate (view-field-label field))
+        :show-required-indicator show-required-indicator
+        :required-indicator-label (when show-required-indicator 
+                                    (if (eq t required-indicator)
+                                      *default-required-indicator*
+                                      required-indicator))
+        :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
+        :content (capture-weblocks-output 
+                   (apply #'render-view-field-value
+                          value presentation
+                          field view widget obj
+                          args)))
+      *weblocks-output-stream*)))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     (field form-view-field) (view form-view) widget obj

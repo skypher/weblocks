@@ -3,6 +3,7 @@
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function
                           #:standard-class #:typep #:subtypep #:standard-method)
+  (:shadow #:slot-value-by-path)
   (:documentation "General Lisp utilities traditionally exported
                    with Weblocks."))
 

@@ -259,6 +259,16 @@ differently.")
 				   (str (format nil "~A" (cdr err))))))
 			      field-errors))))))))))
 
+(defun form-view-buttons-wt (&key submit-html cancel-html)
+  (with-html-to-string
+    (:div :class "submit"
+     (when submit-html 
+       (str submit-html))
+     (when cancel-html 
+       (str cancel-html)))))
+
+(deftemplate :form-view-buttons-wt #'form-view-buttons-wt)
+
 (defgeneric render-form-view-buttons (view obj widget &rest args &key buttons &allow-other-keys)
   (:documentation
    "Renders buttons specified view 'buttons' slot of the 'form-view'
@@ -281,19 +291,24 @@ form-view-buttons for a given view.")
 		 (find name (form-view-buttons view)
 		       :key (lambda (item)
 			      (car (ensure-list item))))))))
-      (with-html
-	(:div :class "submit"
-	      (let ((submit (find-button :submit)))
-		(when submit
-		  (render-button *submit-control-name*
-				 :value (or (cdr submit)
-					    (humanize-name (car submit))))))
-	      (let ((cancel (find-button :cancel)))
-		(when cancel
-		  (render-button *cancel-control-name*
-				 :class "submit cancel"
-				 :value (or (cdr cancel)
-					    (humanize-name (car cancel)))))))))))
+      (write-string 
+        (render-template-to-string 
+          :form-view-buttons-wt
+          (list :view view :object obj :widget widget)
+          :submit-html (let ((submit (find-button :submit)))
+                         (when submit
+                           (capture-weblocks-output
+                             (render-button *submit-control-name*
+                                            :value (translate (or (cdr submit)
+                                                                  (humanize-name (car submit))))))))
+          :cancel-html (let ((cancel (find-button :cancel)))
+                         (when cancel
+                           (capture-weblocks-output 
+                             (render-button *cancel-control-name*
+                                            :class "submit cancel"
+                                            :value (translate (or (cdr cancel)
+                                                                  (humanize-name (car cancel)))))))))
+        *weblocks-output-stream*))))
 
 (defmethod view-caption ((view form-view))
   (if (slot-value view 'caption)
@@ -348,45 +363,68 @@ form-view-buttons for a given view.")
     (when (form-view-focus-p view)
         (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
 
+(defun form-view-field-wt(&key label-class id show-required-indicator required-indicator-label 
+                               show-field-label field-label validation-error content 
+                               field-class)
+  (with-html-to-string
+    (:li :class field-class
+     (:label :class label-class
+      :for id
+      (:span :class "slot-name"
+       (:span :class "extra"
+        (when show-field-label 
+          (str field-label)
+          (str ":&nbsp;"))
+        (when show-required-indicator
+          (htm (:em :class "required-slot"
+                (str required-indicator-label)
+                (str "&nbsp;")))))))
+     (str content)
+     (when validation-error
+       (htm (:p :class "validation-error"
+             (:em
+               (:span :class "validation-error-heading" "Error:&nbsp;")
+               (str validation-error))))))))
+
+(deftemplate :form-view-field-wt #'form-view-field-wt)
+
 (defmethod render-view-field ((field form-view-field) (view form-view)
-			      widget presentation value obj 
-			      &rest args &key validation-errors field-info &allow-other-keys)
+                                                      widget presentation value obj 
+                                                      &rest args &key validation-errors field-info &allow-other-keys)
   (declare (special *presentation-dom-id*))
   (let* ((attributized-slot-name (if field-info
                                    (attributize-view-field-name field-info)
                                    (attributize-name (view-field-slot-name field))))
-	 (validation-error (assoc field validation-errors))
-	 (field-class (concatenate 'string (aif attributized-slot-name it "")
-				   (when validation-error " item-not-validated")))
-         (*presentation-dom-id* (gen-id)))
-    (with-html
-      (:li :class field-class
-	   (:label :class (attributize-presentation
-			   (view-field-presentation field))
-                   :for *presentation-dom-id*
-		   (:span :class "slot-name"
-			  (:span :class "extra"
-				 (unless (empty-p (view-field-label field))
-				   (str (view-field-label field))
-				   (str ":&nbsp;"))
-				 (let ((required-indicator (form-view-field-required-indicator field)))
-				   (when (and (form-view-field-required-p field)
-					      required-indicator)
-				     (htm (:em :class "required-slot"
-					       (if (eq t required-indicator)
-						   (str *default-required-indicator*)
-						   (str required-indicator))
-					       (str "&nbsp;"))))))))
-           (apply #'render-view-field-value
-                  value presentation
-                  field view widget obj
-                  :field-info field-info
-                  args)
-           (when validation-error
-             (htm (:p :class "validation-error"
-                      (:em
-                        (:span :class "validation-error-heading" "Error:&nbsp;")
-                        (str (format nil "~A" (cdr validation-error)))))))))))
+         (validation-error (assoc field validation-errors))
+         (field-class (concatenate 'string (aif attributized-slot-name it "")
+                                   (when validation-error " item-not-validated")))
+         (*presentation-dom-id* (gen-id))
+         (required-indicator (form-view-field-required-indicator field))
+         (show-required-indicator (and (form-view-field-required-p field)
+                                       required-indicator)))
+    (write-string 
+      (render-template-to-string 
+        :form-view-field-wt
+        (list :field field :view view :widget widget :presentation presentation :object obj)
+        :label-class (attributize-presentation
+                       (view-field-presentation field))
+        :id *presentation-dom-id*
+        :show-required-indicator show-required-indicator
+        :required-indicator-label (when show-required-indicator
+                                    (if (eq t required-indicator)
+                                      *default-required-indicator*
+                                      required-indicator))
+        :show-field-label (not (empty-p (view-field-label field)))
+        :field-label (translate (view-field-label field))
+        :field-class field-class
+        :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
+        :content (capture-weblocks-output 
+                   (apply #'render-view-field-value
+                          value presentation
+                          field view widget obj
+                          :field-info field-info
+                          args)))
+      *weblocks-output-stream*)))
 
 (defmethod render-form-view-field-required-indicator ((field form-view-field) (view form-view)
 						      widget presentation value obj)
