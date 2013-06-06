@@ -76,3 +76,28 @@
 (deftest articlize-2
     (articlize "item")
   "an item")
+
+(defmacro with-russian-translation-function (&body body)
+  `(let ((weblocks::*translation-function* 
+           (lambda (string &key count)
+             (case count 
+               (:one "мир")
+               (:few "мира")
+               (:many "миров")))))
+     ,@body))
+
+(deftest russian-proper-number-form-1
+         (with-russian-translation-function 
+           (proper-number-form 1 "мир" :ru))
+         "мир")
+ 
+(deftest russian-proper-number-form-2
+         (with-russian-translation-function 
+           (proper-number-form 2 "мир" :ru))
+         "мира")
+
+(deftest russian-proper-number-form-3
+         (with-russian-translation-function 
+           (proper-number-form 5 "мир" :ru))
+         "миров")
+
