@@ -9,7 +9,8 @@
   (push (cons function context)
         (gethash name *templates*)))
 
-(defun calculate-template-priority (template)
+(defun calculate-template-priority (template actual-context)
+  "Calculates priority for finding effective template."
   (let ((name (car template))
         (context (copy-tree (cdr template))))
 
@@ -22,10 +23,16 @@
                          value)
                      10 
                      0))
+                  ((equal key :context-matches)
+                   (apply value actual-context))
+                  ((functionp value) 
+                   (funcall value (getf actual-context key)))
                   (t 0)))
       0)))
 
 (defun render-template-to-string (template context &rest args)
+  "Calculates effective template and renders it to string.  
+   Effective template is template with max priority."
   (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
                     context 
@@ -34,7 +41,7 @@
            (car 
              (sort 
                (loop for i in templates collect 
-                     (cons (car i) (calculate-template-priority i)))
+                     (cons (car i) (calculate-template-priority i context)))
                #'>
                :key #'cdr))))
 

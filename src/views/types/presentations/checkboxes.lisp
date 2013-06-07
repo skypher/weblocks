@@ -29,7 +29,7 @@
                (:span :class "validation-error-heading" "Error:&nbsp;")
                (str validation-error))))))))
 
-(deftemplate :checkboxes-view-field-wt #'checkboxes-view-field-wt)
+(deftemplate :checkboxes-view-field-wt 'checkboxes-view-field-wt)
 
 (defmethod render-view-field ((field form-view-field) 
                               (view form-view)

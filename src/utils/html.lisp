@@ -112,7 +112,7 @@ without escaping."
      :value value :disabled (when disabledp "disabled")
      :onclick "disableIrrelevantButtons(this);")))
 
-(deftemplate :button-wt #'button-wt)
+(deftemplate :button-wt 'button-wt)
 
 (defun render-button (name  &key (value (translate (humanize-name name))) id (class "submit") disabledp)
   "Renders a button in a form.
@@ -260,7 +260,7 @@ presented to the user."
            :disabled disabled))
      (:span (str (format nil "~A&nbsp;" label))))))
 
-(deftemplate :radio-buttons-wt #'radio-buttons-wt)
+(deftemplate :radio-buttons-wt 'radio-buttons-wt)
 
 (defun render-radio-buttons (name selections &key id (class "radio")
                                                   (selected-value nil selected-value-supplied)

@@ -81,7 +81,7 @@
        (:tbody
          (str content))))))
 
-(deftemplate :table-view-header-wt #'table-view-header-wt)
+(deftemplate :table-view-header-wt 'table-view-header-wt)
 
 (defgeneric with-table-view-header (view obj widget header-fn rows-fn &rest args
                                          &key summary &allow-other-keys)
@@ -105,7 +105,7 @@
     (:tr (str content))
     (str prefix)))
 
-(deftemplate :table-header-row-wt #'table-header-row-wt)
+(deftemplate :table-header-row-wt 'table-header-row-wt)
 
 ;; Table header row
 (defgeneric with-table-view-header-row (view obj widget &rest args)
@@ -146,7 +146,7 @@
     (:th :class row-class
      (:span :class "label" (str label)))))
 
-(deftemplate :table-view-field-header-wt #'table-view-field-header-wt)
+(deftemplate :table-view-field-header-wt 'table-view-field-header-wt)
 
 (defgeneric render-view-field-header (field view widget presentation value obj &rest args
                                             &key field-info &allow-other-keys)

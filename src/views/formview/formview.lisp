@@ -267,7 +267,7 @@ differently.")
      (when cancel-html 
        (str cancel-html)))))
 
-(deftemplate :form-view-buttons-wt #'form-view-buttons-wt)
+(deftemplate :form-view-buttons-wt 'form-view-buttons-wt)
 
 (defgeneric render-form-view-buttons (view obj widget &rest args &key buttons &allow-other-keys)
   (:documentation
@@ -386,7 +386,7 @@ form-view-buttons for a given view.")
                (:span :class "validation-error-heading" "Error:&nbsp;")
                (str validation-error))))))))
 
-(deftemplate :form-view-field-wt #'form-view-field-wt)
+(deftemplate :form-view-field-wt 'form-view-field-wt)
 
 (defmethod render-view-field ((field form-view-field) (view form-view)
                                                       widget presentation value obj 
