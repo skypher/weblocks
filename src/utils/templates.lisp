@@ -15,7 +15,7 @@
         (context (copy-tree (cdr template))))
 
     (or 
-      (loop for (key value) on context :by 'cddr
+      (loop for (key value) on context :by #'cddr
             sum (cond 
                   ((equal key :application-class)
                    (if (subtypep 
