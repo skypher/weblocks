@@ -3,78 +3,81 @@
 
 ;;; testing create-new-item-widget-gridedit
 (deftest-html create-new-item-widget-gridedit-1
-    (with-request :get nil
-      (render-widget
-       (dataedit-create-new-item-widget
-	(make-instance 'gridedit :data (list *joe*)
-		       :data-class 'employee))))
-  (:div :class "widget data-editor dataform" :id "id-123"
-	#.(form-header-template
-	   "abc123"
-	   '((:li :class "name"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Name:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;"))))
-              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
-	     (:li :class "manager"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;")))
-              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
-	   :method "post")))
+              (let ((weblocks::*presentation-dom-id* "id-123"))
+                (with-request :get nil
+                              (render-widget
+                                (dataedit-create-new-item-widget
+                                  (make-instance 'gridedit :data (list *joe*)
+                                                 :data-class 'employee)))))
+              (:div :class "widget data-editor dataform" :id "id-123"
+               #.(form-header-template
+                   "abc123"
+                   '((:li :class "name"
+                      (:label :class "input" :for "id-123"
+                       (:span :class "slot-name"
+                        (:span :class "extra" "Name:&nbsp;"
+                         (:em :class "required-slot" "(required)&nbsp;"))))
+                      (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
+                      (:li :class "manager"
+                       (:label :class "input" :for "id-123"
+                        (:span :class "slot-name"
+                         (:span :class "extra" "Manager:&nbsp;")))
+                       (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
+                   :method "post")))
 
 (deftest-html create-new-item-widget-gridedit-2
-    (with-request :get nil
-      (render-widget
-       (dataedit-create-new-item-widget
-	(make-instance 'gridedit :data (list *joe*)
-		       :data-class 'employee
-		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
-					 (name :label "Foo"
-					       :requiredp t))))))
-  (:div :class "widget data-editor dataform" :id "id-123"
-	#.(form-header-template
-	   "abc123"
-	   '((:li :class "name"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Foo:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;"))))
-              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
-	     (:li :class "manager"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;")))
-              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
-	   :method "post")))
+              (let ((weblocks::*presentation-dom-id* "id-123"))
+                (with-request :get nil
+                              (render-widget
+                                (dataedit-create-new-item-widget
+                                  (make-instance 'gridedit :data (list *joe*)
+                                                 :data-class 'employee
+                                                 :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+                                                                          (name :label "Foo"
+                                                                                :requiredp t)))))))
+              (:div :class "widget data-editor dataform" :id "id-123"
+               #.(form-header-template
+                   "abc123"
+                   '((:li :class "name"
+                      (:label :class "input" :for "id-123"
+                       (:span :class "slot-name"
+                        (:span :class "extra" "Foo:&nbsp;"
+                         (:em :class "required-slot" "(required)&nbsp;"))))
+                      (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
+                      (:li :class "manager"
+                       (:label :class "input" :for "id-123"
+                        (:span :class "slot-name"
+                         (:span :class "extra" "Manager:&nbsp;")))
+                       (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
+                   :method "post")))
 
 (deftest-html create-new-item-widget-gridedit-3
-    (with-request :get nil
-      (render-widget
-       (dataedit-create-new-item-widget
-	(make-instance 'gridedit :data (list *joe*)
-		       :data-class 'employee
-		       :view (defview () (:type table :inherit-from '(:scaffold employee))
-			       (name :label "Foo"))
-		       :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
-					 (name :label "Bar"
-					       :requiredp t))))))
-  (:div :class "widget data-editor dataform" :id "id-123"
-	#.(form-header-template
-	   "abc123"
-	   '((:li :class "name"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Bar:&nbsp;"
-			     (:em :class "required-slot" "(required)&nbsp;"))))
-              (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
-	     (:li :class "manager"
-	      (:label :class "input" :for "id-123"
-	       (:span :class "slot-name"
-		      (:span :class "extra" "Manager:&nbsp;")))
-              (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
-	   :method "post")))
+              (let ((weblocks::*presentation-dom-id* "id-123"))
+                (with-request :get nil
+                              (render-widget
+                                (dataedit-create-new-item-widget
+                                  (make-instance 'gridedit :data (list *joe*)
+                                                 :data-class 'employee
+                                                 :view (defview () (:type table :inherit-from '(:scaffold employee))
+                                                                (name :label "Foo"))
+                                                 :item-form-view (defview () (:type form :inherit-from '(:scaffold employee))
+                                                                          (name :label "Bar"
+                                                                                :requiredp t)))))))
+              (:div :class "widget data-editor dataform" :id "id-123"
+               #.(form-header-template
+                   "abc123"
+                   '((:li :class "name"
+                      (:label :class "input" :for "id-123"
+                       (:span :class "slot-name"
+                        (:span :class "extra" "Bar:&nbsp;"
+                         (:em :class "required-slot" "(required)&nbsp;"))))
+                      (:input :type "text" :name "name" :maxlength "40" :id "id-123"))
+                      (:li :class "manager"
+                       (:label :class "input" :for "id-123"
+                        (:span :class "slot-name"
+                         (:span :class "extra" "Manager:&nbsp;")))
+                       (:input :type "text" :name "manager" :value "Jim" :maxlength "40" :id "id-123")))
+                   :method "post")))
 
 ;;; testing gridedit-create-drilldown-widget
 (deftest-html create-drilldown-widget-gridedit-1

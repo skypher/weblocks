@@ -439,6 +439,17 @@ form-view-buttons for a given view.")
 		 (str required-indicator))
 	     (str "&nbsp;"))))))
 
+(defun form-view-field-value-wt (&key name max-length disabledp value size id)
+  (with-html-to-string
+    (:input :type "text" :name name
+     :disabled (if disabledp "disabled")
+     :value value
+     :maxlength max-length
+     :size size
+     :id id)))
+
+(deftemplate :form-view-field-value-wt 'form-view-field-value-wt)
+
 (defmethod render-view-field-value (value (presentation input-presentation)
 				    field view widget obj
 				    &rest args &key intermediate-values field-info &allow-other-keys)
@@ -448,15 +459,19 @@ form-view-buttons for a given view.")
                                   (attributize-name (view-field-slot-name field)))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
 	(form-field-intermediate-value field intermediate-values)
-      (with-html
-	  (:input :type "text" :name attributized-slot-name
-		  :disabled (and (form-view-field-disabled-p field obj) "disabled")
-		  :value (if intermediate-value-p
-			     intermediate-value
-			     (apply #'print-view-field-value value presentation field view widget obj args))
-		  :maxlength (input-presentation-max-length presentation)
-                  :size (input-presentation-size presentation)
-		  :id *presentation-dom-id*)))))
+        (write-string 
+          (render-template-to-string 
+            :form-view-field-value-wt
+            (list :field field :view view :widget widget :presentation presentation :object obj)
+            :name attributized-slot-name 
+            :max-length (input-presentation-max-length presentation)
+            :disabledp (form-view-field-disabled-p field obj)
+            :value (if intermediate-value-p
+                     intermediate-value
+                     (apply #'print-view-field-value value presentation field view widget obj args))
+            :size (input-presentation-size presentation)
+            :id *presentation-dom-id*)
+          *weblocks-output-stream*))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)
 				   field view widget obj &rest args)
