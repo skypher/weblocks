@@ -163,17 +163,30 @@
        :label (translate (view-field-label field)))
      *weblocks-output-stream*)))
 
+(defun table-view-body-row-wt (&key prefix suffix row-class content)
+  (with-html-to-string
+    (str prefix)
+    (:tr :class row-class
+     (str content))
+    (str suffix)))
+
+(deftemplate :table-view-body-row-wt 'table-view-body-row-wt)
+
 ;; Table body
 (defgeneric with-table-view-body-row (view obj widget &rest args &key alternp &allow-other-keys)
   (:documentation
-   "Used by table view to render body rows. Specialize this function
-to modify HTML around a given row's cells.")
-  (:method ((view table-view) obj widget &rest args &key alternp &allow-other-keys)
-    (safe-apply (sequence-view-row-prefix-fn view) view obj args)
-    (with-html
-      (:tr :class (if alternp "altern" nil)
-	   (apply #'render-table-view-body-row view obj widget args)))
-    (safe-apply (sequence-view-row-suffix-fn view) view obj args)))
+    "Used by table view to render body rows. Specialize this function
+     to modify HTML around a given row's cells.")
+            (:method ((view table-view) obj widget &rest args &key alternp &allow-other-keys)
+             (write-string 
+               (render-template-to-string 
+                 :table-view-body-row-wt 
+                 (list :view view :widget widget :object obj)
+                 :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget args))
+                 :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
+                 :row-class (if alternp "altern" nil)
+                 :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args)))
+               *weblocks-output-stream*)))
 
 (defgeneric render-table-view-body-row (view obj widget &rest args)
   (:documentation

@@ -35,15 +35,15 @@
                               (view form-view)
                               widget (presentation checkboxes-presentation) value obj
                               &rest args &key validation-errors &allow-other-keys)
-  (let* ((attribute-slot-name (attributize-name (view-field-slot-name field)))
+  (let* ((required-indicator (form-view-field-required-indicator field))
+         (attribute-slot-name (attributize-name (view-field-slot-name field)))
          (validation-error (assoc attribute-slot-name validation-errors
                                   :test #'string-equal
                                   :key (lambda (f) (and f (view-field-slot-name f)))))
          (field-class (concatenate 'string attribute-slot-name
                                    (when validation-error " item-not-validated")))
          (show-required-indicator (and (form-view-field-required-p field)
-                                       (not (form-view-field-disabled-p field obj))
-                                       required-indicator)))
+                                       (not (form-view-field-disabled-p field obj)))))
     (write-string 
       (render-template-to-string 
         :checkboxes-view-field-wt 
