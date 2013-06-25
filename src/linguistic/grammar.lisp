@@ -2,7 +2,8 @@
 (in-package :weblocks)
 
 (export '(pluralize singularize proper-number-form vowelp consonantp
-          proper-indefinite-article articlize *current-locale* current-locale))
+          proper-indefinite-article articlize *current-locale* current-locale 
+          russian-proper-number-form))
 
 (defvar *current-locale* :en)
 (defun current-locale ()
@@ -42,17 +43,21 @@
     singular-word
     (pluralize singular-word locale)))
 
-(defmethod proper-number-form-with-locale ((locale (eql :ru)) number singular-word)
+(defun russian-proper-number-form (number single few many)
   (let* ((n (mod (abs number) 100))
          (n1 (mod n 10)))
     (cond 
-      ((and (> n 10) (< n 20))
-       (translate singular-word :count :many))
-      ((and (> n1 1) (< n1 5))
-       (translate singular-word :count :few))
-      ((= n1 1)
-       (translate singular-word :count :one))
-      (t (translate singular-word :count :many)))))
+      ((and (> n 10) (< n 20)) many)
+      ((and (> n1 1) (< n1 5)) few)
+      ((= n1 1) single)
+      (t many))))
+
+(defmethod proper-number-form-with-locale ((locale (eql :ru)) number singular-word)
+  (russian-proper-number-form
+    number 
+    (translate singular-word :count :one)
+    (translate singular-word :count :few)
+    (translate singular-word :count :many)))
 
 (defun proper-number-form (number singular-word &optional (locale (current-locale)))
   (proper-number-form-with-locale locale number singular-word))
