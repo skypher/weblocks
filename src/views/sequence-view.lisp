@@ -110,6 +110,6 @@ is no information available.")
   (apply #'with-view-header view obj widget
 	 (lambda (view obj &rest args)
 	   (declare (ignore obj args))
-	   (render-message (sequence-view-empty-message view) (view-caption view)))
+	   (render-message (translate (sequence-view-empty-message view)) (view-caption view)))
 	 args))
 

@@ -3,7 +3,7 @@
 
 (export '(pluralize singularize proper-number-form vowelp consonantp
           proper-indefinite-article articlize *current-locale* current-locale 
-          russian-proper-number-form))
+          russian-proper-number-form noun-vocative-to-genitive *debug-words-genitives* *debug-words-genders* determine-gender))
 
 (defvar *current-locale* :en)
 (defun current-locale ()
@@ -15,6 +15,12 @@
     ((string-ends-with word "s") (concatenate 'string word "es"))
     ((string-ends-with word "y") (concatenate 'string (substring word 0 (1- (length word))) "ies"))
     (t (concatenate 'string word "s"))))
+
+(defmethod pluralize-with-locale :around ((locale (eql :en)) word)
+  (cond 
+    ((string= word  "There is ~S validation error:")
+     "There are ~S validation errors:")
+    (t (call-next-method))))
 
 (defmethod pluralize-with-locale ((locale (eql :ru)) word)
   (translate word :plural t))
@@ -36,11 +42,17 @@
   "Singularizes word. Converts 'things' to 'thing'."
   (singularize-with-locale locale word))
 
+(defun english-proper-number-form (number single many)
+  (if (= number 1)
+    single 
+    many))
+
 (defmethod proper-number-form-with-locale ((locale (eql :en)) number singular-word)
   "Turns 'singular-word' into proper number form. If 'number' is 1,
    leaves 'singular-word' as is, otherwise pluralizes it."
-  (if (= number 1)
-    singular-word
+  (english-proper-number-form 
+    number 
+    (translate singular-word)
     (pluralize singular-word locale)))
 
 (defun russian-proper-number-form (number single few many)
@@ -86,3 +98,18 @@
   "Prepends a word with a proper indefinite article. Returns 'an
 apple' for 'apple' and 'a table' for 'table'."
   (concatenate 'string (proper-indefinite-article word) " " word))
+
+(defvar *debug-words-genitives* nil)
+
+(defmethod noun-vocative-to-genitive ((obj string))
+  "Needs to be overriden for custom needs"
+  (if *debug-words-genitives*
+    (format nil "... genitive form of ~A ..." obj)
+    obj))
+
+(defvar *debug-words-genders* nil)
+
+(defmethod determine-gender ((obj string))
+  (if *debug-words-genitives* 
+    (error "Cannot determine gender of ~A" obj)
+    :masculine))

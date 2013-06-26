@@ -224,7 +224,7 @@ submitted.
 		   (list->assoc (append (when welcome-name
 					  (list
 					   (cons (if frob-welcome-name ; backwards compat
-                                                   (format nil *dropdown-welcome-message* (car welcome-name))
+                                                   (format nil (translate *dropdown-welcome-message*) (car welcome-name))
                                                    (car welcome-name))
 						 (cdr welcome-name))))
 					selections)

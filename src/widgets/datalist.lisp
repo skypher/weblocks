@@ -187,7 +187,7 @@ removes the drilldown operation, and then adds it again if necessary."
             (render-list data-sequence
                          :orderedp (datalist-ordered-p obj)
                          :render-fn (curry-after (curry #'datalist-render-item obj) args)
-                         :empty-message (sequence-view-empty-message (find-view (dataseq-view obj)))
+                         :empty-message (translate (sequence-view-empty-message (find-view (dataseq-view obj))))
                          :empty-caption (view-caption (find-view (dataseq-view obj)))
                          :item-prefix-fn (lambda (item)
                                            (safe-apply (sequence-view-row-prefix-fn

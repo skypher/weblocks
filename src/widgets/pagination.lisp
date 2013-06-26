@@ -128,10 +128,10 @@ items if 'show-total-items' is set to true."))
 	(str "&nbsp;"))
       ; 'Viewing Page X of Y'
       (:span :class "page-info"
-	     (:span :class "viewing-label" "Viewing ")
-	     (:span :class "page-label" "Page ")
+	     (:span :class "viewing-label" (str (translate "Viewing ")))
+	     (:span :class "page-label" (str (translate "Page ")))
 	     (:span :class "current-page" (:strong (str (pagination-current-page obj))))
-	     (:span :class "of-label" " of ")
+	     (:span :class "of-label" (str (translate " of ")))
 	     (:span :class "total-pages" (str (pagination-page-count obj))))
       ; 'Next' link
       (when (< (pagination-current-page obj)

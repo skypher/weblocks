@@ -61,7 +61,7 @@ may be NIL in which case the default pane name is provided."
            :selected-pane (static-selector-current-pane obj)
            :header (navigation-header obj)
            :container-id (dom-id obj)
-           :empty-message "No navigation entries"
+           :empty-message (translate "No navigation entries")
            menu-args)))
 
 (defmethod render-widget-body ((obj navigation) &rest args)

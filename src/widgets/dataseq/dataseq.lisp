@@ -519,7 +519,7 @@ to the user of the widget.")
   (with-html
     (:span :class "total-items"
 	   (str (let ((total-items-count (dataseq-data-count obj)))
-		  (format nil "(Total of ~A ~A)"
+		  (format nil (translate "(Total of ~A ~A)")
 			  total-items-count
 			  (proper-number-form total-items-count
 					      (humanize-name

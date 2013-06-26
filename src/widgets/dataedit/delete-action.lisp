@@ -44,31 +44,34 @@ modify standard behavior for deleting items from a sequence."
   (let ((item-name (humanize-name (dataseq-data-class obj))))
     (when (dataseq-selection-empty-p items)
       (flash-message (dataseq-flash obj)
-		     (format nil "Please select ~A to delete."
-			     (pluralize (string-downcase item-name))))
+                     (format nil (translate "Please select ~A to delete.")
+                             (noun-vocative-to-genitive (pluralize item-name))))
       (mark-dirty obj)
       (return-from dataedit-delete-items-flow))
     (let ((initial-items-count (dataseq-data-count obj))
-	  deleted-items-count)
+          deleted-items-count)
       (unless (eq :yes (do-confirmation (let ((item-count (ecase (car items)
-							    ;; (:all ...)
-							    (:none (length (cdr items))))))
-					  (format nil "Delete ~A ~A?"
-						  item-count
-						  (proper-number-form item-count item-name)))
-			 :type :yes/no))
-	(return-from dataedit-delete-items-flow))
+                                                            ;; (:all ...)
+                                                            (:none (length (cdr items))))))
+                                          (format nil (translate "Delete ~A ~A?")
+                                                  item-count
+                                                  (proper-number-form item-count (noun-vocative-to-genitive item-name))))
+                                        :type :yes/no))
+        (return-from dataedit-delete-items-flow))
       (if (dataedit-on-delete-items obj)
-	  (funcall (dataedit-on-delete-items obj) obj items)
-	  (ecase (car items)
-	    ;; (:all ...)
-	    (:none (dolist (item (cdr items))
-		     (dataedit-delete-item obj item)))))
+        (funcall (dataedit-on-delete-items obj) obj items)
+        (ecase (car items)
+          ;; (:all ...)
+          (:none (dolist (item (cdr items))
+                   (dataedit-delete-item obj item)))))
       (setf deleted-items-count (- initial-items-count (dataseq-data-count obj)))
       (mark-dirty obj :propagate t)
       (flash-message (dataseq-flash obj)
-		     (format nil "Deleted ~A ~A."
-			     deleted-items-count
-			     (proper-number-form deleted-items-count item-name)))
+                     (format nil "~A ~A ~A."
+                             (translate "Deleted" 
+                                        :preceding-gender (determine-gender item-name)
+                                        :preceding-count deleted-items-count)
+                             deleted-items-count
+                             (proper-number-form deleted-items-count item-name)))
       (safe-funcall (dataedit-on-delete-items-completed obj) obj items))))
 

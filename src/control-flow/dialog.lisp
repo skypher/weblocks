@@ -123,11 +123,11 @@ form buttons in a POST form."
 		   (:ok/cancel (list :ok :cancel))
 		   (:yes/no (list :yes :no)))
 	     :css-class (format nil "confirmation ~A" css-class)
-	     :title "Confirmation"))
+	     :title (translate "Confirmation")))
 
 ;;; Presents a user with an information dialog
 (defun/cc do-information (msg &key (css-class ""))
   (do-choice msg (list :ok)
 	     :css-class (format nil "information ~A" css-class)
-	     :title "Information"))
+	     :title (translate "Information")))
 

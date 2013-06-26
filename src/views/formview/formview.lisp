@@ -177,9 +177,9 @@ before relations can be updated."))
   "Returns an error message for a missing required field."
   (if (form-view-field-required-error-msg form-view-field)
       (form-view-field-required-error-msg form-view-field)
-      (format nil *required-field-message*
-              (humanize-name
-               (view-field-label form-view-field)))))
+      (format nil (translate *required-field-message*)
+              (translate (humanize-name
+               (view-field-label form-view-field))))))
 
 (defparameter *default-required-indicator* "(required)"
   "Default string to render after a field's label if the field is required.")
@@ -239,9 +239,7 @@ differently.")
 	  (:div :class "validation-errors-summary"
 		(:h2 :class "error-count"
 		     (let ((error-count (length errors)))
-		       (if (eql error-count 1)
-			   (str (format nil "There is 1 validation error:"))
-			   (str (format nil "There are ~S validation errors:" error-count)))))
+                       (cl-who:fmt (proper-number-form error-count "There is ~S validation error:") error-count)))
 		(when non-field-errors
 		  (htm
 		   (:ul :class "non-field-validation-errors"
@@ -412,7 +410,7 @@ form-view-buttons for a given view.")
         :show-required-indicator show-required-indicator
         :required-indicator-label (when show-required-indicator
                                     (if (eq t required-indicator)
-                                      *default-required-indicator*
+                                      (translate *default-required-indicator*)
                                       required-indicator))
         :show-field-label (not (empty-p (view-field-label field)))
         :field-label (translate (view-field-label field))
