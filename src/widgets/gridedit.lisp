@@ -33,8 +33,11 @@
                    (when (or (dataedit-mixin-flash-message-on-first-add-p grid)
                              (> (dataseq-data-count grid) 1))
                      (flash-message (dataseq-flash grid)
-                                    (format nil "Added ~A."
-                                            (humanize-name (dataseq-data-class grid)))))
+                                    (format nil 
+                                            (widget-translate 
+                                              grid :item-added-message 
+                                              :preceding-gender (determine-gender (humanize-name (dataseq-data-class grid))))
+                                            (widget-translate grid :item-name :genitive-form-p t))))
 		   (dataedit-reset-state grid)
                    (throw 'annihilate-dataform nil))
      :data-view (dataedit-item-data-view grid)
@@ -50,8 +53,12 @@
 		 :on-success (lambda (obj)
 			       (declare (ignore obj))
 			       (flash-message (dataseq-flash grid)
-					      (format nil "Modified ~A."
-						      (humanize-name (dataseq-data-class grid))))
+                                              (format nil 
+                                                      (widget-translate 
+                                                        grid 
+                                                        :item-modified-message 
+                                                        :preceding-gender (determine-gender (humanize-name (dataseq-data-class grid))))
+                                                      (widget-translate grid :item-name)))
 			       (if (eql (gridedit-drilldown-type grid) :edit)
                                    (progn
                                      (dataedit-reset-state grid)
@@ -78,3 +85,8 @@
   (when (dataedit-item-widget obj)
     (render-widget (dataedit-item-widget obj))))
 
+(defmethod widget-translation-table append ((obj gridedit))
+  (list 
+    (cons :item-modified-message "Modified ~A.")
+    (cons :item-added-message "Added ~A.")
+    (cons :item-name (humanize-name (dataseq-data-class obj)))))

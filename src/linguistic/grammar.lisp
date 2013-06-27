@@ -113,3 +113,17 @@ apple' for 'apple' and 'a table' for 'table'."
   (if *debug-words-genitives* 
     (error "Cannot determine gender of ~A" obj)
     :masculine))
+
+(defun default-translation-function (string &key plural-p genitive-form-p items-count &allow-other-keys)
+  (declare (ignore args))
+
+  (when plural-p 
+    (setf string (pluralize string)))
+
+  (when genitive-form-p 
+    (setf string (noun-vocative-to-genitive string)))
+
+  (when items-count
+    (setf string (proper-number-form items-count string)))
+
+  string)

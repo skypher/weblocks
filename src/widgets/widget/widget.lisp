@@ -584,3 +584,14 @@ Slots will be copied shallowly except for CHILDREN."
   (declare (ignore widget hash))
   nil)
 
+(defgeneric widget-translation-table (obj)
+  (:method-combination append)
+  (:method append (obj)
+   nil))
+
+(defmethod widget-translate (obj &rest args)
+  (apply 
+    #'translate 
+    (list* 
+      (cdr (assoc (car args) (widget-translation-table obj)))
+      (cdr args))))

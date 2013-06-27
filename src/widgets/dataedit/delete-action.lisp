@@ -44,8 +44,9 @@ modify standard behavior for deleting items from a sequence."
   (let ((item-name (humanize-name (dataseq-data-class obj))))
     (when (dataseq-selection-empty-p items)
       (flash-message (dataseq-flash obj)
-                     (format nil (translate "Please select ~A to delete.")
-                             (noun-vocative-to-genitive (pluralize item-name))))
+                     (format nil 
+                             (widget-translate obj :choose-items-for-deletion-message)
+                             (widget-translate obj :item-name :plural-p t :genitive-form-p t)))
       (mark-dirty obj)
       (return-from dataedit-delete-items-flow))
     (let ((initial-items-count (dataseq-data-count obj))
@@ -53,9 +54,9 @@ modify standard behavior for deleting items from a sequence."
       (unless (eq :yes (do-confirmation (let ((item-count (ecase (car items)
                                                             ;; (:all ...)
                                                             (:none (length (cdr items))))))
-                                          (format nil (translate "Delete ~A ~A?")
+                                          (format nil (widget-translate obj :items-delete-question)
                                                   item-count
-                                                  (proper-number-form item-count (noun-vocative-to-genitive item-name))))
+                                                  (widget-translate obj :item-name :items-count item-count :genitive-form t)))
                                         :type :yes/no))
         (return-from dataedit-delete-items-flow))
       (if (dataedit-on-delete-items obj)
@@ -67,10 +68,12 @@ modify standard behavior for deleting items from a sequence."
       (setf deleted-items-count (- initial-items-count (dataseq-data-count obj)))
       (mark-dirty obj :propagate t)
       (flash-message (dataseq-flash obj)
-                     (format nil "~A ~A ~A."
-                             (translate "Deleted" 
-                                        :preceding-gender (determine-gender item-name)
-                                        :preceding-count deleted-items-count)
+                     (format nil 
+                             (widget-translate 
+                               obj
+                               :item-deleted-message 
+                               :preceding-gender (determine-gender item-name)
+                               :preceding-count deleted-items-count)
                              deleted-items-count
                              (proper-number-form deleted-items-count item-name)))
       (safe-funcall (dataedit-on-delete-items-completed obj) obj items))))

@@ -2,13 +2,10 @@
 
 ; i18n utils
 
-(wexport '(*translation-function* translate)
+(wexport '(*translation-function* translate default-translation-function)
          '(t util))
 
-(defvar *translation-function* 
-  (lambda (string &rest args)
-    (declare (ignore args))
-    string))
+(defvar *translation-function* 'default-translation-function)
 
 (defun translate (string &rest args)
   (apply *translation-function* (list* string args)))

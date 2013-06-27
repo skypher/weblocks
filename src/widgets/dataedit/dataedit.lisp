@@ -226,3 +226,9 @@ in order to reset the state after the item widget has done its job."
 ;;; Depend on dataform
 (defmethod dependencies append ((obj dataedit-mixin))
   (list (make-local-dependency :stylesheet "dataform-import" :import-p t)))
+
+(defmethod widget-translation-table append ((obj dataedit-mixin))
+  (list 
+    (cons :item-deleted-message "Deleted ~A ~A.")
+    (cons :items-delete-question "Delete ~A ~A?")
+    (cons :choose-items-for-deletion-message "Please select ~A to delete.")))
