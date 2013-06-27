@@ -42,7 +42,7 @@ returned."
 
 (defun hash-password (password)
   "Returns a one way hash of a plain-text password."
-  (hunchentoot::md5-hex (copy-seq password)))
+  (md5 (copy-seq password)))
 
 (defparameter *default-login-failure-error* "Invalid credentials."
   "Default message in case of login failure.")

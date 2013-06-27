@@ -21,7 +21,7 @@
            slurp-file
            with-file-write
            merge-files-with-newline
-           gzip-file)
+           gzip-file md5)
 	 '(t util))
 
 (defun gen-id (&optional (prefix "dom"))
@@ -230,3 +230,7 @@ answering its result."
        (block nil
          ,@body))))
 
+(defun md5 (string)
+  (ironclad:byte-array-to-hex-string 
+    (ironclad:digest-sequence 
+      :md5 (babel:string-to-octets string :encoding :utf-8))))

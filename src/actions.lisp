@@ -46,7 +46,7 @@ page may display a relevant message, if necessary."
   (let ((new-action-id (gensym "")))
     (format nil "~A:~A"
 	    new-action-id
-	    (hunchentoot::md5-hex
+	    (md5
 	     (hunchentoot::create-random-string 10 36)))))
 
 (defun make-action (action-fn &optional (action-code (generate-action-code)))

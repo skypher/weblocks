@@ -6,7 +6,7 @@
 
 (defsystem weblocks-util
   :name "weblocks-util"
-  :version "0.0.3"
+  :version "0.0.4"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
@@ -22,7 +22,6 @@
                :cl-cont
                :metatilities
                :cl-ppcre
-               :md5
                :anaphora
                :f-underscore
                :bordeaux-threads
@@ -31,7 +30,8 @@
                :trivial-timeout
                :trivial-backtrace 
                :parse-number 
-               :pretty-function)
+               :pretty-function 
+               :ironclad)
   :components 
     ((:module src
       :components (
