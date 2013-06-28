@@ -110,7 +110,6 @@ the latter one being optionally transformed by WRAPPER-FN."
       (setf (slot-value (root-widget) 'children) old-value)
       (update-parent-for-children (widget-children (root-widget))))))
 
-
 (defun/cc do-page (callee)
   "Sets CALLEE as the only child in the root widget, saves the
 continuation, and returns from the delimited computation. When
@@ -118,16 +117,29 @@ CALLEE answers, restores the original children in the root
 widget and reactivates the computation."
   (do-widget nil callee))
 
+(defun modal-wt (&key title content css-class)
+  (with-html-to-string
+    (:div :class "modal"
+     (:h1 (:span (str title)))
+     (:div :class css-class
+      (str content)))))
+
+(deftemplate :modal-wt 'modal-wt)
+
 (defun/cc do-modal (title callee &key css-class)
   "Same as DO-PAGE, but wraps CALLEE in a div container
 for styling purposes."
   (do-widget nil callee
 	     (lambda (new-callee)
-	       (lambda (&rest args)
-		 (declare (ignore args))
-		 (with-html
-		   (:div :class "modal"
-			 (:h1 (:span (str title)))
-			 (:div :class css-class
-			       (render-widget new-callee))))))))
+               (lambda (&rest args)
+                 (declare (ignore args))
+                 (let ((weblocks-stream *weblocks-output-stream*))
+                   (write-string 
+                     (render-template-to-string 
+                       :modal-wt 
+                       (list :css-class css-class :callee callee)
+                       :title title 
+                       :content (capture-weblocks-output (render-widget new-callee))
+                       :css-class css-class)
+                     weblocks-stream))))))
 
