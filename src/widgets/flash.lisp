@@ -76,17 +76,40 @@ messages that need to be shown for AJAX effects."
   (check-type flash flash)
   (push-end (make-widget msg) (flash-messages flash)))
 
+(defun flash-messages-wt (&key content)
+  (with-html-to-string
+    (:div :class "view"
+     (with-extra-tags
+       (htm
+         (:ul :class "messages"
+          (str content)))))))
+
+(deftemplate :flash-messages-wt 'flash-messages-wt)
+
+(defun single-flash-message-wt (&key content)
+  (with-html-to-string 
+    (:li (str content))))
+
+(deftemplate :single-flash-message-wt 'single-flash-message-wt)
+
 (defmethod render-widget-body ((obj flash) &rest args)
   (declare (special *on-ajax-complete-scripts* *dirty-widgets*))
   (let ((messages (flash-messages-to-show obj)))
     (when messages
-      (with-html
-	(:div :class "view"
-	      (with-extra-tags
-		(htm
-		 (:ul :class "messages"
-		      (mapc (lambda (msg)
-			      (htm (:li (apply #'render-widget msg args))))
-			    messages))))))
+      (write-string 
+        (render-template-to-string 
+          :flash-messages-wt 
+          (list :widget obj)
+          :content (format 
+                     nil "~{~A~}"
+                     (mapcar 
+                       (lambda (msg)
+                         (render-template-to-string 
+                           :single-flash-message-wt
+                           (list :widget msg)
+                           :content (capture-weblocks-output 
+                                      (apply #'render-widget msg args))))
+                       messages)))
+        *weblocks-output-stream*)
       (send-script (ps* `((@ ($ ,(dom-id obj)) show)))))))
 

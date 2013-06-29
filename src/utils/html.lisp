@@ -446,13 +446,24 @@ in addition."
       (with-javascript
         script))))
 
+(defun render-message-wt (&key message caption)
+  (with-html-to-string
+    (:p :class "user-message"
+     (when caption
+       (htm (:span :class "caption" (str caption) ":&nbsp;")))
+     (:span :class "message" (str message)))))
+
+(deftemplate :render-message-wt 'render-message-wt)
+
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
-  (with-html
-    (:p :class "user-message"
-        (when caption
-          (htm (:span :class "caption" (str caption) ":&nbsp;")))
-	(:span :class "message" (str message)))))
+  (write-string 
+    (render-template-to-string 
+      :render-message-wt
+      nil 
+      :caption caption 
+      :message message)
+    *weblocks-output-stream*))
 
 (defmacro with-table (colnames &body body)
   `(with-html
