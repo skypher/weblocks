@@ -315,18 +315,24 @@ form-view-buttons for a given view.")
 	(:span :class "action" "Modifying:&nbsp;")
 	(:span :class "object" "~A"))))
 
+(defun form-view-body-wt (&key caption class-name validation-summary fields-prefix fields-suffix form-view-buttons content method action form-id header-class enctype extra-submit-code use-ajax-p)
+  (with-html-to-string
+    (with-html-form (method action
+                            :id form-id
+                            :class header-class
+                            :enctype enctype
+                            :extra-submit-code extra-submit-code
+                            :use-ajax-p use-ajax-p)
 
-(defun form-view-body-wt (&key caption class-name validation-summary fields-prefix fields-suffix form-view-buttons content)
-  (let ((*weblocks-output-stream* (make-string-output-stream)))
-    (with-html
       (when caption
         (htm (:h1 (fmt caption class-name))))
       (str validation-summary)
       (str fields-prefix)
       (:ul (str content))
       (str fields-suffix)
-      (str form-view-buttons)
-      (get-output-stream-string *weblocks-output-stream*))))
+      (str form-view-buttons))))
+
+(deftemplate :form-view-body-wt 'form-view-body-wt)
 
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view form-view) obj widget body-fn &rest args &key
@@ -337,29 +343,37 @@ form-view-buttons for a given view.")
 			     validation-errors
 			     &allow-other-keys)
   (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
+
   (let ((form-id (gen-id))
-	(header-class (format nil "view form ~A"
-			      (attributize-name (object-class-name obj)))))
+        (header-class (format nil "view form ~A"
+                              (attributize-name (object-class-name obj)))))
+
     (when (>= (count-view-fields view)
-	      (form-view-error-summary-threshold view))
+              (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
-    (let ((form-body (form-view-body-wt :caption (view-caption view) 
-                                        :class-name (humanize-name (object-class-name obj))
-                                        :validation-summary (capture-weblocks-output 
-                                                              (render-validation-summary view obj widget validation-errors))
-                                        :fields-prefix (capture-weblocks-output (safe-apply fields-prefix-fn view obj args))
-                                        :fields-suffix (capture-weblocks-output (safe-apply fields-suffix-fn view obj args))
-                                        :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
-                                        :content (capture-weblocks-output (apply body-fn view obj args)))))
-      (with-html-form (method action
-			      :id (when (form-view-focus-p view) form-id)
-			      :class header-class
-			      :enctype (form-view-default-enctype view)
-			      :extra-submit-code (render-form-submit-dependencies *form-submit-dependencies*)
-			      :use-ajax-p (form-view-use-ajax-p view))
-	(write-string form-body *weblocks-output-stream*)))
+
+    (write-string 
+      (render-template-to-string 
+        :form-view-body-wt 
+        (list :view view :object obj :method method)
+        :method method 
+        :action action
+        :header-class header-class
+        :enctype (form-view-default-enctype view)
+        :extra-submit-code (capture-weblocks-output (render-form-submit-dependencies *form-submit-dependencies*))
+        :caption (view-caption view) 
+        :form-id (when (form-view-focus-p view) form-id)
+        :use-ajax-p (form-view-use-ajax-p view)
+        :class-name (humanize-name (object-class-name obj))
+        :validation-summary (capture-weblocks-output 
+                              (render-validation-summary view obj widget validation-errors))
+        :fields-prefix (capture-weblocks-output (safe-apply fields-prefix-fn view obj args))
+        :fields-suffix (capture-weblocks-output (safe-apply fields-suffix-fn view obj args))
+        :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
+        :content (capture-weblocks-output (apply body-fn view obj args)))
+      *weblocks-output-stream*)
     (when (form-view-focus-p view)
-        (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
+      (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
 
 (defun form-view-field-wt(&key label-class id show-required-indicator required-indicator-label 
                                show-field-label field-label validation-error content 

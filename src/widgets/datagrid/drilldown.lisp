@@ -43,32 +43,48 @@
 			   (humanize-name (car (dataseq-on-drilldown widget)))
 			   :ajaxp nil))))))))
 
+(defun datagrid-table-view-body-row-wt (&key row-class prefix suffix row-action session-string content &allow-other-keys)
+  (with-html-to-string
+    (str prefix)
+    (:tr :class row-class
+     :onclick (format nil "initiateActionOnEmptySelection(\"~A\", \"~A\");" row-action session-string)
+     :onmouseover "this.style.cursor = \"pointer\";"
+     :style "cursor: expression(\"hand\");"
+     (str content))
+    (str suffix)))
+
+(deftemplate :datagrid-table-view-body-row-wt 'datagrid-table-view-body-row-wt)
+
 ;;; Drilldown row
 (defmethod with-table-view-body-row ((view table-view) obj (widget datagrid) &rest args
-				     &key alternp &allow-other-keys)
+                                                       &key alternp &allow-other-keys)
   (if (and (dataseq-allow-drilldown-p widget)
-	   (dataseq-on-drilldown widget))
-      (let ((row-action (make-action
-			 (lambda (&rest args)
-			   (declare (ignore args))
-			   (when (dataseq-autoset-drilled-down-item-p widget)
-			     (setf (dataseq-drilled-down-item widget) obj))
-			   (funcall (cdr (dataseq-on-drilldown widget)) widget obj))))
-	    (drilled-down-p (and (dataseq-drilled-down-item widget)
-				 (eql (object-id (dataseq-drilled-down-item widget))
-				      (object-id obj)))))
-	(safe-apply (sequence-view-row-prefix-fn view) view obj args)
-	(with-html
-	  (:tr :class (when (or alternp drilled-down-p)
-			(concatenate 'string
-				     (when alternp "altern")
-				     (when (and alternp drilled-down-p) " ")
-				     (when drilled-down-p "drilled-down")))
-	       :onclick (format nil "initiateActionOnEmptySelection(\"~A\", \"~A\");"
-				row-action (session-name-string-pair))
-	       :onmouseover "this.style.cursor = \"pointer\";"
-	       :style "cursor: expression(\"hand\");"
-	       (apply #'render-table-view-body-row view obj widget :row-action row-action args)))
-	(safe-apply (sequence-view-row-suffix-fn view) view obj args))
-      (call-next-method)))
+           (dataseq-on-drilldown widget))
+    (let ((row-action (make-action
+                        (lambda (&rest args)
+                          (declare (ignore args))
+                          (when (dataseq-autoset-drilled-down-item-p widget)
+                            (setf (dataseq-drilled-down-item widget) obj))
+                          (funcall (cdr (dataseq-on-drilldown widget)) widget obj))))
+          (drilled-down-p (and (dataseq-drilled-down-item widget)
+                               (eql (object-id (dataseq-drilled-down-item widget))
+                                    (object-id obj)))))
+      (write-string 
+        (render-template-to-string 
+          :datagrid-table-view-body-row-wt
+          (list :view view :object obj :widget widget)
+          :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
+          :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args))
+          :row-action row-action
+          :session-string (session-name-string-pair)
+          :row-class (when (or alternp drilled-down-p)
+                       (concatenate 'string
+                                    (when alternp "altern")
+                                    (when (and alternp drilled-down-p) " ")
+                                    (when drilled-down-p "drilled-down")))
+          :alternp alternp 
+          :drilled-down-p drilled-down-p
+          :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget :row-action row-action args)))
+        *weblocks-output-stream*))
+    (call-next-method)))
 
