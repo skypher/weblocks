@@ -7,233 +7,235 @@
 (in-package :weblocks-asd)
 
 (defsystem weblocks
-  :name "weblocks"
-  :version "0.9.27"
-  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
-  :author "Slava Akhmechet"
-  :licence "LLGPL"
-  :description "A Common Lisp web framework."
-  :depends-on (:weblocks-util
-               :weblocks-stores
-               :closer-mop
-               :hunchentoot
-               :puri
-               :cl-json
-               :cl-who
-               :parenscript
-               :cl-fad
-               :optima
-               :cl-cont
-               :metatilities
-               :cl-ppcre
-               :anaphora
-               :f-underscore
-               :bordeaux-threads
-               :salza2
-               :html-template
-               :trivial-timeout
-               :trivial-backtrace 
-               :parse-number 
-               :pretty-function)
-  :components ((:module src
-		:components (
-		 (:file "package")
-		 (:file "weblocks" :depends-on ("package"))
-		 (:module utils
-			  :components ((:file "misc")
-                                       (:file "clos")
-                                       (:file "runtime-class")
-                                       (:file "string")
-                                       (:file "list")
-                                       (:file "uri")
-                                       (:file "html")
-                                       (:file "javascript")
-                                       (:file "isearch"
-                                              :depends-on ("html"))
-                                       (:file "menu"
-                                              :depends-on ("html"))
-                                       (:file "suggest")
-                                       (:file "timing")
-                                       (:file "repl"))
-			  :depends-on ("weblocks"))
-		 (:file "versioning"
-			:depends-on ("weblocks" utils))
-		 (:file "bundling"
-			:depends-on ("weblocks" utils))
-		 (:file "dependencies"
-			:depends-on ("weblocks" "server" "bundling" "versioning" utils))
-		 (:file "dom-object"
-			:depends-on ("weblocks" utils))
-		 (:file "page-template"
-			:depends-on ("weblocks" utils "application"))
-		 (:file "actions"
-			:depends-on ("weblocks" utils))
-		 (:file "log-actions"
-			:depends-on ("weblocks"))
-		 (:file "debug-mode"
-			:depends-on ("weblocks" "actions"))
-		 (:file "uri-tokens"
-			:depends-on ("weblocks"))
-		 (:file "request-hooks"
-			:depends-on ("weblocks"))
-                 (:file "error-handler"
-                        :depends-on ("weblocks" "application"))
-		 (:file "request-handler"
-			:depends-on (utils "weblocks" "page-template" "debug-mode"
-					   "actions" "request-hooks" "application"
-					   "request" "dependencies" "uri-tokens"
-                                           "error-handler"))
-		 (:module linguistic
-			  :components ((:file "grammar"))
-			  :depends-on ("weblocks" utils))
-		 (:module views
-			  :components ((:module view
-						:components ((:file "view")
-							     (:file "utils"
-								    :depends-on ("view"))
-							     (:file "compiler"
-								    :depends-on ("view"))
-							     (:file "scaffold"
-								    :depends-on ("view" "utils"))
-							     (:file "presentation"
-								    :depends-on ("view" "compiler"))))
-				       (:file "dataview"
-					      :depends-on (view))
-				       (:module formview
-						:components ((:file "formview")
-							     (:file "helpers")
-							     (:file "parser"
-								    :depends-on ("formview"))
-							     (:file "scaffold"
-								    :depends-on ("formview" "parser"))
-							     (:file "validation"
-								    :depends-on ("formview"))
-							     (:file "request-deserialization"
-								    :depends-on ("formview" "parser"
-											    "validation")))
-						:depends-on (view))
-				       (:file "sequence-view"
-					      :depends-on (view))
-				       (:file "tableview"
-					      :depends-on (view dataview "sequence-view"))
-				       (:module
-					types
-					:components ((:file "file-upload")
-                                                     (:file "us-states")
-						     (:file "boolean")
-						     (:file "member"
-							    :depends-on (presentations parsers))
-						     (:file "password")
-						     (:module
-						      presentations
-						      :components ((:file "hidden")
-                                                                   (:file "choices")
-								   (:file "date")
-								   (:file "radio"
-									  :depends-on ("choices"))
-								   (:file "dropdown"
-									  :depends-on ("choices"))
-								   (:file "textarea")
-								   (:file "paragraph")
-								   (:file "excerpt")
-								   (:file "image")
-								   (:file "checkboxes")
-								   (:file "url")
-								   (:file "html")))
-						     (:module
-						      parsers
-						      :components ((:file "common"))))
-					:depends-on (view formview dataview)))
-			  :depends-on ("weblocks" "dependencies" utils))
-		 (:module widgets
-			  :components ((:module widget
-						:components ((:file "widget-mop")
-							     (:file "uri-parameters-mixin")
-							     (:file "widget"
-								    :depends-on ("widget-mop"
-										 "uri-parameters-mixin"))
-                                                             (:file "string-widget"
-                                                                    :depends-on ("widget"))
-                                                             (:file "funcall-widget"
-                                                                    :depends-on ("widget"))))
-                                       (:file "composite"
-					      :depends-on (widget))
-				       (:file "flash"
-					      :depends-on (widget))
-				       (:file "data-editor"
-					      :depends-on (widget))
-				       (:file "dataform"
-					      :depends-on (widget "data-editor"))
-				       (:file "quickform"
-					      :depends-on (widget "dataform"))
-				       (:file "simpleform"
-					      :depends-on (widget "quickform"))
-				       (:file "wizard"
-					      :depends-on (widget "dataform"))
-                                       (:file "template-block"
-                                              :depends-on (widget))
-				       (:file "login"
-					      :depends-on (widget "quickform"))
-				       (:module dataseq
-						:components ((:file "dataseq")
-							     #-cmu (:file "operations-action"))
-						:depends-on (widget "flash"))
-				       (:module datagrid
-						:components ((:file "datagrid")
-							     (:file "sort"
-								    :depends-on ("datagrid"))
-							     (:file "select"
-								    :depends-on ("datagrid"))
-							     (:file "drilldown"
-								    :depends-on ("datagrid")))
-						:depends-on (widget "dataseq"))
-				       (:module dataedit
-						:components ((:file "dataedit"
-								    :depends-on (#-cmu "delete-action"))
-							     #-cmu (:file "delete-action"))
-						:depends-on (widget dataseq))
-				       (:file "gridedit"
-					      :depends-on (datagrid dataedit "dataform"))
-				       (:file "listedit"
-					      :depends-on (datalist dataedit "dataform" "quickform"))
-				       (:file "datalist"
-					      :depends-on (widget "dataseq"))
-				       (:file "pagination"
-					      :depends-on (widget "flash"))
-                                       #+(or)(:file "table-composite"
-                                                    :depends-on (composite))
-				       (:file "selector"
-					      :depends-on (widget))
-				       (:file "on-demand-selector"
-					      :depends-on ("selector"))
-				       (:file "navigation"
-					      :depends-on ("selector" widget))
-				       (:file "breadcrumbs"
-					      :depends-on ("navigation")))
-			  :depends-on (views utils "dependencies" "actions" "server" "request"
-						"request-hooks" "dom-object" linguistic))
-		 (:module control-flow
-			  :components ((:file "call-answer")
-				       (:file "dialog"
-					      :depends-on ("call-answer"))
-				       (:file "workflow"
-					      :depends-on ("call-answer")))
-			  :depends-on ("weblocks" "widgets" "request-handler"))
-                 (:file "acceptor"
-                        :depends-on ("weblocks"))
-		 (:file "server"
-			:depends-on ("weblocks" "acceptor" "debug-mode" utils))
-		 (:file "request"
-			:depends-on ("weblocks" "request-hooks" "actions"))
-		 (:file "application-mop"
-			:depends-on ("weblocks" "server"))
-		 (:file "application"
-			:depends-on ("weblocks" "application-mop"))
-		 (:file "default-application"
-			:depends-on ("server" "weblocks" utils "request-handler")))))
-  :in-order-to ((test-op (load-op "weblocks-test"))
-		(doc-op (load-op "weblocks-scripts"))
-		(make-app-op (load-op "weblocks-scripts"))))
+   :name "weblocks"
+   :version "0.9.28"
+   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
+   :author "Slava Akhmechet"
+   :licence "LLGPL"
+   :description "A Common Lisp web framework."
+   :depends-on (:weblocks-util
+     :weblocks-stores
+     :closer-mop
+     :hunchentoot
+     :puri
+     :cl-json
+     :cl-who
+     :parenscript
+     :cl-fad
+     :optima
+     :cl-cont
+     :metatilities
+     :cl-ppcre
+     :anaphora
+     :f-underscore
+     :bordeaux-threads
+     :salza2
+     :html-template
+     :trivial-timeout
+     :trivial-backtrace 
+     :parse-number 
+   :pretty-function)
+   :components ((:module src
+               :components (
+                   (:file "package")
+                   (:file "weblocks" :depends-on ("package"))
+                   (:module utils
+                    :components ((:file "misc")
+                        (:file "clos")
+                        (:file "runtime-class")
+                        (:file "string")
+                        (:file "list")
+                        (:file "uri")
+                        (:file "html")
+                        (:file "javascript")
+                        (:file "isearch"
+                         :depends-on ("html"))
+                        (:file "menu"
+                         :depends-on ("html"))
+                        (:file "suggest")
+                        (:file "timing")
+                        (:file "repl"))
+                    :depends-on ("weblocks"))
+                   (:file "versioning"
+                    :depends-on ("weblocks" utils))
+                     (:file "bundling"
+                      :depends-on ("weblocks" utils))
+                     (:file "dependencies"
+                      :depends-on ("weblocks" "server" "bundling" "versioning" utils))
+                     (:file "dom-object"
+                      :depends-on ("weblocks" utils))
+                     (:file "page-template"
+                      :depends-on ("weblocks" utils "application"))
+                     (:file "actions"
+                      :depends-on ("weblocks" utils))
+                     (:file "log-actions"
+                      :depends-on ("weblocks"))
+                     (:file "debug-mode"
+                      :depends-on ("weblocks" "actions"))
+                     (:file "uri-tokens"
+                      :depends-on ("weblocks"))
+                     (:file "request-hooks"
+                      :depends-on ("weblocks"))
+                     (:file "error-handler"
+                      :depends-on ("weblocks" "application"))
+                     (:file "request-handler"
+                      :depends-on (utils "weblocks" "page-template" "debug-mode"
+                          "actions" "request-hooks" "application"
+                          "request" "dependencies" "uri-tokens"
+                          "error-handler"))
+                     (:module linguistic
+                      :components ((:file "grammar"))
+                      :depends-on ("weblocks" utils))
+                       (:module views
+                        :components ((:module view
+                                :components ((:file "view")
+                                    (:file "utils"
+                                     :depends-on ("view"))
+                                    (:file "compiler"
+                                     :depends-on ("view"))
+                                    (:file "scaffold"
+                                     :depends-on ("view" "utils"))
+                                    (:file "presentation"
+                                     :depends-on ("view" "compiler"))))
+                            (:file "dataview"
+                             :depends-on (view))
+                            (:module formview
+                             :components ((:file "formview")
+                                 (:file "helpers")
+                                 (:file "parser"
+                                  :depends-on ("formview"))
+                                 (:file "scaffold"
+                                  :depends-on ("formview" "parser"))
+                                 (:file "validation"
+                                  :depends-on ("formview"))
+                                 (:file "request-deserialization"
+                                  :depends-on ("formview" "parser"
+                                      "validation"))
+                                 (:file "template-form-view" :depends-on ("formview")))
+                             :depends-on (view))
+    (:file "sequence-view"
+     :depends-on (view))
+                        (:file "tableview"
+                         :depends-on (view dataview "sequence-view"))
+                              (:module
+                               types
+                               :components ((:file "file-upload")
+                                   (:file "us-states")
+                                   (:file "boolean")
+                                   (:file "member"
+                                    :depends-on (presentations parsers))
+                                   (:file "password")
+                                   (:module
+                                    presentations
+                                    :components ((:file "hidden")
+                                        (:file "choices")
+                                        (:file "date")
+                                        (:file "radio"
+                                         :depends-on ("choices"))
+                                        (:file "dropdown"
+                                         :depends-on ("choices"))
+                                        (:file "textarea")
+                                        (:file "paragraph")
+                                        (:file "excerpt")
+                                        (:file "image")
+                                        (:file "checkboxes")
+                                        (:file "url")
+                                        (:file "html")
+                                        (:file "widget")))
+                              (:module
+                               parsers
+                               :components ((:file "common"))))
+                              :depends-on (view formview dataview)))
+                               :depends-on ("weblocks" "dependencies" utils))
+                                (:module widgets
+                                 :components ((:module widget
+                                         :components ((:file "widget-mop")
+                                             (:file "uri-parameters-mixin")
+                                             (:file "widget"
+                                              :depends-on ("widget-mop"
+                                                  "uri-parameters-mixin"))
+                                             (:file "string-widget"
+                                              :depends-on ("widget"))
+                                             (:file "funcall-widget"
+                                              :depends-on ("widget"))))
+                                     (:file "composite"
+                                      :depends-on (widget))
+                                     (:file "flash"
+                                      :depends-on (widget))
+                                     (:file "data-editor"
+                                      :depends-on (widget))
+                                     (:file "dataform"
+                                      :depends-on (widget "data-editor"))
+                                     (:file "quickform"
+                                      :depends-on (widget "dataform"))
+                                     (:file "simpleform"
+                                      :depends-on (widget "quickform"))
+                                (:file "wizard"
+                                 :depends-on (widget "dataform"))
+    (:file "template-block"
+     :depends-on (widget))
+                          (:file "login"
+                           :depends-on (widget "quickform"))
+                                (:module dataseq
+                                 :components ((:file "dataseq")
+#-cmu (:file "operations-action"))
+                                 :depends-on (widget "flash"))
+                                (:module datagrid
+                                 :components ((:file "datagrid")
+                                     (:file "sort"
+                                      :depends-on ("datagrid"))
+                                     (:file "select"
+                                      :depends-on ("datagrid"))
+                                     (:file "drilldown"
+                                      :depends-on ("datagrid")))
+                                 :depends-on (widget "dataseq"))
+                                  (:module dataedit
+                                   :components ((:file "dataedit"
+                                           :depends-on (#-cmu "delete-action"))
+#-cmu (:file "delete-action"))
+                                   :depends-on (widget dataseq))
+    (:file "gridedit"
+     :depends-on (datagrid dataedit "dataform"))
+    (:file "listedit"
+     :depends-on (datalist dataedit "dataform" "quickform"))
+    (:file "datalist"
+     :depends-on (widget "dataseq"))
+    (:file "pagination"
+     :depends-on (widget "flash"))
+#+(or)(:file "table-composite"
+        :depends-on (composite))
+    (:file "selector"
+     :depends-on (widget))
+    (:file "on-demand-selector"
+     :depends-on ("selector"))
+    (:file "navigation"
+     :depends-on ("selector" widget))
+    (:file "breadcrumbs"
+     :depends-on ("navigation")))
+     :depends-on (views utils "dependencies" "actions" "server" "request"
+             "request-hooks" "dom-object" linguistic))
+      (:module control-flow
+       :components ((:file "call-answer")
+           (:file "dialog"
+            :depends-on ("call-answer"))
+           (:file "workflow"
+            :depends-on ("call-answer")))
+       :depends-on ("weblocks" "widgets" "request-handler"))
+        (:file "acceptor"
+         :depends-on ("weblocks"))
+        (:file "server"
+         :depends-on ("weblocks" "acceptor" "debug-mode" utils))
+        (:file "request"
+         :depends-on ("weblocks" "request-hooks" "actions"))
+        (:file "application-mop"
+         :depends-on ("weblocks" "server"))
+        (:file "application"
+         :depends-on ("weblocks" "application-mop"))
+        (:file "default-application"
+         :depends-on ("server" "weblocks" utils "request-handler")))))
+      :in-order-to ((test-op (load-op "weblocks-test"))
+          (doc-op (load-op "weblocks-scripts"))
+          (make-app-op (load-op "weblocks-scripts"))))
 
 ;;; test-op
 (defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))

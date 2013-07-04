@@ -144,3 +144,30 @@ submission behavior.")
    (ecase (dataform-ui-state obj)
      (:form (dataform-form-view obj))
      (:data (dataform-data-view obj)))))
+
+; XXX type option unimplemented
+(defmethod widget-children ((obj dataform) &optional type)
+  "Returns all widgets from all view fields with presentation widget-presentation"
+  (let ((widgets))
+    (map-view-fields 
+      (lambda (field-info)
+        (when (typep (slot-value (field-info-field field-info) 'presentation) 'widget-presentation)
+          (push (widget-presentation-widget (slot-value (field-info-field field-info) 'presentation)) widgets)))
+      (dataform-form-view obj)
+      (dataform-data obj))
+    widgets))
+
+(defun update-form-intermediate-values-on-form-action (&rest args)
+  (when (and (request-parameters)
+             (request-parameter "form-id"))
+    (let ((form (get-widget-by-id (request-parameter "form-id"))))
+      (when (subtypep (type-of form) 'dataform)
+        (setf 
+          (slot-value form 'intermediate-form-values)
+          (request-parameters-for-object-view 
+            (dataform-form-view form)
+            (dataform-data form)))))))
+
+(eval-when (:load-toplevel)
+  (pushnew 'update-form-intermediate-values-on-form-action 
+           (request-hook :application :pre-action)))

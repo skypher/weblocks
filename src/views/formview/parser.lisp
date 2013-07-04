@@ -3,7 +3,7 @@
 
 (export '(parser parser-error-message parse-view-field-value
 	  parser-class-name text text-parser text-parser-matches
-	  text-input-present-p))
+	  text-input-present-p lambda lambda-parser))
 
 ;;; Parser
 (defclass parser ()
@@ -47,9 +47,11 @@ the symbol.")
 	(lambda (slot-name parser)
 	  (let ((parser (ensure-list parser)))
 	    `(setf (form-view-field-parser ,slot-name)
-		   (funcall #'make-instance (parser-class-name ',(car parser))
-			    ,@(quote-property-list-arguments
-			       (cdr parser))))))))
+                   ,(if (symbolp (car parser))
+                      `(funcall #'make-instance (parser-class-name ',(car parser))
+                                ,@(quote-property-list-arguments
+                                    (cdr parser)))
+                      (car parser)))))))
 
 ;;; Default parser
 (defclass text-parser (parser)
@@ -75,3 +77,9 @@ the symbol.")
   "Returns true if the text input is to be considered non-empty."
   (not (string-whitespace-p (or value ""))))
 
+(defclass lambda-parser (parser)
+  ((function :initform nil :initarg :function)))
+
+(defmethod parse-view-field-value ((parser lambda-parser) value obj (view form-view) (field form-view-field) &rest args)
+  (with-slots (function) parser
+    (apply function (list :value value :object obj :view view :field field :args args))))
