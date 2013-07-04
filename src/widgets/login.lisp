@@ -15,7 +15,7 @@
   "A key used to store the authentication object in the session.")
 
 ;;; A wrapper function to quickly present a login dialog
-(defun/cc do-login (on-login &key (view 'default-login-view) (title *default-login-title*))
+(defun/cc do-login (on-login &key (view 'default-login-view) (title (translate *default-login-title*)))
   (do-dialog title (make-instance 'login :on-login on-login :view view)))
 
 (defun authenticatedp ()
