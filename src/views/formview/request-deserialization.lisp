@@ -5,6 +5,47 @@
 	  request-parameters-for-object-view
           request-parameter-for-presentation))
 
+(defun update-intermediate-values-from-request (obj view class-store args)
+  (let (results errors)
+    (apply #'map-view-fields
+           (lambda (field-info)
+             (let* ((field (field-info-field field-info))
+                    (obj (field-info-object field-info))
+                    (field-key (attributize-view-field-name field-info))
+                    (field-value (request-parameter-for-presentation field-key
+                                                                     (view-field-presentation field))))
+               (when (typep (view-field-presentation field) 'form-presentation)
+                 (multiple-value-bind (parsedp presentp parsed-value)
+                   (apply #'parse-view-field-value (form-view-field-parser field)
+                          field-value obj view field
+                          :field-info field-info args)
+                   (unless (form-view-field-disabled-p field obj)
+                     (if parsedp
+                       (if (not presentp)
+                         (if (form-view-field-required-p field)
+                           (push (cons field (get-required-error-msg field))
+                                 errors)
+                           (push (cons field-info nil) results))
+                         (push (cons field-info parsed-value) results))
+                       (push (cons field (parser-error-message
+                                           (form-view-field-parser field)))
+                             errors)))))))
+           view obj args)
+    (values results errors)))
+
+(defun parse-object-view-from-request (obj view class-store args)
+  "Parses an object from request. If parsed successfully,
+   returns true as the first value and an association list
+   of field-info structures and parsed values as the
+   second value. Otherwise, returns nil as the first value
+   and an association list of fields and error messages as
+   the second value."
+  (multiple-value-bind (results errors)
+    (update-intermediate-values-from-request obj view class-store args)
+    (if errors
+      (values nil errors)
+      (values t results))))
+
 (defgeneric update-object-view-from-request (obj view &rest args
 						 &key class-store satisfies
 						 &allow-other-keys)
@@ -26,42 +67,7 @@ Specialize this function to parse given objects differently.")
   (:method (obj view &rest args
 	    &key class-store satisfies
 	    &allow-other-keys)
-    (labels ((parse-object-view-from-request (obj view)
-	       "Parses an object from request. If parsed successfully,
-               returns true as the first value and an association list
-               of field-info structures and parsed values as the
-               second value. Otherwise, returns nil as the first value
-               and an association list of fields and error messages as
-               the second value."
-	       (let (results errors)
-		 (apply #'map-view-fields
-			(lambda (field-info)
-			  (let* ((field (field-info-field field-info))
-				 (obj (field-info-object field-info))
-				 (field-key (attributize-view-field-name field-info))
-				 (field-value (request-parameter-for-presentation field-key
-                                                                                  (view-field-presentation field))))
-			    (when (typep (view-field-presentation field) 'form-presentation)
-			      (multiple-value-bind (parsedp presentp parsed-value)
-				  (apply #'parse-view-field-value (form-view-field-parser field)
-					 field-value obj view field
-					 :field-info field-info args)
-				(unless (form-view-field-disabled-p field obj)
-				  (if parsedp
-				      (if (not presentp)
-					  (if (form-view-field-required-p field)
-					      (push (cons field (get-required-error-msg field))
-						    errors)
-					      (push (cons field-info nil) results))
-					  (push (cons field-info parsed-value) results))
-				      (push (cons field (parser-error-message
-							 (form-view-field-parser field)))
-					    errors)))))))
-			view obj args)
-		 (if errors
-		     (values nil errors)
-		     (values t results))))
-	     (write-value (field value obj)
+    (labels ((write-value (field value obj)
 	       "Writes a field value into object's slot."
 	       (if (slot-boundp field 'writer)
 		   (funcall (form-view-field-writer field) value obj)
@@ -113,7 +119,7 @@ Specialize this function to parse given objects differently.")
 	       (persist-object (or class-store (object-store obj)) obj)))
       ;; Parse, validate, deserialize, and persist the object view
       (multiple-value-bind (parsep results)
-	  (parse-object-view-from-request obj view)
+	  (parse-object-view-from-request obj view class-store args)
 	(if parsep
 	    (multiple-value-bind (validatesp errors)
 		(validate-object-form-view obj view results)
