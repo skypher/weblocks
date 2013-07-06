@@ -56,7 +56,7 @@ modify standard behavior for deleting items from a sequence."
                                                             (:none (length (cdr items))))))
                                           (format nil (widget-translate obj :items-delete-question)
                                                   item-count
-                                                  (widget-translate obj :item-name :items-count item-count :genitive-form t)))
+                                                  (widget-translate obj :item-name :items-count item-count :genitive-form-p t)))
                                         :type :yes/no))
         (return-from dataedit-delete-items-flow))
       (if (dataedit-on-delete-items obj)

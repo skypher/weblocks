@@ -109,7 +109,7 @@
   (if ignore-nulls-p
       (call-next-method)
       (with-html
-	(:span :class "value missing" (str (text-presentation-null-string presentation))))))
+	(:span :class "value missing" (str (translate (text-presentation-null-string presentation)))))))
 
 (defun highlight-regex-matches (item highlight &optional presentation)
   "This function highlights regex matches in text by wrapping them in

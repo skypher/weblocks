@@ -167,68 +167,70 @@ being rendered.
   "A welcome message used by dropdowns as the first entry.")
 
 (defun render-dropdown (name selections &key id class selected-value
-                        ;; 'disabled' was here already; adding 'disabledp' for
-			;; consistency with many other routines.
-			disabled (disabledp disabled)
-			onchange welcome-name multiple autosubmitp
-                        tabindex (frob-welcome-name t))
+                             ;; 'disabled' was here already; adding 'disabledp' for
+                             ;; consistency with many other routines.
+                             disabled (disabledp disabled)
+                             onchange welcome-name multiple autosubmitp
+                             tabindex (frob-welcome-name t))
   "Renders a dropdown HTML element (select).
 
-'name' - the name of html control. The name is attributized before
-being rendered.
+   'name' - the name of html control. The name is attributized before
+   being rendered.
 
-'selections' - a list of strings to render as selections. Each element
-may be a string or a cons cell. If it is a cons cell, the car of each
-cell will be used as the text for each option and the cdr will be used
-for the value.
+   'selections' - a list of strings to render as selections. Each element
+   may be a string or a cons cell. If it is a cons cell, the car of each
+   cell will be used as the text for each option and the cdr will be used
+   for the value.
 
-'id' - an id of the element.
+   'id' - an id of the element.
 
-'class' - css class of the element.
+   'class' - css class of the element.
 
-'selected-value' - a list of strings. Each option will be tested
-against this list and if an option is a member it will be marked as
-selected. A single string can also be provided.
+   'selected-value' - a list of strings. Each option will be tested
+   against this list and if an option is a member it will be marked as
+   selected. A single string can also be provided.
 
-'welcome-name' - a string used to specify dropdown welcome option (see
-*dropdown-welcome-message*). If nil, no welcome message is used. If
-'welcome-name' is a cons cell, car will be treated as the welcome name
-and cdr will be returned as value in case it's selected.
+   'welcome-name' - a string used to specify dropdown welcome option (see
+                                                                       *dropdown-welcome-message*). If nil, no welcome message is used. If
+   'welcome-name' is a cons cell, car will be treated as the welcome name
+   and cdr will be returned as value in case it's selected.
 
-'multiple' - determines whether multiple selections are allowed
+   'multiple' - determines whether multiple selections are allowed
 
-'autosubmitp' - determines if the dropdown automatically submits
-itself on selection. Note, if the parent form uses ajax, the dropdown
-will submit an ajax request. Otherwise, a regular request will be
-submitted.
+   'autosubmitp' - determines if the dropdown automatically submits
+   itself on selection. Note, if the parent form uses ajax, the dropdown
+   will submit an ajax request. Otherwise, a regular request will be
+   submitted.
 
-'disabledp' - input is disabled if true."
+   'disabledp' - input is disabled if true."
   (when welcome-name
     (setf welcome-name (car (list->assoc (list welcome-name)
-					 :map (constantly "")))))
+                                         :map (constantly "")))))
   (with-html
     (:select :id id
-	     :class class
-             :tabindex tabindex
-             :disabled (and disabledp "disabled")
-	     :name (attributize-name name)
-	     :onchange (or onchange
-                           (when autosubmitp
-                             "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }"))
-	     :multiple (when multiple "on" "off")
-	     (mapc (lambda (i)
-		     (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
-                                 :test #'string-equal :key #'princ-to-string)
-			 (htm (:option :value (cdr i) :selected "selected" (str (car i))))
-			 (htm (:option :value (cdr i) (str (car i))))))
-		   (list->assoc (append (when welcome-name
-					  (list
-					   (cons (if frob-welcome-name ; backwards compat
-                                                   (format nil (translate *dropdown-welcome-message*) (car welcome-name))
-                                                   (car welcome-name))
-						 (cdr welcome-name))))
-					selections)
-				:map (constantly nil))))))
+     :class class
+     :tabindex tabindex
+     :disabled (and disabledp "disabled")
+     :name (attributize-name name)
+     :onchange (or onchange
+                   (when autosubmitp
+                     "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }"))
+     :multiple (when multiple "on" "off")
+     (mapc (lambda (i)
+             (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
+                         :test #'string-equal :key #'princ-to-string)
+               (htm (:option :value (cdr i) :selected "selected" (str (car i))))
+               (htm (:option :value (cdr i) (str (car i))))))
+           (list->assoc (append (when welcome-name
+                                  (list
+                                    (cons (if frob-welcome-name ; backwards compat
+                                            (format nil 
+                                                    (translate *dropdown-welcome-message*) 
+                                                    (translate (car welcome-name) :genitive-form-p t))
+                                            (car welcome-name))
+                                          (cdr welcome-name))))
+                                selections)
+                        :map (constantly nil))))))
 
 (defun render-autodropdown (name selections action
 			    &key selected-value welcome-name
