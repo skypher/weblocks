@@ -48,17 +48,18 @@
           (labels-data))
       (apply #'map-view-fields 
              (lambda (field-info)
-               (setf field-values-data 
-                     (append field-values-data 
-                             (list (alexandria:make-keyword (view-field-slot-name (field-info-field field-info))) 
-                                   (capture-weblocks-output 
-                                     (let ((field (field-info-field field-info))
-                                           (obj (field-info-object field-info)))
-                                       (apply #'render-view-field-value
-                                              (obtain-view-field-value field obj)
-                                              (view-field-presentation field)
-                                              field view widget 
-                                              obj args))))))
+               (let ((*presentation-dom-id* (gen-id)))
+                 (setf field-values-data 
+                       (append field-values-data 
+                               (list (alexandria:make-keyword (view-field-slot-name (field-info-field field-info))) 
+                                     (capture-weblocks-output 
+                                       (let ((field (field-info-field field-info))
+                                             (obj (field-info-object field-info)))
+                                         (apply #'render-view-field-value
+                                                (obtain-view-field-value field obj)
+                                                (view-field-presentation field)
+                                                field view widget 
+                                                obj args)))))))
                (setf fields-data 
                      (append fields-data 
                              (list 
