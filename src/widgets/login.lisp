@@ -148,7 +148,7 @@ returned."
                                                (safe-funcall fn)))
 					   (values nil
 						   (list
-						    (cons nil (or error *default-login-failure-error*)))))))
+						    (cons nil (or error (translate *default-login-failure-error*))))))))
 			:answerp nil
                         :data (login-data obj)
                         :class-store (login-class-store obj))))
