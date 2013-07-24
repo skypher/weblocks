@@ -148,7 +148,7 @@ items if 'show-total-items' is set to true."))
       ; Go to page
       (when (> (pagination-page-count obj) 1)
 	(with-html-form (:get (curry #'pagination-on-go-to-page obj))
-	  (:label (:span "Go to page:&nbsp;")
+	  (:label (:span (str (translate "Go to page:&nbsp;")))
 		  (:input :name "page-number"
 			  :class (concatenate 'string
 					      "page-number"
@@ -162,7 +162,7 @@ items if 'show-total-items' is set to true."))
 				    "if(this.value == \"\") { this.value = \"1\"; }")
 			  :value (when (/= (pagination-current-page obj) 1)
 				   "1")))
-	  (render-button "go-to-page" :value "Go")))
+	  (render-button "go-to-page" :value (translate "Go"))))
       ; Total items
       (pagination-render-total-item-count obj))))
 
