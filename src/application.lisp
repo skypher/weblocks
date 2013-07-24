@@ -43,6 +43,7 @@
           update-thread-status
           *registered-webapps*
           with-webapp
+          weblocks-webapp-default-dependencies
           ))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -271,6 +272,16 @@ called (primarily for backward compatibility"
      (when (get-webapp ',name nil)
        (restart-webapp ',name))))
 
+(defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))
+  '((:stylesheet "layout")
+    (:stylesheet "main")
+    (:stylesheet "dialog")
+    (:script "prototype")
+    (:script "scriptaculous")
+    (:script "shortcut")
+    (:script "weblocks")
+    (:script "dialog")))
+
 (defmethod initialize-instance :after
     ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
   "Add some defaults to my slots.  In particular, unless
@@ -306,14 +317,7 @@ to my `application-dependencies' slot."
                       (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
       (setf (weblocks-webapp-application-dependencies self)
-            (append '((:stylesheet "layout")
-                      (:stylesheet "main")
-                      (:stylesheet "dialog")
-                      (:script "prototype")
-                      (:script "scriptaculous")
-                      (:script "shortcut")
-                      (:script "weblocks")
-                      (:script "dialog"))
+            (append (weblocks-webapp-default-dependencies self)
                     (weblocks-webapp-application-dependencies self)))))
   (let ((pfp (weblocks-webapp-public-files-path self)))
     (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
