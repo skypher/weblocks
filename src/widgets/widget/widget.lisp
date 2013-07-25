@@ -516,7 +516,8 @@ if INCLUDE-SUBTYPES-P) in the widget tree starting at ROOT
                     (lambda (widget d)
                       (declare (ignore d))
                       (when (funcall test id (dom-id widget))
-                        (return-from get-widget-by-id widget)))))
+                        (return-from get-widget-by-id widget))))
+  nil)
 
 (defun widget-parents (widget)
   "Return the parent chain of a widget."
