@@ -9,12 +9,12 @@
 
 ;;; Data presentation
 (defclass predicate-presentation (text-presentation)
-  ((false-string :initform "No"
+  ((false-string :initform (translate "No")
 		 :accessor predicate-presentation-false-string
 		 :initarg :false-string
 		 :documentation "A string to be printed when the
 		 predicate is false.")
-   (true-string :initform "Yes"
+   (true-string :initform (translate "Yes")
 		:accessor predicate-presentation-true-string
 		:initarg :true-string
 		:documentation "A string to be printed when the
