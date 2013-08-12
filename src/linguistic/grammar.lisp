@@ -3,7 +3,7 @@
 
 (export '(pluralize singularize proper-number-form vowelp consonantp
           proper-indefinite-article articlize *current-locale* current-locale 
-          russian-proper-number-form noun-vocative-to-genitive *debug-words-genitives* *debug-words-genders* determine-gender))
+          russian-proper-number-form noun-vocative-to-genitive *debug-words-forms* *debug-words-genders* determine-gender))
 
 (defvar *current-locale* :en)
 (defun current-locale ()
@@ -99,22 +99,28 @@
 apple' for 'apple' and 'a table' for 'table'."
   (concatenate 'string (proper-indefinite-article word) " " word))
 
-(defvar *debug-words-genitives* nil)
+(defvar *debug-words-forms* nil)
 
 (defmethod noun-vocative-to-genitive ((obj string))
   "Needs to be overriden for custom needs"
-  (if *debug-words-genitives*
+  (if *debug-words-forms*
     (format nil "... genitive form of ~A ..." obj)
+    obj))
+
+(defmethod noun-vocative-to-accusative ((obj string))
+  "Needs to be overriden for custom needs"
+  (if *debug-words-forms*
+    (format nil "... accusative form of ~A ..." obj)
     obj))
 
 (defvar *debug-words-genders* nil)
 
 (defmethod determine-gender ((obj string))
-  (if *debug-words-genitives* 
+  (if *debug-words-genders* 
     (error "Cannot determine gender of ~A" obj)
     :masculine))
 
-(defun default-translation-function (string &key plural-p genitive-form-p items-count &allow-other-keys)
+(defun default-translation-function (string &key plural-p genitive-form-p items-count accusative-form-p &allow-other-keys)
   (declare (ignore args))
 
   (when plural-p 
@@ -122,6 +128,9 @@ apple' for 'apple' and 'a table' for 'table'."
 
   (when genitive-form-p 
     (setf string (noun-vocative-to-genitive string)))
+
+  (when accusative-form-p 
+    (setf string (noun-vocative-to-accusative string)))
 
   (when items-count
     (setf string (proper-number-form items-count string)))

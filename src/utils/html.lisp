@@ -226,7 +226,7 @@ being rendered.
                                     (cons (if frob-welcome-name ; backwards compat
                                             (format nil 
                                                     (translate *dropdown-welcome-message*) 
-                                                    (translate (car welcome-name) :genitive-form-p t))
+                                                    (translate (car welcome-name) :accusative-form-p t))
                                             (car welcome-name))
                                           (cdr welcome-name))))
                                 selections)

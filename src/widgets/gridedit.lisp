@@ -37,7 +37,7 @@
                                             (widget-translate 
                                               grid :item-added-message 
                                               :preceding-gender (determine-gender (humanize-name (dataseq-data-class grid))))
-                                            (widget-translate grid :item-name :genitive-form-p t))))
+                                            (widget-translate grid :item-name :accusative-form-p t))))
 		   (dataedit-reset-state grid)
                    (throw 'annihilate-dataform nil))
      :data-view (dataedit-item-data-view grid)

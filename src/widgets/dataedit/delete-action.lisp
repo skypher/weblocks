@@ -46,7 +46,7 @@ modify standard behavior for deleting items from a sequence."
       (flash-message (dataseq-flash obj)
                      (format nil 
                              (widget-translate obj :choose-items-for-deletion-message)
-                             (widget-translate obj :item-name :plural-p t :genitive-form-p t)))
+                             (widget-translate obj :item-name :plural-p t :accusative-form-p t)))
       (mark-dirty obj)
       (return-from dataedit-delete-items-flow))
     (let ((initial-items-count (dataseq-data-count obj))
@@ -56,7 +56,7 @@ modify standard behavior for deleting items from a sequence."
                                                             (:none (length (cdr items))))))
                                           (format nil (widget-translate obj :items-delete-question)
                                                   item-count
-                                                  (widget-translate obj :item-name :items-count item-count :genitive-form-p t)))
+                                                  (widget-translate obj :item-name :items-count item-count :accusative-form-p t)))
                                         :type :yes/no))
         (return-from dataedit-delete-items-flow))
       (if (dataedit-on-delete-items obj)
