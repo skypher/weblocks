@@ -19,9 +19,10 @@
        (:span :class "extra"
         (str field-label) ":&nbsp;"
         (when show-required-indicator
-          (:em :class "required-slot"
-           (str required-indicator-label)
-           (str "&nbsp;"))))))
+          (htm 
+            (:em :class "required-slot"
+             (str required-indicator-label)
+             (str "&nbsp;")))))))
      (str content)
      (when validation-error
        (htm (:p :class "validation-error"

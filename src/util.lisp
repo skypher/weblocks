@@ -1,5 +1,5 @@
 (defpackage #:weblocks-util
-  (:use :cl :metabang.utilities :anaphora :hunchentoot :c2mop)
+  (:use :cl :metabang.utilities :anaphora :hunchentoot :c2mop :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function
                           #:standard-class #:typep #:subtypep #:standard-method)

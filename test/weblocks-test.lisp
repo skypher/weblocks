@@ -10,7 +10,8 @@
           :anaphora :f-underscore)
     (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                             #:standard-generic-function #:ensure-generic-function #:standard-class
-                            #:typep #:subtypep)
+                            #:typep #:subtypep 
+                            #:standard-method)
     (:shadowing-import-from :weblocks 
                             #:redirect #:reset-sessions 
                             #:create-folder-dispatcher-and-handler 

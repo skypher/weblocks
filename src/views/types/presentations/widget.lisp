@@ -38,3 +38,8 @@
              :type :set-value)
     value))
 
+(defgeneric get-widget-form-value-from-request (widget)
+  (:documentation "Should parse and return request value for widget. Used for widgets rendered inside of widget-presentation")
+  (:method ((widget t))
+   nil))
+
