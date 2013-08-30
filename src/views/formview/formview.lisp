@@ -225,6 +225,28 @@ before relations can be updated."))
   (:documentation "A default presentation for forms renders an input
   field."))
 
+(defun validation-summary-wt (&key field-errors non-field-errors errors-count-label)
+  (with-html-to-string
+    (:div :class "validation-errors-summary"
+     (:h2 :class "error-count"
+      (str errors-count-label))
+     (when non-field-errors
+       (htm
+         (:ul :class "non-field-validation-errors"
+          (loop for err in non-field-errors do 
+                (htm 
+                  (:li
+                    (str err)))))))
+     (when field-errors
+       (htm
+         (:ul :class "field-validation-errors"
+          (loop for err in field-errors do
+                (htm 
+                  (:li
+                    (str err))))))))))
+
+(deftemplate :validation-summary-wt 'validation-summary-wt)
+
 ;;; Form rendering protocol
 (defgeneric render-validation-summary (view obj widget errors)
   (:documentation "Renders a summary of validation errors on top of
@@ -234,28 +256,13 @@ differently.")
     (declare (ignore view obj))
     (when errors
       (let ((non-field-errors (find-all errors #'null :key #'car))
-	    (field-errors (find-all errors (compose #'not #'null) :key #'car)))
-	(with-html
-	  (:div :class "validation-errors-summary"
-		(:h2 :class "error-count"
-		     (let ((error-count (length errors)))
-                       (cl-who:fmt (proper-number-form error-count "There is ~S validation error:") error-count)))
-		(when non-field-errors
-		  (htm
-		   (:ul :class "non-field-validation-errors"
-			(mapc (lambda (err)
-				(with-html
-				  (:li
-				   (str (format nil "~A" (cdr err))))))
-			      non-field-errors))))
-		(when field-errors
-		  (htm
-		   (:ul :class "field-validation-errors"
-			(mapc (lambda (err)
-				(with-html
-				  (:li
-				   (str (format nil "~A" (cdr err))))))
-			      field-errors))))))))))
+            (field-errors (find-all errors (compose #'not #'null) :key #'car)))
+        (render-wt :validation-summary-wt 
+                   (list :view view :object obj :widget widget)
+                   :errors-count-label (let ((error-count (length errors)))
+                                         (format nil (proper-number-form error-count "There is ~S validation error:") error-count))
+                   :non-field-errors (mapcar #'cdr non-field-errors)
+                   :field-errors (mapcar #'cdr field-errors))))))
 
 (defun form-view-buttons-wt (&key submit-html cancel-html)
   (with-html-to-string
