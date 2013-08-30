@@ -425,30 +425,38 @@ wrapped by a form of the widget. ")
   (:method ((obj dataseq) &rest args)
     (apply #'dataseq-render-operations-default obj args)))
 
+(defun dataseq-operations-wt (&key content &allow-other-keys)
+  (with-html-to-string
+    (:div :class "operations"
+     (str content))))
+
+(deftemplate :dataseq-operations-wt 'dataseq-operations-wt)
 
 (defgeneric dataseq-render-operations-default (obj &rest args
-                                                    &key &allow-other-keys)
+                                                   &key &allow-other-keys)
   (:documentation
-   "The default implementation of operation rendering.  It renders item-ops
-and common-ops as buttons. Note, it renders item operations if
-render-item-ops-p argument is set to true (default), and common operations
-if render-common-ops-p is set to true (default).")
-  (:method ((obj dataseq) &rest args)
-    (declare (ignore args))
-    (flet ((render-operations ()
-	     (with-html
-	       (:div :class "operations"
-		     (mapc (lambda (op)
-			     (render-button (car op)))
-			   (append
-			    (dataseq-common-ops obj)
-			    (when (dataseq-allow-select-p obj)
-			      (dataseq-item-ops obj))))))))
-      (if (dataseq-wrap-body-in-form-p obj)
-	  (render-operations)
-	  (with-html-form (:get (make-action (curry #'dataseq-operations-action obj))
-				:class "operations-form")
-	    (render-operations))))))
+    "The default implementation of operation rendering.  It renders item-ops
+     and common-ops as buttons. Note, it renders item operations if
+     render-item-ops-p argument is set to true (default), and common operations
+     if render-common-ops-p is set to true (default).")
+     (:method ((obj dataseq) &rest args)
+      (declare (ignore args))
+      (flet ((render-operations ()
+               (render-wt 
+                 :dataseq-operations-wt 
+                 (list :widget obj)
+                 :content (capture-weblocks-output 
+                            (mapc (lambda (op)
+                                    (render-button (car op)))
+                                  (append
+                                    (dataseq-common-ops obj)
+                                    (when (dataseq-allow-select-p obj)
+                                      (dataseq-item-ops obj))))))))
+        (if (dataseq-wrap-body-in-form-p obj)
+          (render-operations)
+          (with-html-form (:get (make-action (curry #'dataseq-operations-action obj))
+                           :class "operations-form")
+                          (render-operations))))))
 
 (defgeneric dataseq-render-mining-bar (obj &rest args)
   (:documentation

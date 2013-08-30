@@ -74,6 +74,13 @@ variable. All html should be rendered to this stream.")
   `(with-html-output (*weblocks-output-stream* nil)
      ,@body))
 
+(defun render-wt (template context &rest args)
+  "Calculates effective template and renders it to *weblocks-output-stream*.  
+   Effective template is template with max priority."
+  (write-string 
+    (apply #'render-template-to-string (list* template context args))
+    *weblocks-output-stream*))
+
 (defmacro with-html-to-string (&body body)
   "A wrapper around cl-who with-html-output-to-string macro."
   `(with-html-output-to-string (*weblocks-output-stream* nil)

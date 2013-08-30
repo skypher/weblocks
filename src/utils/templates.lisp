@@ -1,6 +1,6 @@
 (in-package :weblocks-util)
 
-(wexport '(*templates* remove-template deftemplate render-template-to-string)
+(wexport '(*templates* remove-template deftemplate render-template-to-string render-wt-to-string render-wt)
          '(t util))
 
 (defvar *templates* (make-hash-table))
@@ -52,7 +52,7 @@
 
 (defun render-template-to-string (template context &rest args)
   "Calculates effective template and renders it to string.  
-   Effective template is template with max priority."
+  Effective template is template with max priority."
   (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
                     context 
@@ -71,3 +71,5 @@
     (apply 
       (car effective-template)
       args)))
+
+(setf (symbol-function 'render-wt-to-string) (symbol-function 'render-template-to-string))

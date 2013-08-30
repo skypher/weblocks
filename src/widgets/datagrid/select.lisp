@@ -34,25 +34,45 @@ etc.)"
 		 :reader "Select"
 		 :present-as nil))
 
-(defmethod render-view-field-header ((field datagrid-select-field) (view table-view)
-				     (widget datagrid) presentation value obj 
-				     &rest args)
-  (declare (ignore args widget))
-  (with-html (:th :class "select" "")))
+(defun table-select-view-field-header-wt (&rest args)
+  (with-html-to-string (:th :class "select" "")))
 
-(defmethod render-view-field ((field datagrid-select-field) (view table-view)
-			      (widget datagrid) presentation value obj &rest args)
+(deftemplate :table-select-view-field-header-wt 'table-select-view-field-header-wt)
+
+(defmethod render-view-field-header ((field datagrid-select-field)
+                                     (view table-view)
+                                     (widget datagrid) presentation value obj 
+                                     &rest args)
+  "Render cell for select control"
+  (declare (ignore args widget))
+  (render-wt 
+    :table-select-view-field-header-wt 
+    (list :field field :view view :widget widget :presentation presentation :value value :object obj)))
+
+(defun table-select-view-field-wt (&key drilldownp checkbox-name selectedp &allow-other-keys)
+  (with-html-to-string
+    (:td :class "select"
+     :onclick (when drilldownp "stopPropagation(event);")
+     :style (when drilldownp "cursor: default;")
+     (:div
+       (render-checkbox checkbox-name
+                        selectedp
+                        :class nil)))))
+
+(deftemplate :table-select-view-field-wt 'table-select-view-field-wt)
+
+(defmethod render-view-field ((field datagrid-select-field) 
+                              (view table-view)
+                              (widget datagrid) presentation value obj &rest args)
   (declare (ignore args))
   (let ((checkbox-name (concatenate 'string
-				    "item-" (attributize-name (object-id obj))))
-	(drilldownp (and (dataseq-allow-drilldown-p widget)
-			 (dataseq-on-drilldown widget))))
-    (with-html
-      (:td :class "select"
-	   :onclick (when drilldownp "stopPropagation(event);")
-	   :style (when drilldownp "cursor: default;")
-	   (:div
-	    (render-checkbox checkbox-name
-			     (dataseq-item-selected-p widget (object-id obj))
-			     :class nil))))))
+                                    "item-" (attributize-name (object-id obj))))
+        (drilldownp (and (dataseq-allow-drilldown-p widget)
+                         (dataseq-on-drilldown widget))))
+    (render-wt 
+      :table-select-view-field-wt 
+      (list :field field :view view :widget widget :presentation presentation :value value :object obj)
+      :drilldownp drilldownp
+      :checkbox-name checkbox-name 
+      :selectedp (dataseq-item-selected-p widget (object-id obj)))))
 

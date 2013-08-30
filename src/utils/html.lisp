@@ -147,6 +147,17 @@ cut to quickly render a sumbit button."
 			  :id form-id :class form-class)
     (render-button name :value value :id button-id :class button-class)))
 
+(defun checkbox-wt (&key name id class checkedp onclick value disabledp &allow-other-keys)
+  "Checkbox template"
+  (with-html-to-string
+    (:input :name name :type "checkbox" :id id :class class
+     :value value
+     :checked (if checkedp "checked")
+     :disabled (if disabledp "disabled")
+     :onclick onclick)))
+
+(deftemplate :checkbox-wt 'checkbox-wt)
+
 (defun render-checkbox (name checkedp &key id (class "checkbox") onclick disabledp)
   "Renders a checkbox in a form.
 
@@ -156,12 +167,16 @@ being rendered.
 'id' - id of the html control. Default is nil.
 'class' - a class used for styling. By default, \"submit\".
 'disabledp' - input is disabled if true."
-  (with-html
-    (htm (:input :name (attributize-name name) :type "checkbox" :id id :class class
-		 :value (if checkedp "t" "f")
-		 :checked (and checkedp "checked")
-		 :disabled (and disabledp "disabled")
-		 :onclick onclick))))
+  (render-wt 
+    :checkbox-wt 
+    (list :name name :id id :class class)
+    :name (attributize-name name)
+    :id id 
+    :class class
+    :value (if checkedp "t" "f")
+    :checkedp checkedp 
+    :onclick onclick
+    :disabledp disabledp))
 
 (defparameter *dropdown-welcome-message* "[Select ~A]"
   "A welcome message used by dropdowns as the first entry.")
