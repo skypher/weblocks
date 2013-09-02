@@ -6,8 +6,9 @@
 
 (defsystem weblocks-demo
     :name "weblocks-demo"
-    :version "0.1"
+    :version "0.1.1"
     :author "Slava Akhmechet"
+    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
     :licence "Public Domain"
     :description "weblocks-demo"
     :depends-on (:weblocks :metatilities)

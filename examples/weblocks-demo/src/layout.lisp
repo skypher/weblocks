@@ -8,7 +8,7 @@ flow, it accepts K - the continuation parameter."
   (with-html
     (:div :style "text-align: center; font-size:1.4em; margin-top: 4em;"
 	  (:p "This demo application was coded in" (:br)
-	      (:a :href "http://weblocks.viridian-project.de/" "Weblocks")
+	      (:a :href "http://weblocks-framework.info/" "Weblocks")
 	      " - a Lisp web framework." (:br) (:br)
 	      "The source of the demo contains" (:br)
 	      "200 lines of Lisp" (:br)
