@@ -80,21 +80,50 @@ forms."
         do (setf (second keypair) `',val))
   kwargs)
 
+(defparameter *write-values-for-diff-p* t 
+  "If is T then writes test values for failed test into files. You can manually see files differences.")
+
+(defparameter *diff-values-directory* (make-pathname :directory '(:relative "tmp-diffs"))
+  "A directory for writing failed test compare values, see also *write-values-for-diff-p*")
+
 (defun %ensure-nodiff (actual-values expected-values test-form
-		       &key (test *lift-equality-test*))
+                                     &key (test *lift-equality-test*))
   "Helper for `ensure-nodiff'."
   (declare (ignore test-form))
   (ensure-same (length actual-values) (length expected-values) :test =)
   (mapc (lambda (actual expected)
-	  (unless (funcall test actual expected)
-	    (let (report report-args)
-	      (when (and (stringp expected) (shell-command-proc))
-		(setf report "Differences found:~%~A~%"
-		      report-args (list (diff-strings expected actual))))
-	      (apply #'lift::maybe-raise-not-same-condition
-		     actual expected test report report-args))
-	    (return-from %ensure-nodiff nil)))
-	actual-values expected-values)
+          (unless (funcall test actual expected)
+            (let (report report-args)
+              (when (and (stringp expected) (shell-command-proc))
+                (setf report "Differences found:~%~A~%"
+                      report-args (list (diff-strings expected actual))))
+
+              (when *write-values-for-diff-p*
+                (let ((dir *diff-values-directory*))
+                  (ensure-directories-exist dir)
+                  (setf report "Differences found. Diff generated in ~A and ~A")
+                  (setf report-args nil)
+                  (loop for i in (list expected actual)
+                        for j in (list "expected" "actual") do
+                        (let ((filename 
+                                (merge-pathnames 
+                                  (make-pathname 
+                                    :name (format nil "~A.DIFF-~A" (string-downcase lift::*current-test-case-name*) j)
+                                    :type "html")
+                                  dir)))
+                          (push filename report-args)
+                          (with-open-file 
+                            (out filename
+                                 :direction :output 
+                                 :if-does-not-exist :create 
+                                 :if-exists :supersede)
+                            (write-string i out))))
+                  (setf report-args (reverse report-args))))
+
+              (apply #'lift::maybe-raise-not-same-condition
+                     actual expected test report report-args))
+            (return-from %ensure-nodiff nil)))
+        actual-values expected-values)
   t)
 
 (defmacro ensure-nodiff (form values &rest key-args)

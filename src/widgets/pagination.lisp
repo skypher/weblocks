@@ -111,60 +111,121 @@ items if 'show-total-items' is set to true."))
 		      (str (proper-number-form (pagination-total-items obj) "Item"))
 		      ")"))))
 
+(defun pagination-body-wt (&key pages-count-zerop previous-link next-link total-items-info current-page pages-count go-to-page-form &allow-other-keys)
+  (with-html-to-string 
+    (unless pages-count-zerop
+      (htm 
+        ; 'Previous' link
+        (str previous-link)
+        ; 'Viewing Page X of Y'
+        (:span :class "page-info"
+               (:span :class "viewing-label" (str (translate "Viewing ")))
+               (:span :class "page-label" (str (translate "Page ")))
+               (:span :class "current-page" (:strong (str current-page)))
+               (:span :class "of-label" (str (translate " of ")))
+               (:span :class "total-pages" (str pages-count)))
+        ; 'Next' link
+        (str next-link)
+        ; Go to page
+        (str go-to-page-form)
+        ; Total items
+        (str total-items-info)))))
+
+(deftemplate :pagination-body-wt 'pagination-body-wt)
+
+(defun pagination-next-link-wt (&key action last-page-p &allow-other-keys)
+  (with-html-to-string 
+    (unless last-page-p
+      (htm 
+        (str "&nbsp;")
+        (render-link action (translate (humanize-name "Next >")) :class "next-page")))))
+
+(deftemplate :pagination-next-link-wt 'pagination-next-link-wt)
+
+(defun pagination-prev-link-wt (&key action first-page-p &allow-other-keys) 
+  (with-html-to-string 
+    (unless first-page-p
+      (htm 
+        (render-link action (translate (humanize-name "< Previous")) :class "previous-page")
+        (str "&nbsp;")))))
+
+(deftemplate :pagination-prev-link-wt 'pagination-prev-link-wt)
+
+(defun pagination-go-to-page-wt (&key first-page-p form-action last-request-error-p pages-count-more-than-one-p &allow-other-keys)
+  (capture-weblocks-output 
+    (when pages-count-more-than-one-p
+      (with-html-form (:get form-action)
+                      (:label (:span (str (translate "Go to page:&nbsp;")))
+                              (:input :name "page-number"
+                                      :class (concatenate 'string
+                                                          "page-number"
+                                                          (when  last-request-error-p
+                                                            " item-not-validated"))
+                                      :onfocus (concatenate 'string
+                                                            "$(this).removeClassName(\"item-not-validated\");"
+                                                            (unless first-page-p
+                                                              "if(this.value == \"1\") { this.value = \"\"; }"))
+                                      :onblur (unless first-page-p
+                                                "if(this.value == \"\") { this.value = \"1\"; }")
+                                      :value (unless first-page-p
+                                               "1")))
+                      (render-button "go-to-page" :value (translate "Go"))))))
+
+(deftemplate :pagination-go-to-page-wt 'pagination-go-to-page-wt)
+
 (defmethod render-widget-body ((obj pagination) &rest args) 
   (declare (ignore args)
            (special *request-hook*))
   (when (> (pagination-page-count obj) 0)
-    (with-html
-      ; 'Previous' link
-      (when (> (pagination-current-page obj) 1)
-	(render-link (lambda (&rest args)
-                       (declare (ignore args))
-		       (when (> (pagination-current-page obj) 1)
-			 (decf (pagination-current-page obj))
-			 (pagination-call-on-change obj)))
-		     (translate (humanize-name "< Previous"))
-		     :class "previous-page")
-	(str "&nbsp;"))
-      ; 'Viewing Page X of Y'
-      (:span :class "page-info"
-	     (:span :class "viewing-label" (str (translate "Viewing ")))
-	     (:span :class "page-label" (str (translate "Page ")))
-	     (:span :class "current-page" (:strong (str (pagination-current-page obj))))
-	     (:span :class "of-label" (str (translate " of ")))
-	     (:span :class "total-pages" (str (pagination-page-count obj))))
-      ; 'Next' link
-      (when (< (pagination-current-page obj)
-	       (pagination-page-count obj))
-	(str "&nbsp;")
-	(render-link (lambda (&rest args)
-                       (declare (ignore args))
-		       (when (< (pagination-current-page obj)
-				(pagination-page-count obj))
-			 (incf (pagination-current-page obj))
-			 (pagination-call-on-change obj)))
-		     (translate (humanize-name "Next >"))
-		     :class "next-page"))
-      ; Go to page
-      (when (> (pagination-page-count obj) 1)
-	(with-html-form (:get (curry #'pagination-on-go-to-page obj))
-	  (:label (:span (str (translate "Go to page:&nbsp;")))
-		  (:input :name "page-number"
-			  :class (concatenate 'string
-					      "page-number"
-					      (when (slot-value obj 'last-request-error-p)
-						" item-not-validated"))
-			  :onfocus (concatenate 'string
-						"$(this).removeClassName(\"item-not-validated\");"
-						(when (/= (pagination-current-page obj) 1)
-						  "if(this.value == \"1\") { this.value = \"\"; }"))
-			  :onblur (when (/= (pagination-current-page obj) 1)
-				    "if(this.value == \"\") { this.value = \"1\"; }")
-			  :value (when (/= (pagination-current-page obj) 1)
-				   "1")))
-	  (render-button "go-to-page" :value (translate "Go"))))
-      ; Total items
-      (pagination-render-total-item-count obj))))
+    (let ((context (list :widget obj)))
+
+      (render-wt 
+        :pagination-body-wt 
+        context
+
+        :pages-count-zerop (zerop (pagination-page-count obj))
+
+        :current-page (pagination-current-page obj)
+
+        :previous-link (when (> (pagination-current-page obj) 1)
+                         (render-wt-to-string 
+                           :pagination-prev-link-wt 
+                           context
+                           :first-page-p (= (pagination-current-page obj) 1)
+                           :action (function-or-action->action 
+                                     (lambda (&rest args)
+                                       (declare (ignore args))
+                                       (when (> (pagination-current-page obj) 1)
+                                         (decf (pagination-current-page obj))
+                                         (pagination-call-on-change obj))))))
+
+        :next-link (when  (< (pagination-current-page obj)
+                           (pagination-page-count obj))
+                     (render-wt-to-string 
+                       :pagination-next-link-wt
+                       context
+                       :last-page-p (>= (pagination-current-page obj)
+                                        (pagination-page-count obj))
+                       :action (function-or-action->action 
+                                 (lambda (&rest args)
+                                   (declare (ignore args))
+                                   (when (< (pagination-current-page obj)
+                                            (pagination-page-count obj))
+                                     (incf (pagination-current-page obj))
+                                     (pagination-call-on-change obj))))))
+
+        :go-to-page-form (when (> (pagination-page-count obj) 1)
+                           (render-wt-to-string 
+                             :pagination-go-to-page-wt
+                             context
+                             :first-page-p (= (pagination-current-page obj) 1)
+                             :last-request-error-p (slot-value obj 'last-request-error-p)
+                             :pages-count-more-than-one-p (> (pagination-page-count obj) 1)
+                             :form-action (function-or-action->action (curry #'pagination-on-go-to-page obj))))
+
+        :pages-count (pagination-page-count obj)
+
+        :total-items-info (capture-weblocks-output (pagination-render-total-item-count obj))))))
 
 (defun pagination-page-item-range (obj)
   "Returns a range of items that belong to a currently selected
