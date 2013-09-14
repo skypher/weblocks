@@ -76,7 +76,10 @@ variable. All html should be rendered to this stream.")
 
 (defun render-wt (template context &rest args)
   "Calculates effective template and renders it to *weblocks-output-stream*.  
-   Effective template is template with max priority."
+   Effective template is template with max priority.
+   template is template name which will be rendered
+   context is a plist which is used for effective template finding.
+   Other arguments are used as template parameters."
   (write-string 
     (apply #'render-template-to-string (list* template context args))
     *weblocks-output-stream*))

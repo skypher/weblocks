@@ -51,8 +51,7 @@
       0)))
 
 (defun render-template-to-string (template context &rest args)
-  "Calculates effective template and renders it to string.  
-  Effective template is template with max priority."
+  "Similar to render-wt but renders template to string instead of *weblocks-output-stream*"
   (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
                     context 

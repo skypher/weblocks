@@ -445,19 +445,6 @@ form-view-buttons for a given view.")
                           args)))
       *weblocks-output-stream*)))
 
-(defmethod render-form-view-field-required-indicator ((field form-view-field) (view form-view)
-						      widget presentation value obj)
-  (let ((required-indicator (form-view-field-required-indicator field)))
-    (when (and (form-view-field-required-p field)
-	       (not (form-view-field-disabled-p field obj))
-	       required-indicator)
-      (with-html
-	(:em :class "required-slot"
-	     (if (eq t required-indicator)
-		 (str *default-required-indicator*)
-		 (str required-indicator))
-	     (str "&nbsp;"))))))
-
 (defun form-view-field-value-wt (&key name max-length disabledp value size id)
   (with-html-to-string
     (:input :type "text" :name name
