@@ -6,7 +6,7 @@
 
 (defsystem weblocks-util
   :name "weblocks-util"
-  :version "0.0.5"
+  :version "0.1.0"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
@@ -52,5 +52,6 @@
             ;(:file "timing")
             ;(:file "repl")
             (:file "i18n")
-            (:file "templates"))
+            (:file "templates" :depends-on ("html-parts"))
+            (:file "html-parts"))
            :depends-on ("util"))))))

@@ -67,8 +67,19 @@
     (unless (car effective-template)
       (error "Cannot find template ~A" template))
 
-    (apply 
-      (car effective-template)
-      args)))
+    (nested-html-part 
+      (list :type :template 
+            :template-name template 
+            :effective-template effective-template
+            :template-context context)
+
+      (update-current-html-part-children 
+        (loop for (key value) on args by #'cddr 
+              collect value))
+      
+
+      (apply 
+        (car effective-template)
+        args))))
 
 (setf (symbol-function 'render-wt-to-string) (symbol-function 'render-template-to-string))

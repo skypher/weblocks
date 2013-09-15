@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.9.48"
+   :version "0.9.49"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -76,7 +76,7 @@
                      (:file "uri-tokens"
                       :depends-on ("weblocks"))
                      (:file "request-hooks"
-                      :depends-on ("weblocks"))
+                      :depends-on ("weblocks" "debug-mode"))
                      (:file "error-handler"
                       :depends-on ("weblocks" "application"))
                      (:file "request-handler"

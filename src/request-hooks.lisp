@@ -116,3 +116,23 @@ of no arguments."
     (unless (null list)
       (funcall (first list) (rest list)))))
 
+;; Hooks for using html parts, reset parts set before render and save it to session after render 
+;; Allow to modify html parts set when is in debug mode
+(eval-when (:load-toplevel)
+  (pushnew  
+    (lambda ()
+      (when (or *weblocks-global-debug*
+                (webapp-debug))
+        (weblocks-util:reset-html-parts-set)))
+    (request-hook :application :pre-render))
+
+  (pushnew 
+    (lambda ()
+      (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
+      (when (or *weblocks-global-debug*
+                (webapp-debug))
+        (progn 
+          (weblocks-util:update-html-parts-connections)
+          (setf (webapp-session-value 'parts-md5-hash) weblocks-util:*parts-md5-hash*)
+          (setf (webapp-session-value 'parts-md5-context-hash) weblocks-util:*parts-md5-context-hash*))))
+    (request-hook :application :post-render)))
