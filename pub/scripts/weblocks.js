@@ -81,7 +81,7 @@ function onActionSuccess(transport) {
 
     // Update dirty widgets
     var dirtyWidgets = json['widgets'];
-    var minTopOffset = document.height;
+    var minTopOffset = document.documentElement.getHeight();
 
     for(var i in dirtyWidgets) {
 	var widget = $(i);
