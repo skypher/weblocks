@@ -43,8 +43,7 @@
           update-thread-status
           *registered-webapps*
           with-webapp
-          weblocks-webapp-default-dependencies
-          ))
+          weblocks-webapp-default-dependencies))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *registered-webapps* nil
@@ -150,7 +149,8 @@
     :documentation "If non-nil, the name of the `*default-store*'
     bound during request handlers.")
    (session-key :type symbol :accessor weblocks-webapp-session-key :initarg :session-key)
-   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil)
+   (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil 
+          :documentation "Responsible for debug mode, use WEBAPP-DEBUG function for getting slot value")
    (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
                   :documentation "Turns on indentation of HTML for easier visual inspection."))
   (:metaclass webapp-class)
@@ -349,7 +349,12 @@ to my `application-dependencies' slot."
 
 (defun start-webapp (class &rest initargs
                      &key (name (attributize-name class)) &allow-other-keys)
-  "Starts the web application"
+  "Starts the web application if it is not started, shows warning in other case.
+   Returns app.
+
+     :class - is an application name symbol 
+     :initargs - is a list of attributes to pass to application 
+     :name - is an application name - a key for an app to be stored. Application then can be found by this key."
   (check-webapp class)
   (let ((app (get-webapp name nil)))
     (when app
@@ -410,6 +415,8 @@ to my `application-dependencies' slot."
     (stop-weblocks)))
 
 (defun find-app (name)
+  "Returns registered webapp by its NAME
+  Use get-webapp when you need to find an application."
   (let ((app (get-webapp name nil))
         (apps (get-webapps-for-class name)))
     (when (not app)

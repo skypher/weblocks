@@ -45,10 +45,6 @@
   "Resets html parts set"
   (declare (special *parts-md5-hash* *parts-md5-context-hash*))
 
-  (unless 
-    (process-html-parts-p)
-    (return-from reset-html-parts-set))
-
   (setf *parts-md5-hash* (make-hash-table :test 'equal))
   (setf *parts-md5-context-hash* (make-hash-table :test 'equal)))
 
