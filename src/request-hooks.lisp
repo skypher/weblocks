@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(request-hook *request-hook* eval-dynamic-hooks))
+(export '(request-hook *request-hook* eval-dynamic-hooks reset-session-request-hooks))
 
 (defclass request-hooks ()
   ((dynamic-action :accessor dynamic-action-hook
@@ -34,12 +34,15 @@
 (defparameter *application-request-hooks* (make-instance 'request-hooks)
   "A request hook object used in the application scope.")
 
+(defun reset-session-request-hooks ()
+  (setf (webapp-session-value 'request-hooks)
+        (make-instance 'request-hooks)))
+
 (defun session-request-hooks ()
   "A request hook object used in the session scope."
   (if (webapp-session-value 'request-hooks)
       (webapp-session-value 'request-hooks)
-      (setf (webapp-session-value 'request-hooks)
-	    (make-instance 'request-hooks))))
+      (reset-session-request-hooks)))
 
 (defvar *request-hook*)
 (setf (documentation '*request-hook* 'variable)

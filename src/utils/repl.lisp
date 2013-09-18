@@ -17,9 +17,9 @@ the one started most recently) will be selected"
       (cdr (assoc sid (sessions)))
       (cdar (sessions)))))
 
-(defun pt ()
+(defun pt (&optional (stream t))
   "Print the current session's widget tree"
   (walk-widget-tree (root-widget)
                     (lambda (w d)
-                      (loop repeat d do (format t " "))
-                      (format t "~S~%" w))))
+                      (loop repeat d do (format stream " "))
+                      (format stream "~S~%" w))))
