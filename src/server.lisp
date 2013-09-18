@@ -12,7 +12,8 @@
           create-prefix-dispatcher 
           create-static-file-dispatcher-and-handler 
           create-folder-dispatcher-and-handler 
-          active-sessions))
+          active-sessions 
+          *force-files-to-serve*))
 
 (defmacro add-print-object-for-function (function (stream-var) &body body)
   `(let ((function ,function))
@@ -143,6 +144,12 @@ declared AUTOSTART."
       (setf (header-out "Content-Encoding") "gzip")
       (setf (slot-value request 'script-name) (format nil "~A.gz" script-name))
       content-type)))
+
+(defvar *force-files-to-serve* (list "/favicon.ico"))
+(setf (documentation '*force-files-to-serve* 'variable)
+      "A list of urls which should be recognized as files. 
+       This is useful for avoiding double requests to application. 
+       /favicon.ico here fixes Weblocks bug in Google Chrome browser")
     
 (defun weblocks-dispatcher (request)
   "Weblocks' Hunchentoot dispatcher. The function serves all started applications
@@ -168,18 +175,20 @@ declared AUTOSTART."
            (return-from weblocks-dispatcher
              (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
                       request))))
-        ((and (webapp-serves-hostname (hunchentoot:host) app)
-              (list-starts-with (tokenize-uri script-name nil)
-                                (tokenize-uri app-pub-prefix nil)
-                                :test #'string=))
+        ((or 
+           (find script-name *force-files-to-serve* :test #'string=)
+           (and (webapp-serves-hostname (hunchentoot:host) app)
+                (list-starts-with (tokenize-uri script-name nil)
+                                  (tokenize-uri app-pub-prefix nil)
+                                  :test #'string=)))
          (let ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
                (physical-folder (compute-webapp-public-files-path app)))
            (send-cache-rules (weblocks-webapp-public-files-cache-time app))
            (setf content-type (send-gzip-rules (gzip-dependency-types* app)
                                                script-name request virtual-folder physical-folder))
            (return-from weblocks-dispatcher
-             (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                      request))))
+                        (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+                                 request))))
         ((and (webapp-serves-hostname (hunchentoot:host) app)
               (list-starts-with (tokenize-uri script-name nil)
                                 (tokenize-uri app-prefix nil)
