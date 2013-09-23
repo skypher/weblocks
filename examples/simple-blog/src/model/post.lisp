@@ -27,7 +27,7 @@
 	 :documentation "time at which the post was created")
    (author :accessor post-author
 	   :initarg :author
-	   :initform nil
+	   :initform (make-instance 'user)
 	   :type user)))
 
 (defgeneric post-author-id (post)
