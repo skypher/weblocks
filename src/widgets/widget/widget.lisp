@@ -339,7 +339,7 @@ children of w (e.g. may be rendered when w is rendered).")
    Any widget that supports flows must implement this function.  Part
    of the contract is that the fn sets the parent slot of the callee
    to the container.  The other part is that the widget is dirty after
-   the write via a direct call to make-dirty, or to a write to a
+   the write via a direct call to mark-dirty, or to a write to a
    widget slot.")
   (:method ((obj widget) child)
     (let ((place (find-if-not #'null
