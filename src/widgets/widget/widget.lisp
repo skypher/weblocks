@@ -387,6 +387,10 @@ that will be applied before and after the body is rendered.")
   (:method (obj &rest args)
     (warn "Cannot update the widget children of ~S because it is not a widget."
           obj))
+  (:method ((obj function) &rest args)
+           (declare (ignore obj args))
+           ; Do nothing, functions don't have children yet
+           )
   (:method ((obj widget) &rest args)
  "Render all children. Specialize this method if you only want
 to render widgets of a certain type."
