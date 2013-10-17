@@ -125,7 +125,8 @@
    (version-dependency-types :type list
                              :accessor version-dependency-types
                              :initarg :version-dependency-types
-                             :initform '(:stylesheet :script)
+                             ;:initform '(:stylesheet :script)
+                             :initform nil ; versioning does not work well for multiple webapps
                              :documentation "This enables versioning of css, js files. The purpose
        of versioning is to serve modified static files that have been cached permanently, and gziping.
        Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)

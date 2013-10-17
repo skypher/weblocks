@@ -135,18 +135,19 @@ been modified before, its name is kept the same."
 						(maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
 
 (defun update-import-css-content (import-path &key (version-types (version-dependency-types* (current-webapp)))
-				  (gzip-types (gzip-dependency-types* (current-webapp))))
+                                              (gzip-types (gzip-dependency-types* (current-webapp))))
   (let ((urls (extract-import-urls (slurp-file import-path))))
     (with-file-write (stream import-path)
       (dolist (url (nreverse urls))
-	(multiple-value-bind (physical-path virtual-path) (local-path-from-url url)
-	  (if physical-path
-	      (progn
-		(when (find :stylesheet version-types)
-		  (multiple-value-setq (physical-path virtual-path)
-		    (update-versioned-dependency-path physical-path virtual-path)))
-		(when (find :stylesheet gzip-types)
-		  (create-gziped-dependency-file physical-path))
-		(write-import-css (puri:uri virtual-path) stream))
-	      (write-import-css url stream)))))))
+        (multiple-value-bind (physical-path virtual-path) (local-path-from-url url)
+          (if physical-path
+            (progn
+              (when (find :stylesheet version-types)
+                (multiple-value-setq (physical-path virtual-path)
+                  (update-versioned-dependency-path physical-path virtual-path)))
+              (when (find :stylesheet gzip-types)
+                (create-gziped-dependency-file physical-path))
+              (when (find :stylesheet version-types)
+                (write-import-css (puri:uri virtual-path) stream)))
+            (write-import-css url stream)))))))
 
