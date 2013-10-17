@@ -85,27 +85,32 @@ scales down to 'do-modal' instead."
 
 (defun render-choices-get (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
-links."
+   links."
   (with-html
     (:p (str msg))
     (mapc (lambda (choice)
-	    (render-link (lambda (&rest args)
-			   (declare (ignore args))
-			   (answer k choice))
-			 (humanize-name choice))
-	    (htm "&nbsp;"))
-	  choices)))
+            (render-link (lambda (&rest args)
+                           (declare (ignore args))
+                           (answer k (car choice)))
+                         (cdr choice))
+            (htm "&nbsp;"))
+          choices)))
 
 (defun render-choices-post (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
-form buttons in a POST form."
+   form buttons in a POST form."
   (with-html-form (:post (lambda (&rest args)
-			   (loop for choice in choices
-			      when (member choice args :test #'string-equal)
-			      do (progn (answer k choice)
-					(return)))))
+                           (loop for choice in choices do
+                                 (let ((choice-keyword (car choice)))
+                                   (when (member choice-keyword args :test #'string-equal)
+                                     (progn 
+                                       (answer k (if (consp choice) 
+                                                   (car choice)
+                                                   choice))
+                                       (return)))))))
     (:p (str msg))
-    (mapc #'render-button choices)))
+    (loop for choice in choices do 
+          (render-button (car choice) :value (cdr choice)))))
 
 ;;; Presents a user with a message and a choice of elements
 (defun/cc do-choice (msg choices &key (method :post) (css-class "") (title "Select Option"))
@@ -119,15 +124,27 @@ form buttons in a POST form."
 
 ;;; Presents a user with a confirmation dialog
 (defun/cc do-confirmation (msg &key (type :ok/cancel) (css-class ""))
-  (do-choice msg (ecase type
-		   (:ok/cancel (list :ok :cancel))
-		   (:yes/no (list :yes :no)))
-	     :css-class (format nil "confirmation ~A" css-class)
-	     :title (translate "Confirmation")))
+          (do-choice msg (ecase type
+                           (:ok/cancel `((:ok     . ,(widget-translate 'do-confirmation :ok))
+                                         (:cancel . ,(widget-translate 'do-confirmation :cancel))))
+                           (:yes/no `((:yes . ,(widget-translate 'do-confirmation :yes))
+                                      (:no  . ,(widget-translate 'do-confirmation :no)))))
+                     :css-class (format nil "confirmation ~A" css-class)
+                     :title (widget-translate 'do-confirmation :title)))
+
+(defmethod widget-translation-table append ((type (eql 'do-confirmation)) &rest args &key confirmation-type )
+  "Returns"
+  `((:title . ,(translate "Confirmation"))
+    ,@(when (or (not confirmation-type) (equal confirmation-type :yes/no))
+        `((:yes . ,(translate "Yes"))
+          (:no  . ,(translate "No"))))
+    ,@(when (or (not confirmation-type) (equal confirmation-type :ok/cancel))
+        `((:ok . ,(translate "Ok"))
+          (:cancel . ,(translate "Cancel"))))))
 
 ;;; Presents a user with an information dialog
 (defun/cc do-information (msg &key (css-class ""))
-  (do-choice msg (list :ok)
+  (do-choice msg (list (cons :ok (humanize-name :ok)))
 	     :css-class (format nil "information ~A" css-class)
 	     :title (translate "Information")))
 

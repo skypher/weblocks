@@ -178,3 +178,9 @@ are passed to `ensure-same-html'."
     (call-with-fake-output (f0 ,form))
     (with-html-output-to-string (,(gensym "S")) ,cl-whovian)
      . ,ensure-same-html-args))
+
+(defun ensure-alist-has-keys (alist keys)
+  (loop for key in keys do 
+        (ensure (assoc key alist)
+                :report "Alist ~% ~A does not have key ~A"
+                :arguments ((prin1-to-string alist) (prin1-to-string key)))))

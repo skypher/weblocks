@@ -80,14 +80,18 @@
   (declare (ignore data))
   (with-html
     (:div :class "submit"
-	  (render-link (make-action
-			(f_% (setf (dataform-ui-state obj) :form)))
-		       "Modify"
-		       :class "modify")
-	  (when (and (dataform-allow-close-p obj)
-		     (dataform-on-close obj))
-	    (str "&nbsp;")
-	    (render-link (make-action
-			  (f_% (funcall (dataform-on-close obj) obj)))
-			 "Close"
-			 :class "close")))))
+     (render-link (make-action
+                    (f_% (setf (dataform-ui-state obj) :form)))
+                  (widget-translate obj :modify-link-title)
+                  :class "modify")
+     (when (and (dataform-allow-close-p obj)
+                (dataform-on-close obj))
+       (str "&nbsp;")
+       (render-link (make-action
+                      (f_% (funcall (dataform-on-close obj) obj)))
+                    (widget-translate obj :close-link-title)
+                    :class "close")))))
+
+(defmethod widget-translation-table append ((obj data-editor) &rest args)
+  `((:close-link-title . ,(translate "Close"))
+    (:modify-link-title . ,(translate "Modify"))))

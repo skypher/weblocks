@@ -9,6 +9,12 @@
 (defun current-locale ()
   *current-locale*)
 
+(defmethod locale-number-forms ((locale (eql :en)))
+  (list :one :many))
+
+(defmethod locale-number-forms ((locale (eql :ru)))
+  (list :one :few :many))
+
 (defmethod pluralize-with-locale ((locale (eql :en)) word)
   (cond
     ((string-equal word "is") "are")
@@ -42,34 +48,46 @@
   "Singularizes word. Converts 'things' to 'thing'."
   (singularize-with-locale locale word))
 
-(defun english-proper-number-form (number single many)
+(defun english-number-form-type (number)
+  "Returns :one or :many depending on number. Returns number if it is a keyword."
+
+  (if (keywordp number) 
+    (return-from english-number-form-type number))
+
   (if (= number 1)
-    single 
-    many))
+    :one 
+    :many))
 
 (defmethod proper-number-form-with-locale ((locale (eql :en)) number singular-word)
   "Turns 'singular-word' into proper number form. If 'number' is 1,
    leaves 'singular-word' as is, otherwise pluralizes it."
-  (english-proper-number-form 
-    number 
+  (if (equal :one (english-number-form-type number))
     (translate singular-word)
     (pluralize singular-word locale)))
 
-(defun russian-proper-number-form (number single few many)
+(defun russian-number-form-type (number)
+  "Returns :one :few or :many depending on number. Returns number if it is a keyword."
+
+  (if (keywordp number)
+    (return-from russian-number-form-type number))
+
   (let* ((n (mod (abs number) 100))
          (n1 (mod n 10)))
     (cond 
-      ((and (> n 10) (< n 20)) many)
-      ((and (> n1 1) (< n1 5)) few)
-      ((= n1 1) single)
-      (t many))))
+      ((and (> n 10) (< n 20)) :many)
+      ((and (> n1 1) (< n1 5)) :few)
+      ((= n1 1) :one)
+      (t :many))))
+
+(defmethod number-form-type-with-locale ((locale (eql :ru)) number)
+  (russian-number-form-type number))
+
+(defmethod number-form-type-with-locale ((locale (eql :en)) number)
+  (english-number-form-type number))
 
 (defmethod proper-number-form-with-locale ((locale (eql :ru)) number singular-word)
-  (russian-proper-number-form
-    number 
-    (translate singular-word :count :one)
-    (translate singular-word :count :few)
-    (translate singular-word :count :many)))
+  (translate singular-word 
+             :items-count (russian-number-form-type number)))
 
 (defun proper-number-form (number singular-word &optional (locale (current-locale)))
   (proper-number-form-with-locale locale number singular-word))
@@ -123,7 +141,7 @@ apple' for 'apple' and 'a table' for 'table'."
 (defun default-translation-function (string &key plural-p genitive-form-p items-count accusative-form-p &allow-other-keys)
   (declare (ignore args))
 
-  (when plural-p 
+  (when plural-p  
     (setf string (pluralize string)))
 
   (when genitive-form-p 

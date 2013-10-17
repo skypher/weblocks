@@ -79,8 +79,8 @@
 
 (defmacro with-russian-translation-function (&body body)
   `(let ((weblocks::*translation-function* 
-           (lambda (string &key count)
-             (case count 
+           (lambda (string &key items-count)
+             (case items-count 
                (:one "мир")
                (:few "мира")
                (:many "миров")))))

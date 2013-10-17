@@ -141,7 +141,7 @@
 ;;; test render-choices-get
 (deftest-html render-choices-get-1
     (with-request :get nil
-      (weblocks::render-choices-get "hello, world!" (list :a :b :c) nil))
+      (weblocks::render-choices-get "hello, world!" (list (cons :a "A") (cons :b "B") (cons :c "C")) nil))
   (htm
    (:p "hello, world!")
    #.(link-action-template "abc123" "A") "&nbsp;"
@@ -151,7 +151,7 @@
 ;;; test render-choices-post
 (deftest-html render-choices-post-1
     (with-request :get nil
-      (weblocks::render-choices-post "hello, world!" (list :a :b :c) nil))
+      (weblocks::render-choices-post "hello, world!" (list (cons :a "A") (cons :b "B") (cons :c "C")) nil))
   (htm
    (:form
     :action "/foo/bar" :method "post"
@@ -177,7 +177,7 @@
   (ensure-same
     (with-request :get nil
       (make-request-ajax)
-      (do-choice "Please choose" (list :a :b))
+      (do-choice "Please choose" (list (cons :a (humanize-name :a)) (cons :b (humanize-name :b))))
       *on-ajax-complete-scripts*)
     (list (with-javascript-to-string
             (ps:ps
@@ -193,7 +193,7 @@
     (let (res)
       (with-request :get nil
 	(make-request-ajax)
-	(with-call/cc (setf res (do-choice "Please choose" (list :a :b))))
+	(with-call/cc (setf res (do-choice "Please choose" (list (cons :a (humanize-name :a)) (cons :b (humanize-name :b))))))
 	(do-request `(("b" . "B")
 		      (,weblocks::*action-string* . "abc123"))))
       res)
@@ -241,6 +241,17 @@
 		      (,weblocks::*action-string* . "abc123"))))
       res)
   :ok)
+
+(addtest do-confirmation-i18n-1
+         (ensure-same
+           (mapcar #'car (widget-translation-table 'do-confirmation))
+           (list :title :yes :no :ok :cancel))
+         (ensure-same
+           (mapcar #'car (widget-translation-table 'do-confirmation :confirmation-type :ok/cancel))
+           (list :title :ok :cancel))
+         (ensure-same
+           (mapcar #'car (widget-translation-table 'do-confirmation :confirmation-type :yes/no))
+           (list :title :yes :no)))
 
 (addtest do-information-1
   (ensure-same

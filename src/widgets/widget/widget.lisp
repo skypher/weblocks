@@ -14,9 +14,9 @@
           widget-prefix-fn
           widget-suffix-fn
           with-widget-header
-	  update-children
+          update-children
           update-parent-for-children
-	  map-subwidgets
+          map-subwidgets
           walk-widget-tree
           page-title
           page-description
@@ -25,16 +25,19 @@
           render-widget
           render-widget-body
           render-widget-children
-	  update-widget-slots-with-map
+          update-widget-slots-with-map
           get-widgets-by-type
           get-widget-by-id
-	  widget-css-classes
-	  mark-dirty
+          widget-css-classes
+          mark-dirty
           widget-dirty-p
           widget-equal
           widget-tree-equal
           copy-widget-tree
-          *current-widget*))
+          *current-widget* 
+          widget-translate 
+          widget-translation-table
+          ))
 
 (defvar *tree-update-pending* nil
   "T if we're currently updating the widget tree.
@@ -46,57 +49,57 @@ defclass, except adds 'widget-class' metaclass specification and
 inherits from 'widget' if no direct superclasses are provided."
   `(progn
      (defclass ,name ,(remove-duplicates
-		       (append (or direct-superclasses '(widget))
-			       (when (uri-parameter-def-p (car body))
-				 (list 'uri-parameters-mixin))))
+                       (append (or direct-superclasses '(widget))
+                               (when (uri-parameter-def-p (car body))
+                                 (list 'uri-parameters-mixin))))
        ,@body
        (:metaclass widget-class))
      (defmethod per-class-dependencies append ((obj ,name))
        (declare (ignore obj))
        (dependencies-by-symbol (quote ,name)))
      ,@(awhen (maybe-generate-parameter-slot-map-fn name (car body))
-	 (list it))))
+         (list it))))
 
 (defclass widget (dom-object-mixin)
   ((propagate-dirty :accessor widget-propagate-dirty
-		    :initform nil
-		    :initarg :propagate-dirty
-		    :documentation "A list of widgets which will be made
+                    :initform nil
+                    :initarg :propagate-dirty
+                    :documentation "A list of widgets which will be made
                     dirty when this widget is made dirty via a POST
                     request. This slot allows setting up dependencies
                     between widgets that will make multiple widgets
                     update automatically during AJAX requests.")
    (continuation :accessor widget-continuation
-		 :initform nil
-		 :documentation "Stores the continuation object for
+                 :initform nil
+                 :documentation "Stores the continuation object for
                  widgets that were invoked via one of the do-*
                  functions ('do-page', etc.). When 'answer' is called
                  on a widget, this value is used to resume the
                  computation.")
    (parent :accessor widget-parent
            :initarg :parent 
-	   :initform nil
-	   :documentation "Stores the 'parent' of a widget, i.e. the
-	   widget in which this widget is located, if any. This value is
-	   automatically set when you set the widget's children
-	   slot. Note, a widget can only have one parent at any given
-	   time.")
+           :initform nil
+           :documentation "Stores the 'parent' of a widget, i.e. the
+           widget in which this widget is located, if any. This value is
+           automatically set when you set the widget's children
+           slot. Note, a widget can only have one parent at any given
+           time.")
    (children :initform nil
-	     :documentation "This widget's children.")
+             :documentation "This widget's children.")
    (widget-prefix-fn :initform nil
-	             :initarg :widget-prefix-fn
-	             :accessor widget-prefix-fn
-		     :documentation "A function called prior to
-	             rendering the widget body. The function should
-	             expect the widget as well as any additional
-	             arguments passed to the widget.")
+                     :initarg :widget-prefix-fn
+                     :accessor widget-prefix-fn
+                     :documentation "A function called prior to
+                     rendering the widget body. The function should
+                     expect the widget as well as any additional
+                     arguments passed to the widget.")
    (widget-suffix-fn :initform nil
-	             :initarg :widget-suffix-fn
-		     :accessor widget-suffix-fn
-		     :documentation "A function called after rendering
-	             the widget body. The function should expect the
-	             widget as well as any additional arguments passed
-	             to the widget."))
+                     :initarg :widget-suffix-fn
+                     :accessor widget-suffix-fn
+                     :documentation "A function called after rendering
+                     the widget body. The function should expect the
+                     widget as well as any additional arguments passed
+                     to the widget."))
   #+lispworks (:optimize-slot-access nil)
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
@@ -252,8 +255,8 @@ children of w (e.g. may be rendered when w is rendered).")
     their own method for updating parameters (for example based
     on a widget name) without relying on the mixin or the MOP"
    (loop for (sname . pname) in slot-map
-	 for param = (assoc pname uri-params :test #'equalp)
-	 when param
+         for param = (assoc pname uri-params :test #'equalp)
+         when param
          do (setf (slot-value w sname) (cdr param))))
 
 (defgeneric walk-widget-tree (obj fn &optional depth)
@@ -322,9 +325,9 @@ children of w (e.g. may be rendered when w is rendered).")
   "Simple test that the cell is still part of one of the children lists
    to validate the place stored in the closure"
   (notevery #'null
-	    (mapcar (lambda (row)
-		      (notevery #'null
-				(maplist (lambda (e) (eq cell e)) (cdr row)))) children)))
+            (mapcar (lambda (row)
+                      (notevery #'null
+                                (maplist (lambda (e) (eq cell e)) (cdr row)))) children)))
 
 
 (defgeneric make-widget-place-writer (container widget)
@@ -343,26 +346,26 @@ children of w (e.g. may be rendered when w is rendered).")
    widget slot.")
   (:method ((obj widget) child)
     (let ((place (find-if-not #'null
-			      (mapcar (lambda (row) (member child (cdr row)))
-				      (slot-value obj 'children)))))
+                              (mapcar (lambda (row) (member child (cdr row)))
+                                      (slot-value obj 'children)))))
       (if place
-	  (lambda (&optional (callee nil callee-supplied-p))
-	    (assert (place-in-children-p place (slot-value obj 'children)))
-	    (cond
-	      (callee-supplied-p
-	       (rplaca place callee)
-	       (setf (widget-parent callee) obj)
-	       (mark-dirty obj))
-	      (t (car place))))
-	  (lambda (&rest args)
-	    (declare (ignore args))
-	    (style-warn 'widget-not-in-parent :widget child :parent obj)
-	    (mark-dirty obj))))))
+          (lambda (&optional (callee nil callee-supplied-p))
+            (assert (place-in-children-p place (slot-value obj 'children)))
+            (cond
+              (callee-supplied-p
+               (rplaca place callee)
+               (setf (widget-parent callee) obj)
+               (mark-dirty obj))
+              (t (car place))))
+          (lambda (&rest args)
+            (declare (ignore args))
+            (style-warn 'widget-not-in-parent :widget child :parent obj)
+            (mark-dirty obj))))))
 
 
 (defgeneric with-widget-header (obj body-fn &rest args &key
-				    widget-prefix-fn widget-suffix-fn
-				    &allow-other-keys)
+                                    widget-prefix-fn widget-suffix-fn
+                                    &allow-other-keys)
   (:documentation
    "Renders a header and footer for the widget and calls 'body-fn'
 within it. Specialize this function to provide customized headers for
@@ -371,26 +374,22 @@ different widgets.
 'widget-prefix-fn' and 'widget-suffix-fn' allow specifying functions
 that will be applied before and after the body is rendered.")
   (:method (obj body-fn &rest args
-	    &key widget-prefix-fn widget-suffix-fn
-	    &allow-other-keys)
+            &key widget-prefix-fn widget-suffix-fn
+            &allow-other-keys)
     (remf args :widget-prefix-fn)
     (remf args :widget-suffix-fn)
     (with-html
       (:div :class (dom-classes obj)
-	    :id (dom-id obj)
-	    (safe-apply widget-prefix-fn obj args)
-	    (apply body-fn obj args)
-	    (safe-apply widget-suffix-fn obj args)))))
+            :id (dom-id obj)
+            (safe-apply widget-prefix-fn obj args)
+            (apply body-fn obj args)
+            (safe-apply widget-suffix-fn obj args)))))
 
 (defgeneric render-widget-children (obj &rest args)
   (:documentation "Renders the widget's children.")
   (:method (obj &rest args)
     (warn "Cannot update the widget children of ~S because it is not a widget."
           obj))
-  (:method ((obj function) &rest args)
-           (declare (ignore obj args))
-           ; Do nothing, functions don't have children yet
-           )
   (:method ((obj widget) &rest args)
  "Render all children. Specialize this method if you only want
 to render widgets of a certain type."
@@ -439,22 +438,31 @@ stylesheets and javascript links in the page header."))
   (if (ajax-request-p)
     (mapc #'render-dependency-in-ajax-response (dependencies obj))
     (setf *page-dependencies*
-	  (append *page-dependencies* (dependencies obj))))
-  (let ((*current-widget* obj))
-    (if inlinep
-      (progn (apply #'render-widget-body obj args)
-	     (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-      (apply #'with-widget-header
-	     obj
-	     (lambda (obj &rest args)
-	       (apply #'render-widget-body obj args)
-	       (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-             (append
-               (when (widget-prefix-fn obj)
-                 (list :widget-prefix-fn (widget-prefix-fn obj)))
-               (when (widget-suffix-fn obj)
-                 (list :widget-suffix-fn (widget-suffix-fn obj)))
-               args)))))
+          (append *page-dependencies* (dependencies obj))))
+
+  (write-string 
+    (weblocks-util::nested-html-part 
+      (list :type :widget :widget obj)
+      (let ((*current-widget* obj)
+            (*weblocks-output-stream* (make-string-output-stream)))
+
+        (if inlinep
+          (progn (apply #'render-widget-body obj args)
+                 (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+          (apply #'with-widget-header
+                 obj
+                 (lambda (obj &rest args)
+                   (apply #'render-widget-body obj args)
+                   (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+                 (append
+                   (when (widget-prefix-fn obj)
+                     (list :widget-prefix-fn (widget-prefix-fn obj)))
+                   (when (widget-suffix-fn obj)
+                     (list :widget-suffix-fn (widget-suffix-fn obj)))
+                   args)))
+
+        (get-output-stream-string *weblocks-output-stream*)))
+    *weblocks-output-stream*))
 
 (defgeneric mark-dirty (w &key propagate putp)
   (:documentation
@@ -490,7 +498,7 @@ PUTP is a legacy argument. Do not use it in new code."))
 ;;; When slots of a widget are modified, the widget should be marked
 ;;; as dirty to service AJAX calls.
 (defmethod (setf slot-value-using-class) (new-value (class widget-class) (object widget)
-					  (slot-name widget-effective-slot-definition))
+                                          (slot-name widget-effective-slot-definition))
   (when (widget-slot-affects-dirty-status-p slot-name)
     (mark-dirty object))
   (call-next-method new-value class object slot-name))
@@ -589,14 +597,33 @@ Slots will be copied shallowly except for CHILDREN."
   (declare (ignore widget hash))
   nil)
 
-(defgeneric widget-translation-table (obj)
-  (:method-combination append)
-  (:method append (obj)
-   nil))
+(defgeneric widget-translation-table (obj &rest args)
+  (:documentation "Widget translation table is an alist with all strings used in widget which should be translated.
+                   The idea of this table is to hold every string so we just translate this table to translate all widget strings.
+                   Some strings like messages or questions to user can be hard to locate for translation but 
+                   when we put all widget translation strings in one place there is no need in location it will be easy to translate them. 
+                   This function should return translation strings from widget and all its children.
+                   To use string from translation table see 'widget-translate'. 
+                   To use some dynamic string which you want to put into translation table use 'widget-dynamic-translate'")
+                   (:method-combination append)
+                   (:method append (obj &rest args)
+                    (get 'dynamic-translation-table obj)))
 
-(defmethod widget-translate (obj &rest args)
-  (apply 
-    #'translate 
-    (list* 
-      (cdr (assoc (car args) (widget-translation-table obj)))
-      (cdr args))))
+(defmethod widget-translate (obj key &key items-count)
+  "Returns string associated with key from widget translation table"
+  (when items-count 
+    (setf key (concatenate-keywords key :- (number-form-type-with-locale (current-locale) items-count))))
+  (cdr (assoc key (widget-translation-table obj))))
+
+(defmethod widget-dynamic-translate (obj key value)
+  "Updates widget dynamic translation table. When 'key' is already exists in table, replaces it."
+  (let* ((table (get 'dynamic-translation-table obj))
+         (found-element (assoc key table)))
+
+    (when found-element
+      (setf table (remove found-element table)))
+
+    (push (cons key value) table)
+
+    (setf (get 'dynamic-translation-table obj) table)
+    value))

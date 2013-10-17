@@ -11,3 +11,9 @@
 		     (progn (change-class wij 'data-editor)
 			    (dataform-data wij))))
       (ensure-same d obj))))
+
+(addtest dataform-i18n-1 
+  (ensure-alist-has-keys 
+    (widget-translation-table 
+      (make-instance 'dataform :data *joe*))
+    (list :close-link-title :modify-link-title)))

@@ -12,3 +12,8 @@
 	(:div :class "extra-bottom-2" "<!-- empty -->")
 	(:div :class "extra-bottom-3" "<!-- empty -->")))
 
+(addtest sequence-view-i18n-1 
+  (ensure-alist-has-keys 
+    (widget-translation-table (make-instance 'sequence-view))
+    (list :empty-message)))
+

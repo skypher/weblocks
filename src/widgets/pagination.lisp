@@ -119,10 +119,10 @@ items if 'show-total-items' is set to true."))
         (str previous-link)
         ; 'Viewing Page X of Y'
         (:span :class "page-info"
-               (:span :class "viewing-label" (str (translate "Viewing ")))
-               (:span :class "page-label" (str (translate "Page ")))
+               (:span :class "viewing-label" (str (widget-translate 'pagination :viewing-label)))
+               (:span :class "page-label" (str (widget-translate 'pagination :page-label)))
                (:span :class "current-page" (:strong (str current-page)))
-               (:span :class "of-label" (str (translate " of ")))
+               (:span :class "of-label" (str (widget-translate 'pagination :of-label)))
                (:span :class "total-pages" (str pages-count)))
         ; 'Next' link
         (str next-link)
@@ -138,7 +138,7 @@ items if 'show-total-items' is set to true."))
     (unless last-page-p
       (htm 
         (str "&nbsp;")
-        (render-link action (translate (humanize-name "Next >")) :class "next-page")))))
+        (render-link action (widget-translate 'pagination :next-label) :class "next-page")))))
 
 (deftemplate :pagination-next-link-wt 'pagination-next-link-wt)
 
@@ -146,7 +146,7 @@ items if 'show-total-items' is set to true."))
   (with-html-to-string 
     (unless first-page-p
       (htm 
-        (render-link action (translate (humanize-name "< Previous")) :class "previous-page")
+        (render-link action (widget-translate 'pagination :previous-label) :class "previous-page")
         (str "&nbsp;")))))
 
 (deftemplate :pagination-prev-link-wt 'pagination-prev-link-wt)
@@ -155,7 +155,7 @@ items if 'show-total-items' is set to true."))
   (capture-weblocks-output 
     (when pages-count-more-than-one-p
       (with-html-form (:get form-action)
-                      (:label (:span (str (translate "Go to page:&nbsp;")))
+                      (:label (:span (str (widget-translate 'pagination :go-to-page-label)))
                               (:input :name "page-number"
                                       :class (concatenate 'string
                                                           "page-number"
@@ -169,7 +169,7 @@ items if 'show-total-items' is set to true."))
                                                 "if(this.value == \"\") { this.value = \"1\"; }")
                                       :value (unless first-page-p
                                                "1")))
-                      (render-button "go-to-page" :value (translate "Go"))))))
+                      (render-button "go-to-page" :value (widget-translate 'pagination :go-label))))))
 
 (deftemplate :pagination-go-to-page-wt 'pagination-go-to-page-wt)
 
@@ -265,3 +265,17 @@ index (inclusive) and the ending item index (exclusive)."
 	  (flash (flash-message on-error msg))
 	  (function (funcall on-error msg)))))))
 
+(defmethod widget-translation-table append ((type (eql 'pagination)) &rest args)
+  "Returns widget translation table for pagination"
+  `((:viewing-label    . ,(translate "Viewing "))
+    (:page-label       . ,(translate "Page "))
+    (:of-label         . ,(translate " of "))
+    (:next-label       . ,(translate "Next >"))
+    (:previous-label   . ,(translate "< Previous"))
+    (:go-to-page-label . ,(translate "Go to page:&nbsp;"))
+    (:go-label         . ,(translate "Go"))))
+
+
+(defmethod widget-translation-table append ((obj pagination) &rest args)
+  "Returns widget translation table for pagination. Contains pagination for symbol 'pagination"
+  (widget-translation-table 'pagination))

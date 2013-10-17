@@ -60,6 +60,21 @@
 	    may use a specialized caption."))
   (:documentation "A meta description of the user interface."))
 
+(defmethod widget-translation-table append ((obj view) &rest args)
+  (apply 
+    #'append 
+    (remove-duplicates 
+      (map-view-fields 
+        (lambda (info)
+          (let ((info-key (alexandria:make-keyword (string-upcase (attributize-view-field-name info)))))
+            (loop for (key . val) in (widget-translation-table (slot-value info 'weblocks::field))
+                  collect (cons 
+                            (concatenate-keywords info-key :- key)
+                            val))))
+        obj
+        nil)
+      :test #'equal)))
+
 ;;; View field description
 (defclass view-field ()
   ((slot-name :initform nil
@@ -102,6 +117,9 @@
   (:documentation "Contains a meta description of a given field in the
   view."))
 
+(defmethod widget-translation-table append ((obj view-field) &rest args)
+  (widget-translation-table (slot-value obj 'presentation)))
+
 ;;; Inline view
 (defclass inline-view-field (view-field)
   ((label :initform nil
@@ -126,7 +144,20 @@
   (declare (ignore initargs))
   (with-slots (slot-name label) obj
     (unless label
-      (setf label (humanize-name slot-name)))))
+      (setf label (widget-translate obj :label)))))
+
+(defmethod widget-translation-table append ((obj inline-view-field) &rest args)
+  "Returns translation table. :label key/value are present when there is no label set for view-field 
+   or when current label is equal to generated one. 
+   First case is for 'widget-translate', it will return right value to initialize label slot.
+   Second case is for retrieving proper translation table."
+  (with-slots (slot-name label) obj 
+    (unless label
+      (return-from widget-translation-table 
+                   `((:label . ,(translate (humanize-name slot-name))))))
+
+    (when (string= label (translate (humanize-name slot-name)))
+      `((:label . ,(translate (humanize-name slot-name)))))))
 
 ;;; Mixin view
 (defclass mixin-view-field (view-field)

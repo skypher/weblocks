@@ -288,14 +288,14 @@ form-view-buttons for a given view.")
   (:method ((view form-view) obj widget &rest args &key form-view-buttons &allow-other-keys)
     (declare (ignore obj args))
     (flet ((find-button (name)
-	     (ensure-list
-	       (if form-view-buttons
-		   (find name form-view-buttons
-			 :key (lambda (item)
-				(car (ensure-list item))))
-		 (find name (form-view-buttons view)
-		       :key (lambda (item)
-			      (car (ensure-list item))))))))
+             (ensure-list
+               (if form-view-buttons
+                 (find name form-view-buttons
+                       :key (lambda (item)
+                              (car (ensure-list item))))
+                 (find name (form-view-buttons view)
+                       :key (lambda (item)
+                              (car (ensure-list item))))))))
       (write-string 
         (render-template-to-string 
           :form-view-buttons-wt
@@ -304,15 +304,21 @@ form-view-buttons for a given view.")
                          (when submit
                            (capture-weblocks-output
                              (render-button *submit-control-name*
-                                            :value (translate (or (cdr submit)
-                                                                  (humanize-name (car submit))))))))
+                                            :value (widget-dynamic-translate 
+                                                     view 
+                                                     :submit-button-title
+                                                     (translate (or (cdr submit)
+                                                                    (humanize-name (car submit)))))))))
           :cancel-html (let ((cancel (find-button :cancel)))
                          (when cancel
                            (capture-weblocks-output 
                              (render-button *cancel-control-name*
                                             :class "submit cancel"
-                                            :value (translate (or (cdr cancel)
-                                                                  (humanize-name (car cancel)))))))))
+                                            :value (widget-dynamic-translate 
+                                                     view 
+                                                     :cancel-button-title
+                                                     (translate (or (cdr cancel)
+                                                                  (humanize-name (car cancel))))))))))
         *weblocks-output-stream*))))
 
 (defmethod view-caption ((view form-view))
@@ -431,7 +437,7 @@ form-view-buttons for a given view.")
         :show-required-indicator show-required-indicator
         :required-indicator-label (when show-required-indicator
                                     (if (eq t required-indicator)
-                                      (translate *default-required-indicator*)
+                                      (widget-translate field :required-indicator)
                                       required-indicator))
         :show-field-label (not (empty-p (view-field-label field)))
         :field-label (translate (view-field-label field))
@@ -444,6 +450,9 @@ form-view-buttons for a given view.")
                           :field-info field-info
                           args)))
       *weblocks-output-stream*)))
+
+(defmethod widget-translation-table append ((obj form-view-field) &rest args)
+  `((:required-indicator . ,(translate *default-required-indicator*))))
 
 (defun form-view-field-value-wt (&key name max-length disabledp value size id)
   (with-html-to-string

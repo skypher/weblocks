@@ -7,19 +7,19 @@ etc.)"
   (declare (ignore keys))
   (with-html
     (:p :class "datagrid-select-bar"
-        (:strong (str (translate "Select: ")))
+        (:strong (str (widget-translate grid :select-label)))
         (render-link (make-action (lambda (&rest args)
                                     (declare (ignore args))
                                     (setf (dataseq-selection grid)
                                           (cons :none (mapcar #'object-id (dataseq-data grid))))
                                     (mark-dirty grid)))
-                     (translate "All"))
+                     (widget-translate grid :select-all-label))
         ", "
         (render-link (make-action (lambda (&rest args)
                                     (declare (ignore args))
                                     (dataseq-clear-selection grid)
                                     (mark-dirty grid)))
-                     (translate "None")))))
+                     (widget-translate grid :select-none-label)))))
 
 ;; Custom selection field
 (defclass datagrid-select-field (table-view-field)

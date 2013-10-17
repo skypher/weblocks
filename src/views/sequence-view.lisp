@@ -8,14 +8,12 @@
 	  view-field-sorting-mixin-allow-sorting-p sequence-view-field
 	  mixin-sequence-view-field))
 
-;;; Some parameters
-(defparameter *render-empty-sequence-string* "No information available."
-  "The default string used by the sequence view to signify that there
-is no information available.")
+(defmethod widget-translation-table append ((obj (eql 'sequence-view)) &rest args)
+  `((:empty-message . ,(translate "No information available."))))
 
 ;;; Sequence view
 (defclass sequence-view (view)
-  ((empty-message :initform *render-empty-sequence-string*
+  ((empty-message :initform (widget-translate 'sequence-view :empty-message)
 		  :initarg :empty-message
 		  :accessor sequence-view-empty-message
 		  :documentation "See
@@ -37,6 +35,9 @@ is no information available.")
   (:documentation "An abstract class that should be subclassed by
   views designed to present sequences of object in a sequence to the
   user."))
+
+(defmethod widget-translation-table append ((obj sequence-view) &rest args)
+  (widget-translation-table 'sequence-view))
 
 ;;; Sorting mixin
 (defclass view-field-sorting-mixin ()

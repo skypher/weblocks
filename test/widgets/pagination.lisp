@@ -301,3 +301,14 @@
 	(mapcar #'weblocks::string-widget-content (flash-messages f))))
   ("Page number must be an integer between 1 and 4."))
 
+(addtest pagination-i18n-1
+         (ensure-alist-has-keys 
+           (widget-translation-table 'pagination)
+           (list 
+             :viewing-label   
+             :page-label       
+             :of-label         
+             :next-label       
+             :previous-label   
+             :go-to-page-label 
+             :go-label)))

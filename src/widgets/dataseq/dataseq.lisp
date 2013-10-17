@@ -527,9 +527,31 @@ to the user of the widget.")
   (with-html
     (:span :class "total-items"
 	   (str (let ((total-items-count (dataseq-data-count obj)))
-		  (format nil (translate "(Total of ~A ~A)")
-			  total-items-count
-			  (proper-number-form total-items-count
-					      (humanize-name
-					       (dataseq-data-class obj)))))))))
+                  (format nil 
+                          (widget-translate obj :total-message :items-count total-items-count) 
+                          total-items-count)
+		  )))))
+
+(defmethod widget-translation-table append ((obj dataseq) &rest args)
+  "Returns widget translation table for dataseq"
+  `(,@(loop for count-keyword in (locale-number-forms (current-locale))
+            collect 
+            (cons 
+              (concatenate-keywords :total-message- count-keyword)
+              (format nil 
+                      (translate "(Total of ~~A ~A)")
+                      (translate 
+                        (humanize-name (dataseq-data-class obj))
+                        :items-count count-keyword
+                        :accusative-form-p t))))
+     ,@(let ((view-keyword (alexandria:make-keyword (type-of (dataseq-view obj)))))
+         (loop for (key . val) in (widget-translation-table (dataseq-view obj)) 
+               collect (cons 
+                         (concatenate-keywords view-keyword :- key)
+                         val)))
+     ,@(when (dataseq-allow-pagination-p obj)
+         (loop for (key . val) in (widget-translation-table (dataseq-pagination-widget obj))
+               collect (cons 
+                         (concatenate-keywords :pagination- key)
+                         val)))))
 

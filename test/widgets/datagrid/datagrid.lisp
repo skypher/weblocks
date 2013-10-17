@@ -374,3 +374,11 @@
 		    :test #'cl-ppcre:scan))))
   t)
 
+(addtest datagrid-i18n-1
+  (ensure-alist-has-keys 
+    (widget-translation-table 
+      (make-instance 'datagrid :data-class 'employee))
+    (list 
+      :select-label       
+      :select-all-label  
+      :select-none-label)))

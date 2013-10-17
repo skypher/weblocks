@@ -9,12 +9,12 @@
 
 ;;; Data presentation
 (defclass predicate-presentation (text-presentation)
-  ((false-string :initform (translate "No")
+  ((false-string :initform (widget-translate 'predicate-presentation :false-string)
 		 :accessor predicate-presentation-false-string
 		 :initarg :false-string
 		 :documentation "A string to be printed when the
 		 predicate is false.")
-   (true-string :initform (translate "Yes")
+   (true-string :initform (widget-translate 'predicate-presentation :true-string)
 		:accessor predicate-presentation-true-string
 		:initarg :true-string
 		:documentation "A string to be printed when the
@@ -35,6 +35,13 @@
   (if value
       (predicate-presentation-true-string presentation)
       (predicate-presentation-false-string presentation)))
+
+(defmethod widget-translation-table append ((obj (eql 'predicate-presentation)) &rest args)
+  `((:true-string . ,(translate "Yes"))
+    (:false-string . ,(translate "No"))))
+
+(defmethod widget-translation-table append ((obj predicate-presentation) &rest args)
+  (widget-translation-table 'predicate-presentation))
 
 ;;; Form presentation
 (defclass checkbox-presentation (form-presentation)

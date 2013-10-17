@@ -64,3 +64,7 @@
     
     (setf (slot-value obj 'rendered-data-sequence) data-sequence)))
 
+(defmethod widget-translation-table append ((obj datagrid) &rest args)
+  `((:select-label      . ,(translate "Select: "))
+    (:select-all-label  . ,(translate "All"))
+    (:select-none-label . ,(translate "None"))))

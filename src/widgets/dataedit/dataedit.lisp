@@ -227,8 +227,38 @@ in order to reset the state after the item widget has done its job."
 (defmethod dependencies append ((obj dataedit-mixin))
   (list (make-local-dependency :stylesheet "dataform-import" :import-p t)))
 
-(defmethod widget-translation-table append ((obj dataedit-mixin))
-  (list 
-    (cons :item-deleted-message "Deleted ~A ~A.")
-    (cons :items-delete-question "Delete ~A ~A?")
-    (cons :choose-items-for-deletion-message "Please select ~A to delete.")))
+(defmethod widget-translation-table append ((obj dataedit-mixin) &rest args)
+  (list* 
+    (cons :choose-items-for-deletion-message 
+          (format nil 
+                  (translate "Please select ~A to delete.")
+                  (translate 
+                    (humanize-name (dataseq-data-class obj))
+                    :plural-p t
+                    :accusative-form-p t)))
+    (append 
+      (loop for count-keyword in (locale-number-forms (current-locale))
+            collect 
+            (cons 
+              (concatenate-keywords :items-deleted-message- count-keyword)
+              (format nil 
+                      (translate 
+                        "Deleted ~~A ~A."
+                        :preceding-gender (determine-gender (humanize-name (dataseq-data-class obj)))
+                        :preceding-count count-keyword)
+                      (translate  
+                        (humanize-name (dataseq-data-class obj))
+                        :items-count count-keyword 
+                        :accusative-form-p t))))
+      (loop for count-keyword in (locale-number-forms (current-locale))
+            collect 
+            (cons 
+              (concatenate-keywords :items-delete-question-for- count-keyword) 
+              (format nil 
+                      (translate "Delete ~~A ~A?")
+                      (translate 
+                        (humanize-name (dataseq-data-class obj))
+                        :items-count count-keyword
+                        :accusative-form-p t))))
+      (loop for (key . val) in (widget-translation-table 'do-confirmation :confirmation-type :yes/no)
+            collect (cons (concatenate-keywords :do-confirmation- key) val)))))

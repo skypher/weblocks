@@ -1175,3 +1175,8 @@
 	(:input :name "add" :type "submit" :class "submit" :value "Add"
 		:onclick "disableIrrelevantButtons(this);")))
 
+(addtest gridedit-i18n-1 
+  (ensure-alist-has-keys 
+    (widget-translation-table (make-instance 'gridedit :data-class 'employee))
+    (list :item-modified-message 
+          :item-added-message)))

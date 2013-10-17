@@ -71,3 +71,7 @@
 					 'boolean nil))))
   predicate-parser)
 
+(addtest boolean-i18n-1
+  (ensure-alist-has-keys 
+    (widget-translation-table (make-instance 'predicate-presentation))
+    (list :true-string :false-string)))

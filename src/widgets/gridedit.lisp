@@ -6,15 +6,15 @@
 (defwidget gridedit (dataedit-mixin datagrid)
   ((allow-select-p :initform t)
    (drilldown-type :accessor gridedit-drilldown-type
-		 :initform :edit
-		 :initarg :drilldown-type
-		 :documentation "Type of the drilldown UI to be provided
-		 by the gridedit. The default, :edit, provides a form
-		 via 'dataform' widget when the user drills down into
-		 a given item. If :view is specified the UI will
-		 provide a dataform in the view mode. You can also
-		 customize 'gridedit-create-drilldown-widget' to provide
-		 more fine grained behavior."))
+                   :initform :edit
+                   :initarg :drilldown-type
+                   :documentation "Type of the drilldown UI to be provided
+                                   by the gridedit. The default, :edit, provides a form
+                                   via 'dataform' widget when the user drills down into
+                                   a given item. If :view is specified the UI will
+                                   provide a dataform in the view mode. You can also
+                                   customize 'gridedit-create-drilldown-widget' to provide
+                                   more fine grained behavior."))
   (:documentation "A widget based on the 'datagrid' that enhances it
   with user interface to add, remove, and modify data entries."))
 
@@ -33,11 +33,7 @@
                    (when (or (dataedit-mixin-flash-message-on-first-add-p grid)
                              (> (dataseq-data-count grid) 1))
                      (flash-message (dataseq-flash grid)
-                                    (format nil 
-                                            (widget-translate 
-                                              grid :item-added-message 
-                                              :preceding-gender (determine-gender (humanize-name (dataseq-data-class grid))))
-                                            (widget-translate grid :item-name :accusative-form-p t))))
+                                    (widget-translate grid :item-added-message)))
 		   (dataedit-reset-state grid)
                    (throw 'annihilate-dataform nil))
      :data-view (dataedit-item-data-view grid)
@@ -53,12 +49,7 @@
 		 :on-success (lambda (obj)
 			       (declare (ignore obj))
 			       (flash-message (dataseq-flash grid)
-                                              (format nil 
-                                                      (widget-translate 
-                                                        grid 
-                                                        :item-modified-message 
-                                                        :preceding-gender (determine-gender (humanize-name (dataseq-data-class grid))))
-                                                      (widget-translate grid :item-name)))
+                                              (widget-translate grid :item-modified-message))
 			       (if (eql (gridedit-drilldown-type grid) :edit)
                                    (progn
                                      (dataedit-reset-state grid)
@@ -85,8 +76,16 @@
   (when (dataedit-item-widget obj)
     (render-widget (dataedit-item-widget obj))))
 
-(defmethod widget-translation-table append ((obj gridedit))
+(defmethod widget-translation-table append ((obj gridedit) &rest args)
+  "Returns widget translation table for gridedit"
   (list 
-    (cons :item-modified-message "Modified ~A.")
-    (cons :item-added-message "Added ~A.")
-    (cons :item-name (humanize-name (dataseq-data-class obj)))))
+    (cons :item-modified-message 
+          (format nil 
+                  (translate "Modified ~A." 
+                             :preceding-gender (determine-gender (humanize-name (dataseq-data-class obj))))
+                  (translate (humanize-name (dataseq-data-class obj)))))
+    (cons :item-added-message 
+          (format nil 
+                  (translate "Added ~A." 
+                             :preceding-gender (determine-gender (humanize-name (dataseq-data-class obj))))
+                  (translate (humanize-name (dataseq-data-class obj)) :accusative-form-p t)))))

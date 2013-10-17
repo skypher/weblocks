@@ -2,17 +2,17 @@
 (in-package :weblocks-util)
 
 (wexport '(gen-id
-	   safe-apply
+           safe-apply
            safe-funcall
            request-parameter
-	   request-parameters
-	   public-file-relative-path
+           request-parameters
+           public-file-relative-path
            public-files-relative-paths
            symbol-status
            asdf-system-directory
            hash-keys
-	   append-custom-fields
-	   function-designator-p
+           append-custom-fields
+           function-designator-p
            defrender 
            find-own-symbol 
            relative-path 
@@ -21,8 +21,9 @@
            slurp-file
            with-file-write
            merge-files-with-newline
-           gzip-file md5)
-	 '(t util))
+           gzip-file md5
+           concatenate-keywords)
+         '(t util))
 
 (defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
@@ -95,7 +96,7 @@ Ex:
   "Returns a status of 'symbol' in its package (internal, external,
 etc.)"
   (nth-value 1 (find-symbol (symbol-name symbol)
-			    (symbol-package symbol))))
+                            (symbol-package symbol))))
 
 (defvar *asdf-system-cache* (make-hash-table :test #'equalp))
 
@@ -118,13 +119,13 @@ system resides."
   "Appends 'custom-fields' to the end of custom fields that are
 already defined in 'args'."
   (append (cadr (member :custom-fields args))
-	  custom-fields))
+          custom-fields))
 
 (defun function-designator-p (obj)
   "Returns true if the object is a function designator."
   (or (functionp obj)
       (and (symbolp obj)
-	   (not (null (fboundp obj))))
+           (not (null (fboundp obj))))
       (typep obj 'funcallable-standard-object)))
 
 (defun find-own-symbol (name &optional (package nil packagep))
@@ -132,35 +133,35 @@ already defined in 'args'."
   (multiple-value-bind (sym status)
       (if packagep (find-symbol name package) (find-symbol name))
     (and (member status '(:internal :external))
-	 (values sym status))))
+         (values sym status))))
 
 (defun congruent-lambda-expression (lambda-list function)
   "Answer a lambda expression with LAMBDA-LIST that passes all
 args (assuming the call is allowed by LAMBDA-LIST) to FUNCTION,
 answering its result."
   (let* ((reqs (required-args lambda-list))
-	 (opts (aand (member '&optional lambda-list)
-		     (loop for llelt in (cdr it)
-			   until (member llelt lambda-list-keywords)
-			   if (consp llelt)
-			     collect (list (first llelt) (second llelt)
-					   (or (third llelt) (gensym "OPTP")))
-			   else collect (list llelt nil (gensym "OPTP")))))
-	 (keys? (member '&key lambda-list))
-	 (more (and (or keys? (position-if (f_ (member _ '(&body &rest)))
-					   lambda-list))
-		    (gensym "MORE"))))
+         (opts (aand (member '&optional lambda-list)
+                     (loop for llelt in (cdr it)
+                           until (member llelt lambda-list-keywords)
+                           if (consp llelt)
+                             collect (list (first llelt) (second llelt)
+                                           (or (third llelt) (gensym "OPTP")))
+                           else collect (list llelt nil (gensym "OPTP")))))
+         (keys? (member '&key lambda-list))
+         (more (and (or keys? (position-if (f_ (member _ '(&body &rest)))
+                                           lambda-list))
+                    (gensym "MORE"))))
     `(lambda (,@reqs
-	      ,@(and opts (cons '&optional opts))
-	      ,@(and more (list '&rest more))
-	      ,@(and keys? '(&key &allow-other-keys)))
+              ,@(and opts (cons '&optional opts))
+              ,@(and more (list '&rest more))
+              ,@(and keys? '(&key &allow-other-keys)))
        ,(if (or opts more)
-	    `(apply ',function ,@reqs
-		    ,(reduce (lambda (optarg rest)
-			       `(and ,(third optarg)
-				     (cons ,(first optarg) ,rest)))
-			     opts :from-end t :initial-value more))
-	    `(funcall ',function ,@reqs)))))
+            `(apply ',function ,@reqs
+                    ,(reduce (lambda (optarg rest)
+                               `(and ,(third optarg)
+                                     (cons ,(first optarg) ,rest)))
+                             opts :from-end t :initial-value more))
+            `(funcall ',function ,@reqs)))))
 
 
 (defmacro with-file-write ((stream-name path &key (element-type ''base-char))
@@ -169,7 +170,7 @@ answering its result."
      (ensure-directories-exist ,path)
      (with-open-file (,stream-name ,path :direction :output
                                          :element-type ,element-type
-				         :if-exists #+ccl :overwrite #-ccl :supersede
+                                         :if-exists #+ccl :overwrite #-ccl :supersede
                                          :if-does-not-exist :create)
        ,@body)))
 
@@ -188,39 +189,39 @@ answering its result."
       seq)))
 
 (defun merge-files (file-list saved-path
-		    &key (element-type '(unsigned-byte 8)) linkage-element-fn)
+                    &key (element-type '(unsigned-byte 8)) linkage-element-fn)
   (with-file-write (stream saved-path :element-type element-type)
     (write-sequence (slurp-file (car file-list) :element-type element-type)
-		    stream)
+                    stream)
     (dolist (file (cdr file-list))
       (when linkage-element-fn
-	(funcall linkage-element-fn stream))
+        (funcall linkage-element-fn stream))
       (write-sequence (slurp-file file :element-type element-type)
-		      stream))))
+                      stream))))
 
 (defun merge-files-with-newline (file-list saved-path)
   (merge-files file-list saved-path
-	       :linkage-element-fn (lambda (stream) (write-byte 10 stream))))
+               :linkage-element-fn (lambda (stream) (write-byte 10 stream))))
 
 (defun relative-path (full-path prefix-path)
   (princ-to-string
    (make-pathname :directory (cons :relative
-				   (nthcdr (length (pathname-directory prefix-path))
-					   (pathname-directory full-path)))
-		  :name (pathname-name full-path)
-		  :type (pathname-type full-path))))
+                                   (nthcdr (length (pathname-directory prefix-path))
+                                           (pathname-directory full-path)))
+                  :name (pathname-name full-path)
+                  :type (pathname-type full-path))))
 
 (defun gzip-file (input output &key (if-exists #+ccl :overwrite #-ccl :supersede) (if-does-not-exist :create)
-		  (minimum-length 300))
+                  (minimum-length 300))
   "Redefined salsa2:gzip-file with more keywords."
   (with-open-file (istream input :element-type '(unsigned-byte 8))
     (unless (< (file-length istream) minimum-length)
       (with-open-file (ostream output
-			       :element-type '(unsigned-byte 8)
-			       :direction :output
-			       :if-does-not-exist if-does-not-exist
-			       :if-exists if-exists)
-	(salza2:gzip-stream istream ostream)))
+                               :element-type '(unsigned-byte 8)
+                               :direction :output
+                               :if-does-not-exist if-does-not-exist
+                               :if-exists if-exists)
+        (salza2:gzip-stream istream ostream)))
     (probe-file output)))
 
 (defmacro defrender (widget-type &body body)
@@ -234,3 +235,8 @@ answering its result."
   (ironclad:byte-array-to-hex-string 
     (ironclad:digest-sequence 
       :md5 (babel:string-to-octets string :encoding :utf-8))))
+
+(defun concatenate-keywords (&rest symbols)
+  (intern 
+    (apply #'concatenate (list* 'string (mapcar #'string-upcase symbols)))
+    "KEYWORD"))
