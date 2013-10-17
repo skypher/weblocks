@@ -8,34 +8,36 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.10.1"
+   :version "0.10.2"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
    :description "A Common Lisp web framework."
-   :depends-on (:weblocks-util
-     :weblocks-stores
-     :closer-mop
-     :hunchentoot
-     :puri
-     :cl-json
-     :cl-who
-     :parenscript
-     :cl-fad
-     :optima
-     :cl-cont
-     :metatilities
-     :cl-ppcre
-     :anaphora
-     :f-underscore
-     :bordeaux-threads
-     :salza2
-     :html-template
-     :trivial-timeout
-     :trivial-backtrace 
-     :parse-number 
-   :pretty-function 
-   :babel)
+   :depends-on 
+   (:weblocks-util
+    :weblocks-stores
+    :closer-mop
+    :hunchentoot
+    :puri
+    :cl-json
+    :cl-who
+    :parenscript
+    :cl-fad
+    :optima
+    :cl-cont
+    :metatilities
+    :cl-ppcre
+    :anaphora
+    :f-underscore
+    :bordeaux-threads
+    :salza2
+    :html-template
+    :trivial-timeout
+    :trivial-backtrace 
+    :parse-number 
+    :pretty-function 
+    :babel 
+    :split-sequence)
    :components ((:module src
                :components (
                    (:file "package")

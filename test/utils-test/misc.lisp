@@ -203,10 +203,14 @@
   (0 :b 2))
 
 ;;; test tokenize-uri
-(deftest tokenize-uri-1
-    (with-test-webapp ()
-      (weblocks::tokenize-uri "///hello/world/blah\\test\\world?hello=5 ;blah=7"))
-  ("hello" "world" "blah" "test" "world"))
+(addtest tokenize-uri
+  (with-test-webapp ()
+    (ensure-same 
+      (weblocks::tokenize-uri "/hello/world/blah/test/world?hello=5 ;blah=7")
+      '("hello" "world" "blah" "test" "world"))
+    (ensure-same (weblocks::tokenize-uri "") nil)
+    (ensure-same (weblocks::tokenize-uri "/") nil)
+    (ensure-same (weblocks::tokenize-uri "//") '(""))))
 
 ;;; test public-file-relative-path
 (deftest public-file-relative-path-1

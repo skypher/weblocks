@@ -47,6 +47,8 @@ which is more appropriate for our uses."
        do (setf path (add-get-param-to-url path (car x) (cdr x))))
     path))
 
+(defun remove-url-query-string (str)
+  (cl-ppcre:regex-replace "\\?.*" str ""))
 
 (defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
                                                                 (current-webapp))))
@@ -55,17 +57,25 @@ which is more appropriate for our uses."
 ex:
 \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
 => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
-  (loop for token in (cl-ppcre:split "[/\\\\]" 
-				     (cl-ppcre:regex-replace "\\?.*"
-							     (if remove-app-prefix
-								 (subseq uri
-                                                                         (length
-                                                                           (webapp-prefix
-                                                                             app)))
-								 uri)
-							     ""))
-     unless (string-equal "" token)
-       collect (url-decode token)))
+  (flet ((remove-first-and-last-empty-strings (list)
+           (when (string= "" (first list))
+             (setf list (cdr list)))
+
+           (when (string= "" (car (last list)))
+             (setf list (butlast list)))
+           list))
+
+    (remove-first-and-last-empty-strings 
+      (loop for token in (split-sequence:split-sequence 
+                           #\/
+                           (remove-url-query-string 
+                             (if remove-app-prefix
+                               (subseq uri
+                                       (length
+                                         (webapp-prefix
+                                           app)))
+                               uri)))
+            collect (url-decode token)))))
 
 (defun query-string->alist (query-string)
   ;; stolen from cl-oauth -- does one of ours deps already offer this?
