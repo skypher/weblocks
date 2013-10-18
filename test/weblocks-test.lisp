@@ -1,24 +1,18 @@
 
-(defmacro without-package-variance-warnings (&body body)
-    `(eval-when (:compile-toplevel :load-toplevel :execute)
-            (handler-bind (#+sbcl(sb-int:package-at-variance #'muffle-warning))
-                     ,@body)))
-
-(without-package-variance-warnings
-  (defpackage #:weblocks-test
-    (:use :cl :weblocks :weblocks-stores :weblocks-util :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
-          :anaphora :f-underscore)
-    (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-                            #:standard-generic-function #:ensure-generic-function #:standard-class
-                            #:typep #:subtypep 
-                            #:standard-method)
-    (:shadowing-import-from :weblocks 
-                            #:redirect #:reset-sessions 
-                            #:create-folder-dispatcher-and-handler 
-                            #:create-prefix-dispatcher 
-                            #:create-regex-dispatcher 
-                            #:create-static-file-dispatcher-and-handler)
-    (:export #:test-weblocks)))
+(defpackage #:weblocks-test
+  (:use :cl :weblocks :weblocks-stores :weblocks-util :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+        :anaphora :f-underscore)
+  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+                          #:standard-generic-function #:ensure-generic-function #:standard-class
+                          #:typep #:subtypep 
+                          #:standard-method)
+  (:shadowing-import-from :weblocks 
+                          #:redirect #:reset-sessions 
+                          #:create-folder-dispatcher-and-handler 
+                          #:create-prefix-dispatcher 
+                          #:create-regex-dispatcher 
+                          #:create-static-file-dispatcher-and-handler)
+  (:export #:test-weblocks))
 
 (in-package :weblocks-test)
 
@@ -102,8 +96,7 @@ Pass NIL as the optional arg to just return the results instead of
 DESCRIBE-ing them."
   ;; XXX better results combination
   (setf weblocks::*dirty-widgets* nil)
-  (let ((results (list (run-tests :suite 'weblocks-suite)
-		       (run-tests :suite 'weblocks-store-test::store-suite))))
+  (let ((results (list (run-tests :suite 'weblocks-suite))))
     (when verbose
       (mapc #'describe results))
     (values-list results)))
