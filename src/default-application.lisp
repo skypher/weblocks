@@ -10,13 +10,13 @@
 (defmethod render-page-body :after ((app weblocks-default) rendered-html)
   (with-html
     (:div :class "footer"
-	  (:p "Running on "
-	      (str (concatenate
-		    'string (server-type) " " (server-version)))
-	      " (" (str (concatenate 'string (lisp-implementation-type) " "
-				     (lisp-implementation-version))) ")")
-	  (:img :src (make-webapp-public-file-uri "images/footer/valid-xhtml11.png") :alt "This site has valid XHTML 1.1.")
-	  (:img :src (make-webapp-public-file-uri "images/footer/valid-css.png") :alt "This site has valid CSS."))))
+          (:p "Running on "
+              (str (concatenate
+                    'string (server-type) " " (server-version)))
+              " (" (str (concatenate 'string (lisp-implementation-type) " "
+                                     (lisp-implementation-version))) ")")
+          (:img :src (make-webapp-public-file-uri "images/footer/valid-xhtml11.png") :alt "This site has valid XHTML 1.1.")
+          (:img :src (make-webapp-public-file-uri "images/footer/valid-css.png") :alt "This site has valid CSS."))))
 
 (defwidget webapp-control ()
   ())

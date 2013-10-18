@@ -11,8 +11,8 @@
       (call-next-method)
       (with-html
         (:span :class "text"
-	       (str (funcall (get-function presentation)
-			     value))))))
+               (str (funcall (get-function presentation)
+                             value))))))
 
 
 (defmethod print-view-field-value ((value standard-object) (p functioncall-presentation) field view widget obj &rest args) 

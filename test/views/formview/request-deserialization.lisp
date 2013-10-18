@@ -5,67 +5,67 @@
 (deftest update-object-view-from-request-1
     (with-request :get '(("name" . "foo") ("manager" . "bar"))
       (let ((obj (copy-template *joe*)))
-	(update-object-view-from-request obj
-					 (find-view '(form employee)))
-	(values (first-name obj)
-		(manager obj)
-		(length (find-persistent-objects *default-store* 'employee)))))
+        (update-object-view-from-request obj
+                                         (find-view '(form employee)))
+        (values (first-name obj)
+                (manager obj)
+                (length (find-persistent-objects *default-store* 'employee)))))
   "foo" "bar" 1)
 
 (deftest update-object-view-from-request-2
     (with-request :get '(("name" . "foo") ("manager" . "bar"))
       (let ((obj (copy-template *joe*)))
-	(update-object-view-from-request obj
-					 (defview () (:type form
-						      :inherit-from '(:scaffold employee)
-						      :persistp nil)))
-	(values (first-name obj)
-		(manager obj)
-		(length (find-persistent-objects *default-store* 'employee)))))
+        (update-object-view-from-request obj
+                                         (defview () (:type form
+                                                      :inherit-from '(:scaffold employee)
+                                                      :persistp nil)))
+        (values (first-name obj)
+                (manager obj)
+                (length (find-persistent-objects *default-store* 'employee)))))
   "foo" "bar" 0)
 
 (deftest update-object-view-from-request-3
     (with-request :get '(("manager" . "bar"))
       (not (null
-	    (update-object-view-from-request (copy-template *joe*)
-					     (find-view '(form employee))))))
+            (update-object-view-from-request (copy-template *joe*)
+                                             (find-view '(form employee))))))
   nil)
 
 (deftest update-object-view-from-request-4
     (with-request :get '(("manager" . "bar"))
       (not (null
-	    (update-object-view-from-request (copy-template *joe*)
-					     (find-view '(form employee))))))
+            (update-object-view-from-request (copy-template *joe*)
+                                             (find-view '(form employee))))))
   nil)
 
 (deftest update-object-view-from-request-5
     (with-request :get '(("name" . "foo") ("manager" . "bar"))
       (let ((obj (copy-template *joe*)))
-	(multiple-value-bind (result errors)
-	    (update-object-view-from-request obj
-					     (defview () (:type form
-								:inherit-from '(:scaffold employee)
-								:persistp nil
-								:satisfies (lambda (manager data)
-									     (if (string-equal (cdr (assoc 'name data)) (slot-value manager 'name))
-										 t
-										 (values nil "abcd"))))))
-	  (values result (cdr (first errors))))))
+        (multiple-value-bind (result errors)
+            (update-object-view-from-request obj
+                                             (defview () (:type form
+                                                                :inherit-from '(:scaffold employee)
+                                                                :persistp nil
+                                                                :satisfies (lambda (manager data)
+                                                                             (if (string-equal (cdr (assoc 'name data)) (slot-value manager 'name))
+                                                                                 t
+                                                                                 (values nil "abcd"))))))
+          (values result (cdr (first errors))))))
   nil "abcd")
 
 (deftest update-object-view-from-request-6
     (with-request :get '(("name" . "Joe") ("manager" . "foo"))
       (let ((obj (copy-template *joe*)))
-	(multiple-value-bind (result errors)
-	    (update-object-view-from-request obj
-					     (defview () (:type form
-								:inherit-from '(:scaffold employee)
-								:persistp nil
-								:satisfies (lambda (obj data)
-									     (if (string-equal (cdr (assoc 'name data)) (slot-value obj 'name))
-										 t
-										 (values nil "abcd"))))))
-	  (values result (cdr (first errors))))))
+        (multiple-value-bind (result errors)
+            (update-object-view-from-request obj
+                                             (defview () (:type form
+                                                                :inherit-from '(:scaffold employee)
+                                                                :persistp nil
+                                                                :satisfies (lambda (obj data)
+                                                                             (if (string-equal (cdr (assoc 'name data)) (slot-value obj 'name))
+                                                                                 t
+                                                                                 (values nil "abcd"))))))
+          (values result (cdr (first errors))))))
   t nil)
 
 ;;; Test request-parameters-for-object-view
@@ -73,7 +73,7 @@
     (with-request :get '(("name" . "blah"))
       (mapcar
        (lambda (item)
-	 (cons (view-field-slot-name (car item)) (cdr item)))
+         (cons (view-field-slot-name (car item)) (cdr item)))
        (request-parameters-for-object-view (find-view '(form employee)) (copy-template *joe*))))
   ((name . "blah") (manager)))
 

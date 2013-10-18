@@ -10,16 +10,16 @@
           static-selector-get-pane
           static-selector-cached-panes
           static-selector-current-pane
-	  http-not-found))
+          http-not-found))
 
 (define-condition http-not-found (condition) ())
 
 (defwidget selector ()
   ((base-uri :accessor selector-base-uri
              :initform nil
-	     :documentation "The base URI for this selector, set during
-	     the tree shakedown phase before rendering. Used during
-	     rendering to compute URL paths."))
+             :documentation "The base URI for this selector, set during
+             the tree shakedown phase before rendering. Used during
+             rendering to compute URL paths."))
   (:documentation "A selector is a widget within the tree that has a
   relation with URIs."))
 
@@ -67,10 +67,10 @@
 (defmethod update-children ((selector selector))
   (declare (special *uri-tokens*))
   (setf (selector-base-uri selector)
-	(make-webapp-uri
-	 (string-left-trim
-	  "/" (string-right-trim
-	       "/" (uri-tokens-to-string (consumed-tokens *uri-tokens*))))))
+        (make-webapp-uri
+         (string-left-trim
+          "/" (string-right-trim
+               "/" (uri-tokens-to-string (consumed-tokens *uri-tokens*))))))
   (let ((widget (get-widget-for-tokens selector *uri-tokens*)))
     (if widget
       (update-dependents selector widget)
@@ -79,18 +79,18 @@
 
 (defwidget static-selector (selector)
   ((panes :accessor static-selector-panes :initarg :panes :initform nil
-	  :documentation "An alist mapping uri-tokens (strings) to
-	  widgets. The default item (widget) should have nil as the
-	  key. Not providing a default item will cause a redirect to
+          :documentation "An alist mapping uri-tokens (strings) to
+          widgets. The default item (widget) should have nil as the
+          key. Not providing a default item will cause a redirect to
           the first item's URI.")
    (cached-panes :accessor static-selector-cached-panes
                  :initform nil
                  :documentation "Remember the state of the statically
                  selected pane here.")
    (current-pane :accessor static-selector-current-pane :initform nil
-		 :documentation "The uri-tokens corresponding to the
-		 currently selected pane, or an empty string if the
-		 default pane is selected."))
+                 :documentation "The uri-tokens corresponding to the
+                 currently selected pane, or an empty string if the
+                 default pane is selected."))
   (:documentation "A static-selector implements a static mapping from a
   single uri-token to a list of widgets, where only one widget can be
   selected at any given time. This forms the base for most static
@@ -166,13 +166,13 @@
   (let* ((token (peek-at-token uri-tokens))
          (panes (static-selector-panes selector))
          (cached-panes (static-selector-cached-panes selector))
-	 (pane (static-selector-get-pane selector token))
+         (pane (static-selector-get-pane selector token))
          (cached-pane (assoc token cached-panes :test #'equalp))
          (effective-pane (or cached-pane pane))
          (selected-pane (cond
                           ((cdr effective-pane)
-			   (when (car effective-pane)
-			     (pop-tokens uri-tokens))
+                           (when (car effective-pane)
+                             (pop-tokens uri-tokens))
                            effective-pane)
                           ((and (null token) panes)
                            (let ((default-pane (or (static-selector-get-pane selector nil) (first panes))))

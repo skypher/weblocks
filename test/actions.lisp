@@ -18,29 +18,29 @@
 (deftest make-action/get-request-action-1
     (with-request :get nil
       (let ((action-name (make-action (lambda (&rest keys) 123))))
-	(do-request `(("action" . ,action-name)))))
+        (do-request `(("action" . ,action-name)))))
   123)
 
 (deftest make-action/get-request-action-2
     (with-request :post nil
       (let ((action-name (make-action (lambda (&rest keys) 123))))
-	(do-request `(("action" . ,action-name)))))
+        (do-request `(("action" . ,action-name)))))
   123)
 
 (deftest make-action/get-request-action-3
     (with-request :post nil
       (let ((action-name (make-action (lambda (&rest keys) 123))))
-	(setf (slot-value *request* 'get-parameters) `(("action" . ,action-name)))
-	(weblocks::eval-action)))
+        (setf (slot-value *request* 'get-parameters) `(("action" . ,action-name)))
+        (weblocks::eval-action)))
   123)
 
 ;;; test function-or-action->action
 (deftest function-or-action->action-1
     (with-request :get nil
       (multiple-value-bind (res err)
-	  (ignore-errors
-	    (weblocks::function-or-action->action "abc123"))
-	(values res (not (null err)))))
+          (ignore-errors
+            (weblocks::function-or-action->action "abc123"))
+        (values res (not (null err)))))
   nil t)
 
 (deftest function-or-action->action-2
@@ -63,10 +63,10 @@
 ;;; test eval-action
 (deftest eval-action-1
     (with-request :get `(("name" . "Bob")
-			 ("cancel" . "Cancel")
-			 (,weblocks::*action-string* . "abc123"))
+                         ("cancel" . "Cancel")
+                         (,weblocks::*action-string* . "abc123"))
       (make-action (lambda (&key name cancel &allow-other-keys)
-		     (concatenate 'string name cancel)))
+                     (concatenate 'string name cancel)))
       (weblocks::eval-action))
   "BobCancel")
 

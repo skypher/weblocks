@@ -5,18 +5,18 @@
 
 (defwidget flash (widget)
   ((messages :accessor flash-messages
-	     :initform nil
-	     :initarg :messages
-	     :documentation "A list of messages to be rendered the
- 	     next time the widget is to be presented. This can be any
- 	     renderable object (a widget, a function, a string,
- 	     etc.)")
+             :initform nil
+             :initarg :messages
+             :documentation "A list of messages to be rendered the
+             next time the widget is to be presented. This can be any
+             renderable object (a widget, a function, a string,
+             etc.)")
    (old-messages :accessor flash-old-messages
-		 :initform nil
-		 :initarg :messages
-		 :affects-dirty-status-p nil
-		 :documentation "A list of messages from the previous
-		 request."))
+                 :initform nil
+                 :initarg :messages
+                 :affects-dirty-status-p nil
+                 :documentation "A list of messages from the previous
+                 request."))
   (:documentation "A widget that allows displaying a message that
   disappears on the following request. It is useful for one time
   messages (welcome, etc.)"))
@@ -26,29 +26,29 @@
 (defmethod initialize-instance :after ((obj flash) &rest initargs)
   (declare (ignore initargs))
   (push (lambda ()
-	  (when (and (flash-messages obj)
-		     (not (refresh-request-p))
-		     (not (initial-request-p)))
-	    (setf (flash-old-messages obj) (flash-messages obj))
-	    (setf (flash-messages obj) nil)))
-	(request-hook :session :pre-action))
+          (when (and (flash-messages obj)
+                     (not (refresh-request-p))
+                     (not (initial-request-p)))
+            (setf (flash-old-messages obj) (flash-messages obj))
+            (setf (flash-messages obj) nil)))
+        (request-hook :session :pre-action))
   (push (lambda ()
-	  (declare (special *on-ajax-complete-scripts*))
-	  (when (and (ajax-request-p)
-		     (flash-old-messages obj))
-	    (if (flash-messages obj)
-		(send-script
-		  (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
+          (declare (special *on-ajax-complete-scripts*))
+          (when (and (ajax-request-p)
+                     (flash-old-messages obj))
+            (if (flash-messages obj)
+                (send-script
+                  (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
                                                              (create :pulses 3 :duration 0.5)))))
-		(send-script
+                (send-script
                   (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj))))))))
-	(request-hook :session :post-action))
+        (request-hook :session :post-action))
   (push (lambda ()
-	  (declare (special *on-ajax-complete-scripts*))
-	  (when (and (null (flash-messages obj))
-		     (flash-old-messages obj))
-	    (setf (flash-old-messages obj) nil)))
-	(request-hook :session :post-render)))
+          (declare (special *on-ajax-complete-scripts*))
+          (when (and (null (flash-messages obj))
+                     (flash-old-messages obj))
+            (setf (flash-old-messages obj) nil)))
+        (request-hook :session :post-render)))
 
 (defun flash-messages-to-show (flash)
   "Returns a list of messages that need to be shown or nil if there is
@@ -56,7 +56,7 @@ nothing to show. This functions takes into consideration any stale
 messages that need to be shown for AJAX effects."
   (or (flash-messages flash)
       (and (ajax-request-p)
-	   (flash-old-messages flash))))
+           (flash-old-messages flash))))
 
 ;;; Specialize with-widget-header to display a comment if there are no
 ;;; messages. We need this fix for IE6.
@@ -64,11 +64,11 @@ messages that need to be shown for AJAX effects."
   (if (flash-messages-to-show obj)
       (call-next-method)
       (apply #'call-next-method
-	     obj body-fn
-	     :widget-prefix-fn (lambda (&rest args)
-				 (declare (ignore args))
-				 (format *weblocks-output-stream* "<!-- empty flash -->"))
-	     args)))
+             obj body-fn
+             :widget-prefix-fn (lambda (&rest args)
+                                 (declare (ignore args))
+                                 (format *weblocks-output-stream* "<!-- empty flash -->"))
+             args)))
 
 (defun flash-message (flash msg)
   "Add a 'msg' to a list of messages to show on this request in the

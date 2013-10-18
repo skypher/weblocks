@@ -7,21 +7,21 @@
 available companies."
   (declare (ignore arg))
   (find-persistent-objects *prevalence-store* 'company
-			   :order-by (cons 'name :asc)))
+                           :order-by (cons 'name :asc)))
 
 ;;; Company
 (defclass company ()
   ((id :accessor company-id)
    (name :accessor company-name
-	 :initarg :name
-	 :type string)
+         :initarg :name
+         :type string)
    (industry :initform nil
-	     :accessor company-industry
-	     :initarg :industry)
+             :accessor company-industry
+             :initarg :industry)
    (non-profit :initform nil
-	       :accessor company-non-profit-p
-	       :initarg :non-profit-p
-	       :type boolean)))
+               :accessor company-non-profit-p
+               :initarg :non-profit-p
+               :type boolean)))
 
 
 (defun company-list-on-query (company-list-w order range &key countp) 

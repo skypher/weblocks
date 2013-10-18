@@ -11,19 +11,19 @@
 (deftest-html with-page-1
     (with-test-webapp (:class-name 'some-name)
       (let ((weblocks::*page-dependencies*
-	     (mapcar (curry #'apply
-			    (curry-after #'make-local-dependency :do-not-probe t))
-		     '((:stylesheet "foo")
-		       (:stylesheet "bar"))))
-	    (*current-page-description* "Some Page")
+             (mapcar (curry #'apply
+                            (curry-after #'make-local-dependency :do-not-probe t))
+                     '((:stylesheet "foo")
+                       (:stylesheet "bar"))))
+            (*current-page-description* "Some Page")
       (*current-page-title*  "Some Page")
       (*current-page-keywords* nil)
       (*current-page-headers* nil))
-	(declare (special weblocks::*page-dependencies*
-			  *current-page-description* *current-page-title* *current-page-keywords* *current-page-headers*))
-	(with-html
-	  (:div "test"))
-	(weblocks::render-page (weblocks::current-webapp))))
+        (declare (special weblocks::*page-dependencies*
+                          *current-page-description* *current-page-title* *current-page-keywords* *current-page-headers*))
+        (with-html
+          (:div "test"))
+        (weblocks::render-page (weblocks::current-webapp))))
   (htm
    (str "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")
    (str "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">")
@@ -45,13 +45,13 @@
      (:script :src "/some-name/pub/scripts/dialog.js" :type "text/javascript" ""))
     (:body
      (:div :class "page-wrapper"
-	   (:div :class "page-extra-top-1" "<!-- empty -->")
-	   (:div :class "page-extra-top-2" "<!-- empty -->")
-	   (:div :class "page-extra-top-3" "<!-- empty -->")
-	   (:div "test")
-	   (:div :class "page-extra-bottom-1" "<!-- empty -->")
-	   (:div :class "page-extra-bottom-2" "<!-- empty -->")
-	   (:div :class "page-extra-bottom-3" "<!-- empty -->"))
+           (:div :class "page-extra-top-1" "<!-- empty -->")
+           (:div :class "page-extra-top-2" "<!-- empty -->")
+           (:div :class "page-extra-top-3" "<!-- empty -->")
+           (:div "test")
+           (:div :class "page-extra-bottom-1" "<!-- empty -->")
+           (:div :class "page-extra-bottom-2" "<!-- empty -->")
+           (:div :class "page-extra-bottom-3" "<!-- empty -->"))
      (:div :id "ajax-progress" "&nbsp;")
      (:script :type "text/javascript"
       (fmt "~%// <![CDATA[~%")

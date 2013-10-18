@@ -5,70 +5,70 @@
 
 (addtest dependencies-by-symbol
   (ensure-same (remove nil (weblocks::dependencies-by-symbol 'non-existent-widget-name))
-	       nil)
+               nil)
   (ensure-same (values-list
-		(mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-			(remove nil (weblocks::dependencies-by-symbol 'navigation))))
-	       (make-versioned-regex "navigation" "css")
-	       :test (lambda (x y) (cl-ppcre:scan y x))))
+                (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+                        (remove nil (weblocks::dependencies-by-symbol 'navigation))))
+               (make-versioned-regex "navigation" "css")
+               :test (lambda (x y) (cl-ppcre:scan y x))))
 
 
 
 (addtest make-local-dependency
   (ensure-same (make-local-dependency :stylesheet "non-existing-file-name")
-	       nil))
+               nil))
 
 (addtest probe-dependencies
   (ensure-same (values-list (mapcar (lambda (x) (dependency-url (apply #'make-local-dependency x)))
-				   '((:stylesheet "non-existing-file-name" :do-not-probe t)
-				     (:script "weblocks" :do-not-probe t))))
-	       (values (puri:uri "/pub/stylesheets/non-existing-file-name.css")
-		       (puri:uri "/pub/scripts/weblocks.js"))
-	       :test puri:uri=)
+                                   '((:stylesheet "non-existing-file-name" :do-not-probe t)
+                                     (:script "weblocks" :do-not-probe t))))
+               (values (puri:uri "/pub/stylesheets/non-existing-file-name.css")
+                       (puri:uri "/pub/scripts/weblocks.js"))
+               :test puri:uri=)
   (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url (apply #'make-local-dependency x))))
-				   '((:stylesheet "main")
-				     (:script "weblocks"))))
-	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-				    '(("main" "css")
-				      ("weblocks" "js"))))
-	       :test (lambda (x y) (cl-ppcre:scan y x))))
+                                   '((:stylesheet "main")
+                                     (:script "weblocks"))))
+               (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+                                    '(("main" "css")
+                                      ("weblocks" "js"))))
+               :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest stylesheet-dependency-compare
   (ensure-different (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
-		    (make-instance 'stylesheet-dependency :url "http://boing.com/bcd")
-		    :test dependencies-equalp)
+                    (make-instance 'stylesheet-dependency :url "http://boing.com/bcd")
+                    :test dependencies-equalp)
   (ensure-same (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
-	       (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
-	       :test dependencies-equalp))
+               (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
+               :test dependencies-equalp))
 
 (addtest script-dependency-compare
   (ensure-different (make-instance 'script-dependency :url "http://boing.com/abc")
-		    (make-instance 'script-dependency :url "http://boing.com/bcd")
-		    :test dependencies-equalp)
+                    (make-instance 'script-dependency :url "http://boing.com/bcd")
+                    :test dependencies-equalp)
   (ensure-same (make-instance 'script-dependency :url "http://boing.com/abc")
-	       (make-instance 'script-dependency :url "http://boing.com/abc")
-	       :test dependencies-equalp))
+               (make-instance 'script-dependency :url "http://boing.com/abc")
+               :test dependencies-equalp))
 
 
 
 (addtest stylesheet-dependency-position
   (ensure (not (dependencies-lessp
-		(make-instance 'stylesheet-dependency :url "http://boing.com/abc")
-		(make-instance 'stylesheet-dependency :url "http://boing.com/bcd")))))
+                (make-instance 'stylesheet-dependency :url "http://boing.com/abc")
+                (make-instance 'stylesheet-dependency :url "http://boing.com/bcd")))))
 
 (addtest stylesheet-vs-script-position
   (ensure (not (dependencies-lessp
-		(make-instance 'script-dependency :url "http://boing.com/abc")
-		(make-instance 'stylesheet-dependency :url "http://boing.com/bcd"))))
+                (make-instance 'script-dependency :url "http://boing.com/abc")
+                (make-instance 'stylesheet-dependency :url "http://boing.com/bcd"))))
   (ensure (dependencies-lessp
-	   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd")
-	   (make-instance 'script-dependency :url "http://boing.com/abc")))
+           (make-instance 'stylesheet-dependency :url "http://boing.com/bcd")
+           (make-instance 'script-dependency :url "http://boing.com/abc")))
   (ensure (not (dependencies-lessp nil nil))))
 
 (addtest script-dependency-position
   (ensure (not (dependencies-lessp
-		(make-instance 'script-dependency :url "http://boing.com/bcd")
-		(make-instance 'script-dependency :url "http://boing.com/abc")))))
+                (make-instance 'script-dependency :url "http://boing.com/bcd")
+                (make-instance 'script-dependency :url "http://boing.com/abc")))))
 
 
 
@@ -83,11 +83,11 @@
 
 (addtest per-class-dependencies-4
   (ensure-same (values-list (remove nil (per-class-dependencies
-					 (make-instance 'navigation))))
-	       (values-list
-		(mapcar (curry #'make-local-dependency :stylesheet)
-			'("menu" "navigation")))
-	       :test dependencies-equalp))
+                                         (make-instance 'navigation))))
+               (values-list
+                (mapcar (curry #'make-local-dependency :stylesheet)
+                        '("menu" "navigation")))
+               :test dependencies-equalp))
 
 
 
@@ -105,26 +105,26 @@
 
 (addtest dependencies-5
   (ensure-same (values-list (dependencies "main"))
-	       (make-local-dependency :stylesheet "main")
-	       :test dependencies-equalp))
+               (make-local-dependency :stylesheet "main")
+               :test dependencies-equalp))
 
 (addtest dependencies-6
   (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-				    (dependencies (make-instance 'navigation))))
-	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-				    '(("menu" "css")
-				      ("navigation" "css"))))
-	       :test (lambda (x y) (cl-ppcre:scan y x))))
+                                    (dependencies (make-instance 'navigation))))
+               (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+                                    '(("menu" "css")
+                                      ("navigation" "css"))))
+               :test (lambda (x y) (cl-ppcre:scan y x))))
 
 
 (addtest prune-dependencies-1
   (ensure-same
    (values-list (mapcar #'dependency-url
-			(weblocks::prune-dependencies
-			 (list (make-instance 'stylesheet-dependency
-				 :url "http://boing.com/abc.css")
-			       (make-instance 'stylesheet-dependency
-				 :url "http://boing.com/bcd.css")))))
+                        (weblocks::prune-dependencies
+                         (list (make-instance 'stylesheet-dependency
+                                 :url "http://boing.com/abc.css")
+                               (make-instance 'stylesheet-dependency
+                                 :url "http://boing.com/bcd.css")))))
    (values (puri:uri "http://boing.com/abc.css") (puri:uri "http://boing.com/bcd.css"))
    :test puri:uri=))
 
@@ -132,13 +132,13 @@
   (ensure-same
    (values-list
     (mapcar #'dependency-url
-	    (weblocks::prune-dependencies
-	     (list (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")))))
+            (weblocks::prune-dependencies
+             (list (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/abc.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")))))
    (values (puri:uri "http://boing.com/abc.css") (puri:uri "http://boing.com/bcd.css"))
    :test puri:uri=))
 
@@ -147,18 +147,18 @@
   (ensure-same
    (values-list
     (mapcar #'dependency-url
-	    (weblocks::sort-dependencies-by-type
-	     (list (make-instance 'script-dependency :url "http://boing.com/abc.js")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'script-dependency :url "http://boing.com/bcd.js")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/aaa.css")
-		   ))))
+            (weblocks::sort-dependencies-by-type
+             (list (make-instance 'script-dependency :url "http://boing.com/abc.js")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'script-dependency :url "http://boing.com/bcd.js")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/aaa.css")
+                   ))))
    (values-list
     (mapcar #'puri:uri
-	    '("http://boing.com/bcd.css" "http://boing.com/bcd.css"
-	      "http://boing.com/aaa.css" "http://boing.com/abc.js"
-	      "http://boing.com/bcd.js")))
+            '("http://boing.com/bcd.css" "http://boing.com/bcd.css"
+              "http://boing.com/aaa.css" "http://boing.com/abc.js"
+              "http://boing.com/bcd.js")))
    :test puri:uri=))
 
 
@@ -166,16 +166,16 @@
   (ensure-same
    (values-list
     (mapcar #'dependency-url
-	    (compact-dependencies
-	     (list (make-instance 'script-dependency :url "http://boing.com/abc.js")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'script-dependency :url "http://boing.com/bcd.js")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
-		   (make-instance 'stylesheet-dependency :url "http://boing.com/aaa.css")
-		   ))))
+            (compact-dependencies
+             (list (make-instance 'script-dependency :url "http://boing.com/abc.js")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'script-dependency :url "http://boing.com/bcd.js")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/bcd.css")
+                   (make-instance 'stylesheet-dependency :url "http://boing.com/aaa.css")
+                   ))))
   (values-list (mapcar #'puri:uri
-		       '("http://boing.com/bcd.css" "http://boing.com/aaa.css"
-			 "http://boing.com/abc.js" "http://boing.com/bcd.js")))
+                       '("http://boing.com/bcd.css" "http://boing.com/aaa.css"
+                         "http://boing.com/abc.js" "http://boing.com/bcd.js")))
   :test puri:uri=))
 
 

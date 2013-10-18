@@ -45,9 +45,9 @@ page may display a relevant message, if necessary."
   "Generates unique, hard to guess action codes."
   (let ((new-action-id (gensym "")))
     (format nil "~A:~A"
-	    new-action-id
-	    (md5
-	     (hunchentoot::create-random-string 10 36)))))
+            new-action-id
+            (md5
+             (hunchentoot::create-random-string 10 36)))))
 
 (defun make-action (action-fn &optional (action-code (generate-action-code)))
   "Coverts a function into an action that can be rendered into HTML. A
@@ -79,15 +79,15 @@ it does not, signals an error."
   (if (functionp function-or-action)
       (make-action function-or-action)
       (multiple-value-bind (res presentp)
-	  (webapp-permanent-action function-or-action)
-	(declare (ignore res))
-	(if presentp function-or-action
-	    (multiple-value-bind (res presentp)
-		(webapp-session-value function-or-action)
-	      (declare (ignore res))
-	      (if presentp
-		  function-or-action
-		  (error "The value '~A' is not an existing action." function-or-action)))))))
+          (webapp-permanent-action function-or-action)
+        (declare (ignore res))
+        (if presentp function-or-action
+            (multiple-value-bind (res presentp)
+                (webapp-session-value function-or-action)
+              (declare (ignore res))
+              (if presentp
+                  function-or-action
+                  (error "The value '~A' is not an existing action." function-or-action)))))))
 
 (defun make-action-url (action-code &optional (include-question-mark-p t))
   "Accepts action code and returns a URL that can be used to render
@@ -97,16 +97,16 @@ Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
   (concatenate 'string
-	       (request-uri-path) ; we need this for w3m
-	       (if include-question-mark-p "?" "")
+               (request-uri-path) ; we need this for w3m
+               (if include-question-mark-p "?" "")
                *action-string* "="
-	       (url-encode (princ-to-string action-code))))
+               (url-encode (princ-to-string action-code))))
 
 (defun get-request-action-name ()
   "Gets the name of the action from the request."
   (let* ((request-action-name (request-parameter *action-string*))
-	 (get/post-action-name (parameter *action-string*))
-	 (action-name (or request-action-name get/post-action-name)))
+         (get/post-action-name (parameter *action-string*))
+         (action-name (or request-action-name get/post-action-name)))
     action-name))
 
 (defvar *ignore-missing-actions* t)
@@ -118,15 +118,15 @@ appropriate function is returned. If no action is in the parameter,
 returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
   (let ((action-name (get-request-action-name))
-	request-action)
+        request-action)
     (when action-name
       (let ((permanent-action (webapp-permanent-action action-name))
-	    (session-action (webapp-session-value action-name)))
-	(setf request-action (or permanent-action session-action))
+            (session-action (webapp-session-value action-name)))
+        (setf request-action (or permanent-action session-action))
         (unless *ignore-missing-actions*
           (assert request-action (request-action)
                   (concatenate 'string "Cannot find action: " action-name)))
-	request-action))))
+        request-action))))
 
 (defun eval-action ()
   "Evaluates the action that came with the request."

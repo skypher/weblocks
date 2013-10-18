@@ -42,30 +42,30 @@
                                     &rest args &key intermediate-values &allow-other-keys)
   (let ((cal-button-id         (gensym "calbtn"))
         (yui-container-div     (gensym "yuicontainer"))
-	(cal-div               (gensym "cal"))
-	(a-slot-name           (attributize-name (view-field-slot-name field))))
+        (cal-div               (gensym "cal"))
+        (a-slot-name           (attributize-name (view-field-slot-name field))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
       (with-html
-       	(:div :class "yui-skin-sam"
-	      (:div 
-		    (:div :class "datefield"
-			  (:input :type "text" :name a-slot-name :id a-slot-name :readonly "yes"
-							    :value (if intermediate-value-p
-								       intermediate-value
-								       (apply #'print-view-field-value value presentation field view widget obj args))
-							    :maxlength (input-presentation-max-length presentation))
-			  #+OLD (:button :type "button" :id cal-button-id :title "Show Calendar" (:img :src "/pub/images/cal.png" :height "18" :width "18")))
-		    (:div :id yui-container-div :class "yuicalcontainer" ; :style "display:none;"
-			   (:div :id cal-div :class "innercalendar")))))
+        (:div :class "yui-skin-sam"
+              (:div 
+                    (:div :class "datefield"
+                          (:input :type "text" :name a-slot-name :id a-slot-name :readonly "yes"
+                                                            :value (if intermediate-value-p
+                                                                       intermediate-value
+                                                                       (apply #'print-view-field-value value presentation field view widget obj args))
+                                                            :maxlength (input-presentation-max-length presentation))
+                          #+OLD (:button :type "button" :id cal-button-id :title "Show Calendar" (:img :src "/pub/images/cal.png" :height "18" :width "18")))
+                    (:div :id yui-container-div :class "yuicalcontainer" ; :style "display:none;"
+                           (:div :id cal-div :class "innercalendar")))))
 
       ;; (yui) calendar inside frame, but clickable and should update field itself. ;metatilities:date-string
       (send-script (format nil "
-			var dialog, calendar;
-			calendar = new YAHOO.widget.Calendar('~A', {
-			    iframe:true,          // Turn iframe off, since container has iframe support.
-			    hide_blank_weeks:true  // Enable, to demonstrate how we handle changing height, using changeContent
-			});
+                        var dialog, calendar;
+                        calendar = new YAHOO.widget.Calendar('~A', {
+                            iframe:true,          // Turn iframe off, since container has iframe support.
+                            hide_blank_weeks:true  // Enable, to demonstrate how we handle changing height, using changeContent
+                        });
                         function handleSelect(type,args,obj) { 
                           var dates = args[0];
                           var date = dates[0]; ; ;
@@ -78,41 +78,41 @@
                           dialog.hide();
                         }  
                         calendar.selectEvent.subscribe(handleSelect, calendar, true);  
-			dialog = new YAHOO.widget.Dialog('~A', {
-			    context:['~A', 'tl', 'bl'],
+                        dialog = new YAHOO.widget.Dialog('~A', {
+                            context:['~A', 'tl', 'bl'],
                             //fixedcenter:true,
-			    width:'16em',  // Sam Skin dialog needs to have a width defined (7*2em + 2*1em = 16em).
-			    draggable:true,
-			    close:true
-			});
-			calendar.render();
-			dialog.render();
-			// Using dialog.hide() instead of visible:false is a workaround for an IE6/7 container known issue with border-collapse:collapse.
-			dialog.hide();
-			calendar.renderEvent.subscribe(function() {
-			    // Tell Dialog it's contents have changed, Currently used by container for IE6/Safari2 to sync underlay size
-			  //  dialog.fireEvent('changeContent');
-			});
-	                YAHOO.util.Event.on('~A', 'click', function() {
-			    dialog.show();
-			   if (YAHOO.env.ua.opera && document.documentElement) {
-				// Opera needs to force a repaint
-				document.documentElement.style += '';
-			    } 
-			});
+                            width:'16em',  // Sam Skin dialog needs to have a width defined (7*2em + 2*1em = 16em).
+                            draggable:true,
+                            close:true
+                        });
+                        calendar.render();
+                        dialog.render();
+                        // Using dialog.hide() instead of visible:false is a workaround for an IE6/7 container known issue with border-collapse:collapse.
+                        dialog.hide();
+                        calendar.renderEvent.subscribe(function() {
+                            // Tell Dialog it's contents have changed, Currently used by container for IE6/Safari2 to sync underlay size
+                          //  dialog.fireEvent('changeContent');
+                        });
                         YAHOO.util.Event.on('~A', 'click', function() {
-			    dialog.show();
-			   if (YAHOO.env.ua.opera && document.documentElement) {
-				// Opera needs to force a repaint
-				document.documentElement.style += '';
-			    } 
-			});"
-			   cal-div
-			   a-slot-name
-			   yui-container-div
-			   a-slot-name
-			   cal-button-id
-			   a-slot-name)))))
+                            dialog.show();
+                           if (YAHOO.env.ua.opera && document.documentElement) {
+                                // Opera needs to force a repaint
+                                document.documentElement.style += '';
+                            } 
+                        });
+                        YAHOO.util.Event.on('~A', 'click', function() {
+                            dialog.show();
+                           if (YAHOO.env.ua.opera && document.documentElement) {
+                                // Opera needs to force a repaint
+                                document.documentElement.style += '';
+                            } 
+                        });"
+                           cal-div
+                           a-slot-name
+                           yui-container-div
+                           a-slot-name
+                           cal-button-id
+                           a-slot-name)))))
 
  
 
@@ -157,7 +157,7 @@
            (:span :class "label"
                   (:span :class "slot-name"
                          (:span :class "extra"
-				 ;(str (view-field-label field)) ":&nbsp;")
+                                 ;(str (view-field-label field)) ":&nbsp;")
                                  (when (form-view-field-required-p field)
                                    (htm (:em :class "required-slot" "(required)&nbsp;")))
                                 )))
@@ -187,7 +187,7 @@
            (:span :class "label"
                   (:span :class "slot-name"
                          (:span :class "extra"
-				(str (view-field-label field)) ":&nbsp;"
+                                (str (view-field-label field)) ":&nbsp;"
                                  (when (form-view-field-required-p field)
                                    (htm (:em :class "required-slot" "(required)&nbsp;")))
                                 )))

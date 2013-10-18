@@ -1,7 +1,7 @@
 
 (defpackage #:simple-blog
   (:use :cl :weblocks :cl-who
-	:metabang.utilities)
+        :metabang.utilities)
   (:documentation
    "A web application based on Weblocks."))
 

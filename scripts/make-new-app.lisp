@@ -16,9 +16,9 @@ Ex:
   (when (null name)
     (return-from attributize-name ""))
   (let ((namestr (etypecase name
-		     (symbol (symbol-name name))
-		     (string name)
-		     (integer (format nil "~A" name)))))
+                     (symbol (symbol-name name))
+                     (string name)
+                     (integer (format nil "~A" name)))))
     (string-downcase (substitute #\- #\Space namestr))))
 (defun make-dir (pathname)
   "Create directory 'pathname'.
@@ -66,8 +66,8 @@ Borrowed from cl-darcs with permission of copyright owner."
   "Returns a directory of the asdf system file of system
 'system-name'."
   (make-pathname :directory
-		 (pathname-directory (truename (asdf:system-definition-pathname
-						(asdf:find-system system-name))))))
+                 (pathname-directory (truename (asdf:system-definition-pathname
+                                                (asdf:find-system system-name))))))
 
 (defun copy-file-replace (source target &optional match replacement)
   "Copies 'source' to 'target' replacing all instances of 'match' with
@@ -99,17 +99,17 @@ application."
     (setf target *default-pathname-defaults*))
   ; create a directory 'name' under 'target'
   (let* ((new-project-dir (merge-pathnames
-			   (make-pathname :directory `(:relative ,(attributize-name name)))
-			   (truename (pathname-as-directory target))))
-	 (new-project-src-dir (merge-pathnames
-			       (make-pathname :directory '(:relative "src"))
-			       new-project-dir))
-	 (new-project-conf-dir (merge-pathnames
-				(make-pathname :directory '(:relative "conf"))
-				new-project-dir))
-	 (new-project-data-dir (merge-pathnames
-				(make-pathname :directory '(:relative "data"))
-				new-project-dir)))
+                           (make-pathname :directory `(:relative ,(attributize-name name)))
+                           (truename (pathname-as-directory target))))
+         (new-project-src-dir (merge-pathnames
+                               (make-pathname :directory '(:relative "src"))
+                               new-project-dir))
+         (new-project-conf-dir (merge-pathnames
+                                (make-pathname :directory '(:relative "conf"))
+                                new-project-dir))
+         (new-project-data-dir (merge-pathnames
+                                (make-pathname :directory '(:relative "data"))
+                                new-project-dir)))
     ; create necessary directories
     (ensure-directories-exist new-project-dir :verbose t)
     (ensure-directories-exist new-project-src-dir :verbose t)
@@ -117,49 +117,49 @@ application."
     (ensure-directories-exist new-project-data-dir :verbose t)
     ; copy weblocks public files
     (copy-directory (pathname-as-file
-		     (truename (merge-pathnames (make-pathname :directory '(:relative "pub"))
-						(asdf-system-directory :weblocks))))
-		    new-project-dir)
+                     (truename (merge-pathnames (make-pathname :directory '(:relative "pub"))
+                                                (asdf-system-directory :weblocks))))
+                    new-project-dir)
     ; copy init-session.lisp
     (copy-file-replace (merge-pathnames
-			(make-pathname :directory '(:relative "scripts" "new-app-templates")
-				       :name "init-session" :type "lisp")
-			(asdf-system-directory :weblocks-scripts))
-		       (merge-pathnames
-			(make-pathname :name "init-session" :type "lisp")
-			new-project-src-dir)
-		       *app-name-placeholder*
-		       (attributize-name name))
+                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
+                                       :name "init-session" :type "lisp")
+                        (asdf-system-directory :weblocks-scripts))
+                       (merge-pathnames
+                        (make-pathname :name "init-session" :type "lisp")
+                        new-project-src-dir)
+                       *app-name-placeholder*
+                       (attributize-name name))
     ; copy {APPNAME}.asd
     (copy-file-replace (merge-pathnames
-			(make-pathname :directory '(:relative "scripts" "new-app-templates")
-				       :name "{APPNAME}" :type "asd")
-			(asdf-system-directory :weblocks-scripts))
-		       (merge-pathnames
-			(make-pathname :name (attributize-name name) :type "asd")
-			new-project-dir)
-			*app-name-placeholder*
-		       (attributize-name name))
+                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
+                                       :name "{APPNAME}" :type "asd")
+                        (asdf-system-directory :weblocks-scripts))
+                       (merge-pathnames
+                        (make-pathname :name (attributize-name name) :type "asd")
+                        new-project-dir)
+                        *app-name-placeholder*
+                       (attributize-name name))
     ; copy {APPNAME}.lisp
     (copy-file-replace (merge-pathnames
-			(make-pathname :directory '(:relative "scripts" "new-app-templates")
-				       :name "{APPNAME}" :type "lisp")
-			(asdf-system-directory :weblocks-scripts))
-		       (merge-pathnames
-			(make-pathname :name (attributize-name name) :type "lisp")
-			new-project-dir)
-			*app-name-placeholder*
-		       (attributize-name name))
+                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
+                                       :name "{APPNAME}" :type "lisp")
+                        (asdf-system-directory :weblocks-scripts))
+                       (merge-pathnames
+                        (make-pathname :name (attributize-name name) :type "lisp")
+                        new-project-dir)
+                        *app-name-placeholder*
+                       (attributize-name name))
     ; copy stores.lisp
     (copy-file-replace (merge-pathnames
-			(make-pathname :directory '(:relative "scripts" "new-app-templates")
-				       :name "stores" :type "lisp")
-			(asdf-system-directory :weblocks-scripts))
-		       (merge-pathnames
-			(make-pathname :name "stores" :type "lisp")
-			new-project-conf-dir)
-		       *app-name-placeholder*
-		       (attributize-name name))
+                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
+                                       :name "stores" :type "lisp")
+                        (asdf-system-directory :weblocks-scripts))
+                       (merge-pathnames
+                        (make-pathname :name "stores" :type "lisp")
+                        new-project-conf-dir)
+                       *app-name-placeholder*
+                       (attributize-name name))
     ; tell user to add new app to asdf central registry
     (format t "~%~A has been created.~%" name)
     (format t "Please add '~A' to asdf:*central-registry* before you proceed.~%" new-project-dir)

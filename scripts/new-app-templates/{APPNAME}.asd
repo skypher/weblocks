@@ -13,10 +13,10 @@
     :description "{APPNAME}"
     :depends-on (:weblocks)
     :components ((:file "{APPNAME}")
-		 (:module conf
-		  :components ((:file "stores"))
-		  :depends-on ("{APPNAME}"))
-		 (:module src
-		  :components ((:file "init-session"))
-		  :depends-on ("{APPNAME}" conf))))
+                 (:module conf
+                  :components ((:file "stores"))
+                  :depends-on ("{APPNAME}"))
+                 (:module src
+                  :components ((:file "init-session"))
+                  :depends-on ("{APPNAME}" conf))))
 

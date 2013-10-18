@@ -12,24 +12,24 @@
     :description "weblocks-demo"
     :depends-on (:weblocks :metatilities :weblocks-yarek)
     :components ((:file "weblocks-demo-popover")
-		 (:module conf
-		  :components ((:file "stores"))
-		  :depends-on ("weblocks-demo-popover"))
-		 (:module src
-		  :components ((:file "layout"
-				      :depends-on (model))
-			       (:file "snippets"
+                 (:module conf
+                  :components ((:file "stores"))
+                  :depends-on ("weblocks-demo-popover"))
+                 (:module src
+                  :components ((:file "layout"
+                                      :depends-on (model))
+                               (:file "snippets"
                                       :depends-on ("init-session"))
-			       (:file "sandbox"
-				      :depends-on (model))
-			       (:file "init-session"
-				      :depends-on ("layout" "sandbox"))
-			       (:module model
-					:components ((:file "company")
-						     (:file "address")
-						     (:file "person"
-							    :depends-on ("address"))
-						     (:file "employee"
-							    :depends-on ("person" "company")))))
-		  :depends-on ("weblocks-demo-popover" conf))))
+                               (:file "sandbox"
+                                      :depends-on (model))
+                               (:file "init-session"
+                                      :depends-on ("layout" "sandbox"))
+                               (:module model
+                                        :components ((:file "company")
+                                                     (:file "address")
+                                                     (:file "person"
+                                                            :depends-on ("address"))
+                                                     (:file "employee"
+                                                            :depends-on ("person" "company")))))
+                  :depends-on ("weblocks-demo-popover" conf))))
 

@@ -13,9 +13,9 @@
            list->assoc
            ninsert
            find-all
-	   remove-keyword-parameter
+           remove-keyword-parameter
            remove-keyword-parameters)
-	 '(t util))
+         '(t util))
 
 (defun safe-subseq (sequence start &optional end)
   "A safe alternative to subseq that automatically adjust indices."
@@ -31,8 +31,8 @@
   (let ((keyword-package (find-package :keyword)))
     (loop for i in alist
        collect (if (symbolp (car i))
-		   (intern (symbol-name (car i)) keyword-package)
-		   (intern (string-upcase (car i)) keyword-package))
+                   (intern (symbol-name (car i)) keyword-package)
+                   (intern (string-upcase (car i)) keyword-package))
        collect (cdr i))))
 
 (defun insert-after (newelt list index) 
@@ -69,11 +69,11 @@ instead of 'delimeter'.
     ((null list) list)
     ((null (cdr list)) list)
     ((null (cddr list)) (list (car list)
-			      last
-			      (cadr list)))
+                              last
+                              (cadr list)))
     (t (cons (car list)
-	     (cons delimeter
-		   (intersperse (cdr list) delimeter :last last))))))
+             (cons delimeter
+                   (intersperse (cdr list) delimeter :last last))))))
 
 (defun find-all (sequence predicate &key (key #'identity))
   "Returns a sequence of all elements found in 'sequence' that match
@@ -87,9 +87,9 @@ item before passing it to 'predicate'."
   "Determines if a list starts with the given elements."
   (let ((elements (ensure-list elements)))
     (if elements
-	(when (funcall test (car list) (car elements))
-	  (list-starts-with (cdr list) (cdr elements) :test test))
-	t)))
+        (when (funcall test (car list) (car elements))
+          (list-starts-with (cdr list) (cdr elements) :test test))
+        t)))
 
 (defun stable-set-difference (list-1 list-2 &key (test #'eql) (key #'identity))
   "Returns a list of element of 'list-1' that do not appear in 'list-2'. "
@@ -143,6 +143,6 @@ Ex:
 \(list->assoc '(name age (city . location))) => ((name . name) (age . age) (city . location))
 \(list->assoc '(1 (2 . 2) 3) :map #'1+) => ((1 . 2) (2 . 2) (3 . 4))"
   (mapcar (lambda (i)
-	    (if (consp i) i (cons i (funcall map i))))
-	  lst))
+            (if (consp i) i (cons i (funcall map i))))
+          lst))
 

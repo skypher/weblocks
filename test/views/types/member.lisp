@@ -7,7 +7,7 @@
      (cadr
       (multiple-value-list
        (typespec->view-field-presentation (make-instance 'form-scaffold)
-					  'member nil))))
+                                          'member nil))))
   radio-presentation)
 
 ;;; Test member typespec->form-view-field-parser
@@ -16,5 +16,5 @@
      (cadr
       (multiple-value-list
        (typespec->form-view-field-parser (make-instance 'form-scaffold)
-					 'member nil))))
+                                         'member nil))))
   keyword-parser)

@@ -4,9 +4,9 @@
 (defclass user ()
   ((id)
    (name :accessor user-name
-	 :initarg :name
-	 :initform ""
-	 :type string)))
+         :initarg :name
+         :initform ""
+         :type string)))
 
 (defun all-users (&rest args)
   (declare (ignore args))

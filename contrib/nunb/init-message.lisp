@@ -7,23 +7,23 @@
 ;;                                     (field form-view-field) (view form-view) widget obj
 ;;                                     &rest args &key intermediate-values &allow-other-keys)
 ;;   (let (
-;; 	(a-slot-name           (attributize-name (view-field-slot-name field))))
+;;      (a-slot-name           (attributize-name (view-field-slot-name field))))
 ;;     (unless value (setf value (get-init-message presentation)))
 ;;     (multiple-value-bind (intermediate-value intermediate-value-p)
 ;;       (form-field-intermediate-value field intermediate-values)
 ;;       (with-html
-;; 	(:input :type "text" :name a-slot-name :id a-slot-name ;:onfocus "if(value='AC' {value=''}"
-;; 							    :value (if intermediate-value-p
-;; 								       intermediate-value
-;; 								       (apply #'print-view-field-value value presentation field view widget obj args))
-;; 							    :maxlength (input-presentation-max-length presentation)))
+;;      (:input :type "text" :name a-slot-name :id a-slot-name ;:onfocus "if(value='AC' {value=''}"
+;;                                                          :value (if intermediate-value-p
+;;                                                                     intermediate-value
+;;                                                                     (apply #'print-view-field-value value presentation field view widget obj args))
+;;                                                          :maxlength (input-presentation-max-length presentation)))
 
 
 ;;       (send-script (format nil "
-;; 			document.getElementById('~A').onfocus = function () { document.getElementById('~A').value = ''; };"
-;; 			   a-slot-name a-slot-name ;(get-init-message presentation)
+;;                      document.getElementById('~A').onfocus = function () { document.getElementById('~A').value = ''; };"
+;;                         a-slot-name a-slot-name ;(get-init-message presentation)
 
-;; 			   )))))
+;;                         )))))
 
 ;; ;; <input name="TEXTBOXNAME"  value="YOURTEXTBOXVALUE" size="20" maxlength="50" onfocus="if (value='YOURTEXTBOXVALUE') {value=''}" onblur="if (value=='') {value='YOURTEXTBOXVALUE'}" />
 
@@ -39,14 +39,14 @@
 
 ;; ;removed this.
 ;; (defmethod xs-parse-view-field-value ((parser init-message-parser) value obj
-;; 				   (view form-view) (field form-view-field) &rest args)
+;;                                 (view form-view) (field form-view-field) &rest args)
 ;;   (declare (ignore args))
 ;;   (break (format nil "InitParser: Called with ~A and ~A" (get-init-message (view-field-presentation field)) value ))
 ;;   (when (get-init-message (view-field-presentation field))
 ;;     ;(break "inside")
 ;;     (if (ppcre:all-matches value (get-init-message (view-field-presentation field)))
-;; 	(values t nil "") ;what is wrong with this bloody thing: code reaches here, but how do I signal an invalid parsed value?
-;; 	(values t (for-initmessage-text-input-present-p value (view-field-presentation field)) "")))
+;;      (values t nil "") ;what is wrong with this bloody thing: code reaches here, but how do I signal an invalid parsed value?
+;;      (values t (for-initmessage-text-input-present-p value (view-field-presentation field)) "")))
 ;;   (values t (text-input-present-p value) value)      ) ;code's a bit screwed up, don't need this 'coz of when, but it should work.
 
 ;; (defun for-initmessage-text-input-present-p (value presentn)
@@ -69,7 +69,7 @@
 ;;            (:span :class "label"
 ;;                   (:span :class "slot-name"
 ;;                          (:span :class "extra" 
-;; 				(str (view-field-label field)) ":&nbsp;"
+;;                              (str (view-field-label field)) ":&nbsp;"
 ;;                                  (when (form-view-field-required-p field)
 ;;                                    (htm (:em :class "required-slot" "(required)&nbsp;")))
 ;;                                 )))

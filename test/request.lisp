@@ -65,16 +65,16 @@
 (deftest redirect-1
     (with-request :get nil
       (catch 'hunchentoot::handler-done
-	(redirect "/foo")
-	1))
+        (redirect "/foo")
+        1))
   nil)
 
 (deftest redirect-2
     (with-request :get nil
       (make-request-ajax)
       (catch 'hunchentoot::handler-done
-	(redirect "/foo")
-	1))
+        (redirect "/foo")
+        1))
   "{\"redirect\":\"/foo\"}")
 
 (addtest redirect-post-action

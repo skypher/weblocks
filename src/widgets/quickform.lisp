@@ -5,16 +5,16 @@
 
 (defwidget quickform (dataform)
   ((satisfies :accessor quickform-satisfies
-	      :initform nil
-	      :initarg :satisfies
-	      :documentation "A function that corresponds to the value
-	      of 'satisfies' key to 'make-quickform'."))
+              :initform nil
+              :initarg :satisfies
+              :documentation "A function that corresponds to the value
+              of 'satisfies' key to 'make-quickform'."))
   (:documentation "A widget based on dataform designed to quickly
   present forms. Use 'make-quickform' for easy configuration."))
 
 (defun make-quickform (view &key on-success on-cancel satisfies
-		       data (answerp t) (class 'quickform)
-		       (data-class-name (gensym)) class-store)
+                       data (answerp t) (class 'quickform)
+                       (data-class-name (gensym)) class-store)
   "Returns an instance of a dataform widget configured to quickly and
 easily present forms. The advantage of using 'make-quickform' over
 simply calling 'render-view' is that the widget produced by
@@ -50,31 +50,31 @@ answers with its return value. Otherwise, returns the data object.
 be generated from the view."
   (assert (subtypep class 'quickform))
   (make-instance class
-		 :data (or data (make-instance (class-from-view view data-class-name)))
-		 :ui-state :form
-		 :on-success (lambda (obj)
-			       (let ((response (if on-success
-						   (funcall on-success obj (dataform-data obj))
-						   (dataform-data obj))))
-				 (when answerp
-				   (answer obj response)))
-			       (setf (slot-value obj 'validation-errors) nil)
-			       (setf (slot-value obj 'intermediate-form-values) nil)
-			       (throw 'annihilate-dataform nil))
-		 :on-cancel (lambda (obj)
-			      (safe-funcall on-cancel obj)
-			      (when answerp
-				(answer obj))
-			      (throw 'annihilate-dataform nil))
-		 :form-view view
-		 :class-store class-store
-		 :satisfies satisfies))
+                 :data (or data (make-instance (class-from-view view data-class-name)))
+                 :ui-state :form
+                 :on-success (lambda (obj)
+                               (let ((response (if on-success
+                                                   (funcall on-success obj (dataform-data obj))
+                                                   (dataform-data obj))))
+                                 (when answerp
+                                   (answer obj response)))
+                               (setf (slot-value obj 'validation-errors) nil)
+                               (setf (slot-value obj 'intermediate-form-values) nil)
+                               (throw 'annihilate-dataform nil))
+                 :on-cancel (lambda (obj)
+                              (safe-funcall on-cancel obj)
+                              (when answerp
+                                (answer obj))
+                              (throw 'annihilate-dataform nil))
+                 :form-view view
+                 :class-store class-store
+                 :satisfies satisfies))
 
 (defmethod dataform-submit-action ((obj quickform) data &rest args)
   (if (quickform-satisfies obj)
       (apply #'call-next-method obj data
-	     :satisfies (curry (quickform-satisfies obj) obj)
-	     args)
+             :satisfies (curry (quickform-satisfies obj) obj)
+             args)
     (call-next-method)))
 
 

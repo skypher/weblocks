@@ -16,11 +16,11 @@
   (declare (special *rendered-actions*))
   (when (boundp '*rendered-actions*)
     (push (list (cons :type type)
-		(cons :name name)
-		(cons :id id)
-		(cons :class class)
-		(cons :action action))
-	  *rendered-actions*)))
+                (cons :name name)
+                (cons :id id)
+                (cons :class class)
+                (cons :action action))
+          *rendered-actions*)))
 
 (defun log-link (name action &key id class)
   "Wrapper around log-ui-action for links."

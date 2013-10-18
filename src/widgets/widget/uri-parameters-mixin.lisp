@@ -23,7 +23,7 @@
   (awhen (get-parameter-slot-map slot-defs)
     (with-gensyms (widget)
       `(defmethod uri-parameters-slotmap ((,widget ,class))
-	 ',it))))
+         ',it))))
 
 (defun uri-parameter-def-p (slot-defs)
   (member :uri-parameter (flatten slot-defs)))
@@ -31,10 +31,10 @@
 (defun get-parameter-slot-map (slot-defs)
   (remove-if #'null
     (mapcar (lambda (slot-def)
-	      (awhen (member :uri-parameter slot-def)
-		(cons (first slot-def) 
-		      (as-string (cadr it)))))
-	    slot-defs)))
+              (awhen (member :uri-parameter slot-def)
+                (cons (first slot-def) 
+                      (as-string (cadr it)))))
+            slot-defs)))
 
 (defun as-string (obj)
   (etypecase obj

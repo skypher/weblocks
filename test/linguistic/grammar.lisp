@@ -52,7 +52,7 @@
 
 (deftest consonantp-2
     (every #'consonantp
-	   '(#\b #\c #\d #\f #\g #\h #\j #\k #\l #\m #\n #\p #\q #\r #\s #\t #\v #\w #\x #\y #\z))
+           '(#\b #\c #\d #\f #\g #\h #\j #\k #\l #\m #\n #\p #\q #\r #\s #\t #\v #\w #\x #\y #\z))
   t)
 
 ;;; test proper-indefinite-article

@@ -16,7 +16,7 @@
   ;; Set session maintenance (for everyone)
   (unless *maintain-last-session*
     (setf *maintain-last-session*
-	  (bordeaux-threads:make-lock "*maintain-last-session*"))))
+          (bordeaux-threads:make-lock "*maintain-last-session*"))))
 
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
@@ -35,7 +35,7 @@ arguments."
 (define-compiler-macro style-warn (condition &rest warn-args)
   `(when (or (not (boundp '*current-webapp*))
              (null *current-webapp*)
-	     (weblocks-webapp-debug (current-webapp)))
+             (weblocks-webapp-debug (current-webapp)))
      (warn ,condition . ,warn-args)))
 
 (define-condition webapp-style-warning (style-warning)
@@ -45,8 +45,8 @@ behavior on the part of webapps."))
 
 (define-condition non-idempotent-rendering (webapp-style-warning)
   ((change-made :initarg :change-made :reader change-made-during-rendering
-		:documentation "A description of the change that
-		should be moved to action handling."))
+                :documentation "A description of the change that
+                should be moved to action handling."))
   (:report report-non-idempotent-rendering)
   (:documentation "Signalled in common cases where code that alters
 the webapp state appears in a rendering process."))
@@ -55,15 +55,15 @@ the webapp state appears in a rendering process."))
   "Describe a condition where code appears in rendering that should be
 in the action handler."
   (format stream "During the rendering phase, ~A, which should ~
-		  typically be done only during action handling"
-	  (change-made-during-rendering c)))
+                  typically be done only during action handling"
+          (change-made-during-rendering c)))
 
 (define-condition misunderstood-action (webapp-style-warning)
   ((action :initarg :action :reader misunderstood-action
-	   :documentation "What the user did to reveal this problem.")
+           :documentation "What the user did to reveal this problem.")
    (missing :initarg :missing :reader missing-action-handler-part
-	    :documentation "A description of what's missing for ACTION
-	    to be handled correctly."))
+            :documentation "A description of what's missing for ACTION
+            to be handled correctly."))
   (:report report-misunderstood-action)
   (:documentation "Signalled when a user invoked an action, and some
 part of the handler for which the app writer is responsible doesn't
@@ -73,11 +73,11 @@ seem to be implemented correctly."))
   "Describe a `misunderstood-action'."
   (format stream "A webapp user did: \"~A\"
 But it was handled incorrectly; this is probably an issue with ~A"
-	  (misunderstood-action c) (missing-action-handler-part c)))
+          (misunderstood-action c) (missing-action-handler-part c)))
 
 (define-condition missing-default-store (webapp-style-warning)
   ((webapp :initarg :webapp :reader webapp-missing-default-store
-	   :documentation "The webapp lacking one at start-time."))
+           :documentation "The webapp lacking one at start-time."))
   (:report report-missing-default-store)
   (:documentation "Signalled when a webapp lacking a `*default-store*'
   is started."))
@@ -85,6 +85,6 @@ But it was handled incorrectly; this is probably an issue with ~A"
 (defun report-missing-default-store (c stream)
   "Describe a `missing-default-store'."
   (format stream "~A has no default store defined ~
-		  (try ~S or moving ~S after ~S)"
-	  (webapp-missing-default-store c)
-	  :default-store 'defstore 'defwebapp))
+                  (try ~S or moving ~S after ~S)"
+          (webapp-missing-default-store c)
+          :default-store 'defstore 'defwebapp))

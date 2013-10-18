@@ -30,64 +30,64 @@ name of the field to inform users that the field is required.")
 ;;; Form view
 (defclass form-view (view)
   ((error-summary-threshold :initform *form-default-error-summary-threshold*
-			    :initarg :error-summary-threshold
-			    :accessor form-view-error-summary-threshold
-			    :documentation "When the number of fields
+                            :initarg :error-summary-threshold
+                            :accessor form-view-error-summary-threshold
+                            :documentation "When the number of fields
                             in a form is longer than this threshold,
                             an error summary is rendered at top
                             whenever applicable.")
    (use-ajax-p :initform t
-	       :initarg :use-ajax-p
-	       :accessor form-view-use-ajax-p
-	       :documentation "If set to true (default) uses AJAX on
-	       form submission. Otherwise, a full postback is done to
-	       submit the form.")
+               :initarg :use-ajax-p
+               :accessor form-view-use-ajax-p
+               :documentation "If set to true (default) uses AJAX on
+               form submission. Otherwise, a full postback is done to
+               submit the form.")
    (default-method :initform :get
                    :initarg :default-method
-		   :accessor form-view-default-method
-		   :documentation "Default HTML method used for this
-	           form if :method isn't specified in keyword
-	           parameters when rendering the view. Possible values
-	           are :get (default) and :post.")
+                   :accessor form-view-default-method
+                   :documentation "Default HTML method used for this
+                   form if :method isn't specified in keyword
+                   parameters when rendering the view. Possible values
+                   are :get (default) and :post.")
    (default-action :initform (lambda (&rest args)
-			       (declare (ignore args)))
+                               (declare (ignore args)))
                    :initarg :default-action
-		   :accessor form-view-default-action
-		   :documentation "A default action that will be
-	           called upon submission of the form if :action isn't
-	           specified in keyword parameters when rendering the
-	           view.")
+                   :accessor form-view-default-action
+                   :documentation "A default action that will be
+                   called upon submission of the form if :action isn't
+                   specified in keyword parameters when rendering the
+                   view.")
    (enctype :initform nil
-	    :initarg :enctype
-	    :accessor form-view-default-enctype
-	    :documentation "An enctype that will be
-	    used upon submission of the form.")
+            :initarg :enctype
+            :accessor form-view-default-enctype
+            :documentation "An enctype that will be
+            used upon submission of the form.")
    (persistp :initform t
-	     :initarg :persistp
-	     :accessor form-view-persist-p
-	     :documentation "Specifies whether the object should be
-	     persisted via 'persist-object' on successful
-	     deserealization of the form.")
+             :initarg :persistp
+             :accessor form-view-persist-p
+             :documentation "Specifies whether the object should be
+             persisted via 'persist-object' on successful
+             deserealization of the form.")
    (focusp :initform nil
-	   :initarg :focusp
-	   :accessor form-view-focus-p
-	   :documentation "If set to true, renders appropriate
-	   JavaScript to focus on the first element of the form once
-	   the form is loaded. This slot is set to false by default.")
+           :initarg :focusp
+           :accessor form-view-focus-p
+           :documentation "If set to true, renders appropriate
+           JavaScript to focus on the first element of the form once
+           the form is loaded. This slot is set to false by default.")
    (buttons :initform (list :submit :cancel)
-	    :initarg :buttons
-	    :accessor form-view-buttons
-	    :documentation "Contains a list of keywords that identify
-	    buttons to be rendered (by default contains :submit
-	    and :cancel).  Default form view only recognizes :submit
-	    and :cancel keywords. Each item of the list may be a cons
-	    pair, in which case CAR of the pair should be a keyword,
-	    and CDR of the pair should be a string that will be
-	    presented to the user via value of the button.")
+            :initarg :buttons
+            :accessor form-view-buttons
+            :documentation "Contains a list of keywords that identify
+            buttons to be rendered (by default contains :submit
+            and :cancel).  Default form view only recognizes :submit
+            and :cancel keywords. Each item of the list may be a cons
+            pair, in which case CAR of the pair should be a keyword,
+            and CDR of the pair should be a string that will be
+            presented to the user via value of the button.")
    (satisfies :initform nil
-	      :initarg :satisfies
-	      :accessor form-view-satisfies
-	      :documentation "A function or a list of functions that
+              :initarg :satisfies
+              :accessor form-view-satisfies
+              :documentation "A function or a list of functions that
 perform validation on the entire view (possibly combining multiple fields).
 The first argument to the function is the object, still in its previous
 state, i.e. the new form values have not been stored in it yet.  The
@@ -105,15 +105,15 @@ values nil error-message if it does not.")
 ;;; Form view fields
 (defclass form-view-field-writer-mixin ()
   ((writer :initarg :writer
-	   :accessor form-view-field-writer
-	   :documentation "If this slot is bound to a function object,
-	   the function will be called with a new slot value and the
-	   object being rendered as arguments. If the slot is not
-	   bound, '(setf slot-value)' will be used.")
+           :accessor form-view-field-writer
+           :documentation "If this slot is bound to a function object,
+           the function will be called with a new slot value and the
+           object being rendered as arguments. If the slot is not
+           bound, '(setf slot-value)' will be used.")
    (delayed-write-p :initarg :delayed-write-p
-		    :initform nil
-		    :accessor form-view-field-writer-delayed-p
-		    :documentation "If this slot is set to t, then the
+                    :initform nil
+                    :accessor form-view-field-writer-delayed-p
+                    :documentation "If this slot is set to t, then the
 writer will get called after the object has been persisted. This is useful
 for updating relations, where objects need to be assigned ids and stored
 before relations can be updated."))
@@ -122,30 +122,30 @@ before relations can be updated."))
 (defclass form-view-field (inline-view-field form-view-field-writer-mixin)
   ((presentation :initform (make-instance 'input-presentation))
    (parser :initform (make-instance 'text-parser)
-	   :initarg :parse-as
-	   :accessor form-view-field-parser
-	   :documentation "A parser object to be used to parse this
-	   field from a form. If not specified, the string parser will
-	   be used. In addition, scaffold views will attempt to
-	   determine the default parser from the value of the slot
-	   type, if one exists.")
+           :initarg :parse-as
+           :accessor form-view-field-parser
+           :documentation "A parser object to be used to parse this
+           field from a form. If not specified, the string parser will
+           be used. In addition, scaffold views will attempt to
+           determine the default parser from the value of the slot
+           type, if one exists.")
    (satisfies :initform nil
-	      :initarg :satisfies
-	      :accessor form-view-field-satisfies
-	      :documentation "A predicate, or a list of predicates, that
-	      set constraints for parsed values during validation. A
-	      predicate may return multiple values, in which case the
-	      second value is used as the error message instead of the
-	      default one supplied by the parser.")
+              :initarg :satisfies
+              :accessor form-view-field-satisfies
+              :documentation "A predicate, or a list of predicates, that
+              set constraints for parsed values during validation. A
+              predicate may return multiple values, in which case the
+              second value is used as the error message instead of the
+              default one supplied by the parser.")
    (requiredp :initform nil
-	      :initarg :requiredp
-	      :accessor form-view-field-required-p
-	      :documentation "A predicate which determines whether the
-	      field is required.")
+              :initarg :requiredp
+              :accessor form-view-field-required-p
+              :documentation "A predicate which determines whether the
+              field is required.")
    (required-indicator :initform t
-		       :initarg :required-indicator
-		       :accessor form-view-field-required-indicator
-		       :documentation "A string, t or nil. When this 
+                       :initarg :required-indicator
+                       :accessor form-view-field-required-indicator
+                       :documentation "A string, t or nil. When this 
                        field is required, this value is rendered after
                        the field's label. A value of t will render 
                        *default-required-indicator*.")
@@ -158,20 +158,20 @@ before relations can be updated."))
                        data. Otherwise, the standard required error
                        message is presented.")
    (disabledp :initform nil
-	      :initarg :disabledp
-	      :accessor form-view-field-raw-disabled-p
-	      :documentation "A predicate that determines whether the
-	      field is disabled.  This can be either a constant
-	      't' or 'nil', or a function of one argument, the object
-	      to which the view applies."))
+              :initarg :disabledp
+              :accessor form-view-field-raw-disabled-p
+              :documentation "A predicate that determines whether the
+              field is disabled.  This can be either a constant
+              't' or 'nil', or a function of one argument, the object
+              to which the view applies."))
   (:documentation "A field class of the form view."))
 
 (defgeneric form-view-field-disabled-p (field obj)
   (:method ((field form-view-field) obj)
     (let ((raw-value (form-view-field-raw-disabled-p field)))
       (if (functionp raw-value)
-	  (funcall raw-value obj)
-	raw-value))))
+          (funcall raw-value obj)
+        raw-value))))
 
 (defun get-required-error-msg (form-view-field)
   "Returns an error message for a missing required field."
@@ -186,13 +186,13 @@ before relations can be updated."))
 
 (defclass mixin-form-view-field (mixin-view-field form-view-field-writer-mixin)
   ((persistp :initarg :persistp
-	     :accessor mixin-form-view-field-persist-p
-	     :documentation "If this slot is set to true, the mixed in
-	     object will be persisted prior to being written to its
-	     parent via 'persist-object'. If null, 'persist-object'
-	     will not be called. If this slot is unbound (the
-	     default), the value will be taken from
-	     'form-view-persist-p' of the mixin view."))
+             :accessor mixin-form-view-field-persist-p
+             :documentation "If this slot is set to true, the mixed in
+             object will be persisted prior to being written to its
+             parent via 'persist-object'. If null, 'persist-object'
+             will not be called. If this slot is unbound (the
+             default), the value will be taken from
+             'form-view-persist-p' of the mixin view."))
   (:documentation "A field class of the form view."))
 
 (defmethod mixin-form-view-field-persist-p ((obj mixin-form-view-field))
@@ -216,9 +216,9 @@ before relations can be updated."))
 
 (defclass input-presentation (form-presentation text-presentation-mixin)
   ((max-length :initform *max-raw-input-length*
-	       :initarg :max-length
-	       :accessor input-presentation-max-length
-	       :documentation "Maximum length of an input.")
+               :initarg :max-length
+               :accessor input-presentation-max-length
+               :documentation "Maximum length of an input.")
    (size :accessor input-presentation-size
          :initarg :size
          :initform nil))
@@ -325,8 +325,8 @@ form-view-buttons for a given view.")
   (if (slot-value view 'caption)
       (slot-value view 'caption)
       (with-html-output-to-string (out)
-	(:span :class "action" "Modifying:&nbsp;")
-	(:span :class "object" "~A"))))
+        (:span :class "action" "Modifying:&nbsp;")
+        (:span :class "object" "~A"))))
 
 (defun form-view-body-wt (&key caption class-name validation-summary fields-prefix fields-suffix form-view-buttons content method action form-id header-class enctype extra-submit-code use-ajax-p)
   (with-html-to-string
@@ -349,12 +349,12 @@ form-view-buttons for a given view.")
 
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view form-view) obj widget body-fn &rest args &key
-			     (method (form-view-default-method view))
-			     (action (form-view-default-action view))
-			     (fields-prefix-fn (view-fields-default-prefix-fn view))
-			     (fields-suffix-fn (view-fields-default-suffix-fn view))
-			     validation-errors
-			     &allow-other-keys)
+                             (method (form-view-default-method view))
+                             (action (form-view-default-action view))
+                             (fields-prefix-fn (view-fields-default-prefix-fn view))
+                             (fields-suffix-fn (view-fields-default-suffix-fn view))
+                             validation-errors
+                             &allow-other-keys)
   (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
 
   (let ((form-id (gen-id))
@@ -466,14 +466,14 @@ form-view-buttons for a given view.")
 (deftemplate :form-view-field-value-wt 'form-view-field-value-wt)
 
 (defmethod render-view-field-value (value (presentation input-presentation)
-				    field view widget obj
-				    &rest args &key intermediate-values field-info &allow-other-keys)
+                                    field view widget obj
+                                    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (special *presentation-dom-id*))
   (let ((attributized-slot-name (if field-info
                                   (attributize-view-field-name field-info)
                                   (attributize-name (view-field-slot-name field)))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
-	(form-field-intermediate-value field intermediate-values)
+        (form-field-intermediate-value field intermediate-values)
         (write-string 
           (render-template-to-string 
             :form-view-field-value-wt
@@ -489,7 +489,7 @@ form-view-buttons for a given view.")
           *weblocks-output-stream*))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)
-				   field view widget obj &rest args)
+                                   field view widget obj &rest args)
   (declare (ignore presentation obj view field args)))
 
 ;;; Intermediate values helper

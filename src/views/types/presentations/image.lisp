@@ -2,27 +2,27 @@
 (in-package :weblocks)
 
 (export '(image image-presentation image-presentation-alt
-	  image-presentation-title image-presentation-width
-	  image-presentation-height image-presentation-url-default))
+          image-presentation-title image-presentation-width
+          image-presentation-height image-presentation-url-default))
 
 (defclass image-presentation (text-presentation)
   ((alt :initform nil
-	:initarg :alt
-	:accessor image-presentation-alt
-	:documentation "Alternative text to be specified with the
-	image.")
+        :initarg :alt
+        :accessor image-presentation-alt
+        :documentation "Alternative text to be specified with the
+        image.")
    (title :initform nil
-	  :initarg :title
-	  :accessor image-presentation-title
-	  :documentation "A title to be specified with the image.")
+          :initarg :title
+          :accessor image-presentation-title
+          :documentation "A title to be specified with the image.")
    (width :initform nil
-	  :initarg :width
-	  :accessor image-presentation-width
-	  :documentation "A width attribute of the image.")
+          :initarg :width
+          :accessor image-presentation-width
+          :documentation "A width attribute of the image.")
    (height :initform nil
-	   :initarg :height
-	   :accessor image-presentation-height
-	   :documentation "A height attribute of the image.")
+           :initarg :height
+           :accessor image-presentation-height
+           :documentation "A height attribute of the image.")
    (url-default :initform nil
                 :initarg :url-default
                 :accessor image-presentation-url-default
@@ -32,8 +32,8 @@
   (:documentation "Presents a url as an image."))
 
 (defmethod render-view-field-value ((value null) (presentation image-presentation)
-				    field view widget obj &rest args
-				    &key highlight &allow-other-keys)
+                                    field view widget obj &rest args
+                                    &key highlight &allow-other-keys)
   (declare (ignore highlight))
   (if (image-presentation-url-default presentation)
       (apply #'render-view-field-value (image-presentation-url-default presentation)
@@ -41,8 +41,8 @@
       (call-next-method)))
 
 (defmethod render-view-field-value (value (presentation image-presentation)
-				    field view widget obj &rest args
-				    &key highlight &allow-other-keys)
+                                    field view widget obj &rest args
+                                    &key highlight &allow-other-keys)
   (declare (ignore args highlight))
   (if (null value)
       (call-next-method)

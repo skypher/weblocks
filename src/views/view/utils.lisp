@@ -2,11 +2,11 @@
 (in-package :weblocks)
 
 (export '(find-view field-info field-info-field field-info-object
-	  field-info-path get-object-view-fields map-view-fields
-	  find-field-info find-view-field map-mixin-fields
-	  count-view-fields obtain-view-field-value render-object-view
-	  class-from-view render-view render-object-view-impl
-	  attributize-presentation attributize-view-field-name))
+          field-info-path get-object-view-fields map-view-fields
+          find-field-info find-view-field map-mixin-fields
+          count-view-fields obtain-view-field-value render-object-view
+          class-from-view render-view render-object-view-impl
+          attributize-presentation attributize-view-field-name))
 
 ;;; View rendering utils
 (defun find-view (view &optional (signal-error-p t))
@@ -19,12 +19,12 @@ If 'view' is a list, finds a scaffold class by calling
 calling 'generate-scaffold-view' with the scaffold class name and the
 second argument."
   (or (etypecase view
-	(list (generate-scaffold-view (make-instance (scaffold-class-name (first view)))
-				      (find-class (second view))))
-	(symbol (gethash view *views*))
-	(view view))
+        (list (generate-scaffold-view (make-instance (scaffold-class-name (first view)))
+                                      (find-class (second view))))
+        (symbol (gethash view *views*))
+        (view view))
       (when signal-error-p
-	(error "Cannot find view ~A" view))))
+        (error "Cannot find view ~A" view))))
 
 (defstruct field-info
   "A structure that holds information about a given field. Information
@@ -45,81 +45,81 @@ Secondary, answer a termination thunk."
     (setf posned-customs (stable-sort posned-customs #'< :key #'car))
     (let ((posn -1))
       (labels ((custom-field->field-info (custom-field)
-		 (etypecase custom-field
-		   (field-info custom-field)
-		   (view-field (make-field-info :field custom-field
-						:object obj
-						:parent-info nil))))
-	       (wrapper (vfield-info)
-		 (incf posn)
-		 (loop while (and posned-customs
-				  (<= (caar posned-customs) posn))
-		       do (funcall proc (custom-field->field-info
-					 (cdr (pop posned-customs))))
-			  (incf posn))
-		 (funcall proc vfield-info)))
-	(values #'wrapper
-		(f0 (mapc (compose #'wrapper #'custom-field->field-info)
-			  end-customs)
-		    (mapc (compose proc #'custom-field->field-info #'cdr)
-			  posned-customs)))))))
+                 (etypecase custom-field
+                   (field-info custom-field)
+                   (view-field (make-field-info :field custom-field
+                                                :object obj
+                                                :parent-info nil))))
+               (wrapper (vfield-info)
+                 (incf posn)
+                 (loop while (and posned-customs
+                                  (<= (caar posned-customs) posn))
+                       do (funcall proc (custom-field->field-info
+                                         (cdr (pop posned-customs))))
+                          (incf posn))
+                 (funcall proc vfield-info)))
+        (values #'wrapper
+                (f0 (mapc (compose #'wrapper #'custom-field->field-info)
+                          end-customs)
+                    (mapc (compose proc #'custom-field->field-info #'cdr)
+                          posned-customs)))))))
 
 (defun %map-object-view-fields (proc obj view-designator
-				&key include-invisible-p (expand-mixins t)
-				custom-fields &allow-other-keys)
+                                &key include-invisible-p (expand-mixins t)
+                                custom-fields &allow-other-keys)
   "Implement `get-object-view-fields', except for consing up the
 result list, instead calling PROC on each resulting `field-info'."
   (labels ((map-level-fields (proc view)
-	     (let ((view (or (and view (find-view view))
-			     (return-from map-level-fields))))
-	       (map-level-fields proc (view-inherit-from view))
-	       (dolist (vfield (view-fields view))
-		 (funcall proc vfield))))
-	   (map-level (obj view mixin-container)
-	     (let ((vfields (make-hash-table :test 'eq)))
-	       ;; prefer latest
-	       (map-level-fields
-		(f_ (setf (gethash (view-field-slot-name _) vfields) _))
-		view)
-	       (map-level-fields
-		(lambda (vfield)
-		  ;; we only use the in-order vfield as a tag into the
-		  ;; vfields HT, taking first-instance-only
-		  (setf vfield (gethash (view-field-slot-name vfield) vfields))
-		  (when vfield
-		    (let ((vfield-info (make-field-info
-					:field vfield :object obj
-					:parent-info mixin-container)))
-		      (when (or include-invisible-p
-				(not (let ((hide-p-value (view-field-hide-p vfield)))
-				       (if (functionp hide-p-value)
-					   (funcall hide-p-value obj)
-					   hide-p-value))))
-			(etypecase vfield
-			  (inline-view-field
-			     (funcall proc vfield-info))
-			  (mixin-view-field
-			     (if expand-mixins
-				 (map-level
-				  (and obj
-				       (or (obtain-view-field-value vfield obj)
-					   (aif (mixin-view-field-init-form vfield)
-					     (funcall it)
-					     (error "Slot for mixin field ~S has neither value nor initform!" vfield))))
-				  (mixin-view-field-view vfield) vfield-info)
-				 (funcall proc vfield-info))))))
-		    ;; avoid duplicates
-		    (remhash (view-field-slot-name vfield) vfields)))
-		view))))
+             (let ((view (or (and view (find-view view))
+                             (return-from map-level-fields))))
+               (map-level-fields proc (view-inherit-from view))
+               (dolist (vfield (view-fields view))
+                 (funcall proc vfield))))
+           (map-level (obj view mixin-container)
+             (let ((vfields (make-hash-table :test 'eq)))
+               ;; prefer latest
+               (map-level-fields
+                (f_ (setf (gethash (view-field-slot-name _) vfields) _))
+                view)
+               (map-level-fields
+                (lambda (vfield)
+                  ;; we only use the in-order vfield as a tag into the
+                  ;; vfields HT, taking first-instance-only
+                  (setf vfield (gethash (view-field-slot-name vfield) vfields))
+                  (when vfield
+                    (let ((vfield-info (make-field-info
+                                        :field vfield :object obj
+                                        :parent-info mixin-container)))
+                      (when (or include-invisible-p
+                                (not (let ((hide-p-value (view-field-hide-p vfield)))
+                                       (if (functionp hide-p-value)
+                                           (funcall hide-p-value obj)
+                                           hide-p-value))))
+                        (etypecase vfield
+                          (inline-view-field
+                             (funcall proc vfield-info))
+                          (mixin-view-field
+                             (if expand-mixins
+                                 (map-level
+                                  (and obj
+                                       (or (obtain-view-field-value vfield obj)
+                                           (aif (mixin-view-field-init-form vfield)
+                                             (funcall it)
+                                             (error "Slot for mixin field ~S has neither value nor initform!" vfield))))
+                                  (mixin-view-field-view vfield) vfield-info)
+                                 (funcall proc vfield-info))))))
+                    ;; avoid duplicates
+                    (remhash (view-field-slot-name vfield) vfields)))
+                view))))
     (multiple-value-bind (wproc terminate-proc)
-	(inserting-custom-fields obj proc custom-fields)
+        (inserting-custom-fields obj proc custom-fields)
       (setf proc wproc)
       (map-level obj view-designator nil)
       (funcall terminate-proc))))
 
 (defun get-object-view-fields (obj view-designator &rest args
-			       &key include-invisible-p (expand-mixins t) custom-fields
-			       &allow-other-keys)
+                               &key include-invisible-p (expand-mixins t) custom-fields
+                               &allow-other-keys)
   "Returns a list of 'field-info' structures. If 'include-invisible-p'
 is set to true, fields declared as invisible will be returned as
 well.
@@ -141,7 +141,7 @@ are wrapped in field-info structures with common-sense defaults."
   (declare (ignore include-invisible-p expand-mixins custom-fields))
   (let ((expansion '()))
     (apply #'%map-object-view-fields
-	   (f_ (push _ expansion)) obj view-designator args)
+           (f_ (push _ expansion)) obj view-designator args)
     (nreverse expansion)))
 
 (defun map-view-fields (fn view obj &rest args)
@@ -149,7 +149,7 @@ are wrapped in field-info structures with common-sense defaults."
 type field-info."
   (let ((expansion '()))
     (apply #'%map-object-view-fields
-	   (f_ (push (funcall fn _) expansion)) obj view args)
+           (f_ (push (funcall fn _) expansion)) obj view args)
     (nreverse expansion)))
 
 (defun map-sorted-view-fields (fn view obj sort &rest args)
@@ -164,11 +164,11 @@ type field-info."
   "Finds a field-info object by name and returns it."
   (let (field)
     (apply #'map-view-fields
-	   (lambda (fi)
-	     (when (equalp (view-field-slot-name (field-info-field fi))
-			   name)
-	       (setf field fi)))
-	   view obj govf-args)
+           (lambda (fi)
+             (when (equalp (view-field-slot-name (field-info-field fi))
+                           name)
+               (setf field fi)))
+           view obj govf-args)
     field))
 
 (defun find-view-field (&rest args)
@@ -178,10 +178,10 @@ type field-info."
 
 (defun map-mixin-fields (fn view obj &rest govf-args)
   (apply #'%map-object-view-fields
-	 (lambda (field-info)
-	   (when (typep (field-info-field field-info) 'mixin-view-field)
-	     (funcall fn field-info)))
-	 obj view :expand-mixins nil govf-args))
+         (lambda (field-info)
+           (when (typep (field-info-field field-info) 'mixin-view-field)
+             (funcall fn field-info)))
+         obj view :expand-mixins nil govf-args))
 
 (defun count-view-fields (view &rest govf-args)
   "Counts the number of fields in a given view."
@@ -200,23 +200,23 @@ type field-info."
 'reader' slot of 'field' for more details."
   (declare (optimize safety))
   (assert (or (view-field-slot-name field)
-	      (slot-boundp field 'reader))
-	  nil "Either the field must represent a slot, or it's READER slot must be bound.")
+              (slot-boundp field 'reader))
+          nil "Either the field must represent a slot, or it's READER slot must be bound.")
   (let* ((reader-bound-p (slot-boundp field 'reader))
-	 (reader (if reader-bound-p
-		     (view-field-reader field)
-		     (when (view-field-slot-name field)
-		       (or (slot-reader (class-of obj) (view-field-slot-name field))
-			   (curry-after #'slot-value (view-field-slot-name field)))))))
+         (reader (if reader-bound-p
+                     (view-field-reader field)
+                     (when (view-field-slot-name field)
+                       (or (slot-reader (class-of obj) (view-field-slot-name field))
+                           (curry-after #'slot-value (view-field-slot-name field)))))))
     (if (or (functionp reader)
-	    (and (symbolp reader)
-		 (fboundp reader)))
-	(handler-case (funcall reader obj)
-	  (unbound-slot () nil))
-	reader)))
+            (and (symbolp reader)
+                 (fboundp reader)))
+        (handler-case (funcall reader obj)
+          (unbound-slot () nil))
+        reader)))
 
 (defun render-object-view (obj view &rest args
-			   &key widget &allow-other-keys)
+                           &key widget &allow-other-keys)
   "A helper function that finds the view and calls
 'render-object-view-impl'. Additionally, calls 'dependencies' and adds
 the returned items to *page-dependencies*. This is later used by
@@ -224,7 +224,7 @@ Weblocks to declare stylesheets and javascript links in the page
 header."
   (declare (special *page-dependencies*))
   (setf *page-dependencies*
-	(append *page-dependencies* (dependencies (find-view view))))
+        (append *page-dependencies* (dependencies (find-view view))))
   (let (*form-submit-dependencies*)
     (declare (special *form-submit-dependencies*))
     ;; this is not the best place to introduce *form-submitp-dependencies*,
@@ -247,8 +247,8 @@ names is generated.  This was made a method so the elephant backend
 can intercept class names and provide proxies instead."
   (make-class
    (mapcar (lambda (field-info)
-	     (view-field-slot-name (field-info-field field-info)))
-	   (get-object-view-fields nil view))
+             (view-field-slot-name (field-info-field field-info)))
+           (get-object-view-fields nil view))
    class-name))
 
 (defun render-view (view &rest args &key (class-name (gensym)) &allow-other-keys)
@@ -263,20 +263,20 @@ returns the created object."
   (:documentation "Renders 'obj' using 'view'.")
   (:method (obj view widget &rest args)
     (apply #'with-view-header view obj widget
-	   (lambda (view obj &rest args)
-	     (apply #'map-view-fields
-		    (lambda (field-info)
-		      (let ((field (field-info-field field-info))
-			    (obj (field-info-object field-info)))
-			(safe-apply (view-field-prefix-fn field) view field obj args)
-			(apply #'render-view-field
-			       field view widget (view-field-presentation field)
-			       (obtain-view-field-value field obj) obj 
-			       :field-info field-info
-			       args)
-			(safe-apply (view-field-suffix-fn field) view field obj args)))
-		    view obj args))
-	   args)))
+           (lambda (view obj &rest args)
+             (apply #'map-view-fields
+                    (lambda (field-info)
+                      (let ((field (field-info-field field-info))
+                            (obj (field-info-object field-info)))
+                        (safe-apply (view-field-prefix-fn field) view field obj args)
+                        (apply #'render-view-field
+                               field view widget (view-field-presentation field)
+                               (obtain-view-field-value field obj) obj 
+                               :field-info field-info
+                               args)
+                        (safe-apply (view-field-suffix-fn field) view field obj args)))
+                    view obj args))
+           args)))
 
 (defun attributize-presentation (presentation)
   "Attributizes presentation name."

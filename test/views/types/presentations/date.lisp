@@ -18,12 +18,12 @@
    (render-object-view (make-instance 'some-dates) (find-view 'some-dates))
    #.(data-header-template
       nil '((:li :class "x"
-	     (:span :class "label date" "X:&nbsp;")
-	     (:span :class "value" "1984-01-10"))
-	    (:li :class "y"
-	     (:span :class "label date" "Y:&nbsp;")
-	     (:span :class "value" "04/03/1983"))
-	    (:li :class "z"
-	     (:span :class "label date" "Z:&nbsp;")
-	     (:span :class "value" "Thursday, December 01, 1966")))
+             (:span :class "label date" "X:&nbsp;")
+             (:span :class "value" "1984-01-10"))
+            (:li :class "y"
+             (:span :class "label date" "Y:&nbsp;")
+             (:span :class "value" "04/03/1983"))
+            (:li :class "z"
+             (:span :class "label date" "Z:&nbsp;")
+             (:span :class "value" "Thursday, December 01, 1966")))
       :data-class-name 'some-dates :postslots '())))

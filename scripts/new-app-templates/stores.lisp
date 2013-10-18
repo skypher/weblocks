@@ -5,5 +5,5 @@
 ;;; default.
 (defstore *{APPNAME}-store* :prevalence
   (merge-pathnames (make-pathname :directory '(:relative "data"))
-		   (asdf-system-directory :{APPNAME})))
+                   (asdf-system-directory :{APPNAME})))
 

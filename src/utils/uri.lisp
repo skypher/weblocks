@@ -3,20 +3,20 @@
 
 (wexport '(request-uri-path
            add-get-param-to-url
-	   remove-parameter-from-uri
+           remove-parameter-from-uri
            parse-location-hash)
-	 '(t util))
+         '(t util))
 
 ;;; URI from pathname
 (defmethod puri:uri ((thing pathname))
   (puri:uri
    (format nil "~A~{~A/~}~A~A"
-	   (if (eql (car (pathname-directory thing)) :absolute) "/" "")
-	   (cdr (pathname-directory thing))
-	   (or (pathname-name thing) "")
-	   (if (pathname-type thing)
-	       (format nil ".~A" (pathname-type thing))
-	       ""))))
+           (if (eql (car (pathname-directory thing)) :absolute) "/" "")
+           (cdr (pathname-directory thing))
+           (or (pathname-name thing) "")
+           (if (pathname-type thing)
+               (format nil ".~A" (pathname-type thing))
+               ""))))
 
 (defun request-uri-path ()
   "Returns the path component of the request URI. The path component

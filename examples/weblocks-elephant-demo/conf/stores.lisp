@@ -5,5 +5,5 @@
 ;;; default.
 (defstore *elephant-store* :elephant 
   :spec `(:BDB ,(namestring (merge-pathnames (make-pathname :directory '(:relative "data"))
-					     (asdf-system-directory :weblocks-elephant-demo)))))
+                                             (asdf-system-directory :weblocks-elephant-demo)))))
 

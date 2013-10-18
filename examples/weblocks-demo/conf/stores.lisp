@@ -13,11 +13,11 @@
 ;;; Prevalence store...
 (defstore *prevalence-store* :prevalence
   (merge-pathnames (make-pathname :directory '(:relative "data"))
-		   (asdf-system-directory :weblocks-demo)))
+                   (asdf-system-directory :weblocks-demo)))
 
 ;;; CLSQL store
 ;; (defstore *sql-store* :clsql '("localhost" "test" "username" "password")
-;; 	  :database-type :mysql)
+;;        :database-type :mysql)
 
 ;;; Cascade delete should be turned off for prevalence store
 (setf *default-cascade-delete-mixins-p* nil)

@@ -1,10 +1,10 @@
 ;;; diff-sexp.lisp -- diffs s-expressions based on Levenshtein-like edit distance.
 
-;; Author:	Michael Weber <michaelw@foldr.org>
-;; Date:	2005-09-03
-;; Modified:	2005-09-04
-;; Modified:	2005-09-07
-;; Modified:	2005-09-15
+;; Author:      Michael Weber <michaelw@foldr.org>
+;; Date:        2005-09-03
+;; Modified:    2005-09-04
+;; Modified:    2005-09-07
+;; Modified:    2005-09-15
 ;;
 ;; This code is in the Public Domain.
 
@@ -17,16 +17,16 @@
 ;;; Examples:
 
 ;; DIFF-SEXP> (diff-sexp  
-;; 	  	'(DEFUN F (X) (+ (* X 2) 1)) 
-;; 	  	'(DEFUN F (X) (- (* X 2) 3 1)))
+;;              '(DEFUN F (X) (+ (* X 2) 1)) 
+;;              '(DEFUN F (X) (- (* X 2) 3 1)))
 ;; ((DEFUN F (X) (|#-new| + |#+new| - (* X 2) |#+new| 3 1)))
 ;; DIFF-SEXP> (diff-sexp  
-;; 	  	'(DEFUN F (X) (+ (* X 2) 4 1)) 
-;; 	  	'(DEFUN F (X) (- (* X 2) 5 3 1)))
+;;              '(DEFUN F (X) (+ (* X 2) 4 1)) 
+;;              '(DEFUN F (X) (- (* X 2) 5 3 1)))
 ;; ((DEFUN F (X) (|#-new| + |#+new| - (* X 2) |#-new| 4 |#+new| 5 |#+new| 3 1)))
 ;; DIFF-SEXP> (diff-sexp  
-;; 	  	'(DEFUN F (X) (+ (* X 2) 4 4 1)) 
-;; 	  	'(DEFUN F (X) (- (* X 2) 5 5 3 1)))
+;;              '(DEFUN F (X) (+ (* X 2) 4 4 1)) 
+;;              '(DEFUN F (X) (- (* X 2) 5 5 3 1)))
 ;; ((DEFUN F (X) |#-new| (+ (* X 2) 4 4 1) |#+new| (- (* X 2) 5 5 3 1)))
 ;; DIFF-SEXP> 
 
@@ -83,24 +83,24 @@
 
 (defmethod initialize-instance :after ((record deletion-record) &key)
   (setf (slot-value record 'edit-distance)
-	(1+ (tree-size (slot-value record 'change)))))
+        (1+ (tree-size (slot-value record 'change)))))
 
 (defmethod initialize-instance :after ((record insertion-record) &key)
   (setf (slot-value record 'edit-distance)
-	(1+ (tree-size (slot-value record 'change)))))
+        (1+ (tree-size (slot-value record 'change)))))
 
 (defmethod initialize-instance :after ((record update-record) &key)
   (setf (slot-value record 'edit-distance)
-	(+ 1 (tree-size (update-record-old record))
-	   1 (tree-size (update-record-new record)))))
+        (+ 1 (tree-size (update-record-old record))
+           1 (tree-size (update-record-new record)))))
 
 (defmethod initialize-instance :after ((record unchanged-record) &key)
   (setf (slot-value record 'edit-distance)
-	(tree-size (slot-value record 'change))))
+        (tree-size (slot-value record 'change))))
 
 (defmethod initialize-instance :after ((record compound-record) &key)
   (setf (slot-value record 'edit-distance)
-	(reduce #'+ (slot-value record 'changes) :key #'edit-distance)))
+        (reduce #'+ (slot-value record 'changes) :key #'edit-distance)))
 
 
 (defun insertion-record (change)
@@ -132,19 +132,19 @@
 
 (defmethod render-difference ((record update-record))
   (list :|#-new| (update-record-old record) 
-	:|#+new| (update-record-new record)))
+        :|#+new| (update-record-new record)))
 
 (defmethod render-difference ((record unchanged-record))
   (list (change record)))
 
 (defmethod render-difference ((record compound-record))
   (list (loop for r in (reverse (changes record))
-	      append (render-difference r))))
+              append (render-difference r))))
 
 (defun min/edit (record &rest records)
   "Returns record with minimum edit distance."
   (flet ((min/edit/2 (a b)
-	   (if (<= (edit-distance a)
+           (if (<= (edit-distance a)
                    (edit-distance b))
                a b)))
     (declare (dynamic-extent #'min/edit/2))
@@ -154,12 +154,12 @@
 (defun initial-distance (function list)
   "Prepares initial data vectors for Levenshtein algorithm from LIST."
   (loop with seq = (make-sequence '(vector edit-record) (1+ (length list)) 
-				  :initial-element (empty-compound-record))
-	for i from 0
-	for elt in list do
-	(setf (elt seq (1+ i))
+                                  :initial-element (empty-compound-record))
+        for i from 0
+        for elt in list do
+        (setf (elt seq (1+ i))
               (extend-compound-record (elt seq i) (funcall function elt)))
-	finally (return seq)))
+        finally (return seq)))
 
 (defun levenshtein-tree-edit (old-tree new-tree)
   "Calculates the minimal edits needed to transform OLD-TREE into NEW-TREE.
@@ -174,22 +174,22 @@ edit conditionals."
      (min/edit
       (update-record old-tree new-tree)
       (loop with row = (initial-distance #'deletion-record old-tree)
-	    and  col = (initial-distance #'insertion-record new-tree)
-	    and  best-edit
-	    for new-part in new-tree
-	    for current across (subseq col 1) do
-	    (loop for old-part in old-tree
-		  for row-idx from 0 do
-		  (setq best-edit 
-			(min/edit (extend-compound-record (elt row (1+ row-idx))
-							  (insertion-record new-part))
-				  (extend-compound-record current
-							  (deletion-record old-part))
-				  (extend-compound-record (elt row row-idx) 
-							  (levenshtein-tree-edit old-part new-part))))
-		  (shiftf (elt row row-idx) current best-edit))
-	    (setf (elt row (1- (length row))) best-edit)
-	    finally (return best-edit))))))
+            and  col = (initial-distance #'insertion-record new-tree)
+            and  best-edit
+            for new-part in new-tree
+            for current across (subseq col 1) do
+            (loop for old-part in old-tree
+                  for row-idx from 0 do
+                  (setq best-edit 
+                        (min/edit (extend-compound-record (elt row (1+ row-idx))
+                                                          (insertion-record new-part))
+                                  (extend-compound-record current
+                                                          (deletion-record old-part))
+                                  (extend-compound-record (elt row row-idx) 
+                                                          (levenshtein-tree-edit old-part new-part))))
+                  (shiftf (elt row row-idx) current best-edit))
+            (setf (elt row (1- (length row))) best-edit)
+            finally (return best-edit))))))
 
 (defun diff-sexp (old-tree new-tree)
   "Computes a diff between OLD-TREE and NEW-TREE which minimizes the
@@ -208,8 +208,8 @@ number of atoms in the result tree, also counting inserted edit conditionals
 (defun time/diff-sexp (n &key (arity 2))
   (let ((x 1))
     (flet ((generator ()
-	     (prog1 x (incf x))))
+             (prog1 x (incf x))))
       (let ((t1 (n-ary-tree arity n #'generator))
-	    (t2 (n-ary-tree arity n #'generator)))
-	(time (diff-sexp t1 t2))))))
+            (t2 (n-ary-tree arity n #'generator)))
+        (time (diff-sexp t1 t2))))))
 ||#

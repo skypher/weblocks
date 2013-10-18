@@ -37,25 +37,25 @@
 ;;; test widget-dependencies
 (addtest widget-dependencies-1
   (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-				    (dependencies (make-instance 'navigation))))
-	       (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-				    '(("menu" "css")
-				      ("navigation" "css"))))
-	       :test (lambda (x y) (cl-ppcre:scan y x))))
+                                    (dependencies (make-instance 'navigation))))
+               (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+                                    '(("menu" "css")
+                                      ("navigation" "css"))))
+               :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest widget-dependencies-2
   (ensure-same
    (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-					    (dependencies (make-instance 'gridedit
-									 :data-class 'employee)))))
+                                            (dependencies (make-instance 'gridedit
+                                                                         :data-class 'employee)))))
    ;; note, pagination and dataform are there because for gridedit and
    ;; datagrid widget-dependencies is specialized
    (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-			'(("dataseq" "css")
-			  ("datagrid" "js")
-			  ("datagrid" "css")
-			  ("pagination" "css")
-			  ("dataform" "css"))))
+                        '(("dataseq" "css")
+                          ("datagrid" "js")
+                          ("datagrid" "css")
+                          ("pagination" "css")
+                          ("dataform" "css"))))
    :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (deftest widget-dependencies-3
@@ -66,7 +66,7 @@
 ;;; test render-widget-body
 (deftest-html render-widget-body-1
     (render-widget-body (lambda (&rest args)
-			  (with-html (:p "blah"))))
+                          (with-html (:p "blah"))))
   (:p "blah"))
 
 (deftest-html render-widget-body-2
@@ -101,21 +101,21 @@
 (deftest dom-classes-4
     (with-request :get nil
       (dom-classes (make-instance 'gridedit
-					 :data-class 'employee)))
+                                         :data-class 'employee)))
   "widget dataseq datagrid dataedit-mixin gridedit")
 
 ;;; test with-widget-header
 (deftest-html with-widget-header-1
     (with-request :get nil
       (with-widget-header (make-instance 'dataform :data *joe*)
-	(lambda (obj &rest args)
-	  (with-html (:p "test")))
-	:widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
-	:widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
+        (lambda (obj &rest args)
+          (with-html (:p "test")))
+        :widget-prefix-fn (lambda (&rest args) (with-html (:p "hello")))
+        :widget-suffix-fn (lambda (&rest args) (with-html (:p "world")))))
   (:div :class "widget data-editor dataform" :id "id-123"
-	(:p "hello")
-	(:p "test")
-	(:p "world")))
+        (:p "hello")
+        (:p "test")
+        (:p "world")))
 
 ;;; test widget-name specialization for widgets
 (deftest widget-name-1
@@ -147,53 +147,53 @@
 (deftest composite-widgets-4
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) 'a)
-	(composite-widgets w)))
+        (setf (composite-widgets w) 'a)
+        (composite-widgets w)))
   (a))
 
 (deftest composite-widgets-5
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) nil)
-	(composite-widgets w)))
+        (setf (composite-widgets w) nil)
+        (composite-widgets w)))
   nil)
 
 (deftest composite-widgets-6
     (with-request :get nil
       (let ((w (make-instance 'composite)))
-	(setf (composite-widgets w) (list 'a))
-	(composite-widgets w)))
+        (setf (composite-widgets w) (list 'a))
+        (composite-widgets w)))
   (a))
 
 ;;; render function as a widget
 (deftest-html render-function-1
     (with-request :get nil
       (render-widget (lambda (&rest args)
-		       (with-html (:p "blah")))))
+                       (with-html (:p "blah")))))
   (:div :class "widget function"
-	(:p "blah")))
+        (:p "blah")))
 
 ;;; render some other widget without a name
 (deftest-html render-widget-1
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe*)))
   (:div :class "widget data-editor dataform" :id "id-123"
-	#.(data-header-template
-	   "abc123"
-	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
-	      (:span :class "value" "Jim"))))))
+        #.(data-header-template
+           "abc123"
+           '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+             (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
+              (:span :class "value" "Jim"))))))
 
 ;;; render some widget with a name
 (deftest-html render-widget-2
     (with-request :get nil
       (render-widget (make-instance 'dataform :data *joe* :name "Test Widget")))
   (:div :class "widget data-editor dataform" :id "test-widget"
-	#.(data-header-template
-	   "abc123"
-	   '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
-	     (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
-	      (:span :class "value" "Jim"))))))
+        #.(data-header-template
+           "abc123"
+           '((:li :class "name" (:span :class "label text" "Name:&nbsp;") (:span :class "value" "Joe"))
+             (:li :class "manager" (:span :class "label text" "Manager:&nbsp;")
+              (:span :class "value" "Jim"))))))
 
 (deftest-html render-widget-3
     (with-request :get nil
@@ -207,8 +207,8 @@
      (let ((*weblocks-output-stream* (make-string-output-stream)))
        (declare (special *weblocks-output-stream*))
        (with-request :get nil
-	 (render-widget (make-instance 'dataform :data *joe*))
-	 (format nil "~A" (car (mapcar #'dependency-url weblocks::*page-dependencies*)))))
+         (render-widget (make-instance 'dataform :data *joe*))
+         (format nil "~A" (car (mapcar #'dependency-url weblocks::*page-dependencies*)))))
      (make-versioned-regex "dataform-import" "css")
      :test (lambda (x y) (cl-ppcre:scan y x))))
 
@@ -216,19 +216,19 @@
 ;;; mark-dirty
 (deftest mark-dirty-1
     (multiple-value-bind (res errors)
-	(ignore-errors (mark-dirty (lambda () nil)))
+        (ignore-errors (mark-dirty (lambda () nil)))
       (values res (null errors)))
   nil nil)
 
 (deftest mark-dirty-2
     (with-request :get nil
       (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'composite :name "test")))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (mark-dirty w)
-	  (widget-name (car weblocks::*dirty-widgets*)))))
+        (let ((weblocks::*dirty-widgets* nil)
+              (w (make-instance 'composite :name "test")))
+          (declare (special weblocks::*dirty-widgets*))
+          (render-widget w)
+          (mark-dirty w)
+          (widget-name (car weblocks::*dirty-widgets*)))))
   "test")
 
 (addtest mark-dirty-both-propagate-and-putp-supplied
@@ -238,7 +238,7 @@
 ;;; widget-dirty-p
 (deftest widget-dirty-p-1
     (let ((weblocks::*dirty-widgets* nil)
-	  (w (make-instance 'composite :name "test")))
+          (w (make-instance 'composite :name "test")))
       (declare (special weblocks::*dirty-widgets*))
       (widget-dirty-p w))
   nil)
@@ -246,12 +246,12 @@
 (deftest widget-dirty-p-2
     (with-request :get nil
       (progv '(*weblocks-output-stream*) (list (make-string-output-stream))
-	(let ((weblocks::*dirty-widgets* nil)
-	      (w (make-instance 'composite :name "test")))
-	  (declare (special weblocks::*dirty-widgets*))
-	  (render-widget w)
-	  (mark-dirty w)
-	  (not (null (widget-dirty-p w))))))
+        (let ((weblocks::*dirty-widgets* nil)
+              (w (make-instance 'composite :name "test")))
+          (declare (special weblocks::*dirty-widgets*))
+          (render-widget w)
+          (mark-dirty w)
+          (not (null (widget-dirty-p w))))))
   t)
 
 (addtest setf-slot-value-using-class-marks-dirty
@@ -288,13 +288,13 @@
 (deftest widget-printing-3
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
-	(format nil "~s" (make-instance 'weblocks::navigation))))
+        (format nil "~s" (make-instance 'weblocks::navigation))))
   "#<NAVIGATION \"id-123\">")
 
 (deftest widget-printing-4
     (with-request :get nil
       (progv '(*package*) (list (find-package :weblocks-test))
-	(format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
+        (format nil "~s" (make-instance 'weblocks::navigation :dom-id "id-234"))))
   "#<NAVIGATION \"id-234\">")
 
 

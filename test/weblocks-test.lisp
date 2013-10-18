@@ -23,22 +23,22 @@
 (defun call-with-test-environment (thunk)
   "Helper for `with-test-environment'."
   (let ((weblocks::*current-webapp* nil) ;hide application
-	(*print-case* :upcase)	     ;needed by some comparison output
-	interference-methods)
+        (*print-case* :upcase)       ;needed by some comparison output
+        interference-methods)
     (declare (special weblocks::*current-webapp*))
     ;; remove before/after methods from render-page-body
     (mapcar (lambda (m)
-	      (let ((qualifiers (method-qualifiers m)))
-		(when (or (find :before qualifiers)
-			  (find :after qualifiers))
-		  (remove-method #'render-page-body m)
-		  (push m interference-methods))))
-	    (generic-function-methods #'render-page-body))
+              (let ((qualifiers (method-qualifiers m)))
+                (when (or (find :before qualifiers)
+                          (find :after qualifiers))
+                  (remove-method #'render-page-body m)
+                  (push m interference-methods))))
+            (generic-function-methods #'render-page-body))
     ;; do the body
     (unwind-protect (funcall thunk)
     ;; reinstate render-page-body before/after methods
       (loop for m in interference-methods
-	    do (add-method #'render-page-body m)))))
+            do (add-method #'render-page-body m)))))
 
 (defmacro with-test-environment (&body body)
   "This macro takes steps to clear the environment for the unit
@@ -54,18 +54,18 @@ the test suite without loading an application."
 forms that may not have a suite defined in-file, in the file in which
 I am expanded.  Likely to work only at toplevel."
   (let ((inner-part
-	 `(let ((last-set-suite lift::*current-testsuite-name*))
-	    (unless (and file
-			 (string-contains-p
-			  (symbol-name last-set-suite) (pathname-name file)))
-	      (setf lift::*current-testsuite-name* 'weblocks-suite)))))
+         `(let ((last-set-suite lift::*current-testsuite-name*))
+            (unless (and file
+                         (string-contains-p
+                          (symbol-name last-set-suite) (pathname-name file)))
+              (setf lift::*current-testsuite-name* 'weblocks-suite)))))
     `(progn
        (eval-when (:compile-toplevel)
-	 (let ((file *compile-file-pathname*))
-	   ,inner-part))
+         (let ((file *compile-file-pathname*))
+           ,inner-part))
        (eval-when (:load-toplevel :execute)
-	 (let ((file *load-truename*))
-	   ,inner-part)))))
+         (let ((file *load-truename*))
+           ,inner-part)))))
 
 (defmacro deftest (name form &rest values)
   "Define a test in an appropriate testsuite called NAME, ensuring
@@ -74,8 +74,8 @@ that FORM's values and the literal VALUES are equal."
      (set-sensible-suite)
      (addtest ,name
        (ensure-same ,form ,(if (typep values '(cons t null))
-			       `',(first values)
-			       `(values . ,(mapcar (f_ `',_) values)))))))
+                               `',(first values)
+                               `(values . ,(mapcar (f_ `',_) values)))))))
 
 (defmacro defjstest (name form value)
   "Define a test in an appropriate testsuite called NAME, ensuring
@@ -147,7 +147,7 @@ and then compares the string to the expected result."
                :initarg :mod-lisp-p
                :reader hunchentoot::server-mod-lisp-p)
    (ssl-certificate-file :initarg :ssl-certificate-file
-			 :initform nil
+                         :initform nil
                          :reader hunchentoot::server-ssl-certificate-file))
   (:documentation "A class used to mock hunchentoot server in
   order to be able to unit test across requests."))
@@ -166,9 +166,9 @@ and then compares the string to the expected result."
   (remf initargs :full)
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
-		     `(,@initargs ,@(and (not class-name) '(:prefix ""))
-		       :html-indent-p nil)))
-	 (weblocks::*current-webapp* app))
+                     `(,@initargs ,@(and (not class-name) '(:prefix ""))
+                       :html-indent-p nil)))
+         (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (if full
        (progn
@@ -196,23 +196,23 @@ webapp in my context."
   `(call-with-test-webapp (lambda () ,@body) ,@initargs))
 
 (defun call-with-request-in-webapp-context (thunk method parameters
-					    &key (uri nil uri?))
+                                            &key (uri nil uri?))
   "Helper for `call-with-request'."
   (let ((parameters-slot (ecase method
-			   (:get 'get-parameters)
-			   (:post 'post-parameters))))
+                           (:get 'get-parameters)
+                           (:post 'post-parameters))))
     (let* ((*acceptor* (make-instance 'unittest-server))
            (*weblocks-server* *acceptor*)
            (*request* (make-instance 'unittest-request :acceptor *acceptor*))
-	   (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
-	   (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-	   (make-action-orig #'weblocks::make-action)
-	   (generate-widget-id-orig #'weblocks::gen-id)
-	   (dummy-action-count 123)
-	   (*uri-tokens* '("foo" "bar"))
-	   weblocks::*page-dependencies* *session*
-	   *on-ajax-complete-scripts*
-	   weblocks::*rendered-actions*)
+           (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
+           (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+           (make-action-orig #'weblocks::make-action)
+           (generate-widget-id-orig #'weblocks::gen-id)
+           (dummy-action-count 123)
+           (*uri-tokens* '("foo" "bar"))
+           weblocks::*page-dependencies* *session*
+           *on-ajax-complete-scripts*
+           weblocks::*rendered-actions*)
       (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
                         *on-ajax-complete-scripts* weblocks::*rendered-actions* 
                         weblocks-util:*parts-md5-hash*
@@ -221,47 +221,47 @@ webapp in my context."
                         (setf weblocks-util:*parts-md5-hash* (make-hash-table :test 'equal))
                         (setf weblocks-util:*parts-md5-context-hash* (make-hash-table :test 'equal))
 
-			(weblocks::open-stores)
-			(start-session)
-			(setf (symbol-function 'weblocks::make-action)
-			      (lambda (action-fn &optional action-code)
-				(if action-code
-				    (funcall make-action-orig action-fn action-code)
-				    (let ((result (funcall make-action-orig action-fn
-							   (format nil "~A~D"
-								   *dummy-action*
-								   dummy-action-count))))
-				      (incf dummy-action-count)
-				      result))))
-			(setf (symbol-function 'weblocks::gen-id)
-			      (lambda (&optional prefix)
+                        (weblocks::open-stores)
+                        (start-session)
+                        (setf (symbol-function 'weblocks::make-action)
+                              (lambda (action-fn &optional action-code)
+                                (if action-code
+                                    (funcall make-action-orig action-fn action-code)
+                                    (let ((result (funcall make-action-orig action-fn
+                                                           (format nil "~A~D"
+                                                                   *dummy-action*
+                                                                   dummy-action-count))))
+                                      (incf dummy-action-count)
+                                      result))))
+                        (setf (symbol-function 'weblocks::gen-id)
+                              (lambda (&optional prefix)
                                 (declare (ignore prefix))
                                 "id-123"))
-			(setf (slot-value *request* 'method) method)
-			(setf (slot-value *request* parameters-slot) parameters)
-			(setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
-			(setf (slot-value *session* 'hunchentoot::session-id) 1)
-			(setf (slot-value *session* 'hunchentoot::session-string) "test")
-			(when uri?
-			  (setf *uri-tokens* (weblocks::tokenize-uri uri)))
-			(setf (slot-value *request* 'hunchentoot::uri)
-			      (or uri (concatenate 'string "/"
-						   (uri-tokens-to-string *uri-tokens*))))
-			(funcall thunk))
-	(setf (symbol-function 'weblocks::make-action) make-action-orig)
-	(setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
-	(weblocks-stores::close-stores)))))
+                        (setf (slot-value *request* 'method) method)
+                        (setf (slot-value *request* parameters-slot) parameters)
+                        (setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
+                        (setf (slot-value *session* 'hunchentoot::session-id) 1)
+                        (setf (slot-value *session* 'hunchentoot::session-string) "test")
+                        (when uri?
+                          (setf *uri-tokens* (weblocks::tokenize-uri uri)))
+                        (setf (slot-value *request* 'hunchentoot::uri)
+                              (or uri (concatenate 'string "/"
+                                                   (uri-tokens-to-string *uri-tokens*))))
+                        (funcall thunk))
+        (setf (symbol-function 'weblocks::make-action) make-action-orig)
+        (setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
+        (weblocks-stores::close-stores)))))
 
 (defun call-with-request (&rest args)
   "Helper for `with-request''s expansion."
   (if (and (boundp 'weblocks::*current-webapp*)
-	   (let ((app-type (class-name (class-of (weblocks::current-webapp)))))
-	     (or (eq 'weblocks-webapp app-type)
-		 (equalp "WEBLOCKS-TEST"
-			 (package-name (symbol-package app-type))))))
+           (let ((app-type (class-name (class-of (weblocks::current-webapp)))))
+             (or (eq 'weblocks-webapp app-type)
+                 (equalp "WEBLOCKS-TEST"
+                         (package-name (symbol-package app-type))))))
       (apply #'call-with-request-in-webapp-context args)
       (with-test-webapp ()
-	(apply #'call-with-request-in-webapp-context args))))
+        (apply #'call-with-request-in-webapp-context args))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun span-keyword-params (implicit-progn)
@@ -296,8 +296,8 @@ URI - Set the Hunchentoot request URI to this."
 (defun do-request (parameters)
   "Mocks up a submitted request for unit tests."
   (setf (slot-value *request* (ecase (request-method*)
-				(:get 'get-parameters)
-				(:post 'post-parameters))) parameters)
+                                (:get 'get-parameters)
+                                (:post 'post-parameters))) parameters)
   (weblocks::eval-action))
 
 (defun do-request-and-render-dirty (parameters)
@@ -309,9 +309,9 @@ URI - Set the Hunchentoot request URI to this."
   "A friendlier interface for do-request-and-render-dirty."
   (do-request-and-render-dirty
     (cons (cons weblocks::*action-string* action-name)
-	  (loop
-	     for i on args by #'cddr
-	     collect (cons (car i) (cadr i))))))
+          (loop
+             for i on args by #'cddr
+             collect (cons (car i) (cadr i))))))
 
 (defun make-request-ajax ()
   "Adds appropriate headers to a request so it is considered to be an
@@ -320,9 +320,9 @@ AJAX request."
 
 (defvar *recovery-strategies*
   `((with-plain-webapp . ,(lambda (thunk)
-			    (with-test-webapp () (funcall thunk))))
+                            (with-test-webapp () (funcall thunk))))
     (with-simple-request . ,(lambda (thunk)
-			      (with-request :get nil (funcall thunk)))))
+                              (with-request :get nil (funcall thunk)))))
   "Alist of strategies to try in turn when a test fails in `do-test'.
   Each cdr is passed a thunk that will perform the test and determine
   whether it succeeded.  If one succeeds, the car is used as a label

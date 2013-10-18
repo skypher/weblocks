@@ -8,12 +8,12 @@
     :list)
     
   (setf (gethash :present-as *custom-view-field-argument-compilers*)
-	(lambda (slot-name presentation)
-	  (let ((presentation (ensure-list presentation)))
-	    `(setf (view-field-presentation ,slot-name)
-		   (funcall #'make-instance (presentation-class-name ',(car presentation))
-			    ,@(quote-property-list-arguments
-			       (cdr presentation))))))))
+        (lambda (slot-name presentation)
+          (let ((presentation (ensure-list presentation)))
+            `(setf (view-field-presentation ,slot-name)
+                   (funcall #'make-instance (presentation-class-name ',(car presentation))
+                            ,@(quote-property-list-arguments
+                               (cdr presentation))))))))
 
 (defclass presentation ()
   ()

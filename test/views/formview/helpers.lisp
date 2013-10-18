@@ -6,8 +6,8 @@
     (let ((obj (copy-template *joe*)))
       (funcall 
        (make-slot-writer 'name (lambda (value)
-				 (declare (ignore value))
-				 "foo"))
+                                 (declare (ignore value))
+                                 "foo"))
        "bak" obj)
       (first-name obj))
   "foo")

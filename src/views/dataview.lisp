@@ -2,10 +2,10 @@
 (in-package :weblocks)
 
 (export '(data data-view data-view-field data-scaffold
-	  text-presentation text-presentation-mixin
+          text-presentation text-presentation-mixin
           text-presentation-mixin-format-string
           *text-presentation-mixin-default-format-string*
-	  highlight-regex-matches *presentation-dom-id*))
+          highlight-regex-matches *presentation-dom-id*))
 
 ;;; Data view
 (defclass data-view (view)
@@ -39,9 +39,9 @@
 ;;; Presentation
 (defclass text-presentation (presentation text-presentation-mixin)
   ((null-string :accessor text-presentation-null-string
-		:initarg :null-string
-		:initform "Not Specified"
-		:documentation "The string to display if the value is null."))
+                :initarg :null-string
+                :initform "Not Specified"
+                :documentation "The string to display if the value is null."))
   (:documentation "A default presentation that renders values as
   text."))
 
@@ -50,42 +50,42 @@
   (if (slot-value view 'caption)
       (slot-value view 'caption)
       (with-html-output-to-string (out)
-	(:span :class "action" "Viewing:&nbsp;")
-	(:span :class "object" "~A"))))
+        (:span :class "action" "Viewing:&nbsp;")
+        (:span :class "object" "~A"))))
 
 ;;; Implement rendering protocol
 (defmethod with-view-header ((view data-view) obj widget body-fn &rest args &key
-			     (fields-prefix-fn (view-fields-default-prefix-fn view))
-			     (fields-suffix-fn (view-fields-default-suffix-fn view))
-			     &allow-other-keys)
+                             (fields-prefix-fn (view-fields-default-prefix-fn view))
+                             (fields-suffix-fn (view-fields-default-suffix-fn view))
+                             &allow-other-keys)
   (with-html
     (:div :class (format nil "view data ~A"
-			 (attributize-name (object-class-name obj)))
-	  (with-extra-tags
-	    (htm
-	     (unless (empty-p (view-caption view))
-	       (htm (:h1 (fmt (view-caption view)
-			      (humanize-name (object-class-name obj))))))
-	     (safe-apply fields-prefix-fn view obj args)
-	     (:ul (apply body-fn view obj args))
-	     (safe-apply fields-suffix-fn view obj args))))))
+                         (attributize-name (object-class-name obj)))
+          (with-extra-tags
+            (htm
+             (unless (empty-p (view-caption view))
+               (htm (:h1 (fmt (view-caption view)
+                              (humanize-name (object-class-name obj))))))
+             (safe-apply fields-prefix-fn view obj args)
+             (:ul (apply body-fn view obj args))
+             (safe-apply fields-suffix-fn view obj args))))))
 
 (defmethod render-view-field ((field data-view-field) (view data-view)
-			      widget presentation value obj
-			      &rest args &key field-info &allow-other-keys)
+                              widget presentation value obj
+                              &rest args &key field-info &allow-other-keys)
   (with-html
     (:li :class (if field-info
                   (attributize-view-field-name field-info)
                   (attributize-name (view-field-slot-name field)))
-	 (unless (empty-p (view-field-label field))
-	   (htm (:span :class (concatenate 'string "label "
-					   (attributize-presentation
-					    (view-field-presentation field)))
-		       (str (view-field-label field)) ":&nbsp;")))
-	 (apply #'render-view-field-value
-		value presentation
-		field view widget obj
-		args))))
+         (unless (empty-p (view-field-label field))
+           (htm (:span :class (concatenate 'string "label "
+                                           (attributize-presentation
+                                            (view-field-presentation field)))
+                       (str (view-field-label field)) ":&nbsp;")))
+         (apply #'render-view-field-value
+                value presentation
+                field view widget obj
+                args))))
 
 (defvar *presentation-dom-id* nil "DOM id of the currently rendered
   presentation object. If bound during rendering (for example, in
@@ -93,23 +93,23 @@
   functions that render form elements..")
 
 (defmethod render-view-field-value (value (presentation text-presentation)
-				    field view widget obj &rest args
-				    &key highlight &allow-other-keys)
+                                    field view widget obj &rest args
+                                    &key highlight &allow-other-keys)
   (let ((printed-value (apply #'print-view-field-value value presentation field view widget obj args)))
     (with-html
       (:span :class "value"
-	     (str (if highlight
-		      (highlight-regex-matches printed-value highlight presentation)
-		      (escape-for-html printed-value)))))))
+             (str (if highlight
+                      (highlight-regex-matches printed-value highlight presentation)
+                      (escape-for-html printed-value)))))))
 
 (defmethod render-view-field-value ((value null) (presentation text-presentation)
-				    field view widget obj &rest args
-				    &key ignore-nulls-p &allow-other-keys)
+                                    field view widget obj &rest args
+                                    &key ignore-nulls-p &allow-other-keys)
   (declare (ignore args))
   (if ignore-nulls-p
       (call-next-method)
       (with-html
-	(:span :class "value missing" (str (translate (text-presentation-null-string presentation)))))))
+        (:span :class "value missing" (str (translate (text-presentation-null-string presentation)))))))
 
 (defun highlight-regex-matches (item highlight &optional presentation)
   "This function highlights regex matches in text by wrapping them in
@@ -118,20 +118,20 @@ to prevent XSS attacks. If we simply wrap all matches in 'strong' tags
 and then escape the result, we'll escape our 'strong' tags which isn't
 the desired outcome."
   (apply #'concatenate 'string
-	 (remove ""
-		 (loop for i = 0 then k
-		       for (j k . rest) on (ppcre:all-matches highlight item) by #'cddr
-		       for match = (subseq item j k)
-		    collect (escape-for-html (subseq item i j)) into matches
-		    when (not (equalp match ""))
-		         collect (format nil (format nil "<strong>~A</strong>"
+         (remove ""
+                 (loop for i = 0 then k
+                       for (j k . rest) on (ppcre:all-matches highlight item) by #'cddr
+                       for match = (subseq item j k)
+                    collect (escape-for-html (subseq item i j)) into matches
+                    when (not (equalp match ""))
+                         collect (format nil (format nil "<strong>~A</strong>"
                                                      (text-presentation-mixin-format-string presentation))
-					 (escape-for-html match))
-		           into matches
-		    when (null rest) collect (escape-for-html (subseq item k (length item))) into matches
-		    finally (return (if matches
-					matches
-					(list (escape-for-html item))))))))
+                                         (escape-for-html match))
+                           into matches
+                    when (null rest) collect (escape-for-html (subseq item k (length item))) into matches
+                    finally (return (if matches
+                                        matches
+                                        (list (escape-for-html item))))))))
 
 (defmethod print-view-field-value (value presentation field view widget obj &rest args)
   (declare (ignore obj view field args))

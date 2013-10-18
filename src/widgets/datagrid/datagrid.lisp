@@ -13,18 +13,18 @@
   (or (slot-value obj 'view)
       (find-view
        (list 'table
-	     (if (symbolp (dataseq-data-class obj))
-		 (dataseq-data-class obj)
-		 (class-name (dataseq-data-class obj)))))))
+             (if (symbolp (dataseq-data-class obj))
+                 (dataseq-data-class obj)
+                 (class-name (dataseq-data-class obj)))))))
 
 ;;; Mining bar
 (defmethod dataseq-render-mining-bar ((obj datagrid) &rest args)
   (with-html
     (:div :class "data-mining-bar"
-	  (when (dataseq-show-total-items-count-p obj)
-	    (render-total-items-message obj))
-	  (when (dataseq-allow-select-p obj)
-	    (apply #'render-select-bar obj args)))))
+          (when (dataseq-show-total-items-count-p obj)
+            (render-total-items-message obj))
+          (when (dataseq-allow-select-p obj)
+            (apply #'render-select-bar obj args)))))
 
 (defun dataseq-body-wt (&key content)
   (with-html-to-string 

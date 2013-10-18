@@ -22,6 +22,6 @@
 (defwebapp weblocks-demo :prefix ""
            :autostart t
            :public-files-cache-time 100000
-	   :description "A web application based on Weblocks"
-	   :dependencies '((:stylesheet "suggest")))
+           :description "A web application based on Weblocks"
+           :dependencies '((:stylesheet "suggest")))
 

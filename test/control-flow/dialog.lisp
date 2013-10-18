@@ -67,9 +67,9 @@
 (deftest-html update-dialog-on-request-1
     (with-request :get nil
       (setf (weblocks::current-dialog)
-	    (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
-							  (with-html (:p "bar")))
-				   :css-class "baz"))
+            (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
+                                                          (with-html (:p "bar")))
+                                   :css-class "baz"))
       (weblocks::update-dialog-on-request))
   nil)
 
@@ -103,30 +103,30 @@
       (setf (weblocks::current-dialog) 1)
       (make-request-ajax)
       (multiple-value-bind (res err)
-	  (ignore-errors (do-dialog "Some Title" (lambda (k)
-						   (with-html (:p "some widget")))))
-	(not (null err))))
+          (ignore-errors (do-dialog "Some Title" (lambda (k)
+                                                   (with-html (:p "some widget")))))
+        (not (null err))))
   t)
 
 (deftest-html do-dialog-2
     (with-request :get nil
       (setf (root-composite) (make-instance 'composite))
       (do-dialog "Some Title" (lambda (k)
-				(with-html (:p "some widget"))))
+                                (with-html (:p "some widget"))))
       (render-widget (root-composite)))
   (:div :class "widget composite" :id "id-123"
-	(:div :class "widget function"
-	      (:div :class "modal"
-		    (:h1 (:span "Some Title"))
-		    (:div (:div :class "widget function"
-				(:p "some widget")))))))
+        (:div :class "widget function"
+              (:div :class "modal"
+                    (:h1 (:span "Some Title"))
+                    (:div (:div :class "widget function"
+                                (:p "some widget")))))))
 
 (addtest do-dialog-3
   (ensure-same
     (with-request :get nil
       (make-request-ajax)
       (do-dialog "Some Title" (lambda (k)
-				(with-html (:p "some widget"))))
+                                (with-html (:p "some widget"))))
       *on-ajax-complete-scripts*)
     (list (with-javascript-to-string
             (ps:ps
@@ -162,11 +162,11 @@
     (:fieldset
      (:p "hello, world!")
      (:input :name "a" :type "submit" :class "submit" :value "A"
-	  :onclick "disableIrrelevantButtons(this);")
+          :onclick "disableIrrelevantButtons(this);")
      (:input :name "b" :type "submit" :class "submit" :value "B"
-	  :onclick "disableIrrelevantButtons(this);")
+          :onclick "disableIrrelevantButtons(this);")
      (:input :name "c" :type "submit" :class "submit" :value "C"
-	  :onclick "disableIrrelevantButtons(this);")
+          :onclick "disableIrrelevantButtons(this);")
      (:input :name "action" :type "hidden" :value "abc123"))
     (:div :class "extra-bottom-1" "<!-- empty -->")
     (:div :class "extra-bottom-2" "<!-- empty -->")
@@ -192,10 +192,10 @@
 (deftest do-choice-2
     (let (res)
       (with-request :get nil
-	(make-request-ajax)
-	(with-call/cc (setf res (do-choice "Please choose" (list (cons :a (humanize-name :a)) (cons :b (humanize-name :b))))))
-	(do-request `(("b" . "B")
-		      (,weblocks::*action-string* . "abc123"))))
+        (make-request-ajax)
+        (with-call/cc (setf res (do-choice "Please choose" (list (cons :a (humanize-name :a)) (cons :b (humanize-name :b))))))
+        (do-request `(("b" . "B")
+                      (,weblocks::*action-string* . "abc123"))))
       res)
   :b)
 
@@ -235,10 +235,10 @@
 (deftest do-confirmation-3
     (let (res)
       (with-request :get nil
-	(make-request-ajax)
-	(with-call/cc (setf res (do-confirmation "Please confirm")))
-	(do-request `(("ok" . "Ok")
-		      (,weblocks::*action-string* . "abc123"))))
+        (make-request-ajax)
+        (with-call/cc (setf res (do-confirmation "Please confirm")))
+        (do-request `(("ok" . "Ok")
+                      (,weblocks::*action-string* . "abc123"))))
       res)
   :ok)
 

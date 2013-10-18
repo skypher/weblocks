@@ -29,11 +29,11 @@ the widget inside."
                                       close-action (session-name-string-pair))
                      :onmouseover "this.style.cursor = \"pointer\";"
                      :style "cursor: expression(\"hand\");"))))
-	 (widget-html (widget)
-	   (let ((*weblocks-output-stream* (make-string-output-stream)))
-	     (declare (special *weblocks-output-stream*))
-	     (render-widget widget)
-	     (get-output-stream-string *weblocks-output-stream*))))
+         (widget-html (widget)
+           (let ((*weblocks-output-stream* (make-string-output-stream)))
+             (declare (special *weblocks-output-stream*))
+             (render-widget widget)
+             (get-output-stream-string *weblocks-output-stream*))))
     ;(format t "widget-html: ~S~%" (widget-html widget))
     (let ((inner (intern (string-upcase (gen-id "inner"))))
           (close-action (intern (string-upcase (gen-id "close")))))
@@ -51,9 +51,9 @@ request is a refresh and a dialog was shown, appropriate JS is
 inserted into the page to redraw the dialog."
   (let ((current-dialog (current-dialog)))
     (when (and current-dialog
-	       (refresh-request-p))
+               (refresh-request-p))
       (with-javascript
-	(ps* `(funcall (slot-value *Event 'observe)
+        (ps* `(funcall (slot-value *Event 'observe)
                        window "load"
                        (lambda ()
                          ,(make-dialog-js (dialog-title current-dialog)
@@ -71,15 +71,15 @@ scales down to 'do-modal' instead."
   (assert (stringp title))
   (if (ajax-request-p)
       (prog2
-	  (when (current-dialog)
-	    (error "Multiple dialogs not allowed."))
-	  (call callee (lambda (new-callee)
-			 (setf (current-dialog) (make-dialog :title title
-							     :widget new-callee
-							     :close close
-							     :css-class css-class))
+          (when (current-dialog)
+            (error "Multiple dialogs not allowed."))
+          (call callee (lambda (new-callee)
+                         (setf (current-dialog) (make-dialog :title title
+                                                             :widget new-callee
+                                                             :close close
+                                                             :css-class css-class))
                          (send-script (ps* (make-dialog-js title new-callee css-class close)))))
-	(setf (current-dialog) nil)
+        (setf (current-dialog) nil)
         (send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
@@ -145,6 +145,6 @@ scales down to 'do-modal' instead."
 ;;; Presents a user with an information dialog
 (defun/cc do-information (msg &key (css-class ""))
   (do-choice msg (list (cons :ok (humanize-name :ok)))
-	     :css-class (format nil "information ~A" css-class)
-	     :title (translate "Information")))
+             :css-class (format nil "information ~A" css-class)
+             :title (translate "Information")))
 

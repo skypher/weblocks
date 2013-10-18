@@ -9,7 +9,7 @@
   :licence "LLGPL"
   :depends-on ("weblocks")
   :components ((:file "package")
-	       (:module widgets
+               (:module widgets
                 :components ((:file "popover-gridedit"))
                 :depends-on ("package"))))
 

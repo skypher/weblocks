@@ -10,15 +10,15 @@
 
 (defparameter *home-address* (make-instance 'address :id "*home-address*"))
 (defparameter *work-address* (make-instance 'address :id "*work-address*"
-					    :street "200 Pine St"
-					    :city "Chicago"
-					    :state "IL"))
+                                            :street "200 Pine St"
+                                            :city "Chicago"
+                                            :state "IL"))
 
 (defclass address-parser (parser)
   ())
 
 (defmethod parse-view-field-value ((parser address-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
+                                   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (when (not (text-input-present-p value))
     (return-from parse-view-field-value (values t nil)))
@@ -60,31 +60,31 @@
 ;;; helper to create complex site layout
 (defun create-site-layout ()
   (make-instance 'composite :name 'root :widgets
-		 (list
-		  (make-instance
-		   'composite
-		   :name 'root-inner
-		   :widgets
-		   (list
-		    (make-instance 'composite :name 'leaf)
-		    (make-navigation "test-nav-1"
-				     "test1" (make-instance
-					      'composite
-					      :widgets
-					      (list
-					       (make-instance 'composite :name 'test1-leaf)
-					       (make-navigation "test-nav-2"
-								"test3" (lambda (&rest args) nil)
-								"test4" (lambda (&rest args) nil))))
-				     "test2" (make-instance
-					      'composite
-					      :dom-id "test2"
-					      :widgets
-					      (list
-					       (make-instance 'composite :name 'test2-leaf)
-					       (make-navigation "test-nav-3"
-								"test5" (lambda (&rest args) nil)
-								"test6" (lambda (&rest args) nil))))))))))
+                 (list
+                  (make-instance
+                   'composite
+                   :name 'root-inner
+                   :widgets
+                   (list
+                    (make-instance 'composite :name 'leaf)
+                    (make-navigation "test-nav-1"
+                                     "test1" (make-instance
+                                              'composite
+                                              :widgets
+                                              (list
+                                               (make-instance 'composite :name 'test1-leaf)
+                                               (make-navigation "test-nav-2"
+                                                                "test3" (lambda (&rest args) nil)
+                                                                "test4" (lambda (&rest args) nil))))
+                                     "test2" (make-instance
+                                              'composite
+                                              :dom-id "test2"
+                                              :widgets
+                                              (list
+                                               (make-instance 'composite :name 'test2-leaf)
+                                               (make-navigation "test-nav-3"
+                                                                "test5" (lambda (&rest args) nil)
+                                                                "test6" (lambda (&rest args) nil))))))))))
 
 ;;; Some dummy typespecs
 (deftype foo1 () 'integer)

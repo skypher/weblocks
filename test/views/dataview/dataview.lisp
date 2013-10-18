@@ -4,7 +4,7 @@
 ;;; Test view-caption
 (deftest dataview-view-caption-1
     (view-caption (make-instance 'data-view
-				 :caption "foo"))
+                                 :caption "foo"))
   "foo")
 
 ;;; Test data view with-view-header
@@ -12,60 +12,60 @@
     (with-view-header (make-instance 'data-view)
       *joe* nil
       (lambda (&rest args)
-	(declare (ignore args))))
+        (declare (ignore args))))
   #.(data-header-template nil '(nil)
-			  :postslots nil))
+                          :postslots nil))
 
 ;;; Test data view render-view-field
 (deftest-html data-view-render-view-field-1
     (render-view-field (make-instance 'data-view-field
-				      :slot-name 'first-name)
-		       (make-instance 'data-view)
-		       nil (make-instance 'text-presentation)
-		       "Joe" *joe*)
+                                      :slot-name 'first-name)
+                       (make-instance 'data-view)
+                       nil (make-instance 'text-presentation)
+                       "Joe" *joe*)
   (:li :class "first-name"
        (:span :class "label text"
-	      "First Name:&nbsp;")
+              "First Name:&nbsp;")
        (:span :class "value"
-	      "Joe")))
+              "Joe")))
 
 ;;; Test data view render-view-field-value
 (deftest-html data-view-render-view-field-value-1
     (render-view-field-value "Joe" (make-instance 'text-presentation)
-			     (make-instance 'data-view-field)
-			     (make-instance 'data-view)
-			     nil *joe*)
+                             (make-instance 'data-view-field)
+                             (make-instance 'data-view)
+                             nil *joe*)
   (:span :class "value" "Joe"))
 
 (deftest-html data-view-render-view-field-value-2
     (render-view-field-value nil (make-instance 'text-presentation)
-			     (make-instance 'data-view-field)
-			     (make-instance 'data-view)
-			     nil *joe*)
+                             (make-instance 'data-view-field)
+                             (make-instance 'data-view)
+                             nil *joe*)
   (:span :class "value missing" "Not Specified"))
 
 (deftest-html data-view-render-view-field-value-3
     (render-view-field-value "test" (make-instance 'text-presentation)
-			     (make-instance 'data-view-field)
-			     (make-instance 'data-view)
-			     nil *joe* :highlight ".s")
+                             (make-instance 'data-view-field)
+                             (make-instance 'data-view)
+                             nil *joe* :highlight ".s")
   (:span :class "value" "t<strong>es</strong>t"))
 
 (deftest-html data-view-render-view-field-value-4
     (render-view-field-value "te<st" (make-instance 'text-presentation)
-			     (make-instance 'data-view-field)
-			     (make-instance 'data-view)
-			     nil *joe* :highlight "e<s")
+                             (make-instance 'data-view-field)
+                             (make-instance 'data-view)
+                             nil *joe* :highlight "e<s")
   (:span :class "value" "t<strong>e&lt;s</strong>t"))
 
 (deftest-html data-view-render-view-field-value-5
     (render-view-field-value "<script>alert('XSS Attack')</script>"
-			     (make-instance 'text-presentation)
-			     (make-instance 'data-view-field)
-			     (make-instance 'data-view)
-			     nil *joe* :highlight "e<s")
+                             (make-instance 'text-presentation)
+                             (make-instance 'data-view-field)
+                             (make-instance 'data-view)
+                             nil *joe* :highlight "e<s")
   (:span :class "value"
-	 "&lt;script&gt;alert(&#039;XSS Attack&#039;)&lt;/script&gt;"))
+         "&lt;script&gt;alert(&#039;XSS Attack&#039;)&lt;/script&gt;"))
 
 ;;; Test highlight-regex-matches
 (deftest highlight-regex-matches-1
@@ -123,14 +123,14 @@
     (let (weblocks::*page-dependencies*)
       (declare (special weblocks::*page-dependencies*))
       (render-view (defview nil ()
-		     hello world)
-		   :class-name 'render-view-test-class))
+                     hello world)
+                   :class-name 'render-view-test-class))
   #.(data-header-template
      nil
      '((:li :class "hello" (:span :class "label text" "Hello:&nbsp;") (:span :class "value missing"
-								       "Not Specified"))
+                                                                       "Not Specified"))
        (:li :class "world" (:span :class "label text" "World:&nbsp;") (:span :class "value missing"
-								       "Not Specified")))
+                                                                       "Not Specified")))
      :postslots nil
      :data-class-name "render-view-test-class"))
 

@@ -6,14 +6,14 @@
   "Copies the fixtures from the disk store to a sandbox store (to
 ensure users have their own non-peristant sandboxes)."
   (let ((sandbox-store (open-store :memory))
-	(fixtures-store (open-store :prevalence
-				    (merge-pathnames (make-pathname :directory '(:relative "data"))
-						     (asdf-system-directory :employer-employee)))))
+        (fixtures-store (open-store :prevalence
+                                    (merge-pathnames (make-pathname :directory '(:relative "data"))
+                                                     (asdf-system-directory :employer-employee)))))
     (unwind-protect
-	 (progn
-	   (persist-objects sandbox-store (find-persistent-objects fixtures-store 'employee))
-	   (persist-objects sandbox-store (find-persistent-objects fixtures-store 'company))
-	   (setf (sandbox-store) sandbox-store))
+         (progn
+           (persist-objects sandbox-store (find-persistent-objects fixtures-store 'employee))
+           (persist-objects sandbox-store (find-persistent-objects fixtures-store 'company))
+           (setf (sandbox-store) sandbox-store))
       (close-store fixtures-store))))
 
 ;;; Instances of our model should be obtained from the sandbox store

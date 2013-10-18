@@ -4,14 +4,14 @@
           template-block-source
           template-block-vars
           recreate-template-printer
-	  render-template
+          render-template
           *always-recreate-template-printer*))
 
 (defparameter *always-recreate-template-printer* t)
 
 (defwidget template-block ()
   ((template-printer :accessor template-printer-of :initform nil
-		     :affects-dirty-status-p nil)
+                     :affects-dirty-status-p nil)
    (source :accessor template-block-source :initarg :source :initform nil)
    (vars :type list :accessor template-block-vars :initarg :vars :initform nil))
   (:documentation "A block of HTML taken from 'source', which is processed by

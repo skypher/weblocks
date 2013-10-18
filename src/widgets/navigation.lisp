@@ -2,33 +2,33 @@
 (in-package :weblocks)
 
 (export '(navigation render-navigation-menu init-navigation make-navigation
-	  navigation-pane-names navigation-menu-items navigation-header
+          navigation-pane-names navigation-menu-items navigation-header
           navigation-hidden-panes navigation-render-content-p))
 
 (defwidget navigation (static-selector)
   ((pane-names :accessor navigation-pane-names
-	       :initarg :pane-names
-	       :initform nil
-	       :documentation "An alist mapping uri-tokens to
-	       human-readable pane names (rendered as a menu). Use nil
-	       as the key for the default item.")
+               :initarg :pane-names
+               :initform nil
+               :documentation "An alist mapping uri-tokens to
+               human-readable pane names (rendered as a menu). Use nil
+               as the key for the default item.")
    (header :accessor navigation-header
-	   :initarg :header
-	   :initform nil
-	   :documentation "A heading that will be rendered in a <h1> tag")
+           :initarg :header
+           :initform nil
+           :documentation "A heading that will be rendered in a <h1> tag")
    (hidden-panes :accessor navigation-hidden-panes
-		 :initarg :hidden-panes
-		 :initform nil
-		 :documentation "A list of uri-tokens representing a set
-		 of panes that should be hidden (not rendered in a menu,
-		 but accessible from within this navigation object.)")
+                 :initarg :hidden-panes
+                 :initform nil
+                 :documentation "A list of uri-tokens representing a set
+                 of panes that should be hidden (not rendered in a menu,
+                 but accessible from within this navigation object.)")
    (render-content-p :accessor navigation-render-content-p
-		   :initarg :render-content-p
-		   :initform t
-		   :documentation "Whether navigation should also render
-		   its contents. You want to set this to nil if you use
-		   the teleport widget to render the contents
-		   elsewhere."))
+                   :initarg :render-content-p
+                   :initform t
+                   :documentation "Whether navigation should also render
+                   its contents. You want to set this to nil if you use
+                   the teleport widget to render the contents
+                   elsewhere."))
   (:documentation "The navigation widget can act as a menu controls, a
   tabbed control, etc. It is a static-selector that also knows what its
   pane names are, so it can render a menu, set a page title, and
@@ -72,7 +72,7 @@ may be NIL in which case the default pane name is provided."
     (when (navigation-render-content-p obj)
       (with-html 
         (:div :class "navigation-body"
-	    (mapc (lambda (obj) (apply #'render-widget obj args))
+            (mapc (lambda (obj) (apply #'render-widget obj args))
                   (widget-children obj :selector))))))
 
 (defmethod per-class-dependencies append ((obj navigation))
@@ -157,13 +157,13 @@ widget will get cached instead of the generator."
 
 (defwidget teleport ()
   ((source :accessor teleport-source
-	   :initarg :source
-	   :documentation "Source widget that should be teleported and
-	   rendered.")
+           :initarg :source
+           :documentation "Source widget that should be teleported and
+           rendered.")
    (key :accessor teleport-key
-	:initarg :key
-	:initform #'identity
-	:documentation "The function that will be used to access the
+        :initarg :key
+        :initform #'identity
+        :documentation "The function that will be used to access the
    widget from the source."))
   (:documentation "A widget that will render ('teleport') another widget
   to a particular place. It is your responsibility to make sure the

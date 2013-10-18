@@ -11,7 +11,7 @@ the body, one can use 'yield', which will expand into appropriate
     `(let ((,w ,widget))
        (declare (ignorable ,w))
        (macrolet ((yield (target)
-		    `(do-widget ,',w ,target)))
-	 (with-call/cc
-	   ,@body)))))
+                    `(do-widget ,',w ,target)))
+         (with-call/cc
+           ,@body)))))
 

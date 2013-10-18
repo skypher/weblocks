@@ -12,8 +12,8 @@
 
 (deftest entity-class-name-3
     (multiple-value-bind (res err)
-	(ignore-errors
-	  (entity-class-name 'doesnt '#:-exist))
+        (ignore-errors
+          (entity-class-name 'doesnt '#:-exist))
       (declare (ignore err))
       res)
   nil)

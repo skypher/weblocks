@@ -2,15 +2,15 @@
 (in-package :weblocks)
 
 (export '(parser parser-error-message parse-view-field-value
-	  parser-class-name text text-parser text-parser-matches
-	  text-input-present-p lambda lambda-parser))
+          parser-class-name text text-parser text-parser-matches
+          text-input-present-p lambda lambda-parser))
 
 ;;; Parser
 (defclass parser ()
   ((error-message :initform "This value must be valid"
-		  :accessor parser-error-message
-		  :initarg :error-message
-		  :documentation "A default error message. If subclasses
+                  :accessor parser-error-message
+                  :initarg :error-message
+                  :documentation "A default error message. If subclasses
 override 'parser-error-message', it is still recommended that they allow
 callers to override the error message using the ':error-message'
 initarg. See the implementation of 'integer-parser' for an example of
@@ -44,9 +44,9 @@ the symbol.")
     :list)
   
   (setf (gethash :parse-as *custom-view-field-argument-compilers*)
-	(lambda (slot-name parser)
-	  (let ((parser (ensure-list parser)))
-	    `(setf (form-view-field-parser ,slot-name)
+        (lambda (slot-name parser)
+          (let ((parser (ensure-list parser)))
+            `(setf (form-view-field-parser ,slot-name)
                    ,(if (symbolp (car parser))
                       `(funcall #'make-instance (parser-class-name ',(car parser))
                                 ,@(quote-property-list-arguments
@@ -56,15 +56,15 @@ the symbol.")
 ;;; Default parser
 (defclass text-parser (parser)
   ((matches :initform nil
-	    :accessor text-parser-matches
-	    :initarg :matches
-	    :documentation "If this slot is a regular expression, the
-	   input value will be validated against it."))
+            :accessor text-parser-matches
+            :initarg :matches
+            :documentation "If this slot is a regular expression, the
+           input value will be validated against it."))
   (:documentation "A default parser for forms. Simply returns strings
   obtained from the request."))
 
 (defmethod parse-view-field-value ((parser text-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
+                                   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (if (and (text-parser-matches parser)
            (text-input-present-p value))

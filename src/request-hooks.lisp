@@ -5,29 +5,29 @@
 
 (defclass request-hooks ()
   ((dynamic-action :accessor dynamic-action-hook
-		   :initform nil
-		   :documentation "A set of functions that establish
+                   :initform nil
+                   :documentation "A set of functions that establish
                 dynamic state around a body function in the action context")
    (pre-action :accessor pre-action-hook
-	       :initform nil
-	       :documentation "A list of callback functions of no
-	       arguments called before user action is evaluated.")
+               :initform nil
+               :documentation "A list of callback functions of no
+               arguments called before user action is evaluated.")
    (post-action :accessor post-action-hook
-		:initform nil
-		:documentation "A list of callback functions of no
-	        arguments called after user action is evaluated.")
+                :initform nil
+                :documentation "A list of callback functions of no
+                arguments called after user action is evaluated.")
    (dynamic-render :accessor dynamic-render-hook
-		   :initform nil
-		   :documentation "A set of functions that establish
+                   :initform nil
+                   :documentation "A set of functions that establish
                 dynamic state around a body function in the render context")
    (pre-render :accessor pre-render-hook
-	       :initform nil
-	       :documentation "A list of callback functions of no
-	       arguments called before widgets are rendered.")
+               :initform nil
+               :documentation "A list of callback functions of no
+               arguments called before widgets are rendered.")
    (post-render :accessor post-render-hook
-		:initform nil
-		:documentation "A list of callback functions of no
-	        arguments called after widgets are rendered."))
+                :initform nil
+                :documentation "A list of callback functions of no
+                arguments called after widgets are rendered."))
   (:documentation "A data structure that maintains appropriate
   callback functions used to hook into request evaluation."))
 
@@ -100,11 +100,11 @@ of no arguments."
   (with-gensyms (null-list)
     `(eval-dynamic-hooks 
       (append (request-hook :application ,type)
-	      (request-hook :session ,type)
-	      (request-hook :request ,type)
-	      (list (lambda (,null-list) 
-		      (assert (null ,null-list))
-		      ,@body))))))
+              (request-hook :session ,type)
+              (request-hook :request ,type)
+              (list (lambda (,null-list) 
+                      (assert (null ,null-list))
+                      ,@body))))))
 
 (defun eval-dynamic-hooks (var)
   "A helper function that makes it easier to write dynamic hooks.
@@ -114,8 +114,8 @@ of no arguments."
         (eval-dynamic-hooks hooks)))
   "
   (let ((list (etypecase var 
-		(symbol (symbol-value var))
-		(list var))))
+                (symbol (symbol-value var))
+                (list var))))
     (unless (null list)
       (funcall (first list) (rest list)))))
 

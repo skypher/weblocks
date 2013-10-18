@@ -34,7 +34,7 @@
 ;;; Introspection helper
 (defun class-visible-slot-names (obj &rest args)
   (mapcar #'slot-definition-name
-	  (apply #'weblocks::class-visible-slots (class-of obj) args)))
+          (apply #'weblocks::class-visible-slots (class-of obj) args)))
 
 ;;; Test slot-value-by-path
 (deftest slot-value-by-path-1
@@ -99,11 +99,11 @@
   t)
 
 (deftest string-whitespace-p-2
-    (string-whitespace-p "   	")
+    (string-whitespace-p "      ")
   t)
 
 (deftest string-whitespace-p-3
-    (string-whitespace-p " a  	")
+    (string-whitespace-p " a    ")
   nil)
 
 ;;; test render-extra-tags
@@ -224,8 +224,8 @@
 ;;; test public-files-relative-paths
 (deftest public-files-relative-paths-1
     (format nil "~A" (public-files-relative-paths
-		      '(:stylesheet . "foo")
-		      '(:script . "bar")))
+                      '(:stylesheet . "foo")
+                      '(:script . "bar")))
   "(stylesheets/foo.css scripts/bar.js)")
 
 ;;; test request-uri-path
@@ -328,7 +328,7 @@
 
 (deftest puri-uri-pathname-3
     (puri:render-uri (puri:uri (make-pathname :directory '(:absolute "foo" "bar")
-					      :name "baz" :type "txt")) nil)
+                                              :name "baz" :type "txt")) nil)
   "/foo/bar/baz.txt")
 
 ;;; test add-get-param-to-url
@@ -356,15 +356,15 @@
 (deftest make-isearch-regex-1
     (let ((regex (weblocks::make-isearch-regex "hello")))
       (values (ppcre:scan regex "hello")
-	      (ppcre:scan regex "HeLlO")
-	      (ppcre:scan regex "test")))
+              (ppcre:scan regex "HeLlO")
+              (ppcre:scan regex "test")))
   0 0 nil)
 
 (deftest make-isearch-regex-2
     (let ((regex (weblocks::make-isearch-regex "Hello")))
       (values (ppcre:scan regex "Hello")
-	      (ppcre:scan regex "hello")
-	      (ppcre:scan regex "test")))
+              (ppcre:scan regex "hello")
+              (ppcre:scan regex "test")))
   0 nil nil)
 
 ;;; Test object-class-name
@@ -441,8 +441,8 @@
 ;;; maybe-add-trailing-slash
 (addtest maybe-add-trailing-slash-accept-pathnames
   (let* ((p (make-pathname :directory '(:absolute "usr" "bin")))
-	 (p2 (make-pathname :defaults p :name "env" :type nil
-			    :version :newest)))
+         (p2 (make-pathname :defaults p :name "env" :type nil
+                            :version :newest)))
     (ensure-same (weblocks::maybe-add-trailing-slash p) p)
     (ensure-same (weblocks::maybe-add-trailing-slash p2)
-		 (make-pathname :directory '(:absolute "usr" "bin" "env")))))
+                 (make-pathname :directory '(:absolute "usr" "bin" "env")))))

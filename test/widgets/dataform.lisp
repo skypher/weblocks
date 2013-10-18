@@ -48,13 +48,13 @@
 ;;; render data (with custom slot), modify with error, modify, submit.
 (addtest render-dataform-custom-slot
   (let ((dataform (make-instance 'dataform :data (copy-template *joe*)
-				 :data-view (defview () (:inherit-from '(:scaffold employee))
-					      age)
-				 :form-view (defview () (:type form :inherit-from '(:scaffold employee))
-					      (age :parse-as (integer
-							      :error-message "Age must be an integer.")
-						   :requiredp t
-						   :present-as (input :max-length 3))))))
+                                 :data-view (defview () (:inherit-from '(:scaffold employee))
+                                              age)
+                                 :form-view (defview () (:type form :inherit-from '(:scaffold employee))
+                                              (age :parse-as (integer
+                                                              :error-message "Age must be an integer.")
+                                                   :requiredp t
+                                                   :present-as (input :max-length 3))))))
     ;; initial state
     (render-widget dataform)
     ;; click modify
@@ -80,20 +80,20 @@
 #+(or)
 (addtest render-dataform-callbacks
   (let* (on-cancel-called-p
-	 on-success-called-p
-	 on-close-called-p
-	 (dataform (make-instance 'dataform
-				  :data (copy-template *joe*)
-				  :ui-state :form
-				  :on-cancel (lambda (grid)
-					       (declare (ignore grid))
-					       (setf on-cancel-called-p t))
-				  :on-success (lambda (grid)
-						(declare (ignore grid))
-						(setf on-success-called-p t))
-				  :on-close (lambda (grid)
-						(declare (ignore grid))
-						(setf on-close-called-p t)))))
+         on-success-called-p
+         on-close-called-p
+         (dataform (make-instance 'dataform
+                                  :data (copy-template *joe*)
+                                  :ui-state :form
+                                  :on-cancel (lambda (grid)
+                                               (declare (ignore grid))
+                                               (setf on-cancel-called-p t))
+                                  :on-success (lambda (grid)
+                                                (declare (ignore grid))
+                                                (setf on-success-called-p t))
+                                  :on-close (lambda (grid)
+                                                (declare (ignore grid))
+                                                (setf on-close-called-p t)))))
     ;; initial state
     (render-widget dataform)
     (do-action (find-ui-form :class "employee" :test #'search)
@@ -112,16 +112,16 @@
 
 (addtest render-dataform-dropdowns
   (let* ((data (copy-template *joe*))
-	 (dataform (make-instance 'dataform :data data
-				  :data-view (defview () ()
-					       name address)
-				  :form-view (defview () (:type form)
-					       (name :requiredp t)
-					       (address :present-as (dropdown :choices #'addresses)
-							:parse-as address
-							:reader (lambda (obj)
-								  (object-id
-								   (slot-value obj 'address))))))))
+         (dataform (make-instance 'dataform :data data
+                                  :data-view (defview () ()
+                                               name address)
+                                  :form-view (defview () (:type form)
+                                               (name :requiredp t)
+                                               (address :present-as (dropdown :choices #'addresses)
+                                                        :parse-as address
+                                                        :reader (lambda (obj)
+                                                                  (object-id
+                                                                   (slot-value obj 'address))))))))
     ;; initial state
     (render-widget dataform)
     ;; click modify

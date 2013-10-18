@@ -3,15 +3,15 @@
 (declaim (optimize (speed 3) (safety 2) (debug 1) (space 1)))
 
 (export '(dependency url-dependency-mixin stylesheet-dependency script-dependency
-	  javascript-code-dependency
-	  dependency-url
-	  dependencies-equalp dependencies-lessp
-	  render-dependency-in-page-head render-dependency-in-page-body-top
-	  render-dependency-in-page-body-bottom render-dependency-in-form-submit
-	  render-dependency-in-ajax-response
+          javascript-code-dependency
+          dependency-url
+          dependencies-equalp dependencies-lessp
+          render-dependency-in-page-head render-dependency-in-page-body-top
+          render-dependency-in-page-body-bottom render-dependency-in-form-submit
+          render-dependency-in-ajax-response
           render-form-submit-dependencies
-	  make-local-dependency per-class-dependencies dependencies
-	  compact-dependencies build-dependencies))
+          make-local-dependency per-class-dependencies dependencies
+          compact-dependencies build-dependencies))
 
 ;; we need to be able to gather various kinds of dependencies
 ;; from renderable objects (widgets, views, presentations). Dependencies
@@ -38,12 +38,12 @@
 (defclass url-dependency-mixin ()
   ((url :accessor dependency-url :initarg :url
         :type (or string pathname puri:uri)
-	:documentation "URL to the object, represented as a string. May
-	be a relative or an absolute URL. Using the reader for this slot
-	always returns an URI object (as defined by the PURI
-	library).")
+        :documentation "URL to the object, represented as a string. May
+        be a relative or an absolute URL. Using the reader for this slot
+        always returns an URI object (as defined by the PURI
+        library).")
    (local-path :accessor local-path :initarg :local-path :initform nil
-	       :documentation "If the dependency is a local file, this stores its path."))
+               :documentation "If the dependency is a local file, this stores its path."))
   (:documentation "Any dependency which can be represented by an external URL."))
 
 (defmethod dependency-url ((obj url-dependency-mixin))
@@ -67,7 +67,7 @@
 
 (defclass javascript-code-dependency (dependency)
  ((code :accessor javascript-code :initarg :code
-	:documentation "String containing the javascript code."))
+        :documentation "String containing the javascript code."))
   (:documentation "JavaScript code that is to be placed within the page
   being rendered or sent as part of an AJAX update."))
 
@@ -78,7 +78,7 @@ to be able to compare dependencies in order to 1) remove duplicates from
 dependencies we gathered from the widget tree and 2) be able to detect
 when new dependencies appeared in AJAX page updates.")
   ;; by default dependencies aren't equal
-  (:method (d1 d2) nil)		  
+  (:method (d1 d2) nil)           
   ;; we also know how to compare uris
   (:method ((d1 url-dependency-mixin) (d2 url-dependency-mixin))
     (puri:uri= (dependency-url d1) (dependency-url d2))))
@@ -102,13 +102,13 @@ when new dependencies appeared in AJAX page updates.")
   (stable-sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list &key bundle-folder
-			    (bundle-types (bundle-dependency-types* (current-webapp))))
+                            (bundle-types (bundle-dependency-types* (current-webapp))))
   (when (find :stylesheet bundle-types)
     (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency
-						    :bundle-folder bundle-folder)))
+                                                    :bundle-folder bundle-folder)))
   (when (find :script bundle-types)
     (setf dependency-list (bundle-some-dependencies dependency-list 'script-dependency
-						    :bundle-folder bundle-folder)))
+                                                    :bundle-folder bundle-folder)))
   dependency-list)
 
 
@@ -148,8 +148,8 @@ when new dependencies appeared in AJAX page updates.")
 (defmethod render-dependency-in-page-head ((obj stylesheet-dependency))
   (with-html
     (:link :rel "stylesheet" :type "text/css"
-	   :href (dependency-url obj)
-	   :media (stylesheet-media obj))))
+           :href (dependency-url obj)
+           :media (stylesheet-media obj))))
 
 (defmethod render-dependency-in-page-head ((obj script-dependency))
   (with-html
@@ -170,24 +170,24 @@ when new dependencies appeared in AJAX page updates.")
 (defmethod render-dependency-in-ajax-response ((obj stylesheet-dependency))
   (send-script
    (ps* `(include_css
-	  ,(puri:render-uri (dependency-url obj) nil)))
+          ,(puri:render-uri (dependency-url obj) nil)))
    :before-load))
 
 (defmethod render-dependency-in-ajax-response ((obj script-dependency))
   (send-script
    (ps* `(include_dom
-	  ,(puri:render-uri (dependency-url obj) nil)))
+          ,(puri:render-uri (dependency-url obj) nil)))
    :before-load))
 
 ;; since rendering dependencies for views is more complex than a simple mapc, there is a utility function
 (defun render-form-submit-dependencies (dependency-list)
   (let ((code-string (reduce (lambda (e v)
-			       (concatenate 'string e (render-dependency-in-form-submit v)))
-			     (remove nil dependency-list)
-			     :initial-value "")))
+                               (concatenate 'string e (render-dependency-in-form-submit v)))
+                             (remove nil dependency-list)
+                             :initial-value "")))
     (if (equalp code-string "")
-	nil
-	code-string)))
+        nil
+        code-string)))
 
 (defvar *gzip-dependency-lock* (bordeaux-threads:make-lock))
 
@@ -205,26 +205,26 @@ type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (let* ((relative-path (public-file-relative-path type file-name))
-	 (physical-path (princ-to-string (merge-pathnames relative-path
-							  (compute-webapp-public-files-path webapp)))))
+         (physical-path (princ-to-string (merge-pathnames relative-path
+                                                          (compute-webapp-public-files-path webapp)))))
     (when (or do-not-probe (probe-file physical-path))
       (let ((virtual-path (concatenate 'string
                                        (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
                                        relative-path)))
-	(unless do-not-probe
-	  (when (find type (version-dependency-types* webapp))
-	    (multiple-value-setq (physical-path virtual-path)
-	      (update-versioned-dependency-path physical-path virtual-path)))
-	  (when import-p
-	    (update-import-css-content physical-path))	  
-	  (when (find type (gzip-dependency-types* webapp))
-	    (create-gziped-dependency-file physical-path)))
-	(ecase type
-	  (:stylesheet (make-instance 'stylesheet-dependency
-				      :url virtual-path :media media
-				      :local-path physical-path))
-	  (:script (make-instance 'script-dependency :url virtual-path
-				  :local-path physical-path)))))))
+        (unless do-not-probe
+          (when (find type (version-dependency-types* webapp))
+            (multiple-value-setq (physical-path virtual-path)
+              (update-versioned-dependency-path physical-path virtual-path)))
+          (when import-p
+            (update-import-css-content physical-path))    
+          (when (find type (gzip-dependency-types* webapp))
+            (create-gziped-dependency-file physical-path)))
+        (ecase type
+          (:stylesheet (make-instance 'stylesheet-dependency
+                                      :url virtual-path :media media
+                                      :local-path physical-path))
+          (:script (make-instance 'script-dependency :url virtual-path
+                                  :local-path physical-path)))))))
 
 
 (defun build-dependencies (dep-list &optional (app (current-webapp)))
@@ -234,7 +234,7 @@ when statically specyfing application dependencies, where alists are
 more convenient."
   (flet ((filedep-p (type)
            (member type '(:script :stylesheet) :test #'eq))
-	 (deptype->classname (type)
+         (deptype->classname (type)
            (ecase type
              (:stylesheet 'stylesheet-dependency)
              (:script 'script-dependency))))
@@ -254,13 +254,13 @@ more convenient."
 dependencies for a particular symbol, which could (but doesn't have to)
 represent a class."
   (let* ((attributized-widget-class-name (attributize-name symbol))
-	 (base-dependencies (loop for type in '(:stylesheet :script)
-			       collect (make-local-dependency type attributized-widget-class-name)))
-	 (import-stylesheet-name (format nil "~A-import" attributized-widget-class-name))
-	 (import-dependency (make-local-dependency :stylesheet import-stylesheet-name :import-p t)))
+         (base-dependencies (loop for type in '(:stylesheet :script)
+                               collect (make-local-dependency type attributized-widget-class-name)))
+         (import-stylesheet-name (format nil "~A-import" attributized-widget-class-name))
+         (import-dependency (make-local-dependency :stylesheet import-stylesheet-name :import-p t)))
     (if import-dependency
-	(push import-dependency base-dependencies)
-	base-dependencies)))
+        (push import-dependency base-dependencies)
+        base-dependencies)))
 
 (defgeneric per-class-dependencies (obj)
   (:documentation "Return a list of dependencies for an object of a

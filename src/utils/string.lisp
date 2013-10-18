@@ -6,7 +6,7 @@
            string-whitespace-p
            string-remove-left
            string-remove-right
-	   string-invert-case
+           string-invert-case
            remove-spurious-slashes)
          '(t util))
 
@@ -58,25 +58,25 @@ character, nil otherwise."
   "If string 'str' starts with 'prefix', remove 'prefix' from the
 start of 'str'."
   (when (string-starts-with str prefix
-			    :test (if ignore-case-p #'char-equal #'char=))
+                            :test (if ignore-case-p #'char-equal #'char=))
     (subseq str (length prefix))))
 
 (defun string-remove-right (str suffix &key ignore-case-p)
   "If string 'str' ends with 'suffix', remove 'suffix' from the end of
 'str'."
   (when (string-ends-with str suffix
-			  :test (if ignore-case-p #'char-equal #'char=))
+                          :test (if ignore-case-p #'char-equal #'char=))
     (subseq str 0 (- (length str)
-		     (length suffix)))))
+                     (length suffix)))))
 
 (defun string-invert-case (str)
   (map 'string (lambda (char)
-		 (if (upper-case-p char)
-		     (char-downcase char)
-		     (char-upcase char)))
+                 (if (upper-case-p char)
+                     (char-downcase char)
+                     (char-upcase char)))
        (etypecase str
-	 (string str)
-	 (symbol (symbol-name str)))))
+         (string str)
+         (symbol (symbol-name str)))))
 
 ;;; working with those pesky slashes
 (defun remove-spurious-slashes (str)
@@ -113,6 +113,6 @@ Returns the number of stripped slashes as second value."
     (pathname (fad:pathname-as-directory s))
     (otherwise
        (if (equal (subseq s (1- (length s))) "/")
-	   s
-	   (concatenate 'string s "/")))))
+           s
+           (concatenate 'string s "/")))))
 

@@ -63,20 +63,20 @@
       *weblocks-output-stream*)))
 
 (defmethod render-view-field-value (value (presentation radio-presentation)
-				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values field-info &allow-other-keys)
+                                    (field form-view-field) (view form-view) widget obj
+                                    &rest args &key intermediate-values field-info &allow-other-keys)
   (declare (ignore args)
-	   (special *presentation-dom-id*))
+           (special *presentation-dom-id*))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (render-radio-buttons (if field-info
                             (attributize-view-field-name field-info)
                             (attributize-name (view-field-slot-name field)))
-			  (obtain-presentation-choices presentation obj)
-			  :selected-value (if intermediate-value-p
-					      intermediate-value
-					      (when value
-						(attributize-name value)))
-			  :disabledp (form-view-field-disabled-p field obj)
-			  :id *presentation-dom-id*)))
+                          (obtain-presentation-choices presentation obj)
+                          :selected-value (if intermediate-value-p
+                                              intermediate-value
+                                              (when value
+                                                (attributize-name value)))
+                          :disabledp (form-view-field-disabled-p field obj)
+                          :id *presentation-dom-id*)))
 

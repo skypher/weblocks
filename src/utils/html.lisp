@@ -5,16 +5,16 @@
           *cancel-control-name*
           with-html-form
           render-extra-tags
-	  with-extra-tags
-	  render-link
+          with-extra-tags
+          render-link
           render-button
           render-form-and-button
-	  render-checkbox
+          render-checkbox
           render-dropdown
           render-autodropdown
-	  *dropdown-welcome-message*
+          *dropdown-welcome-message*
           render-radio-buttons
-	  render-close-button
+          render-close-button
           render-input-field
           render-password
           render-textarea
@@ -26,7 +26,7 @@
           with-table
           render-definition-list))
 
-(declaim (special *action-string*))	;early
+(declaim (special *action-string*))     ;early
 
 (defmethod render-extra-tags (tag-class count)
   "Renders extra tags to get around CSS limitations. 'tag-class'
@@ -68,7 +68,7 @@ headers on top and three on the bottom. It uses
                 :method (attributize-name ,method-type) :enctype ,enctype
                 :onsubmit (when ,use-ajax-p
                             (format nil "~@[~A~]~A; return false;"
-				    ,extra-submit-code
+                                    ,extra-submit-code
                                     (format nil ,submit-fn
                                             (url-encode (or ,action-code ""))
                                             (session-name-string-pair))))
@@ -94,13 +94,13 @@ without escaping."
   (declare (optimize (speed 3) (space 2)))
   (let* ((*print-pretty* nil)
          (action-code (function-or-action->action action))
-	 (url (make-action-url action-code)))
+         (url (make-action-url action-code)))
     (with-html
       (:a :id id :class class
-	  :href url :onclick (when ajaxp
-			       (format nil "initiateAction(\"~A\", \"~A\"); return false;"
-				       action-code (session-name-string-pair)))
-	  :title title
+          :href url :onclick (when ajaxp
+                               (format nil "initiateAction(\"~A\", \"~A\"); return false;"
+                                       action-code (session-name-string-pair)))
+          :title title
           (funcall (or render-fn (lambda (label)
                                    (htm (str (princ-to-string label)))))
                    label)))
@@ -136,15 +136,15 @@ without escaping."
     *weblocks-output-stream*))
 
 (defun render-form-and-button (name action &key (value (humanize-name name))
-			       (method :get)
-			       button-id (button-class "submit")
-			       (use-ajax-p t)
-			       form-id form-class)
+                               (method :get)
+                               button-id (button-class "submit")
+                               (use-ajax-p t)
+                               form-id form-class)
   "Renders a button within a form. This function can be used a short
 cut to quickly render a sumbit button."
   (with-html-form (method action
-			  :use-ajax-p use-ajax-p
-			  :id form-id :class form-class)
+                          :use-ajax-p use-ajax-p
+                          :id form-id :class form-class)
     (render-button name :value value :id button-id :class button-class)))
 
 (defun checkbox-wt (&key name id class checkedp onclick value disabledp &allow-other-keys)
@@ -248,26 +248,26 @@ being rendered.
                         :map (constantly nil))))))
 
 (defun render-autodropdown (name selections action
-			    &key selected-value welcome-name
-			    id (class "autodropdown")
-			    dropdown-id dropdown-class
-			    submit-id submit-class
-			    (submit-button-name (humanize-name *submit-control-name*))
-			    (method-type :get)
-			    (use-ajax-p t))
+                            &key selected-value welcome-name
+                            id (class "autodropdown")
+                            dropdown-id dropdown-class
+                            submit-id submit-class
+                            (submit-button-name (humanize-name *submit-control-name*))
+                            (method-type :get)
+                            (use-ajax-p t))
   "Renders a dropdown along with a form. The dropdown automatically
 submits on selection, or if JS is off, a button is automatically
 presented to the user."
   (with-html-form (method-type action :use-ajax-p use-ajax-p :id id :class class)
     (render-dropdown name selections
-		     :id dropdown-id
-		     :class dropdown-class
-		     :selected-value selected-value
-		     :welcome-name welcome-name
-		     :autosubmitp t)
+                     :id dropdown-id
+                     :class dropdown-class
+                     :selected-value selected-value
+                     :welcome-name welcome-name
+                     :autosubmitp t)
     (:noscript
      (render-button *submit-control-name* :value (humanize-name submit-button-name)
-		    :id submit-id :class submit-class))))
+                    :id submit-id :class submit-class))))
 
 (defun radio-buttons-wt (&key name value checked disabled label id label-class)
   (with-html-to-string 
@@ -281,7 +281,7 @@ presented to the user."
 
 (defun render-radio-buttons (name selections &key id (class "radio")
                                                   (selected-value nil selected-value-supplied)
-						  disabledp)
+                                                  disabledp)
   "Renders a group of radio buttons.
 
 'name' - name of radio buttons.
@@ -322,19 +322,19 @@ for the value.
 used instead of the default 'Close'."
   (with-html
     (:span :class "close-button"
-	   (render-link close-action (humanize-name button-string)))))
+           (render-link close-action (humanize-name button-string)))))
 
 (defun render-input-field (type name value &key id class maxlength style size
-			   onfocus onblur tabindex disabledp)
+                           onfocus onblur tabindex disabledp)
   (with-html
     (:input :type type :name (attributize-name name) :id id
             :size size
-	    :value value :maxlength maxlength :class class
+            :value value :maxlength maxlength :class class
             :style style
             :tabindex tabindex
             :onfocus onfocus
             :onblur onblur
-	    :disabled (and disabledp "disabled"))))
+            :disabled (and disabledp "disabled"))))
 
 (defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
                         default-value size visibility-option-p tabindex disabledp)
@@ -353,7 +353,7 @@ used instead of the default 'Close'."
                                  (format nil "if (this.value==\"~A\") this.value=\"\";" default-value))
                       :onblur (when default-value
                                 (format nil "if (this.value==\"\") this.value=\"~A\";" default-value))
-		      :disabledp disabledp)
+                      :disabledp disabledp)
   (when visibility-option-p
     (send-script (ps:ps*
                    `(defun toggle-password-visibility (field)
@@ -379,12 +379,12 @@ used instead of the default 'Close'."
 'disabledp' - input is disabled if true."
   (with-html
       (:textarea :name (attributize-name name) :id id
-		 :rows rows :cols cols :class class :disabled (and disabledp "disabled")
-		 (esc (or value "")))))
+                 :rows rows :cols cols :class class :disabled (and disabledp "disabled")
+                 (esc (or value "")))))
 
 (defun render-list (seq &key render-fn (orderedp nil) id class
-		    (empty-message "There are no items in the list.")
-		    empty-caption item-prefix-fn item-suffix-fn)
+                    (empty-message "There are no items in the list.")
+                    empty-caption item-prefix-fn item-suffix-fn)
   "Renders a sequence of items 'seq' in an HTML list. If 'render-fn'
 is provided, calls it with one argument (the item being rendered) in
 order to render the actual item. Otherwise, renders each item as a
@@ -394,28 +394,28 @@ provided, they're called before and after each item (respectively)
 with the item as a single argument."
   (if seq
       (flet ((render-items ()
-	       "Renders the items of the list."
-	       (loop for i in seq
-		  do (with-html
-		       (safe-funcall item-prefix-fn i)
-		       (:li
-			(if render-fn
-			    (funcall render-fn i)
-			    (render-widget i)))
-		       (safe-funcall item-suffix-fn i)))))
-	(if orderedp
-	    (with-html
-	      (:ol :class class :id id
-		   (render-items)))
-	    (with-html
-	      (:ul :class class :id id
-		   (render-items)))))
+               "Renders the items of the list."
+               (loop for i in seq
+                  do (with-html
+                       (safe-funcall item-prefix-fn i)
+                       (:li
+                        (if render-fn
+                            (funcall render-fn i)
+                            (render-widget i)))
+                       (safe-funcall item-suffix-fn i)))))
+        (if orderedp
+            (with-html
+              (:ol :class class :id id
+                   (render-items)))
+            (with-html
+              (:ul :class class :id id
+                   (render-items)))))
       (with-html
-	(:div :class "view"
-	      (with-extra-tags 
-		(htm
-		 (:div :class "empty"
-		       (render-message empty-message empty-caption))))))))
+        (:div :class "view"
+              (with-extra-tags 
+                (htm
+                 (:div :class "empty"
+                       (render-message empty-message empty-caption))))))))
 
 (defmacro scriptonly (&body body)
   "Outputs HTML defined in the body in such a way that it takes effect
@@ -423,12 +423,12 @@ on the client only if client-side scripting is enabled."
   (let ((output (gensym)))
     `(let (,output)
        (let ((*weblocks-output-stream* (make-string-output-stream)))
-	 (with-html
-	   ,@body)
-	 (setf ,output (get-output-stream-string *weblocks-output-stream*)))
+         (with-html
+           ,@body)
+         (setf ,output (get-output-stream-string *weblocks-output-stream*)))
        (if (ajax-request-p)
-	   (write-string ,output *weblocks-output-stream*)
-	   (with-javascript
+           (write-string ,output *weblocks-output-stream*)
+           (with-javascript
              (ps:ps* `(funcall (slot-value document 'write) ,,output)))))))
 
 (defmacro noscript (&body body)
@@ -439,7 +439,7 @@ in addition."
   `(when (not (ajax-request-p))
      (with-html
        (:noscript
-	 ,@body))))
+         ,@body))))
 
 (defun send-script (script &optional (place :after-load))
   "Send JavaScript to the browser. The way of sending depends

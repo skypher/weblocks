@@ -13,20 +13,20 @@ item-id - the integer id of the object to be deleted."
   ;; delete mixin objects
   (if (dataedit-cascade-delete-mixins-p widget)
       (labels ((delete-mixin-objects (view obj)
-		 (map-mixin-fields
-		  (lambda (field-info)
-		    (let* ((field (field-info-field field-info))
-			   (mixin-obj (obtain-view-field-value field obj)))
-		      (delete-mixin-objects (mixin-view-field-view field) mixin-obj)))
-		  view obj)
-		 (delete-persistent-object (dataseq-class-store widget) obj)))
-	(delete-mixin-objects (dataseq-view widget)
-			      (find-persistent-object-by-id (dataseq-class-store widget)
-							    (dataseq-data-class widget)
-							    item-id)))
+                 (map-mixin-fields
+                  (lambda (field-info)
+                    (let* ((field (field-info-field field-info))
+                           (mixin-obj (obtain-view-field-value field obj)))
+                      (delete-mixin-objects (mixin-view-field-view field) mixin-obj)))
+                  view obj)
+                 (delete-persistent-object (dataseq-class-store widget) obj)))
+        (delete-mixin-objects (dataseq-view widget)
+                              (find-persistent-object-by-id (dataseq-class-store widget)
+                                                            (dataseq-data-class widget)
+                                                            item-id)))
       (delete-persistent-object-by-id (dataseq-class-store widget)
-				      (dataseq-data-class widget)
-				      item-id)))
+                                      (dataseq-data-class widget)
+                                      item-id)))
 
 ;;; This function processes actions that perform operations on dataseq
 ;;; items. It's in a separate file because there is an issue with

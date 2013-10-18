@@ -47,7 +47,7 @@
       (ps:ps* `(new (|:YAHOO.widget.:TabView| ,(widget-dom-id widget)))))
     (send-script
       (ps* `(with-lazy-loaded-modules (,(yui-modules widget) 
-				       ,@(yui-loader-args widget))
+                                       ,@(yui-loader-args widget))
          (setf ,(yui-widget-variable widget)
                (new (|:YAHOO.widget.:TabView| ,(yui-target-id widget)
                                               (keywords-to-object ,(yui-component-config widget))))))))

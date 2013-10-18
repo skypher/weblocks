@@ -4,15 +4,15 @@
 ;; Define our application
 (defwebapp weblocks-demo
     :description "A web application based on Weblocks"
-    :init-user-session	'init-user-session
+    :init-user-session  'init-user-session
     :dependencies
     '((:stylesheet "suggest")))
 
 ;; ;; Application dependencies
 ;; (setf *application-public-dependencies*
 ;;       (append (public-files-relative-paths
-;; 	       '(:stylesheet . "suggest"))
-;; 	      *application-public-dependencies*))
+;;             '(:stylesheet . "suggest"))
+;;            *application-public-dependencies*))
 
 ;; Define callback function to initialize new sessions. The function
 ;; sets up a continuation flow, and renders the initial page.

@@ -15,13 +15,13 @@
 (deftestsuite application-suite ()
   ()
   (:dynamic-variables (weblocks::*current-webapp*
-		       (make-instance 'weblocks::weblocks-webapp :prefix ""
+                       (make-instance 'weblocks::weblocks-webapp :prefix ""
                                       :version-dependency-types '(:stylesheet :script)
-				      :html-indent-p nil)))
+                                      :html-indent-p nil)))
   (:setup 
    (setf (weblocks::weblocks-webapp-init-user-session weblocks::*current-webapp*)
-	 (lambda (&rest args)
-	   (declare (ignore args))))
+         (lambda (&rest args)
+           (declare (ignore args))))
    (weblocks::open-stores))
   (:teardown (weblocks-stores::close-stores)))
 
@@ -29,7 +29,7 @@
 (deftestsuite session-suite ()
   ()
   (:dynamic-variables (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
-		      *session*))
+                      *session*))
 
 ;;; A suite that sets up a web request environment
 (deftestsuite request-suite ()
@@ -38,19 +38,19 @@
   (:dynamic-variables (*acceptor* (make-instance 'unittest-server))
                       (*weblocks-server*)
                       (*request*)
-		      (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-		      (weblocks::*dirty-widgets* nil)
-		      (*weblocks-output-stream* (make-string-output-stream))
-		      *uri-tokens* *on-ajax-complete-scripts*
-		      *before-ajax-complete-scripts*
-		      weblocks::*page-dependencies*)
+                      (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+                      (weblocks::*dirty-widgets* nil)
+                      (*weblocks-output-stream* (make-string-output-stream))
+                      *uri-tokens* *on-ajax-complete-scripts*
+                      *before-ajax-complete-scripts*
+                      weblocks::*page-dependencies*)
   (:setup 
    (setf *weblocks-server* *acceptor*)
    (setf *request* (make-instance 'unittest-request :acceptor *acceptor*))
    (setf (slot-value *request* 'method) :get)
           (setf generate-widget-id-orig #'gen-id)
           (setf (symbol-function 'gen-id)
-			      (lambda (&optional prefix)
+                              (lambda (&optional prefix)
                                 (declare (ignore prefix))
                                 "id-123")))
   (:teardown (setf (symbol-function 'gen-id) generate-widget-id-orig)))

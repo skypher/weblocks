@@ -5,8 +5,8 @@
 (deftest-html with-form-html-1
     (with-request :get nil
       (with-html-form (:get "abc123")
-	(:div "test1")
-	(:div "test2")))
+        (:div "test1")
+        (:div "test2")))
   (:form
    :action ""
    :method "get"
@@ -25,7 +25,7 @@
 (deftest-html with-form-html-2
     (with-request :get nil
       (with-html-form (:get "abc123" :id "some-id" :class "some-class")
-	(:div "test")))
+        (:div "test")))
   (:form
    :id "some-id"
    :class "some-class"

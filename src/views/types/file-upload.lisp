@@ -10,11 +10,11 @@
   (:documentation "Present a field for uploading a file."))
 
 (defmethod render-view-field-value (value (presentation file-upload-presentation)
-				    (field form-view-field) (view form-view) widget obj
-				    &key &allow-other-keys)
+                                    (field form-view-field) (view form-view) widget obj
+                                    &key &allow-other-keys)
   (with-html
     (:input :type "file" :name (attributize-name (view-field-slot-name field))
-	    :disabled (and (form-view-field-disabled-p field obj) "disabled"))))
+            :disabled (and (form-view-field-disabled-p field obj) "disabled"))))
 
 ;;; file upload parser
 (defclass file-upload-parser (parser)

@@ -13,13 +13,13 @@
     (error "FIND-UI-ACTION can only be called during an active unit test."))
   ;; Return elements that match the query
   (flet ((prop-match (action prop val &optional (test #'equalp))
-	   (funcall test val (cdr (assoc prop action)))))
+           (funcall test val (cdr (assoc prop action)))))
     (loop
        for action in weblocks::*rendered-actions*
        when (and (prop-match action :type type)
-		 (or (null name) (prop-match action :name name test))
-		 (or (null id) (prop-match action :id id test))
-		 (or (null class) (prop-match action :class class test)))
+                 (or (null name) (prop-match action :name name test))
+                 (or (null id) (prop-match action :id id test))
+                 (or (null class) (prop-match action :class class test)))
        collect (cdr (assoc :action action)))))
 
 (defun find-ui-link (&key name id class (test #'equalp))

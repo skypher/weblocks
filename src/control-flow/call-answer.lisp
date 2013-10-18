@@ -47,8 +47,8 @@ and the result is returned. Otherwise the continuation isn't passed."
   (let/cc k
     (setf (widget-continuation callee) k)
     (safe-funcall op (if (functionp callee)
-			 (curry callee k)
-			 callee))
+                         (curry callee k)
+                         callee))
     t))
 
 (defun answer (continuation &optional result)
@@ -59,16 +59,16 @@ continuation, recursively tries its parents."
   (if (widget-continuation continuation)
       (safe-funcall (widget-continuation continuation) result)
       (when (widget-parent continuation)
-	(answer (widget-parent continuation) result))))
+        (answer (widget-parent continuation) result))))
 
 (defun adopt-widget (parent widget)
   "Like (setf (widget-parent WIDGET) PARENT), but signal an error when
 WIDGET already has a parent (even if it's PARENT)."
   (let ((old-parent (widget-parent widget)))
     (if old-parent
-	(error "Widget ~A already has parent ~A; cannot write parent" 
-	       widget old-parent)
-	(setf (widget-parent widget) parent)))
+        (error "Widget ~A already has parent ~A; cannot write parent" 
+               widget old-parent)
+        (setf (widget-parent widget) parent)))
   (values))
 
 (defun/cc do-widget (widget callee &optional (wrapper-fn #'identity))
@@ -80,19 +80,19 @@ If WRAPPER-FN is present, passes it the new callee and sets the return
 value as the value of a place. By default WRAPPER-FN is simply the
 identity function."
   (if (or (null widget)
-	  (eq widget (root-widget)))
+          (eq widget (root-widget)))
       (do-root-widget callee wrapper-fn)
       (do-widget-aux widget callee wrapper-fn)))
 
 (defun/cc do-widget-aux (widget callee &optional (wrapper-fn #'identity))
   (let* ((parent (or (widget-parent widget)
-		     (error "Attempted to replace widget ~S which has no parent!"
-			    widget)))
-	 (place-writer (make-widget-place-writer parent widget)))
+                     (error "Attempted to replace widget ~S which has no parent!"
+                            widget)))
+         (place-writer (make-widget-place-writer parent widget)))
     (prog1
-	(call callee
-	      (lambda (new-callee)
-		(funcall place-writer (funcall wrapper-fn new-callee))))
+        (call callee
+              (lambda (new-callee)
+                (funcall place-writer (funcall wrapper-fn new-callee))))
       ;; the following is the rest of the computation 
       (funcall place-writer widget))))
 
@@ -130,7 +130,7 @@ widget and reactivates the computation."
   "Same as DO-PAGE, but wraps CALLEE in a div container
 for styling purposes."
   (do-widget nil callee
-	     (lambda (new-callee)
+             (lambda (new-callee)
                (lambda (&rest args)
                  (declare (ignore args))
                  (let ((weblocks-stream *weblocks-output-stream*))

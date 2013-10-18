@@ -6,12 +6,12 @@
 (declaim (special *max-raw-input-length*)) ;early
 
 (defun render-suggest (input-name resultset &key
-		       default-value
-		       (input-id (gensym))
-		       (choices-id (gensym))
-		       (format-fn #'format-suggest-list)
-		       (max-length *max-raw-input-length*)
-		       welcome-name disabledp)
+                       default-value
+                       (input-id (gensym))
+                       (choices-id (gensym))
+                       (format-fn #'format-suggest-list)
+                       (max-length *max-raw-input-length*)
+                       welcome-name disabledp)
   "Renders a block that provides functionality similar to google-suggest.
 
 'input-name' - the 'name' attribute of the input box.
@@ -41,28 +41,28 @@ the client. Accepts a list of results.
   (setf default-value (ensure-list default-value))
   (let ((a-input-name (attributize-name input-name)))
     (if (and (listp resultset)
-	     (not (ajax-request-p)))
-	(progn
-	  (render-dropdown a-input-name resultset :id input-id :selected-value default-value
-			   :welcome-name welcome-name :disabledp disabledp)
-	  (with-javascript (if default-value
-			       "replaceDropdownWithSuggest(~A, '~A', '~A', '~A', '~A');"
-			       "replaceDropdownWithSuggest(~A, '~A', '~A', '~A');")
-	    (if welcome-name "true" "false") input-id a-input-name choices-id (car default-value)))
-	(with-html
-	  (:input :type "text" :id input-id :name a-input-name :class "suggest" :value (car default-value)
-		  :maxlength max-length :disabled (and disabledp "disabled"))
-	  (:div :id choices-id :class "suggest" :style "display: none" "")
-	  (with-javascript "declareSuggest('~A', '~A', ~A, '~A');"
-	    input-id choices-id
-	    (if (listp resultset)
-		(encode-json-to-string resultset)
-		(format nil "'~A'"
-			(make-action
-			 (lambda (&rest keys)
-			   (declare (ignore keys))
-			   (funcall format-fn (funcall resultset (request-parameter a-input-name)))))))
-	    (session-name-string-pair))))))
+             (not (ajax-request-p)))
+        (progn
+          (render-dropdown a-input-name resultset :id input-id :selected-value default-value
+                           :welcome-name welcome-name :disabledp disabledp)
+          (with-javascript (if default-value
+                               "replaceDropdownWithSuggest(~A, '~A', '~A', '~A', '~A');"
+                               "replaceDropdownWithSuggest(~A, '~A', '~A', '~A');")
+            (if welcome-name "true" "false") input-id a-input-name choices-id (car default-value)))
+        (with-html
+          (:input :type "text" :id input-id :name a-input-name :class "suggest" :value (car default-value)
+                  :maxlength max-length :disabled (and disabledp "disabled"))
+          (:div :id choices-id :class "suggest" :style "display: none" "")
+          (with-javascript "declareSuggest('~A', '~A', ~A, '~A');"
+            input-id choices-id
+            (if (listp resultset)
+                (encode-json-to-string resultset)
+                (format nil "'~A'"
+                        (make-action
+                         (lambda (&rest keys)
+                           (declare (ignore keys))
+                           (funcall format-fn (funcall resultset (request-parameter a-input-name)))))))
+            (session-name-string-pair))))))
 
 (defun format-suggest-list (results)
   "Formats a list of results into HTML that can later be sent to a
@@ -72,7 +72,7 @@ suggest control on the client."
     (with-html
       (:ul
        (mapc (lambda (res)
-	       (htm (:li (str res))))
-	     results)))
+               (htm (:li (str res))))
+             results)))
     (get-output-stream-string *weblocks-output-stream*)))
 

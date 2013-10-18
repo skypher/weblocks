@@ -12,7 +12,7 @@
 (defwebapp weblocks-clsql-demo
     :description "A web application based on Weblocks using clsql"
     :prefix "/"
-    :init-user-session	'init-user-session
+    :init-user-session  'init-user-session
     :dependencies
     '((:stylesheet "suggest")))
 

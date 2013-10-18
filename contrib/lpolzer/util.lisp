@@ -46,18 +46,18 @@
 (defun render-custom-link (action draw-fn &key (ajaxp t) id class url (before-fire ""))
   (declare (special weblocks::*uri-tokens*))
   (let* ((action-code (weblocks::function-or-action->action action))
-	 (url (if url
+         (url (if url
                 (let ((weblocks::*uri-tokens* (list url)))
                   (declare (special weblocks::*uri-tokens*))
                   (weblocks::make-action-url action-code))
                 (weblocks::make-action-url action-code))))
     (with-html
       (:a :id id :class class
-	  :href url :onclick (when ajaxp
-			       (format nil "~A initiateAction(\"~A\", \"~A\"); return false;"
+          :href url :onclick (when ajaxp
+                               (format nil "~A initiateAction(\"~A\", \"~A\"); return false;"
                                        before-fire action-code
                                        (weblocks::session-name-string-pair)))
-	  (funcall draw-fn)))))
+          (funcall draw-fn)))))
 
 (defun render-button-link (action button &rest args)
   (apply #'render-custom-link action

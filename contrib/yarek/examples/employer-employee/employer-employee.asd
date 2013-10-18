@@ -12,26 +12,26 @@
     :description "weblocks-demo"
     :depends-on (:weblocks :metatilities :weblocks-yarek)
     :components ((:file "employer-employee")
-		 (:module conf
-		  :components ((:file "stores"))
-		  :depends-on ("employer-employee"))
-		 (:module src
-		  :components ((:file "layout"
-				      :depends-on (model widgets))
-			       (:file "sandbox"
-				      :depends-on (model))
-			       (:file "init-session"
-				      :depends-on ("layout" "sandbox"))
-			       (:module model
-					:components ((:file "company")
-						     (:file "address")
-						     (:file "person"
-							    :depends-on ("address"))
-						     (:file "employee"
-							    :depends-on ("person" "company"))))
+                 (:module conf
+                  :components ((:file "stores"))
+                  :depends-on ("employer-employee"))
+                 (:module src
+                  :components ((:file "layout"
+                                      :depends-on (model widgets))
+                               (:file "sandbox"
+                                      :depends-on (model))
+                               (:file "init-session"
+                                      :depends-on ("layout" "sandbox"))
+                               (:module model
+                                        :components ((:file "company")
+                                                     (:file "address")
+                                                     (:file "person"
+                                                            :depends-on ("address"))
+                                                     (:file "employee"
+                                                            :depends-on ("person" "company"))))
                                (:module widgets
-					:components ((:file "company-gridedit"
+                                        :components ((:file "company-gridedit"
                                                             :depends-on ("company-presenter"))
-						     (:file "company-presenter"))))
-		  :depends-on ("employer-employee" conf))))
+                                                     (:file "company-presenter"))))
+                  :depends-on ("employer-employee" conf))))
 

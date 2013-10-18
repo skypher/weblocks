@@ -15,7 +15,7 @@
 
 (defmethod validate-superclass ((self webapp-class) (super standard-class))
   (typep (class-name (class-of super))
-	 '(member standard-class webapp-class)))
+         '(member standard-class webapp-class)))
 
 (defmethod shared-initialize :after
     ((self webapp-class) slots &key autostart &allow-other-keys)

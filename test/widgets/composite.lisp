@@ -8,12 +8,12 @@
 ;;; test setting composite widget to single widget on init
 (addtest init-composite-single
   (ensure-same (composite-widgets (make-instance 'composite :widgets "foo"))
-	       (list "foo")))
+               (list "foo")))
 
 ;;; test proper setting of widget parent on adding to composite
 (addtest composite-add-widget-parent
   (let* ((w (make-instance 'composite))
-	 (c (make-instance 'composite :widgets w)))
+         (c (make-instance 'composite :widgets w)))
     (ensure-same (widget-parent w) c)))
 
 ;;; widget can be in multiple composites; it's up to the user to ensure
@@ -27,8 +27,8 @@
 #+(or) ; disabled for now -- see comment to (SETF WIDGET-CHILDREN)
 (addtest composite-add-widget-parent-switching
   (let* ((w1 (make-instance 'composite))
-	 (w2 (make-instance 'composite))
-	 (c (make-instance 'composite :widgets w1)))
+         (w2 (make-instance 'composite))
+         (c (make-instance 'composite :widgets w1)))
     (ensure (widget-parent w1))
     (ensure-null (widget-parent w2))
     (setf (composite-widgets c) w2)
@@ -38,8 +38,8 @@
 ;;; testing render for composite widget
 (addtest render-composite
   (let (a-rendered
-	b-rendered
-	(comp (make-instance 'composite)))
+        b-rendered
+        (comp (make-instance 'composite)))
     (push-end (lambda ()
                 (setf a-rendered t))
               (composite-widgets comp))

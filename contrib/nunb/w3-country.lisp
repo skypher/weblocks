@@ -2,9 +2,9 @@
 (in-package :app)
 
 ;; (export '(*w3-countrys* *use-suggest-for-w3-countrys* w3-country
-;; 	  w3-country-presentation w3-country-presentation-use-suggest-p
-;; 	  w3-country-presentation-input-id
-;; 	  w3-country-presentation-choices-id w3-country-parser))
+;;        w3-country-presentation w3-country-presentation-use-suggest-p
+;;        w3-country-presentation-input-id
+;;        w3-country-presentation-choices-id w3-country-parser))
 
 (defparameter *w3-countrys*
   '(("Italia" . "IT") ("United States of America" . "US") ("China" . "CN")
@@ -52,8 +52,8 @@
 
 (defparameter *w3-countrys-abreviation->name*
   (mapcar (lambda (state)
-	    (cons (cdr state) (car state)))
-	  *w3-countrys*)
+            (cons (cdr state) (car state)))
+          *w3-countrys*)
   "An alist of W3C country abbreviations mapped to country names.")
 
 (defparameter *use-suggest-for-w3-countrys* t
@@ -73,47 +73,47 @@ country."
 
 (defclass w3-country-presentation (input-presentation)
   ((use-suggest-p :initform *use-suggest-for-w3-countrys*
-		  :initarg :use-suggest-p
-		  :accessor w3-country-presentation-use-suggest-p
-		  :documentation "If set to true, suggest snippet will
-		  be used as a country input control. Otherwise,
-		  dropdown will be used.")
+                  :initarg :use-suggest-p
+                  :accessor w3-country-presentation-use-suggest-p
+                  :documentation "If set to true, suggest snippet will
+                  be used as a country input control. Otherwise,
+                  dropdown will be used.")
    (input-id :initform (gensym)
-	     :initarg :input-id
-	     :accessor w3-country-presentation-input-id
-	     :documentation "An input ID passed to suggest or
-	     dropdown.")
+             :initarg :input-id
+             :accessor w3-country-presentation-input-id
+             :documentation "An input ID passed to suggest or
+             dropdown.")
    (choices-id :initform (gensym)
-	       :initarg :choices-id
-	       :accessor w3-country-presentation-choices-id
-	       :documentation "A choices ID passed to suggest.")))
+               :initarg :choices-id
+               :accessor w3-country-presentation-choices-id
+               :documentation "A choices ID passed to suggest.")))
 
 (defmethod render-view-field-value (value (presentation w3-country-presentation) 
-				    (field form-view-field) (view form-view) widget obj
-				    &rest args &key intermediate-values &allow-other-keys)
+                                    (field form-view-field) (view form-view) widget obj
+                                    &rest args &key intermediate-values &allow-other-keys)
   (declare (ignore args))
   (multiple-value-bind (intermediate-value intermediate-value-p)
       (form-field-intermediate-value field intermediate-values)
     (let ((selections (mapcar #'car *w3-countrys*))
-	  (default-value (if intermediate-value-p
-			     intermediate-value
-			     (append (ensure-list value)
-				     (ensure-list
-				      (cdr (assoc value *w3-countrys-abreviation->name*
-						  :test #'equalp))))))
-	  (welcome-name "Nazione"))
+          (default-value (if intermediate-value-p
+                             intermediate-value
+                             (append (ensure-list value)
+                                     (ensure-list
+                                      (cdr (assoc value *w3-countrys-abreviation->name*
+                                                  :test #'equalp))))))
+          (welcome-name "Nazione"))
       (if (w3-country-presentation-use-suggest-p presentation)
-	  (render-suggest (view-field-slot-name field)
-			  selections
-			  :default-value default-value
-			  :welcome-name welcome-name
-			  :max-length (input-presentation-max-length presentation)
-			  :input-id (w3-country-presentation-input-id presentation)
-			  :choices-id (w3-country-presentation-choices-id presentation))
-	  (render-dropdown (view-field-slot-name field) selections
-			   :selected-value default-value
-			   :welcome-name welcome-name
-			   :id (w3-country-presentation-input-id presentation))))))
+          (render-suggest (view-field-slot-name field)
+                          selections
+                          :default-value default-value
+                          :welcome-name welcome-name
+                          :max-length (input-presentation-max-length presentation)
+                          :input-id (w3-country-presentation-input-id presentation)
+                          :choices-id (w3-country-presentation-choices-id presentation))
+          (render-dropdown (view-field-slot-name field) selections
+                           :selected-value default-value
+                           :welcome-name welcome-name
+                           :id (w3-country-presentation-input-id presentation))))))
 
 (defclass w3-country-parser (parser)
   ((error-message :initform "valid nazione"))
@@ -121,24 +121,24 @@ country."
   a w3c country."))
 
 (defmethod parse-view-field-value ((parser w3-country-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
+                                   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (let ((value (string-trim +whitespace-characters+ value)))
     (if (empty-p value)
-	(values t nil)
-	(if (eq (length value) 2)
-	    (when (w3-country-p (string-upcase value))
-	      (values t t (string-upcase value)))
-	    (let ((state (assoc value *w3-countrys* :test #'equalp)))
-	      (when state
-		(values t t (cdr state))))))))
+        (values t nil)
+        (if (eq (length value) 2)
+            (when (w3-country-p (string-upcase value))
+              (values t t (string-upcase value)))
+            (let ((state (assoc value *w3-countrys* :test #'equalp)))
+              (when state
+                (values t t (cdr state))))))))
 
 ;;; Scaffolding magic
 (defmethod typespec->view-field-presentation ((scaffold form-scaffold)
-					      (typespec (eql 'w3-country)) args)
+                                              (typespec (eql 'w3-country)) args)
   (values t (make-instance 'w3-country-presentation)))
 
 (defmethod typespec->form-view-field-parser ((scaffold form-scaffold)
-					     (typespec (eql 'w3-country)) args)
+                                             (typespec (eql 'w3-country)) args)
   (values t (make-instance 'w3-country-parser)))
 

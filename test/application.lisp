@@ -14,15 +14,15 @@
   (with-test-webapp (:class-name 'hello-webapp)
     (ensure-same (webapp-name) "hello-webapp" :test string-equal)
     (ensure-same (mapcar #'dependency-url (webapp-application-dependencies))
-		 '(#U"/hello-webapp/pub/stylesheets/layout.css"
-		   #U"/hello-webapp/pub/stylesheets/main.css"
-		   #U"/hello-webapp/pub/stylesheets/dialog.css"
-		   #U"/hello-webapp/pub/scripts/prototype.js"
-		   #U"/hello-webapp/pub/scripts/scriptaculous.js"
-		   #U"/hello-webapp/pub/scripts/shortcut.js"
-		   #U"/hello-webapp/pub/scripts/weblocks.js"
-		   #U"/hello-webapp/pub/scripts/dialog.js")
-		 :test set-equal-uri=)
+                 '(#U"/hello-webapp/pub/stylesheets/layout.css"
+                   #U"/hello-webapp/pub/stylesheets/main.css"
+                   #U"/hello-webapp/pub/stylesheets/dialog.css"
+                   #U"/hello-webapp/pub/scripts/prototype.js"
+                   #U"/hello-webapp/pub/scripts/scriptaculous.js"
+                   #U"/hello-webapp/pub/scripts/shortcut.js"
+                   #U"/hello-webapp/pub/scripts/weblocks.js"
+                   #U"/hello-webapp/pub/scripts/dialog.js")
+                 :test set-equal-uri=)
     (ensure-null (webapp-description))))
 
 
@@ -80,7 +80,7 @@
     (ensure-same (webapp-prefix) "/foo")
     (ensure-same (webapp-public-files-uri-prefix) "/pub")
     (ensure-same (compute-webapp-public-files-uri-prefix
-		  (weblocks::current-webapp)) "/foo/pub")
+                  (weblocks::current-webapp)) "/foo/pub")
     (ensure-same (make-webapp-public-file-uri "foo.css") "/foo/pub/foo.css")))
 
 

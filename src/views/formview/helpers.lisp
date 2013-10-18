@@ -10,6 +10,6 @@ is useful when declaring writers in the UI that should record the
 object ID instead of the object itself."
   (lambda (value obj)
     (setf (slot-value obj slot-name)
-	  (when value
-	    (funcall slot-reader value)))))
+          (when value
+            (funcall slot-reader value)))))
 

@@ -28,32 +28,32 @@ path - a list of slot names"
     (return-from slot-value-by-path
       (slot-value-by-path obj (list path))))
   (let* ((clean-path (remove nil path))
-	 (value (ignore-errors (slot-value obj (car clean-path))))
-	 (path-rest (cdr clean-path)))
+         (value (ignore-errors (slot-value obj (car clean-path))))
+         (path-rest (cdr clean-path)))
     (if path-rest
-	(slot-value-by-path value path-rest)
-	value)))
+        (slot-value-by-path value path-rest)
+        value)))
 
 (defun find-slot-dsd (class slot-name)
   "Returns a direct-slot-definition object of a slot with 'slot-name'
 in 'class'."
   (let ((class (if (symbolp class)
-		   (find-class class)
-		   class)))
+                   (find-class class)
+                   class)))
     (or (loop
-	   for dsd in (class-direct-slots class)
-	   when (eq (slot-definition-name dsd) slot-name)
-	   do (return dsd))
-	(find-if (compose #'not #'null)
-		 (mapcar (curry-after #'find-slot-dsd slot-name)
-			 (class-direct-superclasses class))))))
+           for dsd in (class-direct-slots class)
+           when (eq (slot-definition-name dsd) slot-name)
+           do (return dsd))
+        (find-if (compose #'not #'null)
+                 (mapcar (curry-after #'find-slot-dsd slot-name)
+                         (class-direct-superclasses class))))))
 
 (defun find-slot-esd (class slot-name)
   "Returns an effective-slot-definition object of a slot with
 'slot-name' in 'class'."
   (let ((class (if (symbolp class)
-		   (find-class class)
-		   class)))
+                   (find-class class)
+                   class)))
     (loop
        for esd in (class-slots class)
        when (eq (slot-definition-name esd) slot-name)

@@ -2,12 +2,12 @@
 (in-package :weblocks)
 
 (export '(table table-view table-scaffold table-view-default-summary
-	  table-view-header-row-prefix-fn
-	  table-view-header-row-suffix-fn table-view-field
-	  with-table-view-header with-table-view-header-row
-	  render-table-view-header-row render-view-field-header
-	  render-view-field-header-value with-table-view-body-row
-	  render-table-view-body-row))
+          table-view-header-row-prefix-fn
+          table-view-header-row-suffix-fn table-view-field
+          with-table-view-header with-table-view-header-row
+          render-table-view-header-row render-view-field-header
+          render-view-field-header-value with-table-view-body-row
+          render-table-view-body-row))
 
 ;;; Table view
 (defclass table-view (sequence-view)
@@ -15,23 +15,23 @@
                     :initarg :summary
                     :accessor table-view-default-summary
                     :documentation "A summary string to be used for
-	            the table if no :summary keyword is provided.")
+                    the table if no :summary keyword is provided.")
    (header-row-prefix-fn :initform nil
-			 :initarg :header-row-prefix-fn
-			 :accessor table-view-header-row-prefix-fn
-			 :documentation "A function called prior to
-	                 rendering the table header row. The function
-	                 should expect the view object, the object
-	                 being rendered, and any additional arguments
-	                 passed to the view.")
+                         :initarg :header-row-prefix-fn
+                         :accessor table-view-header-row-prefix-fn
+                         :documentation "A function called prior to
+                         rendering the table header row. The function
+                         should expect the view object, the object
+                         being rendered, and any additional arguments
+                         passed to the view.")
    (header-row-suffix-fn :initform nil
-			 :initarg :header-row-suffix-fn
-			 :accessor table-view-header-row-suffix-fn
-			 :documentation "A function called after
-	                 rendering the header row. The function should
-	                 expect the view object, the object being
-	                 rendered, and any additional arguments passed
-	                 to the view.")
+                         :initarg :header-row-suffix-fn
+                         :accessor table-view-header-row-suffix-fn
+                         :documentation "A function called after
+                         rendering the header row. The function should
+                         expect the view object, the object being
+                         rendered, and any additional arguments passed
+                         to the view.")
    (field-sorter 
                            :initform nil 
                            :initarg :sort-fields-by
@@ -55,20 +55,20 @@
 
 ;; Table heading
 (defmethod with-view-header ((view table-view) obj widget body-fn &rest args &key
-			     (fields-prefix-fn (view-fields-default-prefix-fn view))
-			     (fields-suffix-fn (view-fields-default-suffix-fn view))
-			     &allow-other-keys)
+                             (fields-prefix-fn (view-fields-default-prefix-fn view))
+                             (fields-suffix-fn (view-fields-default-suffix-fn view))
+                             &allow-other-keys)
   (let* ((object-name (object-class-name (car obj)))
-	 (header-class (format nil "view table ~A"
-			       (if (eql object-name 'null)
-				   "empty"
-				   (attributize-name object-name)))))
+         (header-class (format nil "view table ~A"
+                               (if (eql object-name 'null)
+                                   "empty"
+                                   (attributize-name object-name)))))
     (with-html
       (:div :class header-class
-	    (with-extra-tags
-	      (safe-apply fields-prefix-fn view obj args)
-	      (apply body-fn view obj args)
-	      (safe-apply fields-suffix-fn view obj args))))))
+            (with-extra-tags
+              (safe-apply fields-prefix-fn view obj args)
+              (apply body-fn view obj args)
+              (safe-apply fields-suffix-fn view obj args))))))
 
 (defun table-view-header-wt (&key caption summary header-content content)
   (with-html-to-string
@@ -209,35 +209,35 @@
              view obj (table-view-field-sorter view) args)))
 
 (defmethod render-view-field ((field table-view-field) (view table-view)
-			      widget presentation value obj
-			      &rest args
+                              widget presentation value obj
+                              &rest args
                               &key field-info &allow-other-keys)
   (with-html
     (:td :class (if field-info
                   (attributize-view-field-name field-info)
                   (attributize-name (view-field-slot-name field)))
-	 (apply #'render-view-field-value value presentation field view widget obj args))))
+         (apply #'render-view-field-value value presentation field view widget obj args))))
 
 ;; The table itself
 (defmethod render-object-view-impl ((obj sequence) (view table-view) widget &rest args &key
-				    (fields-prefix-fn (view-fields-default-prefix-fn view))
-				    (fields-suffix-fn (view-fields-default-suffix-fn view))
-				    &allow-other-keys)
+                                    (fields-prefix-fn (view-fields-default-prefix-fn view))
+                                    (fields-suffix-fn (view-fields-default-suffix-fn view))
+                                    &allow-other-keys)
   (apply #'with-view-header view obj widget
-	 (lambda (view obj &rest args)
-	   (apply #'with-table-view-header view obj widget
-		  (lambda (view obj widget &rest args)
-		    (safe-apply fields-prefix-fn view obj args)
-		    (apply #'with-table-view-header-row view obj widget args))
-		  (lambda (view obj widget &rest args)
-		    (let ((row-num -1))
-		      (mapc (lambda (obj)
-			      (apply #'with-table-view-body-row view obj
-				     widget
-				     :alternp (oddp (incf row-num))
-				     args))
-			    obj))
-		    (safe-apply fields-suffix-fn view obj args))
-		  args))
-	 args))
+         (lambda (view obj &rest args)
+           (apply #'with-table-view-header view obj widget
+                  (lambda (view obj widget &rest args)
+                    (safe-apply fields-prefix-fn view obj args)
+                    (apply #'with-table-view-header-row view obj widget args))
+                  (lambda (view obj widget &rest args)
+                    (let ((row-num -1))
+                      (mapc (lambda (obj)
+                              (apply #'with-table-view-body-row view obj
+                                     widget
+                                     :alternp (oddp (incf row-num))
+                                     args))
+                            obj))
+                    (safe-apply fields-suffix-fn view obj args))
+                  args))
+         args))
 

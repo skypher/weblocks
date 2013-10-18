@@ -6,10 +6,10 @@
 
 (defmethod render-widget-body ((obj poncy) &rest args)
   (with-html (:div :style "margin: 0 auto; text-align:center;"
-		   (render-image (my-tab-image "tabs" (poncy-title obj) (poncy-width obj))))
-	     (:div :style 
-		 (dolist (b (composite-widgets obj)) 
-			   (render-widget-body b)))))
+                   (render-image (my-tab-image "tabs" (poncy-title obj) (poncy-width obj))))
+             (:div :style 
+                 (dolist (b (composite-widgets obj)) 
+                           (render-widget-body b)))))
 
 
 #+OLD(defun make-text-tab (width file text)
@@ -22,13 +22,13 @@
       (set-rgba-fill  0.3 0.3 0.3 0.3)
       (rounded-rectangle 0 0 x 2y 10 10 )
       (set-gradient-fill  2 2y
-			  0.4 0.4 0.4 0.8
-			  2 y
-			  0 0 0 0.2)
+                          0.4 0.4 0.4 0.8
+                          2 y
+                          0 0 0 0.2)
       (set-gradient-fill  2 y
-			  0.4 0.4 0.4 0.9
-			  2 0
-			  0 0 0 0.2)
+                          0.4 0.4 0.4 0.9
+                          2 0
+                          0 0 0 0.2)
 
       ;(clip-path)      
       ;(rectangle 0 0 x y)

@@ -77,7 +77,7 @@
                                                   (if intermediate-value-p
                                                       intermediate-value
                                                       value)))
-		       :disabledp (form-view-field-disabled-p field obj))))
+                       :disabledp (form-view-field-disabled-p field obj))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     field view widget obj &rest args

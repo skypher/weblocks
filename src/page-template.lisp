@@ -7,8 +7,8 @@
           application-page-title
           application-page-description
           application-page-keywords
-	  *current-page-title*
-	  *current-page-description*
+          *current-page-title*
+          *current-page-description*
           *current-page-keywords*
           *current-page-headers*
           *accumulate-page-keywords*))
@@ -31,11 +31,11 @@
   (declare (special *current-page-title*))
   (let ((webapp-description (webapp-description)))
     (apply #'format nil "~A~A~A"
-	   (webapp-name)
-	   (cond
-	     (*current-page-title* (list " - " *current-page-title*))
-	     (webapp-description (list " - " webapp-description))
-	     (t '("" ""))))))
+           (webapp-name)
+           (cond
+             (*current-page-title* (list " - " *current-page-title*))
+             (webapp-description (list " - " webapp-description))
+             (t '("" ""))))))
 
 (defmethod application-page-description ((app weblocks-webapp))
   (declare (special *current-page-description*))

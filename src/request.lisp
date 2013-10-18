@@ -2,8 +2,8 @@
 (in-package :weblocks)
 
 (export '(*json-content-type* refresh-request-p initial-request-p
-	  ajax-request-p pure-request-p redirect post-action-redirect
-	  post-render-redirect))
+          ajax-request-p pure-request-p redirect post-action-redirect
+          post-render-redirect))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
   "A content type sent to the client to identify json data.")

@@ -3,7 +3,7 @@
 (in-package #:weblocks-s11)
 
 (export '(us-cents us-cents-input us-cents-presentation
-	  us-cents-input-presentation us-cents-parser))
+          us-cents-input-presentation us-cents-parser))
 
 (arnesi:enable-sharp-l-syntax)
 
@@ -38,13 +38,13 @@
     ((parser us-cents-parser) value obj view field &rest args)
   (declare (ignore obj view field args))
   (let* ((present? (text-input-present-p value))
-	 (float-start
-	  (and present?
-	       (position-if #L(or (char<= #\0 !1 #\9) (char= #\. !1)) value)))
-	 (float
-	  (and float-start
-	       (ignore-errors (arnesi:parse-float value :start float-start)))))
+         (float-start
+          (and present?
+               (position-if #L(or (char<= #\0 !1 #\9) (char= #\. !1)) value)))
+         (float
+          (and float-start
+               (ignore-errors (arnesi:parse-float value :start float-start)))))
     (values (or (not present?) float) present?
-	    (and float (round (* 100 float))))))
+            (and float (round (* 100 float))))))
 
 ;;; presentations.lisp ends here

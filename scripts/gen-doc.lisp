@@ -9,7 +9,7 @@ reside."
   (merge-pathnames
    (make-pathname :directory '(:relative "docs" "gen"))
    (make-pathname :directory
-		  (pathname-directory (truename (asdf:system-definition-pathname
+                  (pathname-directory (truename (asdf:system-definition-pathname
                                                  (asdf:find-system :weblocks)))))))
 
 (defun document-package (package &key (system package) (ignore-errors-p t))
@@ -25,9 +25,9 @@ reside."
 (defun document-package/tinaa (package)
   ;; dynamically invoke 'document-system' (since reader has no access to tinaa)
   (funcall (symbol-function (find-symbol (symbol-name '#:document-system) (find-package 'tinaa)))
-	   'package package
+           'package package
            (compute-documentation-path)
-	   :show-parts-without-documentation? t))
+           :show-parts-without-documentation? t))
 
 (defun document-weblocks ()
   ; lazily load necessary systems

@@ -292,9 +292,9 @@
   "Creates a new Weblocks application when (wop:make-app 'name \"/path/to/target/\")
    is called."
   (let ((app-name (cadr (member :name (asdf::operation-original-initargs o))))
-	(app-target (cadr (member :target (asdf::operation-original-initargs o)))))
+        (app-target (cadr (member :target (asdf::operation-original-initargs o)))))
     (funcall (intern (symbol-name :make-application) (find-package :weblocks-scripts))
-	     app-name app-target)))
+             app-name app-target)))
 
 (defmethod operation-done-p ((o make-app-op) (c (eql (find-system :weblocks))))
   nil)

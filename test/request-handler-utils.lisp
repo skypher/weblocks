@@ -2,8 +2,8 @@
 (in-package :weblocks-test)
 
 (defun with-request-template (body &key
-			      (title "Hello")
-			      render-debug-toolbar-p widget-stylesheets)
+                              (title "Hello")
+                              render-debug-toolbar-p widget-stylesheets)
   (format nil "~
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ~
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">~%~
@@ -39,23 +39,23 @@
 <div id='ajax-progress'>&nbsp;</div>~
 </body>~
 </html>"
-	  title
-	  (apply #'concatenate
-		   'string
-		   (loop for i in widget-stylesheets
-		      collect (format
-			       nil
-			       "<link rel='stylesheet' type='text/css' href='/pub/stylesheets/~A.css' />" i)))
-	  (if render-debug-toolbar-p (format nil "~
-	       <link rel='stylesheet' type='text/css' href='/pub/stylesheets/debug-toolbar.css' />")
-	      "")
-	  (if render-debug-toolbar-p (format nil "~
-	       <script src='/pub/scripts/weblocks-debug.js' type='text/javascript'></script>")
-	      "")
-	  (format nil body)
-	  (if render-debug-toolbar-p (format nil "~
-	       <div class='debug-toolbar'>~
+          title
+          (apply #'concatenate
+                   'string
+                   (loop for i in widget-stylesheets
+                      collect (format
+                               nil
+                               "<link rel='stylesheet' type='text/css' href='/pub/stylesheets/~A.css' />" i)))
+          (if render-debug-toolbar-p (format nil "~
+               <link rel='stylesheet' type='text/css' href='/pub/stylesheets/debug-toolbar.css' />")
+              "")
+          (if render-debug-toolbar-p (format nil "~
+               <script src='/pub/scripts/weblocks-debug.js' type='text/javascript'></script>")
+              "")
+          (format nil body)
+          (if render-debug-toolbar-p (format nil "~
+               <div class='debug-toolbar'>~
                <a href='/foo/bar?action=debug-reset-sessions' title='Reset Sessions'>~
                <img src='/pub/images/reset.png' alt='Reset Sessions' /></a>~
                </div>")
-	      "")))
+              "")))

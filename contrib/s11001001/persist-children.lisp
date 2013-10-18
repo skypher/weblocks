@@ -3,8 +3,8 @@
 (in-package #:weblocks-s11)
 
 (export '(persistent-children-mixin persistent-children add-child-to-persist
-	  persist-children persist-child
-	  default-persist-child-order define-default-persist-child-order))
+          persist-children persist-child
+          default-persist-child-order define-default-persist-child-order))
 
 (defgeneric persistent-children (self)
   (:documentation "Answer a list of objects to persist when persisting
@@ -42,13 +42,13 @@ persister exits non-locally, only it and the remaining children are
 left in the queue for a re-call of `persist-children'."
   (let ((removable '()) (children (slot-value self 'children)))
     (unwind-protect (progn
-		      (maphash (lambda (child child-order)
-				 (when (member child-order `(,order t))
-				   (persist-child store child self order)
-				   (push child removable)))
-			       children))
+                      (maphash (lambda (child child-order)
+                                 (when (member child-order `(,order t))
+                                   (persist-child store child self order)
+                                   (push child removable)))
+                               children))
       (dolist (rm removable)
-	(remhash rm children)))))
+        (remhash rm children)))))
 
 (defgeneric persist-child (store child parent order)
   (:documentation "Persist CHILD as a consequence of PARENT.  The
@@ -69,7 +69,7 @@ yourself."))
 (defmacro define-default-persist-child-order (child-specializer parent-specializer expr)
   (arnesi:with-unique-names (child parent)
     `(defmethod default-persist-child-order ((,child ,child-specializer)
-					     (,parent ,parent-specializer))
+                                             (,parent ,parent-specializer))
        ,expr)))
 
 (defmethod weblocks:persist-object :before

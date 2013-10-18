@@ -21,13 +21,13 @@
 
 (defclass mod-record ()
   ((original-path :accessor original-path :initarg :original-path
-		  :documentation "Path of the original unversioned file.")
+                  :documentation "Path of the original unversioned file.")
    (mod-record-path :accessor mod-record-path :initarg :mod-record-path
-		    :documentation "Path of the modification record of the file.")
+                    :documentation "Path of the modification record of the file.")
    (last-mod-time :accessor last-mod-time :initarg :last-mod-time
-		  :documentation "Last recorded modified time of the file.")
+                  :documentation "Last recorded modified time of the file.")
    (last-version :accessor last-version :initarg :last-version
-		 :documentation "Last version of the file. (Currently implemented as an integer)"))
+                 :documentation "Last version of the file. (Currently implemented as an integer)"))
   (:documentation "Holds the modification record of a file."))
 
 (defmethod print-object ((obj mod-record) stream)
@@ -37,13 +37,13 @@
               original-path mod-record-path last-mod-time last-version))))
 
 (defun make-record-path (original-path &key 
-			 (record-folder "mod-record/") (extension ".mod"))
+                         (record-folder "mod-record/") (extension ".mod"))
   (declare (special *current-webapp*))
   (let ((app-pub-folder (compute-webapp-public-files-path *current-webapp*)))
     (merge-pathnames (concatenate 'string (relative-path original-path 
-							 app-pub-folder)
-				  extension)
-		     (merge-pathnames record-folder app-pub-folder))))
+                                                         app-pub-folder)
+                                  extension)
+                     (merge-pathnames record-folder app-pub-folder))))
 
 (defun write-to-mod-record (mod-time version record-path)
   (write-to-file `',(cons mod-time version) record-path))
@@ -62,19 +62,19 @@
 (defun get-mod-record (original-path &key (versioning-p nil))
   (let ((record-path (make-record-path original-path)))
     (if (cl-fad:file-exists-p record-path)
-	(let* ((cell (read-from-file record-path))
-	       (time (car cell))
-	       (version (cdr cell)))
-	  (make-instance 'mod-record :last-mod-time time
-			 :mod-record-path record-path
-			 :last-version version :original-path original-path))
-	(let ((time (file-write-date original-path)))
-	  (write-to-mod-record time 0 record-path)
-	  (when versioning-p
-	    (create-versioned-file original-path 0))
-	  (make-instance 'mod-record :last-mod-time time
-			 :mod-record-path record-path
-			 :last-version 0 :original-path original-path)))))
+        (let* ((cell (read-from-file record-path))
+               (time (car cell))
+               (version (cdr cell)))
+          (make-instance 'mod-record :last-mod-time time
+                         :mod-record-path record-path
+                         :last-version version :original-path original-path))
+        (let ((time (file-write-date original-path)))
+          (write-to-mod-record time 0 record-path)
+          (when versioning-p
+            (create-versioned-file original-path 0))
+          (make-instance 'mod-record :last-mod-time time
+                         :mod-record-path record-path
+                         :last-version 0 :original-path original-path)))))
 
 (defun file-modified-p (mod-record)
   (with-slots (last-mod-time original-path) mod-record
@@ -87,7 +87,7 @@
       (incf last-version)
       (create-versioned-file original-path last-version))
     (write-to-mod-record last-mod-time last-version mod-record-path)))
-			 
+                         
 (defvar *version-dependencies-lock* (bordeaux-threads:make-lock))
 
 (defun update-versioned-dependency-path (original-path &optional other-path)
@@ -112,27 +112,27 @@ been modified before, its name is kept the same."
   (write-string "@import url(" stream)
   (princ url stream)
   (write-string ");" stream))
-	   
+           
 (defun extract-import-urls (string)
   (let (urls (start 0))
     (loop
        (multiple-value-bind (head tail) (cl-ppcre:scan "(?i)import url\(.*?\);" string :start start)
-	 (if head
-	     (progn
-	       (push (subseq string (+ head 11) (- tail 2)) urls)
-	       (setf start tail))
-	     (return-from extract-import-urls urls))))))
+         (if head
+             (progn
+               (push (subseq string (+ head 11) (- tail 2)) urls)
+               (setf start tail))
+             (return-from extract-import-urls urls))))))
 
 (defun local-path-from-url (url &key (type :stylesheet))
   (let* ((name (pathname-name url))
-	 (relative (public-file-relative-path type name))
-	 (webapp (current-webapp))
-	 (local (merge-pathnames relative
-				 (compute-webapp-public-files-path webapp))))
+         (relative (public-file-relative-path type name))
+         (webapp (current-webapp))
+         (local (merge-pathnames relative
+                                 (compute-webapp-public-files-path webapp))))
     (when (cl-fad:file-exists-p local)
       (values local
-	      (princ-to-string (puri:merge-uris relative
-						(maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
+              (princ-to-string (puri:merge-uris relative
+                                                (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
 
 (defun update-import-css-content (import-path &key (version-types (version-dependency-types* (current-webapp)))
                                               (gzip-types (gzip-dependency-types* (current-webapp))))

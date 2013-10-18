@@ -22,14 +22,14 @@
 ;;; Test obtain-presentation-choices
 (deftest obtain-presentation-choices-1
     (obtain-presentation-choices (make-instance 'choices-presentation-mixin
-						:choices (list (cons 1 2)
-							       (cons 3 4)))
-				 *joe*)
+                                                :choices (list (cons 1 2)
+                                                               (cons 3 4)))
+                                 *joe*)
   (("1" . "2") ("3" . "4")))
 
 (deftest obtain-presentation-choices-2
     (obtain-presentation-choices (make-instance 'choices-presentation-mixin
-						:choices (list *joe* *bob*))
-				 *joe*)
+                                                :choices (list *joe* *bob*))
+                                 *joe*)
   (("Employee" . "1") ("Employee" . "2")))
 

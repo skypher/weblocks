@@ -2,16 +2,16 @@
 (in-package :weblocks)
 
 (export '(view view-inherit-from view-fields
-	  view-fields-default-prefix-fn view-fields-default-suffix-fn
-	  view-field view-field-slot-name view-field-reader
-	  view-field-hide-p view-field-prefix-fn view-field-suffix-fn
-	  view-caption inline-view-field view-field-label
-	  view-field-presentation mixin mixin-view-field
-	  mixin-view-field-view mixin-view-field-init-form
-	  with-view-header render-view-field render-view-field-value
-	  print-view-field-value entity-class-name view-class-name
-	  view-default-field-type view-field-class-name
-	  presentation-class-name *form-submit-dependencies*))
+          view-fields-default-prefix-fn view-fields-default-suffix-fn
+          view-field view-field-slot-name view-field-reader
+          view-field-hide-p view-field-prefix-fn view-field-suffix-fn
+          view-caption inline-view-field view-field-label
+          view-field-presentation mixin mixin-view-field
+          mixin-view-field-view mixin-view-field-init-form
+          with-view-header render-view-field render-view-field-value
+          print-view-field-value entity-class-name view-class-name
+          view-default-field-type view-field-class-name
+          presentation-class-name *form-submit-dependencies*))
 
 ;;; Compiled views
 (defvar *views* (make-hash-table)
@@ -25,18 +25,18 @@
 ;;; View description
 (defclass view ()
   ((inherit-from :initform nil
-		 :initarg :inherit-from
-		 :accessor view-inherit-from
-		 :documentation "A view to inherit from. Possible
-		 values include scaffold views (in which case a
-		 default scaffolding view will be used), a custom view
-		 name, or NIL. Specific views should inherit from an
-		 appropriate scaffold view by default.")
+                 :initarg :inherit-from
+                 :accessor view-inherit-from
+                 :documentation "A view to inherit from. Possible
+                 values include scaffold views (in which case a
+                 default scaffolding view will be used), a custom view
+                 name, or NIL. Specific views should inherit from an
+                 appropriate scaffold view by default.")
    (fields :initform nil
-	   :initarg :fields
-	   :accessor view-fields
-	   :documentation "A list of objects of class 'view-field',
-	   used to describe the fields that the view will render.")
+           :initarg :fields
+           :accessor view-fields
+           :documentation "A list of objects of class 'view-field',
+           used to describe the fields that the view will render.")
    (default-fields-prefix-fn
      :initform nil
      :initarg :default-fields-prefix-fn
@@ -53,11 +53,11 @@
      function should expect the view object, the object being
      rendered, and any additional arguments passed to the view.")
    (caption :initform nil
-	    :initarg :caption
-	    :accessor view-caption
-	    :documentation "A caption string to be used for the
-	    view. If this field is set to NIL (the default), each view
-	    may use a specialized caption."))
+            :initarg :caption
+            :accessor view-caption
+            :documentation "A caption string to be used for the
+            view. If this field is set to NIL (the default), each view
+            may use a specialized caption."))
   (:documentation "A meta description of the user interface."))
 
 (defmethod widget-translation-table append ((obj view) &rest args)
@@ -78,42 +78,42 @@
 ;;; View field description
 (defclass view-field ()
   ((slot-name :initform nil
-	      :initarg :slot-name
-	      :accessor view-field-slot-name
-	      :documentation "The name of the slot that this field
-	      represents. This value can be null, in which case the
-	      field does not correspond to any slot.")
+              :initarg :slot-name
+              :accessor view-field-slot-name
+              :documentation "The name of the slot that this field
+              represents. This value can be null, in which case the
+              field does not correspond to any slot.")
    (reader :initarg :reader
-	   :accessor view-field-reader
-	   :documentation "If this slot is bound to a function object,
-	   the function will be called with the object being rendered
-	   as argument, and its return value will be used as the value
-	   of the field. If this slot is not bound to a function
-	   object but another value, the value will be used to render
-	   the value of the field as a convinience. If the slot is not
-	   bound, 'slot-value' will be used.")
+           :accessor view-field-reader
+           :documentation "If this slot is bound to a function object,
+           the function will be called with the object being rendered
+           as argument, and its return value will be used as the value
+           of the field. If this slot is not bound to a function
+           object but another value, the value will be used to render
+           the value of the field as a convinience. If the slot is not
+           bound, 'slot-value' will be used.")
    (hidep :initform nil
-	  :initarg :hidep
-	  :accessor view-field-hide-p
-	  :documentation "A predicate that determines whether the
-	  field is to be hidden from the user. If set to true, the
-	  field will not be rendered. This can be either a constant
-	  't' or 'nil', or a function of one argument, the object
-	  to which the view applies.")
+          :initarg :hidep
+          :accessor view-field-hide-p
+          :documentation "A predicate that determines whether the
+          field is to be hidden from the user. If set to true, the
+          field will not be rendered. This can be either a constant
+          't' or 'nil', or a function of one argument, the object
+          to which the view applies.")
    (prefix-fn :initform nil
-	      :initarg :prefix-fn
-	      :accessor view-field-prefix-fn
-	      :documentation "A function called prior to rendering the
-	      field. The function should expect the view object, the
-	      field object, the object being rendered, and any
-	      additional arguments passed to the view.")
+              :initarg :prefix-fn
+              :accessor view-field-prefix-fn
+              :documentation "A function called prior to rendering the
+              field. The function should expect the view object, the
+              field object, the object being rendered, and any
+              additional arguments passed to the view.")
    (suffix-fn :initform nil
-	      :initarg :suffix-fn
-	      :accessor view-field-suffix-fn
-	      :documentation "A function called after rendering the
-	      field. The function should expect the view object, the
-	      field object, the object being rendered, and any
-	      additional arguments passed to the view."))
+              :initarg :suffix-fn
+              :accessor view-field-suffix-fn
+              :documentation "A function called after rendering the
+              field. The function should expect the view object, the
+              field object, the object being rendered, and any
+              additional arguments passed to the view."))
   (:documentation "Contains a meta description of a given field in the
   view."))
 
@@ -123,20 +123,20 @@
 ;;; Inline view
 (defclass inline-view-field (view-field)
   ((label :initform nil
-	  :initarg :label
-	  :accessor view-field-label
-	  :documentation "A human readable label that will be used to
-	  render the field. By default this value is set to a
-	  humanized form of 'slot-name'.")
+          :initarg :label
+          :accessor view-field-label
+          :documentation "A human readable label that will be used to
+          render the field. By default this value is set to a
+          humanized form of 'slot-name'.")
    (presentation :initform nil
-		 :initarg :present-as
-		 :accessor view-field-presentation
-		 :documentation "A presentation object to be used to
-	         render this field. If not specified, the default
-	         presentation for the type of the view will be
-	         used. In addition, scaffold views will attempt to
-	         determine the default presentation from the value of
-	         the slot type, if one exists."))
+                 :initarg :present-as
+                 :accessor view-field-presentation
+                 :documentation "A presentation object to be used to
+                 render this field. If not specified, the default
+                 presentation for the type of the view will be
+                 used. In addition, scaffold views will attempt to
+                 determine the default presentation from the value of
+                 the slot type, if one exists."))
   (:documentation "Inline fields are fields that are rendered as part
   of the view."))
 
@@ -162,15 +162,15 @@
 ;;; Mixin view
 (defclass mixin-view-field (view-field)
   ((view :initform nil
-	 :initarg :view
-	 :accessor mixin-view-field-view
-	 :documentation "A mixin view to be used to render the
-	 field.")
+         :initarg :view
+         :accessor mixin-view-field-view
+         :documentation "A mixin view to be used to render the
+         field.")
    (initform :initform nil
-	     :initarg :initform
-	     :accessor mixin-view-field-init-form
-	     :documentation "If the object being mixed in is null, the
-	     object produced by this form will be used instead."))
+             :initarg :initform
+             :accessor mixin-view-field-init-form
+             :documentation "If the object being mixed in is null, the
+             object produced by this form will be used instead."))
   (:documentation "Mixin fields render a field with another view."))
 
 ;;; View rendering protocol
@@ -203,16 +203,16 @@ and a suffix."
   (declare (optimize safety))
   (check-type entity-type (not keyword))
   (let ((entity-symbol (concatenate 'string (symbol-name entity-type)
-				    (symbol-name suffix))))
+                                    (symbol-name suffix))))
     (or (find-own-symbol entity-symbol
-			 (symbol-package entity-type))
-	(and (boundp '*current-webapp*)
-	     (find-own-symbol entity-symbol
-			      (symbol-package
-			       (class-name (class-of (current-webapp))))))
-	(find-own-symbol entity-symbol '#:weblocks)
-	(find-if-not #'keywordp (find-all-symbols entity-symbol))
-	(error "Class ~A cannot be found." entity-symbol))))
+                         (symbol-package entity-type))
+        (and (boundp '*current-webapp*)
+             (find-own-symbol entity-symbol
+                              (symbol-package
+                               (class-name (class-of (current-webapp))))))
+        (find-own-symbol entity-symbol '#:weblocks)
+        (find-if-not #'keywordp (find-all-symbols entity-symbol))
+        (error "Class ~A cannot be found." entity-symbol))))
 
 (defgeneric view-class-name (view-type)
   (:documentation "Given a view 'type', converts it to the class name

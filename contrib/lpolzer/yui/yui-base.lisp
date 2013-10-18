@@ -1,8 +1,8 @@
 (in-package :weblocks)
 
 (export '(yui-widget yui-widget-variable yui-target-id yui-component-config
-	  yui-settings-mixin add-options
-	  *yui-loader-base* 
+          yui-settings-mixin add-options
+          *yui-loader-base* 
           add-component-config js-bool))
 
 (defparameter *yui-loader-base* "http://yui.yahooapis.com/2.6.0/build/"
@@ -17,8 +17,8 @@
 
 (defmethod add-options ((obj yui-settings-mixin) &rest options)
   (setf (yui-settings obj)
-	(concatenate 'string (yui-settings obj)
-		     (args-to-component-settings (yui-widget-variable obj) options))))
+        (concatenate 'string (yui-settings obj)
+                     (args-to-component-settings (yui-widget-variable obj) options))))
 
 (defun args-to-component-settings (component-name &rest args)
   (iterate:iter (iterate:for (option value) on args by #'cddr)
@@ -31,21 +31,21 @@
 (defwidget yui-widget (widget yui-settings-mixin)
   ((widget-variable :reader yui-widget-variable
                     :initarg :widget-variable
-		    :initform (intern (gen-id "yuiWidget")) ; ps-gensym is broken on some lisps
-		    :documentation "Global JavaScript variable that will
-		    hold the YUI widget.")
+                    :initform (intern (gen-id "yuiWidget")) ; ps-gensym is broken on some lisps
+                    :documentation "Global JavaScript variable that will
+                    hold the YUI widget.")
    (target-id :accessor yui-target-id
-	      :initarg :target-id
-	      :initform nil
-	      :documentation "Target HTML element that will be replaced
-	      or acted upon by the YUI widget.")
+              :initarg :target-id
+              :initform nil
+              :documentation "Target HTML element that will be replaced
+              or acted upon by the YUI widget.")
    (component-config :accessor yui-component-config
-		     :initarg :config
-		     :initform nil
-		     :documentation "A list of JavaScript widget
-		     configuration options. Will be passed straight
-		     through to `(create ,@options) in parenscript
-		     code. Usually a list of keyword value pairs..")
+                     :initarg :config
+                     :initform nil
+                     :documentation "A list of JavaScript widget
+                     configuration options. Will be passed straight
+                     through to `(create ,@options) in parenscript
+                     code. Usually a list of keyword value pairs..")
    (modules :type list
             :reader yui-modules
             :initarg :modules
@@ -90,15 +90,15 @@ DOM-ready event is triggered."
   "Take &body and put it in a function that will be called back once
 required modules have been loaded and the DOM is ready."
   (let ((callback-name (ps-gensym "$yui_callback"))
-	(loader-name (ps-gensym "$yui_loader")))
+        (loader-name (ps-gensym "$yui_loader")))
     `(progn
        (defun ,callback-name ()
-	 (ensure-dom-ready ,@body))
+         (ensure-dom-ready ,@body))
        (defvar ,loader-name (new (|:YAHOO.util.:YUILoader|
-				  (create :require (array ,@modules)
-					  :load-optional ,load-optional
-					  ,@(when base `(:base ,base))
-					  :on-success ,callback-name))))
+                                  (create :require (array ,@modules)
+                                          :load-optional ,load-optional
+                                          ,@(when base `(:base ,base))
+                                          :on-success ,callback-name))))
        ((@ ,loader-name insert) ,@(unless include-css-p '({} "js"))))))
 
 (defpsmacro keywords-to-object (args)

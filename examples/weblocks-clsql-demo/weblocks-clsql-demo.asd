@@ -12,19 +12,19 @@
     :description "weblocks-clsql-demo"
     :depends-on (:weblocks :metatilities :clsql)
     :components ((:file "weblocks-clsql-demo")
-		 (:module conf
-		  :components ((:file "stores"))
-		  :depends-on ("weblocks-clsql-demo"))
-		 (:module src
-		  :components ((:file "layout"
-				      :depends-on (model))
-			       (:file "snippets")
-			       (:file "init-session"
-				      :depends-on ("layout" "snippets"))
-			       (:module model
-					:components ((:file "company")
-						     (:file "address")
-						     (:file "employee"
-							    :depends-on ("company" "address")))))
-		  :depends-on (conf "weblocks-clsql-demo"))))
+                 (:module conf
+                  :components ((:file "stores"))
+                  :depends-on ("weblocks-clsql-demo"))
+                 (:module src
+                  :components ((:file "layout"
+                                      :depends-on (model))
+                               (:file "snippets")
+                               (:file "init-session"
+                                      :depends-on ("layout" "snippets"))
+                               (:module model
+                                        :components ((:file "company")
+                                                     (:file "address")
+                                                     (:file "employee"
+                                                            :depends-on ("company" "address")))))
+                  :depends-on (conf "weblocks-clsql-demo"))))
 

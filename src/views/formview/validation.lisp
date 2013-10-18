@@ -13,16 +13,16 @@ the 'fields-values' arglist. Returns either t if all functions
 returned t, or nil and an association list of nils and error
 messages if any of the functions failed."
   (let ((validates t)
-	errors)
+        errors)
     (dolist (validator-function validators)
       (multiple-value-bind (validatesp error)
-	  (funcall validator-function object fields-values)
-	(unless validatesp
-	  (setf validates nil)
-	  (push-end (cons nil error) errors))))
+          (funcall validator-function object fields-values)
+        (unless validatesp
+          (setf validates nil)
+          (push-end (cons nil error) errors))))
     (if validates
-	t
-	(values nil errors))))
+        t
+        (values nil errors))))
 
 (defgeneric validate-object-form-view (object view parsed-values)
   (:documentation "Called by the framework during form deserialization
@@ -41,27 +41,27 @@ validation errors) as the second value.
 parsed values.")
   (:method (object (view form-view) parsed-values)
     (let ((validates t)
-	  errors
-	  fields-values)
+          errors
+          fields-values)
       (dolist (info-value-pair parsed-values)
-	(destructuring-bind (field-info . parsed-value)
-	    info-value-pair
-	  (multiple-value-bind (validatesp error)
-	      (let ((field (field-info-field field-info))
-		    (object (field-info-object field-info)))
-		(push (cons (view-field-slot-name field) parsed-value) fields-values)
-		(validate-form-view-field (view-field-slot-name field)
-					  object field view parsed-value))
-	    (unless validatesp
-	      (setf validates nil)
-	      (push-end (cons (field-info-field field-info) error) errors)))))
+        (destructuring-bind (field-info . parsed-value)
+            info-value-pair
+          (multiple-value-bind (validatesp error)
+              (let ((field (field-info-field field-info))
+                    (object (field-info-object field-info)))
+                (push (cons (view-field-slot-name field) parsed-value) fields-values)
+                (validate-form-view-field (view-field-slot-name field)
+                                          object field view parsed-value))
+            (unless validatesp
+              (setf validates nil)
+              (push-end (cons (field-info-field field-info) error) errors)))))
       ;; We proceed to view-level validation only if individual fields were
       ;; successfully validated.
       (if validates
-	  (if (form-view-satisfies view)
-	      (run-view-validators (form-view-satisfies view) object fields-values)
-	      t)
-	  (values nil errors)))))
+          (if (form-view-satisfies view)
+              (run-view-validators (form-view-satisfies view) object fields-values)
+              t)
+          (values nil errors)))))
 
 (defgeneric validate-form-view-field (slot-name object field view parsed-value)
   (:documentation "Called by 'validate-object-form-view' during form
@@ -83,18 +83,18 @@ value. Default implementation obtains the error message by calling
 'parsed-value' - the value parsed from the request.")
   (:method (slot-name object (field form-view-field) (view form-view) parsed-value)
     (let* ((slot-esd (find-slot-esd (class-of object) slot-name))
-	   (slot-type (if slot-esd
-			  (slot-definition-type slot-esd)
-			  t))
-	   (validators (remove nil
-			       (cons (unless (slot-boundp field 'writer)
-				       (lambda (value)
-					 (typep value slot-type)))
-				     (ensure-list (form-view-field-satisfies field))))))
+           (slot-type (if slot-esd
+                          (slot-definition-type slot-esd)
+                          t))
+           (validators (remove nil
+                               (cons (unless (slot-boundp field 'writer)
+                                       (lambda (value)
+                                         (typep value slot-type)))
+                                     (ensure-list (form-view-field-satisfies field))))))
       (loop
-	 for validator in validators
-	 do (multiple-value-bind (result error) (funcall validator parsed-value)
-	      (unless result
-		(return (values nil (or error
-					(parser-error-message (form-view-field-parser field)))))))
-	 finally (return t)))))
+         for validator in validators
+         do (multiple-value-bind (result error) (funcall validator parsed-value)
+              (unless result
+                (return (values nil (or error
+                                        (parser-error-message (form-view-field-parser field)))))))
+         finally (return t)))))

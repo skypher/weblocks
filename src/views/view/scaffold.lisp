@@ -2,11 +2,11 @@
 (in-package :weblocks)
 
 (export '(scaffold scaffold-class-name scaffold-view-type
-	  scaffold-view-field-type generate-scaffold-view
-	  generate-scaffold-view-field class-visible-slots
-	  class-visible-slots-impl inspect-typespec
-	  extract-view-property-from-type
-	  typespec->view-field-presentation))
+          scaffold-view-field-type generate-scaffold-view
+          generate-scaffold-view-field class-visible-slots
+          class-visible-slots-impl inspect-typespec
+          extract-view-property-from-type
+          typespec->view-field-presentation))
 
 ;;; Scaffold class
 (defclass scaffold ()
@@ -27,10 +27,10 @@ scaffold's name, adds '-view', and returns the resulting symbol.")
   (:method (scaffold)
     (find-symbol
      (concatenate 'string
-		  (string-remove-right (symbol-name (class-name (class-of scaffold)))
-				       (symbol-name '#:-scaffold)
-				       :ignore-case-p t)
-		  (symbol-name '#:-view))
+                  (string-remove-right (symbol-name (class-name (class-of scaffold)))
+                                       (symbol-name '#:-scaffold)
+                                       :ignore-case-p t)
+                  (symbol-name '#:-view))
      (symbol-package (class-name (class-of scaffold))))))
 
 (defgeneric scaffold-view-field-type (scaffold)
@@ -41,22 +41,22 @@ symbol.")
   (:method (scaffold)
     (find-symbol
      (concatenate 'string
-		  (string-remove-right (symbol-name (class-name (class-of scaffold)))
-				       (symbol-name '#:-scaffold)
-				       :ignore-case-p t)
-		  (symbol-name '#:-view-field))
+                  (string-remove-right (symbol-name (class-name (class-of scaffold)))
+                                       (symbol-name '#:-scaffold)
+                                       :ignore-case-p t)
+                  (symbol-name '#:-view-field))
      (symbol-package (class-name (class-of scaffold))))))
 
 (defmacro extract-view-property-from-type (property-name property-extraction-fn
-					   scaffold dsd)
+                                           scaffold dsd)
   "Helper macro to obtain view properties from typespecs."
   (let ((extractedp (gensym))
-	(extraction (gensym)))
+        (extraction (gensym)))
     `(multiple-value-bind (,extractedp ,extraction)
-	 (multiple-value-call ,property-extraction-fn
-	   ,scaffold (inspect-typespec (slot-definition-type ,dsd)))
+         (multiple-value-call ,property-extraction-fn
+           ,scaffold (inspect-typespec (slot-definition-type ,dsd)))
        (when ,extractedp
-	 (list ,property-name ,extraction)))))
+         (list ,property-name ,extraction)))))
 
 ;;; Scaffold protocol
 (defgeneric generate-scaffold-view (scaffold-type object-class)
@@ -65,10 +65,10 @@ scaffold type for a given object class. Scaffold views should examine
 the object class and provide a sensible default view for an object.")
   (:method ((scaffold scaffold) object-class)
     (make-instance (scaffold-view-type scaffold)
-		   :inherit-from nil
-		   :fields (mapcar
-			    (curry #'generate-scaffold-view-field scaffold object-class)
-			    (class-visible-slots object-class :readablep t)))))
+                   :inherit-from nil
+                   :fields (mapcar
+                            (curry #'generate-scaffold-view-field scaffold object-class)
+                            (class-visible-slots object-class :readablep t)))))
 
 (defgeneric generate-scaffold-view-field (scaffold object-class direct-slot-definition)
   (:documentation "Generates a sensible view field from a direct slot
@@ -77,21 +77,21 @@ depending on a scaffold view type, object class, or slot
 definition.")
   (:method ((scaffold scaffold) object-class dsd)
     (apply #'make-instance (scaffold-view-field-type scaffold)
-	   :slot-name (slot-definition-name dsd)
-	   :label (humanize-name (slot-definition-name dsd))
-	   (extract-view-property-from-type :present-as #'typespec->view-field-presentation
-					    scaffold dsd))))
+           :slot-name (slot-definition-name dsd)
+           :label (humanize-name (slot-definition-name dsd))
+           (extract-view-property-from-type :present-as #'typespec->view-field-presentation
+                                            scaffold dsd))))
 
 ;;; Scaffold utilities
 (defun class-visible-slots (cls &key readablep writablep)
   "Converts 'cls' to class object if it is a name, and calls
 'class-visible-slots-impl'."
   (class-visible-slots-impl (if (and (symbolp cls)
-				     (not (null cls)))
-				(find-class cls)
-				cls)
-			    :readablep readablep
-			    :writablep writablep))
+                                     (not (null cls)))
+                                (find-class cls)
+                                cls)
+                            :readablep readablep
+                            :writablep writablep))
 
 (defgeneric class-visible-slots-impl (cls &key readablep writablep)
   (:documentation "Returns a list of 'standard-direct-slot-definition'
@@ -104,17 +104,17 @@ If 'writablep' is true, filters out the slots that don't have a
 writer (or accessor) defined.")
   (:method (cls &key readablep writablep)
     (unless (or (null cls)
-		(eql (class-name cls) 'standard-object))
+                (eql (class-name cls) 'standard-object))
       (remove-if (lambda (item)
-		   (or (null item)
-		       (and readablep
-			    (null (slot-definition-readers item)))
-		       (and writablep
-			    (null (slot-definition-writers item)))))
-		 (flatten
-		  (append (mapcar #'class-visible-slots
-				  (class-direct-superclasses cls))
-			  (class-direct-slots cls)))))))
+                   (or (null item)
+                       (and readablep
+                            (null (slot-definition-readers item)))
+                       (and writablep
+                            (null (slot-definition-writers item)))))
+                 (flatten
+                  (append (mapcar #'class-visible-slots
+                                  (class-direct-superclasses cls))
+                          (class-direct-slots cls)))))))
 
 (defun inspect-typespec (typespec)
   "Converts 'typespec' into a representation suitable for further
@@ -129,21 +129,21 @@ This function also implements certain useful logic. For example:
 => (1 5)"
   (if (listp typespec)
       (case (car typespec)
-	(mod (values (car typespec) (cdr typespec)))
-	(eql (values (car typespec) (cdr typespec)))
-	(member (values (car typespec) (cdr typespec)))
-	(not (values nil nil))
-	(satisfies (values (car typespec) (cdr typespec)))
-	(values (values nil nil))
-	(and (match typespec
-		    ((list 'and y) (inspect-typespec y))
-		    (y (values (car typespec) (cdr typespec)))))
-	(or (match typespec
-		   ((list 'or 'null y) (inspect-typespec y))
-		   ((list 'or y 'null) (inspect-typespec y))
-		   ((list 'or y) (inspect-typespec y))
-		   (y (values (car typespec) (cdr typespec)))))
-	(otherwise (values (car typespec) (cdr typespec))))
+        (mod (values (car typespec) (cdr typespec)))
+        (eql (values (car typespec) (cdr typespec)))
+        (member (values (car typespec) (cdr typespec)))
+        (not (values nil nil))
+        (satisfies (values (car typespec) (cdr typespec)))
+        (values (values nil nil))
+        (and (match typespec
+                    ((list 'and y) (inspect-typespec y))
+                    (y (values (car typespec) (cdr typespec)))))
+        (or (match typespec
+                   ((list 'or 'null y) (inspect-typespec y))
+                   ((list 'or y 'null) (inspect-typespec y))
+                   ((list 'or y) (inspect-typespec y))
+                   (y (values (car typespec) (cdr typespec)))))
+        (otherwise (values (car typespec) (cdr typespec))))
       (values typespec nil)))
 
 ;;; Type introspection protocol

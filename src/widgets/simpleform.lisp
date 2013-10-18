@@ -118,10 +118,10 @@ Example:
       ((:summary :data)
        (if (simpleform-summary-view widget) 
          (apply #'render-dataform-summary widget data (simpleform-summary-view widget) args)
-	 (progn
-	   (setf (slot-value widget 'ui-state) :success)
-	   (safe-funcall (dataform-on-success widget) widget)
-	   (render-success-widget))))
+         (progn
+           (setf (slot-value widget 'ui-state) :success)
+           (safe-funcall (dataform-on-success widget) widget)
+           (render-success-widget))))
       (:success
         (render-success-widget)))))
 

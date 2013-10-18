@@ -30,9 +30,9 @@ etc.)"
   "Makes a custom field for rendering select controls."
   (declare (ignore grid-obj))
   (make-instance 'datagrid-select-field
-		 :label "Select"
-		 :reader "Select"
-		 :present-as nil))
+                 :label "Select"
+                 :reader "Select"
+                 :present-as nil))
 
 (defun table-select-view-field-header-wt (&rest args)
   (with-html-to-string (:th :class "select" "")))

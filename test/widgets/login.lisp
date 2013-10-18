@@ -24,10 +24,10 @@
 ;;; test hash-password
 (deftest hash-password-1
     (let ((test1 (hash-password "test1"))
-	  (test2 (hash-password "test2")))
+          (test2 (hash-password "test2")))
       (or (equalp test1 "test1")
-	  (equalp test2 "test2")
-	  (equalp test1 test2)))
+          (equalp test2 "test2")
+          (equalp test1 test2)))
   nil)
 
 ;;; test login flow

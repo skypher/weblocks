@@ -18,8 +18,8 @@
 and suitable only for Weblocks test runners."
   (let ((name-part (format nil "wbtmp~36,6,'0R" (random 2176782335))))
     (if (cl-fad:directory-exists-p #P"/tmp/")
-	(merge-pathnames name-part #P"/tmp/")
-	(merge-pathnames name-part (asdf-system-directory '#:weblocks)))))
+        (merge-pathnames name-part #P"/tmp/")
+        (merge-pathnames name-part (asdf-system-directory '#:weblocks)))))
 
 (defun make-temporary-file
     (&rest open-args &key (direction :output) &allow-other-keys)
@@ -28,22 +28,22 @@ and suitable only for Weblocks test runners."
     (tagbody
      restart
        (let ((tmpnam (simple-tmpnam)))
-	 (handler-bind ((file-error (lambda (err)
-				      (declare (ignore err))
-				      (unless (zerop (decf tries))
-					(go restart)))))
-	   (return-from make-temporary-file
-	     (apply #'open tmpnam :if-exists :error
-		    :direction direction open-args)))))))
+         (handler-bind ((file-error (lambda (err)
+                                      (declare (ignore err))
+                                      (unless (zerop (decf tries))
+                                        (go restart)))))
+           (return-from make-temporary-file
+             (apply #'open tmpnam :if-exists :error
+                    :direction direction open-args)))))))
 
 (defun call/tempfile (proc &rest open-args)
   "Call PROC with an open temporary file stream, passing in
 OPEN-ARGS.  Delete after exiting."
   (let* ((tmpfile (apply #'make-temporary-file open-args))
-	 (fname (pathname tmpfile)))
+         (fname (pathname tmpfile)))
     (unwind-protect
-	 (unwind-protect (funcall proc tmpfile)
-	   (close tmpfile))
+         (unwind-protect (funcall proc tmpfile)
+           (close tmpfile))
       (handler-case (delete-file fname) (file-error ())))))
 
 ;;;; diff invocation
@@ -51,7 +51,7 @@ OPEN-ARGS.  Delete after exiting."
 (defun shell-command-proc ()
   (let ((tspak (find-package '#:trivial-shell)))
     (and tspak
-	 (find-symbol (symbol-name '#:shell-command) tspak))))
+         (find-symbol (symbol-name '#:shell-command) tspak))))
 
 (defun diff-strings (old new)
   "Answer the result of running `*diff-shell-command*' on OLD and NEW
@@ -60,13 +60,13 @@ strings."
    (lambda (oldf)
      (call/tempfile
       (lambda (newf)
-	(princ old oldf)
-	(princ new newf)
-	(force-output oldf)
-	(force-output newf)
-	(funcall (shell-command-proc)
-		 (format nil "~A ~A ~A" *diff-shell-command*
-			 (pathname oldf) (pathname newf))))))))
+        (princ old oldf)
+        (princ new newf)
+        (force-output oldf)
+        (force-output newf)
+        (funcall (shell-command-proc)
+                 (format nil "~A ~A ~A" *diff-shell-command*
+                         (pathname oldf) (pathname newf))))))))
 
 ;;;; LIFT extensions
 
@@ -75,7 +75,7 @@ strings."
 forms."
   (setf kwargs (copy-list kwargs))
   (loop for keypair on kwargs by #'cddr
-	for (key val) = keypair
+        for (key val) = keypair
         if (and (eq key :test) (symbolp val))
         do (setf (second keypair) `',val))
   kwargs)
@@ -138,17 +138,17 @@ See `%ensure-nodiff' for available keyword args."
     ',form . ,key-args))
 
 (defun %ensure-same-html (actual-values expected-values test-form
-			  &rest %ensure-nodiff-args)
+                          &rest %ensure-nodiff-args)
   "Helper for `ensure-same-html'."
   (flet ((maybe-split-html (obj)
-	   (if (and (stringp obj) (length-at-least-p obj 1)
-		    (char= (char obj 0) #\<))
-	       (cl-ppcre:regex-replace-all "><" obj ">
+           (if (and (stringp obj) (length-at-least-p obj 1)
+                    (char= (char obj 0) #\<))
+               (cl-ppcre:regex-replace-all "><" obj ">
 <")
-	       obj)))
+               obj)))
     (apply #'%ensure-nodiff (mapcar #'maybe-split-html actual-values)
-	   (mapcar #'maybe-split-html expected-values)
-	   test-form %ensure-nodiff-args)))
+           (mapcar #'maybe-split-html expected-values)
+           test-form %ensure-nodiff-args)))
 
 (defmacro ensure-same-html (form values &rest key-args)
   "As with `ensure-nodiff', but first transforming the HTML strings

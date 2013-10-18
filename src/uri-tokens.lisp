@@ -19,12 +19,12 @@
 
 (defclass uri-tokens ()
   ((remaining-tokens :accessor remaining-tokens
-		     :documentation "A list of tokens that haven't been
-		     consumed yet.")
+                     :documentation "A list of tokens that haven't been
+                     consumed yet.")
    (consumed-tokens :accessor consumed-tokens
-		    :initform nil
-		    :documentation "A list of tokens that have already
-		    been consumed."))
+                    :initform nil
+                    :documentation "A list of tokens that have already
+                    been consumed."))
   (:documentation "An object representing an URI split into tokens (path
   components). Maintains state of the URI as it is being consumed by the
   widgets to update a widget tree.

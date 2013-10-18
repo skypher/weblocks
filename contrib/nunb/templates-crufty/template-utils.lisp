@@ -15,7 +15,7 @@
   (warn (format nil "filltemplatewidget oob ~A" assoc2))
   
   (let ((filename (merge-pathnames (make-pathname :directory '(:relative "templates") :name name :type language )
-				   *public-files-path*)))
+                                   *public-files-path*)))
     (make-instance 'html-template :file filename :vars (append assoc assoc2))))
 
 (defun make-main-page-employee ()
@@ -27,13 +27,13 @@
   (let ((keyword-package (find-package :keyword)))
     (loop for i in alist
        collect (if (symbolp (car i))
-		   (intern (symbol-name (car i)) keyword-package)
-		   "DONTCARE")
+                   (intern (symbol-name (car i)) keyword-package)
+                   "DONTCARE")
        collect (cdr i))))
 
 ;; (if (symbolp (car i))
-;; 		   (intern (symbol-name (car i)) keyword-package)
-;; 		   (intern (string-upcase (car i)) keyword-package))
+;;                 (intern (symbol-name (car i)) keyword-package)
+;;                 (intern (string-upcase (car i)) keyword-package))
 
 ; was to be used in conjunction with (clos->string (car i))
 ; in the original alist->plist above (in place of string-upcase (car i))

@@ -8,14 +8,14 @@
        :db-constraints (:not-null :unique)
        :type integer)
    (street :initarg :street
-	   :accessor address-street
-	   :type string)
+           :accessor address-street
+           :type string)
    (city :initarg :city
-	 :accessor address-city
-	 :type string)
+         :accessor address-city
+         :type string)
    (state :initarg :state
-	  :accessor address-state
-	  :type string)))
+          :accessor address-state
+          :type string)))
 
 ;;; Table View
 (defview address-table-view (:type table :inherit-from '(:scaffold address))
@@ -30,5 +30,5 @@
 (defview address-form-view (:type form :inherit-from '(:scaffold address))
   (id :hidep t)
   (state :present-as us-state
-	 :parse-as us-state))
+         :parse-as us-state))
 

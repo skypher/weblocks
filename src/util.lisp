@@ -16,14 +16,14 @@ therein are interpreted by prepending \"WEBLOCKS-\".  In the latter
 case, the symbols will be imported first if need be."
   (dolist (pkg (ensure-list package-specs))
     (multiple-value-bind (pkg import-first?)
-	(typecase pkg
-	  (boolean '#:weblocks-util)
-	  (symbol (values (concatenate 'string (symbol-name '#:weblocks-)
-				       (symbol-name pkg))
-			  t))
-	  (string (values (concatenate 'string (symbol-name '#:weblocks-util-) pkg)
-			  t))
-	  (otherwise pkg))
+        (typecase pkg
+          (boolean '#:weblocks-util)
+          (symbol (values (concatenate 'string (symbol-name '#:weblocks-)
+                                       (symbol-name pkg))
+                          t))
+          (string (values (concatenate 'string (symbol-name '#:weblocks-util-) pkg)
+                          t))
+          (otherwise pkg))
       (when import-first?
-	(import symbols-designator pkg))
+        (import symbols-designator pkg))
       (export symbols-designator pkg))))
