@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.10.4"
+   :version "0.10.5"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -149,7 +149,7 @@
                                parsers
                                :components ((:file "common"))))
                               :depends-on (view formview dataview)))
-                               :depends-on ("weblocks" "dependencies" utils))
+                               :depends-on ("weblocks" "dependencies" utils "widget-translation"))
                                 (:module widgets
                                  :components ((:module widget
                                          :components ((:file "widget-mop")
@@ -216,7 +216,7 @@
     (:file "breadcrumbs"
      :depends-on ("navigation")))
      :depends-on (views utils "dependencies" "actions" "server" "request"
-             "request-hooks" "dom-object" linguistic))
+             "request-hooks" "dom-object" linguistic "widget-translation"))
       (:module control-flow
        :components ((:file "call-answer")
            (:file "dialog"
@@ -235,7 +235,8 @@
         (:file "application"
          :depends-on ("weblocks" "application-mop"))
         (:file "default-application"
-         :depends-on ("server" "weblocks" utils "request-handler")))))
+         :depends-on ("server" "weblocks" utils "request-handler"))
+        (:file "widget-translation"))))
       :in-order-to ((test-op (load-op "weblocks-test"))
           (doc-op (load-op "weblocks-scripts"))
           (make-app-op (load-op "weblocks-scripts"))))
