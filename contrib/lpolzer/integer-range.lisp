@@ -6,8 +6,8 @@
   () (:documentation "A presentation for integer ranges."))
 
 (defmethod render-view-field-value (value (presentation integer-range-presentation)
-				    (field form-view-field) (view form-view)
-				    widget obj &rest args
+                                    (field form-view-field) (view form-view)
+                                    widget obj &rest args
                                     &key intermediate-values &allow-other-keys)
   (declare (ignore args))
   (multiple-value-bind (intermediate-value intermediate-value-p)
@@ -21,7 +21,7 @@
   ())
 
 (defmethod parse-view-field-value ((parser integer-range-parser) value obj
-				   (view form-view) (field form-view-field) &rest args)
+                                   (view form-view) (field form-view-field) &rest args)
   (declare (ignore args))
   (let* ((parsed-value (cl-ppcre:split "-" value))
          (min (parse-integer (car parsed-value)))
