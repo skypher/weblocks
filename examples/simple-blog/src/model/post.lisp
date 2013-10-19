@@ -28,7 +28,7 @@
    (author :accessor post-author
            :initarg :author
            :initform nil
-           :type user)))
+           :type (or null user))))
 
 (defgeneric post-author-id (post)
   (:method ((post post))

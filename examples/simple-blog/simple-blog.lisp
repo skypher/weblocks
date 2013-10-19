@@ -2,6 +2,8 @@
 (defpackage #:simple-blog
   (:use :cl :weblocks :cl-who
         :metabang.utilities)
+  (:import-from :weblocks-stores :class-store :find-persistent-objects)
+  (:import-from :weblocks-util :safe-apply)
   (:documentation
    "A web application based on Weblocks."))
 
