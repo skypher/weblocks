@@ -40,10 +40,16 @@
 (defclass text-presentation (presentation text-presentation-mixin)
   ((null-string :accessor text-presentation-null-string
                 :initarg :null-string
-                :initform "Not Specified"
+                :initform (widget-translate 'text-presentation :null-string)
                 :documentation "The string to display if the value is null."))
   (:documentation "A default presentation that renders values as
   text."))
+
+(defmethod widget-translation-table append ((obj (eql 'text-presentation)) &rest args)
+  `((:null-string . ,(translate "Not Specified"))))
+
+(defmethod widget-translation-table append ((obj text-presentation) &rest args)
+  (widget-translation-table 'text-presentation))
 
 ;;; Custom view caption
 (defmethod view-caption ((view data-view))

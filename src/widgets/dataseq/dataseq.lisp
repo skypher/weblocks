@@ -447,7 +447,11 @@ wrapped by a form of the widget. ")
                  (list :widget obj)
                  :content (capture-weblocks-output 
                             (mapc (lambda (op)
-                                    (render-button (car op)))
+                                    (render-button (car op) 
+                                                   :value (widget-dynamic-translate 
+                                                            obj 
+                                                            (concatenate-keywords :operation- (alexandria:make-keyword (car op)))
+                                                            (translate (humanize-name (car op))))))
                                   (append
                                     (dataseq-common-ops obj)
                                     (when (dataseq-allow-select-p obj)
@@ -529,8 +533,7 @@ to the user of the widget.")
            (str (let ((total-items-count (dataseq-data-count obj)))
                   (format nil 
                           (widget-translate obj :total-message :items-count total-items-count) 
-                          total-items-count)
-                  )))))
+                          total-items-count))))))
 
 (defmethod widget-translation-table append ((obj dataseq) &rest args)
   "Returns widget translation table for dataseq"
@@ -554,4 +557,3 @@ to the user of the widget.")
                collect (cons 
                          (concatenate-keywords :pagination- key)
                          val)))))
-

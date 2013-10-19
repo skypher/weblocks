@@ -613,7 +613,10 @@ Slots will be copied shallowly except for CHILDREN."
   "Returns string associated with key from widget translation table"
   (when items-count 
     (setf key (concatenate-keywords key :- (number-form-type-with-locale (current-locale) items-count))))
-  (cdr (assoc key (widget-translation-table obj))))
+  (let ((translation-record (assoc key (widget-translation-table obj))))
+    (unless translation-record 
+      (warn "Translation missing for key ~A" key))
+    (cdr translation-record)))
 
 (defmethod widget-dynamic-translate (obj key value)
   "Updates widget dynamic translation table. When 'key' is already exists in table, replaces it."
