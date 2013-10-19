@@ -110,6 +110,12 @@ values nil error-message if it does not.")
            the function will be called with a new slot value and the
            object being rendered as arguments. If the slot is not
            bound, '(setf slot-value)' will be used.")
+   (write-filter :initarg :write-filter 
+                 :initform nil 
+                 :accessor form-view-field-write-filter
+                 :documentation "If this slot is bound to a function object,
+                                 a function will be called with the value 
+                                 received from parser before writing it with 'writer'")
    (delayed-write-p :initarg :delayed-write-p
                     :initform nil
                     :accessor form-view-field-writer-delayed-p

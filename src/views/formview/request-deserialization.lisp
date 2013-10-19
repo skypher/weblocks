@@ -69,6 +69,8 @@ Specialize this function to parse given objects differently.")
             &allow-other-keys)
     (labels ((write-value (field value obj)
                "Writes a field value into object's slot."
+               (if (form-view-field-write-filter field)
+                 (setf value (funcall (form-view-field-write-filter field) value)))
                (if (slot-boundp field 'writer)
                    (funcall (form-view-field-writer field) value obj)
                    (when (view-field-slot-name field)

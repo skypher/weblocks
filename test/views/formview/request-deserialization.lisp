@@ -68,6 +68,20 @@
           (values result (cdr (first errors))))))
   t nil)
 
+(deftest update-object-view-from-request-7
+    (with-request :get '(("name" . "foo") ("manager" . "bar"))
+      (let ((obj (copy-template *joe*)))
+        (update-object-view-from-request obj
+                                         (defview () (:type form
+                                                      :inherit-from '(:scaffold employee)
+                                                      :persistp nil)
+                                                  (name :write-filter (lambda (value)
+                                                                        (format nil "~A-~A" value value)))))
+        (values (first-name obj)
+                (manager obj)
+                (length (find-persistent-objects *default-store* 'employee)))))
+  "foo-foo" "bar" 0)
+
 ;;; Test request-parameters-for-object-view
 (deftest request-parameters-for-object-view-1
     (with-request :get '(("name" . "blah"))

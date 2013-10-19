@@ -190,6 +190,16 @@
      *joe*)
   "foo")
 
+(deftest obtain-view-field-value-3
+         (obtain-view-field-value
+           (field-info-field
+             (car (get-object-view-fields *joe* (defview () (:inherit-from '(:scaffold employee))
+                                                         (name :reader "foo"
+                                                               :read-filter (lambda (value)
+                                                                              (format nil "~A-~A" value value)))))))
+           *joe*)
+         "foo-foo")
+
 ;;; Test attributize-presentation
 (deftest attributize-presentation-1
     (attributize-presentation (make-instance 'form-presentation))

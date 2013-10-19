@@ -4,6 +4,7 @@
 (export '(view view-inherit-from view-fields
           view-fields-default-prefix-fn view-fields-default-suffix-fn
           view-field view-field-slot-name view-field-reader
+          view-field-read-filter
           view-field-hide-p view-field-prefix-fn view-field-suffix-fn
           view-caption inline-view-field view-field-label
           view-field-presentation mixin mixin-view-field
@@ -92,6 +93,12 @@
            object but another value, the value will be used to render
            the value of the field as a convinience. If the slot is not
            bound, 'slot-value' will be used.")
+   (read-filter :initarg :read-filter 
+                :initform nil
+                :accessor view-field-read-filter
+                :documentation "If this slot is bound to a function object 
+                                the function will be called with single 
+                                argument of field value.")
    (hidep :initform nil
           :initarg :hidep
           :accessor view-field-hide-p
