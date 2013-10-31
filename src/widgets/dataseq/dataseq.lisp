@@ -297,8 +297,10 @@ for the dataseq.")
     (render-widget (dataseq-pagination-widget obj))))
 
 (defmethod dependencies append ((obj dataseq))
-  (when (dataseq-allow-pagination-p obj)
-    (list (make-local-dependency :stylesheet "pagination"))))
+  (list* 
+    (make-local-dependency :stylesheet "table")
+    (when (dataseq-allow-pagination-p obj)
+      (list (make-local-dependency :stylesheet "pagination")))))
 
 ;;; Selection
 (defun dataseq-selection-empty-p (selection-or-dataseq)

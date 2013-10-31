@@ -102,6 +102,10 @@ values nil error-message if it does not.")
   (:documentation "A view designed to interact with the user via input
   forms."))
 
+(defmethod dependencies append ((obj form-view))
+  (list 
+    (make-local-dependency :stylesheet "form")))
+
 ;;; Form view fields
 (defclass form-view-field-writer-mixin ()
   ((writer :initarg :writer

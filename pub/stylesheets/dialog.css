@@ -38,12 +38,13 @@
   padding: 1em;
   _height: 1%; /* hasLayout */
   background-color: white;
+	border-bottom: 1px solid black;
 }
 
 /* Style choice dialog */
 .choice .dialog-body, .modal .choice
 {
-/*  background: white url(/weblocks-common/pub/images/dialog/question.png) no-repeat 0.5em center;*/
+  background: white url(/weblocks-common/pub/images/dialog/question.png) no-repeat 0.5em center;
 }
 
 .dialog h2, .modal h2
@@ -55,7 +56,7 @@
 
 .dialog h1 span, .modal h1 span
 {
-/*  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;*/
+  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
   display: block;
 }
 
@@ -91,13 +92,13 @@
 /* Style information dialog */
 .information .dialog-body, .modal .information
 {
-/*  background-image: url(/weblocks-common/pub/images/dialog/information.png);*/
+  background-image: url(/weblocks-common/pub/images/dialog/information.png);
 }
 
 /* Modal interaction */
 .modal
 {
-/*  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;*/
+  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
   padding-bottom: 2px;
 }
 
@@ -116,11 +117,15 @@
   padding-bottom: 1em;
 }
 
+.title-bar {
+	width: 100%;
+}
+
 .title-text-cell {
   background:white;
   border-top:1px solid black;
   border-left:1px solid black;
+	border-right: 1px solid black;
   padding:0 5px;
   padding-top:3px;
 }
-

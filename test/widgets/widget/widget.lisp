@@ -55,6 +55,7 @@
                           ("datagrid" "js")
                           ("datagrid" "css")
                           ("pagination" "css")
+                          ("table" "css")
                           ("dataform" "css"))))
    :test (lambda (x y) (cl-ppcre:scan y x))))
 

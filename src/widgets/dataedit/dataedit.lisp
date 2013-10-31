@@ -223,10 +223,6 @@ in order to reset the state after the item widget has done its job."
     (setf (data-editor-form-buttons (dataedit-item-widget obj))
           '(:submit))))
 
-;;; Depend on dataform
-(defmethod dependencies append ((obj dataedit-mixin))
-  (list (make-local-dependency :stylesheet "dataform-import" :import-p t)))
-
 (defmethod widget-translation-table append ((obj dataedit-mixin) &rest args)
   (list* 
     (cons :choose-items-for-deletion-message 
