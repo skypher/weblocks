@@ -79,6 +79,12 @@
       ((= n1 1) :one)
       (t :many))))
 
+(defun russian-proper-number-form (number single few many)
+  (case (russian-number-form-type number)
+    (:one single)
+    (:few few)
+    (:many many)))
+
 (defmethod number-form-type-with-locale ((locale (eql :ru)) number)
   (russian-number-form-type number))
 
