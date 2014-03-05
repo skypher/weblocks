@@ -39,6 +39,31 @@ all other parameters. However, none of the callbacks (see
 etc."
   (string-equal (get-parameter "pure") "true"))
 
+(defvar *redirect-request-p* nil)
+
+(defun redirect-request-p ()
+  (declare (special *redirect-request-p*))
+  (or *redirect-request-p* 
+      (webapp-session-value 'redirect-p)))
+
+(defun clear-session-redirect-p ()
+  (declare (special *redirect-request-p*))
+  (setf *redirect-request-p* (webapp-session-value 'redirect-p))
+  (setf (webapp-session-value 'redirect-p) nil))
+
+(defun clear-redirect-var ()
+  (declare (special *redirect-request-p*))
+  (setf *redirect-request-p* nil))
+
+(eval-when (:load-toplevel)
+  (pushnew 'clear-session-redirect-p 
+           (request-hook :application :post-action))
+  (pushnew 'clear-redirect-var 
+           (request-hook :application :pre-action)))
+
+(defun set-redirect-true ()
+  (setf (webapp-session-value 'redirect-p) t))
+
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
                                       :post-render))
                           new-window-p (window-title uri))
@@ -69,6 +94,9 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
                (abort-request-handler
                  (format nil "{\"redirect\":\"~A\"}" uri)))
              (hunchentoot:redirect uri))))
+
+    (set-redirect-true)
+
     (cond
       (new-window-p
         (send-script
