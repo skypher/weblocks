@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.10.9"
+   :version "0.10.10"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -44,7 +44,6 @@
                    (:file "weblocks" :depends-on ("package"))
                    (:module utils
                     :components ((:file "misc")
-                        (:file "clos")
                         (:file "runtime-class")
                         (:file "string")
                         (:file "list")

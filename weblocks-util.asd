@@ -6,7 +6,7 @@
 
 (defsystem weblocks-util
   :name "weblocks-util"
-  :version "0.1.0"
+  :version "0.1.1"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
@@ -39,7 +39,7 @@
           (:module utils
            :components 
            ((:file "misc")
-            ;(:file "clos")
+            (:file "clos")
             ;(:file "runtime-class")
             ;(:file "string")
             (:file "list")
