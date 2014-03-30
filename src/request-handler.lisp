@@ -318,6 +318,17 @@ association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
   (declare (special *dirty-widgets* *weblocks-output-stream*
                     *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+
+  (flet ((remove-duplicate-dirty-widgets ()
+           "Removes all widgets that should be rendered through rendering their parent"
+           (loop for widget in *dirty-widgets* do 
+                 (loop for widget2 in *dirty-widgets* do 
+                       (when (and (not (equal widget widget2))
+                                  (child-of-p widget widget2))
+                         (setf *dirty-widgets* (remove widget2 *dirty-widgets*)))))))
+
+    (remove-duplicate-dirty-widgets))
+
   (setf (content-type*) *json-content-type*)
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)

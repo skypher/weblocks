@@ -508,6 +508,26 @@ onclick='disableIrrelevantButtons(this);' />~
 \"on-load\":[\"testjs\"]~
 }"))
 
+(deftest render-dirty-widgets-2
+    (with-request :get nil
+      (let* ((dirty-child (make-instance 'widget))
+             (parent (make-instance 'composite 
+                                    :widgets (list dirty-child)))
+             (weblocks::*dirty-widgets* (list dirty-child parent))
+             (*weblocks-output-stream* (make-string-output-stream))
+             (*on-ajax-complete-scripts* (list "testjs")))
+        (declare (special weblocks::*dirty-widgets*
+                          *weblocks-output-stream* *on-ajax-complete-scripts*))
+        (weblocks::render-dirty-widgets)
+        (get-output-stream-string *weblocks-output-stream*)))
+  #.(format nil "~
+{~
+\"widgets\":~
+{\"id-123\":\"<div class='widget composite' id='id-123'><div class='widget' id='id-123'><\\/div><\\/div>\",\"id-123\":\"<div class='widget' id='id-123'><\\/div>\"},~
+\"before-load\":null,~
+\"on-load\":[\"testjs\"]~
+}"))
+
 (defwidget dirtier ()
   ((other :initarg :other)))
 

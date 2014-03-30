@@ -101,6 +101,17 @@ inherits from 'widget' if no direct superclasses are provided."
   (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
+(defmethod child-of-p ((parent widget) (child widget))
+  (or 
+    (find child (widget-children parent))
+    (some 
+      (lambda (item)
+        (child-of-p item child))
+      (widget-children parent))))
+
+(defmethod child-of-p ((parent function) child)
+  nil)
+
 
 ;; Process the :name initarg and set the dom-id accordingly. Note that
 ;; it is possible to pass :name nil, which simply means that objects
@@ -482,7 +493,7 @@ PUTP is a legacy argument. Do not use it in new code."))
   (and propagate-supplied putp-supplied
        (error "You specified both PROPAGATE and PUTP as arguments to MARK-DIRTY. Are you kidding me?"))
   (unless (widget-dirty-p w)
-    (push w *dirty-widgets*)
+    (pushnew w *dirty-widgets*)
     ;; NOTE: we have to check for unbound slots because this function
     ;; may get called at initialization time before those slots are bound
     (values t (when (and propagate (slot-boundp w 'propagate-dirty))
