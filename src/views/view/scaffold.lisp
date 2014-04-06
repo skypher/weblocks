@@ -82,40 +82,6 @@ definition.")
            (extract-view-property-from-type :present-as #'typespec->view-field-presentation
                                             scaffold dsd))))
 
-;;; Scaffold utilities
-(defun class-visible-slots (cls &key readablep writablep)
-  "Converts 'cls' to class object if it is a name, and calls
-'class-visible-slots-impl'."
-  (class-visible-slots-impl (if (and (symbolp cls)
-                                     (not (null cls)))
-                                (find-class cls)
-                                cls)
-                            :readablep readablep
-                            :writablep writablep))
-
-(defgeneric class-visible-slots-impl (cls &key readablep writablep)
-  (:documentation "Returns a list of 'standard-direct-slot-definition'
-objects for a class and its subclasses. Slots objects for slots that
-do not have reader accessors are filtered out and not returned.
-
-If 'readablep' is true, filters out the slots that don't have a
-reader (or accessor) defined.
-If 'writablep' is true, filters out the slots that don't have a
-writer (or accessor) defined.")
-  (:method (cls &key readablep writablep)
-    (unless (or (null cls)
-                (eql (class-name cls) 'standard-object))
-      (remove-if (lambda (item)
-                   (or (null item)
-                       (and readablep
-                            (null (slot-definition-readers item)))
-                       (and writablep
-                            (null (slot-definition-writers item)))))
-                 (flatten
-                  (append (mapcar #'class-visible-slots
-                                  (class-direct-superclasses cls))
-                          (class-direct-slots cls)))))))
-
 (defun inspect-typespec (typespec)
   "Converts 'typespec' into a representation suitable for further
 inspection. Returns two values. The first one is a symbol that can be
