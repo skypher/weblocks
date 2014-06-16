@@ -38,7 +38,8 @@ returned."
   "Removes any authentication information from the session."
   (setf (webapp-session-value *authentication-key*) nil)
   (dolist (fn (on-signout-hooks))
-    (safe-funcall fn)))
+    (safe-funcall fn))
+  (weblocks:reset-webapp-session))
 
 (defun hash-password (password)
   "Returns a one way hash of a plain-text password."
