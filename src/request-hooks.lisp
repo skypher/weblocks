@@ -125,7 +125,9 @@ of no arguments."
   (pushnew  
     (lambda ()
       (when (or *weblocks-global-debug*
-                (webapp-debug))
+                (webapp-debug)
+                (not (boundp '*parts-md5-hash*))
+                (not (boundp '*parts-md5-context-hash*)))
         (weblocks-util:reset-html-parts-set)))
     (request-hook :application :pre-render))
 
