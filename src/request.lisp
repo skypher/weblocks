@@ -25,7 +25,8 @@ if there is an action involved (even if the user hits refresh)."
   "Detects if the current request was initiated via AJAX by looking
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
-  (header-in* "X-Requested-With"))
+  (and (header-in* "X-Requested-With")
+       (equal "XMLHttpRequest" (header-in* "X-Requested-With"))))
 
 (defun pure-request-p ()
   "Detects if the current request is declared as 'pure', i.e. affects
