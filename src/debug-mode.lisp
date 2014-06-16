@@ -12,6 +12,7 @@
   (setf *weblocks-global-debug* t)
   ;; Set hunchentoot defaults (for everyone)
   (setf *show-lisp-errors-p* t)
+  (setf *process-html-parts-p* (constantly t))
   ;(setf *show-lisp-backtraces-p* t)
   ;; Set session maintenance (for everyone)
   (unless *maintain-last-session*
@@ -22,6 +23,7 @@
   "A manual method for resetting global debugging state"
   (setf *weblocks-global-debug* nil)
   (setf *show-lisp-errors-p* nil)
+  (setf *process-html-parts-p* (constantly nil))
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
 
