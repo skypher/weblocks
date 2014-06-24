@@ -35,6 +35,12 @@
 otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
   ;; TODO: active webapp, link to control center
   (setf (return-code*) +http-internal-server-error+)
+
+  (unless *show-lisp-errors-p* 
+    (return-from handle-error-condition 
+                 (with-error-page-html ("500 Internal Server Error" "Error caught" "")
+                   (:p "There was an unexpected error."))))
+
   (with-error-page-html ("500 Weblocks Error" "Weblocks caught an error"
                          (escape-string (format nil "~A: ~A" (type-of c) c)))
         (:h2 "Actions") ; FIXME: this should be a bar at the top of the page
