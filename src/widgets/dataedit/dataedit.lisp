@@ -184,9 +184,9 @@ in order to reset the state after the item widget has done its job."
 (defmethod dataedit-update-operations (obj &key
                                    (delete-fn #'dataedit-delete-items-flow)
                                    (add-fn #'dataedit-add-items-flow))
-  "Should be used to update operations the widget supports.
-
-'delete-fn' - a function to be called when delete action is invoked.
+  "Should be used to update operations the widget supports.                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                
+'delete-fn' - a function to be called when delete action is invoked.                                                                                                                                                                                                            
 'add-fn' - a function to be called when add action is invoked."
   (setf (dataseq-item-ops obj)
         (remove 'delete (dataseq-item-ops obj)
@@ -195,12 +195,12 @@ in order to reset the state after the item widget has done its job."
         (remove 'add (dataseq-common-ops obj)
                 :key #'car :test #'string-equal))
   (when (and (dataedit-allow-delete-p obj)
-             (> (dataseq-data-count obj) 0))
-    (pushnew (cons 'delete delete-fn)
+             (> (dataseq-data-count obj) 0))                                                                                                                                                                                                                                      
+    (pushnew (cons (widget-translate obj :delete-items) delete-fn)
              (dataseq-item-ops obj)
              :key #'car))
-  (when (dataedit-allow-add-p obj)
-    (pushnew `(add . ,add-fn)
+  (when (dataedit-allow-add-p obj)                                                                                                                                                                                                                                               
+    (pushnew (cons (widget-translate obj :add-new-item) add-fn)
              (dataseq-common-ops obj)
              :key #'car)))
 
@@ -225,6 +225,8 @@ in order to reset the state after the item widget has done its job."
 
 (defmethod widget-translation-table append ((obj dataedit-mixin) &rest args)
   (list* 
+    (cons :add-new-item "Add")
+    (cons :delete-items "Delete")  
     (cons :choose-items-for-deletion-message 
           (format nil 
                   (translate "Please select ~A to delete.")
