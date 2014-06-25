@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.10.18"
+   :version "0.10.19"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -49,7 +49,6 @@
                         (:file "list")
                         (:file "uri")
                         (:file "html")
-                        (:file "javascript")
                         (:file "isearch"
                          :depends-on ("html"))
                         (:file "menu"

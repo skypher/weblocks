@@ -251,59 +251,6 @@ function include_dom(script_filename) {
   return false;
 }
 
-/* working with CSS classes */
-function addClass(el,myClass){
-  if ((hasClass(el,myClass)) || (typeof el == 'undefined'))
-    return;
-  el.className += " " + myClass;
-}
-
-function removeClass(el,myClass){
-  if (typeof el=='undefined')
-    return;
-  if (el.getAttribute('class') === null)
-    return;
-
-  var classes = el.getAttribute('class').split(" ");
-  var result=[];
-
-  for (i=classes.length;i>=0;i--) {
-    if (classes[i] != myClass)
-      result.push(classes[i]);
-  }
-
-  el.setAttribute('class', result.join(" ")); /* FIXME: ie6/7 need className here */
-}
-
-function hasClass(el, myClass){
-  if ((el.className === null) || (typeof el == 'undefined'))
-    return false;
-
-  var classes = el.className.split(" ");
-
-  for (i=classes.length;i>=0;i--) {
-    if (classes[i] == myClass)
-      return true;
-  }
-
-  return false;
-}
-
-/* collapsible sections */
-function toggleExpandCollapse (heading,container) {
-  if (hasClass(heading,"collapsed")) {
-    removeClass(heading,"collapsed");
-    removeClass(container,"collapsed");
-    addClass(heading,"expanded");
-    addClass(container,"expanded");
-  } else {
-    removeClass(heading,"expanded");
-    removeClass(container,"expanded");
-    addClass(heading,"collapsed");
-    addClass(container,"collapsed");
-  }
-}
-
 function updateWidgetStateFromHash() {
   // http://stackoverflow.com/questions/680785/on-window-location-hash-change
   // TODO need to detect if the hash has been changed but the page hasn't been reloaded
@@ -312,4 +259,3 @@ function updateWidgetStateFromHash() {
   if (hash)
     initiateActionWithArgs(null, null, {'weblocks-internal-location-hash':hash}, "GET", "/");
 }
-
