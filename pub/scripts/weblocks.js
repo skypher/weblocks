@@ -26,11 +26,11 @@ function updateElement(element, newElement) {
 
 function selectionEmpty() {
     if(document.getSelection) {
-	return document.getSelection() == "";
+        return document.getSelection() == "";
     } else if(document.selection && document.selection.createRange) {
-	return document.selection.createRange().text == "";
+        return document.selection.createRange().text == "";
     } else {
-	return true;
+        return true;
     }
 }
 
@@ -38,29 +38,29 @@ function addCss(cssCode) {
     var styleElement = document.createElement("style");
     styleElement.type = "text/css";
     if (styleElement.styleSheet) {
-	styleElement.styleSheet.cssText = cssCode;
+        styleElement.styleSheet.cssText = cssCode;
     } else {
-	styleElement.appendChild(document.createTextNode(cssCode));
+        styleElement.appendChild(document.createTextNode(cssCode));
     }
     document.getElementsByTagName("head")[0].appendChild(styleElement);
 }
 
 function stopPropagation(event) {
     if(event.preventDefault) {
-	event.stopPropagation();
+        event.stopPropagation();
     } else {
-	event.cancelBubble = true;
+        event.cancelBubble = true;
     };
 }
 
 // Register global AJAX handlers to show progress
 Ajax.Responders.register({
   onCreate: function() {
-	    $('ajax-progress').innerHTML = "<img src='/pub/images/progress.gif'>";
-	},
+            $('ajax-progress').innerHTML = "<img src='/pub/images/progress.gif'>";
+        },
   onComplete: function() {
-	    $('ajax-progress').innerHTML = "";
-	}
+            $('ajax-progress').innerHTML = "";
+        }
 });
 
 function onActionSuccess(transport) {
@@ -73,8 +73,8 @@ function onActionSuccess(transport) {
     var redirect = json['redirect'];
     if (redirect)
     {
-	window.location.href = redirect;
-	return;
+        window.location.href = redirect;
+        return;
     }
 
     execJsonCalls(json['before-load']);
@@ -84,19 +84,19 @@ function onActionSuccess(transport) {
     var minTopOffset = document.documentElement.getHeight();
 
     for(var i in dirtyWidgets) {
-	var widget = $(i);
-	if(widget) {
+        var widget = $(i);
+        if(widget) {
             //console.log("updating widget %s", i);
-	  var el = (new Element('div')).update(dirtyWidgets[i]).childElements();
-	  updateElement(widget, el);
+          var el = (new Element('div')).update(dirtyWidgets[i]).childElements();
+          updateElement(widget, el);
 
-	  el.each(function(th){
-	    var offsetTop = th.cumulativeOffset().top;
-	    if(offsetTop < minTopOffset){
-	      minTopOffset = offsetTop;
-	    }
-	  });
-	}
+          el.each(function(th){
+            var offsetTop = th.cumulativeOffset().top;
+            if(offsetTop < minTopOffset){
+              minTopOffset = offsetTop;
+            }
+          });
+        }
     }
     
     // Scroll top if some of updated elements is above area viewed by user
@@ -109,15 +109,15 @@ function onActionSuccess(transport) {
 
 function execJsonCalls (calls) {
     if(calls) {
-	calls.each(function(item)
-			 {
-			     try {
+        calls.each(function(item)
+                         {
+                             try {
                                  //console.log("evalScript: %o", item);
                                  item.evalScripts();
-			     } catch(e) {
+                             } catch(e) {
                                  //console.log("Error evaluating AJAX script %o: %s", item, e);
                              }
-			 });
+                         });
     }
 }
 
@@ -169,16 +169,16 @@ function initiateFormAction(actionCode, form, sessionString) {
 
 function disableIrrelevantButtons(currentButton) {
     $(currentButton.form).getInputs('submit').each(function(obj)
-						   {
-						       obj.disable();
-						       currentButton.enable();
-						   });
+                                                   {
+                                                       obj.disable();
+                                                       currentButton.enable();
+                                                   });
 }
 
 // Fix IE6 flickering issue
 if(Prototype.Browser.IE) {
     try {
-	document.execCommand("BackgroundImageCache", false, true);
+        document.execCommand("BackgroundImageCache", false, true);
     } catch(err) {}
 }
 
@@ -188,24 +188,24 @@ if(Prototype.Browser.IE) {
 if(!window.XMLHttpRequest) {
     // IE6 only
     Event.observe(window, 'load', function() {
-	    var tableRows = $$('.table table tbody tr');
-	    tableRows.each(function(row) {
-		    Event.observe(row, 'mouseover', function() {
-			    row.addClassName('hover');
-			});
-		    Event.observe(row, 'mouseout', function() {
-			    row.removeClassName('hover');
-			});
-		});
-	});
+            var tableRows = $$('.table table tbody tr');
+            tableRows.each(function(row) {
+                    Event.observe(row, 'mouseover', function() {
+                            row.addClassName('hover');
+                        });
+                    Event.observe(row, 'mouseout', function() {
+                            row.removeClassName('hover');
+                        });
+                });
+        });
 }
 
 // Support suggest control
 function declareSuggest(inputId, choicesId, resultSet, sessionString) {
     if(resultSet instanceof Array) {
-	new Autocompleter.Local(inputId, choicesId, resultSet, {});
+        new Autocompleter.Local(inputId, choicesId, resultSet, {});
     } else {
-	new Ajax.Autocompleter(inputId, choicesId, getActionUrl(resultSet, sessionString, true), {});
+        new Ajax.Autocompleter(inputId, choicesId, getActionUrl(resultSet, sessionString, true), {});
     }
 }
 
@@ -213,15 +213,15 @@ function replaceDropdownWithSuggest(ignoreWelcomeMsg, inputId, inputName, choice
     var dropdownOptions = $(inputId).childElements();
     var suggestOptions = [];
     dropdownOptions.each(function(i)
-			 {
-			     if(!(i == dropdownOptions[0] && ignoreWelcomeMsg)) {
-				 suggestOptions.push(i.innerHTML);
-			     }
-			 });
+                         {
+                             if(!(i == dropdownOptions[0] && ignoreWelcomeMsg)) {
+                                 suggestOptions.push(i.innerHTML);
+                             }
+                         });
 
     var inputBox = '<input type="text" id="' + inputId + '" name="' + inputName + '" class="suggest"';
     if(value) {
-	inputBox += 'value="' + value +'"';
+        inputBox += 'value="' + value +'"';
     }
     inputBox += '/>';
 

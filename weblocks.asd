@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.10.19"
+   :version "0.10.20"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
