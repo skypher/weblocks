@@ -40,7 +40,7 @@ saved (may be different from CALLEE because of objects like
 functions).
 
 If CALLEE is of class WIDGET, the continuation is
-saved in the 'current-continuation' slot of CALLEE.
+saved in the 'continuation symbol of CALLEE.
 
 If CALLEE is a function, continuation is curried as a first parameter
 and the result is returned. Otherwise the continuation isn't passed."
