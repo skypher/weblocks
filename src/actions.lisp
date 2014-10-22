@@ -50,7 +50,7 @@ page may display a relevant message, if necessary."
              (hunchentoot::create-random-string 10 36)))))
 
 (defun make-action (action-fn &optional (action-code (generate-action-code)))
-  "Coverts a function into an action that can be rendered into HTML. A
+  "Converts a function into an action that can be rendered into HTML. A
 unique, hard to guess string is generated for the function, and a
 function is added to the session hashtable under this string. The
 string is then returned. When later requests come in,
