@@ -24,7 +24,7 @@
 ;;; Allow customization of widget slot options
 (defclass widget-slot-definition-mixin ()
   ((affects-dirty-status-p :accessor widget-slot-affects-dirty-status-p
-                           :initform t
+                           :initform nil 
                            :initarg :affects-dirty-status-p
                            :documentation "When set to true (the
                            default), the widget will be made dirty

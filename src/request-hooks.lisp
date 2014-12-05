@@ -136,8 +136,9 @@ of no arguments."
       (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
       (when (or *weblocks-global-debug*
                 (webapp-debug))
-        (progn 
-          (weblocks-util:update-html-parts-connections)
-          (setf (webapp-session-value 'parts-md5-hash) weblocks-util:*parts-md5-hash*)
-          (setf (webapp-session-value 'parts-md5-context-hash) weblocks-util:*parts-md5-context-hash*))))
+        (timing "html parts processing"
+          (progn 
+            (weblocks-util:update-html-parts-connections)
+            (setf (webapp-session-value 'parts-md5-hash) weblocks-util:*parts-md5-hash*)
+            (setf (webapp-session-value 'parts-md5-context-hash) weblocks-util:*parts-md5-context-hash*)))))
     (request-hook :application :post-render)))
