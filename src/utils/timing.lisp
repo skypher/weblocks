@@ -19,35 +19,33 @@
   (defvar *timing-level* 0))
 (declaim (fixnum *timing-level*))
 
-(defmethod on-timing-start (level))
-(defmethod on-timing-end (level))
+(defmethod on-timing-start (level name))
+(defmethod on-timing-end (level name))
 
 (defmacro timing (name &body body)
   (with-gensyms (start/real start/cpu
                  end/real end/cpu
                  spent/real spent/cpu)
     `(let ((thunk (lambda () ,@body)))
-       (on-timing-start *timing-level*)
-       (prog1 
-         (if *enable-timings*
-           (let ((,start/real (get-internal-real-time))
-                 (,start/cpu (get-internal-run-time)))
-             (declare (optimize (speed 3)(safety 3))
-                      ((integer 0) ,start/real ,start/cpu))
-             (incf *timing-level*)
-             (prog1
-               (funcall thunk)
-               (let* ((,end/real (get-internal-real-time))
-                      (,end/cpu (get-internal-run-time))
-                      (,spent/real (/ (- ,end/real ,start/real)
-                                      internal-time-units-per-second))
+       (if *enable-timings*
+         (let ((,start/real (get-internal-real-time))
+               (,start/cpu (get-internal-run-time)))
+           (declare (optimize (speed 3)(safety 3))
+                    ((integer 0) ,start/real ,start/cpu))
+           (incf *timing-level*)
+           (on-timing-start *timing-level* ,name)
+           (prog1
+             (funcall thunk)
+             (let* ((,end/real (get-internal-real-time))
+                    (,end/cpu (get-internal-run-time))
+                    (,spent/real (/ (- ,end/real ,start/real)
+                                    internal-time-units-per-second))
 
-                      (,spent/cpu (/ (- ,end/cpu ,start/cpu)
-                                     internal-time-units-per-second)))
-                 (declare ((integer 0) ,end/real ,end/cpu)
-                          ((rational 0) ,spent/real ,spent/cpu))
-                 (report-timing ,name ,spent/real ,spent/cpu)
-                 (decf *timing-level*))))
-           (funcall thunk))
-         (on-timing-end *timing-level*)))))
-
+                    (,spent/cpu (/ (- ,end/cpu ,start/cpu)
+                                   internal-time-units-per-second)))
+               (declare ((integer 0) ,end/real ,end/cpu)
+                        ((rational 0) ,spent/real ,spent/cpu))
+               (report-timing ,name ,spent/real ,spent/cpu)
+               (on-timing-end *timing-level* ,name)
+               (decf *timing-level*))))
+         (funcall thunk)))))
