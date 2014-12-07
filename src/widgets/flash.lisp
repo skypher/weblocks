@@ -6,6 +6,7 @@
 (defwidget flash (widget)
   ((messages :accessor flash-messages
              :initform nil
+             :affects-dirty-status-p t
              :initarg :messages
              :documentation "A list of messages to be rendered the
              next time the widget is to be presented. This can be any

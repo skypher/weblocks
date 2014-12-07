@@ -124,6 +124,7 @@
    (drilled-down-item :accessor dataseq-drilled-down-item
                       :initform nil
                       :initarg :drilled-down-item
+                      :affects-dirty-status-p t
                       :documentation "If 'allow-drilldown-p' is set to
                       true and the user drills down on an item this
                       slot can be set to the item in question. This

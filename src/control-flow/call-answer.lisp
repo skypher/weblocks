@@ -56,6 +56,7 @@ and the result is returned. Otherwise the continuation isn't passed."
 callee widget or the continuation object explicitly. Continuation is
 called with RESULT (defaulting to NIL). If the widget doesn't have a
 continuation, recursively tries its parents."
+  (mark-dirty (root-widget))
   (if (widget-continuation continuation)
       (safe-funcall (widget-continuation continuation) result)
       (when (widget-parent continuation)
@@ -115,6 +116,7 @@ the latter one being optionally transformed by WRAPPER-FN."
 continuation, and returns from the delimited computation. When
 CALLEE answers, restores the original children in the root
 widget and reactivates the computation."
+  (mark-dirty (root-widget))
   (do-widget nil callee))
 
 (defun modal-wt (&key title content css-class)
