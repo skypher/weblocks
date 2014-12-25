@@ -19,7 +19,7 @@
       "A place where we can put md5 hashes of children parts of processed html part.
        Should be used from body of NESTED-HTML-PART macro")
 
-(defvar *process-html-parts-p* (lambda () t))
+(defvar *process-html-parts-p* (lambda () nil))
 (setf (documentation '*current-html-part-children* 'variable)
       "Contains callback which should return boolean value 
        indicating whether html parts should be collected and processed")

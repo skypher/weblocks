@@ -134,8 +134,10 @@ of no arguments."
   (pushnew 
     (lambda ()
       (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
-      (when (or *weblocks-global-debug*
-                (webapp-debug))
+      (when (and 
+              (or *weblocks-global-debug*
+                  (webapp-debug))
+              (weblocks-util::process-html-parts-p))
         (timing "html parts processing"
           (progn 
             (weblocks-util:update-html-parts-connections)
