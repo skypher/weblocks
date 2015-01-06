@@ -68,10 +68,10 @@ Platforms:
   Partially tested on CMUCL, Lispworks, AllegroCL, and OpenMCL.
 
 Official site (with detailed installation guide):
-  http://weblocks.viridian-project.de/
+  http://weblocks-framework.info/
 
 Demo:
-  http://weblocks.viridian-project.de/weblocks-demo 
+  http://weblocks-framework.info/weblocks-demo 
 
 
 CONTRIBUTORS

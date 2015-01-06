@@ -19,8 +19,3 @@ AJAX requests
 Effects (simple)
 
 History (later)
-
-
-=== Misc.
-Get rid of shortcut.js (?)
-
