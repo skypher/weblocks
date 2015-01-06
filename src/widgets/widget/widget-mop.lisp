@@ -27,7 +27,7 @@
                            :initform nil 
                            :initarg :affects-dirty-status-p
                            :documentation "When set to true (the
-                           default), the widget will be made dirty
+                           default is NIL), the widget will be made dirty
                            when this slot is modified.")
    (parameter-name :accessor widget-slot-parameter-name
                    :initarg :uri-parameter
