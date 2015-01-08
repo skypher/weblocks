@@ -523,7 +523,7 @@ onclick='disableIrrelevantButtons(this);' />~
   #.(format nil "~
 {~
 \"widgets\":~
-{\"id-123\":\"<div class='widget composite' id='id-123'><div class='widget' id='id-123'><\\/div><\\/div>\",\"id-123\":\"<div class='widget' id='id-123'><\\/div>\"},~
+{\"id-123\":\"<div class='widget composite' id='id-123'><div class='widget' id='id-123'><\\/div><\\/div>\"},~
 \"before-load\":null,~
 \"on-load\":[\"testjs\"]~
 }"))

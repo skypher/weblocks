@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export 'string-widget)
+(export '(string-widget string-widget-content string-widget-escape-p))
 
 (defwidget string-widget ()
   ((content :type string

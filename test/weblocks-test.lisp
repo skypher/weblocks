@@ -316,7 +316,7 @@ URI - Set the Hunchentoot request URI to this."
 (defun make-request-ajax ()
   "Adds appropriate headers to a request so it is considered to be an
 AJAX request."
-  (push '("X-Requested-With" . "test") (slot-value *request* 'headers-in)))
+  (push '("X-Requested-With" . "XMLHttpRequest") (slot-value *request* 'headers-in)))
 
 (defvar *recovery-strategies*
   `((with-plain-webapp . ,(lambda (thunk)

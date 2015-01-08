@@ -43,7 +43,7 @@
     (with-request :get nil
       (make-request-ajax)
       (ajax-request-p))
-  "test")
+    t)
 
 ;;; test pure-request-p
 (deftest pure-request-p-1

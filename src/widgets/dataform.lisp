@@ -19,12 +19,14 @@
               into form view. If 'form-view' isn't provided, the
               scaffold view will be used by default.")
    (ui-state :initform :data
+             :affects-dirty-status-p t
              :accessor dataform-ui-state
              :initarg :ui-state
              :documentation "Current internal state of the
              widget. Normally :data when rendering via 'render-data'
              and :form when rendering via 'render-form'.")
    (validation-errors :initform nil
+                      :affects-dirty-status-p t
                       :documentation "An association list of field
                       objects and validation errors that occurred during
                       the previous form submission.  A car of 'nil'

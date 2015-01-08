@@ -19,7 +19,6 @@
                    #U"/hello-webapp/pub/stylesheets/dialog.css"
                    #U"/hello-webapp/pub/scripts/prototype.js"
                    #U"/hello-webapp/pub/scripts/scriptaculous.js"
-                   #U"/hello-webapp/pub/scripts/shortcut.js"
                    #U"/hello-webapp/pub/scripts/weblocks.js"
                    #U"/hello-webapp/pub/scripts/dialog.js")
                  :test set-equal-uri=)

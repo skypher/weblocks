@@ -80,6 +80,6 @@
                                     :add-fn 2)
         (values (dataseq-item-ops obj)
                 (dataseq-common-ops obj))))
-  ((weblocks::delete . 1))
-  ((weblocks::add . 2)))
+  (("Delete" . 1))
+  (("Add" . 2)))
 

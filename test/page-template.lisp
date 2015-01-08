@@ -40,7 +40,6 @@
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/bar.css")
      (:script :src "/some-name/pub/scripts/prototype.js" :type "text/javascript" "")
      (:script :src "/some-name/pub/scripts/scriptaculous.js" :type "text/javascript" "")
-     (:script :src "/some-name/pub/scripts/shortcut.js" :type "text/javascript" "")
      (:script :src "/some-name/pub/scripts/weblocks.js" :type "text/javascript" "")
      (:script :src "/some-name/pub/scripts/dialog.js" :type "text/javascript" ""))
     (:body

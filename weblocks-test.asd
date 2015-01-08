@@ -6,7 +6,7 @@
 
 (defsystem weblocks-test
   :name "weblocks-test"
-  :version "0.1.3"
+  :version "0.1.4"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"

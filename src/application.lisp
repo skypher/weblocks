@@ -279,7 +279,6 @@ called (primarily for backward compatibility"
     (:stylesheet "dialog")
     (:script "prototype")
     (:script "scriptaculous")
-    (:script "shortcut")
     (:script "weblocks")
     (:script "dialog")))
 
