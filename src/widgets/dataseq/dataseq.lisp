@@ -83,6 +83,7 @@
                     :documentation "Set to true to enable sorting, or
                     nil to disable it.")
    (sort :accessor dataseq-sort
+         :affects-dirty-status-p t
          :initform nil
          :initarg :sort
          :documentation "Holds a dotted pair of a path to the sorted
