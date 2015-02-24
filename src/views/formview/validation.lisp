@@ -89,7 +89,9 @@ value. Default implementation obtains the error message by calling
            (validators (remove nil
                                (cons (unless (slot-boundp field 'writer)
                                        (lambda (value)
-                                         (typep value slot-type)))
+                                         (or 
+                                           (typep value slot-type)
+                                           (null value))))
                                      (ensure-list (form-view-field-satisfies field))))))
       (loop
          for validator in validators
