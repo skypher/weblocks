@@ -68,8 +68,28 @@ and returns a list as specified in the 'choices' slot."
                            (if (consp choice)
                                (cons (format nil "~A" (car choice))
                                      (format nil "~A" (cdr choice)))
-                               (cons (funcall (presentation-choices-label-key choices-mixin) choice)
-                                     (funcall (presentation-choices-value-key choices-mixin) choice))))
+                               (cons (princ-to-string
+                                      (funcall
+                                       (presentation-choices-label-key choices-mixin) choice))
+                                     (princ-to-string
+                                      (funcall
+                                       (presentation-choices-value-key choices-mixin) choice)))))
                          choices))))
     (obtain-presentation-choices-aux (presentation-choices choices-mixin) obj)))
 
+(defclass choices-parser (parser)
+  ()
+  (:documentation "A parser designed to handle choices."))
+
+(defmethod parse-view-field-value ((parser choices-parser) value obj
+                                   (view form-view) (field form-view-field) &rest args)
+  (declare (ignore args))
+  (let ((presentation
+         (view-field-presentation field)))
+  (values t
+          t
+          (find value
+                (funcall (presentation-choices presentation) obj)
+                :key (compose #'princ-to-string
+                              (presentation-choices-value-key presentation))
+                :test #'string=)))))
