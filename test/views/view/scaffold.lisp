@@ -22,11 +22,11 @@
 
 ;;; Test class-visible-slots
 (deftest class-visible-slots-1
-    (mapcar #'slot-definition-name (class-visible-slots 'employee))
+    (mapcar #'slot-definition-name (weblocks-stores:class-visible-slots 'employee))
   (id name age address education manager veteran))
 
 (deftest class-visible-slots-2
-    (mapcar #'slot-definition-name (class-visible-slots 'employee :writablep t))
+    (mapcar #'slot-definition-name (weblocks-stores:class-visible-slots 'employee :writablep t))
   (name manager))
 
 ;;; Test inspect-typespec

@@ -172,21 +172,6 @@
          #.(link-action-template "abc132" "Next >" :class "next-page")
          #.(pagination-goto-form-template "abc133"))))
 
-(defclass not-searchable-person ()
-  ((id :initform nil)
-   (first-name :accessor nsp-first-name
-               :initarg :first-name)
-   (last-name :accessor nsp-last-name
-              :initarg :last-name)))
-
-(defmethod class-store ((class-name (eql 'not-searchable-person)))
-  *not-searchable-store*)
-
-(defmethod supports-filter-p :around (store)
-  (if (eql store *not-searchable-store*)
-      nil
-      (call-next-method)))
-
 ;;; test render-datagrid-table-body
 (deftest-html render-datagrid-table-body-1
     (with-request :get nil
@@ -241,31 +226,7 @@
                (:td :class "manager" (:span :class "value" "Jim"))))
             :summary "Ordered by name, descending."))))
 
-#+(or) ;; non-sensical, manager's the same...
 (deftest-html render-datagrid-table-body-2
-    (with-request :get nil
-      (persist-objects *default-store* (list *joe* *bob*))
-      (let ((grid (make-instance 'datagrid
-                                 :allow-sorting '(manager)
-                                 :data-class 'employee
-                                 :view (defview () (:type table :inherit-from '(:scaffold employee))
-                                         (name :allow-sorting-p nil)
-                                         (manager :allow-sorting-p t)))))
-        (dataseq-update-sort-column grid)
-        (render-dataseq-body grid)))
-   (:div :class "datagrid-body"
-         #.(table-header-template
-            '((:th :class "name" "Name")
-              (:th :class "manager sort-asc" (:span :class "label" #.(link-action-template "abc123" "Manager"))))
-            '((:tr
-               (:td :class "name" (:span :class "value" "Bob"))
-               (:td :class "manager" (:span :class "value" "Jim")))
-              (:tr :class "altern"
-               (:td :class "name" (:span :class "value" "Joe"))
-               (:td :class "manager" (:span :class "value" "Jim"))))
-            :summary "Ordered by manager, ascending.")))
-
-(deftest-html render-datagrid-table-body-3
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
@@ -285,7 +246,7 @@
                  (:td :class "name" (:span :class "value" "Bob"))
                  (:td :class "manager" (:span :class "value" "Jim")))))))
 
-(deftest-html render-datagrid-table-body-4
+(deftest-html render-datagrid-table-body-3
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid
@@ -320,7 +281,7 @@
                (:td :class "manager" (:span :class "value" "Jim"))))
             :summary "Ordered by name, ascending."))))
 
-(deftest-html render-datagrid-table-body-5
+(deftest-html render-datagrid-table-body-4
     (with-request :get nil
       (persist-objects *default-store* (list *joe* *bob*))
       (let ((grid (make-instance 'datagrid

@@ -34,7 +34,7 @@
 ;;; Introspection helper
 (defun class-visible-slot-names (obj &rest args)
   (mapcar #'slot-definition-name
-          (apply #'weblocks::class-visible-slots (class-of obj) args)))
+          (apply #'weblocks-stores:class-visible-slots (class-of obj) args)))
 
 ;;; Test slot-value-by-path
 (deftest slot-value-by-path-1

@@ -12,7 +12,7 @@
                  :inherit-from nil
                  :fields (mapcar
                           (curry #'generate-scaffold-view-field scaffold object-class)
-                          (class-visible-slots object-class :readablep t :writablep t))))
+                          (weblocks-stores:class-visible-slots object-class :readablep t :writablep t))))
 
 (defmethod generate-scaffold-view-field ((scaffold form-scaffold)
                                          object-class dsd)

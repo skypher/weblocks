@@ -160,21 +160,6 @@ declared AUTOSTART."
            (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
            content-type)
       (cond
-        ((list-starts-with (tokenize-uri script-name nil)
-                           (tokenize-uri "/weblocks-common" nil)
-                           :test #'string=)
-         (let ((virtual-folder "/weblocks-common/pub/")
-               (physical-folder (aif (ignore-errors (probe-file (compute-public-files-path :weblocks)))
-                                       it
-                                       #p"./pub/")))
-           (unless *weblocks-global-debug*
-             (send-cache-rules 100000)
-             (setf content-type
-                   (send-gzip-rules '(:stylesheet :script)
-                                    script-name request virtual-folder physical-folder)))
-           (return-from weblocks-dispatcher
-             (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                      request))))
         ((or 
            (find script-name *force-files-to-serve* :test #'string=)
            (and (webapp-serves-hostname (hunchentoot:host) app)

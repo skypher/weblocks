@@ -15,6 +15,7 @@
   nil)
 
 (defwebapp hcr-hello-webapp
+  :js-backend :prototype
   :init-user-session 'hcr-init-user-session)
 (defmethod initialize-instance :after ((self hcr-hello-webapp) &key &allow-other-keys)
   (setf (weblocks::weblocks-webapp-name self) "HCR Hello"))
@@ -105,6 +106,7 @@ onclick='disableIrrelevantButtons(this);' />~
 \"on-load\":null}"))
 
 (defwebapp hcr2-hello-webapp
+  :js-backend :prototype
   :init-user-session 'hcr2-init-user-session
   :dependencies '((:script "weblocks-debug")))
 
@@ -438,6 +440,7 @@ onclick='disableIrrelevantButtons(this);' />~
   0)
 
 (defwebapp broken-init
+  :js-backend :prototype
   :init-user-session 'broken-init-user-session)
 
 (defun broken-init-user-session (rootcomp)
