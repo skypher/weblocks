@@ -33,7 +33,8 @@
                      :selected-value (if intermediate-value-p
                                          intermediate-value
                                          (when value
-                                           (presentation-choices-default-value-key value)))
+                                           (princ-to-string
+                                            (funcall
+                                             (presentation-choices-value-key presentation) value))))
                      :disabledp (form-view-field-disabled-p field obj)
                      :id *presentation-dom-id*)))
-
