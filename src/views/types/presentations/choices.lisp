@@ -59,10 +59,10 @@
 (defgeneric obtain-presentation-choices-aux (choices obj))
 
 (defmethod obtain-presentation-choices-aux ((choices function) obj)
-  (obtain-presentation-choices-aux (funcall choices obj) obj))
+  (funcall choices obj))
 
 (defmethod obtain-presentation-choices-aux ((choices symbol) obj)
-  (obtain-presentation-choices-aux (funcall choices obj) obj))
+  (funcall choices obj))
 
 (defmethod obtain-presentation-choices-aux ((choices cons) obj)
   (declare (ignore obj))
