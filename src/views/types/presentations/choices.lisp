@@ -92,4 +92,4 @@ and returns a list as specified in the 'choices' slot."
                 (funcall (presentation-choices presentation) obj)
                 :key (compose #'princ-to-string
                               (presentation-choices-value-key presentation))
-                :test #'string=)))))
+                :test #'string=))))
