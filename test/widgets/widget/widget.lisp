@@ -44,20 +44,19 @@
                :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (addtest widget-dependencies-2
-  (ensure-same
-   (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-                                            (dependencies (make-instance 'gridedit
-                                                                         :data-class 'employee)))))
-   ;; note, pagination and dataform are there because for gridedit and
-   ;; datagrid widget-dependencies is specialized
-   (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-                        '(("dataseq" "css")
-                          ("datagrid" "js")
-                          ("datagrid" "css")
-                          ("pagination" "css")
-                          ("table" "css")
-                          ("dataform" "css"))))
-   :test (lambda (x y) (cl-ppcre:scan y x))))
+         (ensure-same
+           (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
+                                                    (dependencies (make-instance 'gridedit
+                                                                                 :data-class 'employee)))))
+           ;; note, pagination and dataform are there because for gridedit and
+           ;; datagrid widget-dependencies is specialized
+           (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
+                                '(("dataseq" "css")
+                                  ("datagrid" "css")
+                                  ("pagination" "css")
+                                  ("table" "css")
+                                  ("datagrid" "backend-js"))))
+           :test (lambda (x y) (cl-ppcre:scan y x))))
 
 (deftest widget-dependencies-3
     (with-request :get nil

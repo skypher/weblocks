@@ -106,10 +106,10 @@ DESCRIBE-ing them."
 
 ;; see store/store-utils.lisp
 (defwebapp app-with-not-searchable-store
+  :js-backend :prototype
   :autostart nil)
 
 ; We'll use memory store for testing
-(weblocks-stores:defstore *not-searchable-store* :memory)
 (weblocks-stores:defstore *test-store* :memory)
 
 (defmacro deftest-html (name form value)
@@ -167,7 +167,8 @@ and then compares the string to the expected result."
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
                      `(,@initargs ,@(and (not class-name) '(:prefix ""))
-                       :html-indent-p nil)))
+                       :html-indent-p nil 
+                       :js-backend :prototype)))
          (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (if full

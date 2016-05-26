@@ -6,6 +6,7 @@
 
 (defwebapp hello-webapp
     :bundle-dependency-types nil
+    :js-backend :prototype
     :version-dependency-types nil
     :gzip-dependency-types nil)
 
@@ -17,10 +18,10 @@
                  '(#U"/hello-webapp/pub/stylesheets/layout.css"
                    #U"/hello-webapp/pub/stylesheets/main.css"
                    #U"/hello-webapp/pub/stylesheets/dialog.css"
-                   #U"/hello-webapp/pub/scripts/prototype.js"
-                   #U"/hello-webapp/pub/scripts/scriptaculous.js"
-                   #U"/hello-webapp/pub/scripts/weblocks.js"
-                   #U"/hello-webapp/pub/scripts/dialog.js")
+                   #U"/hello-webapp/pub/scripts/prototype-backend/prototype.js"
+                   #U"/hello-webapp/pub/scripts/prototype-backend/scriptaculous.js"
+                   #U"/hello-webapp/pub/scripts/prototype-backend/weblocks.js"
+                   #U"/hello-webapp/pub/scripts/prototype-backend/dialog.js")
                  :test set-equal-uri=)
     (ensure-null (webapp-description))))
 
@@ -34,6 +35,7 @@
 
 ;;; uri prefix
 (defwebapp hello2-webapp
+           :js-backend :prototype
            :prefix "/")
 
 (addtest defwebapp-prefix
@@ -44,8 +46,10 @@
 
 
 (defwebapp hello3-webapp
+           :js-backend :prototype
            :prefix "/foo")
 (defwebapp hello4-webapp
+           :js-backend :prototype
            :prefix "/foo/")
 
 (addtest defwebapp-prefix-2
@@ -57,10 +61,12 @@
 
 ;;; public files' uri prefix
 (defwebapp hello5-webapp
+           :js-backend :prototype
            :prefix "/"
            :public-files-uri-prefix "/pub") 
 (defwebapp hello6-webapp
            :prefix "/"
+           :js-backend :prototype
            :public-files-uri-prefix "/pub/") 
 
 (addtest defwebapp-pub-prefix
@@ -72,6 +78,7 @@
 
 (defwebapp hello7-webapp
            :prefix "/foo"
+           :js-backend :prototype
            :public-files-uri-prefix "/pub")
 
 (addtest defwebapp-pub-prefix-2
@@ -85,11 +92,14 @@
 
 ;;; public files' path
 (defwebapp hello8-webapp
+           :js-backend :prototype
            :public-files-path "./pub") 
 (defwebapp hello9-webapp
+           :js-backend :prototype
            :public-files-path "./pub/") 
 (defwebapp hello10-webapp
-    :public-files-path #P"pub")
+           :js-backend :prototype
+           :public-files-path #P"pub")
 
 (addtest defwebapp-pub-path
   (dolist (app '(hello8-webapp hello9-webapp))
@@ -100,18 +110,22 @@
 
 ;;; interaction of hostname and prefix dispatching
 (defwebapp host-1
+           :js-backend :prototype
            :hostnames '("foo.com")
            :prefix "/foo")
 
 (defwebapp host-2
+           :js-backend :prototype
            :hostnames '("foo.com")
            :prefix "/")
 
 (defwebapp host-3
+           :js-backend :prototype
            :hostnames nil
            :prefix "/foo")
 
 (defwebapp host-4
+           :js-backend :prototype
            :hostnames nil
            :prefix "/")
 

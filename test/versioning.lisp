@@ -8,9 +8,10 @@
 (defun make-versioned-regex (name type)
   "Used for checking potential local dependency path."
   (let ((dir (cond ((string= type "css") "stylesheets")
-                   ((string= type "js") "scripts")))
+                   ((string= type "js") "scripts")
+                   ((string= type "backend-js") "scripts/prototype-backend")))
         (pub-dir "pub"))
-    (format nil "^/~A/~A/(?:vzn/~A\\.\\d\\d*?|~A)\\.~A$" pub-dir dir name name type)))
+    (format nil "^/~A/~A/(?:vzn/~A\\.\\d\\d*?|~A)\\.~A$" pub-dir dir name name (if (string= type "backend-js") "js" type))))
 
 (deftestsuite versioning-suite (weblocks-suite print-upcase-suite)
   ())

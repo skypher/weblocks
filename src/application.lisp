@@ -43,7 +43,8 @@
           update-thread-status
           *registered-webapps*
           with-webapp
-          weblocks-webapp-default-dependencies))
+          weblocks-webapp-default-dependencies 
+          weblocks-webapp-js-backend))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *registered-webapps* nil
@@ -59,6 +60,9 @@
                 :initform nil 
                 :documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
+   (js-backend :accessor weblocks-webapp-js-backend 
+               :initarg :js-backend
+               :initform (error "Please load javascript backend for framework (default is :prototype from https://github.com/html/weblocks-prototype-js) and pass :js-backend value (`:js-backend :prototype` for example) into your `defwebapp`"))
    (public-files-path :type (or null string pathname)
                       :accessor weblocks-webapp-public-files-path
                       :initarg :public-files-path 
@@ -234,7 +238,7 @@ co-exist, so long as they have different prefixes
 the dependencies list.  By default 'defwebapp' adds the following resources:
 
   Stylesheets: layout.css, main.css
-  Scripts: prototype.js, weblocks.js, scriptaculous.js
+  Scripts (only for prototype js backend): prototype.js, weblocks.js, scriptaculous.js 
 
 :dependencies - is a list of dependencies to append to the default dependencies
 list of the application.
@@ -276,11 +280,7 @@ called (primarily for backward compatibility"
 (defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))
   '((:stylesheet "layout")
     (:stylesheet "main")
-    (:stylesheet "dialog")
-    (:script "prototype")
-    (:script "scriptaculous")
-    (:script "weblocks")
-    (:script "dialog")))
+    (:stylesheet "dialog")))
 
 (defmethod initialize-instance :after
     ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)

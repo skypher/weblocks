@@ -26,7 +26,7 @@
 
 (defun process-html-parts-p ()
   "Whether or not to capture html parts information"
-  (funcall *process-html-parts-p*))
+  (and (boundp '*parts-md5-context-hash*) (funcall *process-html-parts-p*)))
 
 (defmacro nested-html-part (context &body body)
   "Adds part of html (a string received as a result of &body evaluation)

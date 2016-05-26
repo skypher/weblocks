@@ -154,6 +154,7 @@ submission behavior.")
     (map-view-fields 
       (lambda (field-info)
         (when (typep (slot-value (field-info-field field-info) 'presentation) 'widget-presentation)
+          ; XXX: 'widget-presentation-widget returns funcallable, need to replace with proper code and test
           (push (widget-presentation-widget (slot-value (field-info-field field-info) 'presentation)) widgets)))
       (dataform-form-view obj)
       (dataform-data obj))
