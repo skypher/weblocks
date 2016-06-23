@@ -25,6 +25,13 @@
 
 (declaim (special *action-string*))     ;early
 
+(defmacro capture-weblocks-output (&body body)
+  `(weblocks-util::nested-html-part 
+     (list :type :capture-weblocks-output)
+     (let ((*weblocks-output-stream* (make-string-output-stream)))
+       ,@body 
+       (get-output-stream-string *weblocks-output-stream*))))
+
 (defmethod render-extra-tags (tag-class count)
   "Renders extra tags to get around CSS limitations. 'tag-class'
 is a string that specifies the class name and 'count' is the

@@ -7,13 +7,6 @@
   "A default message shown by 'render-menu' if no entries are
   available.")
 
-(defmacro capture-weblocks-output (&body body)
-  `(weblocks-util::nested-html-part 
-     (list :type :capture-weblocks-output)
-     (let ((*weblocks-output-stream* (make-string-output-stream)))
-       ,@body 
-       (get-output-stream-string *weblocks-output-stream*))))
-
 (defun render-menu-item-wt (&key item-id pane-class span-class content target-is-function pane-selected-or-disabled item-href)
   (with-html-to-string
     (:li :id item-id
