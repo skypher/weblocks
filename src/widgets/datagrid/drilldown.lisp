@@ -73,6 +73,7 @@
         (render-template-to-string 
           :datagrid-table-view-body-row-wt
           (list :view view :object obj :widget widget)
+          :object obj
           :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
           :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args))
           :row-action row-action
