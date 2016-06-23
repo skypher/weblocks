@@ -352,21 +352,6 @@
       (weblocks:remove-parameter-from-uri "/pub/baz" "action"))
   "/pub/baz?session=test2&foo=bar")
 
-;;; test make-isearch-regex
-(deftest make-isearch-regex-1
-    (let ((regex (weblocks::make-isearch-regex "hello")))
-      (values (ppcre:scan regex "hello")
-              (ppcre:scan regex "HeLlO")
-              (ppcre:scan regex "test")))
-  0 0 nil)
-
-(deftest make-isearch-regex-2
-    (let ((regex (weblocks::make-isearch-regex "Hello")))
-      (values (ppcre:scan regex "Hello")
-              (ppcre:scan regex "hello")
-              (ppcre:scan regex "test")))
-  0 nil nil)
-
 ;;; Test object-class-name
 (deftest object-class-name-1
     (object-class-name *joe*)

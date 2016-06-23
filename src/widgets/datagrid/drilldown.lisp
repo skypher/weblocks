@@ -21,13 +21,20 @@
                    :reader label
                    :present-as nil)))
 
+(defun table-drilldown-field-header-cell-wt (&key class content &allow-other-keys)
+  (with-html-to-string (:th :class class (str content))))
+
+(deftemplate :table-drilldown-field-header-cell-wt 'table-drilldown-field-header-cell-wt)
+
 ;;; Drilldown cells
 (defmethod render-view-field-header ((field datagrid-drilldown-field) (view table-view)
                                      (widget datagrid) presentation value obj &rest args)
   (declare (ignore args))
-  (with-html (:th :class (datagrid-drilldown-style
-                          (car (dataseq-on-drilldown widget)))
-                  "")))
+  (render-wt 
+    :table-drilldown-field-header-cell-wt
+    (list :field field :view view :widget widget :presentation presentation :object obj :value value)
+    :class (datagrid-drilldown-style
+             (car (dataseq-on-drilldown widget)))))
 
 (defmethod render-view-field ((field datagrid-drilldown-field) (view table-view)
                               (widget datagrid) presentation value obj &rest args

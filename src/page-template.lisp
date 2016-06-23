@@ -86,6 +86,16 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 ;;
 ;; Render header entries
 ;;
+(defun page-headers-wt (&key content-type description keywords content &allow-other-keys)
+  (with-html-to-string 
+    (:meta :http-equiv "Content-type" :content content-type)
+    (when description
+      (htm (:meta :name "description" :content description)))
+    (when keywords
+      (htm (:meta :name "keywords" :content (format nil "~{~A~^,~}" it))))
+    (str content)))
+
+(deftemplate :page-headers-wt 'page-headers-wt)
 
 (defmethod render-page-headers ((app weblocks-webapp))
   "A placeholder to add :meta entries, :expires headers and other 
@@ -94,16 +104,17 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
    here to customize header rendering on a per-request basis.  By default
    this function renders the current content type."
   (declare (special *current-page-headers*))
-  (with-html 
-    (:meta :http-equiv "Content-type" :content *default-content-type*)
-    (awhen (application-page-description app)
-      (htm (:meta :name "description" :value it)))
-    (awhen (application-page-keywords app)
-      (htm (:meta :name "keywords" :value (format nil "~{~A~^,~}" it))))
-    (dolist (header *current-page-headers*)
-      (etypecase header
-        (string (htm (str header)))
-        ((or function symbol) (funcall header))))))
+  (render-wt :page-headers-wt 
+             (list :app app)
+             :content-type *default-content-type*
+             :description (application-page-description app)
+             :keywords (application-page-keywords app)
+             :content (capture-weblocks-output 
+                        (with-html 
+                          (dolist (header *current-page-headers*)
+                            (etypecase header
+                              (string (htm (str header)))
+                              ((or function symbol) (funcall header))))))))
 
 ;;
 ;; Render the page body

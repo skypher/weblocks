@@ -14,6 +14,15 @@ about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
   `(webapp-session-value 'dialog-contents))
 
+(defun dialog-js-wt (&key image-src image-onclick &allow-other-keys)
+  (with-html-to-string
+    (:img :src  image-src
+     :onclick image-onclick
+     :onmouseover "this.style.cursor = \"pointer\";"
+     :style "cursor: expression(\"hand\");")))
+
+(deftemplate :dialog-js-wt 'dialog-js-wt)
+
 (defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
 the widget inside." 
@@ -23,12 +32,11 @@ the widget inside."
                                 close
                                 (f_% (answer widget))))
                   (close-action (make-action close-fn)))
-             (with-html-to-string
-               (:img :src (make-webapp-public-file-uri "images/dialog/close.gif")
-                     :onclick (format nil "initiateAction(\"~A\", \"~A\");"
-                                      close-action (session-name-string-pair))
-                     :onmouseover "this.style.cursor = \"pointer\";"
-                     :style "cursor: expression(\"hand\");"))))
+             (render-wt-to-string 
+               :dialog-js-wt
+               nil
+               :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
+               :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
          (widget-html (widget)
            (let ((*weblocks-output-stream* (make-string-output-stream)))
              (declare (special *weblocks-output-stream*))
@@ -83,20 +91,36 @@ scales down to 'do-modal' instead."
         (send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
+(defun choices-get-wt (&key message content)
+  (with-html-to-string
+    (:p (str message))
+    (str content)))
+
+(deftemplate :choices-get-wt 'choices-get-wt)
+
 (defun render-choices-get (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
    links."
-  (with-html
-    (:p (str msg))
-    (mapc (lambda (choice)
-            (render-link (lambda (&rest args)
-                           (declare (ignore args))
-                           (answer k (car choice)))
-                         (cdr choice))
-            (htm "&nbsp;"))
-          choices)))
+  (render-wt 
+    :choices-get-wt 
+    nil 
+    :message msg
+    :content (capture-weblocks-output 
+               (with-html 
+                 (mapc (lambda (choice)
+                         (render-link (lambda (&rest args)
+                                        (declare (ignore args))
+                                        (answer k (car choice)))
+                                      (cdr choice))
+                         (htm "&nbsp;"))
+                       choices)))))
 
-(defun render-choices-post (msg choices k)
+(defun choices-post-wt (&key message content &allow-other-keys)
+  (with-html-to-string 
+    (:p (str message)) 
+    (str content)))
+
+(defun render-choices-post (msg choices k &rest args)
   "Renders the contents of a choice dialog with choices displayed as
    form buttons in a POST form."
   (with-html-form (:post (lambda (&rest args)
@@ -108,9 +132,11 @@ scales down to 'do-modal' instead."
                                                    (car choice)
                                                    choice))
                                        (return)))))))
-    (:p (str msg))
-    (loop for choice in choices do 
-          (render-button (car choice) :value (cdr choice)))))
+    (render-wt :choices-post-wt nil 
+               :message msg 
+               :content (capture-weblocks-output 
+                          (loop for choice in choices do 
+                                (render-button (car choice) :value (cdr choice)))))))
 
 ;;; Presents a user with a message and a choice of elements
 (defun/cc do-choice (msg choices &key (method :post) (css-class "") (title "Select Option"))

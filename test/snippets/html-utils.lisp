@@ -339,25 +339,6 @@
            (:input :name "some-name" :type "radio" :class "radio" :value "c")
            (:span "c&nbsp;"))))
 
-;;; test render-close-button
-(deftest-html render-close-button-1
-    (with-request :get nil
-      (make-action #'identity "abc123")
-      (render-close-button "abc123"))
-  (:span :class "close-button"
-         (:a :href "/foo/bar?action=abc123"
-             :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
-             "(Close)")))
-
-(deftest-html render-close-button-2
-    (with-request :get nil
-      (make-action #'identity "abc123")
-      (render-close-button "abc123" "Foo"))
-  (:span :class "close-button"
-         (:a :href "/foo/bar?action=abc123"
-             :onclick "initiateAction(\"abc123\", \"weblocks-session=1%3ATEST\"); return false;"
-             "Foo")))
-
 ;;; test render-password
 (deftest-html render-password-1
     (render-password 'name1 "value1" :id "id1"  :class "class1")

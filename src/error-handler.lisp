@@ -3,23 +3,35 @@
 
 (export '(handle-http-error handle-error-condition print-trivial-backtrace))
 
-(defmacro with-error-page-html ((title heading &optional description) &body body)
-  `(with-html-to-string
+(defun error-page-html-wt (&key title heading description &allow-other-keys)
+  (with-html-to-string
     (:html
       (:head
-        (:title (str ,title))
+        (:title (str title))
         (:link :rel "stylesheet" :type "text/css" :href "/weblocks-common/pub/stylesheets/error-page.css"))
       (:body ; TODO date
         (:h1 (:img :src "/weblocks-common/pub/images/weblocks-alien-small.png")
-             (str ,heading))
-        ,@(when description
-           (append '(:h2 "Description") `(:p (:tt (str ,description)))))
-        ,@body
-        ,(when (or description body)
-           '(:hr))
+         (str heading))
+        (when description
+          (htm (:h2 "Description")
+               (:p (:tt (str description)))))
+        (str content)
+        (when (or description body)
+          (htm (:hr)))
         (:div :class "footer"
-            "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
-            " running on " (str (hunchentoot::address-string)))))))
+         "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
+         " running on " (str (hunchentoot::address-string)))))))
+
+(deftemplate :error-page-html-wt 'error-page-html-wt)
+
+(defmacro with-error-page-html ((title heading &optional description) &body body)
+  `(render-wt 
+     :error-page-html-wt 
+     nil 
+     :title ,title
+     :heading ,heading
+     :description ,description
+     :content (capture-weblocks-output ,@body)))
 
 (defmethod handle-http-error ((app weblocks-webapp) code &optional condition)
   (with-error-page-html ((escape-string (format nil "~A ~A" code (reason-phrase code)))

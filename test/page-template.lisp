@@ -33,7 +33,7 @@
     (:head
      (:title "some-name - Some Page")
      (:meta :http-equiv "Content-type" :content "text/html; charset=utf-8")
-     (:meta :name "description" :value "Some Page")
+     (:meta :name "description" :content "Some Page")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/layout.css")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/main.css")
      (:link :rel "stylesheet" :type "text/css" :href "/some-name/pub/stylesheets/dialog.css")

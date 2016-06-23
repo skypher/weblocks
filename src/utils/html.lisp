@@ -14,7 +14,6 @@
           render-autodropdown
           *dropdown-welcome-message*
           render-radio-buttons
-          render-close-button
           render-input-field
           render-password
           render-textarea
@@ -22,9 +21,7 @@
           scriptonly
           noscript
           render-message
-          send-script
-          with-table
-          render-definition-list))
+          send-script))
 
 (declaim (special *action-string*))     ;early
 
@@ -35,10 +32,10 @@ number of extra tags to render.
 Ex:
 \(render-extra-tags \"extra-\" 2) =>
 \"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
-  (with-html-output (*weblocks-output-stream*)
+  (with-html
     (loop for i from 1 to count
           for attr = (format nil "~A~A" tag-class i)
-       do (htm (:div :class attr "<!-- empty -->")))))
+          do (htm (:div :class attr "<!-- empty -->")))))
 
 (defmacro with-extra-tags (&body body)
   "A macro used to wrap html into extra tags necessary for
@@ -78,6 +75,15 @@ headers on top and three on the bottom. It uses
                         (:input :name *action-string* :type "hidden" :value ,action-code))))))
        (log-form ,action-code :id ,id :class ,class))))
 
+(defun html-link-wt (&key id class href onclick title content &allow-other-keys)
+  (with-html-to-string
+    (:a :id id :class class
+     :href href :onclick onclick
+     :title title
+     (str content))))
+
+(deftemplate :html-link-wt 'html-link-wt)
+
 (defun render-link (action label &key (ajaxp t) id class title render-fn)
   "Renders an action into a href link. If AJAXP is true (the
 default), the link will be rendered in such a way that the action will
@@ -95,15 +101,20 @@ without escaping."
   (let* ((*print-pretty* nil)
          (action-code (function-or-action->action action))
          (url (make-action-url action-code)))
-    (with-html
-      (:a :id id :class class
-          :href url :onclick (when ajaxp
-                               (format nil "initiateAction(\"~A\", \"~A\"); return false;"
-                                       action-code (session-name-string-pair)))
-          :title title
-          (funcall (or render-fn (lambda (label)
-                                   (htm (str (princ-to-string label)))))
-                   label)))
+    (render-wt 
+      :html-link-wt
+      nil 
+      :id id
+      :class class
+      :href url
+      :onclick (when ajaxp
+                 (format nil "initiateAction(\"~A\", \"~A\"); return false;"
+                         action-code (session-name-string-pair)))
+      :content (capture-weblocks-output 
+                 (with-html 
+                   (funcall (or render-fn (lambda (label)
+                                          (htm (str (princ-to-string label)))))
+                          label))))
     (log-link label action-code :id id :class class)))
 
 (defun button-wt (&key value name id class disabledp submitp)
@@ -179,6 +190,27 @@ being rendered.
 (defparameter *dropdown-welcome-message* "[Select ~A]"
   "A welcome message used by dropdowns as the first entry.")
 
+(defun dropdown-field-wt (&key id class tabindex disabled name onchange multiple content &allow-other-keys)
+  (with-html-to-string
+    (:select :id id
+     :class class
+     :tabindex tabindex
+     :disabled (when disabled "disabled")
+     :name name
+     :onchange onchange
+     :multiple (when multiple "on")
+     (str content))))
+
+(deftemplate :dropdown-field-wt 'dropdown-field-wt)
+
+(defun dropdown-option-wt (&key selectedp value content &allow-other-keys)
+  (with-html-to-string 
+    (if selectedp 
+      (htm (:option :value value :selected "selected" (str content)))
+      (htm (:option :value value (str content))))))
+
+(deftemplate :dropdown-option-wt 'dropdown-option-wt)
+
 (defun render-dropdown (name selections &key id class selected-value
                              ;; 'disabled' was here already; adding 'disabledp' for
                              ;; consistency with many other routines.
@@ -219,31 +251,35 @@ being rendered.
   (when welcome-name
     (setf welcome-name (car (list->assoc (list welcome-name)
                                          :map (constantly "")))))
-  (with-html
-    (:select :id id
-     :class class
-     :tabindex tabindex
-     :disabled (and disabledp "disabled")
-     :name (attributize-name name)
-     :onchange (or onchange
-                   (when autosubmitp
-                     "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }"))
-     :multiple (when multiple "on" "off")
-     (mapc (lambda (i)
-             (if (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
-                         :test #'string-equal :key #'princ-to-string)
-               (htm (:option :value (cdr i) :selected "selected" (str (car i))))
-               (htm (:option :value (cdr i) (str (car i))))))
-           (list->assoc (append (when welcome-name
-                                  (list
-                                    (cons (if frob-welcome-name ; backwards compat
-                                            (format nil 
-                                                    (translate *dropdown-welcome-message*) 
-                                                    (translate (car welcome-name) :accusative-form-p t))
-                                            (car welcome-name))
-                                          (cdr welcome-name))))
-                                selections)
-                        :map (constantly nil))))))
+  (render-wt 
+    :dropdown-field-wt 
+    nil
+    :id id
+    :class class
+    :tabindex tabindex
+    :disabled disabledp
+    :name (attributize-name name)
+    :onchange (or onchange
+                  (when autosubmitp
+                    "if(this.form.onsubmit) { this.form.onsubmit(); } else { this.form.submit(); }"))
+    :multiple multiple 
+    :content (capture-weblocks-output 
+               (mapc (lambda (i)
+                       (render-wt :dropdown-option-wt nil 
+                                  :selectedp (member (princ-to-string (or (cdr i) (car i))) (ensure-list selected-value)
+                                                     :test #'string-equal :key #'princ-to-string)
+                                  :value (cdr i)
+                                  :content (car i)))
+                     (list->assoc (append (when welcome-name
+                                            (list
+                                              (cons (if frob-welcome-name ; backwards compat
+                                                      (format nil 
+                                                              (translate *dropdown-welcome-message*) 
+                                                              (translate (car welcome-name) :accusative-form-p t))
+                                                      (car welcome-name))
+                                                    (cdr welcome-name))))
+                                          selections)
+                                  :map (constantly nil))))))
 
 (defun render-autodropdown (name selections action
                             &key selected-value welcome-name
@@ -312,25 +348,41 @@ for the value.
           :disabled (and disabledp "disabled")
           :label (car i))))
 
-(defun render-close-button (close-action &optional (button-string "(Close)"))
-  "Renders a close button. If the user clicks on the close button,
-'close-action' is called back. If 'button-string' is provided, it used
-used instead of the default 'Close'."
-  (with-html
-    (:span :class "close-button"
-           (render-link close-action (humanize-name button-string)))))
+(defun input-field-wt (&key type name id size value maxlength class style tabindex onfocus onblur disabled &allow-other-keys)
+  (with-html-to-string
+    (:input :type type :name name :id id
+     :size size
+     :value value :maxlength maxlength :class class
+     :style style
+     :tabindex tabindex
+     :onfocus onfocus
+     :onblur onblur
+     :disabled disabled)))
+
+(deftemplate :input-field-wt 'input-field-wt)
 
 (defun render-input-field (type name value &key id class maxlength style size
                            onfocus onblur tabindex disabledp)
-  (with-html
-    (:input :type type :name (attributize-name name) :id id
-            :size size
-            :value value :maxlength maxlength :class class
-            :style style
-            :tabindex tabindex
-            :onfocus onfocus
-            :onblur onblur
-            :disabled (and disabledp "disabled"))))
+  (render-wt 
+    :input-field-wt 
+    nil 
+    :id id 
+    :type type 
+    :class class
+    :name (attributize-name name)
+    :disabled (and disabledp "disabled")
+    :size size
+    :value value :maxlength maxlength
+    :onfocus onfocus
+    :onblur onblur))
+
+(defun password-field-visibility-option-wt (&key content)
+  (with-html-to-string
+    (:label
+      (str content)
+      (esc "Show password"))))
+
+(deftemplate :password-field-visibility-option-wt 'password-field-visibility-option-wt)
 
 (defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
                         default-value size visibility-option-p tabindex disabledp)
@@ -357,11 +409,20 @@ used instead of the default 'Close'."
                         (if (== (slot-value it 'type) "password")
                           (setf (slot-value it 'type) "text")
                           (setf (slot-value it 'type) "password"))))))
-    (with-html
-      (:label
-        (render-checkbox (gen-id) nil
-                         :onclick (format nil "togglePasswordVisibility(\"~A\")" id))
-        (esc "Show password")))))
+    (render-wt 
+      :password-field-visibility-option-wt 
+      nil
+      :content (capture-weblocks-output 
+                 (render-checkbox (gen-id) nil
+                                  :onclick (format nil "togglePasswordVisibility(\"~A\")" id))))))
+
+(defun textarea-field-wt (&key name id rows cols class disabledp content &allow-other-keys)
+  (with-html-to-string
+    (:textarea :name name :id id
+     :rows rows :cols cols :class class :disabled (and disabledp "disabled")
+     (esc content))))
+
+(deftemplate :textarea-field-wt 'textarea-field-wt)
 
 (defun render-textarea (name value rows cols &key id class disabledp)
   "Renders a textarea in a form.
@@ -373,11 +434,40 @@ used instead of the default 'Close'."
 'cols' - number of columns in textarea
 'class' - a class used for styling. By default, \"textarea\".
 'disabledp' - input is disabled if true."
-  (with-html
-      (:textarea :name (attributize-name name) :id id
-                 :rows rows :cols cols :class class :disabled (and disabledp "disabled")
-                 (esc (or value "")))))
+  (render-wt :textarea-field-wt nil :name (attributize-name name) :id id :rows rows :cols cols :class class :disabledp disabledp :content (or value "")))
 
+(defun ordered-list-wt (&key class id content &allow-other-keys)
+  (with-html-to-string
+    (:ol :class class :id id
+     (str content))))
+
+(deftemplate :ordered-list-wt 'ordered-list-wt)
+
+(defun unordered-list-wt (&key class id content &allow-other-keys)
+  (with-html-to-string
+    (:ul :class class :id id
+     (str content))))
+
+(deftemplate :unordered-list-wt 'unordered-list-wt)
+
+(defun empty-list-wt (&key message &allow-other-keys)
+  (with-html-to-string
+    (:div :class "view"
+     (with-extra-tags 
+       (htm
+         (:div :class "empty"
+          (str message)))))))
+
+(deftemplate :empty-list-wt 'empty-list-wt)
+
+(defun list-item-wt (&key prefix-html suffix-html content &allow-other-keys)
+  (with-html-to-string 
+    (str prefix-html)
+    (:li (str content))
+    (str suffix-html)))
+
+(deftemplate :list-item-wt 'list-item-wt)
+ 
 (defun render-list (seq &key render-fn (orderedp nil) id class
                     (empty-message "There are no items in the list.")
                     empty-caption item-prefix-fn item-suffix-fn)
@@ -389,29 +479,20 @@ set orderedp to true. If item-prefix-fn or item-suffix-fn are
 provided, they're called before and after each item (respectively)
 with the item as a single argument."
   (if seq
-      (flet ((render-items ()
-               "Renders the items of the list."
-               (loop for i in seq
-                  do (with-html
-                       (safe-funcall item-prefix-fn i)
-                       (:li
-                        (if render-fn
-                            (funcall render-fn i)
-                            (render-widget i)))
-                       (safe-funcall item-suffix-fn i)))))
-        (if orderedp
-            (with-html
-              (:ol :class class :id id
-                   (render-items)))
-            (with-html
-              (:ul :class class :id id
-                   (render-items)))))
-      (with-html
-        (:div :class "view"
-              (with-extra-tags 
-                (htm
-                 (:div :class "empty"
-                       (render-message empty-message empty-caption))))))))
+    (flet ((render-items ()
+             "Renders the items of the list."
+             (loop for i in seq
+                   do (render-wt :list-item-wt nil 
+                                 :prefix-html (capture-weblocks-output (safe-funcall item-prefix-fn i))
+                                 :suffix-html (capture-weblocks-output (safe-funcall item-suffix-fn i))
+                                 :content (capture-weblocks-output 
+                                            (if render-fn
+                                              (funcall render-fn i)
+                                              (render-widget i)))))))
+      (if orderedp
+        (render-wt :ordered-list-wt nil :class class  :id id :content (capture-weblocks-output (render-items)))
+        (render-wt :unordered-list-wt nil :class class  :id id :content (capture-weblocks-output (render-items)))))
+    (render-wt :empty-list-wt nil :message (capture-weblocks-output (render-message empty-message empty-caption)))))
 
 (defmacro scriptonly (&body body)
   "Outputs HTML defined in the body in such a way that it takes effect
@@ -475,32 +556,3 @@ in addition."
     nil 
     :caption caption 
     :message message))
-
-(defmacro with-table (colnames &body body)
-  `(with-html
-     (:table :cellpadding 0 :cellspacing 0
-       (:thead
-         (:tr
-           ,@(loop for colname in colnames
-                   collect `(let ((evaled-colname ,colname))
-                              (htm
-                                (:th :class (awhen evaled-colname
-                                              (attributize-name it))
-                                   (awhen evaled-colname
-                                     (esc it))))))))
-       (:tbody
-         ,@body))))
-
-(defun render-definition-list (data &key class id style)
-  "Render the definition list DATA (a flat key/value list).
-The caller is responsible for escaping all data."
-  (assert (evenp (length data)) (data))
-  (with-html
-    (:dl :class class :id id :style style
-      (loop for dt = (pop data)
-            for dd = (pop data)
-            while (and dt dd)
-            do (htm
-                 (:dt :class (attributize-name dt) (str dt))
-                 (:dd :class (attributize-name dt) (str dd)))))))
-
