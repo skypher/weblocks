@@ -1,6 +1,6 @@
 (in-package :weblocks-util)
 
-(wexport '(*templates* remove-template deftemplate render-template-to-string render-wt-to-string render-wt)
+(wexport '(*templates* remove-template deftemplate render-wt-to-string render-wt)
          '(t util))
 
 (defvar *templates* (make-hash-table))
@@ -50,7 +50,7 @@
                   (t 0)))
       0)))
 
-(defun render-template-to-string (template context &rest args)
+(defun render-wt-to-string (template context &rest args)
   "Similar to render-wt but renders template to string instead of *weblocks-output-stream*"
   (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
@@ -81,5 +81,3 @@
       (apply 
         (car effective-template)
         args))))
-
-(setf (symbol-function 'render-wt-to-string) (symbol-function 'render-template-to-string))

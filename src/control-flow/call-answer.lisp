@@ -139,7 +139,7 @@ for styling purposes."
                  (let ((weblocks-stream *weblocks-output-stream*))
                    ; Does not work when replacing code with render-wt
                    (write-string 
-                     (render-template-to-string 
+                     (render-wt-to-string 
                        :modal-wt 
                        (list :css-class css-class :callee callee)
                        :title title 
