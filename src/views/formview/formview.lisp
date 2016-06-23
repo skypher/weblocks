@@ -306,8 +306,7 @@ form-view-buttons for a given view.")
                  (find name (form-view-buttons view)
                        :key (lambda (item)
                               (car (ensure-list item))))))))
-      (write-string 
-        (render-template-to-string 
+        (render-wt 
           :form-view-buttons-wt
           (list :view view :object obj :widget widget)
           :submit-html (let ((submit (find-button :submit)))
@@ -328,8 +327,7 @@ form-view-buttons for a given view.")
                                                      view 
                                                      :cancel-button-title
                                                      (translate (or (cdr cancel)
-                                                                  (humanize-name (car cancel))))))))))
-        *weblocks-output-stream*))))
+                                                                    (humanize-name (car cancel)))))))))))))
 
 (defmethod view-caption ((view form-view))
   (if (slot-value view 'caption)
@@ -375,26 +373,24 @@ form-view-buttons for a given view.")
               (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-form")))
 
-    (write-string 
-      (render-template-to-string 
-        :form-view-body-wt 
-        (list :view view :object obj :method method)
-        :method method 
-        :action action
-        :header-class header-class
-        :enctype (form-view-default-enctype view)
-        :extra-submit-code (capture-weblocks-output (render-form-submit-dependencies *form-submit-dependencies*))
-        :caption (view-caption view) 
-        :form-id (when (form-view-focus-p view) form-id)
-        :use-ajax-p (form-view-use-ajax-p view)
-        :class-name (humanize-name (object-class-name obj))
-        :validation-summary (capture-weblocks-output 
-                              (render-validation-summary view obj widget validation-errors))
-        :fields-prefix (capture-weblocks-output (safe-apply fields-prefix-fn view obj args))
-        :fields-suffix (capture-weblocks-output (safe-apply fields-suffix-fn view obj args))
-        :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
-        :content (capture-weblocks-output (apply body-fn view obj args)))
-      *weblocks-output-stream*)
+    (render-wt 
+      :form-view-body-wt 
+      (list :view view :object obj :method method)
+      :method method 
+      :action action
+      :header-class header-class
+      :enctype (form-view-default-enctype view)
+      :extra-submit-code (capture-weblocks-output (render-form-submit-dependencies *form-submit-dependencies*))
+      :caption (view-caption view) 
+      :form-id (when (form-view-focus-p view) form-id)
+      :use-ajax-p (form-view-use-ajax-p view)
+      :class-name (humanize-name (object-class-name obj))
+      :validation-summary (capture-weblocks-output 
+                            (render-validation-summary view obj widget validation-errors))
+      :fields-prefix (capture-weblocks-output (safe-apply fields-prefix-fn view obj args))
+      :fields-suffix (capture-weblocks-output (safe-apply fields-suffix-fn view obj args))
+      :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
+      :content (capture-weblocks-output (apply body-fn view obj args)))
     (when (form-view-focus-p view)
       (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
 
@@ -437,29 +433,27 @@ form-view-buttons for a given view.")
          (required-indicator (form-view-field-required-indicator field))
          (show-required-indicator (and (form-view-field-required-p field)
                                        required-indicator)))
-    (write-string 
-      (render-template-to-string 
-        :form-view-field-wt
-        (list :field field :view view :widget widget :presentation presentation :object obj)
-        :label-class (attributize-presentation
-                       (view-field-presentation field))
-        :id *presentation-dom-id*
-        :show-required-indicator show-required-indicator
-        :required-indicator-label (when show-required-indicator
-                                    (if (eq t required-indicator)
-                                      (widget-translate field :required-indicator)
-                                      required-indicator))
-        :show-field-label (not (empty-p (view-field-label field)))
-        :field-label (translate (view-field-label field))
-        :field-class field-class
-        :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
-        :content (capture-weblocks-output 
-                   (apply #'render-view-field-value
-                          value presentation
-                          field view widget obj
-                          :field-info field-info
-                          args)))
-      *weblocks-output-stream*)))
+    (render-wt 
+      :form-view-field-wt
+      (list :field field :view view :widget widget :presentation presentation :object obj)
+      :label-class (attributize-presentation
+                     (view-field-presentation field))
+      :id *presentation-dom-id*
+      :show-required-indicator show-required-indicator
+      :required-indicator-label (when show-required-indicator
+                                  (if (eq t required-indicator)
+                                    (widget-translate field :required-indicator)
+                                    required-indicator))
+      :show-field-label (not (empty-p (view-field-label field)))
+      :field-label (translate (view-field-label field))
+      :field-class field-class
+      :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
+      :content (capture-weblocks-output 
+                 (apply #'render-view-field-value
+                        value presentation
+                        field view widget obj
+                        :field-info field-info
+                        args)))))
 
 (defmethod widget-translation-table append ((obj form-view-field) &rest args)
   `((:required-indicator . ,(translate *default-required-indicator*))))
@@ -483,20 +477,18 @@ form-view-buttons for a given view.")
                                   (attributize-view-field-name field-info)
                                   (attributize-name (view-field-slot-name field)))))
     (multiple-value-bind (intermediate-value intermediate-value-p)
-        (form-field-intermediate-value field intermediate-values)
-        (write-string 
-          (render-template-to-string 
-            :form-view-field-value-wt
-            (list :field field :view view :widget widget :presentation presentation :object obj)
-            :name attributized-slot-name 
-            :max-length (input-presentation-max-length presentation)
-            :disabledp (form-view-field-disabled-p field obj)
-            :value (if intermediate-value-p
-                     intermediate-value
-                     (apply #'print-view-field-value value presentation field view widget obj args))
-            :size (input-presentation-size presentation)
-            :id *presentation-dom-id*)
-          *weblocks-output-stream*))))
+      (form-field-intermediate-value field intermediate-values)
+      (render-wt 
+        :form-view-field-value-wt
+        (list :field field :view view :widget widget :presentation presentation :object obj)
+        :name attributized-slot-name 
+        :max-length (input-presentation-max-length presentation)
+        :disabledp (form-view-field-disabled-p field obj)
+        :value (if intermediate-value-p
+                 intermediate-value
+                 (apply #'print-view-field-value value presentation field view widget obj args))
+        :size (input-presentation-size presentation)
+        :id *presentation-dom-id*))))
 
 (defmethod print-view-field-value ((value null) (presentation input-presentation)
                                    field view widget obj &rest args)

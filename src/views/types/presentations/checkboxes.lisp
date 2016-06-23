@@ -45,8 +45,8 @@
                                    (when validation-error " item-not-validated")))
          (show-required-indicator (and (form-view-field-required-p field)
                                        (not (form-view-field-disabled-p field obj)))))
-    (write-string 
-      (render-template-to-string 
+    
+      (render-wt 
         :checkboxes-view-field-wt 
         (list :field field :view view :widget widget :presentation presentation :object obj)
         :field-class field-class 
@@ -61,8 +61,7 @@
                    (apply #'render-view-field-value
                           value presentation
                           field view widget obj
-                          args)))
-      *weblocks-output-stream*)))
+                          args)))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     (field form-view-field) (view form-view) widget obj

@@ -98,20 +98,18 @@ messages that need to be shown for AJAX effects."
   (declare (special *on-ajax-complete-scripts* *dirty-widgets*))
   (let ((messages (flash-messages-to-show obj)))
     (when messages
-      (write-string 
-        (render-template-to-string 
-          :flash-messages-wt 
-          (list :widget obj)
-          :content (format 
-                     nil "~{~A~}"
-                     (mapcar 
-                       (lambda (msg)
-                         (render-template-to-string 
-                           :single-flash-message-wt
-                           (list :widget msg)
-                           :content (capture-weblocks-output 
-                                      (apply #'render-widget msg args))))
-                       messages)))
-        *weblocks-output-stream*)
+      (render-wt
+        :flash-messages-wt 
+        (list :widget obj)
+        :content (format 
+                   nil "~{~A~}"
+                   (mapcar 
+                     (lambda (msg)
+                       (render-wt-to-string 
+                         :single-flash-message-wt
+                         (list :widget msg)
+                         :content (capture-weblocks-output 
+                                    (apply #'render-widget msg args))))
+                     messages)))
       (send-script (ps* `((@ ($ ,(dom-id obj)) show)))))))
 

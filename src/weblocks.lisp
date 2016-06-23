@@ -81,7 +81,7 @@ variable. All html should be rendered to this stream.")
    context is a plist which is used for effective template finding.
    Other arguments are used as template parameters."
   (write-string 
-    (apply #'render-template-to-string (list* template context args))
+    (apply #'render-wt-to-string (list* template context args))
     *weblocks-output-stream*))
 
 (defmacro with-html-to-string (&body body)

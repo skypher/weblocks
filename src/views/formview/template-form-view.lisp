@@ -79,42 +79,41 @@
                              (list (alexandria:make-keyword (view-field-slot-name (field-info-field field-info)))
                                    (translate (view-field-label (field-info-field field-info)))))))
              view obj args)
-      (write-string 
-        (apply 
-          #'render-template-to-string 
-          (list* 
-            template
-            (list :view view :object obj :method method)
-            :method method 
-            :action action
-            :header-class (attributize-name (object-class-name obj))
-            :enctype (form-view-default-enctype view)
-            :extra-submit-code (capture-weblocks-output (render-form-submit-dependencies *form-submit-dependencies*))
-            :caption (view-caption view) 
-            :form-id (when (form-view-focus-p view) form-id)
-            :use-ajax-p (form-view-use-ajax-p view)
-            :class-name (humanize-name (object-class-name obj))
-            :validation-summary (capture-weblocks-output 
-                                  (render-validation-summary view obj widget validation-errors))
-            :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
-            :fields-data fields-data
-            :field-values-data field-values-data
-            :labels-data labels-data
-            :content (capture-weblocks-output (apply body-fn view obj args))
-            (append 
-              (loop for (key value) on fields-data  :by #'cddr
-                    append (list 
-                             (alexandria:make-keyword (format nil "~A-FIELD" key))
-                             value))
-              (loop for (key value) on field-values-data  :by #'cddr
-                    append (list 
-                             (alexandria:make-keyword (format nil "~A-FIELD-VALUE" key))
-                             value))
-              (loop for (key value) on labels-data  :by #'cddr
-                    append (list 
-                             (alexandria:make-keyword (format nil "~A-LABEL" key))
-                             value))
-              (safe-apply additional-variables-fn (list :view view :object obj :widget widget)))))
-        *weblocks-output-stream*)))
+
+      (apply 
+        #'render-wt 
+        (list* 
+          template
+          (list :view view :object obj :method method)
+          :method method 
+          :action action
+          :header-class (attributize-name (object-class-name obj))
+          :enctype (form-view-default-enctype view)
+          :extra-submit-code (capture-weblocks-output (render-form-submit-dependencies *form-submit-dependencies*))
+          :caption (view-caption view) 
+          :form-id (when (form-view-focus-p view) form-id)
+          :use-ajax-p (form-view-use-ajax-p view)
+          :class-name (humanize-name (object-class-name obj))
+          :validation-summary (capture-weblocks-output 
+                                (render-validation-summary view obj widget validation-errors))
+          :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
+          :fields-data fields-data
+          :field-values-data field-values-data
+          :labels-data labels-data
+          :content (capture-weblocks-output (apply body-fn view obj args))
+          (append 
+            (loop for (key value) on fields-data  :by #'cddr
+                  append (list 
+                           (alexandria:make-keyword (format nil "~A-FIELD" key))
+                           value))
+            (loop for (key value) on field-values-data  :by #'cddr
+                  append (list 
+                           (alexandria:make-keyword (format nil "~A-FIELD-VALUE" key))
+                           value))
+            (loop for (key value) on labels-data  :by #'cddr
+                  append (list 
+                           (alexandria:make-keyword (format nil "~A-LABEL" key))
+                           value))
+            (safe-apply additional-variables-fn (list :view view :object obj :widget widget)))))))
   (when (form-view-focus-p view)
     (send-script (ps* `((@ ($ ,form-id) focus-first-element))))))

@@ -137,6 +137,7 @@ for styling purposes."
                (lambda (&rest args)
                  (declare (ignore args))
                  (let ((weblocks-stream *weblocks-output-stream*))
+                   ; Does not work when replacing code with render-wt
                    (write-string 
                      (render-template-to-string 
                        :modal-wt 

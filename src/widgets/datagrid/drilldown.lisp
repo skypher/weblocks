@@ -69,23 +69,22 @@
           (drilled-down-p (and (dataseq-drilled-down-item widget)
                                (eql (object-id (dataseq-drilled-down-item widget))
                                     (object-id obj)))))
-      (write-string 
-        (render-template-to-string 
-          :datagrid-table-view-body-row-wt
-          (list :view view :object obj :widget widget)
-          :object obj
-          :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
-          :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args))
-          :row-action row-action
-          :session-string (session-name-string-pair)
-          :row-class (when (or alternp drilled-down-p)
-                       (concatenate 'string
-                                    (when alternp "altern")
-                                    (when (and alternp drilled-down-p) " ")
-                                    (when drilled-down-p "drilled-down")))
-          :alternp alternp 
-          :drilled-down-p drilled-down-p
-          :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget :row-action row-action args)))
-        *weblocks-output-stream*))
+      
+      (render-wt 
+        :datagrid-table-view-body-row-wt
+        (list :view view :object obj :widget widget)
+        :object obj
+        :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
+        :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args))
+        :row-action row-action
+        :session-string (session-name-string-pair)
+        :row-class (when (or alternp drilled-down-p)
+                     (concatenate 'string
+                                  (when alternp "altern")
+                                  (when (and alternp drilled-down-p) " ")
+                                  (when drilled-down-p "drilled-down")))
+        :alternp alternp 
+        :drilled-down-p drilled-down-p
+        :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget :row-action row-action args))))
     (call-next-method)))
 

@@ -18,9 +18,7 @@
                                           field view widget obj &rest args
                                           &key &allow-other-keys)
   (let ((printed-value (apply #'print-view-field-value value presentation field view widget obj args)))
-    (write-string 
-      (render-template-to-string 
+      (render-wt 
         :html-presentation-field-value-wt
         (list :field field :view view :widget widget :object obj :presentation presentation)
-        :value printed-value)
-      *weblocks-output-stream*)))
+        :value printed-value)))

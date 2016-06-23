@@ -123,8 +123,7 @@ without escaping."
    'id' - id of the html control. Default is nil.
    'class' - a class used for styling. By default, \"submit\".
    'disabledp' - button is disabled if true."
-  (write-string 
-    (render-template-to-string 
+    (render-wt 
       :button-wt
       nil
       :value value
@@ -132,8 +131,7 @@ without escaping."
       :id id
       :class class 
       :disabledp disabledp 
-      :submitp (string= name "submit"))
-    *weblocks-output-stream*))
+      :submitp (string= name "submit")))
 
 (defun render-form-and-button (name action &key (value (humanize-name name))
                                (method :get)
@@ -299,22 +297,20 @@ for the value.
                                                     ((eql j 1) " first")
                                                     ((eql j count) " last")
                                                     (t "")))
-     do (write-string 
-          (render-template-to-string 
-            :radio-buttons-wt 
-            (list 
-              :template-for :radio-buttons 
-              :radio-name name)
-            :label-class label-class
-            :id id
-            :name (attributize-name name)
-            :value (cdr i)
-            :checked (when (and selected-value-supplied
-                                (equalp (cdr i) selected-value))
-                       "checked")
-            :disabled (and disabledp "disabled")
-            :label (car i))
-          *weblocks-output-stream*)))
+     do (render-wt 
+          :radio-buttons-wt 
+          (list 
+            :template-for :radio-buttons 
+            :radio-name name)
+          :label-class label-class
+          :id id
+          :name (attributize-name name)
+          :value (cdr i)
+          :checked (when (and selected-value-supplied
+                              (equalp (cdr i) selected-value))
+                     "checked")
+          :disabled (and disabledp "disabled")
+          :label (car i))))
 
 (defun render-close-button (close-action &optional (button-string "(Close)"))
   "Renders a close button. If the user clicks on the close button,
@@ -474,13 +470,11 @@ in addition."
 
 (defun render-message (message &optional caption)
   "Renders a message to the user with standardized markup."
-  (write-string 
-    (render-template-to-string 
-      :render-message-wt
-      nil 
-      :caption caption 
-      :message message)
-    *weblocks-output-stream*))
+  (render-wt 
+    :render-message-wt
+    nil 
+    :caption caption 
+    :message message))
 
 (defmacro with-table (colnames &body body)
   `(with-html

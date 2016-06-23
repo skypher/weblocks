@@ -43,8 +43,7 @@
          (show-required-indicator (and (form-view-field-required-p field)
                                        (not (form-view-field-disabled-p field obj))
                                        required-indicator)))
-    (write-string 
-      (render-template-to-string 
+      (render-wt 
         :radio-view-field-wt 
         (list :field field :view view :widget widget :presentation presentation :object obj :value value)
         :field-class field-class 
@@ -59,8 +58,7 @@
                    (apply #'render-view-field-value
                           value presentation
                           field view widget obj
-                          args)))
-      *weblocks-output-stream*)))
+                          args)))))
 
 (defmethod render-view-field-value (value (presentation radio-presentation)
                                     (field form-view-field) (view form-view) widget obj

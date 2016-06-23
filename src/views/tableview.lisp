@@ -89,15 +89,13 @@
                    table, thead, and tbody HTML.")
                    (:method ((view table-view) obj widget header-fn rows-fn &rest args
                                                &key summary &allow-other-keys)
-                    (write-string 
-                      (render-template-to-string 
-                        :table-view-header-wt 
-                        (list :view view :object obj :widget widget)
-                        :caption (view-caption view)
-                        :summary (or summary (table-view-default-summary view))
-                        :header-content (capture-weblocks-output (apply header-fn view (car obj) widget args))
-                        :content (capture-weblocks-output (apply rows-fn view obj widget args)))
-                      *weblocks-output-stream*)))
+                            (render-wt
+                              :table-view-header-wt 
+                              (list :view view :object obj :widget widget)
+                              :caption (view-caption view)
+                              :summary (or summary (table-view-default-summary view))
+                              :header-content (capture-weblocks-output (apply header-fn view (car obj) widget args))
+                              :content (capture-weblocks-output (apply rows-fn view obj widget args)))))
 
 (defun table-header-row-wt (&key suffix content prefix)
   (with-html-to-string
@@ -114,14 +112,12 @@
      'render-table-view-header-row' to render the header cells. Specialize
      this function to modify HTML around a given header row's cells.")
      (:method ((view table-view) obj widget &rest args)
-      (write-string 
-        (render-template-to-string 
+        (render-wt 
           :table-header-row-wt 
           (list :view view :object obj :widget widget)
           :suffix (capture-weblocks-output (safe-apply (table-view-header-row-prefix-fn view) view obj args))
           :content (capture-weblocks-output (apply #'render-table-view-header-row view obj widget args))
-          :prefix (capture-weblocks-output (safe-apply (table-view-header-row-suffix-fn view) view obj args)))
-        *weblocks-output-stream*)))
+          :prefix (capture-weblocks-output (safe-apply (table-view-header-row-suffix-fn view) view obj args)))))
 
 (defgeneric render-table-view-header-row (view obj widget &rest args)
   (:documentation
@@ -153,15 +149,13 @@
   (:documentation "Renders a table header cell.")
   (:method ((field table-view-field) (view table-view) widget presentation value obj &rest args
                                      &key field-info &allow-other-keys)
-   (write-string 
-     (render-template-to-string 
-       :table-view-field-header-wt 
-       (list :view view :field field :widget widget :presentation presentation :object obj)
-       :row-class (if field-info
-                    (attributize-view-field-name field-info)
-                    (attributize-name (view-field-slot-name field)))
-       :label (translate (view-field-label field)))
-     *weblocks-output-stream*)))
+           (render-wt 
+             :table-view-field-header-wt 
+             (list :view view :field field :widget widget :presentation presentation :object obj)
+             :row-class (if field-info
+                          (attributize-view-field-name field-info)
+                          (attributize-name (view-field-slot-name field)))
+             :label (translate (view-field-label field)))))
 
 (defun table-view-body-row-wt (&key prefix suffix row-class content)
   (with-html-to-string
@@ -178,15 +172,13 @@
     "Used by table view to render body rows. Specialize this function
      to modify HTML around a given row's cells.")
             (:method ((view table-view) obj widget &rest args &key alternp &allow-other-keys)
-             (write-string 
-               (render-template-to-string 
-                 :table-view-body-row-wt 
-                 (list :view view :widget widget :object obj)
-                 :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget args))
-                 :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
-                 :row-class (if alternp "altern" nil)
-                 :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args)))
-               *weblocks-output-stream*)))
+                     (render-wt 
+                       :table-view-body-row-wt 
+                       (list :view view :widget widget :object obj)
+                       :content (capture-weblocks-output (apply #'render-table-view-body-row view obj widget args))
+                       :prefix (capture-weblocks-output (safe-apply (sequence-view-row-prefix-fn view) view obj args))
+                       :row-class (if alternp "altern" nil)
+                       :suffix (capture-weblocks-output (safe-apply (sequence-view-row-suffix-fn view) view obj args)))))
 
 (defgeneric render-table-view-body-row (view obj widget &rest args)
   (:documentation
@@ -208,15 +200,25 @@
                  (safe-apply (view-field-suffix-fn field) view field obj args)))
              view obj (table-view-field-sorter view) args)))
 
+(defun table-view-body-row-cell-wt (&key class content)
+  (with-html-to-string
+    (:td :class class
+     (str content))))
+
+(deftemplate :table-view-body-row-cell-wt 'table-view-body-row-cell-wt)
+
 (defmethod render-view-field ((field table-view-field) (view table-view)
-                              widget presentation value obj
-                              &rest args
-                              &key field-info &allow-other-keys)
-  (with-html
-    (:td :class (if field-info
-                  (attributize-view-field-name field-info)
-                  (attributize-name (view-field-slot-name field)))
-         (apply #'render-view-field-value value presentation field view widget obj args))))
+                                                       widget presentation value obj
+                                                       &rest args
+                                                       &key field-info &allow-other-keys)
+  (render-wt 
+    :table-view-body-row-cell-wt 
+    (list :view view :widget widget :object obj)
+    :class (if field-info
+             (attributize-view-field-name field-info)
+             (attributize-name (view-field-slot-name field)))
+    :content (capture-weblocks-output 
+               (apply #'render-view-field-value value presentation field view widget obj args))))
 
 ;; The table itself
 (defmethod render-object-view-impl ((obj sequence) (view table-view) widget &rest args &key
