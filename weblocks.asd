@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.13.1"
+   :version "0.13.2"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -201,8 +201,6 @@
      :depends-on (widget "dataseq"))
     (:file "pagination"
      :depends-on (widget "flash"))
-#+(or)(:file "table-composite"
-        :depends-on (composite))
     (:file "selector"
      :depends-on (widget))
     (:file "on-demand-selector"

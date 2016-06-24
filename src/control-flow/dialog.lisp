@@ -120,6 +120,8 @@ scales down to 'do-modal' instead."
     (:p (str message)) 
     (str content)))
 
+(deftemplate :choices-post-wt 'choices-post-wt)
+
 (defun render-choices-post (msg choices k &rest args)
   "Renders the contents of a choice dialog with choices displayed as
    form buttons in a POST form."

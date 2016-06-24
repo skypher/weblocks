@@ -3,7 +3,7 @@
 
 (export '(handle-http-error handle-error-condition print-trivial-backtrace))
 
-(defun error-page-html-wt (&key title heading description &allow-other-keys)
+(defun error-page-html-wt (&key title heading description content &allow-other-keys)
   (with-html-to-string
     (:html
       (:head
@@ -31,7 +31,8 @@
      :title ,title
      :heading ,heading
      :description ,description
-     :content (capture-weblocks-output ,@body)))
+     :content (capture-weblocks-output 
+                (with-html ,@body))))
 
 (defmethod handle-http-error ((app weblocks-webapp) code &optional condition)
   (with-error-page-html ((escape-string (format nil "~A ~A" code (reason-phrase code)))
