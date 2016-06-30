@@ -16,7 +16,7 @@
           (htm (:h2 "Description")
                (:p (:tt (str description)))))
         (str content)
-        (when (or description body)
+        (when (or description content)
           (htm (:hr)))
         (:div :class "footer"
          "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
