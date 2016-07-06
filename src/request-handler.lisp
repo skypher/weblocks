@@ -76,7 +76,9 @@ customize behavior."))
                             (return-from handle-client-request
                                          (handle-error-condition app c))
                             (invoke-debugger c)))))
-    (let ((*print-pretty* t))
+    (let ((*print-pretty* t)
+          ; Hunchentoot already displays warnings into log file, we just suppress output
+          (*error-output* (make-string-output-stream)))
       (with-webapp app (call-next-method)))))
 
 (defmethod handle-client-request :around (app)
