@@ -284,6 +284,8 @@
   (asdf:operate 'doc-op :weblocks))
 
 (defun make-app (name &optional target)
+   "Creates a new Weblocks app named <name> into directory <target> 
+    based on the new-app-template."
    (or (find-package :weblocks-scripts) (asdf:load-system :weblocks-scripts))
    (funcall (find-symbol "MAKE-APPLICATION" "WEBLOCKS-SCRIPTS") name target))
 
