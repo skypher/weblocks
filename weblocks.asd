@@ -8,7 +8,7 @@
 
 (defsystem weblocks
    :name "weblocks"
-   :version "0.13.5"
+   :version "0.13.6"
    :maintainer "Olexiy Zamkoviy, Scott L. Burson"
    :author "Slava Akhmechet"
    :licence "LLGPL"
@@ -287,6 +287,6 @@
    "Creates a new Weblocks app named <name> into directory <target> 
     based on the new-app-template."
    (or (find-package :weblocks-scripts) (asdf:load-system :weblocks-scripts))
-   (funcall (find-symbol "MAKE-APPLICATION" "WEBLOCKS-SCRIPTS") name target))
+   (uiop:symbol-call :weblocks-scripts :make-application name target))
 
 
