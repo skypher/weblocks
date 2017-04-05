@@ -9,6 +9,10 @@ env:
     - LISP=sbcl
     - LISP=ccl
 
+matrix:
+  allow_failures:
+    - env: LISP=ccl
+
 addons:
   apt:
     packages:
@@ -21,7 +25,19 @@ cache:
   directories:
     - $HOME/.roswell
     - $HOME/.config/common-lisp
-    
+
+before_script:
+  - cat /proc/meminfo
+  - ros --version
+  - ros config
+  - ros -e '(princ (lisp-implementation-type))
+            (terpri)
+            (princ (lisp-implementation-version))
+            (terpri)
+            (princ *features*)
+            (terpri)
+            (uiop:quit 0)'
+  
 script:
   # - echo '(handler-case (progn (ql:quickload :weblocks-test)
   #                              (weblocks-test:test-weblocks))
