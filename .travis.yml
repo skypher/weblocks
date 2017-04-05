@@ -9,6 +9,11 @@ env:
     - LISP=sbcl
     - LISP=ccl
 
+addons:
+  apt:
+    packages:
+      - libtidy-dev
+
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
 
