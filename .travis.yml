@@ -18,3 +18,4 @@ cache:
     
 script:
   - echo '(ql:quickload :weblocks-test) (weblocks-test:test-weblocks)' | ros run
+
