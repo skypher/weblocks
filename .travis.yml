@@ -6,7 +6,7 @@ env:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
-    - LISP=sbcl
+    - LISP=sbcl OPTS="--dynamic-space-size 2048"
     - LISP=ccl
 
 matrix:
@@ -46,8 +46,9 @@ script:
   #                   (uiop:quit 1)))' | ros run && echo "TESTS ARE OK" || echo "TESTS ARE FAILED"
   # - exit 1
   # - echo '(uiop:quit 1)' | ros run
+  - echo "OPTS=$OPTS"
   - echo '(uiop:quit
              (or (ignore-errors
                          (progn (ql:quickload :weblocks-test)
                                 (funcall (intern "test-weblocks" "weblocks-test"))))
-                 1))' | ros run
+                 1))' | ros run $OPTS
