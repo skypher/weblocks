@@ -33,5 +33,5 @@ script:
   - echo '(uiop:quit
              (or (ignore-errors
                          (progn (ql:quickload :weblocks-test)
-                                (weblocks-test:test-weblocks)))
+                                (funcall (intern "test-weblocks" "weblocks-test"))))
                  1))' | ros run
