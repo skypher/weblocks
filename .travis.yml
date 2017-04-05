@@ -25,5 +25,6 @@ cache:
 script:
   - echo '(handler-case (progn (ql:quickload :weblocks-test)
                                (weblocks-test:test-weblocks))
-              (t () (uiop:quit 1)))' | ros run
-
+              (t () (princ "Error occured, returning 1")
+                    (terpri)
+                    (uiop:quit 1)))' | ros run && echo "TESTS ARE OK" || echo "TESTS ARE FAILED"
