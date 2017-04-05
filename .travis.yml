@@ -29,9 +29,9 @@ script:
   #                   (terpri)
   #                   (uiop:quit 1)))' | ros run && echo "TESTS ARE OK" || echo "TESTS ARE FAILED"
   # - exit 1
-  - echo '(uiop:quit 1)' | ros run
-  # - echo '(uiop:quit
-  #            (or (ignore-errors
-  #                        (progn (ql:quickload :weblocks-test)
-  #                               (weblocks-test:test-weblocks)))
-  #                1))' | ros run && echo "TESTS ARE OK" || echo "TESTS ARE FAILED"
+  # - echo '(uiop:quit 1)' | ros run
+  - echo '(uiop:quit
+             (or (ignore-errors
+                         (progn (ql:quickload :weblocks-test)
+                                (weblocks-test:test-weblocks)))
+                 1))' | ros run
