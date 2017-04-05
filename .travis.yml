@@ -8,12 +8,10 @@ env:
 
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
-  - git clone 
 
 cache:
   directories:
     - $HOME/.roswell
-    - $HOME/nginx
     - $HOME/.config/common-lisp
     
 script:
