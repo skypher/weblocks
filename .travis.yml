@@ -2,6 +2,9 @@ language: common-lisp
 sudo: false
 
 env:
+  global:
+    - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
+    - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
     - LISP=sbcl
     - LISP=ccl
