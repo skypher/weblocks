@@ -18,5 +18,7 @@ cache:
     - $HOME/.config/common-lisp
     
 script:
-  - echo '(ql:quickload :weblocks-test) (weblocks-test:test-weblocks)' | ros run
+  - echo '(handler-case (progn (ql:quickload :weblocks-test)
+                               (weblocks-test:test-weblocks))
+              (t () (uiop:quit 1)))' | ros run
 
