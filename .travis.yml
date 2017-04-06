@@ -54,7 +54,7 @@ script:
                                 (princ "Everything loaded, starting tests.")
                                 (terpri)
                                 (terpri)
-                                (funcall (intern "test-weblocks" "weblocks-test"))
+                                (funcall (intern "TEST-WEBLOCKS" "WEBLOCKS-TEST"))
                                 (princ "DONE")
                                 (terpri)))
                  1))' | ros run -- $OPTS
