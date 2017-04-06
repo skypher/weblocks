@@ -16,10 +16,14 @@ exec ros -Q -- $0 "$@"
 (defun main (&rest argv)
   (declare (ignorable argv))
   
-  (let ((result (weblocks-test:test-weblocks)))
+  (ignore-errors
+   (let ((result (weblocks-test:test-weblocks)))
 
-    (if (lift:errors result)
-        (uiop:quit 1)
-        (uiop:quit 0))))
+     (if (lift:errors result)
+         (uiop:quit 1)
+         (uiop:quit 0))))
+  
+  ;; some error was raised by test-framework
+  (uiop:quit 2))
 
 ;;; vim: set ft=lisp lisp:

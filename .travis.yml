@@ -23,7 +23,9 @@ addons:
   apt:
     packages:
       - libtidy-dev
-
+      - libc6-i386
+      - openjdk-7-jre
+      
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
 
