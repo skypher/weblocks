@@ -1,0 +1,25 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#| <Put a one-line description here>
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp
+  (ql:quickload :weblocks-test))
+
+(defpackage :ros.script.run-tests.3700466499
+  (:use :cl))
+(in-package :ros.script.run-tests.3700466499)
+
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  
+  (let ((result (weblocks-test:test-weblocks)))
+
+    (if (lift:errors result)
+        (uiop:quit 1)
+        (uiop:quit 0))))
+
+;;; vim: set ft=lisp lisp:

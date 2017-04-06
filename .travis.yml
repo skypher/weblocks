@@ -47,14 +47,15 @@ script:
   # - exit 1
   # - echo '(uiop:quit 1)' | ros run
   - echo "OPTS=$OPTS"
-  - echo '(uiop:quit
-             (or (ignore-errors
-                         (progn (ql:quickload :weblocks-test)
-                                (terpri)
-                                (princ "Everything loaded, starting tests.")
-                                (terpri)
-                                (terpri)
-                                (funcall (intern "TEST-WEBLOCKS" "WEBLOCKS-TEST"))
-                                (princ "DONE")
-                                (terpri)))
-                 1))' | ros run -- $OPTS
+  - ./run-tests.ros
+  # - echo '(uiop:quit
+  #            (or (ignore-errors
+  #                        (progn (ql:quickload :weblocks-test)
+  #                               (terpri)
+  #                               (princ "Everything loaded, starting tests.")
+  #                               (terpri)
+  #                               (terpri)
+  #                               (funcall (intern "TEST-WEBLOCKS" "WEBLOCKS-TEST"))
+  #                               (princ "DONE")
+  #                               (terpri)))
+  #                1))' | ros run -- $OPTS
