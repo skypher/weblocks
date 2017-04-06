@@ -51,4 +51,4 @@ script:
              (or (ignore-errors
                          (progn (ql:quickload :weblocks-test)
                                 (funcall (intern "test-weblocks" "weblocks-test"))))
-                 1))' | ros run $OPTS
+                 1))' | ros run -- $OPTS
