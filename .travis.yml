@@ -32,8 +32,9 @@ addons:
     packages:
       - libtidy-dev
       - libc6-i386
-      # For AllegroCL
+      # For AllegroCL, because CL+SSL requires it
       - libssl1.0.0
+      - libssl-dev
       - openjdk-7-jre
       
 install:
