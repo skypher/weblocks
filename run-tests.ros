@@ -7,7 +7,7 @@ exec ros -Q -- $0 "$@"
   (ros:ensure-asdf)
   #+quicklisp
   (handler-case (ql:quickload :weblocks-test)
-    (t (c)
+    (error (c)
       (format t "~%Unable to load :WEBLOCKS-TEST~%Error was: ~a~2%"
               c)
       (uiop:quit 3))))
