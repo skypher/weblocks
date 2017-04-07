@@ -1,7 +1,7 @@
 #!/bin/sh
 #|-*- mode:lisp -*-|#
 #| <Put a one-line description here>
-exec ros -Q -- $0 "$@"
+exec ros dynamic-space-size=4096 -Q -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
@@ -23,7 +23,6 @@ exec ros -Q -- $0 "$@"
 
   (format t "~%WEBLOCKS-TEST's location: ~a~2%"
           (ql:where-is-system :weblocks-test))
-  
   
   (ignore-errors
    (let ((result (weblocks-test:test-weblocks)))
