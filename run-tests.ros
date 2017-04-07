@@ -8,7 +8,8 @@ exec ros -Q -- $0 "$@"
   #+quicklisp
   (handler-case (ql:quickload :weblocks-test)
     (t (c)
-      (format t "~%Unable to load :WEBLOCKS-TEST~%Error was: ~a~2%")
+      (format t "~%Unable to load :WEBLOCKS-TEST~%Error was: ~a~2%"
+              c)
       (uiop:quit 3))))
 
 
