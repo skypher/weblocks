@@ -7,17 +7,19 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
     # OPTS="--dynamic-space-size 4096"
-    - LISP=sbcl
-    - LISP=ecl
-    - LISP=abcl
+    # - LISP=sbcl
+    # - LISP=ecl
+    # - LISP=abcl
     - LISP=allegro
-    - LISP=ccl
-    - LISP=clisp
-    - LISP=cmucl
+    # - LISP=ccl
+    # - LISP=clisp
+    # - LISP=cmucl
 
 matrix:
   allow_failures:
     - env: LISP=ccl
+    # it shows success but actually fails with tracebacks
+    - env: LISP=abcl
 
 addons:
   apt:
@@ -45,6 +47,7 @@ before_script:
             (princ *features*)
             (terpri)
             (uiop:quit 0)'
+  - apt-cache search -n libssl
   
 script:
   # - echo '(handler-case (progn (ql:quickload :weblocks-test)
