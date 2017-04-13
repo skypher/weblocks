@@ -11,7 +11,7 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
   (format t "LIBRARY-DIRECTORIES: ~S"
           (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")))
   (pushnew "/lib/x86_64-linux-gnu/"
-           (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")
+           (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI"))
            :test #'equal)
   
   (handler-case (ql:quickload :weblocks-test)
