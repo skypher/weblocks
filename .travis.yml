@@ -9,6 +9,8 @@ env:
     # OPTS="--dynamic-space-size 4096"
     # - LISP=sbcl
     - LISP=allegro
+      # to make it find libssl.so.1.0.0
+      LD_LIBRARY_PATH=/lib/x86_64-linux-gnu
     # fails with mmap: Invalid argument
     #            ensure_space: Failed to validate 0 bytes at 0x58100000
     # - LISP=cmucl
