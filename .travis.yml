@@ -33,8 +33,8 @@ addons:
       - libtidy-dev
       - libc6-i386
       # For AllegroCL, because CL+SSL requires it
-      - libssl1.0.0
-      - libssl-dev
+#      - libssl1.0.0
+#      - libssl-dev
       - openjdk-7-jre
       
 install:
@@ -46,6 +46,7 @@ cache:
     - $HOME/.config/common-lisp
 
 before_script:
+  - env
   - cat /proc/meminfo
   - ros --version
   - ros config
@@ -56,7 +57,7 @@ before_script:
             (princ *features*)
             (terpri)
             (uiop:quit 0)'
-  - apt-cache search -n libssl
+#  - apt-cache search -n libssl
   - dpkg -S libssl
   
 script:
