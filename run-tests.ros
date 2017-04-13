@@ -5,6 +5,10 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
+  (pushnew "/lib/x86_64-linux-gnu/"
+           cffi:*foreign-library-directories*
+           :test #'equal)
+  
   #+quicklisp
   (handler-case (ql:quickload :weblocks-test)
     (error (c)
