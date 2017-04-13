@@ -7,7 +7,9 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
   (ros:ensure-asdf)
   
   (ql:quickload :cffi)
-  
+
+  (format t "LIBRARY-DIRECTORIES: ~S"
+          (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI"))
   (pushnew "/lib/x86_64-linux-gnu/"
            (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")
            :test #'equal)
