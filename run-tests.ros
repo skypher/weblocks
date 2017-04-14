@@ -8,11 +8,11 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
   
   (ql:quickload :cffi)
 
-  ;; (format t "LIBRARY-DIRECTORIES: ~S"
-  ;;         (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")))
-  ;; (pushnew "/lib/x86_64-linux-gnu/"
-  ;;          (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI"))
-  ;;          :test #'equal)
+  (format t "LIBRARY-DIRECTORIES: ~S~%"
+          (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")))
+  (pushnew "/lib/x86_64-linux-gnu/"
+           (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI"))
+           :test #'equal)
   
   (handler-case (ql:quickload :weblocks-test)
     (error (c)
