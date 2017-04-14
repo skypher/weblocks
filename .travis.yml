@@ -61,6 +61,7 @@ before_script:
             (uiop:quit 0)'
 #  - apt-cache search -n libssl
   - dpkg -S libssl
+  - ls -l /lib/x86_64-linux-gnu/libssl*
   
 script:
   # - echo '(handler-case (progn (ql:quickload :weblocks-test)
