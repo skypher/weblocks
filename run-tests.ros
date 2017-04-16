@@ -6,14 +6,6 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
 (progn ;;init forms
   (ros:ensure-asdf)
   
-  (ql:quickload :cffi)
-
-  (pushnew "/lib/x86_64-linux-gnu"
-           (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI"))
-           :test #'equal)
-  (format t "LIBRARY-DIRECTORIES: ~S~%"
-          (symbol-value (intern "*FOREIGN-LIBRARY-DIRECTORIES*" "CFFI")))
-  
   (handler-case (ql:quickload :weblocks-test)
     (error (c)
       (format t "~%Unable to load :WEBLOCKS-TEST~%Error was: ~a~2%"
