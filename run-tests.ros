@@ -28,10 +28,12 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
    (let ((result (weblocks-test:test-weblocks)))
 
      (if (lift:errors result)
-         (uiop:quit 1)
-         (uiop:quit 0))))
+         (progn (format t "~3&There were some errors in tests.~%")
+                (uiop:quit 1))
+         (progn (format t "~3&Success.~%")
+                (uiop:quit 0)))))
   
-  ;; some error was raised by test-framework
+  (format t "~3&There were some errors from test framework.~%")
   (uiop:quit 2))
 
 ;;; vim: set ft=lisp lisp:
