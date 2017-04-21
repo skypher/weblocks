@@ -572,7 +572,7 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
                         (compute-public-files-path
                          (attributize-name
                           (weblocks-webapp-name app))))))
-            (if (and path (probe-file path))
+            (if (and path (fad:directory-exists-p path))
               (setf (weblocks-webapp-public-files-path app) path)
                 (progn
                   (and (weblocks-webapp-debug app) (not warned)
