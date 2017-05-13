@@ -72,6 +72,8 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
   (declare (special *page-dependencies*))
+  (log:debug "Rendering page for" app)
+  
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
         (all-dependencies (timing "compact-dependencies"
                             (compact-dependencies (append (webapp-application-dependencies)

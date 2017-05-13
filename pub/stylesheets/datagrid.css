@@ -10,13 +10,13 @@
 
 .sort-asc span a
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/up_arrow.png) no-repeat right center;
+  background: url(../images/widget/datagrid/up_arrow.png) no-repeat right center;
 }
 
 
 .sort-desc span a
 {
-  background: url(/weblocks-common/pub/images/widget/datagrid/down_arrow.png) no-repeat right center;
+  background: url(../images/widget/datagrid/down_arrow.png) no-repeat right center;
 }
 
 .sort-asc span a, .sort-desc span a,
@@ -57,7 +57,7 @@ p.datagrid-select-bar strong
 
 .datagrid table tbody tr.drilled-down td.select div
 {
-  background: url(/weblocks-common/pub/images/widget/arrow.png) no-repeat center center;
+  background: url(../images/widget/arrow.png) no-repeat center center;
 }
 
 

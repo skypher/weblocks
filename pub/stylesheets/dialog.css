@@ -44,7 +44,7 @@
 /* Style choice dialog */
 .choice .dialog-body, .modal .choice
 {
-  background: white url(/weblocks-common/pub/images/dialog/question.png) no-repeat 0.5em center;
+  background: white url(../images/dialog/question.png) no-repeat 0.5em center;
 }
 
 .dialog h2, .modal h2
@@ -56,7 +56,7 @@
 
 .dialog h1 span, .modal h1 span
 {
-  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
+  background: url(../images/horizontal_line.png) repeat-x bottom;
   display: block;
 }
 
@@ -92,13 +92,13 @@
 /* Style information dialog */
 .information .dialog-body, .modal .information
 {
-  background-image: url(/weblocks-common/pub/images/dialog/information.png);
+  background-image: url(../images/dialog/information.png);
 }
 
 /* Modal interaction */
 .modal
 {
-  background: url(/weblocks-common/pub/images/horizontal_line.png) repeat-x bottom;
+  background: url(../images/horizontal_line.png) repeat-x bottom;
   padding-bottom: 2px;
 }
 

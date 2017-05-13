@@ -206,8 +206,10 @@ file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
   (let* ((relative-path (public-file-relative-path type file-name))
          (physical-path (princ-to-string (merge-pathnames relative-path
-                                                          (compute-webapp-public-files-path webapp)))))
-    (when (or do-not-probe (probe-file physical-path))
+                                                          (compute-webapp-public-files-path webapp))))
+         (file-exists (probe-file physical-path)))
+    
+    (if (or do-not-probe file-exists)
       (let ((virtual-path (concatenate 'string
                                        (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
                                        relative-path)))
@@ -224,7 +226,9 @@ returns a dependency object."
                                       :url virtual-path :media media
                                       :local-path physical-path))
           (:script (make-instance 'script-dependency :url virtual-path
-                                  :local-path physical-path)))))))
+                                                     :local-path physical-path))))
+      (log:warn "Depdendency wasn't found locally"
+                physical-path))))
 
 
 (defun build-dependencies (dep-list &optional (app (current-webapp)))
@@ -232,12 +236,15 @@ returns a dependency object."
 alist of dependencies into a list of dependency objects. Used mostly
 when statically specyfing application dependencies, where alists are
 more convenient."
+  (log:debug "Building dependencies for" app "from" dep-list)
+  
   (flet ((filedep-p (type)
            (member type '(:script :stylesheet) :test #'eq))
          (deptype->classname (type)
            (ecase type
              (:stylesheet 'stylesheet-dependency)
              (:script 'script-dependency))))
+    
     (mapcar (lambda (dep)
               (if (consp dep)
                   (destructuring-bind (type arg) dep
