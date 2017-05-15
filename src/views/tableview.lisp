@@ -58,7 +58,7 @@
                                 body
                                 prefix
                                 suffix)
-  (with-html
+  (with-html-to-string
     (:div :class header-class
           (with-extra-tags
             (str prefix)
@@ -76,16 +76,19 @@
          (header-class (format nil "view table ~A"
                                (if (eql object-name 'null)
                                    "empty"
-                                   (attributize-name object-name)))))
+                                   (attributize-name object-name))))
+         (body-html (capture-weblocks-output
+                      (apply body-fn view obj args)))
+         (prefix-html (capture-weblocks-output
+                        (safe-apply fields-prefix-fn view obj args)))
+         (suffix-html (capture-weblocks-output
+                        (safe-apply fields-suffix-fn view obj args))))
     (render-wt :table-view-wrapper-wt
                ()
                :header-class header-class
-               :body (capture-weblocks-output
-                       (apply body-fn view obj args))
-               :prefix (capture-weblocks-output
-                         (safe-apply fields-prefix-fn view obj args))
-               :suffix (capture-weblocks-output
-                         (safe-apply fields-suffix-fn view obj args)))))
+               :body body-html
+               :prefix prefix-html
+               :suffix suffix-html)))
 
 (defun table-view-header-wt (&key caption summary header-content content)
   (with-html-to-string
