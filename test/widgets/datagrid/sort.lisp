@@ -1,6 +1,10 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite datagrid-sort-suite (weblocks-suite)
+  ())
+
+
 ;;; test datagrid-render-view-field-header-sort
 (deftest-html datagrid-render-view-field-header-sort-1
     (with-request :get nil

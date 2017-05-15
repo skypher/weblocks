@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite gridedit-suite (weblocks-suite)
+  ())
+
 ;;; testing create-new-item-widget-gridedit
 (deftest-html create-new-item-widget-gridedit-1
               (let ((weblocks::*presentation-dom-id* "id-123"))

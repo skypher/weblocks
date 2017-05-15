@@ -1,6 +1,10 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite quickform-suite (weblocks-suite)
+  ())
+
+
 (deftest test-quickform-1
     (with-request :get nil
       (typep 

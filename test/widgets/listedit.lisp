@@ -1,5 +1,8 @@
-
 (in-package :weblocks-test)
+
+(deftestsuite listedit-suite (weblocks-suite)
+  ())
+
 
 (deftest-html render-widget-body-listedit-1
     (with-request :get nil

@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite pagination-suite (weblocks-suite)
+  ())
+
 ;;; test initialize instance for pagination
 (deftest pagination-initialize-instance-1
     (with-request :get nil

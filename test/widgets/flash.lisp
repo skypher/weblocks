@@ -1,5 +1,8 @@
-
 (in-package :weblocks-test)
+
+(deftestsuite flash-suite (weblocks-suite)
+  ())
+
 
 (defun evaluate-flash-hooks ()
   "A utility function that evaluates hooks set up by the flash
