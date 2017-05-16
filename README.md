@@ -10,6 +10,12 @@ Weblocks is an advanced web framework written in Common Lisp.
 Currently your web application should depend on :weblocks and :weblocks-prototype-js packages to work.
 [Weblocks PrototypeJs backend](http://github.com/html/weblocks-prototype-js)
 
+This branch contains following branches
+=======================================
+
+* travis-config
+* more-logging-and-js-backend-fix
+
 Move to Clack and Ningle
 ========================
 
