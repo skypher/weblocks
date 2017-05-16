@@ -45,23 +45,23 @@
                                    (when validation-error " item-not-validated")))
          (show-required-indicator (and (form-view-field-required-p field)
                                        (not (form-view-field-disabled-p field obj)))))
-    
-      (render-wt 
-        :checkboxes-view-field-wt 
-        (list :field field :view view :widget widget :presentation presentation :object obj)
-        :field-class field-class 
-        :field-label (translate (view-field-label field))
-        :show-required-indicator show-required-indicator
-        :required-indicator-label (when show-required-indicator 
-                                    (if (eq t required-indicator)
-                                      *default-required-indicator*
-                                      required-indicator))
-        :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
-        :content (capture-weblocks-output 
-                   (apply #'render-view-field-value
-                          value presentation
-                          field view widget obj
-                          args)))))
+
+    (render-wt 
+      :checkboxes-view-field-wt 
+      (list :field field :view view :widget widget :presentation presentation :object obj)
+      :field-class field-class 
+      :field-label (translate (view-field-label field))
+      :show-required-indicator show-required-indicator
+      :required-indicator-label (when show-required-indicator 
+                                  (if (eq t required-indicator)
+                                    *default-required-indicator*
+                                    required-indicator))
+      :validation-error (and validation-error (format nil "~A" (cdr validation-error)))
+      :content (capture-weblocks-output 
+                 (apply #'render-view-field-value
+                        value presentation
+                        field view widget obj
+                        args)))))
 
 (defmethod render-view-field-value (value (presentation checkboxes-presentation)
                                     (field form-view-field) (view form-view) widget obj
@@ -92,7 +92,10 @@
   (with-html-to-string
     (:input :name name :type "checkbox" :id id :class class
      :checked checked-p :disabled (if disabled-p "disabled")
-     :value value (str content))))
+     :value value)
+    (str content)))
+
+(deftemplate :checkbox-view-field-value-wt 'render-checkbox-wt)
 
 (defun render-checkboxes (name selections &key id (class "checkbox") selected-values disabledp)
   "If `disabledp' is true, all the checkboxes are disabled."
@@ -100,16 +103,16 @@
     (let ((checked-p (if (find (cdr val) selected-values :test #'equal) "checked" nil))
           (label (if (consp val) (car val) val))
           (value (if (consp val) (cdr val) val)))
-      (write-string 
-        (render-checkbox-wt 
-          :name (attributize-name name)
-          :id id
-          :class class
-          :checked-p checked-p
-          :value value
-          :content (humanize-name label)
-          :disabled-p disabledp)
-        *weblocks-output-stream*))))
+      (render-wt 
+        :checkbox-view-field-value-wt 
+        (list :name name :id id :disabledp disabledp)
+        :name (attributize-name name)
+        :id id
+        :class class
+        :checked-p checked-p
+        :value value
+        :content (humanize-name label)
+        :disabled-p disabledp))))
 
 (defmethod request-parameter-for-presentation (name (presentation checkboxes-presentation))
   (declare (ignore presentation))

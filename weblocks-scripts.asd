@@ -6,7 +6,7 @@
 
 (defsystem weblocks-scripts
   :name "weblocks-scripts"
-  :version "0.0.1"
+  :version "0.0.2"
   :maintainer "Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"

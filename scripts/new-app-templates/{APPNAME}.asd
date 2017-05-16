@@ -11,7 +11,7 @@
     :author ""
     :licence ""
     :description "{APPNAME}"
-    :depends-on (:weblocks)
+    :depends-on (:weblocks :weblocks-jquery-js)
     :components ((:file "{APPNAME}")
                  (:module conf
                   :components ((:file "stores"))

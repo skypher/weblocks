@@ -20,6 +20,7 @@
     :init-user-session '{APPNAME}::init-user-session
     :autostart nil                   ;; have to start the app manually
     :ignore-default-dependencies nil ;; accept the defaults
+    :js-backend :jquery
     :debug t
     )
 
