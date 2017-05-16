@@ -1,6 +1,10 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite datagrid-select-suite (weblocks-suite)
+  ())
+
+
 ;;; test render-select-bar
 (deftest-html render-select-bar-1
     (with-request :get nil

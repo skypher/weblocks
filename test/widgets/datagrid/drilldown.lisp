@@ -1,6 +1,10 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite datagrid-drilldown-suite (weblocks-suite)
+  ())
+
+
 ;;; test datagrid-drilldown-style
 (deftest datagrid-drilldown-style-1
     (weblocks::datagrid-drilldown-style 'some-slot)

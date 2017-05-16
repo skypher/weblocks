@@ -1,6 +1,9 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite datagrid-suite (weblocks-suite)
+  ())
+
 ;;; test datagrid-render-mining-bar
 (deftest-html dataseq-render-mining-bar-datagrid-1
     (with-request :get nil

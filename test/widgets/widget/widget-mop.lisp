@@ -1,6 +1,10 @@
 
 (in-package :weblocks-test)
 
+(deftestsuite widget-mop-suite (weblocks-suite)
+  ())
+
+
 ;;; test direct-slot-definition-class for widget
 (deftest direct-slot-definition-class-widget-1
     (class-name (direct-slot-definition-class (find-class 'widget)))

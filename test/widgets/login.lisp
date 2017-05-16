@@ -1,5 +1,7 @@
-
 (in-package :weblocks-test)
+
+(deftestsuite login-suite (weblocks-suite)
+  ())
 
 ;;; test authenticatedp
 (deftest authenticatedp-1

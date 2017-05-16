@@ -1,5 +1,7 @@
-
 (in-package :weblocks-test)
+
+(deftestsuite datalist-suite (weblocks-suite)
+  ())
 
 ;;; Make sure we can't turn on selection
 (deftest datalist-initialize-instance-1

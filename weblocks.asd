@@ -14,7 +14,8 @@
    :licence "LLGPL"
    :description "A Common Lisp web framework."
    :depends-on 
-   (:weblocks-util
+   (:log4cl
+    :weblocks-util
     :weblocks-stores
     :closer-mop
     :hunchentoot

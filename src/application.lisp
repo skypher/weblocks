@@ -44,7 +44,9 @@
           *registered-webapps*
           with-webapp
           weblocks-webapp-default-dependencies 
-          weblocks-webapp-js-backend))
+          weblocks-webapp-js-backend
+          initialize-js-backend
+          get-js-backend-dependencies))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *registered-webapps* nil
@@ -278,9 +280,12 @@ called (primarily for backward compatibility"
        (restart-webapp ',name))))
 
 (defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))
+  (log:debug "Initializing default dependencies for weblocks application")
+  
   '((:stylesheet "layout")
     (:stylesheet "main")
     (:stylesheet "dialog")))
+
 
 (defmethod initialize-instance :after
     ((self weblocks-webapp) &key ignore-default-dependencies &allow-other-keys)
@@ -299,8 +304,8 @@ to my `application-dependencies' slot."
             (slot-value self 'public-files-uri-prefix)))
     (and (slot-boundp self 'public-files-path)
          (slot-value self 'public-files-path)
-      (setf (weblocks-webapp-public-files-path self)
-            (slot-value self 'public-files-path)))
+         (setf (weblocks-webapp-public-files-path self)
+               (slot-value self 'public-files-path)))
     (slot-default default-store-name
                   (webapp-default-store-name (class-of self)))
     (slot-default html-indent-p (weblocks-webapp-debug self))
@@ -314,11 +319,24 @@ to my `application-dependencies' slot."
                                 no init-user-session function is found."
                                (weblocks-webapp-name self))))
       (slot-default prefix
-                      (concatenate 'string "/" (attributize-name class-name))))
+                    (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
-      (setf (weblocks-webapp-application-dependencies self)
-            (append (weblocks-webapp-default-dependencies self)
-                    (weblocks-webapp-application-dependencies self)))))
+      (let ((*current-webapp* self))
+        (setf (weblocks-webapp-application-dependencies self)
+              (build-dependencies
+               (append
+                ;; Backend dependencies should go first, to
+                ;; load jquery or prototype before all other code
+                ;; will be loaded.
+                (get-js-backend-dependencies
+                 self
+                 (weblocks-webapp-js-backend self))
+                ;; After that, we load dependencies of a class
+                (weblocks-webapp-default-dependencies self)
+                ;; And finally, we add them to existing application
+                ;; dependencies.
+                (weblocks-webapp-application-dependencies self)))))))
+  
   (let ((pfp (weblocks-webapp-public-files-path self)))
     (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
       (warn "~S ~S includes a nondirectory component; this can break file probing"
@@ -355,6 +373,8 @@ to my `application-dependencies' slot."
      :class - is an application name symbol 
      :initargs - is a list of attributes to pass to application 
      :name - is an application name - a key for an app to be stored. Application then can be found by this key."
+  (log:debug "Starting webapp" class initargs name)
+  
   (check-webapp class)
   (let ((app (get-webapp name nil)))
     (when app
@@ -383,14 +403,25 @@ to my `application-dependencies' slot."
 (defun enable-webapp (app)
   "Make sure the app with the \"\" prefix is always the last one and that there
    is only one!"
-   (let ((webapps (sort-webapps (remove-duplicates (cons app *active-webapps*)))))
-     (if (> (count "" (mapcar #'weblocks-webapp-prefix *active-webapps*) :test #'equal) 1)
-       (error "Cannot have two defaults dispatchers with prefix \"\"")
-       (setf *active-webapps* webapps))))
+  (log:debug "Enabling webapp" app)
+  
+  (let ((webapps (sort-webapps (remove-duplicates (cons app *active-webapps*)))))
+    (if (> (count "" (mapcar #'weblocks-webapp-prefix *active-webapps*) :test #'equal) 1)
+        (error "Cannot have two defaults dispatchers with prefix \"\"")
+        (setf *active-webapps* webapps))))
 
 (defgeneric initialize-webapp (app)
   (:documentation "A protocol for performing any special initialization on the creation of a webapp object.")
   (:method ((app t)) nil))
+
+
+(defgeneric initialize-js-backend (app backend)
+  (:documentation "Initializes js backend. Usually backend adds some handlers to serve static files"))
+
+
+(defgeneric get-js-backend-dependencies (app backend)
+  (:documentation "Returns dependecies list for a JS backend"))
+
 
 (defmethod initialize-webapp :before ((app weblocks-webapp))
   "Ensure that all registered stores are open"
@@ -398,8 +429,18 @@ to my `application-dependencies' slot."
     (start-weblocks))
   (open-stores))
 
+
+(defmethod initialize-webapp :after ((self weblocks-webapp))
+  (let ((js-backend (weblocks-webapp-js-backend self)))
+    (log:debug "Initializing js backend") js-backend
+  
+    (initialize-js-backend self js-backend)))
+
+
 (defun stop-webapp (name)
   "Stops the web application"
+  (log:debug "Stopping webapp" name)
+  
   (let ((app (find-app name)))
     (setf *active-webapps* (delete app *active-webapps*))
     (finalize-webapp app)))
