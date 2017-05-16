@@ -1,0 +1,10 @@
+# to build documentation
+sphinx
+pygments-cl-repl
+sphinx-bootstrap-theme
+
+# to support docstring extraction and cross-referencing
+-e git+git@github.com:russell/sphinxcontrib-cldomain.git#egg=sphinxcontrib-cldomain
+
+# to run commands from tasks.py
+invoke
