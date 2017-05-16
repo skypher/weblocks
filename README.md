@@ -1,3 +1,8 @@
+Weblocks
+========
+
+[![Build Status](https://travis-ci.org/skypher/weblocks.svg?branch=master)](https://travis-ci.org/skypher/weblocks)
+
 Weblocks is an advanced web framework written in Common Lisp.
 
 [Offical Weblocks site](http://weblocks-framework.info)
