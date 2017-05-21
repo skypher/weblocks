@@ -7,11 +7,10 @@ Forms enable the user to communicate with a web application.
 Usually the server side action boils down to selecting, modifying, creating or
 deleting data sets (this is sometimes abbreviated as CRUD: Create/Read/Update/Delete)
 
-TODO 
-Building  web forms is usually a cumbersome process. Elaborate but complicated
-solutions have been devised`'w_footnote(for example PHP's Quickform extensions),
-but so far we haven't found any of them to match the ease of use and flexibility
-of Weblocks' declarative view DSL.
+Building web forms is usually a cumbersome process. Elaborate but
+complicated solutions have been devised [#php-quickform]_, but so far we
+haven't found any of them to match the ease of use and flexibility of
+Weblocks' declarative view DSL.
 
 
 Introduction
@@ -86,9 +85,6 @@ But let's assume that we want custom labels for the dropdown:
                                               ("We've solved that problem already..." . :resolved)))))
 
 
-
-
-
 Quickforms
 ==========
 
@@ -122,3 +118,8 @@ in view definition is necessary, we don't want dynamic class to persist.
 There are options in ``make-quickform`` for validation, control flow and other things.
 See ``make-quickform`` documentation (http://quickdocs.org/weblocks/api)
 
+.. rubric:: Footnotes
+
+.. [#php-quickform] For example `PHP's Quickform
+                    <https://pear.php.net/manual/en/package.html.html-quickform.tutorial.php>`_
+                    extensions.

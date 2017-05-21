@@ -8,9 +8,7 @@ Widgets
 
 Widgets are the main building blocks of Weblocks (hence the name).
 
-TODO
-At the heart of Weblocks is a tree`'w_footnote(An acyclic graph with exactly one
-parent per node) of widgets that is manipulated by the clients requests. When a
+At the heart of Weblocks is a tree [#tree]_ of widgets that is manipulated by the clients requests. When a
 client sends its first request to a Weblocks application then a new session is
 started for it and a widget tree is associated with this session.
 
@@ -67,11 +65,8 @@ Navigations and dispatchers
 Dispatchers are widgets that configure themselves and their children
 (i.e. broadly speaking the widget tree) based on the URI of the request.
 
-TODO
 Navigations are dispatchers that maintain a simple one-to-one association between
-an URI token`'w_footnote(each path component of an URI is a token; for example
-in ``"/foo/bar/quux"`` there are three tokens foo bar and quux.) and
-a widget.
+an URI token [#uri-tokens]_ and a widget.
 
 Note that each widget can also in turn be a navigation that consumes an
 URI token, thereby building a many-to-many relationship between tokens
@@ -92,8 +87,7 @@ map tokens to widgets:
                                    "Billing" (make-instance 'billing-widget :shop-type 'food))))
 
 ``MAKE-WIDGET`` is applied to the widget argument so you can use strings
-and function designators`'w_footnote(i.e. symbols naming a global function
-and function objects themselves) instead of widgets in this context.
+and function designators [#function-designators]_ instead of widgets in this context.
 
 
 Views
@@ -257,3 +251,14 @@ context, will choose effective template and call it with parameters
    :onclick onclick
    :disabledp disabledp
 
+
+.. rubric:: Footnotes
+
+.. [#tree] An acyclic graph with exactly one parent per node.
+
+.. [#uri-tokens] Еach path component of an URI is a token; for example
+                 in ``"/foo/bar/quux"`` there are three tokens ``foo``
+                 ``bar`` and ``quux``.
+
+.. [#function-designators] I.e. symbols naming a global function and
+                           function objects themselves.
