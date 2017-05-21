@@ -1,82 +1,80 @@
-=================
- weblocks
-=================
+==========
+ Weblocks
+==========
 
 .. insert-your badges like that:
 
-.. image:: https://travis-ci.org/40ants/cl-hamcrest.svg?branch=master
-    :target: https://travis-ci.org/40ants/cl-hamcrest
+.. image:: https://travis-ci.org/40ants/weblocks.svg?branch=master
+    :target: https://travis-ci.org/40ants/weblocks
 
 .. Everything starting from this commit will be inserted into the
    index page of the HTML documentation.
 .. include-from
 
-Give some introduction.
+This branch contains following branches
+=======================================
 
-Reasoning
-=========
+* travis-config
+* more-logging-and-js-backend-fix
+* documentation
 
-Explain why this project so outstanding and why it
-was created.
-
-You can give some examples. This is how common lisp
-code should be formatted:
-
-.. code-block:: common-lisp
-
-   (defvar log-item '(:|@message| "Some"
-                      :|@timestamp| 122434342
-                      ;; this field is wrong and
-                      ;; shouldn't be here
-                      :|@fields| nil))
-
-And this is how you can provide REPL examples:
-
-.. code-block:: common-lisp-repl
-
-   TEST> (format nil "Blah minor: ~a"
-                     100500)
-   "Blah minor: 100500"
 
 Roadmap
 =======
 
-Provide a Roadmap.
+* Move from raw Hunchentoot to Clack.
+* Refactor dependencies processing.
+* Write easy to understand, working tutorials.
+* Make jquery backend default.
+* Extract all widgets into a separate system
+  and make them use bootstrap by default.
 
 .. Everything after this comment will be omitted from HTML docs.
 .. include-to
 
-Building Documentation
-======================
+Moving to Clack and Ningle
+==========================
 
-Provide instruction how to build or use your library.
+Benefits
+--------
 
-How to build documentation
---------------------------
+Will be able to use different http servers, not only Hunchentoot.
 
-To build documentation, you need a Sphinx. It is
-documentaion building tool written in Python.
+Useful snippets
+---------------
 
-To install it, you need a virtualenv. Read
-this instructions
-`how to install it
-<https://virtualenv.pypa.io/en/stable/installation/#installation>`_.
+Use this::
 
-Also, you'll need a `cl-launch <http://www.cliki.net/CL-Launch>`_.
-It is used by documentation tool to run a script which extracts
-documentation strings from lisp systems.
+    (lack.util:generate-random-id)
+    
+instead of::
 
-Run these commands to build documentation::
+    (md5 (hunchentoot::create-random-string 10 36))
+    
+in `(generate-action-code)`
 
-  virtualenv env
-  source env/bin/activate
-  pip install -r docs/requirements.txt
-  invoke build_docs
 
-These commands will create a virtual environment and
-install some python libraries there. Command ``invoke build_docs``
-will build documentation and upload it to the GitHub, by replacing
-the content of the ``gh-pages`` branch.
+What to replace
+---------------
+
+An URL routing
+~~~~~~~~~~~~~~
+
+Seems easy with ningle:route.
+
+An File Upload
+~~~~~~~~~~~~~~
+
+How to do this with clack and ningle???
+
+Session management
+~~~~~~~~~~~~~~~~~~
+
+Need to replace::
+
+  (hunchentoot:session-value ...)
+  hunchentoot:*session*
+  etc
 
 
 License
