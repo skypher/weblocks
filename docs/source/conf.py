@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinxcontrib.cldomain',
     'sphinxcontrib.hyperspec',
+    'releases',
 ]
 
 from os.path import join, dirname, realpath, expandvars
