@@ -85,6 +85,16 @@ of no arguments."
      (mapc #'funcall (request-hook :session ,location))
      (mapc #'funcall (request-hook :request ,location))))
 
+(defmacro log-hooks (location)
+  "Log appropriate hooks."
+  `(progn
+     (mapc (f_ (log:debug "Application hook" _))
+           (request-hook :application ,location))
+     (mapc (f_ (log:debug "Application hook" _))
+           (request-hook :session ,location))
+     (mapc (f_ (log:debug "Application hook" _))
+           (request-hook :request ,location))))
+
 (defmacro with-dynamic-hooks ((type) &rest body)
   "Performs nested calls of all the hooks of type, the innermost call is
    a closure over the body expression.  Dynamic action hooks take one
@@ -121,26 +131,42 @@ of no arguments."
 
 ;; Hooks for using html parts, reset parts set before render and save it to session after render 
 ;; Allow to modify html parts set when is in debug mode
-(eval-when (:load-toplevel)
-  (pushnew  
-    (lambda ()
-      (when (or *weblocks-global-debug*
-                (webapp-debug)
-                (not (boundp '*parts-md5-hash*))
-                (not (boundp '*parts-md5-context-hash*)))
-        (weblocks-util:reset-html-parts-set)))
-    (request-hook :application :pre-render))
 
-  (pushnew 
-    (lambda ()
-      (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
-      (when (and 
-              (or *weblocks-global-debug*
-                  (webapp-debug))
-              (weblocks-util::process-html-parts-p))
-        (timing "html parts processing"
-          (progn 
-            (weblocks-util:update-html-parts-connections)
-            (setf (webapp-session-value 'parts-md5-hash) weblocks-util:*parts-md5-hash*)
-            (setf (webapp-session-value 'parts-md5-context-hash) weblocks-util:*parts-md5-context-hash*)))))
-    (request-hook :application :post-render)))
+;; Раньше все pushnew были завёрнуты в этот eval-when,
+;; не знаю зачем
+;; (eval-when (:load-toplevel))
+;; кроме того, pushnew не работает и всё равно при повторном евале добавляет в словарь
+;; *application-request-hooks* дубликаты функций, а вот если 
+
+(defun reset-html-parts ()
+  (when (or *weblocks-global-debug*
+            (webapp-debug))
+    
+    (log:warn "Resetting html parts cache")
+    (weblocks.utils.html-parts:reset)))
+
+(defun update-html-parts ()
+  (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
+  (when (or *weblocks-global-debug*
+            (webapp-debug))
+    (timing "html parts processing"
+      (progn 
+        (weblocks.utils.html-parts:update-html-parts-connections)
+        ;; Don't know why to do this,
+        ;; because this is only place where webapp-session-value
+        ;; is called with this argument. Probably, these values
+        ;; are never restored from the session.
+        ;;
+        ;; (setf (webapp-session-value 'parts-md5-hash)
+        ;;       weblocks-util:*parts-md5-hash*)
+        ;; (setf (webapp-session-value 'parts-md5-context-hash)
+        ;;       weblocks-util:*parts-md5-context-hash*)
+        ))))
+
+(pushnew  
+ #'reset-html-parts
+ (request-hook :application :pre-render))
+
+(pushnew 
+ #'update-html-parts
+ (request-hook :application :post-render))

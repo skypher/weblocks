@@ -1,28 +1,35 @@
-(in-package :weblocks-util)
+(defpackage #:weblocks.utils.html-parts
+  (:use #:cl)
+  (:export
+   #:reset
+   #:update-html-parts-connections
+   #:update-current-html-part-children
+   #:nested-html-part)
+  (:import-from #:weblocks-util
+                #:md5))
+(in-package weblocks.utils.html-parts)
 
-(wexport '(*parts-md5-hash* *parts-md5-context-hash* *process-html-parts-p* get-html-part get-html-part-context get-html-part-children nested-html-part reset-html-parts-set update-html-parts-connections get-html-parts-root-hash)
-         '(t util))
 
-(defvar *parts-md5-hash*)
-(setf (documentation '*parts-md5-hash* 'variable)
-      "A hash with key of html part md5 hash 
-       and the value of list with html part as car
-       and list of children as cdr")
+(defvar *parts-md5-hash* (make-hash-table :test 'equal)
+  "A hash with key of html part md5 hash 
+and the value of list with html part as car
+and list of children as cdr")
 
-(defvar *parts-md5-context-hash*)
-(setf (documentation '*parts-md5-context-hash* 'variable)
-      "A hash with key of html part md5 hash 
-       and the value of html part context")
 
-(defvar *current-html-part-children* nil)
-(setf (documentation '*current-html-part-children* 'variable)
-      "A place where we can put md5 hashes of children parts of processed html part.
-       Should be used from body of NESTED-HTML-PART macro")
+(defvar *parts-md5-context-hash* (make-hash-table :test 'equal)
+  "A hash with key of html part md5 hash 
+and the value of html part context")
 
-(defvar *process-html-parts-p* (lambda () nil))
-(setf (documentation '*current-html-part-children* 'variable)
-      "Contains callback which should return boolean value 
-       indicating whether html parts should be collected and processed")
+
+(defvar *current-html-part-children* nil
+  "A place where we can put md5 hashes of children parts of processed html part.
+Should be used from body of NESTED-HTML-PART macro")
+
+
+(defvar *process-html-parts-p* (lambda () nil)
+  "Contains callback which should return boolean value 
+indicating whether html parts should be collected and processed")
+
 
 (defun process-html-parts-p ()
   "Whether or not to capture html parts information"
@@ -30,9 +37,11 @@
 
 (defmacro nested-html-part (context &body body)
   "Adds part of html (a string received as a result of &body evaluation)
-   and context associated with it to html parts set."
+and context associated with it to html parts set.
+
+Returns value, returned by evaluation of the body.
+"
   `(let ((value))
-     (declare (special *current-html-part-children* *parts-md5-hash* *parts-md5-context-hash*))
      (setf *current-html-part-children* nil)
      (setf value (progn ,@body))
      (when (process-html-parts-p)
@@ -41,9 +50,8 @@
              (cons value (mapcar #'md5 *current-html-part-children*))))
      value))
 
-(defun reset-html-parts-set ()
+(defun reset ()
   "Resets html parts set"
-  (declare (special *parts-md5-hash* *parts-md5-context-hash*))
 
   (setf *parts-md5-hash* (make-hash-table :test 'equal))
   (setf *parts-md5-context-hash* (make-hash-table :test 'equal)))
@@ -57,34 +65,37 @@
 
 (defun get-html-part (key)
   "Returns html part string by its md5"
-  (declare (special *parts-md5-hash*))
   (car (gethash key *parts-md5-hash*)))
 
 (defun get-html-part-children (key)
   "Returns html part child parts by its md5"
-  (declare (special *parts-md5-hash*))
   (cdr (gethash key *parts-md5-hash*)))
 
 (defun set-html-part-children (key children)
   "Sets html part child parts by its md5"
-  (declare (special *parts-md5-hash*))
-  (setf (cdr (gethash key *parts-md5-hash*)) children))
+  (let ((html-part (get-html-part key)))
+    (setf (gethash key *parts-md5-hash*)
+          (cons html-part children))))
+
+(defun push-new-html-part-child (key child-key)
+  "Adds child-key to the list of part's children."
+  (set-html-part-children key
+                          (adjoin child-key
+                                  (get-html-part-children key)
+                                  :test #'string=)))
 
 (defun remove-html-part (key)
   "Removes html part by its md5"
-  (declare (special *parts-md5-hash*))
   (remhash key *parts-md5-hash*))
 
 (defun get-html-part-context (key)
   "Returns html part context by its md5"
-  (declare (special *parts-md5-context-hash*))
   (gethash key *parts-md5-context-hash*))
 
 (defun update-html-parts-connections ()
   "Builds html parts tree from html parts list. 
    Each html part child is a substring of its parent.
    Html parts which are empty strings removed from html parts set."
-  (declare (special *parts-md5-hash*))
   (unless 
     (process-html-parts-p)
     (return-from update-html-parts-connections))
@@ -107,31 +118,31 @@
         (let ((value (get-html-part key))
               (child-value))
 
-          ; Step first, adding child-parent connections
+          ;; Step first, adding child-parent connections
           (loop for child-key being the hash-keys of *parts-md5-hash* do 
                 (setf child-value (get-html-part child-key))
-                (if (and 
-                      (not (zerop (length child-value)))
-                      (is-substring-of-p child-value value))
-                  (pushnew child-key (cdr (gethash key *parts-md5-hash*)) :test #'string=)))
+                (when (and 
+                        (not (zerop (length child-value)))
+                        (is-substring-of-p child-value value))
+                  (push-new-html-part-child key child-key)))
 
           ; Step second, removing messy connections
           (loop for child-key being the hash-keys of *parts-md5-hash* do 
-                (setf children (get-html-part-children child-key))
+            (let ((children (get-html-part-children child-key)))
 
-                (loop for child in children do 
-                      (let ((child-children (get-html-part-children child)))
-                        (loop for i in child-children do 
-                              (when (find i children :test #'string=)
-                                (setf children (remove i children :test #'string=))))))
+              (loop for child in children do 
+                (let ((child-children (get-html-part-children child)))
+                  (loop for i in child-children do 
+                    (when (find i children :test #'string=)
+                      (setf children (remove i children :test #'string=))))))
 
-                (set-html-part-children child-key children)))))
+              (set-html-part-children child-key children))))))
 
 (defun update-current-html-part-children (args)
   "Takes strings list as an argument and adds strings 
    which are html parts (which are in html parts set)
    to *current-html-part-children* list "
-  (declare (special *parts-md5-hash*))
+
   (loop for value on args
         if (and (stringp value) (gethash (md5 value) *parts-md5-hash*))
         do
@@ -139,7 +150,6 @@
 
 (defun get-html-parts-root-hash ()
   "Returns md5 hash of root html part in parts tree"
-  (declare (special *parts-md5-hash*))
   (let ((max-length (loop for key being the hash-keys of *parts-md5-hash* 
                           maximize (length (get-html-part key)))))
     (loop for key being the hash-keys of *parts-md5-hash* 

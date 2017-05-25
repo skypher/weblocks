@@ -67,13 +67,13 @@
     (unless (car effective-template)
       (error "Cannot find template ~A" template))
 
-    (nested-html-part 
+    (weblocks.utils.html-parts:nested-html-part 
       (list :type :template 
             :template-name template 
             :effective-template effective-template
             :template-context context)
 
-      (update-current-html-part-children 
+      (weblocks.utils.html-parts:update-current-html-part-children 
         (loop for (key value) on args by #'cddr 
               collect value))
       
