@@ -1,0 +1,62 @@
+language: common-lisp
+sudo: false
+
+env:
+  global:
+    - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
+    - ROSWELL_INSTALL_DIR=$HOME/.roswell
+  matrix:
+    - LISP=sbcl
+    # unable to find libssl.so, I tried hard, but it doesn't see it
+    - LISP=allegro
+    # fails with mmap: Invalid argument
+    #            ensure_space: Failed to validate 0 bytes at 0x58100000
+    - LISP=cmucl
+    # fails on weblocks-test loading
+    - LISP=ccl
+    # shows error there is no package with name "UIOP"
+    - LISP=clisp
+    # it shows success but actually fails with tracebacks
+    - LISP=abcl
+    # compile error on loading yaclml-20150709-git
+    - LISP=ecl
+
+matrix:
+  allow_failures:
+    - env: LISP=allegro
+    - env: LISP=cmucl
+    - env: LISP=ccl
+    - env: LISP=clisp
+    - env: LISP=abcl
+    - env: LISP=ecl
+
+addons:
+  apt:
+    packages:
+      - libtidy-dev
+      - libc6-i386
+      - openjdk-7-jre
+      
+install:
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
+
+cache:
+  directories:
+    - $HOME/.roswell
+    - $HOME/.config/common-lisp
+
+before_script:
+  - env
+  - cat /proc/meminfo
+  - ros --version
+  - ros config
+  - ros -e '(princ (lisp-implementation-type))
+            (terpri)
+            (princ (lisp-implementation-version))
+            (terpri)
+            (princ *features*)
+            (terpri)
+            (uiop:quit 0)'
+  
+script:
+  - ./run-tests.ros
