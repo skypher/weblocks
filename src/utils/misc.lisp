@@ -104,11 +104,7 @@ etc.)"
   "Computes the directory in which the .asdf file for a given ASDF
 system resides."
   (sor (gethash asdf-system-name *asdf-system-cache*)
-       (setf it (make-pathname :directory
-                               (pathname-directory
-                                 (truename
-                                   (asdf:system-definition-pathname
-                                     (asdf:find-system asdf-system-name))))))))
+       (setf it (asdf:system-source-directory asdf-system-name))))
 
 (defun hash-keys (hashtable)
   "Returns all keys in the hashtable."

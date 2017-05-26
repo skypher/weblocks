@@ -65,9 +65,7 @@ Borrowed from cl-darcs with permission of copyright owner."
 (defun asdf-system-directory (system-name)
   "Returns a directory of the asdf system file of system
 'system-name'."
-  (make-pathname :directory
-                 (pathname-directory (truename (asdf:system-definition-pathname
-                                                (asdf:find-system system-name))))))
+  (asdf:system-source-directory system-name))
 
 (defun copy-file-replace (source target &optional match replacement)
   "Copies 'source' to 'target' replacing all instances of 'match' with
@@ -117,47 +115,32 @@ application."
     (ensure-directories-exist new-project-data-dir :verbose t)
     ; copy weblocks public files
     (copy-directory (pathname-as-file
-                     (truename (merge-pathnames (make-pathname :directory '(:relative "pub"))
-                                                (asdf-system-directory :weblocks))))
+                     (asdf:system-relative-pathname "weblocks" "pub/"))
                     new-project-dir)
     ; copy init-session.lisp
-    (copy-file-replace (merge-pathnames
-                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
-                                       :name "init-session" :type "lisp")
-                        (asdf-system-directory :weblocks-scripts))
-                       (merge-pathnames
-                        (make-pathname :name "init-session" :type "lisp")
-                        new-project-src-dir)
+    (copy-file-replace (asdf:system-relative-pathname "weblocks-scripts"
+                                                      "scripts/new-app-templates/init-session.lisp")
+                       (uiop:subpathname new-project-src-dir "init-session.lisp")
                        *app-name-placeholder*
                        (attributize-name name))
     ; copy {APPNAME}.asd
-    (copy-file-replace (merge-pathnames
-                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
-                                       :name "{APPNAME}" :type "asd")
-                        (asdf-system-directory :weblocks-scripts))
-                       (merge-pathnames
-                        (make-pathname :name (attributize-name name) :type "asd")
-                        new-project-dir)
+    (copy-file-replace (asdf:system-relative-pathname "weblocks-scripts"
+                                                      "scripts/new-app-templates/{APPNAME}.asd")
+                       (uiop:subpathname new-project-dir
+                                         (uiop:strcat (attributize-name name) ".asd"))
                         *app-name-placeholder*
                        (attributize-name name))
     ; copy {APPNAME}.lisp
-    (copy-file-replace (merge-pathnames
-                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
-                                       :name "{APPNAME}" :type "lisp")
-                        (asdf-system-directory :weblocks-scripts))
-                       (merge-pathnames
-                        (make-pathname :name (attributize-name name) :type "lisp")
-                        new-project-dir)
+    (copy-file-replace (asdf:system-relative-pathname "weblocks-scripts"
+                                                      "scripts/new-app-templates/{APPNAME}.lisp")
+                       (uiop:subpathname new-project-dir
+                                         (uiop:strcat (attributize-name name) ".lisp"))
                         *app-name-placeholder*
                        (attributize-name name))
     ; copy stores.lisp
-    (copy-file-replace (merge-pathnames
-                        (make-pathname :directory '(:relative "scripts" "new-app-templates")
-                                       :name "stores" :type "lisp")
-                        (asdf-system-directory :weblocks-scripts))
-                       (merge-pathnames
-                        (make-pathname :name "stores" :type "lisp")
-                        new-project-conf-dir)
+    (copy-file-replace (asdf:system-relative-pathname "weblocks-scripts"
+                                                      "scripts/new-app-templates/stores.lisp")
+                       (uiop:subpathname new-project-dir "stores.lisp")
                        *app-name-placeholder*
                        (attributize-name name))
     ; tell user to add new app to asdf central registry
