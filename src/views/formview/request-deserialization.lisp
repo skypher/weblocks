@@ -165,4 +165,4 @@ request.
   preprocessed for PRESENTATION.")
   (:method (name presentation)
     (declare (ignore presentation))
-    (request-parameter name)))
+    (weblocks.server:request-parameter name)))

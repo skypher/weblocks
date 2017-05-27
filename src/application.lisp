@@ -423,6 +423,13 @@ to my `application-dependencies' slot."
   (:documentation "Returns dependecies list for a JS backend"))
 
 
+(defmethod weblocks.dependencies:get-dependencies ((self weblocks-webapp))
+  (log:debug "Returning new-style dependencies for base application class.")
+  
+  (weblocks.dependencies:get-dependencies
+   (weblocks-webapp-js-backend self)))
+
+
 (defmethod initialize-webapp :before ((app weblocks-webapp))
   "Ensure that all registered stores are open"
   (unless weblocks::*weblocks-server*

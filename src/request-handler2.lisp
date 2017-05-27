@@ -52,6 +52,9 @@ customize behavior."))
 (defmethod handle-client-request :around (app)
   "This wrapper sets a timeout on the request and reports response timings."
 
+  (log:debug "Handling client request for" app)
+  
+
   ;; TODO: understand how to use it and write a doc.
   
   (handler-bind ((trivial-timeout::timeout-error
@@ -142,20 +145,17 @@ customize behavior."))
             weblocks::*before-ajax-complete-scripts*
             weblocks::*on-ajax-complete-scripts*
             weblocks::*page-dependencies*
+            
+            ;; New-style dependencies
+            (weblocks.dependencies:*page-dependencies*
+              (weblocks.dependencies:get-dependencies app))
+            
             weblocks::*current-page-title*
             weblocks::*current-page-description*
             weblocks::*current-page-keywords*
             weblocks::*current-page-headers*
             (cl-who::*indent* (weblocks::weblocks-webapp-html-indent-p app)))
-        (declare (special weblocks::*weblocks-output-stream*
-                          weblocks::*dirty-widgets*
-                          weblocks::*on-ajax-complete-scripts*
-                          weblocks::*uri-tokens*
-                          weblocks::*page-dependencies*
-                          weblocks::*current-page-title*
-                          weblocks::*current-page-description*
-                          weblocks::*current-page-keywords*
-                          weblocks::*current-page-headers*))
+        
         (when (weblocks::pure-request-p)
           (weblocks::abort-request-handler (weblocks::eval-action))) ; FIXME: what about the txn hook?
 
@@ -166,7 +166,7 @@ customize behavior."))
                                         (weblocks::eval-action))
           (weblocks::eval-hook :post-action))
 
-        (when (and (not (weblocks::ajax-request-p))
+        (when (and (not (weblocks.server:ajax-request-p))
                    (find weblocks::*action-string* (weblocks::get-parameters*)
                          :key #'car :test #'string-equal))
           (weblocks::redirect (weblocks::remove-action-from-uri
@@ -175,7 +175,7 @@ customize behavior."))
         (weblocks::timing "rendering (w/ hooks)"
           (weblocks::eval-hook :pre-render)
           (weblocks::with-dynamic-hooks (:dynamic-render)
-                                        (if (weblocks::ajax-request-p)
+                                        (if (weblocks.server:ajax-request-p)
                                             (weblocks::handle-ajax-request app)
                                             (weblocks::handle-normal-request app)))
           (weblocks::log-hooks :post-render)
@@ -186,7 +186,7 @@ customize behavior."))
         (if (member (weblocks::return-code*)
                     weblocks::*approved-return-codes*)
             (progn 
-              (unless (weblocks::ajax-request-p)
+              (unless (weblocks.server:ajax-request-p)
                 (setf (weblocks::webapp-session-value 'last-request-uri)
                       (weblocks::all-tokens weblocks::*uri-tokens*)))
               (get-output-stream-string weblocks::*weblocks-output-stream*))

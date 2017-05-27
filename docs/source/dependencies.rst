@@ -59,3 +59,52 @@ Before including library we should get it served from http.
 The easiest way to do this is to install Weblocks assets package
 jquery-seq.  Other way is to download jQuery-seq, to put it into
 pub/scripts/ directory.
+
+
+Notes
+=====
+
+Зависимости билдятся через вызов (dependencies root) и последующие
+(render-dependency-in-page-head). Между ними дополнительно выполняются
+шаги::
+
+  <DEBUG> [16:47:19] weblocks dependencies.lisp (build-dependencies) -
+    Building dependencies for WEBLOCKS::APP: #<HACRM::HACRM {1003D02BB3}>
+    from WEBLOCKS::DEP-LIST: (#<WEBLOCKS:SCRIPT-DEPENDENCY /pub/scripts/jquery-1.8.2.js>
+                              #<WEBLOCKS:SCRIPT-DEPENDENCY /pub/scripts/jquery-seq.js>
+                              #<WEBLOCKS:SCRIPT-DEPENDENCY /pub/scripts/weblocks-jquery.js>
+                              #<WEBLOCKS:STYLESHEET-DEPENDENCY /bootstrap/css/bootstrap.css>
+                              #<WEBLOCKS:STYLESHEET-DEPENDENCY /pub/stylesheets/twitter-bootstrap.css>
+                              #<WEBLOCKS:STYLESHEET-DEPENDENCY /pub/stylesheets/layout.css>
+                              #<WEBLOCKS:STYLESHEET-DEPENDENCY /pub/stylesheets/main.css>
+                              #<WEBLOCKS:STYLESHEET-DEPENDENCY /pub/stylesheets/dialog.css>
+                              NIL
+                              #<WEBLOCKS:SCRIPT-DEPENDENCY /bootstrap/js/bootstrap.js>)
+
+  <DEBUG> [16:47:19] weblocks dependencies.lisp (compact-dependencies) -
+    Compacting dependencies
+  <DEBUG> [16:47:19] weblocks dependencies.lisp (prune-dependencies) -
+    Pruning dependencies
+  <DEBUG> [16:47:19] weblocks dependencies.lisp (bundle-dependencies) -
+
+
+Метод (dependencies) вызывает (render-widget), который, в свою очередь,
+вызывается из handle-normal-request.
+
+
+Метод (render-dependency-in-page-header) вызывается из render-page, а
+тот из handle-normal-request.
+
+
+Что нужно решить
+================
+
+* static dependency должно понимать пути относительно заданной системы.
+* не должны создаваться новые одинаковые dependency и роуты (может быть
+  сделать around для get-dependencies и в нём кэшировать?)
+* роут зависимости должен автоматически включать приложение или виджет,
+  чтобы не было конфликтов.
+* подумать, что делать с assets, можно ли их как-то переиспользовать.
+  Быть может сделать более автоматическими, типа формул, или просто
+  сделать тип зависимости asset-dependency, который будет скачивать
+  asset и отдавать рендерить на странице несколько зависимостей.

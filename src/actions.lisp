@@ -104,10 +104,7 @@ Ex:
 
 (defun get-request-action-name ()
   "Gets the name of the action from the request."
-  (let* ((request-action-name (request-parameter *action-string*))
-         (get/post-action-name (parameter *action-string*))
-         (action-name (or request-action-name get/post-action-name)))
-    action-name))
+  (weblocks.server:request-parameter *action-string*))
 
 (defvar *ignore-missing-actions* t)
 
@@ -130,5 +127,11 @@ raises an assertion."
 
 (defun eval-action ()
   "Evaluates the action that came with the request."
-  (safe-apply (get-request-action) (alist->plist (request-parameters))))
+  (let ((action-name (get-request-action-name))
+        (action (get-request-action))
+        (arguments (alist->plist (weblocks.server:request-parameters))))
+    
+    (log:debug "Calling" action "with" arguments "and" action-name)
+    (safe-apply action
+                arguments)))
 

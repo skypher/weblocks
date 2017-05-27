@@ -442,35 +442,42 @@ Additionally, calls 'dependencies' and adds the returned items to
 stylesheets and javascript links in the page header."))
 
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
-  (declare (special *page-dependencies*))
+  (log:debug "Rendering widget" obj "with" *page-dependencies*)
+  
   (if (ajax-request-p)
-    (mapc #'render-dependency-in-ajax-response (dependencies obj))
-    (setf *page-dependencies*
-          (append *page-dependencies* (dependencies obj))))
+      (mapc #'render-dependency-in-ajax-response (dependencies obj))
+      (progn (setf *page-dependencies*
+                   (append *page-dependencies*
+                           (dependencies obj)))
+             
+             ;; Update new-style dependencies
+             (setf weblocks.dependencies:*page-dependencies*
+                   (append weblocks.dependencies:*page-dependencies*
+                           (weblocks.dependencies:get-dependencies obj)))))
 
   (write-string 
-    (weblocks-util::nested-html-part 
-      (list :type :widget :widget obj)
-      (let ((*current-widget* obj)
-            (*weblocks-output-stream* (make-string-output-stream)))
+   (weblocks.utils.html-parts:nested-html-part 
+       (list :type :widget :widget obj)
+     (let ((*current-widget* obj)
+           (*weblocks-output-stream* (make-string-output-stream)))
 
-        (if inlinep
-          (progn (apply #'render-widget-body obj args)
-                 (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-          (apply #'with-widget-header
-                 obj
-                 (lambda (obj &rest args)
-                   (apply #'render-widget-body obj args)
-                   (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-                 (append
+       (if inlinep
+           (progn (apply #'render-widget-body obj args)
+                  (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+           (apply #'with-widget-header
+                  obj
+                  (lambda (obj &rest args)
+                    (apply #'render-widget-body obj args)
+                    (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+                  (append
                    (when (widget-prefix-fn obj)
                      (list :widget-prefix-fn (widget-prefix-fn obj)))
                    (when (widget-suffix-fn obj)
                      (list :widget-suffix-fn (widget-suffix-fn obj)))
                    args)))
 
-        (get-output-stream-string *weblocks-output-stream*)))
-    *weblocks-output-stream*))
+       (get-output-stream-string *weblocks-output-stream*)))
+   *weblocks-output-stream*))
 
 (defgeneric mark-dirty (w &key propagate putp)
   (:documentation

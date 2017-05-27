@@ -107,6 +107,7 @@ customize behavior."))
         (webapp-update-thread-status "Request complete/idle")))))
 
 (defmethod handle-client-request ((app weblocks-webapp))
+
   (progn                                ;save it for splitting this up
     (when (null *session*)
       (when (get-request-action-name)
@@ -151,15 +152,7 @@ customize behavior."))
             *current-page-keywords*
             *current-page-headers*
             (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
-        (declare (special *weblocks-output-stream*
-                          *dirty-widgets*
-                          *on-ajax-complete-scripts*
-                          *uri-tokens*
-                          *page-dependencies*
-                          *current-page-title*
-                          *current-page-description*
-                          *current-page-keywords*
-                          *current-page-headers*))
+
         (when (pure-request-p)
           (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
 
@@ -193,8 +186,6 @@ customize behavior."))
           (handle-http-error app (return-code*)))))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
-  (declare (special *weblocks-output-stream* *dirty-widgets*
-                    *on-ajax-complete-scripts* *uri-tokens* *page-dependencies*))
   (webapp-update-thread-status "Handling AJAX request")
   (timing "handle-ajax-request"
     (update-location-hash-dependents)
@@ -213,11 +204,7 @@ customize behavior."))
         page-title
         page-description
         page-keywords)
-    (declare (special *tree-update-pending*
-                      *current-page-title*
-                      *current-page-description*
-                      *current-page-keywords*
-                      *current-page-headers*))
+
     (walk-widget-tree (root-widget)
                       (lambda (widget d)
                         (update-widget-parameters widget (request-method*) (request-parameters))
@@ -268,8 +255,6 @@ customize behavior."))
     (gethash *session* *session-locks*)))
 
 (defmethod handle-normal-request ((app weblocks-webapp))
-  (declare (special *weblocks-output-stream*
-                    *uri-tokens*))
   ; we need to render widgets before the boilerplate HTML
   ; that wraps them in order to collect a list of script and
   ; stylesheet dependencies.
@@ -283,6 +268,13 @@ customize behavior."))
     (webapp-update-thread-status "Handling normal request [rendering widgets]")
     (timing "widget tree rendering"
       (render-widget (root-widget))))
+
+  (log:debug "Page's new-style dependencies"
+             weblocks.dependencies:*page-dependencies*)
+
+  (weblocks.server:register-dependencies
+   weblocks.dependencies:*page-dependencies*)
+  
   ; set page title if it isn't already set
   (when (and (null *current-page-description*)
              (last (all-tokens *uri-tokens*)))
@@ -318,8 +310,7 @@ marked dirty in the rendering phase.")
   "Renders widgets that have been marked as dirty into a JSON
 association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
-  (declare (special *dirty-widgets* *weblocks-output-stream*
-                    *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
+
 
   (flet ((remove-duplicate-dirty-widgets ()
            "Removes all widgets that should be rendered through rendering their parent"

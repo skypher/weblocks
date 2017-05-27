@@ -16,6 +16,8 @@
   :depends-on 
   (:log4cl
    :clack
+   :lack-request
+   :function-cache
    :weblocks-util
    :weblocks-stores
    :closer-mop

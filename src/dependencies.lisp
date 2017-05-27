@@ -96,13 +96,15 @@ when new dependencies appeared in AJAX page updates.")
 
 (defun prune-dependencies (dependency-list)
   "Remove duplicates from a list of dependencies."
+  (log:debug "Pruning dependencies")
   (remove-duplicates dependency-list :test #'dependencies-equalp :from-end t))
 
 (defun sort-dependencies-by-type (dependency-list)
   (stable-sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list &key bundle-folder
-                            (bundle-types (bundle-dependency-types* (current-webapp))))
+                                                 (bundle-types (bundle-dependency-types* (current-webapp))))
+  (log:debug "Bundling dependencies")
   (when (find :stylesheet bundle-types)
     (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency
                                                     :bundle-folder bundle-folder)))
@@ -118,6 +120,7 @@ when new dependencies appeared in AJAX page updates.")
   dependencies. By adding :before, :after or :around methods one could
   do more interesting things, such as combining differences.")
   (:method (dependency-list)
+    (log:debug "Compacting dependencies")
     (timing "sort-deps"
       (sort-dependencies-by-type
         (timing "bundle-deps"
@@ -146,34 +149,42 @@ when new dependencies appeared in AJAX page updates.")
 ;; Rendering implementations
 
 (defmethod render-dependency-in-page-head ((obj stylesheet-dependency))
+  (log:debug "Rendering stylesheet dependency" obj)
   (with-html
     (:link :rel "stylesheet" :type "text/css"
            :href (dependency-url obj)
            :media (stylesheet-media obj))))
 
 (defmethod render-dependency-in-page-head ((obj script-dependency))
+  (log:debug "Rendering script dependency" obj)
   (with-html
     (:script :src (dependency-url obj) :type "text/javascript" "")))
 
 (defmethod render-dependency-in-page-head ((obj javascript-code-dependency))
+  (log:debug "Rendering javascript code dependency" obj)
   (send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-page-body-top ((obj javascript-code-dependency))
+  (log:debug "Rendering js dependency at the body top" obj)
   (send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-page-body-bottom ((obj javascript-code-dependency))
+  (log:debug "Rendering js dependency at the body bottom" obj)
   (send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-form-submit ((obj javascript-code-dependency))
+  (log:debug "Rendering js dependency in form submit" obj)
   (javascript-code obj))
 
 (defmethod render-dependency-in-ajax-response ((obj stylesheet-dependency))
+  (log:debug "Rendering css dependency in ajax response" obj)
   (send-script
    (ps* `(include_css
           ,(puri:render-uri (dependency-url obj) nil)))
    :before-load))
 
 (defmethod render-dependency-in-ajax-response ((obj script-dependency))
+  (log:debug "Rendering js dependency in ajax response" obj)
   (send-script
    (ps* `(include_dom
           ,(puri:render-uri (dependency-url obj) nil)))
@@ -181,6 +192,7 @@ when new dependencies appeared in AJAX page updates.")
 
 ;; since rendering dependencies for views is more complex than a simple mapc, there is a utility function
 (defun render-form-submit-dependencies (dependency-list)
+  (log:debug "Rendering from submit dependency list" dependency-list)
   (let ((code-string (reduce (lambda (e v)
                                (concatenate 'string e (render-dependency-in-form-submit v)))
                              (remove nil dependency-list)
@@ -192,6 +204,7 @@ when new dependencies appeared in AJAX page updates.")
 (defvar *gzip-dependency-lock* (bordeaux-threads:make-lock))
 
 (defun create-gziped-dependency-file (original-path)
+  (log:debug "Creating gziped dependency file from" original-path)
   (bordeaux-threads:with-lock-held (*gzip-dependency-lock*)
     (let ((new-path (format nil "~A.gz" original-path)))
       (gzip-file original-path new-path))))
@@ -204,6 +217,9 @@ when new dependencies appeared in AJAX page updates.")
 type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
 returns a dependency object."
+  
+  (log:debug "Making local dependency of" type "from" file-name)
+  
   (let* ((relative-path (public-file-relative-path type file-name))
          (physical-path (princ-to-string (merge-pathnames relative-path
                                                           (compute-webapp-public-files-path webapp))))
@@ -260,6 +276,7 @@ more convenient."
   "A utility function used to help in gathering dependencies. Determines
 dependencies for a particular symbol, which could (but doesn't have to)
 represent a class."
+  (log:debug "Returning dependencies by" symbol)
   (let* ((attributized-widget-class-name (attributize-name symbol))
          (base-dependencies (loop for type in '(:stylesheet :script)
                                collect (make-local-dependency type attributized-widget-class-name)))
@@ -286,7 +303,9 @@ represent a class."
   function most of the time.")
   (:method-combination append)
   ;; no dependencies by default
-  (:method append (obj) ()))
+  (:method append (obj)
+    (log:debug "Gathering per class dependencies for" obj)
+    ()))
 
 
 (defgeneric dependencies (obj)
@@ -313,7 +332,9 @@ represent a class."
   ;; from user-defined append methods and 2. traverse the class tree and
   ;; gather all class-related dependencies. This :around method collects
   ;; everything and removes empty dependencies.
-  (:method :around (obj) (nreverse (remove nil (append (call-next-method) (per-class-dependencies obj)))))
+  (:method :around (obj)
+    (log:debug "Returning dependencies for" obj)
+    (nreverse (remove nil (append (call-next-method) (per-class-dependencies obj)))))
 
   ;; No dependencies by default
   (:method append (obj) ())
