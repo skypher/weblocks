@@ -6,20 +6,6 @@
 (defparameter *app-name-placeholder* (ppcre:quote-meta-chars "{APPNAME}")
   "A placeholder located in template files.")
 
-(defun attributize-name (name)
-  "Convert a string or a symbol to a format suitable for
-serialization (in particular for markup languages like HTML).
-
-Ex:
-\(attributize-name 'hello-world) => \"hello-world\"
-\(attributize-name \"Hello world-ref\") => \"hello-world-ref\""
-  (when (null name)
-    (return-from attributize-name ""))
-  (let ((namestr (etypecase name
-                     (symbol (symbol-name name))
-                     (string name)
-                     (integer (format nil "~A" name)))))
-    (string-downcase (substitute #\- #\Space namestr))))
 (defun make-dir (pathname)
   "Create directory 'pathname'.
 

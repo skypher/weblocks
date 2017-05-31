@@ -254,41 +254,6 @@ customize behavior."))
             (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
     (gethash *session* *session-locks*)))
 
-(defmethod handle-normal-request ((app weblocks-webapp))
-  ; we need to render widgets before the boilerplate HTML
-  ; that wraps them in order to collect a list of script and
-  ; stylesheet dependencies.
-  (webapp-update-thread-status "Handling normal request [tree shakedown]")
-  (bordeaux-threads:with-lock-held ((session-lock))
-    (handler-case (timing "tree shakedown"
-                    (update-widget-tree))
-      (http-not-found () (return-from handle-normal-request
-                                      (page-not-found-handler app))))
-
-    (webapp-update-thread-status "Handling normal request [rendering widgets]")
-    (timing "widget tree rendering"
-      (render-widget (root-widget))))
-
-  (log:debug "Page's new-style dependencies"
-             weblocks.dependencies:*page-dependencies*)
-
-  (weblocks.server:register-dependencies
-   weblocks.dependencies:*page-dependencies*)
-  
-  ; set page title if it isn't already set
-  (when (and (null *current-page-description*)
-             (last (all-tokens *uri-tokens*)))
-    (setf *current-page-description* 
-          (humanize-name (last-item (all-tokens *uri-tokens*)))))
-  ; render page will wrap the HTML already rendered to
-  ; *weblocks-output-stream* with necessary boilerplate HTML
-  (webapp-update-thread-status "Handling normal request [rendering page]")
-  (timing "page render"
-    (render-page app))
-  ;; make sure all tokens were consumed (FIXME: still necessary?)
-  (unless (or (tokens-fully-consumed-p *uri-tokens*)
-              (null (all-tokens *uri-tokens*)))
-    (page-not-found-handler app)))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."

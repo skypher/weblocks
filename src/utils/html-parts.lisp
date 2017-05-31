@@ -4,7 +4,11 @@
    #:reset
    #:update-html-parts-connections
    #:update-current-html-part-children
-   #:nested-html-part)
+   #:nested-html-part
+   #:get-html-part
+   #:get-html-part-context
+   #:get-html-parts-root-hash
+   #:get-html-part-children)
   (:import-from #:weblocks-util
                 #:md5))
 (in-package weblocks.utils.html-parts)

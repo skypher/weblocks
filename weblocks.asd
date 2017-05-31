@@ -17,6 +17,7 @@
   (:log4cl
    :clack
    :lack-request
+   :routes
    :function-cache
    :weblocks-util
    :weblocks-stores
@@ -65,12 +66,19 @@
                               :depends-on ("weblocks" utils))
                              (:file "dependencies"
                               :depends-on ("weblocks" "server" "bundling" "versioning" utils))
+                             (:file "dependencies2"
+                              :depends-on ("weblocks"
+                                           "bundling"
+                                           "versioning"
+                                           utils
+                                           "routes"))
                              (:file "dom-object"
                               :depends-on ("weblocks" utils))
                              (:file "page-template"
                               :depends-on ("weblocks" utils "application"))
                              (:file "actions"
-                              :depends-on ("weblocks" utils))
+                              :depends-on ("weblocks"
+                                           utils))
                              (:file "log-actions"
                               :depends-on ("weblocks"))
                              (:file "debug-mode"
@@ -81,16 +89,28 @@
                               :depends-on ("weblocks" "debug-mode"))
                              (:file "error-handler"
                               :depends-on ("weblocks" "application"))
+                             (:file "request2")
                              (:file "request-handler"
                               :depends-on (utils "weblocks" "page-template" "debug-mode"
                                                  "actions" "request-hooks" "application"
                                                  "request" "dependencies" "uri-tokens"
                                                  "error-handler"))
+                             (:file "variables")
                              (:file "request-handler2"
-                              :depends-on (utils "weblocks" "page-template" "debug-mode"
-                                                 "actions" "request-hooks" "application"
-                                                 "request" "dependencies" "uri-tokens"
-                                                 "error-handler"))
+                              :depends-on (utils
+                                           "weblocks"
+                                           "page-template"
+                                           "debug-mode"
+                                           "actions"
+                                           "request-hooks"
+                                           "application"
+                                           "request"
+                                           "dependencies"
+                                           "uri-tokens"
+                                           "error-handler"
+                                           "routes"
+                                           "request2"
+                                           "variables"))
                              (:module linguistic
                               :components ((:file "grammar"))
                               :depends-on ("weblocks" utils))
@@ -154,7 +174,11 @@
                                                           parsers
                                                           :components ((:file "common"))))
                                             :depends-on (view formview dataview)))
-                              :depends-on ("weblocks" "dependencies" utils "widget-translation"))
+                              :depends-on ("weblocks"
+                                           "dependencies"
+                                           "dependencies2"
+                                           utils
+                                           "widget-translation"))
                              (:module widgets
                               :components ((:module widget
                                             :components ((:file "widget-mop")
@@ -229,10 +253,16 @@
                               :depends-on ("weblocks" "widgets" "request-handler"))
                              (:file "acceptor"
                               :depends-on ("weblocks"))
+                             (:file "routes")
                              (:file "server"
                               :depends-on ("weblocks" "acceptor" "debug-mode" utils))
                              (:file "server2"
-                              :depends-on ("weblocks" "acceptor" "debug-mode" utils))
+                              :depends-on ("weblocks"
+                                           "acceptor"
+                                           utils
+                                           "routes"
+                                           "request-handler2"
+                                           "dependencies2"))
                              (:file "request"
                               :depends-on ("weblocks" "request-hooks" "actions"))
                              (:file "application-mop"
@@ -240,7 +270,11 @@
                              (:file "application"
                               :depends-on ("weblocks" "application-mop"))
                              (:file "default-application"
-                              :depends-on ("server" "weblocks" utils "request-handler"))
+                              :depends-on ("server"
+                                           "weblocks"
+                                           utils
+                                           "request-handler"
+                                           "request-handler2"))
                              (:file "widget-translation"))))
   :in-order-to ((test-op (load-op "weblocks-test"))
                 (doc-op (load-op "weblocks-scripts"))

@@ -37,10 +37,6 @@ page may display a relevant message, if necessary."
     (setf (return-code*) +http-not-found+)))
 
 
-(defparameter *action-string* "action"
-  "A string used to pass actions from a client to the server. See
-  'get-request-action'.")
-
 (defun generate-action-code ()
   "Generates unique, hard to guess action codes."
   (let ((new-action-id (gensym "")))
@@ -102,34 +98,28 @@ Ex:
                *action-string* "="
                (url-encode (princ-to-string action-code))))
 
-(defun get-request-action-name ()
-  "Gets the name of the action from the request."
-  (weblocks.server:request-parameter *action-string*))
 
 (defvar *ignore-missing-actions* t)
 
-(defun get-request-action ()
+(defun get-request-action (action-name)
   "Gets an action from the request. If the request contains
 *action-string* parameter, the action is looked up in the session and
 appropriate function is returned. If no action is in the parameter,
 returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
-  (let ((action-name (get-request-action-name))
-        request-action)
-    (when action-name
-      (let ((permanent-action (webapp-permanent-action action-name))
-            (session-action (webapp-session-value action-name)))
-        (setf request-action (or permanent-action session-action))
-        (unless *ignore-missing-actions*
-          (assert request-action (request-action)
-                  (concatenate 'string "Cannot find action: " action-name)))
-        request-action))))
+  (when action-name
+    (let ((permanent-action (webapp-permanent-action action-name))
+          (session-action (webapp-session-value action-name)))
+      (setf request-action (or permanent-action session-action))
+      (unless *ignore-missing-actions*
+        (assert request-action (request-action)
+                (concatenate 'string "Cannot find action: " action-name)))
+      request-action)))
 
-(defun eval-action ()
+
+(defun eval-action (action-name arguments)
   "Evaluates the action that came with the request."
-  (let ((action-name (get-request-action-name))
-        (action (get-request-action))
-        (arguments (alist->plist (weblocks.server:request-parameters))))
+  (let ((action (get-request-action action-name)))
     
     (log:debug "Calling" action "with" arguments "and" action-name)
     (safe-apply action

@@ -3,8 +3,25 @@
   (:export
    #:route
    #:get-dependency
-   #:make-route))
+   #:make-route
+   #:*routes*
+   #:register-dependencies))
 (in-package weblocks.routes)
+
+
+(defvar *routes* (make-instance 'routes:mapper)
+  "We will store mapping from URL to dependency here.")
+
+
+(defun register-dependencies (dependencies)
+  "Adds dependencies to the router to make HTTP server handle them."
+  (dolist (dependency dependencies)
+    ;; to not create a circular dependency between weblocks.dependencies and weblocsk.routes
+    ;; we have to intern this symbol at runtime
+    (let ((route (funcall (intern "GET-ROUTE" 'weblocks.dependencies)
+                          dependency)))
+      (when route
+        (routes:connect *routes* route)))))
 
 
 (defclass route (routes:route)

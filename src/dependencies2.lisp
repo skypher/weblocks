@@ -81,11 +81,11 @@ should have only path part, like /static/css/bootstrap.css."))
   (if (equal (get-content-type dependency)
              "application/javascript")
       ;; Javascript
-      (weblocks-utils::with-html
+      (weblocks::with-html
         (:script :src (get-url dependency)
                  :type "text/javascript" ""))
       ;; CSS
-      (weblocks-utils::with-html
+      (weblocks::with-html
         (:link :rel "stylesheet" :type "text/css"
                :href (get-url dependency)
                :media "screen"))))
@@ -95,11 +95,11 @@ should have only path part, like /static/css/bootstrap.css."))
   (if (equal (get-content-type dependency)
              "application/javascript")
       ;; Javascript
-      (weblocks-utils::with-html
+      (weblocks::with-html
         (:script :src (get-url dependency)
                  :type "text/javascript" ""))
       ;; CSS
-      (weblocks-utils::with-html
+      (weblocks::with-html
         (:link :rel "stylesheet" :type "text/css"
                :href (get-url dependency)
                :media "screen"

@@ -88,10 +88,55 @@ customize behavior."))
        (weblocks::webapp-update-thread-status "Request complete/idle")))))
 
 
-(defmethod handle-client-request ((app weblocks::weblocks-webapp))
+(defmethod handle-normal-request ((app weblocks:weblocks-webapp))
+  ;; we need to render widgets before the boilerplate HTML
+  ;; that wraps them in order to collect a list of script and
+  ;; stylesheet dependencies.
+  (weblocks::webapp-update-thread-status "Handling normal request [tree shakedown]")
+  (bordeaux-threads:with-lock-held ((weblocks::session-lock))
+    (handler-case (weblocks::timing "tree shakedown"
+                    (weblocks::update-widget-tree))
+      (weblocks::http-not-found ()
+        (return-from handle-normal-request
+          (weblocks::page-not-found-handler app))))
+
+    (weblocks::webapp-update-thread-status "Handling normal request [rendering widgets]")
+    (weblocks::timing "widget tree rendering"
+      (weblocks::render-widget (weblocks::root-widget))))
+
+  (log:debug "Page's new-style dependencies"
+             weblocks.dependencies:*page-dependencies*)
+
+  (weblocks.routes:register-dependencies
+   weblocks.dependencies:*page-dependencies*)
+  
+  ;; set page title if it isn't already set
+  (when (and (null weblocks::*current-page-description*)
+             (last (weblocks::all-tokens weblocks::*uri-tokens*)))
+    (setf weblocks::*current-page-description* 
+          (weblocks::humanize-name (weblocks::last-item
+                                    (weblocks::all-tokens weblocks::*uri-tokens*)))))
+  ;; render page will wrap the HTML already rendered to
+  ;; *weblocks-output-stream* with necessary boilerplate HTML
+  (weblocks::webapp-update-thread-status "Handling normal request [rendering page]")
+  (weblocks::timing "page render"
+    (weblocks::render-page app))
+  ;; make sure all tokens were consumed (FIXME: still necessary?)
+  (unless (or (weblocks::tokens-fully-consumed-p weblocks::*uri-tokens*)
+              (null (weblocks::all-tokens weblocks::*uri-tokens*)))
+    (weblocks::page-not-found-handler app)))
+
+
+(defun get-action-name-from-request ()
+  "Returns called action name if any action was called"
+  (weblocks.request:request-parameter
+   weblocks::*action-string*))
+
+
+(defmethod handle-client-request ((app weblocks:weblocks-webapp))
   (progn                                ;save it for splitting this up
     (when (null weblocks::*session*)
-      (when (weblocks::get-request-action-name)
+      (when (get-action-name-from-request)
         (weblocks::expired-action-handler app))
       (weblocks::start-session)
       (setf (weblocks::webapp-session-value 'last-request-uri)
@@ -156,17 +201,25 @@ customize behavior."))
             weblocks::*current-page-headers*
             (cl-who::*indent* (weblocks::weblocks-webapp-html-indent-p app)))
         
-        (when (weblocks::pure-request-p)
-          (weblocks::abort-request-handler (weblocks::eval-action))) ; FIXME: what about the txn hook?
+        (let ((action-name (get-action-name-from-request))
+              (action-arguments
+                (weblocks-util:alist->plist (weblocks.request:request-parameters))))
+          
+          (when (weblocks::pure-request-p)
+            (weblocks::abort-request-handler
+             (weblocks::eval-action action-name
+                                    action-arguments))) ; FIXME: what about the txn hook?
 
-        (weblocks::webapp-update-thread-status "Processing action")
-        (weblocks::timing "action processing (w/ hooks)"
-          (weblocks::eval-hook :pre-action)
-          (weblocks::with-dynamic-hooks (:dynamic-action)
-                                        (weblocks::eval-action))
-          (weblocks::eval-hook :post-action))
+          (weblocks::webapp-update-thread-status "Processing action")
+          (weblocks::timing "action processing (w/ hooks)"
+            (weblocks::eval-hook :pre-action)
+            (weblocks::with-dynamic-hooks
+                (:dynamic-action)
+                (weblocks::eval-action action-name
+                                       action-arguments))
+            (weblocks::eval-hook :post-action)))
 
-        (when (and (not (weblocks.server:ajax-request-p))
+        (when (and (not (weblocks.request:ajax-request-p))
                    (find weblocks::*action-string* (weblocks::get-parameters*)
                          :key #'car :test #'string-equal))
           (weblocks::redirect (weblocks::remove-action-from-uri
@@ -175,9 +228,9 @@ customize behavior."))
         (weblocks::timing "rendering (w/ hooks)"
           (weblocks::eval-hook :pre-render)
           (weblocks::with-dynamic-hooks (:dynamic-render)
-                                        (if (weblocks.server:ajax-request-p)
+                                        (if (weblocks.request:ajax-request-p)
                                             (weblocks::handle-ajax-request app)
-                                            (weblocks::handle-normal-request app)))
+                                            (handle-normal-request app)))
           (weblocks::log-hooks :post-render)
           (weblocks::eval-hook :post-render))
 
@@ -186,7 +239,7 @@ customize behavior."))
         (if (member (weblocks::return-code*)
                     weblocks::*approved-return-codes*)
             (progn 
-              (unless (weblocks.server:ajax-request-p)
+              (unless (weblocks.request:ajax-request-p)
                 (setf (weblocks::webapp-session-value 'last-request-uri)
                       (weblocks::all-tokens weblocks::*uri-tokens*)))
               (get-output-stream-string weblocks::*weblocks-output-stream*))

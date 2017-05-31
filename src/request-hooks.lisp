@@ -146,7 +146,6 @@ of no arguments."
     (weblocks.utils.html-parts:reset)))
 
 (defun update-html-parts ()
-  (declare (special weblocks-util:*parts-md5-hash* weblocks-util:*parts-md5-context-hash*))
   (when (or *weblocks-global-debug*
             (webapp-debug))
     (timing "html parts processing"

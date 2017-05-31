@@ -9,13 +9,7 @@
            #:handle-request
            #:*server*
            #:stop-weblocks
-           #:start-weblocks
-           #:register-dependencies
-           #:*request*
-           #:request-parameters
-           #:request-parameter
-           #:request-header
-           #:ajax-request-p))
+           #:start-weblocks))
 (in-package weblocks.server)
 
 
@@ -59,17 +53,6 @@ Make instance, then start it with ``start`` method."
                  :server-type server-type))
 
 
-(defvar *routes* (make-instance 'routes:mapper)
-  "We will store mapping from URL to dependency here.")
-
-
-(defun register-dependencies (dependencies)
-  "Adds dependencies to the router to make HTTP server handle them."
-  (dolist (dependency dependencies)
-    (let ((route (weblocks.dependencies:get-route dependency)))
-      (when route
-        (routes:connect *routes* route)))))
-
 ;; (let ((dependency (weblocks.dependencies:make-static-css-dependency "/tmp/bar.css")))
 ;;   (routes:connect *routes* (weblocks.dependencies:get-route dependency)))
 
@@ -78,55 +61,19 @@ Make instance, then start it with ``start`` method."
 ;;  "/Users/art/common-lisp/weblocks-twitter-bootstrap-application/twitter-bootstrap.css")
 
 
-(defvar *request* nil
-  "Holds current request from a browser.")
-
-
-(defvar *latest-request* nil
-  "For debugging")
-
-(defun request-parameters (&key (request *request*))
-  "Returns association list with GET or POST parameters for current request."
-  (lack.request:request-parameters request))
-
-
-(defun request-parameter (name &key (request *request*))
-  "Returns GET or POST parameter by name."
-  (declare (type string name))
-
-  (let ((params (request-parameters :request request)))
-    (alexandria:assoc-value params
-                            name
-                            :test #'equal)))
-
-
-(defun request-header (name &key (request *request*))
-  "Returns value of the HTTP header or nil. Name is case insensitive."
-  (let ((headers (lack.request:request-headers request))
-        (lowercased-name (string-downcase name)))
-    (gethash lowercased-name
-             headers)))
-
-
-(defun ajax-request-p (&optional (request *request*))
-  "Detects if the current request was initiated via AJAX by looking
-for 'X-Requested-With' http header. This function expects to be called
-in a dynamic hunchentoot environment."
-  (equal (request-header "X-Requested-With" :request request)
-         "XMLHttpRequest"))
-
 
 (defmethod handle-request ((server server) env)
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
-  
-  (let ((*request* (lack.request:make-request env)))
-    (log:debug "Serving" *request* (request-parameters))
-    (setf *latest-request* *request*)
+
+  (let ((weblocks.request:*request* (lack.request:make-request env)))
+    (log:debug "Serving" weblocks.request:*request* (weblocks.request:request-parameters))
+    (setf weblocks.request::*latest-request*
+          weblocks.request:*request*)
 
     (let* ((path-info (getf env :path-info))
            (hostname (getf env :server-name))
-           (route (routes:match weblocks.server::*routes* path-info)))
+           (route (routes:match weblocks.routes:*routes* path-info)))
 
       ;; If dependency found, then return it's content along with content-type
       (when route
@@ -150,13 +97,13 @@ This function serves all started applications and their static files."
       (dolist (app weblocks::*active-webapps*)
         (log:debug "Searching file in" app)
 
-        (let ((app-prefix (weblocks:webapp-prefix app))
-              (app-pub-prefix (weblocks:compute-webapp-public-files-uri-prefix app))
+        (let ((app-prefix (weblocks::webapp-prefix app))
+              (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app))
               weblocks::*default-content-type*)
 
           (cond
             ((or 
-              (find path-info weblocks:*force-files-to-serve* :test #'string=)
+              (find path-info weblocks::*force-files-to-serve* :test #'string=)
               (and (weblocks::webapp-serves-hostname hostname app)
                    (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                                (weblocks::tokenize-uri app-pub-prefix nil)
@@ -183,7 +130,7 @@ This function serves all started applications and their static files."
 
              (return-from handle-request
                (list 200
-                     (list :content-type (if (ajax-request-p)
+                     (list :content-type (if (weblocks.request:ajax-request-p)
                                              "application/json"
                                              "text/html"))
                      (list (weblocks.request-handler:handle-client-request app))))))))
@@ -197,14 +144,25 @@ This function serves all started applications and their static files."
       
       ;; Otherwise, starting a server
       (let ((port (get-port server)))
-        (log:info "Starting webserver on" port)
+        (log:info "Starting webserver on" port debug)
         
         ;; Suppressing output to stdout, because Clack writes message
         ;; about started server and we want to write into a log instead.
         (with-output-to-string (*standard-output*)
           (setf (get-handler server)
                 (clack:clackup (lambda (env)
-                                 (handle-request server env))
+                                 (handle-request server env)
+                                 ;; (handler-case ()
+                                 ;;   (t (condition)
+                                 ;;     (let* ((traceback (with-output-to-string (stream)
+                                 ;;                         (trivial-backtrace:print-condition condition stream)))
+                                 ;;            (condition (describe condition))
+                                 ;;            (just-traceback (trivial-backtrace:backtrace-string)))
+                                 ;;       (log:error "Unhandled exception" condition traceback just-traceback))
+                                 ;;     '(500
+                                 ;;       ("Content-Type" "text/html")
+                                 ;;       ("Something went wrong!"))))
+                                 )
                                :server (get-server-type server)
                                :port port
                                :debug debug)))
@@ -258,16 +216,17 @@ declared AUTOSTART."
             "You're trying to start Weblocks without threading ~
             support. Recompile your Lisp with threads enabled."))
   (if debug
-    (weblocks::enable-global-debugging)
-    (weblocks::disable-global-debugging))
+      (weblocks::enable-global-debugging)
+      (weblocks::disable-global-debugging))
   (when (null *server*)
     (values
-      (start (setf *server*
-                   (make-server :port port)))
-      (mapcar (lambda (class)
-                (unless (weblocks::get-webapps-for-class class)
-                  (weblocks::start-webapp class :debug debug)))
-              weblocks::*autostarting-webapps*))))
+     (start (setf *server*
+                  (make-server :port port))
+            :debug debug)
+     (mapcar (lambda (class)
+               (unless (weblocks::get-webapps-for-class class)
+                 (weblocks::start-webapp class :debug debug)))
+             weblocks::*autostarting-webapps*))))
 
 
 (defun stop-weblocks ()

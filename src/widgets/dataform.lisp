@@ -163,9 +163,9 @@ submission behavior.")
 (defun update-form-intermediate-values-on-form-action (&rest args)
   (declare (ignorable args))
   
-  (when (and (weblocks.server:request-parameters)
-             (weblocks.server:request-parameter "form-id"))
-    (let ((form (get-widget-by-id (weblocks.server:request-parameter "form-id"))))
+  (when (and (weblocks.request:request-parameters)
+             (weblocks.request:request-parameter "form-id"))
+    (let ((form (get-widget-by-id (weblocks.request:request-parameter "form-id"))))
       (when (subtypep (type-of form) 'dataform)
         (setf 
           (slot-value form 'intermediate-form-values)

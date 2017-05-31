@@ -26,7 +26,7 @@
 (declaim (special *action-string*))     ;early
 
 (defmacro capture-weblocks-output (&body body)
-  `(weblocks-util::nested-html-part 
+  `(weblocks.utils.html-parts:nested-html-part 
      (list :type :capture-weblocks-output)
      (let ((*weblocks-output-stream* (make-string-output-stream)))
        ,@body 
