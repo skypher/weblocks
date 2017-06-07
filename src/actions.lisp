@@ -64,7 +64,7 @@ don't provide a hard to guess code ('generate-action-code' is used by
 default), the user will be vulnerable to an attack where a malicious
 attacker can attempt to guess a dangerour action id and send the user
 a link to it. Only use guessable action codes for GET actions."
-  (setf (webapp-session-value action-code) action-fn)
+  (setf (weblocks.session:get-value action-code) action-fn)
   action-code)
 
 (defun function-or-action->action (function-or-action)
@@ -79,7 +79,7 @@ it does not, signals an error."
         (declare (ignore res))
         (if presentp function-or-action
             (multiple-value-bind (res presentp)
-                (webapp-session-value function-or-action)
+                (weblocks.session:get-value function-or-action)
               (declare (ignore res))
               (if presentp
                   function-or-action
@@ -93,10 +93,10 @@ Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
   (concatenate 'string
-               (request-uri-path) ; we need this for w3m
+               (weblocks.request:request-path-info) ; we need this for w3m
                (if include-question-mark-p "?" "")
                *action-string* "="
-               (url-encode (princ-to-string action-code))))
+               (quri:url-encode (princ-to-string action-code))))
 
 
 (defvar *ignore-missing-actions* t)
@@ -108,9 +108,9 @@ appropriate function is returned. If no action is in the parameter,
 returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
   (when action-name
-    (let ((permanent-action (webapp-permanent-action action-name))
-          (session-action (webapp-session-value action-name)))
-      (setf request-action (or permanent-action session-action))
+    (let* ((permanent-action (webapp-permanent-action action-name))
+           (session-action (weblocks.session:get-value action-name))
+           (request-action (or permanent-action session-action)))
       (unless *ignore-missing-actions*
         (assert request-action (request-action)
                 (concatenate 'string "Cannot find action: " action-name)))

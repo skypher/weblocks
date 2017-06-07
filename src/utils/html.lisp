@@ -68,13 +68,13 @@ headers on top and three on the bottom. It uses
   (let ((action-code (gensym)))
     `(let ((,action-code (function-or-action->action ,action)))
        (with-html
-         (:form :id ,id :class ,class :action (request-uri-path)
+         (:form :id ,id :class ,class :action (weblocks.request:request-path-info)
                 :method (attributize-name ,method-type) :enctype ,enctype
                 :onsubmit (when ,use-ajax-p
                             (format nil "~@[~A~]~A; return false;"
                                     ,extra-submit-code
                                     (format nil ,submit-fn
-                                            (url-encode (or ,action-code ""))
+                                            (quri:url-encode (or ,action-code ""))
                                             (session-name-string-pair))))
                 (with-extra-tags
                   (htm (:fieldset
@@ -510,7 +510,7 @@ on the client only if client-side scripting is enabled."
          (with-html
            ,@body)
          (setf ,output (get-output-stream-string *weblocks-output-stream*)))
-       (if (ajax-request-p)
+       (if (weblocks.request:ajax-request-p)
            (write-string ,output *weblocks-output-stream*)
            (with-javascript
              (ps:ps* `(funcall (slot-value document 'write) ,,output)))))))
@@ -520,7 +520,7 @@ on the client only if client-side scripting is enabled."
 client-side scripting is disabled. This macro behaves identically
 to :noscript html element, but avoids rendering HTML on AJAX requests
 in addition."
-  `(when (not (ajax-request-p))
+  `(when (not (weblocks.request:ajax-request-p))
      (with-html
        (:noscript
          ,@body))))
@@ -536,7 +536,7 @@ in addition."
   (let ((script (etypecase script
                   (string script)
                   (list (ps* script)))))
-    (if (ajax-request-p)
+    (if (weblocks.request:ajax-request-p)
       (let ((code (if (equalp (hunchentoot:header-in* "X-Weblocks-Client") "JQuery")
                     script
                     (with-javascript-to-string script))))

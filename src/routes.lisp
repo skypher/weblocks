@@ -5,12 +5,18 @@
    #:get-dependency
    #:make-route
    #:*routes*
-   #:register-dependencies))
+   #:register-dependencies
+   #:reset-routes))
 (in-package weblocks.routes)
 
 
 (defvar *routes* (make-instance 'routes:mapper)
   "We will store mapping from URL to dependency here.")
+
+
+(defun reset-routes ()
+  "Resets routes before starting Weblocks server."
+  (setf *routes* (make-instance 'routes:mapper)))
 
 
 (defun register-dependencies (dependencies)

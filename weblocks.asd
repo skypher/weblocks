@@ -22,7 +22,6 @@
    :weblocks-util
    :weblocks-stores
    :closer-mop
-   :hunchentoot
    :puri
    :cl-json
    :cl-who
@@ -46,9 +45,17 @@
   :components ((:module src
                 :components (
                              (:file "package")
-                             (:file "weblocks" :depends-on ("package"))
+                             (:file "weblocks"
+                              :depends-on ("session"
+                                           "package"))
+                             (:file "session")
                              (:module utils
-                              :components ((:file "misc")
+                              :components ((:file "misc"
+                                            :depends-on (
+                                                         ;; utils/misc stores unique ids in a session
+                                                         "repl"
+                                                         ;;  "session"
+                                                         ))
                                            (:file "runtime-class")
                                            (:file "string")
                                            (:file "list")
@@ -59,25 +66,29 @@
                                            (:file "suggest")
                                            (:file "timing")
                                            (:file "repl"))
-                              :depends-on ("weblocks"))
+                              :depends-on ("session"
+                                           "weblocks"
+                                           ))
                              (:file "versioning"
-                              :depends-on ("weblocks" utils))
+                              :depends-on ("weblocks" "session" utils))
                              (:file "bundling"
-                              :depends-on ("weblocks" utils))
+                              :depends-on ("weblocks" "session" utils))
                              (:file "dependencies"
-                              :depends-on ("weblocks" "server" "bundling" "versioning" utils))
+                              :depends-on ("weblocks" "server" "bundling" "versioning" "session" utils))
                              (:file "dependencies2"
                               :depends-on ("weblocks"
                                            "bundling"
                                            "versioning"
+                                           "session"
                                            utils
                                            "routes"))
                              (:file "dom-object"
-                              :depends-on ("weblocks" utils))
+                              :depends-on ("weblocks" "session" utils))
                              (:file "page-template"
-                              :depends-on ("weblocks" utils "application"))
+                              :depends-on ("weblocks" "session" utils "application"))
                              (:file "actions"
                               :depends-on ("weblocks"
+                                           "session"
                                            utils))
                              (:file "log-actions"
                               :depends-on ("weblocks"))
@@ -88,16 +99,22 @@
                              (:file "request-hooks"
                               :depends-on ("weblocks" "debug-mode"))
                              (:file "error-handler"
-                              :depends-on ("weblocks" "application"))
+                              :depends-on ("weblocks"
+                                           "application"
+                                           "request2"))
                              (:file "request2")
                              (:file "request-handler"
-                              :depends-on (utils "weblocks" "page-template" "debug-mode"
-                                                 "actions" "request-hooks" "application"
-                                                 "request" "dependencies" "uri-tokens"
-                                                 "error-handler"))
+                              :depends-on ("session"
+                                           utils "weblocks" "page-template" "debug-mode"
+                                           "actions" "request-hooks" "application"
+                                           "request" "dependencies" "uri-tokens"
+                                           "error-handler"))
                              (:file "variables")
+                             (:file "session-lock"
+                              :depends-on ("session"))
                              (:file "request-handler2"
-                              :depends-on (utils
+                              :depends-on ("session"
+                                           utils
                                            "weblocks"
                                            "page-template"
                                            "debug-mode"
@@ -110,10 +127,11 @@
                                            "error-handler"
                                            "routes"
                                            "request2"
-                                           "variables"))
+                                           "variables"
+                                           "session-lock"))
                              (:module linguistic
                               :components ((:file "grammar"))
-                              :depends-on ("weblocks" utils))
+                              :depends-on ("weblocks" "session" utils))
                              (:module views
                               :components ((:module view
                                             :components ((:file "view")
@@ -177,6 +195,7 @@
                               :depends-on ("weblocks"
                                            "dependencies"
                                            "dependencies2"
+                                           "session"
                                            utils
                                            "widget-translation"))
                              (:module widgets
@@ -242,7 +261,7 @@
                                             :depends-on ("selector" widget))
                                            (:file "breadcrumbs"
                                             :depends-on ("navigation")))
-                              :depends-on (views utils "dependencies" "actions" "server" "request"
+                              :depends-on (views "session" utils "dependencies" "actions" "server" "request"
                                                  "request-hooks" "dom-object" linguistic "widget-translation"))
                              (:module control-flow
                               :components ((:file "call-answer")
@@ -255,10 +274,11 @@
                               :depends-on ("weblocks"))
                              (:file "routes")
                              (:file "server"
-                              :depends-on ("weblocks" "acceptor" "debug-mode" utils))
+                              :depends-on ("weblocks" "acceptor" "debug-mode" "session" utils))
                              (:file "server2"
                               :depends-on ("weblocks"
                                            "acceptor"
+                                           "session"
                                            utils
                                            "routes"
                                            "request-handler2"
@@ -268,10 +288,12 @@
                              (:file "application-mop"
                               :depends-on ("weblocks" "server"))
                              (:file "application"
-                              :depends-on ("weblocks" "application-mop"))
+                              :depends-on ("weblocks"
+                                           "application-mop"))
                              (:file "default-application"
                               :depends-on ("server"
                                            "weblocks"
+                                           "session"
                                            utils
                                            "request-handler"
                                            "request-handler2"))

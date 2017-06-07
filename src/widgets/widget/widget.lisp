@@ -208,7 +208,7 @@ children of w (e.g. may be rendered when w is rendered).")
                (remove type children :key #'car))
               (widgets
                (cons (cons type (ensure-list widgets)) children))))
-      (when (and (ajax-request-p)
+      (when (and (weblocks.request:ajax-request-p)
                  (not *tree-update-pending*)
                  (get-widgets-by-type 'selector :root obj))
         (handler-case (update-widget-tree)
@@ -444,7 +444,7 @@ stylesheets and javascript links in the page header."))
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
   (log:debug "Rendering widget" obj "with" *page-dependencies*)
   
-  (if (ajax-request-p)
+  (if (weblocks.request:ajax-request-p)
       (mapc #'render-dependency-in-ajax-response (dependencies obj))
       (progn (setf *page-dependencies*
                    (append *page-dependencies*

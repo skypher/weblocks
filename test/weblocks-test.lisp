@@ -214,13 +214,8 @@ webapp in my context."
            weblocks::*page-dependencies* *session*
            *on-ajax-complete-scripts*
            weblocks::*rendered-actions*)
-      (declare (special *uri-tokens* weblocks::*page-dependencies* *session*
-                        *on-ajax-complete-scripts* weblocks::*rendered-actions* 
-                        weblocks-util:*parts-md5-hash*
-                        weblocks-util:*parts-md5-context-hash*))
       (unwind-protect (progn
-                        (setf weblocks-util:*parts-md5-hash* (make-hash-table :test 'equal))
-                        (setf weblocks-util:*parts-md5-context-hash* (make-hash-table :test 'equal))
+                        (weblocks.utils.html-parts:reset)
 
                         (weblocks::open-stores)
                         (start-session)

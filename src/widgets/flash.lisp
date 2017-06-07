@@ -57,7 +57,7 @@
 nothing to show. This functions takes into consideration any stale
 messages that need to be shown for AJAX effects."
   (or (flash-messages flash)
-      (and (ajax-request-p)
+      (and (weblocks.request:ajax-request-p)
            (flash-old-messages flash))))
 
 ;;; Specialize with-widget-header to display a comment if there are no

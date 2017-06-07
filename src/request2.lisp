@@ -5,7 +5,12 @@
    #:request-parameters
    #:request-parameter
    #:request-header
-   #:ajax-request-p))
+   #:ajax-request-p
+   #:request-server-name
+   #:request-server-port
+   #:request-uri
+   #:request-method
+   #:request-path-info))
 (in-package weblocks.request)
 
 
@@ -16,6 +21,30 @@
 (defvar *latest-request* nil
   "For debugging")
 
+
+(defun request-uri (&optional (request *request*))
+  "For URL http://example.com/foo/bar?blah=minor returns
+/foo/bar?blah=minor path of the request's URL."
+  (lack.request:request-uri request))
+
+
+(defun request-path-info (&optional (request *request*))
+  "For URL http://example.com/foo/bar?blah=minor returns
+/foo/bar path of the request's URL."
+  (lack.request:request-path-info request))
+
+
+(defun request-server-name (&optional (request *request*))
+  (lack.request:request-server-name request))
+
+
+(defun request-server-port (&optional (request *request*))
+  (lack.request:request-server-port request))
+
+
+(defun request-method (&key (request *request*))
+  "Returns association list with GET or POST parameters for current request."
+  (lack.request:request-method request))
 
 
 (defun request-parameters (&key (request *request*))

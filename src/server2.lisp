@@ -66,7 +66,9 @@ Make instance, then start it with ``start`` method."
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
 
-  (let ((weblocks.request:*request* (lack.request:make-request env)))
+  (let ((weblocks.request:*request* (lack.request:make-request env))
+        (weblocks.session::*session* (getf env :lack.session)))
+
     (log:debug "Serving" weblocks.request:*request* (weblocks.request:request-parameters))
     (setf weblocks.request::*latest-request*
           weblocks.request:*request*)
@@ -125,15 +127,27 @@ This function serves all started applications and their static files."
                   (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                               (weblocks::tokenize-uri app-prefix nil)
                                               :test #'string=))
+
              ;; TODO это внутри использует hunchentoot
-             (weblocks::no-cache)    ; disable caching for dynamic pages
+             ;;      но при запуске на Woo вызывает ошибку
+             ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
+             ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
              (return-from handle-request
-               (list 200
-                     (list :content-type (if (weblocks.request:ajax-request-p)
-                                             "application/json"
-                                             "text/html"))
-                     (list (weblocks.request-handler:handle-client-request app))))))))
+               (let ((weblocks.response:*code* 200)
+                     (weblocks.response:*content-type*
+                       (if (weblocks.request:ajax-request-p)
+                           "application/json"
+                           "text/html"))
+                     (weblocks.response:*headers* nil))
+                 (list weblocks.response:*code* ;; this value can be changed somewhere in
+                       ;; handle-client-request
+                       (append (list :content-type weblocks.response:*content-type*)
+                               weblocks.response:*headers*)
+                       ;; Here we use catch to allow to abort usual response
+                       ;; processing and to return data immediately
+                       (list (catch 'weblocks.response::abort-processing
+                               (weblocks.request-handler:handle-client-request app))))))))))
      
       (log:debug "Application dispatch failed for" path-info))))
 
@@ -143,26 +157,29 @@ This function serves all started applications and their static files."
       (log:warn "Webserver already started")
       
       ;; Otherwise, starting a server
-      (let ((port (get-port server)))
+      (let* ((port (get-port server))
+             (app (lack:builder
+                   :session
+                   (lambda (env)
+                     (handle-request server env)
+                     ;; (handler-case ()
+                     ;;   (t (condition)
+                     ;;     (let* ((traceback (with-output-to-string (stream)
+                     ;;                         (trivial-backtrace:print-condition condition stream)))
+                     ;;            (condition (describe condition))
+                     ;;            (just-traceback (trivial-backtrace:backtrace-string)))
+                     ;;       (log:error "Unhandled exception" condition traceback just-traceback))
+                     ;;     '(500
+                     ;;       ("Content-Type" "text/html")
+                     ;;       ("Something went wrong!"))))
+                     ))))
         (log:info "Starting webserver on" port debug)
         
         ;; Suppressing output to stdout, because Clack writes message
         ;; about started server and we want to write into a log instead.
         (with-output-to-string (*standard-output*)
           (setf (get-handler server)
-                (clack:clackup (lambda (env)
-                                 (handle-request server env)
-                                 ;; (handler-case ()
-                                 ;;   (t (condition)
-                                 ;;     (let* ((traceback (with-output-to-string (stream)
-                                 ;;                         (trivial-backtrace:print-condition condition stream)))
-                                 ;;            (condition (describe condition))
-                                 ;;            (just-traceback (trivial-backtrace:backtrace-string)))
-                                 ;;       (log:error "Unhandled exception" condition traceback just-traceback))
-                                 ;;     '(500
-                                 ;;       ("Content-Type" "text/html")
-                                 ;;       ("Something went wrong!"))))
-                                 )
+                (clack:clackup app
                                :server (get-server-type server)
                                :port port
                                :debug debug)))
@@ -195,7 +212,9 @@ This function serves all started applications and their static files."
               "stopped")))
 
 
-(defun start-weblocks (&key (debug t) (port 8080))
+(defun start-weblocks (&key (debug t)
+                         (port 8080)
+                         (server-type :hunchentoot))
   "Starts weblocks framework hooked into Hunchentoot server.
 
 Set DEBUG to true in order for error messages and stack traces to be shown
@@ -211,6 +230,11 @@ the initargs :PORT and :SESSION-COOKIE-NAME default to
 
 Also opens all stores declared via DEFSTORE and starts webapps
 declared AUTOSTART."
+
+  (log:info "Starting weblocks" port server-type debug)
+
+  (weblocks.routes:reset-routes)
+  
   (unless (member :bordeaux-threads *features*)
     (cerror "I know what I'm doing and will stubbornly continue."
             "You're trying to start Weblocks without threading ~
@@ -221,7 +245,8 @@ declared AUTOSTART."
   (when (null *server*)
     (values
      (start (setf *server*
-                  (make-server :port port))
+                  (make-server :port port
+                               :server-type server-type))
             :debug debug)
      (mapcar (lambda (class)
                (unless (weblocks::get-webapps-for-class class)
@@ -238,7 +263,9 @@ declared AUTOSTART."
     (dolist (app weblocks::*active-webapps*)
       (weblocks::stop-webapp (weblocks::weblocks-webapp-name app)))
     (setf weblocks::*last-session* nil)
-    (weblocks::reset-sessions)
+
+    ;; TODO: Replace with CLACK's sessions
+    ;; (weblocks::reset-sessions)
     (when *server*
       (stop *server*))
     (setf *server* nil)))

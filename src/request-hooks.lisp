@@ -35,13 +35,13 @@
   "A request hook object used in the application scope.")
 
 (defun reset-session-request-hooks ()
-  (setf (webapp-session-value 'request-hooks)
+  (setf (weblocks.session:get-value 'request-hooks)
         (make-instance 'request-hooks)))
 
 (defun session-request-hooks ()
   "A request hook object used in the session scope."
-  (if (webapp-session-value 'request-hooks)
-      (webapp-session-value 'request-hooks)
+  (if (weblocks.session:get-value 'request-hooks)
+      (weblocks.session:get-value 'request-hooks)
       (reset-session-request-hooks)))
 
 (defvar *request-hook*)
@@ -152,13 +152,13 @@ of no arguments."
       (progn 
         (weblocks.utils.html-parts:update-html-parts-connections)
         ;; Don't know why to do this,
-        ;; because this is only place where webapp-session-value
+        ;; because this is only place where weblocks.session:get-value
         ;; is called with this argument. Probably, these values
         ;; are never restored from the session.
         ;;
-        ;; (setf (webapp-session-value 'parts-md5-hash)
+        ;; (setf (weblocks.session:get-value 'parts-md5-hash)
         ;;       weblocks-util:*parts-md5-hash*)
-        ;; (setf (webapp-session-value 'parts-md5-context-hash)
+        ;; (setf (weblocks.session:get-value 'parts-md5-context-hash)
         ;;       weblocks-util:*parts-md5-context-hash*)
         ))))
 

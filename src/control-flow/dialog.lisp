@@ -12,7 +12,7 @@ dialog."
   "Expands to code that signifies a place that contains information
 about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
-  `(webapp-session-value 'dialog-contents))
+  `(weblocks.session:get-value 'dialog-contents))
 
 (defun dialog-js-wt (&key image-src image-onclick &allow-other-keys)
   (with-html-to-string

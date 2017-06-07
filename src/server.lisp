@@ -76,8 +76,6 @@
 (setf *hunchentoot-default-external-format*
       (flexi-streams:make-external-format :utf-8))
 
-;;; Set outgoing encoding to utf-8
-(setf *default-content-type* "text/html; charset=utf-8")
 
 (defun start-weblocks (&rest keys &key (debug t) (port 8080)
                                        (acceptor-class 'weblocks-acceptor)
@@ -211,25 +209,29 @@ declared AUTOSTART."
 |#
 
 ;; install weblocks-dispatcher
-(eval-when (:load-toplevel)
-  (let ((easy-handlers (find 'hunchentoot:dispatch-easy-handlers *dispatch-table*)))
-    (when easy-handlers 
-      (setf *dispatch-table* (remove easy-handlers *dispatch-table*)))
-    (push 'weblocks-dispatcher *dispatch-table*)
-    (when easy-handlers 
-      (push easy-handlers *dispatch-table*))))
+;; (eval-when (:load-toplevel)
+;;   (let ((easy-handlers (find 'hunchentoot:dispatch-easy-handlers *dispatch-table*)))
+;;     (when easy-handlers 
+;;       (setf *dispatch-table* (remove easy-handlers *dispatch-table*)))
+;;     (push 'weblocks-dispatcher *dispatch-table*)
+;;     (when easy-handlers 
+;;       (push easy-handlers *dispatch-table*))))
 
 (defun session-name-string-pair ()
   "Returns a session name and string suitable for URL rewriting. This
 pair is passed to JavaScript because web servers don't normally do URL
 rewriting in JavaScript code."
-  (if (and *rewrite-for-session-urls*
-           (null (cookie-in (session-cookie-name *weblocks-server*)))
-           (hunchentoot:session-cookie-value *session*))
-      (format nil "~A=~A"
-              (url-encode (session-cookie-name *weblocks-server*))
-              (string-upcase (url-encode (hunchentoot:session-cookie-value *session*))))
-      ""))
+
+  ""
+  ;; TODO: removed seems is used only in tests
+  ;; (if (and *rewrite-for-session-urls*
+  ;;          (null (cookie-in (session-cookie-name *weblocks-server*)))
+  ;;          (hunchentoot:session-cookie-value *session*))
+  ;;     (format nil "~A=~A"
+  ;;             (url-encode (session-cookie-name *weblocks-server*))
+  ;;             (string-upcase (url-encode (hunchentoot:session-cookie-value *session*))))
+  ;;     "")
+  )
 
 (defun server-type ()
   "Hunchentoot")

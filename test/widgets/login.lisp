@@ -11,7 +11,7 @@
 
 (deftest authenticatedp-2
     (with-request :get nil
-      (setf (webapp-session-value *authentication-key*) 123)
+      (setf (weblocks.session:get-value *authentication-key*) 123)
       (authenticatedp))
   123)
 

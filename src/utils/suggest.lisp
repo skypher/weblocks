@@ -41,7 +41,7 @@ the client. Accepts a list of results.
   (setf default-value (ensure-list default-value))
   (let ((a-input-name (attributize-name input-name)))
     (if (and (listp resultset)
-             (not (ajax-request-p)))
+             (not (weblocks.request:ajax-request-p)))
         (progn
           (render-dropdown a-input-name resultset :id input-id :selected-value default-value
                            :welcome-name welcome-name :disabledp disabledp)

@@ -118,7 +118,7 @@ having to worry about special characters in JavaScript code."
 (defmacro root-widget ()
   "Expands to code that can be used as a place to access to the root
 composite."
-  `(webapp-session-value 'root-widget))
+  `(weblocks.session:get-value 'root-widget))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

@@ -30,8 +30,6 @@
           make-webapp-public-file-uri
           reset-webapp-session
           webapp-session-key
-          webapp-session-value
-          delete-webapp-session-value
           define-permanent-action
           define-permanent-action/cc
           remove-webapp-permanent-action
@@ -432,8 +430,11 @@ to my `application-dependencies' slot."
 
 (defmethod initialize-webapp :before ((app weblocks-webapp))
   "Ensure that all registered stores are open"
-  (unless weblocks::*weblocks-server*
-    (start-weblocks))
+
+  ;; to not introduce circular dependency we have these intern calls
+  (unless (intern "*SERVER*" :weblocks.server)
+    (funcall (intern "START-WEBLOCKS" :weblocks.server)))
+  
   (open-stores))
 
 
@@ -499,33 +500,6 @@ provider URI)."
 
 (defun webapp-session-hash (&optional (session *session*) (webapp (current-webapp)))
   (session-value (webapp-session-key webapp) session))
-
-(defun webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
-  "Get a session value from the currently running webapp.
-KEY is compared using EQUAL."
-  (let ((webapp-session (webapp-session-hash session webapp )))
-    (cond (webapp-session
-           (gethash key webapp-session))
-          (webapp
-           (values nil nil))
-          (t
-           nil))))
-
-(defun (setf webapp-session-value) (value key &optional (session *session*) (webapp (current-webapp)))
-  "Set a session value for the currently running webapp.
-KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (webapp-session-key webapp) session)))
-    (unless webapp-session
-      (setf webapp-session (make-hash-table :test #'equal)
-            (session-value (webapp-session-key webapp)) webapp-session))
-    (setf (gethash key webapp-session) value)))
-
-(defun delete-webapp-session-value (key &optional (session *session*) (webapp (current-webapp)))
-  "Clear the session value for the currently running webapp.
-KEY is compared using EQUAL."
-  (let ((webapp-session (session-value (webapp-session-key) session)))
-    (when webapp-session
-      (remhash key webapp-session))))
 
 ;;
 ;; Permanent actions

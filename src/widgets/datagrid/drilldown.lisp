@@ -42,7 +42,7 @@
   (declare (ignore args))
   (with-html
     (:td :class (datagrid-drilldown-style (car (dataseq-on-drilldown widget)))
-         (unless (ajax-request-p)
+         (unless (weblocks.request:ajax-request-p)
            (htm
             (:noscript
              (:div

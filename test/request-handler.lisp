@@ -43,7 +43,7 @@
                 (cons '("X-Requested-With" . "blah")
                       (slot-value *request* 'hunchentoot::headers-in)))
           (setf result2 (handle-client-request app))
-          (values (null (webapp-session-value "debug-reset-sessions"))
+          (values (null (weblocks.session:get-value "debug-reset-sessions"))
                   result1 result2))))
   t
   #.(with-request-template "~
@@ -131,7 +131,7 @@ onclick='disableIrrelevantButtons(this);' />~
           ;; handle the first request (make sure data is drawn)
           (setf result1 (handle-client-request app))
           (fmakunbound 'hcr2-init-user-session)
-          (values result1 (not (null (webapp-session-value "debug-reset-sessions")))))))
+          (values result1 (not (null (weblocks.session:get-value "debug-reset-sessions")))))))
   #.(with-request-template
             "~
 <div class='widget function'>~

@@ -3,10 +3,19 @@
     with Weblocks."))
 
 (defpackage #:weblocks
-  (:use :cl :c2mop :metabang.utilities :hunchentoot :cl-who :json :optima :cont :parenscript
-        :anaphora :f-underscore :trivial-timeout 
-        :weblocks-stores 
-        :weblocks-util)
+  (:use #:cl
+        #:c2mop
+        #:metabang.utilities
+        #:cl-who
+        #:json
+        #:optima
+        #:cont
+        #:parenscript
+        #:anaphora
+        #:f-underscore
+        #:trivial-timeout 
+        #:weblocks-stores 
+        #:weblocks-util)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function
                           #:standard-class #:typep #:subtypep #:standard-method)

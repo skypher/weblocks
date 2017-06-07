@@ -24,14 +24,16 @@
   (:method ((obj dom-object-mixin))
     (if (slot-boundp obj 'dom-id)
         (slot-value obj 'dom-id)
-        (when (boundp '*session*)
+        (when (boundp 'weblocks.session::*session*)
           (setf (slot-value obj 'dom-id) (gen-id))))))
 
 (defgeneric dom-id (obj)
   (:documentation "Provides a consistent interface to identifying widgets
 by their DOM id. Returns a string or nil if the object is to have no id.")
   (:method ((obj dom-object-mixin))
+    (log:debug "Returning dom-id for" obj)
     (let ((id (ensure-dom-id obj)))
+      (log:debug "dom-id" id)
       (and id (attributize-name id))))
   (:method ((obj symbol)) nil)
   (:method ((obj function)) nil)

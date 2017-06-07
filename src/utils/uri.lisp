@@ -18,15 +18,6 @@
                (format nil ".~A" (pathname-type thing))
                ""))))
 
-(defun request-uri-path ()
-  "Returns the path component of the request URI. The path component
-does not include the domain name, and any query string parameters.
-Ex (when URI is http://blah.com/foo/bar?x=1&y=2):
-\(request-uri-path)
-=> \"/foo/bar\""
-  (identity (cl-ppcre:regex-replace "/?(?:\\?.*)$" (request-uri*) "")))
-
-
 (defun add-get-param-to-url (url name value)
   "Based on Edi's code in URL-REWRITE but uses & instead of &amp;
 which is more appropriate for our uses."
@@ -41,11 +32,18 @@ which is more appropriate for our uses."
 
 (defun remove-parameter-from-uri (uri parameter)
   "Removes the given parameter from a URI."
-  (let ((path (puri:uri-path (puri:parse-uri uri))))
-    (loop for x in (get-parameters*)
-       when (not (string-equal (car x) parameter))
-       do (setf path (add-get-param-to-url path (car x) (cdr x))))
-    path))
+  (let* ((parsed-uri (puri:parse-uri uri))
+         (query (or (puri:uri-query parsed-uri)
+                    ""))
+         (params (quri:url-decode-params query))
+         (final-params (remove-if (m ((name . value))
+                                    (declare (ignorable value))
+                                    (equal name parameter))
+                                  params)))
+
+    (setf (puri:uri-query parsed-uri)
+          (quri:url-encode-params final-params))
+    (puri:render-uri parsed-uri nil)))
 
 (defun remove-url-query-string (str)
   (cl-ppcre:regex-replace "\\?.*" str ""))
@@ -75,7 +73,7 @@ ex:
                                          (webapp-prefix
                                            app)))
                                uri)))
-            collect (url-decode token)))))
+            collect (quri:url-decode token)))))
 
 (defun query-string->alist (query-string)
   ;; stolen from cl-oauth -- does one of ours deps already offer this?
@@ -89,7 +87,7 @@ ex:
     alist))
 
 (defun parse-location-hash ()
-  (let ((raw-hash (hunchentoot:get-parameter "weblocks-internal-location-hash")))
+  (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
     (when raw-hash
       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 

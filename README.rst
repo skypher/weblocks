@@ -57,24 +57,33 @@ in `(generate-action-code)`
 What to replace
 ---------------
 
-An URL routing
-~~~~~~~~~~~~~~
-
-Seems easy with ningle:route.
-
 An File Upload
 ~~~~~~~~~~~~~~
 
 How to do this with clack and ningle???
 
-Session management
-~~~~~~~~~~~~~~~~~~
 
-Need to replace::
+How to run tests
+================
 
-  (hunchentoot:session-value ...)
-  hunchentoot:*session*
-  etc
+All tests:
+
+.. code:: common-lisp
+
+          (weblocks-test:test-weblocks)
+
+or
+
+.. code:: common-lisp
+
+          (lift:run-tests :suite 'WEBLOCKS-SUITE)
+
+Single test:
+
+.. code:: common-lisp
+          
+          (lift:run-test :name 'weblocks-test::dataform-i18n-1
+                         :suite :widgets/data-editor-suite)
 
 
 License

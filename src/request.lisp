@@ -15,11 +15,11 @@ if there is an action involved (even if the user hits refresh)."
   (declare (special *uri-tokens*))
   (and
    (null (get-request-action))
-   (equalp (all-tokens *uri-tokens*) (webapp-session-value 'last-request-uri))))
+   (equalp (all-tokens *uri-tokens*) (weblocks.session:get-value 'last-request-uri))))
 
 (defun initial-request-p ()
   "Returns true if the request is the first request for the session."
-  (equalp (webapp-session-value 'last-request-uri) :none))
+  (equalp (weblocks.session:get-value 'last-request-uri) :none))
 
 (defun ajax-request-p ()
   "Detects if the current request was initiated via AJAX by looking
@@ -38,19 +38,19 @@ satisfied, the actions have access to the session, the widgets, and
 all other parameters. However, none of the callbacks (see
 *on-pre-request*) are executed, no widgets are sent to the client,
 etc."
-  (string-equal (get-parameter "pure") "true"))
+  (string-equal (weblocks.request:request-parameter "pure") "true"))
 
 (defvar *redirect-request-p* nil)
 
 (defun redirect-request-p ()
   (declare (special *redirect-request-p*))
   (or *redirect-request-p* 
-      (webapp-session-value 'redirect-p)))
+      (weblocks.session:get-value 'redirect-p)))
 
 (defun clear-session-redirect-p ()
   (declare (special *redirect-request-p*))
-  (setf *redirect-request-p* (webapp-session-value 'redirect-p))
-  (setf (webapp-session-value 'redirect-p) nil))
+  (setf *redirect-request-p* (weblocks.session:get-value 'redirect-p))
+  (setf (weblocks.session:get-value 'redirect-p) nil))
 
 (defun clear-redirect-var ()
   (declare (special *redirect-request-p*))
@@ -63,7 +63,7 @@ etc."
            (request-hook :application :pre-action)))
 
 (defun set-redirect-true ()
-  (setf (webapp-session-value 'redirect-p) t))
+  (setf (weblocks.session:get-value 'redirect-p) t))
 
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
                                       :post-render))
@@ -89,20 +89,22 @@ DEFER is disregarded in this case.
 NEW-WINDOW functionality will only work when Javascript is enabled."
   (assert (member defer '(nil :post-action :post-render)))
   (flet ((do-redirect ()
-           (if (ajax-request-p)
-             (progn
-               (setf (content-type*) *json-content-type*)
-               (abort-request-handler
-                 (format nil "{\"redirect\":\"~A\"}" uri)))
-             (hunchentoot:redirect uri))))
+           (if (weblocks.request:ajax-request-p)
+               (weblocks.response:abort-processing
+                (format nil "{\"redirect\":\"~A\"}" uri)
+                :content-type *json-content-type*)
+               (weblocks.response:abort-processing
+                nil
+                :headers (list :location uri)
+                :code 302))))
 
     (set-redirect-true)
 
     (cond
       (new-window-p
-        (send-script
-          (ps:ps*
-            `((slot-value window 'open) ,uri ,window-title))))
+       (send-script
+        (ps:ps*
+         `((slot-value window 'open) ,uri ,window-title))))
       ((eq defer :post-action)
        (push #'do-redirect (request-hook :request :post-action)))
       ((eq defer :post-render)

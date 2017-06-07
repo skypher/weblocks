@@ -29,8 +29,8 @@
 ;;; webapp session values
 (addtest session-value
   (with-test-webapp ()
-    (setf (webapp-session-value 'foo) 'bar)
-    (ensure-same (webapp-session-value 'foo) 'bar)))
+    (setf (weblocks.session:get-value 'foo) 'bar)
+    (ensure-same (weblocks.session:get-value 'foo) 'bar)))
 
 
 ;;; uri prefix

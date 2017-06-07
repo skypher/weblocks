@@ -82,7 +82,7 @@
 (addtest update-dialog-on-request-3
   (ensure-same
     (with-request :get nil
-      (setf (webapp-session-value 'weblocks::last-request-uri) *uri-tokens*)
+      (setf (weblocks.session:get-value 'weblocks::last-request-uri) *uri-tokens*)
       (setf (weblocks::current-dialog)
             (weblocks::make-dialog :title "foo" :widget (lambda (&rest args)
                                                           (with-html (:p "bar")))

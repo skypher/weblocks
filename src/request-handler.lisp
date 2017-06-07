@@ -1,9 +1,5 @@
 (in-package :weblocks)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (when (find-symbol "*APPROVED-RETURN-CODES*" 'hunchentoot)
-    (pushnew 'hunchentoot-approved-return-codes *features*)))
-
 (export '(handle-client-request
           *before-ajax-complete-scripts*
           *on-ajax-complete-scripts*
@@ -12,13 +8,11 @@
           *backtrace-on-session-init-error*
           *style-warn-on-circular-dirtying*
           *style-warn-on-late-propagation*
-          #-hunchentoot-approved-return-codes
-            *approved-return-codes*))
+          *approved-return-codes*))
 
 (defvar *current-page-description* nil)
 
-#-hunchentoot-approved-return-codes
-  (defvar *approved-return-codes* (list +http-ok+))
+(defvar *approved-return-codes* (list 200))
 
 (defvar *before-ajax-complete-scripts*)
 (setf (documentation '*before-ajax-complete-scripts* 'variable)
@@ -113,7 +107,7 @@ customize behavior."))
       (when (get-request-action-name)
         (expired-action-handler app))
       (start-session)
-      (setf (webapp-session-value 'last-request-uri) :none)
+      (setf (weblocks.session:get-value 'last-request-uri) :none)
       (when *rewrite-for-session-urls*
         (redirect (request-uri*))))
     (when *maintain-last-session*
@@ -163,7 +157,7 @@ customize behavior."))
             (eval-action))
           (eval-hook :post-action))
 
-        (when (and (not (ajax-request-p))
+        (when (and (not (weblocks.request:ajax-request-p))
                    (find *action-string* (get-parameters*)
                          :key #'car :test #'string-equal))
           (redirect (remove-action-from-uri (request-uri*))))
@@ -171,7 +165,7 @@ customize behavior."))
         (timing "rendering (w/ hooks)"
           (eval-hook :pre-render)
           (with-dynamic-hooks (:dynamic-render)
-            (if (ajax-request-p)
+            (if (weblocks.request:ajax-request-p)
               (handle-ajax-request app)
               (handle-normal-request app)))
           (eval-hook :post-render))
@@ -180,8 +174,8 @@ customize behavior."))
 
         (if (member (return-code*) *approved-return-codes*)
           (progn 
-            (unless (ajax-request-p)
-              (setf (webapp-session-value 'last-request-uri) (all-tokens *uri-tokens*)))
+            (unless (weblocks.request:ajax-request-p)
+              (setf (weblocks.session:get-value 'last-request-uri) (all-tokens *uri-tokens*)))
             (get-output-stream-string *weblocks-output-stream*))
           (handle-http-error app (return-code*)))))))
 
@@ -207,7 +201,9 @@ customize behavior."))
 
     (walk-widget-tree (root-widget)
                       (lambda (widget d)
-                        (update-widget-parameters widget (request-method*) (request-parameters))
+                        (update-widget-parameters widget
+                                                  (weblocks.request:request-method)
+                                                  (weblocks.request:request-parameters))
                         (update-children widget)
                         (let ((title (page-title widget))
                               (description (page-description widget))
@@ -236,25 +232,6 @@ customize behavior."))
     (when page-keywords
       (setf *current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
 
-(defvar *session-locks* (make-hash-table :test #'eq
-                                         #+sbcl :weakness #+sbcl :key
-                                         #+ccl :weak #+ccl :key)
-  "Per-session locks to avoid having unrelated threads
-  waiting.")
-#-(or sbcl ccl) (warn "No GC mechanism for *SESSION-LOCKS* on your Lisp. ~
-            Expect a tiny memory leak until fixed.")
-
-(defvar *session-lock-table-lock* (bordeaux-threads:make-lock
-                                    "*session-lock-table-lock*"))
-
-(defun session-lock ()
-  (bordeaux-threads:with-lock-held (*session-lock-table-lock*)
-    (unless (gethash *session* *session-locks*)
-      (setf (gethash *session* *session-locks*) 
-            (bordeaux-threads:make-lock (format nil "session lock for session ~S" *session*))))
-    (gethash *session* *session-locks*)))
-
-
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
   (remove-parameter-from-uri uri (session-cookie-name *weblocks-server*)))
@@ -276,6 +253,7 @@ marked dirty in the rendering phase.")
 association list. This function is normally called by
 'handle-client-request' to service AJAX requests."
 
+  (log:debug "Rendering dirty widgets")
 
   (flet ((remove-duplicate-dirty-widgets ()
            "Removes all widgets that should be rendered through rendering their parent"
@@ -287,7 +265,9 @@ association list. This function is normally called by
 
     (remove-duplicate-dirty-widgets))
 
-  (setf (content-type*) *json-content-type*)
+  (setf weblocks.response:*content-type*
+        *json-content-type*)
+  
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)
                (when *style-warn-on-circular-dirtying*
@@ -330,7 +310,7 @@ association list. This function is normally called by
 (defun action-txn-hook (hooks)
   "This is a dynamic action hook that wraps POST actions using the 
    weblocks transaction functions over all stores"
-  (if (eq (request-method*) :post)
+  (if (eq (weblocks.request:request-method) :post)
       (let (tx-error-occurred-p)
         (multiple-value-bind (dynamic-stores non-dynamic-stores)
             (loop for store-name in *store-names*

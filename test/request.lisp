@@ -4,7 +4,7 @@
 ;;; test refresh-request-p
 (deftest refresh-request-p-1
     (with-request :get nil
-      (setf (webapp-session-value 'weblocks::last-request-uri) '("foo" "bar"))
+      (setf (weblocks.session:get-value 'weblocks::last-request-uri) '("foo" "bar"))
       (refresh-request-p))
   t)
 

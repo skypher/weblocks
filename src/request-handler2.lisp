@@ -2,7 +2,8 @@
   (:use #:cl
         #:f-underscore)
   (:export
-   #:handle-client-request))
+   #:handle-client-request
+   #:abort-request-handler))
 (in-package weblocks.request-handler)
 
 
@@ -93,7 +94,7 @@ customize behavior."))
   ;; that wraps them in order to collect a list of script and
   ;; stylesheet dependencies.
   (weblocks::webapp-update-thread-status "Handling normal request [tree shakedown]")
-  (bordeaux-threads:with-lock-held ((weblocks::session-lock))
+  (bordeaux-threads:with-lock-held ((weblocks.session-lock:get-lock))
     (handler-case (weblocks::timing "tree shakedown"
                     (weblocks::update-widget-tree))
       (weblocks::http-not-found ()
@@ -107,6 +108,7 @@ customize behavior."))
   (log:debug "Page's new-style dependencies"
              weblocks.dependencies:*page-dependencies*)
 
+  ;; TODO: only add new routes
   (weblocks.routes:register-dependencies
    weblocks.dependencies:*page-dependencies*)
   
@@ -135,18 +137,21 @@ customize behavior."))
 
 (defmethod handle-client-request ((app weblocks:weblocks-webapp))
   (progn                                ;save it for splitting this up
-    (when (null weblocks::*session*)
-      (when (get-action-name-from-request)
-        (weblocks::expired-action-handler app))
-      (weblocks::start-session)
-      (setf (weblocks::webapp-session-value 'last-request-uri)
-            :none)
-      (when weblocks::*rewrite-for-session-urls*
-        (weblocks::redirect (weblocks::request-uri*))))
-    (when weblocks::*maintain-last-session*
-      (bordeaux-threads:with-lock-held (weblocks::*maintain-last-session*)
-        (setf weblocks::*last-session*
-              weblocks::*session*)))
+    ;; TODO: replace with lack.session
+    ;; (when (null weblocks::*session*)
+    ;;   (when (get-action-name-from-request)
+    ;;     (weblocks::expired-action-handler app))
+    ;;   (weblocks::start-session)
+    ;;   (setf (weblocks::weblocks.session:get-value 'last-request-uri)
+    ;;         :none)
+    ;;   (when weblocks::*rewrite-for-session-urls*
+    ;;     (weblocks::redirect (weblocks::request-uri*))))
+    ;;
+    ;; (when weblocks::*maintain-last-session*
+    ;;   (bordeaux-threads:with-lock-held (weblocks::*maintain-last-session*)
+    ;;     (setf weblocks::*last-session*
+    ;;           weblocks::*session*)))
+    
     (let ((weblocks::*request-hook* ;; Make an instance to store Request's hooks
             (make-instance 'weblocks::request-hooks))
           weblocks::*dirty-widgets*)
@@ -177,16 +182,17 @@ customize behavior."))
           (push 'weblocks::update-dialog-on-request
                 (weblocks::request-hook :session :post-action)))
         
-        (when (and weblocks::*rewrite-for-session-urls*
-                   (weblocks::cookie-in (weblocks::session-cookie-name
-                                         weblocks::*weblocks-server*)))
-          (weblocks::redirect (weblocks::remove-session-from-uri (weblocks::request-uri*)))))
+        ;; (when (and weblocks::*rewrite-for-session-urls*
+        ;;            (weblocks::cookie-in (weblocks::session-cookie-name
+        ;;                                  weblocks::*weblocks-server*)))
+        ;;   (weblocks::redirect (weblocks::remove-session-from-uri (weblocks::request-uri*))))
+        )
 
       (let ((weblocks::*weblocks-output-stream*
               (make-string-output-stream))
             (weblocks::*uri-tokens*
               (make-instance 'weblocks::uri-tokens
-                             :tokens (weblocks::tokenize-uri (weblocks::request-uri*))))
+                             :tokens (weblocks::tokenize-uri (weblocks.request:request-uri))))
             weblocks::*before-ajax-complete-scripts*
             weblocks::*on-ajax-complete-scripts*
             weblocks::*page-dependencies*
@@ -206,7 +212,7 @@ customize behavior."))
                 (weblocks-util:alist->plist (weblocks.request:request-parameters))))
           
           (when (weblocks::pure-request-p)
-            (weblocks::abort-request-handler
+            (abort-request-handler
              (weblocks::eval-action action-name
                                     action-arguments))) ; FIXME: what about the txn hook?
 
@@ -219,11 +225,12 @@ customize behavior."))
                                        action-arguments))
             (weblocks::eval-hook :post-action)))
 
+        ;; Remove "action" parameter for the GET parameters
+        ;; it it is not an AJAX request
         (when (and (not (weblocks.request:ajax-request-p))
-                   (find weblocks::*action-string* (weblocks::get-parameters*)
-                         :key #'car :test #'string-equal))
+                   (weblocks.request:request-parameter weblocks::*action-string*))
           (weblocks::redirect (weblocks::remove-action-from-uri
-                               (weblocks::request-uri*))))
+                               (weblocks.request:request-uri))))
 
         (weblocks::timing "rendering (w/ hooks)"
           (weblocks::eval-hook :pre-render)
@@ -236,11 +243,19 @@ customize behavior."))
 
         
 
-        (if (member (weblocks::return-code*)
+        ;; TODO: replace return-code with something else
+        (if (member weblocks.response:*code*
                     weblocks::*approved-return-codes*)
             (progn 
               (unless (weblocks.request:ajax-request-p)
-                (setf (weblocks::webapp-session-value 'last-request-uri)
+                (setf (weblocks.session::get-value 'last-request-uri)
                       (weblocks::all-tokens weblocks::*uri-tokens*)))
               (get-output-stream-string weblocks::*weblocks-output-stream*))
             (weblocks::handle-http-error app (weblocks::return-code*)))))))
+
+
+(defun abort-request-handler (response)
+  "Aborts execution of the current request and returns a response as is."
+
+  ;; TODO: signal a condition and handle it somewhere.
+  nil)

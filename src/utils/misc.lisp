@@ -1,3 +1,5 @@
+(eval-when (:compile-toplevel)
+  (format t "~3&Loading weblocks.misc.utils~3%"))
 
 (in-package :weblocks-util)
 
@@ -28,8 +30,8 @@
 (defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
-  (let ((new-widget-id (1+ (or (session-value 'last-unique-id) -1))))
-    (setf (session-value 'last-unique-id) new-widget-id)
+  (let ((new-widget-id (1+ (or (weblocks.session:get-value 'last-unique-id) -1))))
+    (setf (weblocks.session:get-value 'last-unique-id) new-widget-id)
     (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
 
 (defun safe-apply (fn &rest args)
@@ -59,6 +61,8 @@ error is signalled."
 via GET method, the parameters are obtained from the query string. If
 the request was submitted via POST, the parameters are obtained from
 the body of the request. Otherwise, an error is signalled."
+  ;; TODO: remove this
+  
   (ecase (request-method*)
     (:get (get-parameters*))
     (:post (post-parameters*))))

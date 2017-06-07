@@ -23,20 +23,20 @@
 is authenticated, authentication information stored in the session is
 returned."
   (multiple-value-bind (auth-info success)
-      (webapp-session-value *authentication-key*)
+      (weblocks.session:get-value *authentication-key*)
     (when success auth-info)))
 
 (defmacro on-signout-hooks ()
   "A list of callback functions of no arguments to be called when the user signs out."
-  `(webapp-session-value 'on-signout))
+  `(weblocks.session:get-value 'on-signout))
 
 (defmacro on-signin-hooks ()
   "A list of callback functions of no arguments to be called when the user signs out."
-  `(webapp-session-value 'on-signin))
+  `(weblocks.session:get-value 'on-signin))
 
 (defun logout ()
   "Removes any authentication information from the session."
-  (setf (webapp-session-value *authentication-key*) nil)
+  (setf (weblocks.session:get-value *authentication-key*) nil)
   (dolist (fn (on-signout-hooks))
     (safe-funcall fn))
   (weblocks:reset-webapp-session))
@@ -144,7 +144,7 @@ returned."
                                          (funcall (login-on-login obj) obj o)
                                        (if success
                                            (prog1 ; make sure we return the proper value, or validation will fail
-                                             (setf (webapp-session-value *authentication-key*) success)
+                                             (setf (weblocks.session:get-value *authentication-key*) success)
                                              (dolist (fn (on-signin-hooks))
                                                (safe-funcall fn)))
                                            (values nil
@@ -167,7 +167,7 @@ server. Sessions without authentication information are ignored."
                                (declare (special *current-webapp*))
                                (setf *current-webapp* webapp)
                                (mapcar (lambda (session)
-                                         (push (car (multiple-value-list (webapp-session-value *authentication-key* session))) lst))
+                                         (push (car (multiple-value-list (weblocks.session:get-value *authentication-key* session))) lst))
                                        (active-sessions)))
                              lst))))
 
