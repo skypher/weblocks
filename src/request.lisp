@@ -120,3 +120,8 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
   "Legacy wrapper; use REDIRECT with :DEFER set to :POST-RENDER instead."
   (redirect uri :defer :post-render))
 
+
+(defun parse-location-hash ()
+  (let ((raw-hash (request-parameter "weblocks-internal-location-hash")))
+    (when raw-hash
+      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))

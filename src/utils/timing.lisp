@@ -1,10 +1,10 @@
 
 (in-package :weblocks)
 
-(wexport '(*enable-timings*
-           *timing-report-fn*
-           timing)
-         '(t util))
+;; (wexport '(*enable-timings*
+;;            *timing-report-fn*
+;;            timing)
+;;          '(t util))
 
 (defvar *enable-timings* nil)
 

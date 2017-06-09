@@ -1,31 +1,31 @@
 (eval-when (:compile-toplevel)
   (format t "~3&Loading weblocks.misc.utils~3%"))
 
-(in-package :weblocks-util)
+(in-package :weblocks)
 
-(wexport '(gen-id
-           safe-apply
-           safe-funcall
-           request-parameter
-           request-parameters
-           public-file-relative-path
-           public-files-relative-paths
-           symbol-status
-           asdf-system-directory
-           hash-keys
-           append-custom-fields
-           function-designator-p
-           defrender 
-           find-own-symbol 
-           relative-path 
-           read-from-file 
-           write-to-file
-           slurp-file
-           with-file-write
-           merge-files-with-newline
-           gzip-file md5
-           concatenate-keywords)
-         '(t util))
+;; (wexport '(gen-id
+;;            safe-apply
+;;            safe-funcall
+;;            request-parameter
+;;            request-parameters
+;;            public-file-relative-path
+;;            public-files-relative-paths
+;;            symbol-status
+;;            asdf-system-directory
+;;            hash-keys
+;;            append-custom-fields
+;;            function-designator-p
+;;            defrender 
+;;            find-own-symbol 
+;;            relative-path 
+;;            read-from-file 
+;;            write-to-file
+;;            slurp-file
+;;            with-file-write
+;;            merge-files-with-newline
+;;            gzip-file md5
+;;            concatenate-keywords)
+;;          '(t util))
 
 (defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
@@ -44,28 +44,28 @@ used to create IDs for html elements, widgets, etc."
   (when fn
     (apply #'funcall fn args)))
 
-(defun request-parameter (name)
-  "Get parameter 'name' from the request. If the request was
-submitted via GET method, the parameter is obtained from the
-query string. If the request was submitted via POST, the
-parameter is obtained from the body of the request. Otherwise, an
-error is signalled."
-  (when (eq (request-method*) :head)
-    (warn "User agent ~S sent a HEAD request" (hunchentoot:user-agent)))
-  (ecase (request-method*)
-    (:get (get-parameter name))
-    (:post (post-parameter name))))
+;; (defun request-parameter (name)
+;;   "Get parameter 'name' from the request. If the request was
+;; submitted via GET method, the parameter is obtained from the
+;; query string. If the request was submitted via POST, the
+;; parameter is obtained from the body of the request. Otherwise, an
+;; error is signalled."
+;;   (when (eq (request-method*) :head)
+;;     (warn "User agent ~S sent a HEAD request" (hunchentoot:user-agent)))
+;;   (ecase (request-method*)
+;;     (:get (get-parameter name))
+;;     (:post (post-parameter name))))
 
-(defun request-parameters ()
-  "Get parameters alist from the request. If the request was submitted
-via GET method, the parameters are obtained from the query string. If
-the request was submitted via POST, the parameters are obtained from
-the body of the request. Otherwise, an error is signalled."
-  ;; TODO: remove this
+;; (defun request-parameters ()
+;;   "Get parameters alist from the request. If the request was submitted
+;; via GET method, the parameters are obtained from the query string. If
+;; the request was submitted via POST, the parameters are obtained from
+;; the body of the request. Otherwise, an error is signalled."
+;;   ;; TODO: remove this
   
-  (ecase (request-method*)
-    (:get (get-parameters*))
-    (:post (post-parameters*))))
+;;   (ecase (request-method*)
+;;     (:get (get-parameters*))
+;;     (:post (post-parameters*))))
 
 (defun public-file-relative-path (type filename)
   "Infer FILENAME's relative path and extension from TYPE.
@@ -244,3 +244,5 @@ answering its result."
   (intern 
     (apply #'concatenate (list* 'string (mapcar #'string-upcase symbols)))
     "KEYWORD"))
+
+

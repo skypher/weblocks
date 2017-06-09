@@ -42,8 +42,7 @@ page may display a relevant message, if necessary."
   (let ((new-action-id (gensym "")))
     (format nil "~A:~A"
             new-action-id
-            (md5
-             (hunchentoot::create-random-string 10 36)))))
+            (lack.util:generate-random-id))))
 
 (defun make-action (action-fn &optional (action-code (generate-action-code)))
   "Converts a function into an action that can be rendered into HTML. A

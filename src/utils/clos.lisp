@@ -1,5 +1,5 @@
 
-(in-package :weblocks-util)
+(in-package :weblocks)
 
 ;;; CLOS and MOP utils.
 

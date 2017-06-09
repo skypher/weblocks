@@ -1,13 +1,13 @@
-(defpackage #:weblocks-util
-  (:use :cl :metabang.utilities :anaphora :hunchentoot :c2mop :f-underscore)
-  (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
-                          #:standard-generic-function #:ensure-generic-function
-                          #:standard-class #:typep #:subtypep #:standard-method)
-  (:shadow #:slot-value-by-path)
-  (:documentation "General Lisp utilities traditionally exported
-                   with Weblocks."))
+;; (defpackage #:weblocks-util
+;;   (:use :cl :metabang.utilities :anaphora :hunchentoot :c2mop :f-underscore)
+;;   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
+;;                           #:standard-generic-function #:ensure-generic-function
+;;                           #:standard-class #:typep #:subtypep #:standard-method)
+;;   (:shadow #:slot-value-by-path)
+;;   (:documentation "General Lisp utilities traditionally exported
+;;                    with Weblocks."))
 
-(in-package :weblocks-util)
+(in-package :weblocks)
 
 (defun wexport (symbols-designator &optional (package-specs t))
   "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',

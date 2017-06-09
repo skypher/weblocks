@@ -14,8 +14,9 @@
         #:anaphora
         #:f-underscore
         #:trivial-timeout 
-        #:weblocks-stores 
-        #:weblocks-util)
+        ;; #:weblocks-stores 
+        ;; #:weblocks-util
+        )
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function
                           #:standard-class #:typep #:subtypep #:standard-method)
@@ -24,7 +25,7 @@
   (:shadowing-import-from :optima #:match)
   (:shadowing-import-from :metabang.utilities #:with-array #:size #:bind)
   (:shadowing-import-from :json #:prototype)
-  (:shadowing-import-from :weblocks-util #:find-all)
+  ;; (:shadowing-import-from :weblocks-util #:find-all)
   (:shadow #:redirect #:reset-sessions #:errors #:create-regex-dispatcher #:create-prefix-dispatcher #:create-folder-dispatcher-and-handler #:create-static-file-dispatcher-and-handler)
   (:export #:defstore #:asdf-system-directory #:id #:persist-object
            #:initialize-webapp)

@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(*menu-empty-message* render-menu))
+;; (export '(*menu-empty-message* render-menu))
 
 (defparameter *menu-empty-message* "No menu entries."
   "A default message shown by 'render-menu' if no entries are

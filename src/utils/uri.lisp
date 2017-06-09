@@ -1,11 +1,11 @@
 
 (in-package :weblocks)
 
-(wexport '(request-uri-path
-           add-get-param-to-url
-           remove-parameter-from-uri
-           parse-location-hash)
-         '(t util))
+;; (wexport '(request-uri-path
+;;            add-get-param-to-url
+;;            remove-parameter-from-uri
+;;            parse-location-hash)
+;;          '(t util))
 
 ;;; URI from pathname
 (defmethod puri:uri ((thing pathname))
@@ -18,17 +18,17 @@
                (format nil ".~A" (pathname-type thing))
                ""))))
 
-(defun add-get-param-to-url (url name value)
-  "Based on Edi's code in URL-REWRITE but uses & instead of &amp;
-which is more appropriate for our uses."
-  (concatenate 'string
-               url
-               (if (find #\? url :test #'char=)
-                 "&"
-                 "?")
-               name
-               "="
-               (url-rewrite:url-encode value)))
+;; (defun add-get-param-to-url (url name value)
+;;   "Based on Edi's code in URL-REWRITE but uses & instead of &amp;
+;; which is more appropriate for our uses."
+;;   (concatenate 'string
+;;                url
+;;                (if (find #\? url :test #'char=)
+;;                  "&"
+;;                  "?")
+;;                name
+;;                "="
+;;                (url-rewrite:url-encode value)))
 
 (defun remove-parameter-from-uri (uri parameter)
   "Removes the given parameter from a URI."
@@ -86,8 +86,9 @@ ex:
                         kv-pairs)))
     alist))
 
-(defun parse-location-hash ()
-  (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
-    (when raw-hash
-      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
+;; Moved to weblocks.request
+;; (defun parse-location-hash ()
+;;   (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
+;;     (when raw-hash
+;;       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 

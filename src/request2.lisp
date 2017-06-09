@@ -34,6 +34,12 @@
   (lack.request:request-path-info request))
 
 
+(defun request-host (&optional (request *request*))
+  "For URL http://example.com/foo/bar?blah=minor returns
+/foo/bar path of the request's URL."
+  (lack.request:request-path-info request))
+
+
 (defun request-server-name (&optional (request *request*))
   (lack.request:request-server-name request))
 

@@ -1,21 +1,21 @@
 
-(in-package :weblocks-util)
+(in-package :weblocks)
 
-(wexport '(safe-subseq
-           alist->plist
-           insert-after
-           insert-at
-           drop-last
-           intersperse
-           list-starts-with
-           stable-set-difference
-           safe-getf
-           list->assoc
-           ninsert
-           find-all
-           remove-keyword-parameter
-           remove-keyword-parameters)
-         '(t util))
+;; (wexport '(safe-subseq
+;;            alist->plist
+;;            insert-after
+;;            insert-at
+;;            drop-last
+;;            intersperse
+;;            list-starts-with
+;;            stable-set-difference
+;;            safe-getf
+;;            list->assoc
+;;            ninsert
+;;            find-all
+;;            remove-keyword-parameter
+;;            remove-keyword-parameters)
+;;          '(t util))
 
 (defun safe-subseq (sequence start &optional end)
   "A safe alternative to subseq that automatically adjust indices."

@@ -1,6 +1,6 @@
 
 (defpackage #:weblocks-test
-  (:use :cl :weblocks :weblocks-stores :weblocks-util :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
+  (:use :cl :weblocks :weblocks-stores :lift :c2mop :cl-who :hunchentoot :metatilities :moptilities
         :anaphora :f-underscore)
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function #:standard-class

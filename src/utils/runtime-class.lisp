@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(wexport '(make-class) '(t util))
+;; (wexport '(make-class) '(t util))
 
 (defun make-class (slots &optional (class-name (gensym)))
   "Makes an anonymous class with a number of slots.

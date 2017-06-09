@@ -46,9 +46,17 @@
           initialize-js-backend
           get-js-backend-dependencies))
 
+;; TODO: dont understand why this defvar is surrounded by eval-when
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *registered-webapps* nil
     "A list of applications that the system knows about"))
+
+
+(defun default-init-user-session (root)
+  (setf (widget-children root)
+        "Please create a function to initialize a session and pass it to the
+  defwebapp as :init-user-session argument.") )
+
 
 (defclass weblocks-webapp ()
   ((name :type (or symbol string)
@@ -62,7 +70,11 @@
                    by 'application-page-title' to generate the default title for each page.")
    (js-backend :accessor weblocks-webapp-js-backend 
                :initarg :js-backend
-               :initform (error "Please load javascript backend for framework (default is :prototype from https://github.com/html/weblocks-prototype-js) and pass :js-backend value (`:js-backend :prototype` for example) into your `defwebapp`"))
+               :initform :jquery-js
+               :documentation "Please load javascript backend for
+               framework (default is :jquery-js from
+               https://github.com/html/weblocks-jquery-js) and pass it
+               as :js-backend value (`:js-backend :prototype` for example).")
    (public-files-path :type (or null string pathname)
                       :accessor weblocks-webapp-public-files-path
                       :initarg :public-files-path 
@@ -145,6 +157,7 @@
    (init-user-session :type (or symbol function)
                       :accessor weblocks-webapp-init-user-session
                       :initarg :init-user-session
+                      :initform #'default-init-user-session
                       :documentation "'init-user-session' must be defined by weblocks client in the
                          same package as 'name'. This function will accept a single parameter - a 
                          widget at the root of the application. 'init-user-session' is

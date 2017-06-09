@@ -48,12 +48,6 @@ Borrowed from cl-darcs with permission of copyright owner."
           (t
            (copy-file source-file target-file)))))))
 
-(defun asdf-system-directory (system-name)
-  "Returns a directory of the asdf system file of system
-'system-name'."
-  (make-pathname :directory
-                 (pathname-directory (truename (asdf:system-definition-pathname
-                                                (asdf:find-system system-name))))))
 
 (defun copy-file-replace (source target &optional match replacement)
   "Copies 'source' to 'target' replacing all instances of 'match' with

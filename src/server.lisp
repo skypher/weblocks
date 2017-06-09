@@ -24,38 +24,47 @@
      function))
 
 (defun create-regex-dispatcher (regex handler &key (name "regex-dispatcher"))
-  (add-print-object-for-function 
-    (hunchentoot:create-regex-dispatcher regex handler) 
-    (stream)
-    (princ 
-      (format nil 
-              "~A, regexp - \"~A\""
-              name
-              (ppcre:regex-replace-all "\"" regex "\\\"")) stream)))
+  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
+  ;; (add-print-object-for-function 
+  ;;   (hunchentoot:create-regex-dispatcher regex handler) 
+  ;;   (stream)
+  ;;   (princ 
+  ;;     (format nil 
+  ;;             "~A, regexp - \"~A\""
+  ;;             name
+  ;;             (ppcre:regex-replace-all "\"" regex "\\\"")) stream))
+  )
 
 (defun create-static-file-dispatcher-and-handler (uri path &optional content-type)
   (log:debug "Creating static file dispatcher for" uri path content-type)
+  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
   
-  (add-print-object-for-function 
-    (hunchentoot:create-static-file-dispatcher-and-handler uri path content-type) 
-    (stream)
-    (princ (format nil "static-file-dispatcher, uri - ~A file - ~A, content-type - ~A" uri path content-type) stream)))
+  ;; (add-print-object-for-function 
+  ;;   (hunchentoot:create-static-file-dispatcher-and-handler uri path content-type) 
+  ;;   (stream)
+  ;;   (princ (format nil "static-file-dispatcher, uri - ~A file - ~A, content-type - ~A" uri path content-type) stream))
+  )
 
 (defun create-folder-dispatcher-and-handler (uri-prefix base-path &optional content-type)
   (log:debug "Creating folder dispatcher" uri-prefix base-path content-type)
-  (add-print-object-for-function 
-    (hunchentoot:create-folder-dispatcher-and-handler uri-prefix base-path content-type) 
-    (stream)
-    (princ (format nil "folder-dispatcher, uri - ~A path - ~A, content-type - ~A" uri-prefix base-path content-type) stream)))
+  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
+  
+  ;; (add-print-object-for-function 
+  ;;   (hunchentoot:create-folder-dispatcher-and-handler uri-prefix base-path content-type) 
+  ;;   (stream)
+  ;;   (princ (format nil "folder-dispatcher, uri - ~A path - ~A, content-type - ~A" uri-prefix base-path content-type) stream))
+  )
 
 (defun create-prefix-dispatcher (prefix handler)
-  (add-print-object-for-function 
-    (hunchentoot:create-prefix-dispatcher prefix handler) 
-    (stream)
-    (princ 
-      (format nil 
-              "prefix-dispatcher, prefix - \"~A\"" 
-              (ppcre:regex-replace-all "\"" prefix "\\\"")) stream)))
+  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
+  ;; (add-print-object-for-function 
+  ;;   (hunchentoot:create-prefix-dispatcher prefix handler) 
+  ;;   (stream)
+  ;;   (princ 
+  ;;     (format nil 
+  ;;             "prefix-dispatcher, prefix - \"~A\"" 
+  ;;             (ppcre:regex-replace-all "\"" prefix "\\\"")) stream))
+  )
 
 (defvar *weblocks-server* nil
   "If the server is started, bound to hunchentoot server
@@ -155,45 +164,46 @@ declared AUTOSTART."
        /favicon.ico here fixes Weblocks bug in Google Chrome browser")
 
 
-(defun weblocks-dispatcher (request)
-  "Weblocks' Hunchentoot dispatcher. The function serves all started applications
-  and their static files."
-  (log:debug "Serving" request)
+;; Removed when moving to Clack
+;; (defun weblocks-dispatcher (request)
+;;   "Weblocks' Hunchentoot dispatcher. The function serves all started applications
+;;   and their static files."
+;;   (log:debug "Serving" request)
   
-  (dolist (app *active-webapps*)
-    (log:debug "Searching file in" app)
+;;   (dolist (app *active-webapps*)
+;;     (log:debug "Searching file in" app)
     
-    (let* ((script-name (script-name request))
-           (hostname (host request))
-           (app-prefix (webapp-prefix app))
-           (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
-           *default-content-type*)
+;;     (let* ((script-name (script-name request))
+;;            (hostname (host request))
+;;            (app-prefix (webapp-prefix app))
+;;            (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
+;;            *default-content-type*)
 
-      (cond
-        ((or 
-          (find script-name *force-files-to-serve* :test #'string=)
-          (and (webapp-serves-hostname hostname app)
-               (list-starts-with (tokenize-uri script-name nil)
-                                 (tokenize-uri app-pub-prefix nil)
-                                 :test #'string=)))
-         (let* ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
-                (physical-folder (compute-webapp-public-files-path app))
-                (content-type (send-gzip-rules (gzip-dependency-types* app)
-                                               script-name request virtual-folder physical-folder)))
-           (send-cache-rules (weblocks-webapp-public-files-cache-time app))
+;;       (cond
+;;         ((or 
+;;           (find script-name *force-files-to-serve* :test #'string=)
+;;           (and (webapp-serves-hostname hostname app)
+;;                (list-starts-with (tokenize-uri script-name nil)
+;;                                  (tokenize-uri app-pub-prefix nil)
+;;                                  :test #'string=)))
+;;          (let* ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
+;;                 (physical-folder (compute-webapp-public-files-path app))
+;;                 (content-type (send-gzip-rules (gzip-dependency-types* app)
+;;                                                script-name request virtual-folder physical-folder)))
+;;            (send-cache-rules (weblocks-webapp-public-files-cache-time app))
 
-           ;; This is not optimal, because a new dispatcher created for each request
-           (return-from weblocks-dispatcher
-             (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                      request))))
-        ((and (webapp-serves-hostname (hunchentoot:host) app)
-              (list-starts-with (tokenize-uri script-name nil)
-                                (tokenize-uri app-prefix nil)
-                                :test #'string=))
-         (no-cache)                     ; disable caching for dynamic pages
-         (return-from weblocks-dispatcher 
-           (f0 (handle-client-request app)))))))
-  (log:debug "Application dispatch failed for" (script-name request)))
+;;            ;; This is not optimal, because a new dispatcher created for each request
+;;            (return-from weblocks-dispatcher
+;;              (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+;;                       request))))
+;;         ((and (webapp-serves-hostname (hunchentoot:host) app)
+;;               (list-starts-with (tokenize-uri script-name nil)
+;;                                 (tokenize-uri app-prefix nil)
+;;                                 :test #'string=))
+;;          (no-cache)                     ; disable caching for dynamic pages
+;;          (return-from weblocks-dispatcher 
+;;            (f0 (handle-client-request app)))))))
+;;   (log:debug "Application dispatch failed for" (script-name request)))
 
 ;; Redirect to default app if all other handlers fail
 ;; *** removed from Hunchentoot; find another way to implement this.
@@ -233,6 +243,8 @@ rewriting in JavaScript code."
   ;;     "")
   )
 
+#|
+Removed after moving to Clack
 (defun server-type ()
   "Hunchentoot")
 
@@ -248,4 +260,4 @@ rewriting in JavaScript code."
   "Returns a list of currently active sessions."
   (loop for s in (mapcar #'cdr (session-db *weblocks-server*))
         collect s))
-
+|#

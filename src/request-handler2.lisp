@@ -209,7 +209,7 @@ customize behavior."))
         
         (let ((action-name (get-action-name-from-request))
               (action-arguments
-                (weblocks-util:alist->plist (weblocks.request:request-parameters))))
+                (weblocks::alist->plist (weblocks.request:request-parameters))))
           
           (when (weblocks::pure-request-p)
             (abort-request-handler

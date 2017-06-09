@@ -1,7 +1,7 @@
-(in-package :weblocks-util)
+(in-package :weblocks)
 
-(wexport '(*templates* remove-template deftemplate render-wt-to-string render-wt)
-         '(t util))
+;; (wexport '(*templates* remove-template deftemplate render-wt-to-string render-wt)
+;;          '(t util))
 
 (defvar *templates* (make-hash-table))
 (setf (documentation '*templates* 'variable)

@@ -1,14 +1,14 @@
 
 (in-package :weblocks)
 
-(wexport '(humanize-name
-           attributize-name
-           string-whitespace-p
-           string-remove-left
-           string-remove-right
-           string-invert-case
-           remove-spurious-slashes)
-         '(t util))
+;; (wexport '(humanize-name
+;;            attributize-name
+;;            string-whitespace-p
+;;            string-remove-left
+;;            string-remove-right
+;;            string-invert-case
+;;            remove-spurious-slashes)
+;;          '(t util))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable

@@ -9,7 +9,7 @@
    #:get-html-part-context
    #:get-html-parts-root-hash
    #:get-html-part-children)
-  (:import-from #:weblocks-util
+  (:import-from #:weblocks
                 #:md5))
 (in-package weblocks.utils.html-parts)
 

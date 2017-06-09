@@ -3,19 +3,24 @@
 
 (export '(sessions in-session pt))
 
-(declaim (special *weblocks-server*))
+;; (declaim (special *weblocks-server*))
+
+;; TODO: reimplement this functionality
+;;       using new sessions
 
 (defun sessions ()
-  (hunchentoot:session-db *weblocks-server*))
+  ;; (hunchentoot:session-db *weblocks-server*)
+  )
 
 (defun in-session (&optional sid)
   "Enter a session context. If SID is supplied the session with
 this id will be selected. Otherwise the first session (likely
 the one started most recently) will be selected"
-  (setf hunchentoot:*session*
-    (if sid
-      (cdr (assoc sid (sessions)))
-      (cdar (sessions)))))
+  ;; (setf hunchentoot:*session*
+  ;;   (if sid
+  ;;     (cdr (assoc sid (sessions)))
+  ;;     (cdar (sessions))))
+  )
 
 (defun pt (&optional (stream t))
   "Print the current session's widget tree"

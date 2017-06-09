@@ -1,4 +1,4 @@
-(in-package :weblocks-util)
+(in-package :weblocks)
 
 ; i18n utils
 
