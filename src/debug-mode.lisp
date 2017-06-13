@@ -37,7 +37,7 @@ arguments."
 (define-compiler-macro style-warn (condition &rest warn-args)
   `(when (or (not (boundp '*current-webapp*))
              (null *current-webapp*)
-             (weblocks-webapp-debug (current-webapp)))
+             (weblocks-webapp-debug *current-webapp*))
      (warn ,condition . ,warn-args)))
 
 (define-condition webapp-style-warning (style-warning)

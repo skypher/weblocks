@@ -30,7 +30,7 @@
 (defun get-bundle-tally (&key bundle-folder)
   "Copy the tally file into a bundle-tally object"
   (when (null bundle-folder)
-    (setf bundle-folder (merge-pathnames "bundles/" (compute-webapp-public-files-path (current-webapp)))))
+    (setf bundle-folder (merge-pathnames "bundles/" (compute-webapp-public-files-path *current-webapp*))))
   (let* ((tally-path (merge-pathnames "tally" bundle-folder))
          (file-data (when (cl-fad:file-exists-p tally-path)
                       (read-from-file tally-path)))
@@ -82,7 +82,7 @@
 
 (defun build-bundle (file-list type &key media bundle-folder)
   (bordeaux-threads:with-lock-held (*bundle-dependencies-lock*)
-    (let* ((app (current-webapp))
+    (let* ((app *current-webapp*)
            (tally (get-bundle-tally :bundle-folder bundle-folder))
            (bundle-name (find-bundle file-list tally)))
       (when (null bundle-name)          

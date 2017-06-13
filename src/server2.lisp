@@ -70,8 +70,12 @@ This function serves all started applications and their static files."
         (weblocks.session::*session* (getf env :lack.session)))
 
     (log:debug "Serving" weblocks.request:*request* (weblocks.request:request-parameters))
+    
     (setf weblocks.request::*latest-request*
           weblocks.request:*request*)
+    (setf weblocks.session::*latest-session*
+          weblocks.session::*session*)
+
 
     (let* ((path-info (getf env :path-info))
            (hostname (getf env :server-name))
@@ -83,25 +87,20 @@ This function serves all started applications and their static files."
           (multiple-value-bind (content content-type)
               (weblocks.dependencies:serve dependency)
            
-            (return-from handle-request
-              `(200
-                (:content-type ,content-type)
-                (,content))))))
+            (let ((content (typecase content
+                             (string (list content))
+                             (t content))))
+              (return-from handle-request
+                (list 200
+                      (list :content-type content-type)
+                      content))))))
 
-      (when (not (equal path-info
-                        "/"))
-        (return-from handle-request 
-          (list 404
-                (list :content-type "text/html")
-                (list (format nil "File \"~A\" was not found"
-                              path-info)))))
-     
       (dolist (app weblocks::*active-webapps*)
-        (log:debug "Searching file in" app)
-
         (let ((app-prefix (weblocks::webapp-prefix app))
               (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app))
               weblocks::*default-content-type*)
+
+          (log:debug "Searching handler in" app app-prefix app-pub-prefix)
 
           (cond
             ((or 
@@ -120,9 +119,11 @@ This function serves all started applications and their static files."
 
                ;; This is not optimal, because a new dispatcher created for each request
                ;; TODO: find out how to serve directory in Clack
-               (return-from handle-request
-                 (funcall (weblocks::create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                          env))))
+               ;;       and move route creation into app initialization code
+               ;; (return-from handle-request
+               ;;   (funcall (weblocks::create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+               ;;            env))
+               ))
             ((and (weblocks::webapp-serves-hostname hostname app)
                   (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                               (weblocks::tokenize-uri app-prefix nil)
@@ -134,22 +135,29 @@ This function serves all started applications and their static files."
              ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
              (return-from handle-request
-               (let ((weblocks.response:*code* 200)
-                     (weblocks.response:*content-type*
-                       (if (weblocks.request:ajax-request-p)
-                           "application/json"
-                           "text/html"))
-                     (weblocks.response:*headers* nil))
+               (let* ((weblocks.response:*code* 200)
+                      (weblocks.response:*content-type*
+                        (if (weblocks.request:ajax-request-p)
+                            "application/json"
+                            "text/html"))
+                      (weblocks.response:*headers* nil)
+                      (content (catch 'weblocks.response::abort-processing
+                                 (weblocks.request-handler:handle-client-request app))))
+                 
                  (list weblocks.response:*code* ;; this value can be changed somewhere in
                        ;; handle-client-request
                        (append (list :content-type weblocks.response:*content-type*)
                                weblocks.response:*headers*)
                        ;; Here we use catch to allow to abort usual response
                        ;; processing and to return data immediately
-                       (list (catch 'weblocks.response::abort-processing
-                               (weblocks.request-handler:handle-client-request app))))))))))
+                       (list content))))))))
      
-      (log:debug "Application dispatch failed for" path-info))))
+      (log:debug "Application dispatch failed for" path-info)
+
+      (list 404
+            (list :content-type "text/html")
+            (list (format nil "File \"~A\" was not found"
+                          path-info))))))
 
 
 (defmethod start ((server server) &key debug)
@@ -215,14 +223,11 @@ This function serves all started applications and their static files."
 (defun start-weblocks (&key (debug t)
                          (port 8080)
                          (server-type :hunchentoot))
-  "Starts weblocks framework hooked into Hunchentoot server.
+  "Starts weblocks framework hooked into Clack server.
 
 Set DEBUG to true in order for error messages and stack traces to be shown
 to the client (note: stack traces are temporarily not available due to changes
 in Hunchentoot 1.0.0).
-
-Set ACCEPTOR-CLASS if you want to use a custom acceptor (it must inherit
-from WEBLOCKS-ACCEPTOR).
 
 All other keywords will be passed as initargs to the acceptor;
 the initargs :PORT and :SESSION-COOKIE-NAME default to
@@ -262,7 +267,7 @@ declared AUTOSTART."
   (when (not (null *server*))
     (dolist (app weblocks::*active-webapps*)
       (weblocks::stop-webapp (weblocks::weblocks-webapp-name app)))
-    (setf weblocks::*last-session* nil)
+    (setf weblocks.session::*last-session* nil)
 
     ;; TODO: Replace with CLACK's sessions
     ;; (weblocks::reset-sessions)

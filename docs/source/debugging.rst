@@ -4,7 +4,8 @@
 
 To make interactive debugger popup in Slime, set
 ``weblocks:*catch-errors-p*`` to ``nil``. Otherwise, weblocks will catch
-an error and render ``HTTP 500 Unhandled error`` page.
+an error and render ``HTTP 500 Unhandled error`` page. This option is
+``t`` by default.
 
 You can also control verbosity level of 500 page by setting
 ``*show-lisp-errors-p*`` variable. If it is ``nil``, then no error and

@@ -16,7 +16,8 @@
    #:make-remote-js-dependency
    #:make-remote-css-dependency
    #:get-integrity
-   #:get-cross-origin))
+   #:get-cross-origin
+   #:make-static-image-dependency))
 (in-package weblocks.dependencies)
 
 
@@ -58,7 +59,11 @@ See more information at: https://www.w3.org/TR/SRI/")
                  :reader get-content-type)
    (path :type pathname
          :initarg :path
-         :reader get-path)))
+         :reader get-path)
+   (binary :type bool
+           :initarg :binary
+           :initform nil
+           :reader is-binary)))
 
 
 (defgeneric get-url (dependency)
@@ -78,17 +83,20 @@ should have only path part, like /static/css/bootstrap.css."))
 
 
 (defmethod render-in-head ((dependency dependency))
-  (if (equal (get-content-type dependency)
-             "application/javascript")
-      ;; Javascript
-      (weblocks::with-html
-        (:script :src (get-url dependency)
-                 :type "text/javascript" ""))
-      ;; CSS
-      (weblocks::with-html
-        (:link :rel "stylesheet" :type "text/css"
-               :href (get-url dependency)
-               :media "screen"))))
+  (cond
+    ;; Javascript
+    ((equal (get-content-type dependency)
+            "application/javascript")
+     (weblocks::with-html
+       (:script :src (get-url dependency)
+                :type "text/javascript" "")))
+    ;; CSS
+    ((equal (get-content-type dependency)
+            "text/css")
+     (weblocks::with-html
+       (:link :rel "stylesheet" :type "text/css"
+              :href (get-url dependency)
+              :media "screen")))))
 
 
 (defmethod render-in-head ((dependency remote-dependency))
@@ -153,18 +161,51 @@ a browser."
                                         dependency)))))
 
 
-(defun make-static-js-dependency (path)
-  "Creates a JavaScript dependency, served from the disk."
+(defun make-static-js-dependency (path &key system)
+  "Creates a JavaScript dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  
   (make-instance 'static-dependency
                  :content-type "application/javascript"
-                 :path path))
+                 :path (if system
+                           (asdf:system-relative-pathname system
+                                                          path)
+                           path)))
 
 
-(defun make-static-css-dependency (path)
-  "Creates a CSS dependency, served from the disk."
+(defun make-static-css-dependency (path &key system)
+  "Creates a CSS dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  
   (make-instance 'static-dependency
                  :content-type "text/css"
-                 :path path))
+                 :path (if system
+                           (asdf:system-relative-pathname system
+                                                          path)
+                           path)))
+
+
+(defun make-static-image-dependency (path &key system)
+  "Creates an image dependency, served from the disk.
+
+It is not rendered into an HTML, but served from disk."
+  
+  (let* ((path (if system
+                  (asdf:system-relative-pathname system
+                                                 path)
+                  (pathname path)))
+         (ext (pathname-type path))
+         (content-type (format nil "image/~a"
+                               ext)))
+    
+    (make-instance 'static-dependency
+                   :content-type content-type
+                   :path path
+                   :binary t)))
 
 
 (defun make-remote-js-dependency (url &key integrity
@@ -189,9 +230,13 @@ a browser."
 
 (defmethod serve ((dependency static-dependency))
   "Serves static dependency from the disk."
-  (values (alexandria:read-file-into-string
-           (get-path dependency))
-          (get-content-type dependency)))
+  (let ((data (if (is-binary dependency)
+                  (alexandria:read-file-into-byte-vector
+                   (get-path dependency))
+                  (alexandria:read-file-into-string
+                   (get-path dependency)))))
+    (values (pathname (get-path dependency))
+            (get-content-type dependency))))
 
 
 (defmethod get-url ((dependency static-dependency))
@@ -201,10 +246,15 @@ URL type is returned as second value and can be :local or :remote.
 For static-dependency it is :local."
   
   (let* ((path (get-path dependency))
-         (parts (split-sequence:split-sequence #\/ path))
-         (filename (car (last parts)))
-         (prefix (format nil "/static/css/"))
+         ;; (parts (split-sequence:split-sequence #\/ path))
+         ;; (filename (car (last parts)))
+         (filename (pathname-name path))
+         (ext (pathname-type path))
+         (prefix (format nil "/static/~a/"
+                         ext))
          (filename-with-prefix (concatenate 'string
                                             prefix
-                                            filename)))
+                                            filename
+                                            "."
+                                            ext)))
     (values filename-with-prefix :local)))

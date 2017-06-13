@@ -49,7 +49,7 @@
   (cl-ppcre:regex-replace "\\?.*" str ""))
 
 (defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
-                                                                (current-webapp))))
+                                                                *current-webapp*)))
   "Tokenizes an URI into a list of elements.
 
 ex:

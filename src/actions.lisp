@@ -19,7 +19,7 @@ redirects to the root of the application.")
   (:method ((app t))
     (funcall *expired-action-handler* app)))
 
-(defun default-expired-action-handler (&optional (app (current-webapp)))
+(defun default-expired-action-handler (&optional (app *current-webapp*))
   "Default value of *expired-action-handler*. Redirects to application
 root and sets a query parameter 'timeout' to true, so that the home
 page may display a relevant message, if necessary."

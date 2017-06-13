@@ -103,7 +103,7 @@ when new dependencies appeared in AJAX page updates.")
   (stable-sort dependency-list #'dependencies-lessp))
 
 (defun bundle-dependencies (dependency-list &key bundle-folder
-                                                 (bundle-types (bundle-dependency-types* (current-webapp))))
+                                                 (bundle-types (bundle-dependency-types* *current-webapp*)))
   (log:debug "Bundling dependencies")
   (when (find :stylesheet bundle-types)
     (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency
@@ -212,7 +212,7 @@ when new dependencies appeared in AJAX page updates.")
 
 ;; Dependency gathering
 
-(defun make-local-dependency (type file-name &key do-not-probe media (webapp (current-webapp)) (import-p nil))
+(defun make-local-dependency (type file-name &key do-not-probe media (webapp *current-webapp*) (import-p nil))
   "Make a local (e.g. residing on the same web server) dependency of
 type :stylesheet or :script. Unless :do-not-probe is set, checks if
 file-name exists in the server's public files directory, and if it does,
@@ -247,7 +247,7 @@ returns a dependency object."
                 physical-path))))
 
 
-(defun build-dependencies (dep-list &optional (app (current-webapp)))
+(defun build-dependencies (dep-list &optional (app *current-webapp*))
   "Utility function: convert a list of either dependency objects or an
 alist of dependencies into a list of dependency objects. Used mostly
 when statically specyfing application dependencies, where alists are
@@ -304,7 +304,7 @@ represent a class."
   (:method-combination append)
   ;; no dependencies by default
   (:method append (obj)
-    (log:debug "Gathering per class dependencies for" obj)
+    (log:debug "No per-class dependencies for" obj "by default")
     ()))
 
 
@@ -334,7 +334,13 @@ represent a class."
   ;; everything and removes empty dependencies.
   (:method :around (obj)
     (log:debug "Returning dependencies for" obj)
-    (nreverse (remove nil (append (call-next-method) (per-class-dependencies obj)))))
+    (let ((dependencies (nreverse
+                         (remove nil
+                                 (append (call-next-method)
+                                         (per-class-dependencies obj))))))
+      (log:debug "Dependencies for"
+                 obj
+                 dependencies)))
 
   ;; No dependencies by default
   (:method append (obj) ())

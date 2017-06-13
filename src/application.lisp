@@ -1,5 +1,5 @@
 
-(in-package :weblocks)
+(in-package weblocks)
 
 ;; make SBCL use and verify type information for slots
 (declaim (optimize (safety 3)))
@@ -13,7 +13,7 @@
           get-webapps-for-class
           initialize-webapp
           finalize-webapp
-          webapp-application-dependencies
+;;          webapp-application-dependencies
           webapp-name in-webapp
           bundle-dependency-types
           version-dependency-types
@@ -42,9 +42,10 @@
           *registered-webapps*
           with-webapp
           weblocks-webapp-default-dependencies 
-          weblocks-webapp-js-backend
+          ;; weblocks-webapp-js-backend
           initialize-js-backend
-          get-js-backend-dependencies))
+          ;; get-js-backend-dependencies
+          ))
 
 ;; TODO: dont understand why this defvar is surrounded by eval-when
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -52,10 +53,32 @@
     "A list of applications that the system knows about"))
 
 
+(defvar *current-webapp*)
+(setf (documentation '*current-webapp* 'variable)
+      "A currently active web application.")
+
+
 (defun default-init-user-session (root)
   (setf (widget-children root)
-        "Please create a function to initialize a session and pass it to the
-  defwebapp as :init-user-session argument.") )
+        (f_%
+          (with-html
+            (:h1 "No init-user-session")
+            (:p "Please create a function to initialize a session and pass it to the
+  defwebapp as :init-user-session argument.")
+            (:p "It could be something simple, like this one:")
+            (:pre
+             (:code
+              "(defun init-user-session (root)
+  (setf (widget-children root)
+        (lambda ()
+          (with-html
+            (:h1 \"Hello world!\")))))"))
+
+            ;; TODO: add a link to a Quickstart
+            (:p "Read more in "
+                (:a :href ""
+                    "documentaion")
+                ".")))) )
 
 
 (defclass weblocks-webapp ()
@@ -68,13 +91,11 @@
                 :initform nil 
                 :documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
-   (js-backend :accessor weblocks-webapp-js-backend 
+   (js-backend :accessor webapp-js-backend 
                :initarg :js-backend
-               :initform :jquery-js
-               :documentation "Please load javascript backend for
-               framework (default is :jquery-js from
-               https://github.com/html/weblocks-jquery-js) and pass it
-               as :js-backend value (`:js-backend :prototype` for example).")
+               :initform :jquery
+               :documentation "Specify a javascript backend for
+               framework (default is :jquery-js)")
    (public-files-path :type (or null string pathname)
                       :accessor weblocks-webapp-public-files-path
                       :initarg :public-files-path 
@@ -116,6 +137,7 @@
            :initarg :prefix
            :documentation "The subtree of the URI space at this site that belongs to
            the webapp.")
+   ;; TODO: may be remove
    (application-dependencies :type list
                              :accessor weblocks-webapp-application-dependencies 
                              :initarg :dependencies
@@ -290,12 +312,13 @@ called (primarily for backward compatibility"
      (when (get-webapp ',name nil)
        (restart-webapp ',name))))
 
-(defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))
-  (log:debug "Initializing default dependencies for weblocks application")
+
+;; (defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))
+;;   (log:debug "Initializing default dependencies for weblocks application")
   
-  '((:stylesheet "layout")
-    (:stylesheet "main")
-    (:stylesheet "dialog")))
+;;   '((:stylesheet "layout")
+;;     (:stylesheet "main")
+;;     (:stylesheet "dialog")))
 
 
 (defmethod initialize-instance :after
@@ -303,6 +326,15 @@ called (primarily for backward compatibility"
   "Add some defaults to my slots.  In particular, unless
 IGNORE-DEFAULT-DEPENDENCIES, prepend the default Weblocks dependencies
 to my `application-dependencies' slot."
+
+  ;; Make an instance of js backend class from
+  ;; a keyword name
+  (setf (webapp-js-backend self)
+        (weblocks.js:make-js-backend
+         (webapp-js-backend self)))
+  
+  
+  ;; TODO: refactor this mess
   (macrolet ((slot-default (name initform)
                `(unless (slot-boundp self ',name)
                   (setf (slot-value self ',name) ,initform))))
@@ -332,21 +364,24 @@ to my `application-dependencies' slot."
       (slot-default prefix
                     (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
-      (let ((*current-webapp* self))
-        (setf (weblocks-webapp-application-dependencies self)
-              (build-dependencies
-               (append
-                ;; Backend dependencies should go first, to
-                ;; load jquery or prototype before all other code
-                ;; will be loaded.
-                (get-js-backend-dependencies
-                 self
-                 (weblocks-webapp-js-backend self))
-                ;; After that, we load dependencies of a class
-                (weblocks-webapp-default-dependencies self)
-                ;; And finally, we add them to existing application
-                ;; dependencies.
-                (weblocks-webapp-application-dependencies self)))))))
+      ;; Replaced with new king of dependencies
+      ;;
+      ;; (let ((*current-webapp* self))
+      ;;   (setf (weblocks-webapp-application-dependencies self)
+      ;;         (build-dependencies
+      ;;          (append
+      ;;           ;; Backend dependencies should go first, to
+      ;;           ;; load jquery or prototype before all other code
+      ;;           ;; will be loaded.
+      ;;           (get-js-backend-dependencies
+      ;;            self
+      ;;            (weblocks-webapp-js-backend self))
+      ;;           ;; After that, we load dependencies of a class
+      ;;           (weblocks-webapp-default-dependencies self)
+      ;;           ;; And finally, we add them to existing application
+      ;;           ;; dependencies.
+      ;;           (weblocks-webapp-application-dependencies self)))))
+      ))
   
   (let ((pfp (weblocks-webapp-public-files-path self)))
     (when (and pfp (or (pathname-name pfp) (pathname-type pfp)))
@@ -426,19 +461,28 @@ to my `application-dependencies' slot."
   (:method ((app t)) nil))
 
 
-(defgeneric initialize-js-backend (app backend)
-  (:documentation "Initializes js backend. Usually backend adds some handlers to serve static files"))
+;; TODO: Probably, we don't need it anymore after dependency and normal
+;;       routing was introduced.
+;; (defgeneric initialize-js-backend (app backend)
+;;   (:documentation "Initializes js backend. Usually backend adds some handlers to serve static files")
+;;   (:method (app backend)
+;;     ;; Do nothing by default
+;;     ))
 
 
-(defgeneric get-js-backend-dependencies (app backend)
-  (:documentation "Returns dependecies list for a JS backend"))
+;; (defgeneric get-js-backend-dependencies (app backend)
+;;   (:documentation "Returns dependecies list for a JS backend")
+  
+;;   (:method (app backend)
+;;     "By default, there is no dependencies"
+;;     nil))
 
 
 (defmethod weblocks.dependencies:get-dependencies ((self weblocks-webapp))
   (log:debug "Returning new-style dependencies for base application class.")
   
   (weblocks.dependencies:get-dependencies
-   (weblocks-webapp-js-backend self)))
+   (webapp-js-backend self)))
 
 
 (defmethod initialize-webapp :before ((app weblocks-webapp))
@@ -447,15 +491,25 @@ to my `application-dependencies' slot."
   ;; to not introduce circular dependency we have these intern calls
   (unless (intern "*SERVER*" :weblocks.server)
     (funcall (intern "START-WEBLOCKS" :weblocks.server)))
-  
-  (open-stores))
+
+  ;; TODO: Separate stores into a separate system
+  ;;       with dependency from weblocks and make a hook
+  ;;       to initialize stores (or anything else) without
+  ;;       explicit call in weblocks itself.
+  ;;       Probably, stores should have a class-mixin
+  ;;       which will define it's own initialize-webapp :before method.
+  ;; (open-stores)
+  )
 
 
-(defmethod initialize-webapp :after ((self weblocks-webapp))
-  (let ((js-backend (weblocks-webapp-js-backend self)))
-    (log:debug "Initializing js backend") js-backend
+;; Removed, because now js-backend is a class
+;; and is created in initialize-instance method
+;; (defmethod initialize-webapp :after ((self weblocks-webapp))
+;;   ;; (let ((js-backend (weblocks-webapp-js-backend self)))
+;;   ;;   (log:debug "Initializing js backend") js-backend
   
-    (initialize-js-backend self js-backend)))
+;;   ;;   (initialize-js-backend self js-backend))
+;;   )
 
 
 (defun stop-webapp (name)
@@ -492,13 +546,13 @@ to my `application-dependencies' slot."
   (start-webapp name))
 
 ;;; building webapp uris
-(defun make-webapp-uri (uri &optional (app (current-webapp)))
+(defun make-webapp-uri (uri &optional (app *current-webapp*))
   "Makes a URI for a weblocks application (by concatenating the app
 prefix and the provided uri)."
   (remove-spurious-slashes
     (concatenate 'string "/" (webapp-prefix app) "/" uri)))
 
-(defun make-webapp-public-file-uri (uri &optional (app (current-webapp)))
+(defun make-webapp-public-file-uri (uri &optional (app *current-webapp*))
   "Makes a URI for a public file for a weblocks application (by
 concatenating the app prefix, the public folder prefix, and the
 provider URI)."
@@ -508,10 +562,10 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
-(defun webapp-session-key (&optional (webapp (current-webapp)))
+(defun webapp-session-key (&optional (webapp *current-webapp*))
   (weblocks-webapp-session-key webapp))
 
-(defun webapp-session-hash (&optional (session *session*) (webapp (current-webapp)))
+(defun webapp-session-hash (&optional (session *session*) (webapp *current-webapp*))
   (session-value (webapp-session-key webapp) session))
 
 ;;
@@ -524,7 +578,6 @@ provider URI)."
 
 (defun webapp-permanent-action (action)
   "Returns the action function associated with this symbol in the current webapp"
-  (declare (special *current-webapp*))
   (when *current-webapp*
     (let ((action-table (webapp-permanent-actions *current-webapp*)))
       (when action-table
@@ -625,7 +678,7 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
       (weblocks-webapp-public-files-uri-prefix app)
       app)))
 
-(defun compute-webapp-public-files-uri-prefix-util (&optional (app (current-webapp)))
+(defun compute-webapp-public-files-uri-prefix-util (&optional (app *current-webapp*))
   "A wrapper around 'compute-webapp-public-files-uri-prefix' that
   handles current app."
   (compute-webapp-public-files-uri-prefix app))
@@ -642,14 +695,6 @@ the system specified by 'asdf-system-name', and goes into 'pub'."
 
 ;;; Convenience accessors
 ;;; These procedures are relative to the current request's selected webapp
-(defvar *current-webapp*)
-(setf (documentation '*current-webapp* 'variable)
-      "A currently active web application.")
-
-(defun current-webapp ()
-  "Returns the currently invoked instance of a web application."
-  (declare (special *current-webapp*))
-  *current-webapp*)
 
 (defun package-webapp-classes (&optional (package *package*))
   "Answer a list of webapp classes that were defined (e.g. by
@@ -681,31 +726,32 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
         (get-webapp (or name
                         (first *registered-webapps*)))))
 
-(defun reset-webapp-session (&optional (app (current-webapp)))
+(defun reset-webapp-session (&optional (app *current-webapp*))
   "Reset sessions on a per-webapp basis"
   (setf (session-value (webapp-session-key app)) nil))
 
-(defun webapp-application-dependencies (&optional (app (current-webapp)))
-  "Returns a list of dependencies on scripts and/or stylesheets that
-   will persist throughout the whole application. See documentation for
-   'widget-application-dependencies' for more details."
-  (build-dependencies
-   (weblocks-webapp-application-dependencies app)
-   app))
+;; Removed in preference to new dependencies
+;; (defun webapp-application-dependencies (&optional (app *current-webapp*))
+;;   "Returns a list of dependencies on scripts and/or stylesheets that
+;;    will persist throughout the whole application. See documentation for
+;;    'widget-application-dependencies' for more details."
+;;   (build-dependencies
+;;    (weblocks-webapp-application-dependencies app)
+;;    app))
 
-(defun webapp-name (&optional (app (current-webapp)))
+(defun webapp-name (&optional (app *current-webapp*))
   "Returns the name of the web application (also see 'defwebapp'). Please
    note, this name will be used for the composition of the page title
    displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-name app))
 
-(defun webapp-description (&optional (app (current-webapp)))
+(defun webapp-description (&optional (app *current-webapp*))
   "Returns the description of the web application. Please note, this
    description will be used for the composition of the page title
    displayed to the user. See 'application-page-title' for details."
   (weblocks-webapp-description app))
 
-(defun webapp-serves-hostname (hostname &optional (app (current-webapp)))
+(defun webapp-serves-hostname (hostname &optional (app *current-webapp*))
   "Does APP serve requests for HOSTNAME?"
   (let ((hostname (car (cl-ppcre:split ":" hostname)))) ; ignore port
   (or (null (webapp-hostnames app))
@@ -718,25 +764,25 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
            (cl-ppcre:regex-replace-all "\\*" pattern ".*")
            hostname)))
 
-(defun webapp-hostnames (&optional (app (current-webapp)))
+(defun webapp-hostnames (&optional (app *current-webapp*))
   "Returns the hostnames this application will serve requests for."
   (weblocks-webapp-hostnames app))
 
-(defun webapp-prefix (&optional (app (current-webapp)))
+(defun webapp-prefix (&optional (app *current-webapp*))
   "Returns the URL prefix of the application."
   (weblocks-webapp-prefix app))
 
-(defun webapp-debug (&optional (app (current-webapp)))
+(defun webapp-debug (&optional (app *current-webapp*))
   "Whether APP is in debug mode."
   (weblocks-webapp-debug app))
 
-(defun webapp-public-files-uri-prefix (&optional (app (current-webapp)))
+(defun webapp-public-files-uri-prefix (&optional (app *current-webapp*))
   (weblocks-webapp-public-files-uri-prefix app))
 
-(defun webapp-public-files-path (&optional (app (current-webapp)))
+(defun webapp-public-files-path (&optional (app *current-webapp*))
   (weblocks-webapp-public-files-path app))
 
-(defun webapp-init-user-session (&optional (app (current-webapp)))
+(defun webapp-init-user-session (&optional (app *current-webapp*))
   "Returns the init function for the user session."
   (let ((init (weblocks-webapp-init-user-session app)))
     (etypecase init

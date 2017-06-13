@@ -4,6 +4,7 @@
    #:*code*
    #:*content-type*
    #:abort-processing
+   #:add-header
    #:*headers*))
 (in-package weblocks.response)
 
@@ -26,10 +27,21 @@ for AJAX requests. Set it to another content type if you need to return somethin
   "HTTP headers to return in response to request.
 
 This variable is bound to nil for each request. Set it to plist
-with any headers you need.
+with any headers you need or use (add-header ...) to add one header.
 
 Additional header :content-type will be added to this list before
 returning response. To change content type, set *content-type*.")
+
+
+(defun add-header (name value)
+  "Use this function to add a HTTP header:
+
+\(add-header :x-request-id 100500\)"
+
+  (declare (type symbol name)
+           (type string value))
+  (push value *headers*)
+  (push name *headers*))
 
 
 (defun abort-processing (content &key (content-type nil content-type-given)

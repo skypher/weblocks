@@ -5,12 +5,19 @@
   (:use #:cl)
   (:export
    #:delete-value
-   #:get-value))
+   #:get-value
+   #:reset-latest-session))
 (in-package weblocks.session)
 
 
 (defvar *session* nil
   "Stores current requests's session")
+
+
+(defvar *latest-session* nil
+  "Stores last session, to be able to clear it during development.
+
+To clear, use function \(reset-last-session\).")
 
 
 ;; previously webapp-session-value
@@ -43,3 +50,7 @@ KEY is compared using EQUAL."
 
   (remhash key *session*))
 
+
+(defun reset-latest-session ()
+  (when *latest-session*
+    (clrhash *latest-session*)))

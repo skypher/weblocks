@@ -102,7 +102,8 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
                                               (dolist (arg (cdr frame))
                                                 (htm (:li (:code (esc (format nil "~A" arg)))))))))))))))))))
 
-    `(,+http-internal-server-error+
-      ("Content-Type" "text/html")
-      (,html))))
+    (log:debug "Returning 500 error to user")
+    (weblocks.response:abort-processing html
+                                        :content-type "text/html"
+                                        :code 500)))
 

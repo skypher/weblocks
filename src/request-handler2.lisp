@@ -195,7 +195,7 @@ customize behavior."))
                              :tokens (weblocks::tokenize-uri (weblocks.request:request-uri))))
             weblocks::*before-ajax-complete-scripts*
             weblocks::*on-ajax-complete-scripts*
-            weblocks::*page-dependencies*
+;;            weblocks::*page-dependencies*
             
             ;; New-style dependencies
             (weblocks.dependencies:*page-dependencies*
@@ -254,8 +254,8 @@ customize behavior."))
             (weblocks::handle-http-error app (weblocks::return-code*)))))))
 
 
-(defun abort-request-handler (response)
-  "Aborts execution of the current request and returns a response as is."
+;; (defun abort-request-handler (response)
+;;   "Aborts execution of the current request and returns a response as is."
 
-  ;; TODO: signal a condition and handle it somewhere.
-  nil)
+;;   ;; TODO: signal a condition and handle it somewhere.
+;;   nil)

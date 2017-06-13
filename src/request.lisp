@@ -62,8 +62,10 @@ etc."
   (pushnew 'clear-redirect-var 
            (request-hook :application :pre-action)))
 
+
 (defun set-redirect-true ()
   (setf (weblocks.session:get-value 'redirect-p) t))
+
 
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
                                       :post-render))
@@ -94,7 +96,7 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
                 (format nil "{\"redirect\":\"~A\"}" uri)
                 :content-type *json-content-type*)
                (weblocks.response:abort-processing
-                nil
+                ""
                 :headers (list :location uri)
                 :code 302))))
 
@@ -122,6 +124,6 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
 
 
 (defun parse-location-hash ()
-  (let ((raw-hash (request-parameter "weblocks-internal-location-hash")))
+  (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
     (when raw-hash
       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))

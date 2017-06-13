@@ -13,9 +13,10 @@
           *current-page-headers*
           *accumulate-page-keywords*))
 
-(defvar *page-dependencies*)
-(setf (documentation '*page-dependencies* 'variable)
-      "A list of dependencies of the currently rendered page.")
+;; Moved to weblocks.dependencies
+;; (defvar *page-dependencies*)
+;; (setf (documentation '*page-dependencies* 'variable)
+;;       "A list of dependencies of the currently rendered page.")
 
 (defvar *accumulate-page-keywords* t
   "Whether to accumulate widgets' keywords for the keywords
@@ -71,18 +72,21 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
   "Default page rendering template and protocol"
   ; Note, anything that precedes the doctype puts IE6 in quirks mode
   ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
-  (declare (special *page-dependencies*))
   (log:debug "Rendering page for" app)
   
   (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
-        (all-dependencies (timing "compact-dependencies"
-                            (compact-dependencies (append (webapp-application-dependencies)
-                                                          *page-dependencies*)))))
+        ;; TODO: understand how dependency compaction worked before
+        ;;       and may be reimplement it.
+        ;; (all-dependencies (timing "compact-dependencies"
+        ;;                     (compact-dependencies (append (webapp-application-dependencies)
+        ;;                                                   *page-dependencies*))))
+        (all-dependencies weblocks.dependencies:*page-dependencies*))
+    
     (render-wt :page-wt (list :app app) 
                :title (application-page-title app)
                :header-content (capture-weblocks-output 
                                  (render-page-headers app)
-                                 (mapc #'render-dependency-in-page-head all-dependencies))
+                                 (mapc #'weblocks.dependencies:render-in-head all-dependencies))
                :body-content (capture-weblocks-output (render-page-body app rendered-html)))))
 
 ;;

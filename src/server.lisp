@@ -1,5 +1,4 @@
-
-(in-package :weblocks)
+(in-package weblocks)
 
 (export '(*last-session*
           start-weblocks
@@ -86,59 +85,66 @@
       (flexi-streams:make-external-format :utf-8))
 
 
-(defun start-weblocks (&rest keys &key (debug t) (port 8080)
-                                       (acceptor-class 'weblocks-acceptor)
-                       &allow-other-keys)
-  "Starts weblocks framework hooked into Hunchentoot server.
+;; Moved to weblocks.server
+;; (defun start-weblocks (&rest keys &key (debug t) (port 8080)
+;;                        &allow-other-keys)
+;;   "Starts weblocks framework hooked into Hunchentoot server.
 
-Set DEBUG to true in order for error messages and stack traces to be shown
-to the client (note: stack traces are temporarily not available due to changes
-in Hunchentoot 1.0.0).
+;; Set DEBUG to true in order for error messages and stack traces to be shown
+;; to the client (note: stack traces are temporarily not available due to changes
+;; in Hunchentoot 1.0.0).
 
-Set ACCEPTOR-CLASS if you want to use a custom acceptor (it must inherit
-from WEBLOCKS-ACCEPTOR).
+;; All other keywords will be passed as initargs to the acceptor;
+;; the initargs :PORT and :SESSION-COOKIE-NAME default to
+;; 8080 and `weblocks-GENSYM'.
 
-All other keywords will be passed as initargs to the acceptor;
-the initargs :PORT and :SESSION-COOKIE-NAME default to
-8080 and `weblocks-GENSYM'.
+;; Also opens all stores declared via DEFSTORE and starts webapps
+;; declared AUTOSTART."
+;;   (unless (member :bordeaux-threads *features*)
+;;     (cerror "I know what I'm doing and will stubbornly continue."
+;;             "You're trying to start Weblocks without threading ~
+;;             support. Recompile your Lisp with threads enabled."))
+;;   (if debug
+;;     (enable-global-debugging)
+;;     (disable-global-debugging))
+;;   (when (null *weblocks-server*)
+;;     (values
+;;       (start (setf *weblocks-server*))
+;;       (mapcar (lambda (class)
+;;                 (unless (get-webapps-for-class class)
+;;                   (start-webapp class :debug debug)))
+;;               *autostarting-webapps*))))
 
-Also opens all stores declared via DEFSTORE and starts webapps
-declared AUTOSTART."
-  (unless (member :bordeaux-threads *features*)
-    (cerror "I know what I'm doing and will stubbornly continue."
-            "You're trying to start Weblocks without threading ~
-            support. Recompile your Lisp with threads enabled."))
-  (if debug
-    (enable-global-debugging)
-    (disable-global-debugging))
-  (when (null *weblocks-server*)
-    (values
-      (start (setf *weblocks-server*
-                   (apply #'make-instance acceptor-class :port port
-                          (remove-keyword-parameters keys :port :debug :acceptor-class))))
-      (mapcar (lambda (class)
-                (unless (get-webapps-for-class class)
-                  (start-webapp class :debug debug)))
-              *autostarting-webapps*))))
-
-(defun stop-weblocks ()
-  "Stops weblocks. Closes all stores declared via 'defstore'."
-  (when (not (null *weblocks-server*))
-    (dolist (app *active-webapps*)
-      (stop-webapp (weblocks-webapp-name app)))
-    (setf *last-session* nil)
-    (reset-sessions)
-    (when *weblocks-server*
-      (stop *weblocks-server*))
-    (setf *weblocks-server* nil)))
+;; Moved to weblocks.server
+;; (defun stop-weblocks ()
+;;   "Stops weblocks. Closes all stores declared via 'defstore'."
+;;   (when (not (null *weblocks-server*))
+;;     (dolist (app *active-webapps*)
+;;       (stop-webapp (weblocks-webapp-name app)))
+;;     (setf *last-session* nil)
+;;     (reset-sessions)
+;;     (when *weblocks-server*
+;;       (stop *weblocks-server*))
+;;     (setf *weblocks-server* nil)))
 
 
 ;;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
 (defun send-cache-rules (cache-time)
   (when cache-time
     (check-type cache-time integer)
-    (setf (header-out "Expires") (rfc-1123-date (+ (get-universal-time) cache-time)))
-    (setf (header-out "Cache-Control") (format nil "max-age=~D" (max 0 cache-time)))))
+    (let* ((now (local-time:now))
+           (cache-until (local-time-duration:timestamp-duration+
+                         now
+                         (local-time-duration:duration :sec cache-time))))
+      (weblocks.response:add-header
+       :expired
+       (local-time:format-rfc1123-timestring
+        nil
+        cache-until))
+      (weblocks.response:add-header
+       :cache-control
+       (format nil "max-age=~D" (max 0 cache-time))))))
+
 
 (defun send-gzip-rules (types script-name request virtual-folder physical-folder)
   (let (content-type)

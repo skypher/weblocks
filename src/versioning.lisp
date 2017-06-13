@@ -126,7 +126,7 @@ been modified before, its name is kept the same."
 (defun local-path-from-url (url &key (type :stylesheet))
   (let* ((name (pathname-name url))
          (relative (public-file-relative-path type name))
-         (webapp (current-webapp))
+         (webapp *current-webapp*)
          (local (merge-pathnames relative
                                  (compute-webapp-public-files-path webapp))))
     (when (cl-fad:file-exists-p local)
@@ -134,8 +134,8 @@ been modified before, its name is kept the same."
               (princ-to-string (puri:merge-uris relative
                                                 (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))))))))
 
-(defun update-import-css-content (import-path &key (version-types (version-dependency-types* (current-webapp)))
-                                              (gzip-types (gzip-dependency-types* (current-webapp))))
+(defun update-import-css-content (import-path &key (version-types (version-dependency-types* *current-webapp*))
+                                                   (gzip-types (gzip-dependency-types* *current-webapp*)))
   (let ((urls (extract-import-urls (slurp-file import-path))))
     (with-file-write (stream import-path)
       (dolist (url (nreverse urls))
