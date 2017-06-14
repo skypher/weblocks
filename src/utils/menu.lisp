@@ -23,14 +23,13 @@
     (:div :class "view menu" ; should probably be 'rendered-menu' but I'm not going to be
      ; the one adapting the CSS to this.
      :id menu-id
-     (with-extra-tags
-       (when menu-header
-         (htm (:h1 (str menu-header))))
-       (if menu-empty-p
+     (when menu-header
+       (htm (:h1 (str menu-header))))
+     (if menu-empty-p
          (str menu-empty-message)
          (if menu-ordered-list-p 
-           (htm (:ol (str menu-content)))
-           (htm (:ul (str menu-content)))))))))
+             (htm (:ol (str menu-content)))
+             (htm (:ul (str menu-content))))))))
 
 (defun render-menu (options &key selected-pane header (container-id (gen-id)) (base "")
                     ordered-list-p (empty-message *menu-empty-message*)

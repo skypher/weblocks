@@ -137,9 +137,7 @@ inside it but outside the rendering of the root widget"))
 (defun page-body-wt (&key body-string &allow-other-keys)
   (with-html-to-string
     (:div :class "page-wrapper"
-     (render-extra-tags "page-extra-top-" 3)
-     (htm (str body-string))
-     (render-extra-tags "page-extra-bottom-" 3))))
+     (htm (str body-string)))))
 
 (deftemplate :page-body-wt 'page-body-wt)
 

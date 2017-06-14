@@ -4,8 +4,6 @@
 (export '(*submit-control-name*
           *cancel-control-name*
           with-html-form
-          render-extra-tags
-          with-extra-tags
           render-link
           render-button
           render-form-and-button
@@ -32,28 +30,6 @@
        ,@body 
        (get-output-stream-string *weblocks-output-stream*))))
 
-(defmethod render-extra-tags (tag-class count)
-  "Renders extra tags to get around CSS limitations. 'tag-class'
-is a string that specifies the class name and 'count' is the
-number of extra tags to render.
-Ex:
-\(render-extra-tags \"extra-\" 2) =>
-\"<div class=\"extra-1\"></div><div class=\"extra-1\"></div>\""
-  (with-html
-    (loop for i from 1 to count
-          for attr = (format nil "~A~A" tag-class i)
-          do (htm (:div :class attr "<!-- empty -->")))))
-
-(defmacro with-extra-tags (&body body)
-  "A macro used to wrap html into extra tags necessary for
-hacking CSS formatting. The macro wraps the body with three
-headers on top and three on the bottom. It uses
-'render-extra-tags' function along with 'extra-top-' and
-'extra-bottom-' arguments."
-  `(progn
-     (render-extra-tags "extra-top-" 3)
-     ,@body
-     (render-extra-tags "extra-bottom-" 3)))
 
 (defparameter *submit-control-name* "submit"
   "The name of the control responsible for form submission.")
@@ -76,10 +52,9 @@ headers on top and three on the bottom. It uses
                                     (format nil ,submit-fn
                                             (quri:url-encode (or ,action-code ""))
                                             (session-name-string-pair))))
-                (with-extra-tags
-                  (htm (:fieldset
-                        ,@body
-                        (:input :name *action-string* :type "hidden" :value ,action-code))))))
+                (:fieldset
+                 ,@body
+                 (:input :name *action-string* :type "hidden" :value ,action-code))))
        (log-form ,action-code :id ,id :class ,class))))
 
 (defun html-link-wt (&key id class href onclick title content &allow-other-keys)
@@ -460,10 +435,8 @@ for the value.
 (defun empty-list-wt (&key message &allow-other-keys)
   (with-html-to-string
     (:div :class "view"
-     (with-extra-tags 
-       (htm
-         (:div :class "empty"
-          (str message)))))))
+          (:div :class "empty"
+                (str message)))))
 
 (deftemplate :empty-list-wt 'empty-list-wt)
 

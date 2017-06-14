@@ -57,8 +57,7 @@
                 (list
                   (f_%
                     (with-html
-                      (:div :class "header"
-                            (with-extra-tags))
+                      (:div :class "header")
                       (:h1 "Welcome to " (:em "Weblocks!"))
                       (:p "To learn more on how to get started
                           writing " (:em "Weblocks") " applications, please see the "

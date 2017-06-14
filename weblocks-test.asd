@@ -11,8 +11,16 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
-  :depends-on (:weblocks :weblocks-stores :lift :closer-mop :metatilities
-               :anaphora :f-underscore :weblocks-prototype-js)
+  :depends-on (:weblocks
+               ;; This will be separated to another repository
+;;               :weblocks-stores
+               :lift
+               :closer-mop
+               :metatilities
+               :anaphora
+               :f-underscore
+               ;; :weblocks-prototype-js
+               )
   :components ((:module test
                 :components (
                  (:file "weblocks-test")

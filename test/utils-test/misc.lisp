@@ -106,24 +106,6 @@
     (string-whitespace-p " a    ")
   nil)
 
-;;; test render-extra-tags
-(deftest-html render-extra-tags-1
-    (render-extra-tags "test-" 2)
-  (htm (:div :class "test-1" "<!-- empty -->")
-       (:div :class "test-2" "<!-- empty -->")))
-
-;;; test with-extra-tags
-(deftest-html with-extra-tags-1
-    (with-extra-tags
-      (with-html (:div "hi")))
-  (htm (:div :class "extra-top-1" "<!-- empty -->")
-       (:div :class "extra-top-2" "<!-- empty -->")
-       (:div :class "extra-top-3" "<!-- empty -->")
-       (:div "hi")
-       (:div :class "extra-bottom-1" "<!-- empty -->")
-       (:div :class "extra-bottom-2" "<!-- empty -->")
-       (:div :class "extra-bottom-3" "<!-- empty -->")))
-
 ;;; test alist->plist
 (deftest alist->plist-1
     (alist->plist '((hello . world) (blah . test)))

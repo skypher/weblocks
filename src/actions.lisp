@@ -76,7 +76,8 @@ it does not, signals an error."
       (multiple-value-bind (res presentp)
           (webapp-permanent-action function-or-action)
         (declare (ignore res))
-        (if presentp function-or-action
+        (if presentp
+            function-or-action
             (multiple-value-bind (res presentp)
                 (weblocks.session:get-value function-or-action)
               (declare (ignore res))
@@ -124,3 +125,15 @@ raises an assertion."
     (safe-apply action
                 arguments)))
 
+
+;; TODO add to documentation
+(defun make-js-action (action)
+  "Returns a code which can be inserted into onclick attribute and will
+execute given Lisp function on click.
+
+It accepts any function as input and produces a string with JavaScript code.
+"
+  
+  (let* ((action-code (function-or-action->action action)))
+    (format nil "initiateAction(\"~A\", \"~A\"); return false;"
+            action-code (session-name-string-pair))))

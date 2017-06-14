@@ -81,10 +81,8 @@ messages that need to be shown for AJAX effects."
 (defun flash-messages-wt (&key content)
   (with-html-to-string
     (:div :class "view"
-     (with-extra-tags
-       (htm
-         (:ul :class "messages"
-          (str content)))))))
+          (:ul :class "messages"
+               (str content)))))
 
 (deftemplate :flash-messages-wt 'flash-messages-wt)
 

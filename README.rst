@@ -86,6 +86,20 @@ Single test:
                          :suite :widgets/data-editor-suite)
 
 
+Changes from master branch
+==========================
+
+Added
+-----
+
+* make-js-action function
+
+Removed
+-------
+
+* with-extra-tags macro
+* render-extra-tags generic
+
 License
 =======
 
