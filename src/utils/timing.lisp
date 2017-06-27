@@ -8,9 +8,10 @@
 
 (defvar *enable-timings* nil)
 
-(defvar *timing-report-fn* (lambda (name real cpu)
-                             (format t "time spent for ~S (real/cpu): ~F/~F~%"
-                                     name real cpu)))
+(defvar *timing-report-fn*
+  (lambda (name real cpu)
+    (log:debug (format nil "time spent for ~S (real/cpu): ~F/~F~%"
+                       name real cpu))))
 
 (defun report-timing (name real cpu)
   (funcall *timing-report-fn* name real cpu))

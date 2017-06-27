@@ -19,6 +19,8 @@
    :lack-request
    :routes
    :function-cache
+   :local-time
+   :local-time-duration
    ;;   :weblocks-util
 
    ;; TODO: remove this dependency and reverse it
@@ -103,7 +105,10 @@
                               )
                              (:file "application-mop"
                               ;;:depends-on ;; ("weblocks" "server")
-                              )
+                                    )
+                             (:module "js-backend"
+                              :components ((:file "base")
+                                           (:file "jquery")))
                              (:file "application"
                               ;;:depends-on ;; ("weblocks"
                                           ;;  "application-mop")
@@ -127,13 +132,14 @@
                               )
                              (:file "request-hooks"
 ;;                              :depends-on ;; ("weblocks" "debug-mode")
-                              )
+                                    )
+;;                             (:file "response2")
+                             (:file "response")
                              (:file "error-handler"
 ;;                              :depends-on ;; ("weblocks"
                                           ;;  "application"
                                           ;;  "request2")
                                     )
-                             (:file "response")
                              (:file "request-handler"
 ;;                              :depends-on ;; ("session"
                                           ;;  utils "weblocks" "page-template" "debug-mode"

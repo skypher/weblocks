@@ -13,6 +13,7 @@ Contents
 
    introduction
    installation
+   quickstart
    components
    stores
    widgets

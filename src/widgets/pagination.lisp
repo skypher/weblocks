@@ -68,11 +68,11 @@
 (defmethod initialize-instance :after ((obj pagination) &rest initargs)
   (declare (ignore initargs))
   ; Mark error flag for reset on action
-  (push (lambda ()
-          (when (and (slot-value obj 'last-request-error-p)
-                     (not (refresh-request-p)))
-            (setf (slot-value obj 'last-request-error-p) nil)))
-        (request-hook :session :pre-action)))
+  (add-request-hook :session :pre-action
+                    (lambda ()
+                      (when (and (slot-value obj 'last-request-error-p)
+                                 (not (weblocks.request::refresh-request-p)))
+                        (setf (slot-value obj 'last-request-error-p) nil)))))
 
 (defmethod (setf pagination-total-items) :after (value (obj pagination))
   (when (> (pagination-current-page obj)

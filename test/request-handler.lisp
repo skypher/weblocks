@@ -5,17 +5,18 @@
   ())
 
 ;;; testing handle-client-request
-(deftest handle-client-request-0
-    (with-request :get nil
-      (setf (slot-value *request* 'hunchentoot::script-name) "/hello/world/bar.txt")
-      (multiple-value-bind (res err)
-          (ignore-errors
-            (handle-client-request))
-        res))
-  nil)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-0
+;;     (with-request :get nil
+;;       (setf (slot-value *request* 'hunchentoot::script-name) "/hello/world/bar.txt")
+;;       (multiple-value-bind (res err)
+;;           (ignore-errors
+;;             (handle-client-request))
+;;         res))
+;;   nil)
 
 (defwebapp hcr-hello-webapp
-  :js-backend :prototype
+  :js-backend :jquery
   :init-user-session 'hcr-init-user-session)
 (defmethod initialize-instance :after ((self hcr-hello-webapp) &key &allow-other-keys)
   (setf (weblocks::weblocks-webapp-name self) "HCR Hello"))
@@ -106,7 +107,7 @@ onclick='disableIrrelevantButtons(this);' />~
 \"on-load\":null}"))
 
 (defwebapp hcr2-hello-webapp
-  :js-backend :prototype
+  :js-backend :jquery
   :init-user-session 'hcr2-init-user-session
   :dependencies '((:script "weblocks-debug")))
 
@@ -184,17 +185,18 @@ onclick='disableIrrelevantButtons(this);' />~
       :widget-stylesheets '("navigation")
       :title "HCR Hello - Test2"))
 
-(deftest handle-client-request-4
-    (with-request :get nil
-      (let (result1 result2 result3)
-        ;; set the uri
-        (setf (slot-value *request* 'hunchentoot::uri) "/")
-        ;; make sure we handle cookies
-        (setf *session* nil)
-        (catch 'hunchentoot::handler-done
-          (handle-client-request (weblocks::current-webapp)))
-        (string-downcase (header-out :location))))
-  "http://nil/?weblocks-session=1%3atest")
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-4
+;;     (with-request :get nil
+;;       (let (result1 result2 result3)
+;;         ;; set the uri
+;;         (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;         ;; make sure we handle cookies
+;;         (setf *session* nil)
+;;         (catch 'hunchentoot::handler-done
+;;           (handle-client-request (weblocks::current-webapp)))
+;;         (string-downcase (header-out :location))))
+;;   "http://nil/?weblocks-session=1%3atest")
 
 (deftest handle-client-request-5
     (with-test-webapp (:class-name 'hcr-hello-webapp)
@@ -208,88 +210,89 @@ onclick='disableIrrelevantButtons(this);' />~
           ;; do the test
           (unwind-protect
                (progn
-                 (push inc-res (request-hook :application :pre-action))
+                 (add-request-hook :application :pre-action inc-res)
                  (setf pushed-pre t)
-                 (push inc-res (request-hook :application :post-action))
+                 (add-request-hook :application :post-action inc-res)
                  (setf pushed-post t)
                  (handle-client-request (weblocks::current-webapp)))
             (when pushed-post
-              (pop (request-hook :application :post-action)))
+              (remove-request-hook :application :post-action inc-res))
             (when pushed-pre
-              (pop (request-hook :application :pre-action))))
+              (request-hook :application :pre-action inc-res)))
           ;; tear down the application
           (fmakunbound 'hcr-init-user-session)
           res)))
   2)
 
 (deftest handle-client-request-6
-    (with-test-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get nil :uri "/hcr-hello-webapp/"
-        (let ((res 0))
-          ;; set up our mini-application
-          (declare (special *request-hook*))
-          (defun hcr-init-user-session (comp) nil)
-          ;; start the session
-          (start-session)
-          ;; do the test
-          (push (lambda ()
-                  (incf res))
-                (request-hook :session :pre-render))
-          (push (lambda ()
-                  (incf res))
-                (request-hook :session :post-render))
-          (handle-client-request (weblocks::current-webapp))
-          ;; tear down the application
-          (fmakunbound 'hcr-init-user-session)
-          res)))
+  (with-test-webapp (:class-name 'hcr-hello-webapp)
+    (with-request :get nil :uri "/hcr-hello-webapp/"
+                  (let ((res 0))
+                    ;; set up our mini-application
+                    (declare (special *request-hook*))
+                    (defun hcr-init-user-session (comp) nil)
+                    ;; start the session
+                    (start-session)
+                    ;; do the test
+                    (add-request-hook :session :pre-render
+                                      (lambda ()
+                                        (incf res)))
+                    (add-request-hook :session :post-render
+                                      (lambda ()
+                                        (incf res)))
+                    (handle-client-request (weblocks::current-webapp))
+                    ;; tear down the application
+                    (fmakunbound 'hcr-init-user-session)
+                    res)))
   2)
 
 (deftest handle-client-request-7
-    (with-test-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get nil :uri "/hcr-hello-webapp/"
-        (let ((res 0))
-          ;; start the session
-          (start-session)
-          ;; set up our mini-application
-          (defun hcr-init-user-session (comp)
-            (push (lambda ()
-                    (incf res))
-                  (request-hook :request :pre-action))
-            (push (lambda ()
-                    (incf res))
-                  (request-hook :request :post-render)))
-          ;; do the test
-          (handle-client-request (weblocks::current-webapp))
-          ;; tear down the application
-          (fmakunbound 'hcr-init-user-session)
-          res)))
+  (with-test-webapp (:class-name 'hcr-hello-webapp)
+    (with-request :get nil :uri "/hcr-hello-webapp/"
+                  (let ((res 0))
+                    ;; start the session
+                    (start-session)
+                    ;; set up our mini-application
+                    (defun hcr-init-user-session (comp)
+                      (add-request-hook :request :pre-action
+                                        (lambda ()
+                                          (incf res)))
+                      (add-request-hook :request :post-render
+                                        (lambda ()
+                                          (incf res))))
+                    ;; do the test
+                    (handle-client-request (weblocks::current-webapp))
+                    ;; tear down the application
+                    (fmakunbound 'hcr-init-user-session)
+                    res)))
   2)
 
-(deftest handle-client-request-8
-    (with-test-webapp (:class-name 'hcr-hello-webapp)
-      (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
-          :uri "/hcr-hello-webapp/"
-        (let ((res 0))
-          ;; start the session
-          (start-session)
-          ;; action
-          (make-action (lambda (&rest args)
-                         (incf res)))
-          ;; set up our mini-application
-          (defun hcr-init-user-session (comp)
-            (push (lambda ()
-                    (incf res))
-                  (request-hook :request :pre-action))
-            (push (lambda ()
-                    (incf res))
-                  (request-hook :request :post-render)))
-          ;; do the test
-          (catch 'hunchentoot::handler-done
-            (handle-client-request (weblocks::current-webapp)))
-          ;; tear down the application
-          (fmakunbound 'hcr-init-user-session)
-          res)))
-  1)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-8
+;;   (with-test-webapp (:class-name 'hcr-hello-webapp)
+;;     (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
+;;                   :uri "/hcr-hello-webapp/"
+;;                   (let ((res 0))
+;;                     ;; start the session
+;;                     (start-session)
+;;                     ;; action
+;;                     (make-action (lambda (&rest args)
+;;                                    (incf res)))
+;;                     ;; set up our mini-application
+;;                     (defun hcr-init-user-session (comp)
+;;                       (add-request-hook :request :pre-action
+;;                                         (lambda ()
+;;                                           (incf res)))
+;;                       (add-request-hook :request :post-render
+;;                                         (lambda ()
+;;                                           (incf res))))
+;;                     ;; do the test
+;;                     (catch 'hunchentoot::handler-done
+;;                       (handle-client-request (weblocks::current-webapp)))
+;;                     ;; tear down the application
+;;                     (fmakunbound 'hcr-init-user-session)
+;;                     res)))
+;;   1)
 
 #+(or)
 (deftest handle-client-request-9
@@ -310,69 +313,72 @@ onclick='disableIrrelevantButtons(this);' />~
         "<div class='widget function'></div>"
       :title "HCR Hello - Some Page"))
 
-(deftest handle-client-request-10
-    (with-request :get '(("action" . "abc123"))
-      (let ((res 0))
-        ;; set up mini application
-        (declare (special *request-hook*))
-        (start-session)
-        ;; set the uri
-        (setf (slot-value *request* 'hunchentoot::uri) "/")
-        ;; prepare action
-        (make-action (lambda (&rest args)
-                       nil)
-                     "abc123")
-        ;; prepare hooks
-        (push (lambda ()
-                (incf res))
-              (request-hook :session :pre-action))
-        (push (lambda ()
-                (incf res))
-              (request-hook :session :post-action))
-        ;; prepare dummy app
-        (setf (root-composite) (make-instance 'composite))
-        ;; make sure we redirect to hide ugly URLs
-        (catch 'hunchentoot::handler-done
-          (handle-client-request (weblocks::current-webapp)))
-        ;; result
-        (values (string-downcase (header-out :location)) res)))
-  "http://nil/?weblocks-session=1%3atest" 2)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-10
+;;   (with-request :get '(("action" . "abc123"))
+;;                 (let ((res 0))
+;;                   ;; set up mini application
+;;                   (declare (special *request-hook*))
+;;                   (start-session)
+;;                   ;; set the uri
+;;                   (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;                   ;; prepare action
+;;                   (make-action (lambda (&rest args)
+;;                                  nil)
+;;                                "abc123")
+;;                   ;; prepare hooks
+;;                   (add-request-hook :session :pre-action
+;;                                     (lambda ()
+;;                                       (incf res)))
+;;                   (add-request-hook :session :post-action
+;;                                     (lambda ()
+;;                                       (incf res)))
+;;                   ;; prepare dummy app
+;;                   (setf (root-composite) (make-instance 'composite))
+;;                   ;; make sure we redirect to hide ugly URLs
+;;                   (catch 'hunchentoot::handler-done
+;;                     (handle-client-request (weblocks::current-webapp)))
+;;                   ;; result
+;;                   (values (string-downcase (header-out :location)) res)))
+;;   "http://nil/?weblocks-session=1%3atest" 2)
 
-(deftest handle-client-request-11
-    (with-request :get '(("action" . "abc123"))
-      (make-request-ajax)
-      (start-session)
-      ;; set the uri
-      (setf (slot-value *request* 'hunchentoot::uri) "/")
-      ;; prepare action
-      (make-action (lambda (&rest args)
-                     nil)
-                   "abc123")
-      ;; prepare dummy app
-      (setf (root-composite) (make-instance 'composite))
-      ;; make sure we redirect to hide ugly URLs
-      (catch 'hunchentoot::handler-done
-        (handle-client-request (weblocks::current-webapp)))
-      ;; result
-      (header-out :location))
-  nil)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-11
+;;     (with-request :get '(("action" . "abc123"))
+;;       (make-request-ajax)
+;;       (start-session)
+;;       ;; set the uri
+;;       (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;       ;; prepare action
+;;       (make-action (lambda (&rest args)
+;;                      nil)
+;;                    "abc123")
+;;       ;; prepare dummy app
+;;       (setf (root-composite) (make-instance 'composite))
+;;       ;; make sure we redirect to hide ugly URLs
+;;       (catch 'hunchentoot::handler-done
+;;         (handle-client-request (weblocks::current-webapp)))
+;;       ;; result
+;;       (header-out :location))
+;;   nil)
 
-(deftest handle-client-request-12
-    (with-request :get nil
-      ;; set up mini application
-      (start-session)
-      ;; set the uri
-      (setf (slot-value *request* 'hunchentoot::uri) "/")
-      ;; prepare dummy app
-      (setf (root-composite) (make-instance 'composite))
-      ;; make sure we redirect to hide ugly URLs
-      (catch 'hunchentoot::handler-done
-        (handle-client-request (weblocks::current-webapp)))
-      ;; clean up app
-      (fmakunbound 'init-user-session)
-      ;; result
-      (header-out :location))
-  nil)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-12
+;;     (with-request :get nil
+;;       ;; set up mini application
+;;       (start-session)
+;;       ;; set the uri
+;;       (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;       ;; prepare dummy app
+;;       (setf (root-composite) (make-instance 'composite))
+;;       ;; make sure we redirect to hide ugly URLs
+;;       (catch 'hunchentoot::handler-done
+;;         (handle-client-request (weblocks::current-webapp)))
+;;       ;; clean up app
+;;       (fmakunbound 'init-user-session)
+;;       ;; result
+;;       (header-out :location))
+;;   nil)
 
 (defmethod begin-transaction :after (store)
   (declare (special *res*))
@@ -392,55 +398,57 @@ onclick='disableIrrelevantButtons(this);' />~
              (boundp '*res*))
     (decf *res*)))
 
-(deftest handle-client-request-13
-    (with-request :post '(("action" . "abc123"))
-      (let ((*res* 0))
-        ;; set up mini application
-        (declare (special *request-hook* *res*))
-        (make-request-ajax)
-        (start-session)
-        ;; set the uri
-        (setf (slot-value *request* 'hunchentoot::uri) "/")
-        ;; prepare action
-        (make-action (lambda (&rest args)
-                       nil)
-                     "abc123")
-        ;; prepare dummy app
-        (setf (root-composite) (make-instance 'composite))
-        ;; handle the request
-        (catch 'hunchentoot::handler-done
-          (handle-client-request (weblocks::current-webapp)))
-        ;; result
-        *res*))
-  2)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-13
+;;     (with-request :post '(("action" . "abc123"))
+;;       (let ((*res* 0))
+;;         ;; set up mini application
+;;         (declare (special *request-hook* *res*))
+;;         (make-request-ajax)
+;;         (start-session)
+;;         ;; set the uri
+;;         (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;         ;; prepare action
+;;         (make-action (lambda (&rest args)
+;;                        nil)
+;;                      "abc123")
+;;         ;; prepare dummy app
+;;         (setf (root-composite) (make-instance 'composite))
+;;         ;; handle the request
+;;         (catch 'hunchentoot::handler-done
+;;           (handle-client-request (weblocks::current-webapp)))
+;;         ;; result
+;;         *res*))
+;;   2)
 
-(deftest handle-client-request-14
-    (with-request :get '(("action" . "abc123"))
-      (let ((weblocks::*render-debug-toolbar* nil) (*res* 0))
-        ;; set up mini application
-        (declare (special *request-hook* *res*))
-        (make-request-ajax)
-        (start-session)
-        ;; set the uri
-        (setf (slot-value *request* 'hunchentoot::uri) "/")
-        ;; prepare action
-        (make-action (lambda (&rest args)
-                       (error "foo"))
-                     "abc123")
-        ;; prepare dummy app
-        (setf (root-composite) (make-instance 'composite))
-        ;; handle the request
-        (catch 'hunchentoot::handler-done
-          (ignore-errors
-            (handle-client-request (weblocks::current-webapp))))
-        ;; clean up app
-        (fmakunbound 'init-user-session)
-        ;; result
-        *res*))
-  0)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest handle-client-request-14
+;;     (with-request :get '(("action" . "abc123"))
+;;       (let ((weblocks::*render-debug-toolbar* nil) (*res* 0))
+;;         ;; set up mini application
+;;         (declare (special *request-hook* *res*))
+;;         (make-request-ajax)
+;;         (start-session)
+;;         ;; set the uri
+;;         (setf (slot-value *request* 'hunchentoot::uri) "/")
+;;         ;; prepare action
+;;         (make-action (lambda (&rest args)
+;;                        (error "foo"))
+;;                      "abc123")
+;;         ;; prepare dummy app
+;;         (setf (root-composite) (make-instance 'composite))
+;;         ;; handle the request
+;;         (catch 'hunchentoot::handler-done
+;;           (ignore-errors
+;;             (handle-client-request (weblocks::current-webapp))))
+;;         ;; clean up app
+;;         (fmakunbound 'init-user-session)
+;;         ;; result
+;;         *res*))
+;;   0)
 
 (defwebapp broken-init
-  :js-backend :prototype
+  :js-backend :jquery
   :init-user-session 'broken-init-user-session)
 
 (defun broken-init-user-session (rootcomp)

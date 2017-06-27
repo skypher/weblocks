@@ -26,31 +26,31 @@
 ;;; rendering. On ajax calls the BlindUp effect is added.
 (defmethod initialize-instance :after ((obj flash) &rest initargs)
   (declare (ignore initargs))
-  (push (lambda ()
-          (when (and (flash-messages obj)
-                     (not (refresh-request-p))
-                     (not (initial-request-p))
-                     (not (redirect-request-p)))
-            (setf (flash-old-messages obj) (flash-messages obj))
-            (setf (flash-messages obj) nil)))
-        (request-hook :session :pre-action))
-  (push (lambda ()
-          (declare (special *on-ajax-complete-scripts*))
-          (when (and (ajax-request-p)
-                     (flash-old-messages obj))
-            (if (flash-messages obj)
-                (send-script
-                  (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
-                                                             (create :pulses 3 :duration 0.5)))))
-                (send-script
-                  (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj))))))))
-        (request-hook :session :post-action))
-  (push (lambda ()
-          (declare (special *on-ajax-complete-scripts*))
-          (when (and (null (flash-messages obj))
-                     (flash-old-messages obj))
-            (setf (flash-old-messages obj) nil)))
-        (request-hook :session :post-render)))
+  (add-request-hook :session :pre-action
+                    (lambda ()
+                      (when (and (flash-messages obj)
+                                 (not (weblocks.request::refresh-request-p))
+                                 (not (initial-request-p))
+                                 (not (redirect-request-p)))
+                        (setf (flash-old-messages obj) (flash-messages obj))
+                        (setf (flash-messages obj) nil))))
+  (add-request-hook :session :post-action
+                (lambda ()
+                  (declare (special *on-ajax-complete-scripts*))
+                  (when (and (ajax-request-p)
+                             (flash-old-messages obj))
+                    (if (flash-messages obj)
+                        (send-script
+                         (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
+                                     (create :pulses 3 :duration 0.5)))))
+                        (send-script
+                         (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj)))))))))
+  (add-request-hook :session :post-render
+                    (lambda ()
+                      (declare (special *on-ajax-complete-scripts*))
+                      (when (and (null (flash-messages obj))
+                                 (flash-old-messages obj))
+                        (setf (flash-old-messages obj) nil)))))
 
 (defun flash-messages-to-show (flash)
   "Returns a list of messages that need to be shown or nil if there is

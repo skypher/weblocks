@@ -131,7 +131,7 @@ customize behavior."))
               (unless finished?
                 (setf (root-widget) nil)
                 (reset-webapp-session))))
-          (push 'update-dialog-on-request (request-hook :session :post-action)))
+          (add-request-hook :session :post-action 'update-dialog-on-request))
         (when (and *rewrite-for-session-urls*
                    (cookie-in (session-cookie-name *weblocks-server*)))
           (redirect (remove-session-from-uri (request-uri*)))))
@@ -347,6 +347,5 @@ association list. This function is normally called by
   
 ;; a default dynamic-action hook function wraps actions in a transaction
 (eval-when (:load-toplevel)
-  (pushnew 'action-txn-hook
-           (request-hook :application :dynamic-action)))
+  (add-request-hook :application :dynamic-action 'action-txn-hook))
 

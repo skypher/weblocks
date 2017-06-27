@@ -31,7 +31,7 @@
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (weblocks.session:get-value 'last-unique-id) -1))))
-    (setf (weblocks.session:get-value 'last-unique-id) new-widget-id)
+    (weblocks.session:set-value 'last-unique-id new-widget-id)
     (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
 
 (defun safe-apply (fn &rest args)
@@ -170,6 +170,7 @@ answering its result."
 
 (defmacro with-file-write ((stream-name path &key (element-type ''base-char))
                            &body body)
+  "Ensures that directories exists, then opens a file for write and executes a body."
   `(progn
      (ensure-directories-exist ,path)
      (with-open-file (,stream-name ,path :direction :output

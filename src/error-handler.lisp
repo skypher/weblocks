@@ -6,23 +6,28 @@
 (defun error-page-html-wt (&key title heading description content &allow-other-keys)
   (with-html-to-string
     (:html
-      (:head
-        (:title (str title))
-        (:link :rel "stylesheet" :type "text/css" :href "/weblocks-common/pub/stylesheets/error-page.css"))
-      (:body ; TODO date
-        (:h1 (:img :src "/weblocks-common/pub/images/weblocks-alien-small.png")
-         (str heading))
-        (when description
-          (htm (:h2 "Description")
-               (:p (:tt (str description)))))
-        (str content)
-        (when (or description content)
-          (htm (:hr)))
-        (:div :class "footer"
-         "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
-         " running on " (str (format nil "~A:~A"
-                                     (weblocks.request:request-server-name)
-                                     (weblocks.request:request-server-port))))))))
+     (:head
+      (:title (str title))
+      (:link :rel "stylesheet" :type "text/css" :href "/weblocks-common/pub/stylesheets/error-page.css"))
+     (:body                             ; TODO date
+      (:h1 (esc heading))
+      (when description
+        (htm (:h2 "Description")
+             (:p (:tt (esc description)))))
+      (str content)
+      (when (or description content)
+        (htm (:hr)))
+      (:table :class "footer"
+              :width "100%"
+              (:tr :valign "center"
+                   (:td :width "10"
+                    (:img :src "http://40ants.com/img/made-with-lisp.svg"
+                          :width "60"))
+                   (:td 
+                    "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
+                    " running on " (esc (format nil "~A:~A"
+                                                (weblocks.request:request-server-name)
+                                                (weblocks.request:request-server-port))))))))))
 
 (deftemplate :error-page-html-wt 'error-page-html-wt)
 
@@ -49,10 +54,7 @@
   "Print a pretty platform-specific backtrace if possible;
 otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
 
-  (let ((html (if *show-lisp-errors-p* 
-                  (with-error-page-html ("500 Internal Server Error" "Error caught" "")
-                    (:p "There was an unexpected error."))
-
+  (let ((html (if *show-lisp-errors-p*
                   ;; when verbose error should be reported
                   (with-error-page-html ("500 Weblocks Error" "Weblocks caught an error"
                                                               (escape-string (format nil "~A: ~A" (type-of c) c)))
@@ -65,7 +67,7 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
                       (:tr
                        (:th "") (:th "Key") (:th "Value")))
                      (:tbody
-                      (let ((session-data (webapp-session-hash)))
+                      (let ((session-data weblocks.session::*session*))
                         (loop for i from 1
                               for key being the hash-key of session-data 
                               for value being the hash-value of session-data 
@@ -100,9 +102,15 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
                                         (:td :class "frame-args"
                                              (:ol
                                               (dolist (arg (cdr frame))
-                                                (htm (:li (:code (esc (format nil "~A" arg)))))))))))))))))))
+                                                (htm (:li (:code (esc (format nil "~A" arg))))))))))))))))
 
-    (log:debug "Returning 500 error to user")
+                  ;; otherwise - just render a short message
+                  (with-error-page-html ("500 Internal Server Error" "Error caught" "")
+                    (:p "There was an unexpected error.")))))
+
+    (let ((traceback (print-trivial-backtrace c)))
+      (log:error "Returning 500 error to user" traceback))
+    
     (weblocks.response:abort-processing html
                                         :content-type "text/html"
                                         :code 500)))

@@ -4,7 +4,7 @@
 
 Load weblocks and create a package for a sandbox:
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
           
    CL-USER> (ql:quickload :weblocks)
    CL-USER> (defpackage todo (:use :cl :weblocks))
@@ -14,14 +14,14 @@ Load weblocks and create a package for a sandbox:
 
 Now, create an application:
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
 
    TODO> (defwebapp tasks)
    TODO> (start-webapp 'tasks)
    TODO> (weblocks.server:start-weblocks)
 
-Open `http://localhost:8080/tasks/`_ in your browser and you'll see a
-text like that:
+Open `<http://localhost:8080/tasks/>`_ in your browser and you'll see a
+text like that::
 
   No init-user-session
 
@@ -35,13 +35,17 @@ text like that:
           (lambda ()
             (with-html
                (:h1 "Hello world!")))))
+
+  (defwebapp your-app
+     ;; some-options
+     :init-user-session 'init-user-session)
                
   Read more in documentaion.
 
 It means that you didn't write any code for your application. Let's do
 it now and make an application which outputs a list of tasks.
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
 
    TODO> (defun init-user-session (root)
            (let ((tasks '("Make my first app in Weblocks"
@@ -60,7 +64,7 @@ list in a memory. Then it renders these tasks as HTML ``ul`` block.
 
 Restart application:
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
 
    TODO> (progn (weblocks:restart-webapp 'tasks)
                 (weblocks.session:reset-latest-session))
@@ -74,7 +78,7 @@ into it.
 
 Write a new ``init-user-session`` in the repl:
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
                                   
    TODO> (defun init-user-session (root)
            (let ((tasks '("Make my first app in Weblocks"
@@ -100,7 +104,7 @@ Write a new ``init-user-session`` in the repl:
 Pay attention to two new blocks in this code. Now it have inner function
 ``add-task``:
 
-.. code:: common-lisp
+.. code-block:: common-lisp
 
    (add-task (&rest rest &key task &allow-other-keys)
      (push task tasks)
@@ -118,7 +122,7 @@ same technic can be used to update a smaller piecese, called :ref:`widgets`.
 
 Another block in our new version of init-user-session is a form:
 
-.. code:: common-lisp
+.. code-block:: common-lisp
 
    (with-html-form (:POST #'add-task)
       (:input :type "text"
@@ -136,13 +140,13 @@ form submit.
           server-side, because action can be any lisp function, even an
           anonymous lambda, closuring all necessary variables.
 
-Restart application an reload a page. Test your form now and see in a
+Restart application and reload a page. Test your form now and see in a
 `Webinspector`_ how weblocks sends requests to the server and receives
 HTML code with rendered HTML block.
 
 Now we'll our application really useful – add a code to toggle tasks:
 
-.. code:: common-lisp-repl
+.. code-block:: common-lisp-repl
 
    TODO> (defstruct task
            (title)
@@ -194,7 +198,7 @@ This code have following significant changes:
 * Now we store our tasks as structures to be able to change their state
   easily:
   
-  .. code:: common-lisp
+  .. code-block:: common-lisp
 
      (defstruct task
         (title)
@@ -205,20 +209,20 @@ This code have following significant changes:
 
 * Next change is a small helper to toggle done attribute:
 
-  .. code:: common-lisp
+  .. code-block:: common-lisp
 
-  (toggle-task (task)
-     (setf (task-done task)
-     (if (task-done task)
-       nil
-       t))
-     (mark-dirty root))
+     (toggle-task (task)
+        (setf (task-done task)
+        (if (task-done task)
+          nil
+          t))
+        (mark-dirty root))
 
 * And finally, we've modified our task rendering function by adding a
   code to render a checkbox with an anonymous lisp function, attached to
   it's ``onclick`` attribute:
 
-  .. code:: common-lisp
+  .. code-block:: common-lisp
 
      (with-html
         (:p (:input :type "checkbox"
@@ -237,7 +241,15 @@ This code have following significant changes:
   returns on this callback a new prerendered HTML with all tasks.
   Next I'll show how to rerender only a single task on such changes.
 
-  .. note:: As a homework, play with lambdas and add a "Delete" button
-            next after each task.
+What is next?
+=============
 
-_Webinspector: http://TODO
+As a homework:
+
+1. Play with lambdas and add a "Delete" button next after
+   each task.
+2. Add ability to sort tasks by name or by completion flag.
+3. Read rest of documentation and make real application, using the full
+   power of the Common Lisp.
+
+.. _Webinspector: https://developers.google.com/web/tools/chrome-devtools/inspect-styles/

@@ -42,7 +42,7 @@ extensions = [
 from os.path import join, dirname, realpath, expandvars
 cl_systems = [
     {
-        'name': 'weblocks-test',
+        'name': 'weblocks',
         'path': join(dirname(realpath(__file__)), '../../'),
         'packages': [
             'weblocks',

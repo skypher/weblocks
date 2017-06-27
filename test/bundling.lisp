@@ -12,43 +12,45 @@
   (let ((path1 (merge-pathnames "test1" *temp-bundles-folder*))
         (path2 (merge-pathnames "test2" *temp-bundles-folder*))
         (path3 (merge-pathnames "test3" *temp-bundles-folder*)))
-    (weblocks:with-file-write (stream path1)
+    (weblocks::with-file-write (stream path1)
       (write-string "test1" stream))
-    (weblocks:with-file-write (stream path2)
+    (weblocks::with-file-write (stream path2)
       (write-string "test2" stream))
     (weblocks::merge-files-with-newline (list path1 path2) path3)
     (ensure-same (weblocks::slurp-file path3)
                  "test1
 test2")))
 
-(defun make-prototype-dependency (url path)
-  (make-instance 'weblocks:script-dependency 
-                 :url (weblocks-utils:prepend-webapp-path url)     
-                 :local-path (merge-pathnames  path (weblocks::asdf-system-directory :weblocks-prototype-js))))
+;; TODO: dependency bundling should be reimplemented for a new style dependencies
+;;
+;; (defun make-prototype-dependency (url path)
+;;   (make-instance 'weblocks:script-dependency 
+;;                  :url (weblocks-utils:prepend-webapp-path url)     
+;;                  :local-path (merge-pathnames  path (weblocks::asdf-system-directory :weblocks-prototype-js))))
 
-(defun make-test-dependencies-1 ()
-  (let ((test-deps (list 
-                     (make-local-dependency :stylesheet "isearch")
-                     (make-prototype-dependency "/pub/scripts/prototype-backend/weblocks-debug.js" #p"scripts/weblocks-debug.js")
-                     (make-instance 'stylesheet-dependency :url "/pub/stylesheets/datagrid-import.css")
-                     (make-local-dependency :stylesheet "datagrid")
-                     (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js"))))
-    (push (make-instance 'stylesheet-dependency :url #U"http://example.com/external.css")
-          test-deps)
-    (push (make-instance 'script-dependency :url #U"http://example.com/external.js")
-          test-deps)
-    test-deps))
+;; (defun make-test-dependencies-1 ()
+;;   (let ((test-deps (list 
+;;                      (make-local-dependency :stylesheet "isearch")
+;;                      (make-prototype-dependency "/pub/scripts/prototype-backend/weblocks-debug.js" #p"scripts/weblocks-debug.js")
+;;                      (make-instance 'stylesheet-dependency :url "/pub/stylesheets/datagrid-import.css")
+;;                      (make-local-dependency :stylesheet "datagrid")
+;;                      (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js"))))
+;;     (push (make-instance 'stylesheet-dependency :url #U"http://example.com/external.css")
+;;           test-deps)
+;;     (push (make-instance 'script-dependency :url #U"http://example.com/external.js")
+;;           test-deps)
+;;     test-deps))
 
-(defun make-test-dependencies-2 ()
-  (list 
-    (make-local-dependency :stylesheet "suggest")
-    (make-prototype-dependency "/pub/scripts/prototype-backend/dialog.js" #p"scripts/dialog.js")
-    (make-local-dependency :stylesheet "isearch")
-    (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js")))
+;; (defun make-test-dependencies-2 ()
+;;   (list 
+;;     (make-local-dependency :stylesheet "suggest")
+;;     (make-prototype-dependency "/pub/scripts/prototype-backend/dialog.js" #p"scripts/dialog.js")
+;;     (make-local-dependency :stylesheet "isearch")
+;;     (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js")))
 
-(defun make-test-dependencies-3 ()
-  (list (make-prototype-dependency "/pub/scripts/prototype-backend/dialog.js" #p"scripts/dialog.js")
-        (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js")))
+;; (defun make-test-dependencies-3 ()
+;;   (list (make-prototype-dependency "/pub/scripts/prototype-backend/dialog.js" #p"scripts/dialog.js")
+;;         (make-prototype-dependency "/pub/scripts/prototype-backend/sound.js" #p"scripts/sound.js")))
 
 (defun make-test-dependencies-4 ()
   (mapcar (lambda (x) (apply #'make-local-dependency x))

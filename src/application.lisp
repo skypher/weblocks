@@ -72,7 +72,11 @@
   (setf (widget-children root)
         (lambda ()
           (with-html
-            (:h1 \"Hello world!\")))))"))
+            (:h1 \"Hello world!\")))))
+
+(defwebapp your-app
+   ;; some-options
+   :init-user-session \'init-user-session)"))
 
             ;; TODO: add a link to a Quickstart
             (:p "Read more in "
@@ -528,7 +532,8 @@ to my `application-dependencies' slot."
 (defmethod finalize-webapp :after ((app weblocks-webapp))
   "Shutdown Weblocks when no more apps are running."
   (when (null *active-webapps*)
-    (stop-weblocks)))
+    ;; TODO: break this tie
+    (funcall (intern "STOP-WEBLOCKS" :weblocks.server))))
 
 (defun find-app (name)
   "Returns registered webapp by its NAME
@@ -562,11 +567,13 @@ provider URI)."
 
 
 ;;; webapp-scoped session values
-(defun webapp-session-key (&optional (webapp *current-webapp*))
-  (weblocks-webapp-session-key webapp))
+;; 
+;; (defun webapp-session-key (&optional (webapp *current-webapp*))
+;;   (weblocks-webapp-session-key webapp))
 
-(defun webapp-session-hash (&optional (session *session*) (webapp *current-webapp*))
-  (session-value (webapp-session-key webapp) session))
+;; Replaced with weblocks.session:*session*
+;; (defun webapp-session-hash (&optional (session *session*) (webapp *current-webapp*))
+;;   (session-value (webapp-session-key webapp) session))
 
 ;;
 ;; Permanent actions
@@ -578,7 +585,7 @@ provider URI)."
 
 (defun webapp-permanent-action (action)
   "Returns the action function associated with this symbol in the current webapp"
-  (when *current-webapp*
+  (when (boundp '*current-webapp*)
     (let ((action-table (webapp-permanent-actions *current-webapp*)))
       (when action-table
         (gethash (if (symbolp action) (symbol-name action) action)

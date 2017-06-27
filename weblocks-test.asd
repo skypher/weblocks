@@ -15,12 +15,15 @@
                ;; This will be separated to another repository
 ;;               :weblocks-stores
                :lift
+               :prove ;; will change lift with prove soon
+               :lack-test
                :closer-mop
                :metatilities
                :anaphora
                :f-underscore
                ;; :weblocks-prototype-js
                )
+  :serial t
   :components ((:module test
                 :components (
                  (:file "weblocks-test")
@@ -45,9 +48,12 @@
                  (:file "actions"
                         :depends-on ("test-code"))
                  (:file "uri-tokens"
-                        :depends-on ("test-code"))
+                  :depends-on ("test-code"))
+                 (:file "utils2")
+                 (:file "request-hooks2")
                  (:file "request-hooks"
-                        :depends-on ("test-code"))
+;                        :depends-on ("test-code")
+                        )
                  (:file "request-handler-utils"
                         :depends-on ("test-code"))
                  (:file "request-handler"
@@ -73,83 +79,89 @@
                                        (:file "html-utils-helper")
                                        (:file "html-utils"
                                               :depends-on ("html-utils-helper")))
-                          :depends-on ("test-code" fixtures))
-                 (:module views
-                          :components ((:module view
-                                                :components ((:file "view")
-                                                             (:file "compiler")
-                                                             (:file "scaffold")
-                                                             (:file "utils")))
-                                       (:module dataview
-                                                :components ((:file "test-template")
-                                                             (:file "dataview"
-                                                                    :depends-on ("test-template"))))
-                                       (:module formview
-                                                :components ((:file "test-template")
-                                                             (:file "formview"
-                                                                    :depends-on ("test-template"))
-                                                             (:file "helpers")
-                                                             (:file "parser")
-                                                             (:file "scaffold")
-                                                             (:file "validation")
-                                                             (:file "request-deserialization"))
-                                                :depends-on (dataview))
-                                       (:module tableview
-                                                :components ((:file "test-template")
-                                                             (:file "tableview"
-                                                                    :depends-on ("test-template")))
-                                                :depends-on (dataview))
-                                       (:file "sequence-view"
-                                              :depends-on (view))
-                                       (:module types
-                                                :components ((:file "boolean")
-                                                             (:file "member")
-                                                             (:file "password")
-                                                             (:file "us-states")
-                                                             (:module parsers
-                                                                      :components ((:file "common")))
-                                                             (:module presentations
-                                                                      :components ((:file "choices")
-                                                                                   (:file "dropdown")
-                                                                                   (:file "radio")
-                                                                                   (:file "excerpt")
-                                                                                   (:file "paragraph")
-                                                                                   (:file "textarea")
-                                                                                   (:file "image")
-                                                                                   (:file "date")
-                                                                                   (:file "url"))))))
-                          :depends-on ("test-code" fixtures snippets))
+                  :depends-on ("test-code" fixtures))
+                 ;; TODO: move these tests into a separate repository
+                 ;; (:module views
+                 ;;          :components ((:module view
+                 ;;                                :components ((:file "view")
+                 ;;                                             (:file "compiler")
+                 ;;                                             (:file "scaffold")
+                 ;;                                             (:file "utils")))
+                 ;;                       (:module dataview
+                 ;;                                :components ((:file "test-template")
+                 ;;                                             (:file "dataview"
+                 ;;                                                    :depends-on ("test-template"))))
+                 ;;                       (:module formview
+                 ;;                                :components ((:file "test-template")
+                 ;;                                             (:file "formview"
+                 ;;                                                    :depends-on ("test-template"))
+                 ;;                                             (:file "helpers")
+                 ;;                                             (:file "parser")
+                 ;;                                             (:file "scaffold")
+                 ;;                                             (:file "validation")
+                 ;;                                             (:file "request-deserialization"))
+                 ;;                                :depends-on (dataview))
+                 ;;                       (:module tableview
+                 ;;                                :components ((:file "test-template")
+                 ;;                                             (:file "tableview"
+                 ;;                                                    :depends-on ("test-template")))
+                 ;;                                :depends-on (dataview))
+                 ;;                       (:file "sequence-view"
+                 ;;                              :depends-on (view))
+                 ;;                       (:module types
+                 ;;                                :components ((:file "boolean")
+                 ;;                                             (:file "member")
+                 ;;                                             (:file "password")
+                 ;;                                             (:file "us-states")
+                 ;;                                             (:module parsers
+                 ;;                                                      :components ((:file "common")))
+                 ;;                                             (:module presentations
+                 ;;                                                      :components ((:file "choices")
+                 ;;                                                                   (:file "dropdown")
+                 ;;                                                                   (:file "radio")
+                 ;;                                                                   (:file "excerpt")
+                 ;;                                                                   (:file "paragraph")
+                 ;;                                                                   (:file "textarea")
+                 ;;                                                                   (:file "image")
+                 ;;                                                                   (:file "date")
+                 ;;                                                                   (:file "url"))))))
+                 ;;          :depends-on ("test-code" fixtures snippets))
                  (:module widgets
                           :components ((:module widget
                                                 :components ((:file "widget")
                                                              (:file "widget-mop")))
-                                       (:file "dataform")
-                                       (:file "data-editor")
-                                       (:file "quickform")
-                                       (:file "login")
-                                       (:file "flash")
-                                       (:file "datalist")
-                                       (:file "listedit")
-                                       (:module dataseq
-                                                :components ((:file "dataseq")))
-                                       (:module dataedit
-                                                :components ((:file "dataedit")
-                                                             (:file "delete-action")))
-                                       (:module datagrid
-                                                :components ((:file "datagrid")
-                                                             (:file "sort")
-                                                             (:file "select")
-                                                             (:file "drilldown"))
-                                                :depends-on ("pagination-utils"))
-                                       (:file "gridedit"
-                                              :depends-on ("pagination-utils"))
-                                       (:file "selector")
-                                       (:file "navigation")
-                                       (:file "pagination-utils")
-                                       (:file "pagination"
-                                              :depends-on ("pagination-utils"))
-                                       (:file "composite"))
-                          :depends-on ("versioning" "test-code" fixtures views))
+                                       (:file "composite")
+                                       ;; (:file "dataform")
+                                       ;; (:file "data-editor")
+                                       ;; (:file "quickform")
+                                       ;; (:file "login")
+                                       ;; (:file "flash")
+                                       ;; (:file "datalist")
+                                       ;; (:file "listedit")
+                                       ;; (:module dataseq
+                                       ;;          :components ((:file "dataseq")))
+                                       ;; (:module dataedit
+                                       ;;          :components ((:file "dataedit")
+                                       ;;                       (:file "delete-action")))
+                                       ;; (:module datagrid
+                                       ;;          :components ((:file "datagrid")
+                                       ;;                       (:file "sort")
+                                       ;;                       (:file "select")
+                                       ;;                       (:file "drilldown"))
+                                       ;;          :depends-on ("pagination-utils"))
+                                       ;; (:file "gridedit"
+                                       ;;        :depends-on ("pagination-utils"))
+                                       ;; (:file "selector")
+                                       ;; (:file "navigation")
+                                       ;; (:file "pagination-utils")
+                                       ;; (:file "pagination"
+                                       ;;        :depends-on ("pagination-utils"))
+                                       )
+                  :depends-on ("versioning"
+                               "test-code"
+                               fixtures
+                               ;; views
+                               ))
                  (:module control-flow
                           :components ((:file "call-answer")
                                        (:file "dialog")

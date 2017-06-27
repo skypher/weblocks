@@ -99,6 +99,33 @@ Removed
 
 * with-extra-tags macro
 * render-extra-tags generic
+* add-get-param-to-url and remove-parameter-from-uri functions
+
+Renamed
+-------
+
+* get-request-action-name was renamed to get-action-name-from-request
+
+Replacements
+------------
+
+* Function webapp-session-hash was replaced with just
+  weblocks.session::*session*
+* Function webapp-session-key replaced with weblocks.session:get-value
+* Macro hook-by-scope now is a function.
+* Macro request-hook now is a function, use add-request-hook instead of
+  (push 'some-func (request-hook :session :post-action))
+  
+
+Testsuite refactoring
+=====================
+
+After some issues were resolved, I've got this result
+running stefil tests::
+
+  Test Report for WEBLOCKS-SUITE: 366 tests run, 732 Errors.
+
+Started to port tests to Prove.
 
 License
 =======

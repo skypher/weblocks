@@ -1,21 +1,13 @@
 
 (in-package :weblocks)
 
-(export '(*json-content-type* refresh-request-p initial-request-p
+(export '(*json-content-type* initial-request-p
           ajax-request-p pure-request-p redirect post-action-redirect
           post-render-redirect))
 
 (defparameter *json-content-type* "application/json; charset=utf-8"
   "A content type sent to the client to identify json data.")
 
-(defun refresh-request-p ()
-  "Determines if a request is a result of the user invoking a browser
-refresh function. Note that a request will not be considered a refresh
-if there is an action involved (even if the user hits refresh)."
-  (declare (special *uri-tokens*))
-  (and
-   (null (get-request-action))
-   (equalp (all-tokens *uri-tokens*) (weblocks.session:get-value 'last-request-uri))))
 
 (defun initial-request-p ()
   "Returns true if the request is the first request for the session."
@@ -48,19 +40,19 @@ etc."
       (weblocks.session:get-value 'redirect-p)))
 
 (defun clear-session-redirect-p ()
-  (declare (special *redirect-request-p*))
-  (setf *redirect-request-p* (weblocks.session:get-value 'redirect-p))
-  (setf (weblocks.session:get-value 'redirect-p) nil))
+  ;; First, set a flag if delayed redirect was requested.
+  (setf *redirect-request-p*
+        (weblocks.session:get-value 'redirect-p))
+  ;; Next, reset this flag in the session
+  (weblocks.session:set-value 'redirect-p nil))
 
 (defun clear-redirect-var ()
   (declare (special *redirect-request-p*))
   (setf *redirect-request-p* nil))
 
 (eval-when (:load-toplevel)
-  (pushnew 'clear-session-redirect-p 
-           (request-hook :application :post-action))
-  (pushnew 'clear-redirect-var 
-           (request-hook :application :pre-action)))
+  (add-request-hook :application :post-action 'clear-session-redirect-p )
+  (add-request-hook :application :pre-action 'clear-redirect-var ))
 
 
 (defun set-redirect-true ()
@@ -108,9 +100,9 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
         (ps:ps*
          `((slot-value window 'open) ,uri ,window-title))))
       ((eq defer :post-action)
-       (push #'do-redirect (request-hook :request :post-action)))
+       (add-request-hook :request :post-action #'do-redirect))
       ((eq defer :post-render)
-       (push #'do-redirect (request-hook :request :post-render)))
+       (request-hook :request :post-render #'do-redirect))
       (t (do-redirect)))))
 
 ;;; legacy wrappers for redirect

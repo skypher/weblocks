@@ -3,7 +3,7 @@
 
 
 (defwebapp some-name
-    :js-backend :prototype
+    :js-backend :jquery
     :bundle-dependency-types nil
     :version-dependency-types nil
     :gzip-dependency-types nil)

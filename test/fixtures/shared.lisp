@@ -17,14 +17,16 @@
 (defclass address-parser (parser)
   ())
 
-(defmethod parse-view-field-value ((parser address-parser) value obj
-                                   (view form-view) (field form-view-field) &rest args)
-  (declare (ignore args))
-  (when (not (text-input-present-p value))
-    (return-from parse-view-field-value (values t nil)))
-  (let ((object (find value (addresses) :key #'object-id :test #'string-equal)))
-    (when object
-      (values t t object))))
+;; Commented because views and forms will be separated from weblocks.
+;;
+;; (defmethod parse-view-field-value ((parser address-parser) value obj
+;;                                    (view form-view) (field form-view-field) &rest args)
+;;   (declare (ignore args))
+;;   (when (not (text-input-present-p value))
+;;     (return-from parse-view-field-value (values t nil)))
+;;   (let ((object (find value (addresses) :key #'object-id :test #'string-equal)))
+;;     (when object
+;;       (values t t object))))
 
 (defun addresses (&rest args)
   "Returns a list of addresses."

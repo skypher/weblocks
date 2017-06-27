@@ -62,20 +62,22 @@
   t)
 
 ;;; test redirect
-(deftest redirect-1
-    (with-request :get nil
-      (catch 'hunchentoot::handler-done
-        (redirect "/foo")
-        1))
-  nil)
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest redirect-1
+;;     (with-request :get nil
+;;       (catch 'hunchentoot::handler-done
+;;         (redirect "/foo")
+;;         1))
+;;   nil)
 
-(deftest redirect-2
-    (with-request :get nil
-      (make-request-ajax)
-      (catch 'hunchentoot::handler-done
-        (redirect "/foo")
-        1))
-  "{\"redirect\":\"/foo\"}")
+;; Removed because we do not depend on hunchentoot directly
+;; (deftest redirect-2
+;;     (with-request :get nil
+;;       (make-request-ajax)
+;;       (catch 'hunchentoot::handler-done
+;;         (redirect "/foo")
+;;         1))
+;;   "{\"redirect\":\"/foo\"}")
 
 (addtest redirect-post-action
   (let ((weblocks:*request-hook* (make-instance 'weblocks::request-hooks)))

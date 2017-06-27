@@ -442,13 +442,13 @@ Additionally, calls 'dependencies' and adds the returned items to
 stylesheets and javascript links in the page header."))
 
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
-  (log:debug "Rendering widget" obj "with" *page-dependencies*)
+  (log:debug "Rendering widget" obj "with" weblocks.dependencies:*page-dependencies*)
   
   (if (weblocks.request:ajax-request-p)
       (mapc #'render-dependency-in-ajax-response (dependencies obj))
-      (progn (setf *page-dependencies*
-                   (append *page-dependencies*
-                           (dependencies obj)))
+      (progn ;; (setf *page-dependencies*
+             ;;       (append *page-dependencies*
+             ;;               (dependencies obj)))
              
              ;; Update new-style dependencies
              (setf weblocks.dependencies:*page-dependencies*

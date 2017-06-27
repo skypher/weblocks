@@ -6,7 +6,8 @@
   (:export
    #:delete-value
    #:get-value
-   #:reset-latest-session))
+   #:reset-latest-session
+   #:set-value))
 (in-package weblocks.session)
 
 
@@ -21,22 +22,22 @@ To clear, use function \(reset-last-session\).")
 
 
 ;; previously webapp-session-value
-(defun get-value (key &optional (webapp weblocks::*current-webapp*))
+(defmacro get-value (key &optional default)
   "Get a session value from the currently running webapp.
-KEY is compared using EQUAL."
-  (declare (ignorable webapp))
+KEY is compared using EQUAL.
 
-  (unless *session*
-    (error "Session was not created for this request!"))
-  ;; TODO: seems, previously keys were separated for different weblocks apps
-  ;;       but I've simplified it for now
-  (gethash key *session*))
+It was made as a macro to not evaluate 'default' on each call."
+
+  `(progn (unless *session*
+            (error "Session was not created for this request!"))
+          ;; TODO: seems, previously keys were separated for different weblocks apps
+          ;;       but I've simplified it for now
+          (alexandria:ensure-gethash ,key *session* ,default)))
 
 
-(defun (setf get-value) (value key &optional (webapp weblocks::*current-webapp*))
+(defun set-value (key value)
   "Set a session value for the currently running webapp.
 KEY is compared using EQUAL."
-  (declare (ignorable webapp))
   
   (setf (gethash key *session*)
         value))

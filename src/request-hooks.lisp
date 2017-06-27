@@ -31,12 +31,15 @@
   (:documentation "A data structure that maintains appropriate
   callback functions used to hook into request evaluation."))
 
+
 (defparameter *application-request-hooks* (make-instance 'request-hooks)
   "A request hook object used in the application scope.")
 
+
 (defun reset-session-request-hooks ()
-  (setf (weblocks.session:get-value 'request-hooks)
-        (make-instance 'request-hooks)))
+  (let ((hooks (make-instance 'request-hooks)))
+    (weblocks.session:set-value 'request-hooks hooks)
+    hooks))
 
 (defun session-request-hooks ()
   "A request hook object used in the session scope."
@@ -48,15 +51,34 @@
 (setf (documentation '*request-hook* 'variable)
       "A request hook object used in the request scope.")
 
-(defmacro hook-by-scope (scope)
+(defun hook-by-scope (scope)
   "Returns a place which contains the hook object for the specified
 scope."
   (ecase scope
-    (:application '*application-request-hooks*)
-    (:session '(session-request-hooks))
-    (:request '*request-hook*)))
+    (:application *application-request-hooks*)
+    (:session (session-request-hooks))
+    (:request *request-hook*)))
 
-(defmacro request-hook (scope location)
+
+(defun add-request-hook (scope location hook)
+  "Adds a new hook to the list of hooks."
+  (let ((hooks (hook-by-scope scope)))
+
+    (pushnew hook
+             (slot-value hooks
+                         (intern (symbol-name location)
+                                 :weblocks)))
+    hooks))
+
+
+(defun remove-request-hook (scope location hook)
+  "Removes a new hook to the list of hooks."
+  (let ((hooks (hook-by-scope scope)))
+    ;; TODO: implement
+    nil))
+
+
+(defun request-hook (scope location)
   "Allows access to a series of hooks exposed by 'handle-client-request'.
 
 scope - the scope of the hook. Can be set to :application, :session,
@@ -71,19 +93,29 @@ to :dynamic-action :pre-action, :post-action,
 The macro returns a place that can be used to push a callback function
 of no arguments."
   (ecase location
-    (:dynamic-action `(dynamic-action-hook (hook-by-scope ,scope)))
-    (:pre-action `(pre-action-hook (hook-by-scope ,scope)))
-    (:post-action `(post-action-hook (hook-by-scope ,scope)))
-    (:dynamic-render `(dynamic-render-hook (hook-by-scope ,scope)))
-    (:pre-render `(pre-render-hook (hook-by-scope ,scope)))
-    (:post-render `(post-render-hook (hook-by-scope ,scope)))))
+    (:dynamic-action (dynamic-action-hook (hook-by-scope scope)))
+    (:pre-action (pre-action-hook (hook-by-scope scope)))
+    (:post-action (post-action-hook (hook-by-scope scope)))
+    (:dynamic-render (dynamic-render-hook (hook-by-scope scope)))
+    (:pre-render (pre-render-hook (hook-by-scope scope)))
+    (:post-render (post-render-hook (hook-by-scope scope)))))
 
-(defmacro eval-hook (location)
+
+(defun eval-hook (location)
   "Evaluates the appropriate hook. See 'request-hook'."
-  `(progn
-     (mapc #'funcall (request-hook :application ,location))
-     (mapc #'funcall (request-hook :session ,location))
-     (mapc #'funcall (request-hook :request ,location))))
+  (loop for scope in '(:application :session :request)
+        for hooks = (request-hook scope location)
+        do (progn
+             (log:debug "Calling hooks for" scope location)
+             (loop for hook in hooks
+                   do (progn
+                        (log:debug "Calling hook" hook)
+                        (funcall hook)))))
+  ;; `;; (progn
+  ;;   (mapc #'funcall (request-hook :application ,location))
+  ;;   (mapc #'funcall (request-hook :session ,location))
+  ;;   (mapc #'funcall (request-hook :request ,location)))
+  )
 
 (defmacro log-hooks (location)
   "Log appropriate hooks."
@@ -162,10 +194,8 @@ of no arguments."
         ;;       weblocks-util:*parts-md5-context-hash*)
         ))))
 
-(pushnew  
- #'reset-html-parts
- (request-hook :application :pre-render))
+(add-request-hook :application :pre-render
+                  'reset-html-parts)
 
-(pushnew 
- #'update-html-parts
- (request-hook :application :post-render))
+(add-request-hook :application :post-render
+                  'update-html-parts)

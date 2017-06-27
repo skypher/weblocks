@@ -115,7 +115,7 @@ DESCRIBE-ing them."
 
 ;; see store/store-utils.lisp
 (defwebapp app-with-not-searchable-store
-  :js-backend :prototype
+  :js-backend :jquery
   :autostart nil)
 
 ;; We'll use memory store for testing
@@ -131,42 +131,44 @@ and then compares the string to the expected result."
      (addtest ,name
        (ensure-html-output ,form ,value))))
 
+;; Removed because now we'll share request processing code in real code and tests
 ;;; faking hunchentoot's requests
-(defclass unittest-request (request)
-  ((headers-in :initform nil)
-   method server-protocol
-   (hunchentoot::uri :initform nil)
-   (content-stream :reader content-stream)
-   (cookies-in :initform nil)
-   (get-parameters :initform nil)
-   (post-parameters :initform nil)
-   (script-name :initform nil)
-   (query-string :initform nil)
-   (session :initform nil
-            :accessor hunchentoot::session)
-   (aux-data :initform nil
-             :accessor hunchentoot::aux-data)
-   (raw-post-data :initform nil))
-  (:default-initargs :remote-addr "localhost")
-  (:documentation "A class used to mock hunchentoot requests in
-  order to be able to unit test across requests."))
+;; (defclass unittest-request (request)
+;;   ((headers-in :initform nil)
+;;    method server-protocol
+;;    (hunchentoot::uri :initform nil)
+;;    (content-stream :reader content-stream)
+;;    (cookies-in :initform nil)
+;;    (get-parameters :initform nil)
+;;    (post-parameters :initform nil)
+;;    (script-name :initform nil)
+;;    (query-string :initform nil)
+;;    (session :initform nil
+;;             :accessor hunchentoot::session)
+;;    (aux-data :initform nil
+;;              :accessor hunchentoot::aux-data)
+;;    (raw-post-data :initform nil))
+;;   (:default-initargs :remote-addr "localhost")
+;;   (:documentation "A class used to mock hunchentoot requests in
+;;   order to be able to unit test across requests."))
 
 ;;; faking hunchentoot's server
-(defclass unittest-server (weblocks-acceptor)
-  ((mod-lisp-p :initform nil
-               :initarg :mod-lisp-p
-               :reader hunchentoot::server-mod-lisp-p)
-   (ssl-certificate-file :initarg :ssl-certificate-file
-                         :initform nil
-                         :reader hunchentoot::server-ssl-certificate-file))
-  (:documentation "A class used to mock hunchentoot server in
-  order to be able to unit test across requests."))
+;; Removed because now we'll share request processing code in real code and tests
+;; (defclass unittest-server (weblocks-acceptor)
+;;   ((mod-lisp-p :initform nil
+;;                :initarg :mod-lisp-p
+;;                :reader hunchentoot::server-mod-lisp-p)
+;;    (ssl-certificate-file :initarg :ssl-certificate-file
+;;                          :initform nil
+;;                          :reader hunchentoot::server-ssl-certificate-file))
+;;   (:documentation "A class used to mock hunchentoot server in
+;;   order to be able to unit test across requests."))
 
-(defmethod hunchentoot::server-mod-lisp-p ((obj unittest-server))
-  (slot-value obj 'mod-lisp-p))
+;; (defmethod hunchentoot::server-mod-lisp-p ((obj unittest-server))
+;;   (slot-value obj 'mod-lisp-p))
 
-(defmethod session-cookie-name ((obj unittest-server))
-  "weblocks-session")
+;; (defmethod session-cookie-name ((obj unittest-server))
+;;   "weblocks-session")
 
 (defparameter *dummy-action* "abc"
   "A dummy action code for unit tests.")
@@ -178,7 +180,7 @@ and then compares the string to the expected result."
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
                      `(,@initargs ,@(and (not class-name) '(:prefix ""))
                        :html-indent-p nil 
-                       :js-backend :prototype)))
+                       :js-backend :jquery)))
          (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))
      (if full
@@ -206,59 +208,62 @@ webapp in my context."
   (declare (ignore full class-name))
   `(call-with-test-webapp (lambda () ,@body) ,@initargs))
 
+
 (defun call-with-request-in-webapp-context (thunk method parameters
                                             &key (uri nil uri?))
   "Helper for `call-with-request'."
-  (let ((parameters-slot (ecase method
-                           (:get 'get-parameters)
-                           (:post 'post-parameters))))
-    (let* ((*acceptor* (make-instance 'unittest-server))
-           (*weblocks-server* *acceptor*)
-           (*request* (make-instance 'unittest-request :acceptor *acceptor*))
-           (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
-           (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
-           (make-action-orig #'weblocks::make-action)
-           (generate-widget-id-orig #'weblocks::gen-id)
-           (dummy-action-count 123)
-           (*uri-tokens* '("foo" "bar"))
-           weblocks::*page-dependencies* *session*
-           *on-ajax-complete-scripts*
-           weblocks::*rendered-actions*)
-      (unwind-protect (progn
-                        (weblocks.utils.html-parts:reset)
+  ;; Removed because now we'll share request processing code in real code and tests
+  ;; (let ((parameters-slot (ecase method
+;;                            (:get 'get-parameters)
+;;                            (:post 'post-parameters))))
+;;     (let* ((*acceptor* (make-instance 'unittest-server))
+;;            (*weblocks-server* *acceptor*)
+;;            (*request* (make-instance 'unittest-request :acceptor *acceptor*))
+;;            (hunchentoot::*session-secret* (hunchentoot::reset-session-secret))
+;;            (hunchentoot::*reply* (make-instance 'hunchentoot::reply))
+;;            (make-action-orig #'weblocks::make-action)
+;;            (generate-widget-id-orig #'weblocks::gen-id)
+;;            (dummy-action-count 123)
+;;            (*uri-tokens* '("foo" "bar"))
+;;            weblocks::*page-dependencies* *session*
+;;            *on-ajax-complete-scripts*
+;;            weblocks::*rendered-actions*)
+;;       (unwind-protect (progn
+;;                         (weblocks.utils.html-parts:reset)
 
-                        (weblocks::open-stores)
-                        (start-session)
-                        (setf (symbol-function 'weblocks::make-action)
-                              (lambda (action-fn &optional action-code)
-                                (if action-code
-                                    (funcall make-action-orig action-fn action-code)
-                                    (let ((result (funcall make-action-orig action-fn
-                                                           (format nil "~A~D"
-                                                                   *dummy-action*
-                                                                   dummy-action-count))))
-                                      (incf dummy-action-count)
-                                      result))))
-                        (setf (symbol-function 'weblocks::gen-id)
-                              (lambda (&optional prefix)
-                                (declare (ignore prefix))
-                                "id-123"))
-                        (setf (slot-value *request* 'method) method)
-                        (setf (slot-value *request* parameters-slot) parameters)
-                        (setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
-                        (setf (slot-value *session* 'hunchentoot::session-id) 1)
-                        (setf (slot-value *session* 'hunchentoot::session-string) "test")
-                        (when uri?
-                          (setf *uri-tokens* (weblocks::tokenize-uri uri)))
-                        (setf (slot-value *request* 'hunchentoot::uri)
-                              (or uri (concatenate 'string "/"
-                                                   (uri-tokens-to-string *uri-tokens*))))
-                        (funcall thunk))
-        (setf (symbol-function 'weblocks::make-action) make-action-orig)
-        (setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
-        ;; TODO: stores should be moved to a separate system
-;;        (weblocks-stores::close-stores)
-        ))))
+;;                         (weblocks::open-stores)
+;;                         (start-session)
+;;                         (setf (symbol-function 'weblocks::make-action)
+;;                               (lambda (action-fn &optional action-code)
+;;                                 (if action-code
+;;                                     (funcall make-action-orig action-fn action-code)
+;;                                     (let ((result (funcall make-action-orig action-fn
+;;                                                            (format nil "~A~D"
+;;                                                                    *dummy-action*
+;;                                                                    dummy-action-count))))
+;;                                       (incf dummy-action-count)
+;;                                       result))))
+;;                         (setf (symbol-function 'weblocks::gen-id)
+;;                               (lambda (&optional prefix)
+;;                                 (declare (ignore prefix))
+;;                                 "id-123"))
+;;                         (setf (slot-value *request* 'method) method)
+;;                         (setf (slot-value *request* parameters-slot) parameters)
+;;                         (setf (slot-value *request* 'hunchentoot::script-name) "/foo/bar")
+;;                         (setf (slot-value *session* 'hunchentoot::session-id) 1)
+;;                         (setf (slot-value *session* 'hunchentoot::session-string) "test")
+;;                         (when uri?
+;;                           (setf *uri-tokens* (weblocks::tokenize-uri uri)))
+;;                         (setf (slot-value *request* 'hunchentoot::uri)
+;;                               (or uri (concatenate 'string "/"
+;;                                                    (uri-tokens-to-string *uri-tokens*))))
+;;                         (funcall thunk))
+;;         (setf (symbol-function 'weblocks::make-action) make-action-orig)
+;;         (setf (symbol-function 'weblocks::gen-id) generate-widget-id-orig)
+;;         ;; TODO: stores should be moved to a separate system
+;; ;;        (weblocks-stores::close-stores)
+;;         )))
+  )
 
 (defun call-with-request (&rest args)
   "Helper for `with-request''s expansion."

@@ -46,10 +46,10 @@
 
 
 (defwebapp hello3-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :prefix "/foo")
 (defwebapp hello4-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :prefix "/foo/")
 
 (addtest defwebapp-prefix-2
@@ -61,12 +61,12 @@
 
 ;;; public files' uri prefix
 (defwebapp hello5-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :prefix "/"
            :public-files-uri-prefix "/pub") 
 (defwebapp hello6-webapp
            :prefix "/"
-           :js-backend :prototype
+           :js-backend :jquery
            :public-files-uri-prefix "/pub/") 
 
 (addtest defwebapp-pub-prefix
@@ -78,7 +78,7 @@
 
 (defwebapp hello7-webapp
            :prefix "/foo"
-           :js-backend :prototype
+           :js-backend :jquery
            :public-files-uri-prefix "/pub")
 
 (addtest defwebapp-pub-prefix-2
@@ -92,13 +92,13 @@
 
 ;;; public files' path
 (defwebapp hello8-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :public-files-path "./pub") 
 (defwebapp hello9-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :public-files-path "./pub/") 
 (defwebapp hello10-webapp
-           :js-backend :prototype
+           :js-backend :jquery
            :public-files-path #P"pub")
 
 (addtest defwebapp-pub-path
@@ -110,22 +110,22 @@
 
 ;;; interaction of hostname and prefix dispatching
 (defwebapp host-1
-           :js-backend :prototype
+           :js-backend :jquery
            :hostnames '("foo.com")
            :prefix "/foo")
 
 (defwebapp host-2
-           :js-backend :prototype
+           :js-backend :jquery
            :hostnames '("foo.com")
            :prefix "/")
 
 (defwebapp host-3
-           :js-backend :prototype
+           :js-backend :jquery
            :hostnames nil
            :prefix "/foo")
 
 (defwebapp host-4
-           :js-backend :prototype
+           :js-backend :jquery
            :hostnames nil
            :prefix "/")
 

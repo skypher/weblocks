@@ -6,7 +6,7 @@
 
 (in-package :weblocks)
 
-(export '(composite composite-widgets root-composite))
+(export '(composite composite-widgets))
 
 (defwidget composite (widget)
   ())
@@ -20,8 +20,12 @@
 (defmethod (setf composite-widgets) (value comp)
   (setf (widget-children comp) value))
 
-(defmacro root-composite ()
+;; Seems it is used only in tests,
+;; TODO: may be to remove
+(defun root-composite ()
   "Expands to code that can be used as a place to access to the root
 composite."
-  `(weblocks.session:get-value 'root-widget))
+  (weblocks.session:get-value 'root-widget))
 
+(defun (setf root-composite) (value)
+  (weblocks.session:set-value 'root-widget value))

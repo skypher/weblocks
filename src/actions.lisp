@@ -63,8 +63,26 @@ don't provide a hard to guess code ('generate-action-code' is used by
 default), the user will be vulnerable to an attack where a malicious
 attacker can attempt to guess a dangerour action id and send the user
 a link to it. Only use guessable action codes for GET actions."
-  (setf (weblocks.session:get-value action-code) action-fn)
+
+  ;; Here we put into the session two maps:
+  ;; code->action which maps from string code to a function
+  ;; and
+  ;; action->code which maps backward from a function to a code.
+  (let ((code->action 
+          (weblocks.session:get-value 'code->action
+                                      (make-hash-table :test #'equal))))
+
+    (setf (gethash action-code code->action) action-fn))
+
+  ;; Now, get or create a table for function->code mapping
+  (let ((action->code
+          (weblocks.session:get-value 'action->code
+                                      (make-hash-table))))
+
+    (setf (gethash action-fn action->code) action-code))
+  
   action-code)
+
 
 (defun function-or-action->action (function-or-action)
   "Accepts a function or an existing action. If the value is a
@@ -72,18 +90,31 @@ function, calls 'make-action' and returns its result. Otherwise,
 checks if the action already exists. If it does, returns the value. If
 it does not, signals an error."
   (if (functionp function-or-action)
-      (make-action function-or-action)
+      ;; If it is a function, first we'll try to find
+      ;; a code for it in the session.
+      (multiple-value-bind (code code-p)
+          (gethash function-or-action
+                   (weblocks.session:get-value 'action->code
+                                               (make-hash-table)))
+        (if code-p
+            code
+            (make-action function-or-action)))
+      
+      ;; if it is an action code
       (multiple-value-bind (res presentp)
           (webapp-permanent-action function-or-action)
         (declare (ignore res))
         (if presentp
             function-or-action
             (multiple-value-bind (res presentp)
-                (weblocks.session:get-value function-or-action)
+                (gethash function-or-action
+                         (weblocks.session:get-value 'code->action
+                                                     (make-hash-table)))
               (declare (ignore res))
               (if presentp
                   function-or-action
                   (error "The value '~A' is not an existing action." function-or-action)))))))
+
 
 (defun make-action-url (action-code &optional (include-question-mark-p t))
   "Accepts action code and returns a URL that can be used to render
@@ -109,7 +140,10 @@ returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
   (when action-name
     (let* ((permanent-action (webapp-permanent-action action-name))
-           (session-action (weblocks.session:get-value action-name))
+           (code->action 
+             (weblocks.session:get-value 'code->action
+                                         (make-hash-table :test #'equal)))
+           (session-action (gethash action-name code->action))
            (request-action (or permanent-action session-action)))
       (unless *ignore-missing-actions*
         (assert request-action (request-action)

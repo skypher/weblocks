@@ -174,8 +174,8 @@ submission behavior.")
             (dataform-data form)))))))
 
 (eval-when (:load-toplevel)
-  (pushnew 'update-form-intermediate-values-on-form-action 
-           (request-hook :application :pre-action)))
+  (add-request-hook :application :pre-action
+                    'update-form-intermediate-values-on-form-action ))
 
 (defmethod widget-translation-table append ((obj dataform) &rest args)
   (let ((result)

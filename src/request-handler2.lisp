@@ -129,12 +129,6 @@ customize behavior."))
     (weblocks::page-not-found-handler app)))
 
 
-(defun get-action-name-from-request ()
-  "Returns called action name if any action was called"
-  (weblocks.request:request-parameter
-   weblocks::*action-string*))
-
-
 (defmethod handle-client-request ((app weblocks:weblocks-webapp))
   (progn                                ;save it for splitting this up
     ;; TODO: replace with lack.session
@@ -158,8 +152,8 @@ customize behavior."))
       (when (null (weblocks::root-widget))
         (let ((root-widget (make-instance 'weblocks::widget
                                           :name "root")))
-          (setf (weblocks::root-widget)
-                root-widget)
+          (weblocks.session:set-value 'weblocks::root-widget
+                                      root-widget)
           (let (finished?
                 (init-user-session-func (weblocks::webapp-init-user-session)))
             (unwind-protect
@@ -173,14 +167,14 @@ customize behavior."))
                               root-widget))
                    (setf finished? t))
               (unless finished?
-                (setf (weblocks::root-widget)
-                      nil)
+                (weblocks.session:set-value 'weblocks::root-widget
+                                            nil)
                 (weblocks::reset-webapp-session))))
           
           ;; TODO: understand why there is coupling with Dialog here and
           ;;       how to move it into the Dialog's code.
-          (push 'weblocks::update-dialog-on-request
-                (weblocks::request-hook :session :post-action)))
+          (weblocks::add-request-hook :session :post-action
+                                      'weblocks::update-dialog-on-request))
         
         ;; (when (and weblocks::*rewrite-for-session-urls*
         ;;            (weblocks::cookie-in (weblocks::session-cookie-name
@@ -195,7 +189,7 @@ customize behavior."))
                              :tokens (weblocks::tokenize-uri (weblocks.request:request-uri))))
             weblocks::*before-ajax-complete-scripts*
             weblocks::*on-ajax-complete-scripts*
-;;            weblocks::*page-dependencies*
+            ;;            weblocks::*page-dependencies*
             
             ;; New-style dependencies
             (weblocks.dependencies:*page-dependencies*
@@ -207,12 +201,12 @@ customize behavior."))
             weblocks::*current-page-headers*
             (cl-who::*indent* (weblocks::weblocks-webapp-html-indent-p app)))
         
-        (let ((action-name (get-action-name-from-request))
+        (let ((action-name (weblocks.request::get-action-name-from-request))
               (action-arguments
                 (weblocks::alist->plist (weblocks.request:request-parameters))))
           
           (when (weblocks::pure-request-p)
-            (abort-request-handler
+            (weblocks.response:abort-processing
              (weblocks::eval-action action-name
                                     action-arguments))) ; FIXME: what about the txn hook?
 
@@ -248,10 +242,10 @@ customize behavior."))
                     weblocks::*approved-return-codes*)
             (progn 
               (unless (weblocks.request:ajax-request-p)
-                (setf (weblocks.session::get-value 'last-request-uri)
-                      (weblocks::all-tokens weblocks::*uri-tokens*)))
+                (weblocks.session::set-value 'last-request-uri
+                                             (weblocks::all-tokens weblocks::*uri-tokens*)))
               (get-output-stream-string weblocks::*weblocks-output-stream*))
-            (weblocks::handle-http-error app (weblocks::return-code*)))))))
+            (weblocks::handle-http-error app weblocks.response:*code*))))))
 
 
 ;; (defun abort-request-handler (response)

@@ -23,7 +23,7 @@
 (addtest versioning-test-1
   (cl-fad:delete-directory-and-files *temp-version-folder* :if-does-not-exist :ignore)
   (cl-fad:delete-directory-and-files *temp-mod-record-folder* :if-does-not-exist :ignore)
-  (weblocks:with-file-write (stream *temp-version-file*)
+  (weblocks::with-file-write (stream *temp-version-file*)
       (write-string "test-text" stream))
   ;; version file initialization
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
@@ -31,7 +31,7 @@
                        (pathname "/www/vzn/temp.0.test")))
 
   (sleep 1) ;; so that modified time of temp.test will change
-  (weblocks:with-file-write (stream *temp-version-file*)
+  (weblocks::with-file-write (stream *temp-version-file*)
       (write-string "new-test-text" stream))
   (ensure-same (weblocks::update-versioned-dependency-path *temp-version-file* "/www/temp.test")
                (values (pathname (cl-ppcre:regex-replace "temp.test$" *temp-version-file* "vzn/temp.1.test"))
@@ -39,7 +39,7 @@
 
   ;; import rule versioning
   (let ((import-path (concatenate 'string *temp-version-folder* "import.css")))
-    (weblocks:with-file-write (stream import-path)
+    (weblocks::with-file-write (stream import-path)
       (write-string "@import url(/pub/stylesheets/table.css);
 @import url(/pub/stylesheets/form.css);" stream))
     (weblocks::update-import-css-content import-path :version-types '(:stylesheet) :gzip-types nil)
@@ -49,7 +49,7 @@
 
 (addtest gzipping-test-1
   (cl-fad:delete-directory-and-files *temp-version-folder* :if-does-not-exist :ignore)
-  (weblocks:with-file-write (stream *temp-version-file*)
+  (weblocks::with-file-write (stream *temp-version-file*)
     (write-string (make-sequence 'string 1000 :initial-element #\x) stream))
   (weblocks::create-gziped-dependency-file *temp-version-file*)
   (ensure (cl-fad:file-exists-p (concatenate 'string *temp-version-file* ".gz"))))

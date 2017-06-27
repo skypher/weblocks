@@ -59,7 +59,7 @@ request is a refresh and a dialog was shown, appropriate JS is
 inserted into the page to redraw the dialog."
   (let ((current-dialog (current-dialog)))
     (when (and current-dialog
-               (refresh-request-p))
+               (weblocks.request::refresh-request-p))
       (with-javascript
         (ps* `(funcall (slot-value *Event 'observe)
                        window "load"

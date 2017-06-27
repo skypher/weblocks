@@ -10,7 +10,8 @@
    #:request-server-port
    #:request-uri
    #:request-method
-   #:request-path-info))
+   #:request-path-info
+   #:refresh-request-p))
 (in-package weblocks.request)
 
 
@@ -84,3 +85,18 @@ in a dynamic hunchentoot environment."
          "XMLHttpRequest"))
 
 
+(defun get-action-name-from-request ()
+  "Returns called action name if any action was called"
+  (request-parameter
+   weblocks::*action-string*))
+
+
+(defun refresh-request-p ()
+  "Determines if a request is a result of the user invoking a browser
+refresh function. Note that a request will not be considered a refresh
+if there is an action involved (even if the user hits refresh)."
+  (let ((action-name (get-action-name-from-request)))
+    (and
+     (null (weblocks::get-request-action action-name))
+     (equalp (weblocks::all-tokens weblocks::*uri-tokens*)
+             (weblocks.session:get-value 'weblocks::last-request-uri)))))
