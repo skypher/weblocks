@@ -3,7 +3,8 @@
         #:f-underscore)
   (:export
    #:handle-client-request
-   #:abort-request-handler))
+   #:abort-request-handler
+   #:page-not-found-handler))
 (in-package weblocks.request-handler)
 
 
@@ -40,7 +41,7 @@ customize behavior."))
 (defmethod handle-client-request :around ((app weblocks::weblocks-webapp))
   "This wrapper sets current application and suppresses error output from Hunchentoot."
   (handler-bind ((error (lambda (c)
-                          (if weblocks::*catch-errors-p*
+                          (if weblocks.variables:*catch-errors-p*
                             (return-from handle-client-request
                                          (weblocks::handle-error-condition app c))
                             (invoke-debugger c)))))
@@ -89,6 +90,19 @@ customize behavior."))
        (weblocks::webapp-update-thread-status "Request complete/idle")))))
 
 
+(defgeneric page-not-found-handler (app)
+  (:documentation "This function is called when the current widget 
+   heirarchy fails to parse a URL.  The default behavior simply sets the 
+   404 return code")
+  (:method ((app t))
+    (declare (ignore app))
+    
+    (setf weblocks.response:*code* 404
+          weblocks.response:*content-type* "plain/text")
+
+    (weblocks.response:abort-processing "Not found")))
+
+
 (defmethod handle-normal-request ((app weblocks:weblocks-webapp))
   ;; we need to render widgets before the boilerplate HTML
   ;; that wraps them in order to collect a list of script and
@@ -99,7 +113,7 @@ customize behavior."))
                     (weblocks::update-widget-tree))
       (weblocks::http-not-found ()
         (return-from handle-normal-request
-          (weblocks::page-not-found-handler app))))
+          (page-not-found-handler app))))
 
     (weblocks::webapp-update-thread-status "Handling normal request [rendering widgets]")
     (weblocks::timing "widget tree rendering"
@@ -126,7 +140,7 @@ customize behavior."))
   ;; make sure all tokens were consumed (FIXME: still necessary?)
   (unless (or (weblocks::tokens-fully-consumed-p weblocks::*uri-tokens*)
               (null (weblocks::all-tokens weblocks::*uri-tokens*)))
-    (weblocks::page-not-found-handler app)))
+    (page-not-found-handler app)))
 
 
 (defmethod handle-client-request ((app weblocks:weblocks-webapp))
@@ -150,8 +164,7 @@ customize behavior."))
             (make-instance 'weblocks::request-hooks))
           weblocks::*dirty-widgets*)
       (when (null (weblocks::root-widget))
-        (let ((root-widget (make-instance 'weblocks::widget
-                                          :name "root")))
+        (let ((root-widget (weblocks::make-root-widget app)))
           (weblocks.session:set-value 'weblocks::root-widget
                                       root-widget)
           (let (finished?
@@ -246,6 +259,7 @@ customize behavior."))
                                              (weblocks::all-tokens weblocks::*uri-tokens*)))
               (get-output-stream-string weblocks::*weblocks-output-stream*))
             (weblocks::handle-http-error app weblocks.response:*code*))))))
+
 
 
 ;; (defun abort-request-handler (response)

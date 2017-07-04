@@ -3,7 +3,6 @@
 (export '(handle-client-request
           *before-ajax-complete-scripts*
           *on-ajax-complete-scripts*
-          *catch-errors-p*
           *request-timeout*
           *backtrace-on-session-init-error*
           *style-warn-on-circular-dirtying*
@@ -23,9 +22,6 @@
 (setf (documentation '*on-ajax-complete-scripts* 'variable)
       "A list of client-side scripts to be sent over to the browser at
       the end of ajax request execution.")
-
-;; remove this when Hunchentoot reintroduces *catch-errors-p*
-(defvar *catch-errors-p* t)
 
 (defvar *request-timeout* 180
   "Seconds until we abort a request because it took too long.
@@ -66,7 +62,7 @@ customize behavior."))
 
 (defmethod handle-client-request :around ((app weblocks-webapp))
   (handler-bind ((error (lambda (c)
-                          (if *catch-errors-p*
+                          (if weblocks.variables:*catch-errors-p*
                             (return-from handle-client-request
                                          (handle-error-condition app c))
                             (invoke-debugger c)))))

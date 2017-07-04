@@ -2,8 +2,8 @@
 
 ; i18n utils
 
-(wexport '(*translation-function* translate default-translation-function)
-         '(t util))
+;; (wexport '(*translation-function* translate default-translation-function)
+;;          '(t util))
 
 (defvar *translation-function* 'default-translation-function)
 

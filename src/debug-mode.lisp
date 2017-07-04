@@ -3,16 +3,25 @@
 
 (export '(disable-global-debugging enable-global-debugging *weblocks-global-debug*))
 
-(declaim (special *current-webapp* *maintain-last-session*))
+;; (declaim (special *current-webapp* *maintain-last-session*))
 
 (defvar *weblocks-global-debug* nil)
+
+(defvar *show-lisp-errors-p* nil)
 
 (defun enable-global-debugging ()
   "Setup hooks for session maintenance and showing backtraces"
   (setf *weblocks-global-debug* t)
-  ;; Set hunchentoot defaults (for everyone)
-  (setf *show-lisp-errors-p* t)
-  (setf *process-html-parts-p* (constantly t))
+
+  ;; Drop into a lisp debugger on errors
+  (setf weblocks.variables:*catch-errors-p* nil)
+  ;; Previously this option was turned on here.
+  ;; It renders a html page with a backtrace on error.
+  ;; (setf *show-lisp-errors-p* t)
+  
+  ;; Some thing for html rendering debugging
+  (setf weblocks.utils.html-parts::*process-html-parts-p*
+        (constantly t))
   ;(setf *show-lisp-backtraces-p* t)
   ;; Set session maintenance (for everyone)
   (unless *maintain-last-session*
@@ -22,8 +31,10 @@
 (defun disable-global-debugging ()
   "A manual method for resetting global debugging state"
   (setf *weblocks-global-debug* nil)
+  (setf weblocks.variables:*catch-errors-p* t)
   (setf *show-lisp-errors-p* nil)
-  (setf *process-html-parts-p* (constantly nil))
+  (setf weblocks.utils.html-parts::*process-html-parts-p*
+        (constantly nil))
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
 

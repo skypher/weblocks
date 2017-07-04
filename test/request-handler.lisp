@@ -460,7 +460,7 @@ onclick='disableIrrelevantButtons(this);' />~
   (with-test-webapp (:class-name 'broken-init)
     (with-request :get nil :uri "/broken-init/"
       (let ((finished-handler 0)
-            (*catch-errors-p* nil))
+            (weblocks.variables:*catch-errors-p* nil))
         (handler-bind
             ((simple-error
               (lambda (sig)

@@ -21,6 +21,7 @@
    :function-cache
    :local-time
    :local-time-duration
+   :dexador ;; to retrive remote dependencies and put them into the cache
    ;;   :weblocks-util
 
    ;; TODO: remove this dependency and reverse it
@@ -51,6 +52,8 @@
   :components ((:module src
                 :components (
                              (:file "package")
+                             (:file "variables")
+                             
                              (:file "session")
                              (:file "weblocks"
                               ;; :depends-on ("session"
@@ -58,7 +61,8 @@
                               )
                              (:file "request2")
                              (:module utils
-                              :components ((:file "misc"
+                              :components ((:file "clos")
+                                           (:file "misc"
 ;;                                            :depends-on ;; (
                                                         ;;  ;; utils/misc stores unique ids in a session
                                                         ;;  "repl"
@@ -147,7 +151,6 @@
                                           ;;  "request" "dependencies" "uri-tokens"
                                           ;;  "error-handler")
                               )
-                             (:file "variables")
                              (:file "session-lock"
 ;;                              :depends-on ;; ("session")
                               )

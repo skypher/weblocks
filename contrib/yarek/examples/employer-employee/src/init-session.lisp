@@ -36,5 +36,5 @@
 ;; Define callback function to initialize new sessions
 (defun init-slime-debugging ()
   "Don't catch errors and redirect debugger to slime.  Works great !"
-  (setf hunchentoot:*catch-errors-p* nil)
+  (setf weblocks.variables:*catch-errors-p* nil)
   (setf *debugger-hook* 'swank:swank-debugger-hook))

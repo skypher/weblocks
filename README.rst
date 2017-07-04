@@ -93,6 +93,7 @@ Added
 -----
 
 * make-js-action function
+* make-root-widget generic
 
 Removed
 -------
@@ -105,6 +106,11 @@ Renamed
 -------
 
 * get-request-action-name was renamed to get-action-name-from-request
+* page-not-found-handler generic was moved to weblocks.request-handler
+* variable weblocks:*catch-errors-p* moved to
+  weblocks.variables:*catch-errors-p*
+* slot-value-by-path, find-slot-dsd, find-slot-esd, object-class-name
+  and slot-equal were moved from weblocks-util to weblocks.utils.clos.
 
 Replacements
 ------------

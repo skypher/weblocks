@@ -40,23 +40,3 @@
 
       (is  (member 'foo (weblocks:request-hook :session :post-action))
            t))))
-
-
-
-(declaim (notinline foo bar boo))
-
-(defun foo ()
-  (let ((bar (random 10)))
-    (incf bar)
-    (break)
-    (setf bar (* bar bar))
-    (princ bar)
-
-    bar))
-
-
-(defun fib (n)
-  (if (<= 0 n 1)
-      (/ 1 0)
-      (+ (fib (- n 1))
-         (fib (- n 2)))))

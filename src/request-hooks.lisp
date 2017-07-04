@@ -51,6 +51,7 @@
 (setf (documentation '*request-hook* 'variable)
       "A request hook object used in the request scope.")
 
+
 (defun hook-by-scope (scope)
   "Returns a place which contains the hook object for the specified
 scope."

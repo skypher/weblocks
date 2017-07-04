@@ -16,6 +16,7 @@
 ;;               :weblocks-stores
                :lift
                :prove ;; will change lift with prove soon
+               :cl-mock ;; to mock some functions in tests
                :lack-test
                :closer-mop
                :metatilities

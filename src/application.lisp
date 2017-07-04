@@ -36,7 +36,6 @@
           compute-webapp-public-files-path
           compute-webapp-public-files-uri-prefix
           compute-webapp-public-files-uri-prefix-util
-          current-webapp
           webapp-update-thread-status
           update-thread-status
           *registered-webapps*
@@ -315,6 +314,16 @@ called (primarily for backward compatibility"
        (:metaclass webapp-class))
      (when (get-webapp ',name nil)
        (restart-webapp ',name))))
+
+
+(defgeneric make-root-widget (app)
+  (:documentation "Creates a root widget for user session.
+
+It is called each time, when new user session is initialized.")
+
+  (:method ((app weblocks-webapp))
+    (make-instance 'weblocks::widget
+                   :name "root")))
 
 
 ;; (defmethod weblocks-webapp-default-dependencies ((self weblocks-webapp))

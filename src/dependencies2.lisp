@@ -17,7 +17,9 @@
    #:make-remote-css-dependency
    #:get-integrity
    #:get-cross-origin
-   #:make-static-image-dependency))
+   #:make-static-image-dependency
+   #:*cache-remote-dependencies-in*
+   #:get-url))
 (in-package weblocks.dependencies)
 
 
@@ -25,6 +27,14 @@
   "A list which contains all page dependencies.
 
 Weblocks fills this list during page rendering.")
+
+
+(defvar *cache-remote-dependencies-in* nil
+  "If this variable is set to a pathname, then
+remote dependencies will be cached and served as local dependencies.
+
+This pathname should point to a directory where cached dependencies will
+be stored.")
 
 
 (defclass dependency ()
@@ -138,7 +148,7 @@ to gather necessary dependencies and to inject them into resulting HTML.")
 
 (defmethod initialize-instance :after ((dependency static-dependency)
                                        &rest initargs)
-  "Creating a route for the dependency it it is \"local\".
+  "Creating a route for the dependency if it is \"local\".
 
 This way it will be possible to serve requests for this dependency from
 a browser."
@@ -159,6 +169,32 @@ a browser."
                         'route)
             (weblocks.routes:make-route url
                                         dependency)))))
+
+
+(defmethod initialize-instance :after ((dependency remote-dependency)
+                                       &rest initargs)
+  "Creating a route for the dependency if it is \"local\".
+
+This way it will be possible to serve requests for this dependency from
+a browser."
+  
+  (declare (ignorable initargs))
+
+  ;; Each dependency should have an url.
+  (multiple-value-bind (url type)
+      (get-url dependency)
+
+    ;; But we only interested in a local dependencies,
+    ;; not in those which will be served by CDN.
+    (when (eql type
+               :local)
+
+      ;; And now we will bind a route to dependency and vice-versa.
+      (setf (slot-value dependency
+                        'route)
+            (weblocks.routes:make-route url
+                                        dependency)))))
+
 
 
 (defun make-static-js-dependency (path &key system)
@@ -230,12 +266,30 @@ It is not rendered into an HTML, but served from disk."
 
 (defmethod serve ((dependency static-dependency))
   "Serves static dependency from the disk."
-  (let ((data (if (is-binary dependency)
-                  (alexandria:read-file-into-byte-vector
-                   (get-path dependency))
-                  (alexandria:read-file-into-string
-                   (get-path dependency)))))
-    (values (pathname (get-path dependency))
+  (values (pathname (get-path dependency))
+          (get-content-type dependency)))
+
+
+(defmethod serve ((dependency remote-dependency))
+  "Serves remote dependency from local cache."
+  (let ((local-path (pathname (get-path dependency))))
+    
+    (unless (cl-fad:file-exists-p local-path)
+      (let* ((url (slot-value dependency 'url))
+             (input (dex:get url
+                             :want-stream t
+                             :force-binary t)))
+        
+        (ensure-directories-exist local-path)
+        
+        (with-open-file (output local-path
+                                :direction :output
+                                :element-type '(unsigned-byte 8)
+                                :if-exists :supersede
+                                :if-does-not-exist :create)
+          (cl-fad:copy-stream input output))))
+    
+    (values local-path
             (get-content-type dependency))))
 
 
@@ -258,3 +312,26 @@ For static-dependency it is :local."
                                             "."
                                             ext)))
     (values filename-with-prefix :local)))
+
+
+(defmethod get-url ((dependency remote-dependency))
+  (let* ((url (slot-value dependency 'url)))
+    (if *cache-remote-dependencies-in*
+        (values (concatenate 'string "/remote-deps-cache/"
+                             (weblocks::md5 url))
+                :local)
+        (values url
+                :remote))))
+
+(defmethod get-path ((dependency remote-dependency))
+  "Returns a path to cached file."
+  (check-type *cache-remote-dependencies-in* pathname)
+  (assert (cl-fad:directory-pathname-p
+           *cache-remote-dependencies-in*))
+
+  ;; Here we didn't use get-url method because when caching is
+  ;; turned on, it will return a local uri not the original URL
+  (let* ((url (slot-value dependency 'url))
+         (hash (weblocks::md5 url)))
+    (merge-pathnames hash *cache-remote-dependencies-in*)))
+

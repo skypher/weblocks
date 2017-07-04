@@ -1,14 +1,21 @@
+(defpackage #:weblocks.utils.clos
+  (:use #:cl)
+  (:export #:slot-value-by-path 
+           #:find-slot-dsd
+           #:find-slot-esd
+           #:object-class-name
+           #:slot-equal))
 
-(in-package :weblocks)
+(in-package weblocks.utils.clos)
 
 ;;; CLOS and MOP utils.
 
-(wexport '(slot-value-by-path 
-           find-slot-dsd
-           find-slot-esd
-           object-class-name
-           slot-equal)
-         '(t util))
+;; (wexport '(slot-value-by-path 
+;;            find-slot-dsd
+;;            find-slot-esd
+;;            object-class-name
+;;            slot-equal)
+;;          '(t util))
 
 
 (defun slot-value-by-path (obj path)

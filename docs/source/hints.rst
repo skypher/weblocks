@@ -31,7 +31,7 @@ Debugging Techniques
 
 TRACE (beware builtin funs), BACKTRACE, DESCRIBE
 If no errors show up (sometimes occurs e.g. when working with continuations!)
-try *CATCH-ERRORS-P*
+try to set weblocks.variables:*CATCH-ERRORS-P* to nil.
 
 
 Deployment

@@ -11,7 +11,7 @@
 (start-webapp 'tasks)
 (weblocks.server:start-weblocks)
 
-(setf weblocks:*catch-errors-p* nil)
+(setf weblocks.variables:*catch-errors-p* nil)
 
 
 ;; Part 2

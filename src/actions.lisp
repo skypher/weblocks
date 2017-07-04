@@ -28,15 +28,6 @@ page may display a relevant message, if necessary."
     :defer nil))
 
 
-(defgeneric page-not-found-handler (app)
-  (:documentation "This function is called when the current widget 
-   heirarchy fails to parse a URL.  The default behavior simply sets the 
-   +http-not-found+ return code")
-  (:method ((app t))
-    (declare (ignore app))
-    (setf (return-code*) +http-not-found+)))
-
-
 (defun generate-action-code ()
   "Generates unique, hard to guess action codes."
   (let ((new-action-id (gensym "")))

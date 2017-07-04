@@ -31,15 +31,14 @@
 
 (defun calculate-template-priority (template actual-context)
   "Calculates priority for finding effective template."
-  (let ((name (car template))
-        (context (copy-tree (cdr template))))
+  (let ((context (copy-tree (cdr template))))
 
     (or 
       (loop for (key value) on context :by #'cddr
             sum (cond 
                   ((equal key :application-class)
                    (if (subtypep 
-                         (type-of (funcall (intern "CURRENT-WEBAPP" "WEBLOCKS")))
+                        (type-of (intern "*CURRENT-WEBAPP*" "WEBLOCKS"))
                          value)
                      10 
                      0))

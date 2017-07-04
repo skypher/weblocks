@@ -20,3 +20,15 @@
 ;;; Set outgoing encoding to utf-8
 (defvar *default-content-type* "text/html; charset=utf-8")
 
+
+(defpackage #:weblocks.variables
+  (:use #:cl)
+  (:export
+   #:*catch-errors-p*))
+
+(in-package weblocks.variables)
+
+
+(defvar *catch-errors-p* t
+  "If this variable is nil, then weblocks will start lisp's debugger on unhandled conditions.")
+
