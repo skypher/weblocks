@@ -15,19 +15,19 @@
   (log:debug "Returning new-style dependencies for jquery backend.")
 
 
-  (list (weblocks.dependencies:make-remote-js-dependency
+  (list (weblocks.dependencies:make-dependency
          "https://code.jquery.com/jquery-1.8.2.js"
          ;; :integrity "sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
          )
         ;; depends on src/utils/misc.lisp
-        (weblocks.dependencies:make-static-js-dependency
+        (weblocks.dependencies:make-dependency
          "src/js-backend/jquery/jquery.js"
          :system :weblocks)
 
-        (weblocks.dependencies:make-static-js-dependency
+        (weblocks.dependencies:make-dependency
          "src/js-backend/jquery/jquery.ba-bbq.js"
          :system :weblocks)
 
-        (weblocks.dependencies:make-static-image-dependency
+        (weblocks.dependencies:make-dependency
          "src/js-backend/jquery/progress.gif"
          :system :weblocks)))

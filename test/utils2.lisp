@@ -3,7 +3,8 @@
         #:weblocks)
   (:export
    #:with-request
-   #:with-session))
+   #:with-session
+   #:is-html))
 (in-package weblocks.t.utils)
 
 
@@ -19,4 +20,10 @@
      ,@body))
 
 
+(defmacro is-html (form expected &optional message)
+  `(let ((result (with-output-to-string
+                     (weblocks:*weblocks-output-stream*)
+                   ,form)))
+     (prove:like result ,expected
+               ,message)))
 

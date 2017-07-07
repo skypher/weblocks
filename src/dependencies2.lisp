@@ -2,12 +2,12 @@
   (:use #:cl)
   (:export
    #:dependency
-   #:static-dependency
+   #:local-dependency
    #:get-content-type
    #:get-path
-   #:make-static-js-dependency
+   #:make-local-js-dependency
    #:serve
-   #:make-static-css-dependency
+   #:make-local-css-dependency
    #:get-route
    #:get-dependencies
    #:*page-dependencies*
@@ -17,9 +17,12 @@
    #:make-remote-css-dependency
    #:get-integrity
    #:get-cross-origin
-   #:make-static-image-dependency
+   #:make-local-image-dependency
    #:*cache-remote-dependencies-in*
-   #:get-url))
+   #:get-url
+   #:infer-type-from
+   #:make-dependency
+   #:get-type))
 (in-package weblocks.dependencies)
 
 
@@ -38,35 +41,41 @@ be stored.")
 
 
 (defclass dependency ()
-  ((route :initarg :route
-          :initform nil
-          :reader get-route)))
+  ((type :type keyword
+         :initarg :type
+         :initform (error ":type argument is required.")
+         :reader get-type)))
+
+
+(defgeneric get-route (dependency)
+  (:documentation "This method should return a routes:route object
+if dependency should ber served from local server.")
+  (:method (dependency)
+    "By default dependencies aren't served by Lisp."
+    (declare (ignore dependency))))
 
 
 (defclass remote-dependency (dependency)
-  ((content-type :type string
-                 :initarg :content-type
-                 :reader get-content-type)
-   (url :type string
-        :initarg :url
-        :reader get-url)
-   (integrity :type string
+  ((remote-url :type string
+               :initarg :remote-url
+               :reader get-remote-url)
+   (integrity :type (or string null)
               :initarg :integrity
               :initform nil
               :reader get-integrity
               :documentation "A hash, used by modern browsers for subresource integrity checking.
 
 See more information at: https://www.w3.org/TR/SRI/")
-   (cross-origin :type string
+   (cross-origin :type (or string null)
                  :initarg :cross-origin
                  :initform "anonymous"
                  :reader get-cross-origin)))
 
 
-(defclass static-dependency (dependency)
-  ((content-type :type string
-                 :initarg :content-type
-                 :reader get-content-type)
+(defclass local-dependency (dependency)
+  ((route :initarg :route
+          :initform nil
+          :reader get-route)
    (path :type pathname
          :initarg :path
          :reader get-path)
@@ -76,12 +85,35 @@ See more information at: https://www.w3.org/TR/SRI/")
            :reader is-binary)))
 
 
+(defclass cached-remote-dependency (remote-dependency local-dependency)
+  ()
+  (:documentation "This is subclass of remote dependency which is
+downloaded and stored in the local cache and served by lisp image.
+
+You don't' need to create it manually, just set *cache-remote-dependencies-in*
+variable to a path where to store data before all (make-dependency...) will be made,
+and they will create cached-remote-dependency instead of remote-dependency
+objects automatically."))
+
+
 (defgeneric get-url (dependency)
   (:documentation "Returns URL of the dependency.
 
 If dependency should be served by the server, second value is :local.
 Otherwise it is :external. Also, in first case dependency's URL
-should have only path part, like /static/css/bootstrap.css."))
+should have only path part, like /local/css/bootstrap.css."))
+
+(defun get-content-type (dependency)
+  "Returns a MIME content type for given dependency.
+
+It is used when dependency is served locally."
+  
+  (ecase (get-type dependency)
+    (:js "application/javascript")
+    (:css "text/css")
+    (:png "image/png")
+    (:jpg "image/jpeg")
+    (:gif "image/gif")))
 
 
 (defgeneric render-in-head (dependency)
@@ -93,16 +125,14 @@ should have only path part, like /static/css/bootstrap.css."))
 
 
 (defmethod render-in-head ((dependency dependency))
-  (cond
-    ;; Javascript
-    ((equal (get-content-type dependency)
-            "application/javascript")
+  (case (get-type dependency)
+
+    (:js
      (weblocks::with-html
        (:script :src (get-url dependency)
                 :type "text/javascript" "")))
-    ;; CSS
-    ((equal (get-content-type dependency)
-            "text/css")
+
+    (:css
      (weblocks::with-html
        (:link :rel "stylesheet" :type "text/css"
               :href (get-url dependency)
@@ -110,19 +140,20 @@ should have only path part, like /static/css/bootstrap.css."))
 
 
 (defmethod render-in-head ((dependency remote-dependency))
-  (if (equal (get-content-type dependency)
-             "application/javascript")
-      ;; Javascript
-      (weblocks::with-html
-        (:script :src (get-url dependency)
-                 :type "text/javascript" ""))
-      ;; CSS
-      (weblocks::with-html
-        (:link :rel "stylesheet" :type "text/css"
-               :href (get-url dependency)
-               :media "screen"
-               :integrity (get-integrity dependency)
-               :cross-origin (get-cross-origin dependency)))))
+  (case (get-type dependency)
+    ;; Javascript
+    (:js
+     (weblocks::with-html
+       (:script :src (get-url dependency)
+                :type "text/javascript" "")))
+    ;; CSS
+    (:css
+     (weblocks::with-html
+       (:link :rel "stylesheet" :type "text/css"
+              :href (get-url dependency)
+              :media "screen"
+              :integrity (get-integrity dependency)
+              :cross-origin (get-cross-origin dependency))))))
 
 
 (defgeneric serve (dependency)
@@ -146,7 +177,7 @@ to gather necessary dependencies and to inject them into resulting HTML.")
     nil))
 
 
-(defmethod initialize-instance :after ((dependency static-dependency)
+(defmethod initialize-instance :after ((dependency local-dependency)
                                        &rest initargs)
   "Creating a route for the dependency if it is \"local\".
 
@@ -154,21 +185,15 @@ This way it will be possible to serve requests for this dependency from
 a browser."
   
   (declare (ignorable initargs))
+  (log:debug "Making route for" dependency)
 
   ;; Each dependency should have an url.
-  (multiple-value-bind (url type)
-      (get-url dependency)
-
-    ;; But we only interested in a local dependencies,
-    ;; not in those which will be served by CDN.
-    (when (eql type
-               :local)
-
-      ;; And now we will bind a route to dependency and vice-versa.
-      (setf (slot-value dependency
-                        'route)
-            (weblocks.routes:make-route url
-                                        dependency)))))
+  (let ((url (get-url dependency)))
+    ;; And now we will bind a route to dependency and vice-versa.
+    (setf (slot-value dependency
+                      'route)
+          (weblocks.routes:make-route url
+                                      dependency))))
 
 
 (defmethod initialize-instance :after ((dependency remote-dependency)
@@ -196,14 +221,72 @@ a browser."
                                         dependency)))))
 
 
+(defgeneric infer-type-from (path-or-url)
+  (:documentation "Returns a keyword meaning content type of the dependency
+by infering it from URL or a path"))
 
-(defun make-static-js-dependency (path &key system)
+
+(defmethod infer-type-from ((path pathname))
+  (let* ((type (pathname-type path)))
+    
+    (if (member type '("css" "js" "png" "jpg" "ico" "gif") :test #'string-equal)
+        (intern (string-upcase type)
+                :keyword)
+        (error "Unable to infer type from ~a" path))))
+
+
+(defmethod infer-type-from ((url string))
+  (let* ((parsed (puri:parse-uri url))
+         (url-path (puri:uri-path parsed)))
+    (if url-path
+        (infer-type-from (pathname url-path))
+        (error "Unable to infer type from ~a" url))))
+
+
+
+(defun make-dependency (path-or-url &key system
+                                      type
+                                      integrity
+                                      cross-origin)
+  "Creates a JavaScript dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  (declare (type (or string pathname) path-or-url))
+
+  ;; If a usual string was given, but it is does not look like
+  ;; a URL, we'll consider it a path to a file, to make developer's
+  ;; life fun and easy.
+  (when (and (stringp path-or-url)
+             (not (cl-ppcre:scan "^https?://"
+                                 path-or-url)))
+    (setf path-or-url
+          (pathname path-or-url)))
+  
+  (let ((type (or type
+                  (infer-type-from path-or-url))))
+    (typecase path-or-url
+      (string (make-instance (if *cache-remote-dependencies-in*
+                                 'cached-remote-dependency
+                                 'remote-dependency)
+                             :type type
+                             :remote-url path-or-url
+                             :integrity integrity
+                             :cross-origin cross-origin))
+      (pathname (make-instance 'local-dependency
+                               :type type
+                               :path (if system
+                                         (asdf:system-relative-pathname system
+                                                                        path-or-url)
+                                         path-or-url))))))
+
+(defun make-local-js-dependency (path &key system)
   "Creates a JavaScript dependency, served from the disk.
 
 If system's name was give, then path is calculated relative
 to this system's source root."
   
-  (make-instance 'static-dependency
+  (make-instance 'local-dependency
                  :content-type "application/javascript"
                  :path (if system
                            (asdf:system-relative-pathname system
@@ -211,13 +294,13 @@ to this system's source root."
                            path)))
 
 
-(defun make-static-css-dependency (path &key system)
+(defun make-local-css-dependency (path &key system)
   "Creates a CSS dependency, served from the disk.
 
 If system's name was give, then path is calculated relative
 to this system's source root."
   
-  (make-instance 'static-dependency
+  (make-instance 'local-dependency
                  :content-type "text/css"
                  :path (if system
                            (asdf:system-relative-pathname system
@@ -225,7 +308,7 @@ to this system's source root."
                            path)))
 
 
-(defun make-static-image-dependency (path &key system)
+(defun make-local-image-dependency (path &key system)
   "Creates an image dependency, served from the disk.
 
 It is not rendered into an HTML, but served from disk."
@@ -238,7 +321,7 @@ It is not rendered into an HTML, but served from disk."
          (content-type (format nil "image/~a"
                                ext)))
     
-    (make-instance 'static-dependency
+    (make-instance 'local-dependency
                    :content-type content-type
                    :path path
                    :binary t)))
@@ -264,18 +347,18 @@ It is not rendered into an HTML, but served from disk."
                  :cross-origin cross-origin))
 
 
-(defmethod serve ((dependency static-dependency))
-  "Serves static dependency from the disk."
+(defmethod serve ((dependency local-dependency))
+  "Serves local dependency from the disk."
   (values (pathname (get-path dependency))
           (get-content-type dependency)))
 
 
-(defmethod serve ((dependency remote-dependency))
+(defmethod serve ((dependency cached-remote-dependency))
   "Serves remote dependency from local cache."
   (let ((local-path (pathname (get-path dependency))))
     
     (unless (cl-fad:file-exists-p local-path)
-      (let* ((url (slot-value dependency 'url))
+      (let* ((url (get-remote-url dependency))
              (input (dex:get url
                              :want-stream t
                              :force-binary t)))
@@ -293,15 +376,13 @@ It is not rendered into an HTML, but served from disk."
             (get-content-type dependency))))
 
 
-(defmethod get-url ((dependency static-dependency))
+(defmethod get-url ((dependency local-dependency))
   "Returns dependency's url and it's type.
 
 URL type is returned as second value and can be :local or :remote.
-For static-dependency it is :local."
+For local-dependency it is :local."
   
   (let* ((path (get-path dependency))
-         ;; (parts (split-sequence:split-sequence #\/ path))
-         ;; (filename (car (last parts)))
          (filename (pathname-name path))
          (ext (pathname-type path))
          (prefix (format nil "/static/~a/"
@@ -311,17 +392,16 @@ For static-dependency it is :local."
                                             filename
                                             "."
                                             ext)))
-    (values filename-with-prefix :local)))
+    filename-with-prefix))
 
 
 (defmethod get-url ((dependency remote-dependency))
-  (let* ((url (slot-value dependency 'url)))
+  (let* ((remote-url (get-remote-url dependency)))
     (if *cache-remote-dependencies-in*
-        (values (concatenate 'string "/remote-deps-cache/"
-                             (weblocks::md5 url))
-                :local)
-        (values url
-                :remote))))
+        (concatenate 'string "/remote-deps-cache/"
+                     (weblocks::md5 remote-url))
+        remote-url)))
+
 
 (defmethod get-path ((dependency remote-dependency))
   "Returns a path to cached file."
@@ -329,9 +409,9 @@ For static-dependency it is :local."
   (assert (cl-fad:directory-pathname-p
            *cache-remote-dependencies-in*))
 
-  ;; Here we didn't use get-url method because when caching is
-  ;; turned on, it will return a local uri not the original URL
-  (let* ((url (slot-value dependency 'url))
+  (let* ((url (get-remote-url dependency))
          (hash (weblocks::md5 url)))
     (merge-pathnames hash *cache-remote-dependencies-in*)))
+
+
 
