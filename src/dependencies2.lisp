@@ -359,18 +359,21 @@ It is not rendered into an HTML, but served from disk."
     
     (unless (cl-fad:file-exists-p local-path)
       (let* ((url (get-remote-url dependency))
-             (input (dex:get url
-                             :want-stream t
-                             :force-binary t)))
+             ;; игнорируем ошибки пока в самолёте
+             (input (ignore-errors
+                     (dex:get url
+                              :want-stream t
+                              :force-binary t))))
         
         (ensure-directories-exist local-path)
         
-        (with-open-file (output local-path
-                                :direction :output
-                                :element-type '(unsigned-byte 8)
-                                :if-exists :supersede
-                                :if-does-not-exist :create)
-          (cl-fad:copy-stream input output))))
+        (when input
+          (with-open-file (output local-path
+                                  :direction :output
+                                  :element-type '(unsigned-byte 8)
+                                  :if-exists :supersede
+                                  :if-does-not-exist :create)
+            (cl-fad:copy-stream input output)))))
     
     (values local-path
             (get-content-type dependency))))
