@@ -181,13 +181,14 @@ This function serves all started applications and their static files."
                      ;;       ("Content-Type" "text/html")
                      ;;       ("Something went wrong!"))))
                      ))))
-        (log:info "Starting webserver on" port debug)
+        (log:info "Starting webserver on [::0]:" port debug)
         
         ;; Suppressing output to stdout, because Clack writes message
         ;; about started server and we want to write into a log instead.
         (with-output-to-string (*standard-output*)
           (setf (get-handler server)
                 (clack:clackup app
+                               :address "::0"
                                :server (get-server-type server)
                                :port port
                                :debug debug)))

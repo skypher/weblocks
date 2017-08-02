@@ -28,7 +28,7 @@
                    (loop for task in tasks
                          do (cl-who:htm (:li (str task))))))))))
 
-(defwebapp your-app
+(defwebapp tasks
      :init-user-session #'init-user-session)
 
 (progn (weblocks:restart-webapp 'tasks)

@@ -58,6 +58,8 @@ it now and make an application which outputs a list of tasks.
                        (:ul :class "tasks"
                             (loop for task in tasks
                                   do (cl-who:htm (:li (str task))))))))))
+   TODO> (defwebapp tasks
+           :init-user-session #'init-user-session)
 
 This code defined a list of tasks. For simplicity, they are defined as a
 list in a memory. Then it renders these tasks as HTML ``ul`` block.
