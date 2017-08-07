@@ -22,7 +22,8 @@
    #:get-url
    #:infer-type-from
    #:make-dependency
-   #:get-type))
+   #:get-type
+   #:render-in-ajax-response))
 (in-package weblocks.dependencies)
 
 
@@ -117,11 +118,22 @@ It is used when dependency is served locally."
 
 
 (defgeneric render-in-head (dependency)
-  (:documentation "Renderns a piece of html.")
+  (:documentation "Renders a piece of html.")
   (:method (dependency)
     (format weblocks:*weblocks-output-stream*
             "<!-- Dependency ~S -->"
             dependency)))
+
+
+(defgeneric render-in-ajax-response (dependency)
+  (:documentation "Returns a JS code to dynamically include a CSS or JS dependency
+into a webpage on AJAX response.
+
+This makes possible to load new styles and code for widgets which can appear on a page
+as a response to some action.")
+  (:method (dependency)
+    (declare (ignorable dependency))
+    (log:warn "No method to handle AJAX" dependency)))
 
 
 (defmethod render-in-head ((dependency dependency))
@@ -137,6 +149,21 @@ It is used when dependency is served locally."
        (:link :rel "stylesheet" :type "text/css"
               :href (get-url dependency)
               :media "screen")))))
+
+
+(defmethod render-in-ajax-response ((dependency dependency))
+  (case (get-type dependency)
+    (:js
+     (let ((script (parenscript:ps* `(include_dom
+                                      ,(get-url dependency)))))
+       (log:debug "Rendering js dependency in ajax response" dependency)
+       (weblocks:send-script script :before-load)))
+
+    (:css
+     (let ((script (parenscript:ps* `(include_css
+                                      ,(get-url dependency)))))
+       (log:debug "Rendering css dependency in ajax response" dependency)
+       (weblocks:send-script script :before-load)))))
 
 
 (defmethod render-in-head ((dependency remote-dependency))

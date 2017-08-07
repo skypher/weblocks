@@ -29,5 +29,9 @@
          :system :weblocks)
 
         (weblocks.dependencies:make-dependency
+         "src/js-backend/jquery/jquery-seq.js"
+         :system :weblocks)
+
+        (weblocks.dependencies:make-dependency
          "src/js-backend/jquery/progress.gif"
          :system :weblocks)))
