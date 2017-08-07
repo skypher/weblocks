@@ -97,8 +97,7 @@ This function serves all started applications and their static files."
 
       (dolist (app weblocks::*active-webapps*)
         (let ((app-prefix (weblocks::webapp-prefix app))
-              (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app))
-              weblocks::*default-content-type*)
+              (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app)))
 
           (log:debug "Searching handler in" app app-prefix app-pub-prefix)
 
