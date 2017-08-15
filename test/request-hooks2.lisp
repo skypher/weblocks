@@ -5,38 +5,50 @@
 (in-package weblocks.t.request-hooks)
 
 
-(subtest "session-request-hooks"
-  (with-request ("/")
+(subtest "Callbacks list for unknown name is empty"
+  (with-session
+    (with-request ("/")
+      (is (weblocks.hooks::get-callbacks
+           weblocks.hooks::*session-hooks*
+           :some-unknown-name)
+          nil
+          "If no callbacks were added for the name, then get-callbacks should return an empty list."))))
+
+
+(subtest "Add session hook"
+  (with-session
+    (with-request ("/")
+      (weblocks.hooks:add-session-hook :post-action 'foo)
+
+      (ok (member 'foo (weblocks.hooks::get-callbacks
+                        weblocks.hooks::*session-hooks*
+                        :post-action))
+          "Function add-session-hook should put given value into the list of callbacks bound to the session."))))
+
+
+(subtest "Hooks evaluation"
+  (subtest "Without params"
     (with-session
-      (let ((hooks (weblocks::session-request-hooks)))
-        (isnt hooks
-              nil
-              "For fresh request and session, request-hooks should be a fresh struct.")
-        (is (weblocks::dynamic-action-hook hooks)
-            nil
-            "And there is no dynamic action hooks.")
-        (is (weblocks::pre-action-hook hooks)
-            nil
-            "And there is no \"pre\" action hooks.")
-        (is (weblocks::post-action-hook hooks)
-            nil
-            "And there is no \"post\" action hooks.")
+      (with-request ("/")
+        (let (call-result)
+          (flet ((callback ()
+                   (setf call-result
+                         'callback-was-called)))
+            (weblocks.hooks:add-session-hook :post-action #'callback)
+            (weblocks.hooks:eval-hooks :post-action)
 
-        (is (weblocks::dynamic-render-hook hooks)
-            nil
-            "And there is no dynamic render hooks.")
-        (is (weblocks::pre-render-hook hooks)
-            nil
-            "And there is no \"pre\" render hooks.")
-        (is (weblocks::post-render-hook hooks)
-            nil
-            "And there is no \"post\" render hooks.")))))
+            (is call-result
+                'callback-was-called))))))
 
-
-(subtest "add-request-hook"
-  (with-request ("/")
+  (subtest "With params"
     (with-session
-      (weblocks::add-request-hook :session :post-action 'foo)
+      (with-request ("/")
+        (let (call-result)
+          (flet ((callback (param)
+                   (push param call-result)))
+            (weblocks.hooks:add-session-hook :some-hook #'callback)
+            (weblocks.hooks:eval-hooks :some-hook 'blah)
 
-      (is  (member 'foo (weblocks:request-hook :session :post-action))
-           t))))
+            (is call-result
+                '(blah))))))))
+

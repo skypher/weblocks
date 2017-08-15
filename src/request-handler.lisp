@@ -127,7 +127,7 @@ customize behavior."))
               (unless finished?
                 (setf (root-widget) nil)
                 (reset-webapp-session))))
-          (add-request-hook :session :post-action 'update-dialog-on-request))
+          (weblocks.hooks:add-session-hook :post-action 'update-dialog-on-request))
         (when (and *rewrite-for-session-urls*
                    (cookie-in (session-cookie-name *weblocks-server*)))
           (redirect (remove-session-from-uri (request-uri*)))))
@@ -310,7 +310,7 @@ association list. This function is normally called by
    weblocks transaction functions over all stores"
 
   ;; Added this temporarily to fix errors without stores
-  (eval-dynamic-hooks hooks)
+  (weblocks.hooks:eval-dynamic-hooks hooks)
   
   ;; (if (eq (weblocks.request:request-method) :post)
   ;;     (let (tx-error-occurred-p)
@@ -343,5 +343,5 @@ association list. This function is normally called by
   
 ;; a default dynamic-action hook function wraps actions in a transaction
 (eval-when (:load-toplevel)
-  (add-request-hook :application :dynamic-action 'action-txn-hook))
+  (weblocks.hooks:add-application-hook :dynamic-action 'action-txn-hook))
 

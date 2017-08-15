@@ -51,8 +51,8 @@ etc."
   (setf *redirect-request-p* nil))
 
 (eval-when (:load-toplevel)
-  (add-request-hook :application :post-action 'clear-session-redirect-p )
-  (add-request-hook :application :pre-action 'clear-redirect-var ))
+  (weblocks.hooks:add-application-hook :post-action 'clear-session-redirect-p )
+  (weblocks.hooks:add-application-hook :pre-action 'clear-redirect-var ))
 
 
 (defun set-redirect-true ()
@@ -100,9 +100,9 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
         (ps:ps*
          `((slot-value window 'open) ,uri ,window-title))))
       ((eq defer :post-action)
-       (add-request-hook :request :post-action #'do-redirect))
+       (weblocks.hooks:add-request-hook :post-action #'do-redirect))
       ((eq defer :post-render)
-       (request-hook :request :post-render #'do-redirect))
+       (weblocks.hooks:add-request-hook :post-render #'do-redirect))
       (t (do-redirect)))))
 
 ;;; legacy wrappers for redirect
