@@ -77,8 +77,9 @@ See more information at: https://www.w3.org/TR/SRI/")
   ((route :initarg :route
           :initform nil
           :reader get-route)
-   (path :type pathname
+   (path :type (or pathname null)
          :initarg :path
+         :initform nil
          :reader get-path)
    (binary :type bool
            :initarg :binary
@@ -103,6 +104,18 @@ objects automatically."))
 If dependency should be served by the server, second value is :local.
 Otherwise it is :external. Also, in first case dependency's URL
 should have only path part, like /local/css/bootstrap.css."))
+
+
+(defmethod print-object ((object local-dependency) stream)
+  (print-unreadable-object (object stream :type t)
+    (when (get-path object)
+      (format stream "path: ~S" (get-path object)))))
+
+
+(defmethod print-object ((object remote-dependency) stream)
+  (print-unreadable-object (object stream :type t)
+    (format stream "url: ~S" (get-remote-url object))))
+
 
 (defun get-content-type (dependency)
   "Returns a MIME content type for given dependency.
