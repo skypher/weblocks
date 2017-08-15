@@ -279,7 +279,9 @@ by infering it from URL or a path"))
 
 If system's name was give, then path is calculated relative
 to this system's source root."
-  (declare (type (or string pathname) path-or-url))
+  (check-type path-or-url (or string pathname))
+
+  (log:debug "Creating dependency from" path-or-url)
 
   ;; If a usual string was given, but it is does not look like
   ;; a URL, we'll consider it a path to a file, to make developer's
