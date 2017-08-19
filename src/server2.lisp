@@ -22,6 +22,9 @@
   ((port :type integer
          :initarg :port
          :reader get-port)
+   (interface :type string
+              :initarg :interface
+              :reader get-interface)
    (server-type :initarg :server-type
                 :reader get-server-type)
    (handler :initform nil
@@ -45,11 +48,13 @@ Returns a webserver's instance.")
 
 (defun make-server (&key
                       (port 8080)
+                      (interface "localhost")
                       (server-type :hunchentoot))
   "Makes a webserver instance.
 Make instance, then start it with ``start`` method."
   (make-instance 'server
                  :port port
+                 :interface interface
                  :server-type server-type))
 
 
@@ -165,6 +170,7 @@ This function serves all started applications and their static files."
       
       ;; Otherwise, starting a server
       (let* ((port (get-port server))
+             (interface (get-interface server))
              (app (lack:builder
                    :session
                    (lambda (env)
@@ -180,14 +186,14 @@ This function serves all started applications and their static files."
                      ;;       ("Content-Type" "text/html")
                      ;;       ("Something went wrong!"))))
                      ))))
-        (log:info "Starting webserver on [::0]:" port debug)
+        (log:info "Starting webserver on" interface port debug)
         
         ;; Suppressing output to stdout, because Clack writes message
         ;; about started server and we want to write into a log instead.
         (with-output-to-string (*standard-output*)
           (setf (get-handler server)
                 (clack:clackup app
-                               :address "::0"
+                               :address interface
                                :server (get-server-type server)
                                :port port
                                :debug debug)))
@@ -222,6 +228,7 @@ This function serves all started applications and their static files."
 
 (defun start-weblocks (&key (debug t)
                          (port 8080)
+                         (interface "localhost")
                          (server-type :hunchentoot))
   "Starts weblocks framework hooked into Clack server.
 
@@ -251,6 +258,7 @@ declared AUTOSTART."
     (values
      (start (setf *server*
                   (make-server :port port
+                               :interface "localhost"
                                :server-type server-type))
             :debug debug)
      (mapcar (lambda (class)
