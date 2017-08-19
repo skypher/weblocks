@@ -258,7 +258,7 @@ declared AUTOSTART."
     (values
      (start (setf *server*
                   (make-server :port port
-                               :interface "localhost"
+                               :interface interface
                                :server-type server-type))
             :debug debug)
      (mapcar (lambda (class)
