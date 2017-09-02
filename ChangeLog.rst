@@ -2,6 +2,7 @@
  ChangeLog
 ===========
 
+* :release:`0.13.9 <2017-09-02>`
 * :feature:`-` Added integrity field for remove javascript dependencies.
   Also, ``get-cross-origin`` and ``:cross-origin`` were removed to
   ``get-crossorigin`` and ``:crossorigin``, to conform the html
