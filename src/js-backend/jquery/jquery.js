@@ -98,11 +98,13 @@ function stopPropagation(event) {
 }
 
 function startProgress(){
-  jQuery('#ajax-progress').html("<img src='/static/gif/progress.gif'>");
+    var progress = jQuery('#ajax-progress');
+    progress.show(progress.data('show-speed'));
 }
 
 function stopProgress(){
-  jQuery('#ajax-progress').html("");
+    var progress = jQuery('#ajax-progress');
+    progress.hide(progress.data('hide-speed'));
 }
 
 log('LOADED');

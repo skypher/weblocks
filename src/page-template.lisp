@@ -63,7 +63,6 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
        (str header-content))
      (:body
        (str body-content)
-       (:div :id "ajax-progress" "&nbsp;")
        (with-javascript "updateWidgetStateFromHash();")))))
 
 (deftemplate :page-wt 'page-wt)
