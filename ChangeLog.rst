@@ -2,6 +2,10 @@
  ChangeLog
 ===========
 
+* :feature:`-` Added integrity field for remove javascript dependencies.
+  Also, ``get-cross-origin`` and ``:cross-origin`` were removed to
+  ``get-crossorigin`` and ``:crossorigin``, to conform the html
+  attibute's spelling.
 * :release:`0.13.8 <2017-09-02>`
 * :bug:`-` Fixed error on ``(weblocks:redirect...)`` call.
 * :bug:`-` Fixed dependency handling in ajax requests.

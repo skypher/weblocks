@@ -16,7 +16,7 @@
    #:make-remote-js-dependency
    #:make-remote-css-dependency
    #:get-integrity
-   #:get-cross-origin
+   #:get-crossorigin
    #:make-local-image-dependency
    #:*cache-remote-dependencies-in*
    #:get-url
@@ -67,10 +67,10 @@ if dependency should ber served from local server.")
               :documentation "A hash, used by modern browsers for subresource integrity checking.
 
 See more information at: https://www.w3.org/TR/SRI/")
-   (cross-origin :type (or string null)
-                 :initarg :cross-origin
-                 :initform "anonymous"
-                 :reader get-cross-origin)))
+   (crossorigin :type (or string null)
+                :initarg :crossorigin
+                :initform "anonymous"
+                :reader get-crossorigin)))
 
 
 (defclass local-dependency (dependency)
@@ -185,7 +185,9 @@ as a response to some action.")
     (:js
      (weblocks::with-html
        (:script :src (get-url dependency)
-                :type "text/javascript" "")))
+                :type "text/javascript"
+                :integrity (get-integrity dependency)
+                :crossorigin (get-crossorigin dependency))))
     ;; CSS
     (:css
      (weblocks::with-html
@@ -193,7 +195,7 @@ as a response to some action.")
               :href (get-url dependency)
               :media "screen"
               :integrity (get-integrity dependency)
-              :cross-origin (get-cross-origin dependency))))))
+              :crossorigin (get-crossorigin dependency))))))
 
 
 (defgeneric serve (dependency)
@@ -287,7 +289,7 @@ by infering it from URL or a path"))
 (defun make-dependency (path-or-url &key system
                                       type
                                       integrity
-                                      cross-origin)
+                                      crossorigin)
   "Creates a JavaScript dependency, served from the disk.
 
 If system's name was give, then path is calculated relative
@@ -314,7 +316,7 @@ to this system's source root."
                              :type type
                              :remote-url path-or-url
                              :integrity integrity
-                             :cross-origin cross-origin))
+                             :crossorigin crossorigin))
       (pathname (make-instance 'local-dependency
                                :type type
                                :path (if system
