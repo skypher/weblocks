@@ -70,7 +70,7 @@ In the end, we'll build the mandatory TODO-list app:
 This code defined a list of tasks. For simplicity, they are defined as a
 list in a memory. Then it renders these tasks as HTML ``ul`` block.
 
-Restart application:
+Restart the application:
 
 .. code-block:: common-lisp-repl
 
@@ -118,7 +118,7 @@ Write a new ``init-user-session`` in the repl:
                            (:input :type "submit"
                                    :value "Add"))))))))
 
-Pay attention to two new blocks in this code. Now it have inner function
+Pay attention to two new blocks in this code. Now it has the inner function
 ``add-task``:
 
 .. code-block:: common-lisp
@@ -127,17 +127,17 @@ Pay attention to two new blocks in this code. Now it have inner function
      (push task tasks)
      (mark-dirty root))
 
-It does only to simple things:
+It does only two simple things:
 
-- adds a task into a list;
-- tells Weblocks that page is a dirty and should be redrawn.
+- it adds a task into a list;
+- it tells Weblocks that the page is dirty and should be redrawn.
 
-Second thing is a really important because it allows Weblocks to render
-necessary parts of the page on the server and to inject it into HTML DOM
-in the browser. Here it rerenders whole page, but later you'll see that
-same technic can be used to update a smaller piecese, called :ref:`widgets`.
+This second point is really important because it allows Weblocks to render
+necessary parts of the page on the server and to inject it into the HTML DOM
+in the browser. Here it rerenders the whole page, but later you'll see that
+the same technic can be used to update smaller pieces, called :ref:`widgets`.
 
-Another block in our new version of init-user-session is a form:
+Another block in our new version of init-user-session is the form:
 
 .. code-block:: common-lisp
 
@@ -153,15 +153,15 @@ form submit.
 
 .. note:: This is really amazing!
 
-          With Weblocks, you can handle all business logic on
-          server-side, because action can be any lisp function, even an
+          With Weblocks, you can handle all the business logic
+          server-side, because an action can be any lisp function, even an
           anonymous lambda, closuring all necessary variables.
 
-Restart application and reload a page. Test your form now and see in a
-`Webinspector`_ how weblocks sends requests to the server and receives
+Restart the application and reload the page. Test your form now and see in a
+`Webinspector`_ how Weblocks sends requests to the server and receives
 HTML code with rendered HTML block.
 
-Now we'll our application really useful – add a code to toggle tasks:
+Now we'll make our application really useful – wekll add code to toggle tasks:
 
 .. code-block:: common-lisp-repl
 
@@ -210,7 +210,7 @@ Now we'll our application really useful – add a code to toggle tasks:
                            (:input :type "submit"
                                    :value "Add"))))))))
 
-This code have following significant changes:
+This code has the following significant changes:
 
 * Now we store our tasks as structures to be able to change their state
   easily:
@@ -221,10 +221,10 @@ This code have following significant changes:
         (title)
         (done))
 
-  And now they have additional attribute ``done`` for indication if we
+  And now they have the additional attribute ``done`` for indication if we're
   done with a task or not.
 
-* Next change is a small helper to toggle done attribute:
+* The next change is a small helper to toggle the ``done`` attribute:
 
   .. code-block:: common-lisp
 
@@ -237,7 +237,7 @@ This code have following significant changes:
 
 * And finally, we've modified our task rendering function by adding a
   code to render a checkbox with an anonymous lisp function, attached to
-  it's ``onclick`` attribute:
+  its ``onclick`` attribute:
 
   .. code-block:: common-lisp
 
@@ -252,9 +252,9 @@ This code have following significant changes:
                        (cl-who:htm (:strike (str title)))
                        (str title)))))
 
-  Function ``make-js-action`` returns a Javascript code, which
+  The function ``make-js-action`` returns a Javascript code, which
   calls back a lisp lambda function when evaluated in the browser.
-  And because ``toggle-task`` marks as "dirty" root widget, Weblocks
+  And because ``toggle-task`` marks the root widget as "dirty", Weblocks
   returns on this callback a new prerendered HTML with all tasks.
   Next I'll show how to rerender only a single task on such changes.
 
@@ -265,8 +265,8 @@ As a homework:
 
 1. Play with lambdas and add a "Delete" button next after
    each task.
-2. Add ability to sort tasks by name or by completion flag.
-3. Read rest of documentation and make real application, using the full
-   power of the Common Lisp.
+2. Add the ability to sort tasks by name or by completion flag.
+3. Read the rest of the documentation and make a real application, using the full
+   power of Common Lisp.
 
 .. _Webinspector: https://developers.google.com/web/tools/chrome-devtools/inspect-styles/
