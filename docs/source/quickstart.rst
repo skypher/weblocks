@@ -83,9 +83,9 @@ Write a new ``init-user-session`` in the repl:
 .. code-block:: common-lisp-repl
 
    TODO> (defun init-user-session (root)
-           (let ((tasks '("Make my first app in Weblocks"
-                          "Deploy it somewhere"
-                          "Have a profit")))
+           (let ((tasks (reverse '("Make my first app in Weblocks"
+                                   "Deploy it somewhere"
+                                   "Have a profit"))))
              (flet ((add-task (&rest rest &key task &allow-other-keys)
                       (push task tasks)
                       (mark-dirty root)))
@@ -94,8 +94,9 @@ Write a new ``init-user-session`` in the repl:
                        (with-html
                          (:h1 "Tasks")
                          (:ul :class "tasks"
-                              (loop for task in tasks
+                              (loop for task in (reverse tasks)
                                     do (cl-who:htm (:li (str task)))))
+
                          (with-html-form (:POST #'add-task)
                            (:input :type "text"
                                    :name "task"
@@ -155,9 +156,9 @@ Now we'll our application really useful – add a code to toggle tasks:
            (done))
 
    TODO> (defun init-user-session (root)
-           (let ((tasks (list (make-task :title "Make my first app in Weblocks" :done t)
-                              (make-task :title "Deploy it somewhere" :done nil)
-                              (make-task :title "Have a profit" :done nil))))
+           (let ((tasks (reverse (list (make-task :title "Make my first app in Weblocks" :done t)
+                                       (make-task :title "Deploy it somewhere" :done nil)
+                                       (make-task :title "Have a profit" :done nil)))))
              (labels ((add-task (&rest rest &key task &allow-other-keys)
                         (log:info "Pushing" task "to" tasks rest)
                         (push (make-task :title task :done nil) tasks)
@@ -186,7 +187,7 @@ Now we'll our application really useful – add a code to toggle tasks:
                        (with-html
                          (:h1 "Tasks")
                          (:div :class "tasks"
-                               (loop for task in tasks
+                               (loop for task in (reverse tasks)
                                      do (cl-who:htm (render-task task))))
                          (with-html-form (:POST #'add-task)
                            (:input :type "text"
