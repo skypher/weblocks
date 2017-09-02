@@ -2,6 +2,7 @@
  ChangeLog
 ===========
 
+* :release:`0.13.8 <2017-09-02>`
 * :bug:`-` Fixed error on ``(weblocks:redirect...)`` call.
 * :bug:`-` Fixed dependency handling in ajax requests.
 * :feature:`-` Now if unhandled exception occure, Woo's handler remains
