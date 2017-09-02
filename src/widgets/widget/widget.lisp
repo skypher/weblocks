@@ -445,14 +445,15 @@ stylesheets and javascript links in the page header."))
   (log:debug "Rendering widget" obj "with" weblocks.dependencies:*page-dependencies*)
   
   (let ((widget-dependencies (weblocks.dependencies:get-dependencies obj)))
-    (if (weblocks.request:ajax-request-p)
-        ;; Return a code to embed new dependencies into new page
-        (mapc #'weblocks.dependencies:render-in-ajax-response
-              widget-dependencies)
-        ;; Update new-style dependencies
-        (setf weblocks.dependencies:*page-dependencies*
-              (append weblocks.dependencies:*page-dependencies*
-                      widget-dependencies))))
+    ;; Update new-style dependencies
+    (setf weblocks.dependencies:*page-dependencies*
+          (append weblocks.dependencies:*page-dependencies*
+                  widget-dependencies))
+    
+    (when (weblocks.request:ajax-request-p)
+      ;; Return a code to embed new dependencies into new page
+      (mapc #'weblocks.dependencies:render-in-ajax-response
+            widget-dependencies)))
 
   (write-string 
    (weblocks.utils.html-parts:nested-html-part 

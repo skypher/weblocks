@@ -176,10 +176,16 @@ customize behavior."))
           (handle-http-error app (return-code*)))))))
 
 (defmethod handle-ajax-request ((app weblocks-webapp))
+  (log:debug "Handling AJAX request")
+  
   (webapp-update-thread-status "Handling AJAX request")
   (timing "handle-ajax-request"
     (update-location-hash-dependents)
-    (render-dirty-widgets)))
+    (render-dirty-widgets)
+
+    ;; TODO: only add new routes
+    (weblocks.routes:register-dependencies
+     weblocks.dependencies:*page-dependencies*)))
 
 (defun update-location-hash-dependents ()
   (let ((hash (parse-location-hash)))

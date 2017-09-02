@@ -177,7 +177,7 @@ hooks:
   (when (or weblocks::*weblocks-global-debug*
             (weblocks::webapp-debug))
     
-    (log:warn "Resetting html parts cache")
+    (log:debug "Resetting html parts cache")
     (weblocks.utils.html-parts:reset)))
 
 (defun update-html-parts ()
