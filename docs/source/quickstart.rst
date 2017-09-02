@@ -45,6 +45,12 @@ text like that::
 It means that you didn't write any code for your application. Let's do
 it now and make an application which outputs a list of tasks.
 
+In the end, we'll build the mandatory TODO-list app:
+
+.. image:: _static/quickstart-check-task.gif
+   :align: center
+   :alt: the TODO-list app in Weblocks.
+
 .. code-block:: common-lisp-repl
 
    TODO> (defun init-user-session (root)
@@ -71,12 +77,20 @@ Restart application:
    TODO> (progn (weblocks:restart-webapp 'tasks)
                 (weblocks.debug:reset-latest-session))
 
-Right now it should looks like:
+Right now it should look like this:
 
-TODO: add an image.
+.. image:: _static/quickstart-list.png
+   :align: center
+   :alt: Our first list of tasks.
+   :width: 400px
+
 
 Now, we'll add some ability to interact with a list – to add some tasks
-into it.
+into it, like so:
+
+.. image:: _static/quickstart-add-task.gif
+   :align: center
+   :alt: Adding tasks in our TODO-list interactively.
 
 Write a new ``init-user-session`` in the repl:
 
