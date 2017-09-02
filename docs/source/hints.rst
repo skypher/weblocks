@@ -152,13 +152,11 @@ At a glance
 
    * -
      - Weblocks
-     - UCW/AJAX
      - Seaside
      - PLT Webserver
      - RubyOnRails
      - Django
    * - Language
-     - Common Lisp
      - Common Lisp
      - Smalltalk
      - Scheme
@@ -166,7 +164,6 @@ At a glance
      - Python
    * - Supports REST
      - Yes
-     -
      -
      - Yes
      - Yes
@@ -177,9 +174,7 @@ At a glance
      -
      -
      -
-     -
    * - AJAX support built-in
-     - Yes
      - Yes
      -
      -
@@ -187,7 +182,6 @@ At a glance
      - No
    * - Degrades gracefully without AJAX
      - Yes
-     - No
      - (N/A)
      - (N/A)
      - No
@@ -195,19 +189,16 @@ At a glance
    * - Scaffolding/DRY
      - Dynamic
      -
-     -
      - No
      - Static
      -
    * - Support for non-SQL databases
      - Yes
      -
-     -
      - Yes
      - No
      -
    * - Interactive debugging
-     - Yes
      - Yes
      - Yes
      - Yes
@@ -217,11 +208,9 @@ At a glance
      - Yes
      -
      -
-     -
      - No
      - No
    * - Community
-     - Tiny
      - Tiny
      - Small
      - Small
@@ -231,19 +220,16 @@ At a glance
      - Yes
      -
      -
-     -
      - Yes
      - Yes
    * - Commercial support
      - Yes
      -
      -
-     -
      - Yes
      - Yes
    * - Licence
      - LLGPL
-     -
      -
      -
      -
