@@ -2,6 +2,7 @@
  ChangeLog
 ===========
 
+* :bug:`-` Fixed error on ``(weblocks:redirect...)`` call.
 * :bug:`-` Fixed dependency handling in ajax requests.
 * :feature:`-` Now if unhandled exception occure, Woo's handler remains
   working. Previously, handler's thread shut down on any unhandled exception.

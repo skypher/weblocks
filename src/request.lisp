@@ -56,7 +56,7 @@ etc."
 
 
 (defun set-redirect-true ()
-  (setf (weblocks.session:get-value 'redirect-p) t))
+  (weblocks.session:set-value 'redirect-p t))
 
 
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
