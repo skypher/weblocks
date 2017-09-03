@@ -147,22 +147,94 @@ Weblocks compared to other frameworks
 At a glance
 -----------
 
-w_beg(table,r,c,c,c,c,c,c)
-                                 || Weblocks    || UCW/AJAX         || Seaside || PLT Webserver || RubyOnRails || Django //
-Language                         || Common Lisp || Common Lisp || Smalltalk || Scheme || Ruby || Python //
-Supports REST                    || Yes         ||  ||  || Yes || Yes || Yes //
-Supports multi-tier dispatch     || Yes         ||  ||  ||  || || //
-AJAX support built-in            || Yes         || Yes ||  ||  || No || No //
-Degrades gracefully without AJAX || Yes         || No || (N/A) || (N/A) || No || No //
-Scaffolding/DRY                  || Dynamic     ||  ||  || No || Static || //
-Support for non-SQL databases    || Yes         ||  ||  || Yes || No || //
-Interactive debugging            || Yes         || Yes || Yes || Yes || No || No //
-Bundling/compression built-in    || Yes         ||   ||  ||  || No || No //
-Community                        || Tiny        || Tiny  ||  Small || Small || Medium || Medium //
-Community support                || Yes         ||  ||  ||  || Yes || Yes //
-Commercial support               || Yes         || Yes || Yes ||  || Yes || Yes //
-License                          || LLGPL       ||  || || || ||  //
-w_end(table)
+.. list-table:: Weblocks compared with other frameworks
+   :header-rows: 1
+
+   * -
+     - Weblocks
+     - Seaside
+     - PLT Webserver
+     - RubyOnRails
+     - Django
+   * - Language
+     - Common Lisp
+     - Smalltalk
+     - Scheme
+     - Ruby
+     - Python
+   * - Supports REST
+     - Yes
+     -
+     - Yes
+     - Yes
+     - Yes
+   * - Suports multi-tier dispatch
+     - Yes
+     -
+     -
+     -
+     -
+   * - AJAX support built-in
+     - Yes
+     -
+     -
+     - No
+     - No
+   * - Degrades gracefully without AJAX
+     - Yes
+     - (N/A)
+     - (N/A)
+     - No
+     - No
+   * - Scaffolding/DRY
+     - Dynamic
+     -
+     - No
+     - Static
+     -
+   * - Support for non-SQL databases
+     - Yes
+     -
+     - Yes
+     - No
+     -
+   * - Interactive debugging
+     - Yes
+     - Yes
+     - Yes
+     - No
+     - No
+   * - Bundling/compression built-in
+     - Yes
+     -
+     -
+     - No
+     - No
+   * - Community
+     - Tiny
+     - Small
+     - Small
+     - Medium
+     - Medium
+   * - Community support
+     - Yes
+     -
+     -
+     - Yes
+     - Yes
+   * - Commercial support
+     - Yes
+     -
+     -
+     - Yes
+     - Yes
+   * - Licence
+     - LLGPL
+     -
+     -
+     -
+     - 
+
 
 In-depth comparison
 -------------------
