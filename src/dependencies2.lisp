@@ -404,10 +404,15 @@ It is not rendered into an HTML, but served from disk."
     (unless (cl-fad:file-exists-p local-path)
       (let* ((url (get-remote-url dependency))
              ;; игнорируем ошибки пока в самолёте
-             (input (ignore-errors
-                     (dex:get url
-                              :want-stream t
-                              :force-binary t))))
+             (input (handler-case
+                        (progn
+                          (log:debug "Caching" url)
+                          (dex:get url
+                                   :want-stream t
+                                   :force-binary t))
+                      (t ()
+                        (log:error "Unable to fetch" url)
+                        (values)))))
         
         (ensure-directories-exist local-path)
         
