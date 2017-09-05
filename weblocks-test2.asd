@@ -11,6 +11,7 @@
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
+  :defsystem-depends-on (:prove-asdf)
   :depends-on (:weblocks
                :prove   ;; will change lift with prove soon
                :hamcrest-prove
