@@ -8,6 +8,9 @@
 (in-package weblocks.test.dependencies)
 
 
+(plan 8)
+
+
 (subtest "Infer type"
   (is (infer-type-from "/some/path/to.css")
       :css
@@ -167,3 +170,6 @@
     (isnt (get-route dependency)
           nil
           "Cached dependency should have a route.")))
+
+
+(finalize)

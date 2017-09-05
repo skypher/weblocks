@@ -5,6 +5,7 @@
         #:weblocks.t.utils))
 (in-package weblocks.t.weblocks)
 
+(plan 3)
 
 (subtest "root-composite-1"
   (with-session
@@ -29,3 +30,6 @@
       (with-javascript-to-string "foo~A" "bar")
       
       "Macro with-javascript should write into *weblocks-output-stream*"))
+
+
+(finalize)

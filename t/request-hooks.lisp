@@ -5,6 +5,9 @@
 (in-package weblocks.t.request-hooks)
 
 
+(plan 3)
+
+
 (subtest "Callbacks list for unknown name is empty"
   (with-session
     (with-request ("/")
@@ -52,3 +55,5 @@
             (is call-result
                 '(blah))))))))
 
+
+(finalize)

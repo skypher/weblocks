@@ -6,17 +6,21 @@
 (in-package weblocks.t.actions)
 
 
+(plan 4)
+
+
 (subtest "get-action-name-from-request"
-  (with-request ("/?action=blah" :method :get)
-    (is (weblocks.request-handler::get-action-name-from-request)
-        "blah"
-        "It should work with GET parameters"))
-  
-  (with-request ("/" :method :post
-                     :data '(("action" . "blah")))
-    (is (weblocks.request-handler::get-action-name-from-request)
-        "blah"
-        "And with POSTs")))
+  (with-session
+    (with-request ("/?action=blah" :method :get)
+      (is (weblocks.request::get-action-name-from-request)
+          "blah"
+          "It should work with GET parameters"))
+    
+    (with-request ("/" :method :post
+                       :data '(("action" . "blah")))
+      (is (weblocks.request::get-action-name-from-request)
+          "blah"
+          "And with POSTs"))))
 
 
 (subtest "make-action/get-request-action-1"
@@ -30,10 +34,11 @@
 
 
 (subtest "function-or-action->action-error"
-  (with-request ("/")
-    (is-error (weblocks::function-or-action->action "abc123")
-              'error
-              "Action with name \"abc123\" wasn't defined and function should raise an exception.")))
+  (with-session
+    (with-request ("/")
+      (is-error (weblocks::function-or-action->action "abc123")
+                'error
+                "Action with name \"abc123\" wasn't defined and function should raise an exception."))))
 
 
 (subtest "function-or-action->action-success"
@@ -47,3 +52,6 @@
     (is (weblocks::function-or-action->action #'identity)
         "abc123"
         "This also should work if a function was given as an argument")))
+
+
+(finalize)

@@ -21,10 +21,13 @@
                :anaphora
                :f-underscore)
   :serial t
-  :components ((:module test
+  :components ((:module t
                 :components
-                ((:file "utils2")
-                 (:file "dependencies2")
-                 (:file "request-hooks2")))))
+                ((:file "utils")
+                 (:test-file "dependencies")
+                 (:test-file "request-hooks")
+                 (:test-file "weblocks")
+                 (:test-file "actions")
+                 (:test-file "request")))))
 
 

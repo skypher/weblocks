@@ -6,6 +6,9 @@
 (in-package weblocks.t.request)
 
 
+(plan 1)
+
+
 (subtest "refresh-request-p-1"
   (with-session
     (with-request ("/foo/bar")
@@ -13,3 +16,6 @@
                                   '("foo" "bar"))
       (is (weblocks.request:refresh-request-p)
           t))))
+
+
+(finalize)
