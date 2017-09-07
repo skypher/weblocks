@@ -2,6 +2,11 @@
  ChangeLog
 ===========
 
+* :release:`0.13.10 <2017-09-06>`
+* Added ``:handle-request`` dynamic hook called around request handling code.
+
+  Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*`` are already bound.
+
 * :release:`0.13.9 <2017-09-02>`
 * :feature:`-` Added integrity field for remove javascript dependencies.
   Also, ``get-cross-origin`` and ``:cross-origin`` were removed to
