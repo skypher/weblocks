@@ -26,7 +26,11 @@ Here are hook names, defined by Weblocks:
 * ``:post-action`` – A list of callback functions of no arguments called after user action is evaluated.
 * ``:dynamic-render`` – A set of functions that establish dynamic state around a body function in the render context.
 * ``:pre-render`` – A list of callback functions of no arguments called before widgets are rendered.
-* ``:post-render`` – A list of callback functions of no arguments called after widgets are rendered.
+* ``:post-render`` – A list of callback functions of no arguments called
+  after widgets are rendered.
+* ``:handle-request`` – Dynamic hook called around request handling
+  code. Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*``
+  are already bound.
 
 TODO: Add example of a custom hook.
 

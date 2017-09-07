@@ -37,15 +37,15 @@
       (reset-session-hooks)))
 
 
-(defvar *session-hooks*)
-(setf (documentation '*session-hooks* 'variable)
-      "A session hooks object is stored in user's session and should be
+;; Variables *session-hooks* or *request-hooks*
+;; should be bound by with-hooks macro, during request processing.
+(defvar *session-hooks* nil
+        "A session hooks object is stored in user's session and should be
 bound to this variable by `with-hooks' macro.")
 
 
-(defvar *request-hooks*)
-(setf (documentation '*request-hooks* 'variable)
-      "A request hooks object used in the request scope.")
+(defvar *request-hooks* nil
+  "A request hooks object used in the request scope.")
 
 
 ;; internal function
@@ -84,11 +84,12 @@ list bound to a current request."
 
 (defun get-callbacks (hooks name)
   "Internal function to get callbacks list from a hooks storage."
-  (check-type hooks hooks)
+  (check-type hooks (or hooks null))
   (check-type name symbol)
-  (let* ((hash (slot-value hooks 'hooks))
-         (callbacks (gethash name hash)))
-    callbacks))
+  (when hooks
+    (let* ((hash (slot-value hooks 'hooks))
+           (callbacks (gethash name hash)))
+      callbacks)))
 
 
 (defun eval-hook-callbacks (hooks name args)
