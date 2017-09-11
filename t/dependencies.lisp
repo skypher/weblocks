@@ -75,12 +75,12 @@
 
 (subtest "Remote dependency can be served from local cache directory."
   (let* ((original-url "http://ya.ru/some.css")
-         (dependency (make-dependency
-                       original-url))
          (random-string (cl-fad::generate-random-string))
          (*cache-remote-dependencies-in*
            (pathname (format nil "/tmp/weblocks-cache/unittests/~A/"
                              random-string)))
+         (dependency (make-dependency
+                      original-url))
          (resulting-path (get-path dependency))
          (resulting-url (get-url dependency)))
     

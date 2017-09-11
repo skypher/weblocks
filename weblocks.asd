@@ -134,7 +134,7 @@
                              (:file "uri-tokens"
 ;;                              :depends-on ;; ("weblocks")
                               )
-                             (:file "request-hooks"
+                             (:file "hooks"
 ;;                              :depends-on ;; ("weblocks" "debug-mode")
                                     )
 ;;                             (:file "response2")

@@ -50,9 +50,13 @@ etc."
   (declare (special *redirect-request-p*))
   (setf *redirect-request-p* nil))
 
-(eval-when (:load-toplevel)
-  (weblocks.hooks:add-application-hook :post-action 'clear-session-redirect-p )
-  (weblocks.hooks:add-application-hook :pre-action 'clear-redirect-var ))
+;; (weblocks.hooks:add-application-hook :pre-action 'clear-redirect-var )
+;; (weblocks.hooks:add-application-hook :post-action 'clear-session-redirect-p )
+(weblocks.hooks:add-application-hook :action
+    clear-redirects ()
+  (clear-redirect-var)
+  (weblocks.hooks:call-next-hook)
+  (clear-session-redirect-p))
 
 
 (defun set-redirect-true ()

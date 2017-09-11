@@ -17,6 +17,7 @@ Contents
    components
    stores
    widgets
+   hooks
    forms
    views
    continuations

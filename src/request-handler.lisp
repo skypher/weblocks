@@ -311,7 +311,10 @@ association list. This function is normally called by
 
 
 ;; TODO: move this code to weblocks.stores
-(defun action-txn-hook (hooks)
+;; a default dynamic-action hook function wraps actions in a transaction
+(weblocks.hooks:add-application-hook
+    :dynamic-action
+    action-txn-hook ()
   "This is a dynamic action hook that wraps POST actions using the 
    weblocks transaction functions over all stores"
 
@@ -346,8 +349,4 @@ association list. This function is normally called by
   ;;               (mapc #'commit-transaction non-dynamic-stores))))))
   ;;     (eval-dynamic-hooks hooks))
   )
-  
-;; a default dynamic-action hook function wraps actions in a transaction
-(eval-when (:load-toplevel)
-  (weblocks.hooks:add-application-hook :dynamic-action 'action-txn-hook))
 

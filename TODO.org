@@ -1,0 +1,28 @@
+* Roadmap
+** DONE Make hooks system easier to use
+- State "DONE"       from "TODO"       [2017-09-11 Mon 09:59]
+Get rid of distinction between :pre :post and :dynamic hooks
+
+Code for adding a hook should look like:
+
+#+BEGIN_SRC lisp
+
+(add-application-hook my-hook ()
+  (some-code-of-implementation)
+  (call-next-hook))
+
+#+END_SRC
+
+Instead of
+
+#+BEGIN_SRC lisp
+
+(defun my-hook (hooks)
+   (some-code-of-implementation)
+   (eval-dynamic-hooks hooks))
+
+(add-application-hook :pre-render
+                      'reset-html-parts)
+#+END_SRC
+** TODO Make a package per file in all codebase
+** TODO Remove all special widgets with html rendering code into separate weblocks-ui library

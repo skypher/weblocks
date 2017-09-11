@@ -160,7 +160,12 @@ submission behavior.")
       (dataform-data obj))
     widgets))
 
-(defun update-form-intermediate-values-on-form-action (&rest args)
+
+(weblocks.hooks:add-application-hook
+    ;; pre-action
+    :action
+    update-form-intermediate-values-on-form-action ()
+  
   (declare (ignorable args))
   
   (when (and (weblocks.request:request-parameters)
@@ -168,15 +173,10 @@ submission behavior.")
     (let ((form (get-widget-by-id (weblocks.request:request-parameter "form-id"))))
       (when (subtypep (type-of form) 'dataform)
         (setf 
-          (slot-value form 'intermediate-form-values)
-          (request-parameters-for-object-view 
-            (dataform-form-view form)
-            (dataform-data form)))))))
-
-(eval-when (:load-toplevel)
-  (weblocks.hooks:add-application-hook
-   :pre-action
-   'update-form-intermediate-values-on-form-action))
+         (slot-value form 'intermediate-form-values)
+         (request-parameters-for-object-view 
+          (dataform-form-view form)
+          (dataform-data form)))))))
 
 (defmethod widget-translation-table append ((obj dataform) &rest args)
   (let ((result)

@@ -3,6 +3,33 @@
 ===========
 
 * :release:`0.13.10 <2017-09-06>`
+  
+Changes in weblocks.request-hooks:
+----------------------------------
+
+* Package ``weblocks.request-hooks`` was renamed to ``weblocks.hooks``.
+* Macro ``with-dynamic-hooks`` was renamed to ``with-hook``.
+* Functions add-application-hook, add-session-hook, add-request-hook
+  became a macroses and their argument lists were changed. Now the
+  should be used like:
+
+  .. code-block:: lisp
+       
+     (weblocks.hooks:add-session-hook
+              :some-hook
+              my-beautiful-callback (param)
+            (do-something-useful-with param))
+
+  ``weblocks.request-hooks:eval-hooks`` was renamed to
+  ``weblocks.hooks:call`` and now can be called with params:
+
+  .. code-block:: lisp
+
+     (weblocks.hooks:call :some-hook
+           first-param
+           second-param)
+           
+* :release:`0.13.10 <2017-09-06>`
 * Added ``:handle-request`` dynamic hook called around request handling code.
 
   Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*`` are already bound.

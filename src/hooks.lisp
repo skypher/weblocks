@@ -5,11 +5,9 @@
    #:add-application-hook
    #:add-request-hook
    #:add-session-hook
-   #:with-hooks
-   #:eval-hooks
-   #:with-dynamic-hooks
-   #:log-hooks
-   #:eval-dynamic-hooks))
+   #:prepare-hooks
+   #:with-hook
+   #:call-next-hook))
 (in-package weblocks.hooks)
 
 
@@ -38,10 +36,10 @@
 
 
 ;; Variables *session-hooks* or *request-hooks*
-;; should be bound by with-hooks macro, during request processing.
+;; should be bound by prepare-hooks macro, during request processing.
 (defvar *session-hooks* nil
         "A session hooks object is stored in user's session and should be
-bound to this variable by `with-hooks' macro.")
+bound to this variable by `prepare-hooks' macro.")
 
 
 (defvar *request-hooks* nil
@@ -49,30 +47,64 @@ bound to this variable by `with-hooks' macro.")
 
 
 ;; internal function
-(defun add-hook (hooks hook-name callback)
+(defun add-hook (hooks hook-name callback-name callback)
   "Adds a callback to the callbacks list with name `hook-name'."
   (check-type hooks hooks)
   (check-type hook-name symbol)
   (check-type callback (or symbol function))
+  (check-type callback-name symbol)
 
   (let ((hooks-hash (slot-value hooks 'hooks)))
-    (pushnew callback
-             (gethash hook-name hooks-hash))))
+    (if (assoc callback-name
+               (gethash hook-name hooks-hash)
+               :test #'eql)
+        ;; replacing callback with given name
+        (setf (cdr (assoc callback-name
+                          (gethash hook-name hooks-hash)
+                          :test #'eql))
+              callback)
+        ;; adding new callback
+        (push (cons callback-name callback)
+              (gethash hook-name hooks-hash)))))
 
 
-(defun add-session-hook (name callback)
-  (add-hook *session-hooks* name callback))
+
+(eval-when  (:compile-toplevel :load-toplevel :execute)
+  (defun add-hook-helper (hook-storage hook-name callback-name args body)
+    `(flet ((,callback-name (next-hooks ,@args)
+              (declare (ignorable next-hooks))
+              (flet ((call-next-hook ()
+                       (eval-next-hooks next-hooks)))
+                ,@body)))
+       (add-hook ,hook-storage ,hook-name ',callback-name
+                 #',callback-name))))
 
 
-(defun add-application-hook (name callback)
-  (add-hook *application-hooks* name callback))
+(defmacro add-session-hook (hook-name callback-name (&rest args) &body body)
+  (add-hook-helper '*session-hooks*
+                   hook-name
+                   callback-name
+                   args
+                   body))
 
 
-(defun add-request-hook (name callback)
-  (add-hook *request-hooks* name callback))
+(defmacro add-application-hook (hook-name callback-name (&rest args) &body body)
+  (add-hook-helper '*application-hooks*
+                   hook-name
+                   callback-name
+                   args
+                   body))
 
 
-(defmacro with-hooks (&body body)
+(defmacro add-request-hook (hook-name callback-name (&rest args) &body body)
+  (add-hook-helper '*request-hooks*
+                   hook-name
+                   callback-name
+                   args
+                   body))
+
+
+(defmacro prepare-hooks (&body body)
   "Prepares internal special variables for request processing.
 
 It takes hooks from user session and creates an empty hooks
@@ -82,6 +114,14 @@ list bound to a current request."
      ,@body))
 
 
+(defun get-callback-name (callback)
+  (car callback))
+
+
+(defun get-callback-value (callback)
+  (cdr callback))
+
+
 (defun get-callbacks (hooks name)
   "Internal function to get callbacks list from a hooks storage."
   (check-type hooks (or hooks null))
@@ -89,7 +129,17 @@ list bound to a current request."
   (when hooks
     (let* ((hash (slot-value hooks 'hooks))
            (callbacks (gethash name hash)))
-      callbacks)))
+      (mapcar #'get-callback-value callbacks))))
+
+
+(defun get-callbacks-names (hooks name)
+  "Internal function to get a list of callbacks names from a hooks storage."
+  (check-type hooks (or hooks null))
+  (check-type name symbol)
+  (when hooks
+    (let* ((hash (slot-value hooks 'hooks))
+           (callbacks (gethash name hash)))
+      (mapcar #'get-callback-name callbacks))))
 
 
 (defun eval-hook-callbacks (hooks name args)
@@ -99,23 +149,24 @@ list bound to a current request."
 
   (let* ((hash (slot-value hooks 'hooks))
          (callbacks (gethash name hash)))
-    (loop for callback in callbacks
-          do (progn
-               (log:debug "Calling" callback)
-               (apply callback args)))))
+    (dolist (callback callbacks)
+      (log:debug "Calling" callback)
+      (apply (get-callback-value callback) args))))
 
 
 ;; external
-(defun eval-hooks (name &rest args)
-  (eval-hook-callbacks *application-hooks*
-                       name
-                       args)
-  (eval-hook-callbacks *session-hooks*
-                       name
-                       args)
-  (eval-hook-callbacks *request-hooks*
-                       name
-                       args))
+
+;; TODO: remove
+;; (defun call (name &rest args)
+;;   (eval-hook-callbacks *application-hooks*
+;;                        name
+;;                        args)
+;;   (eval-hook-callbacks *session-hooks*
+;;                        name
+;;                        args)
+;;   (eval-hook-callbacks *request-hooks*
+;;                        name
+;;                        args))
 
 
 (defun log-hooks (name)
@@ -128,11 +179,14 @@ list bound to a current request."
         (get-callbacks *request-hooks* name)))
 
 
-(defmacro with-dynamic-hooks ((name) &rest body)
+(defmacro with-hook ((name &rest args) &rest body)
   "Performs nested calls of all the hooks of name, the innermost call is
    a closure over the body expression.  Dynamic action hooks take one
    argument, which is a list of dynamic hooks.  In the inner context, they
    apply the first element of the list to the rest
+
+   TODO: Add another example, using add-session-hook and
+         call-next-hook.
 
    An example of a dynamic hook:
   
@@ -140,16 +194,41 @@ list bound to a current request."
      (with-transaction ()
        (unless (null inner-fns)
          (funcall (first inner-fns) (rest inner-fns)))))"
-  (metatilities:with-gensyms (null-list)
-    `(eval-dynamic-hooks 
+  (metatilities:with-gensyms (null-list ignored-args)
+    `(eval-next-hooks 
       (append (get-callbacks *application-hooks* ,name)
               (get-callbacks *session-hooks* ,name)
               (get-callbacks *request-hooks* ,name)
-              (list (lambda (,null-list) 
-                      (assert (null ,null-list))
-                      ,@body))))))
+              (list (lambda (,null-list &rest ,ignored-args)
+                      (declare (ignorable ,ignored-args))
+                      (check-type ,null-list null)
+                      ,@body)))
+      ,@args)))
 
-(defun eval-dynamic-hooks (var)
+
+;; TODO: remove, was replaced with with-hook
+;; (defmacro with-dynamic-hooks ((name) &rest body)
+;;   "Performs nested calls of all the hooks of name, the innermost call is
+;;    a closure over the body expression.  Dynamic action hooks take one
+;;    argument, which is a list of dynamic hooks.  In the inner context, they
+;;    apply the first element of the list to the rest
+
+;;    An example of a dynamic hook:
+  
+;;    (defun transaction-hook (inner-fns)
+;;      (with-transaction ()
+;;        (unless (null inner-fns)
+;;          (funcall (first inner-fns) (rest inner-fns)))))"
+;;   (metatilities:with-gensyms (null-list)
+;;     `(eval-dynamic-hooks 
+;;       (append (get-callbacks *application-hooks* ,name)
+;;               (get-callbacks *session-hooks* ,name)
+;;               (get-callbacks *request-hooks* ,name)
+;;               (list (lambda (,null-list) 
+;;                       (assert (null ,null-list))
+;;                       ,@body))))))
+
+(defun eval-next-hooks (next-hooks &rest args)
   "Helper function that makes it easier to write dynamic hooks.
 
 Call it at the end of your dynamic hook, to evaluate inner
@@ -159,11 +238,15 @@ hooks:
      (with-my-context ()
         (eval-dynamic-hooks hooks)))
   "
-  (let ((list (etypecase var 
+  (let ((list (etypecase next-hooks 
                 (symbol (symbol-value var))
-                (list var))))
+                (list next-hooks))))
     (unless (null list)
-      (funcall (first list) (rest list)))))
+      (let ((current-hook (first list))
+            (next-hooks (rest list)))
+        (apply current-hook
+               next-hooks
+               args)))))
 
 ;; Hooks for using html parts, reset parts set before render and save it to session after render 
 ;; Allow to modify html parts set when is in debug mode
@@ -174,12 +257,14 @@ hooks:
 ;; кроме того, pushnew не работает и всё равно при повторном евале добавляет в словарь
 ;; *application-request-hooks* дубликаты функций, а вот если 
 
+;; TODO: move this hook to place where html parts are processed
 (defun reset-html-parts ()
   (when (or weblocks::*weblocks-global-debug*
             (weblocks::webapp-debug))
     
     (log:debug "Resetting html parts cache")
     (weblocks.utils.html-parts:reset)))
+
 
 (defun update-html-parts ()
   (when (or weblocks::*weblocks-global-debug*
@@ -198,8 +283,9 @@ hooks:
         ;;       weblocks-util:*parts-md5-context-hash*)
         ))))
 
-(add-application-hook :pre-render
-                      'reset-html-parts)
+(add-application-hook :render
+    process-html-parts ()
+  (reset-html-parts)
+;;  (call-next-hook)
+  (update-html-parts))
 
-(add-application-hook :post-render
-                      'update-html-parts)

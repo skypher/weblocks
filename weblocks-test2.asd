@@ -26,7 +26,7 @@
                 :components
                 ((:file "utils")
                  (:test-file "dependencies")
-                 (:test-file "request-hooks")
+                 (:test-file "hooks")
                  (:test-file "weblocks")
                  (:test-file "actions")
                  (:test-file "request")))))

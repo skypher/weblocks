@@ -98,5 +98,5 @@ if there is an action involved (even if the user hits refresh)."
   (let ((action-name (get-action-name-from-request)))
     (and
      (null (weblocks::get-request-action action-name))
-     (equalp (weblocks::all-tokens weblocks::*uri-tokens*)
+     (equalp (weblocks.request::all-tokens weblocks::*uri-tokens*)
              (weblocks.session:get-value 'weblocks::last-request-uri)))))

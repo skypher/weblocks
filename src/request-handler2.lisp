@@ -162,7 +162,7 @@ customize behavior."))
         (let ((uri (weblocks.request:request-uri)))
           (log:debug "Handling client request" uri))
     
-        (weblocks.hooks:with-hooks
+        (weblocks.hooks:prepare-hooks
           (let (weblocks::*dirty-widgets*)
             (when (null (weblocks::root-widget))
               (let ((root-widget (weblocks::make-root-widget app)))
@@ -226,11 +226,9 @@ customize behavior."))
 
                 (weblocks::webapp-update-thread-status "Processing action")
                 (weblocks::timing "action processing (w/ hooks)"
-                  (weblocks.hooks:eval-hooks :pre-action)
-                  (weblocks.hooks:with-dynamic-hooks (:dynamic-action)
+                  (weblocks.hooks:with-hook (:action)
                     (weblocks::eval-action action-name
-                                           action-arguments))
-                  (weblocks.hooks:eval-hooks :post-action)))
+                                           action-arguments))))
 
               ;; Remove "action" parameter for the GET parameters
               ;; it it is not an AJAX request
@@ -240,8 +238,7 @@ customize behavior."))
                                      (weblocks.request:request-uri))))
 
               (weblocks::timing "rendering (w/ hooks)"
-                (weblocks.hooks:eval-hooks :pre-render)
-                (weblocks.hooks:with-dynamic-hooks (:dynamic-render)
+                (weblocks.hooks:with-hook (:render)
                   (if (weblocks.request:ajax-request-p)
                       (weblocks::handle-ajax-request app)
                       (handle-normal-request app))
@@ -252,10 +249,7 @@ customize behavior."))
                   ;;
                   ;; TODO: only add new routes
                   (weblocks.routes:register-dependencies
-                   weblocks.dependencies:*page-dependencies*))
-                
-                (weblocks.hooks:log-hooks :post-render)
-                (weblocks.hooks:eval-hooks :post-render))
+                   weblocks.dependencies:*page-dependencies*)))
 
         
 
