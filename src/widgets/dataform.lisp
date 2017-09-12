@@ -166,8 +166,6 @@ submission behavior.")
     :action
     update-form-intermediate-values-on-form-action ()
   
-  (declare (ignorable args))
-  
   (when (and (weblocks.request:request-parameters)
              (weblocks.request:request-parameter "form-id"))
     (let ((form (get-widget-by-id (weblocks.request:request-parameter "form-id"))))

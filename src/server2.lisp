@@ -77,7 +77,7 @@ This function serves all started applications and their static files."
     ;; Dynamic hook :handle-request makes possible to write
     ;; some sort of middlewares, which change *request* and *session*
     ;; variables or make some sort
-    (weblocks.hooks:with-dynamic-hooks (:handle-request)
+    (weblocks.hooks:with-hook (:handle-request)
       (setf weblocks.request::*latest-request*
             weblocks.request:*request*)
       (setf weblocks.session::*latest-session*
@@ -115,11 +115,12 @@ This function serves all started applications and their static files."
                      (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                                  (weblocks::tokenize-uri app-pub-prefix nil)
                                                  :test #'string=)))
-               (let* ((virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
-                      (physical-folder (weblocks::compute-webapp-public-files-path app))
+               (let* (;; (virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
+                      ;; (physical-folder (weblocks::compute-webapp-public-files-path app))
                       ;; TODO send-gzip-rules move to this file
-                      (content-type (weblocks::send-gzip-rules (weblocks::gzip-dependency-types* app)
-                                                               path-info env virtual-folder physical-folder)))
+                      ;; (content-type (weblocks::send-gzip-rules (weblocks::gzip-dependency-types* app)
+                      ;;                                          path-info env virtual-folder physical-folder))
+                      )
                  ;; TODO send-cache-rules
                  (weblocks::send-cache-rules (weblocks::weblocks-webapp-public-files-cache-time app))
 

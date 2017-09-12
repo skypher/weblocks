@@ -7,7 +7,8 @@
    #:add-session-hook
    #:prepare-hooks
    #:with-hook
-   #:call-next-hook))
+   #:call-next-hook
+   #:call-hook))
 (in-package weblocks.hooks)
 
 
@@ -73,14 +74,27 @@ bound to this variable by `prepare-hooks' macro.")
   (defun add-hook-helper (hook-storage hook-name callback-name args body)
     `(flet ((,callback-name (next-hooks ,@args)
               (declare (ignorable next-hooks))
-              (flet ((call-next-hook ()
-                       (eval-next-hooks next-hooks)))
-                ,@body)))
+              (let (next-hook-was-called)
+                (flet ((call-next-hook ()
+                         (eval-next-hooks next-hooks)
+                         ;; Remember that we already called other
+                         ;; callbacks
+                         (setf next-hook-was-called t)))
+                  ,@body
+                  ;; Call next-hooks if it wasn't called during somewhere in the body
+                  (unless next-hook-was-called
+                    (call-next-hook))))))
        (add-hook ,hook-storage ,hook-name ',callback-name
                  #',callback-name))))
 
 
 (defmacro add-session-hook (hook-name callback-name (&rest args) &body body)
+  "Registers a new session hook like that:
+
+\(add-session-hook :request
+    update-dialog \(\)
+  \(do-some-useful job\)\)
+ "
   (add-hook-helper '*session-hooks*
                    hook-name
                    callback-name
@@ -156,19 +170,6 @@ list bound to a current request."
 
 ;; external
 
-;; TODO: remove
-;; (defun call (name &rest args)
-;;   (eval-hook-callbacks *application-hooks*
-;;                        name
-;;                        args)
-;;   (eval-hook-callbacks *session-hooks*
-;;                        name
-;;                        args)
-;;   (eval-hook-callbacks *request-hooks*
-;;                        name
-;;                        args))
-
-
 (defun log-hooks (name)
   "A helper function to log all known hooks with given name."
   (mapc (f_ (log:debug "Application hook" _))
@@ -181,19 +182,29 @@ list bound to a current request."
 
 (defmacro with-hook ((name &rest args) &rest body)
   "Performs nested calls of all the hooks of name, the innermost call is
-   a closure over the body expression.  Dynamic action hooks take one
-   argument, which is a list of dynamic hooks.  In the inner context, they
-   apply the first element of the list to the rest
+   a closure over the body expression. All hooks take at least one
+   argument, which is a list of inner hooks. After doing their job, they
+   apply the first element of the list to the rest, but this machanics
+   is hidden by add-(application|session|request)-hook macroses:
 
-   TODO: Add another example, using add-session-hook and
-         call-next-hook.
+   (add-session-hook :action
+      log-action (action)
+      (log:info \"Before calling\" action)
+      (call-next-hook)
+      (log:info \"After calling\" action))
 
-   An example of a dynamic hook:
-  
-   (defun transaction-hook (inner-fns)
-     (with-transaction ()
-       (unless (null inner-fns)
-         (funcall (first inner-fns) (rest inner-fns)))))"
+   Next, somewhere in the code, where action is called:
+
+   (with-hook (:action action-object)
+      ;; any custom code here
+      (process action-object))
+
+   Streamlined code execution will looks like:
+
+   (defun action-handler (action-object)
+      (log:info \"Before calling\" action-object)
+      (process action-object)
+      (log:info \"After calling\" action-object))"
   (metatilities:with-gensyms (null-list ignored-args)
     `(eval-next-hooks 
       (append (get-callbacks *application-hooks* ,name)
@@ -206,38 +217,18 @@ list bound to a current request."
       ,@args)))
 
 
-;; TODO: remove, was replaced with with-hook
-;; (defmacro with-dynamic-hooks ((name) &rest body)
-;;   "Performs nested calls of all the hooks of name, the innermost call is
-;;    a closure over the body expression.  Dynamic action hooks take one
-;;    argument, which is a list of dynamic hooks.  In the inner context, they
-;;    apply the first element of the list to the rest
+(defmacro call-hook (name &rest args)
+  "A little helper to use when you want to call a hook
+   and don't have a code to wrap."
+  `(with-hook (,name ,@args)))
 
-;;    An example of a dynamic hook:
-  
-;;    (defun transaction-hook (inner-fns)
-;;      (with-transaction ()
-;;        (unless (null inner-fns)
-;;          (funcall (first inner-fns) (rest inner-fns)))))"
-;;   (metatilities:with-gensyms (null-list)
-;;     `(eval-dynamic-hooks 
-;;       (append (get-callbacks *application-hooks* ,name)
-;;               (get-callbacks *session-hooks* ,name)
-;;               (get-callbacks *request-hooks* ,name)
-;;               (list (lambda (,null-list) 
-;;                       (assert (null ,null-list))
-;;                       ,@body))))))
 
 (defun eval-next-hooks (next-hooks &rest args)
   "Helper function that makes it easier to write dynamic hooks.
 
-Call it at the end of your dynamic hook, to evaluate inner
-hooks:
-
-   (defun my-hook (hooks)
-     (with-my-context ()
-        (eval-dynamic-hooks hooks)))
-  "
+It whould be called somewhere inside a hook, to evaluate inner
+hooks. But you don't need to call it manually, just use
+one of add-xxxx-hook and a (call-next-hook) inside of it."
   (let ((list (etypecase next-hooks 
                 (symbol (symbol-value var))
                 (list next-hooks))))

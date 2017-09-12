@@ -14,7 +14,8 @@
 
 
 (defwebapp test-app
-  :prefix "/")
+  :prefix "/"
+  :autostart nil)
 
 
 (defmacro with-request ((uri &key (method :get) data) &body body)

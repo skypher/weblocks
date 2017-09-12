@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+* :release:`0.13.11 <2017-09-12>`
+
+* :feature:`-` Added ``weblocks.hooks:call-hook`` helper.
+* :feature:`-` Now ``call-next-hook`` is called automatically if it
+  wasn't called explicitly.
+
 * :release:`0.13.10 <2017-09-06>`
   
 Changes in weblocks.request-hooks:

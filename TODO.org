@@ -24,5 +24,7 @@ Instead of
 (add-application-hook :pre-render
                       'reset-html-parts)
 #+END_SRC
+** TODO Process (declare ...) forms in add-xxxx-hook macrose
+Need to place these forms in the top of flet from
 ** TODO Make a package per file in all codebase
 ** TODO Remove all special widgets with html rendering code into separate weblocks-ui library

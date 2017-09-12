@@ -5,7 +5,7 @@
 (in-package weblocks.t.hooks)
 
 
-(plan 5)
+(plan 6)
 
 
 (subtest "Callbacks list for unknown name is empty"
@@ -115,7 +115,26 @@
             '(:bar)
             "If callback was overwritten, then we have only :bar in the list.")))))
 
-;; TODO: add a test to check if warning is raised if hook does not call
-;;       call-next-hook
+
+(subtest "Call-next-hook will be called automatically if it wasn't used in a callback body."
+  (with-session
+    (with-request ("/")
+      (let (result)
+        (weblocks.hooks:add-session-hook :my-hook foo ()
+          (push :foo result))
+
+        (weblocks.hooks:add-session-hook :my-hook bar ()
+          (push :bar result))
+
+        (weblocks.hooks:with-hook (:my-hook)
+                                  t)
+
+        ;; Neither of two callbacks use call-next-hook,
+        ;; but results should contain both :foo and :bar,
+        ;; because call-next-hook was called at the end of each callback
+        ;; implicitly
+        (is result
+            '(:foo :bar)
+            "Call-next-hook should be called implicitly and execute all available hooks.")))))
 
 (finalize)

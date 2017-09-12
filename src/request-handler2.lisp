@@ -187,8 +187,9 @@ customize behavior."))
           
                 ;; TODO: understand why there is coupling with Dialog here and
                 ;;       how to move it into the Dialog's code.
-                (weblocks.hooks:add-session-hook :post-action
-                                                 'weblocks::update-dialog-on-request))
+                (weblocks.hooks:add-session-hook :action
+                    update-dialog ()
+                  (weblocks::update-dialog-on-request)))
         
               ;; (when (and weblocks::*rewrite-for-session-urls*
               ;;            (weblocks::cookie-in (weblocks::session-cookie-name
