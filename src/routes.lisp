@@ -36,6 +36,10 @@
                :reader get-dependency)))
 
 
+(defclass websocket-route (routes:route)
+  ())
+
+
 (defun make-route (uri dependency)
   "Makes a route for dependency.
 
@@ -44,3 +48,13 @@ Automatically adds a prefix depending on current webapp and widget."
   (make-instance 'route
                  :template (routes:parse-template uri)
                  :dependency dependency))
+
+
+(defun make-websocket-route (uri)
+  "Makes a route for websocket handle.
+
+Automatically adds a prefix depending on current webapp and widget."
+
+  (let ((route (make-instance 'websocket-route
+                              :template (routes:parse-template uri))))
+    (routes:connect *routes* route)))

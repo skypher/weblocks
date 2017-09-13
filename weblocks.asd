@@ -46,7 +46,8 @@
    :trivial-backtrace 
    :parse-number 
    :pretty-function 
-   :babel 
+   :babel
+   :websocket-driver ;; to handle websocket connections
    :split-sequence)
   :serial t
   :components ((:module src
@@ -375,7 +376,8 @@
                              ;;  )
                              (:file "server"
                               ;;:depends-on ;; ("weblocks" "acceptor" "debug-mode" "session" utils)
-                              )
+                                    )
+                             (:file "websocket")
                              (:file "server2"
                               ;;:depends-on ;; ("weblocks"
                                           ;;  "acceptor"

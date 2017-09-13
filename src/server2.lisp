@@ -90,17 +90,22 @@ This function serves all started applications and their static files."
 
         ;; If dependency found, then return it's content along with content-type
         (when route
-          (let ((dependency (weblocks.routes:get-dependency route)))
-            (multiple-value-bind (content content-type)
-                (weblocks.dependencies:serve dependency)
+          (typecase route
+            (weblocks.routes:route
+             (let ((dependency (weblocks.routes:get-dependency route)))
+               (multiple-value-bind (content content-type)
+                   (weblocks.dependencies:serve dependency)
               
-              (let ((content (typecase content
-                               (string (list content))
-                               (t content))))
-                (return-from handle-request
-                  (list 200
-                        (list :content-type content-type)
-                        content))))))
+                 (let ((content (typecase content
+                                  (string (list content))
+                                  (t content))))
+                   (return-from handle-request
+                     (list 200
+                           (list :content-type content-type)
+                           content))))))
+            (weblocks.routes::websocket-route
+             (return-from handle-request
+               (weblocks.websocket::process-websocket env)))))
 
         (dolist (app weblocks::*active-webapps*)
           (let ((app-prefix (weblocks::webapp-prefix app))
