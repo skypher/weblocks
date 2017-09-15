@@ -312,41 +312,41 @@ association list. This function is normally called by
 
 ;; TODO: move this code to weblocks.stores
 ;; a default dynamic-action hook function wraps actions in a transaction
-(weblocks.hooks:add-application-hook
-    :dynamic-action
-    action-txn-hook ()
-  "This is a dynamic action hook that wraps POST actions using the 
-   weblocks transaction functions over all stores"
+;; (weblocks.hooks:add-application-hook
+;;     :action
+;;     action-txn-hook ()
+;;   "This is a dynamic action hook that wraps POST actions using the 
+;;    weblocks transaction functions over all stores"
 
-  ;; Added this temporarily to fix errors without stores
-  (weblocks.hooks:eval-dynamic-hooks hooks)
+;;   ;; Added this temporarily to fix errors without stores
+;;   (weblocks.hooks:call-next-hook)
   
-  ;; (if (eq (weblocks.request:request-method) :post)
-  ;;     (let (tx-error-occurred-p)
-  ;;       (multiple-value-bind (dynamic-stores non-dynamic-stores)
-  ;;           (loop for store-name in *store-names*
-  ;;                 for store = (symbol-value store-name)
-  ;;                 when store
-  ;;                   if (use-dynamic-transaction-p store)
-  ;;                     collect store into dynamic-stores
-  ;;                   else collect store into non-dynamic-stores
-  ;;                 finally (return (values dynamic-stores non-dynamic-stores)))
-  ;;         (labels ((dynamic-transactions (stores)
-  ;;                    (if (null stores)
-  ;;                        (eval-dynamic-hooks hooks)
-  ;;                        (dynamic-transaction
-  ;;                         (car stores)
-  ;;                         (f0 (dynamic-transactions (cdr stores))))))
-  ;;                  (handle-error (error)
-  ;;                    (declare (ignore error))
-  ;;                    (mapc #'rollback-transaction non-dynamic-stores)
-  ;;                    (setf tx-error-occurred-p t)))
-  ;;           (unwind-protect
-  ;;                (handler-bind ((error #'handle-error))
-  ;;                  (mapc #'begin-transaction non-dynamic-stores)
-  ;;                  (dynamic-transactions dynamic-stores))
-  ;;             (unless tx-error-occurred-p
-  ;;               (mapc #'commit-transaction non-dynamic-stores))))))
-  ;;     (eval-dynamic-hooks hooks))
-  )
+;;   ;; (if (eq (weblocks.request:request-method) :post)
+;;   ;;     (let (tx-error-occurred-p)
+;;   ;;       (multiple-value-bind (dynamic-stores non-dynamic-stores)
+;;   ;;           (loop for store-name in *store-names*
+;;   ;;                 for store = (symbol-value store-name)
+;;   ;;                 when store
+;;   ;;                   if (use-dynamic-transaction-p store)
+;;   ;;                     collect store into dynamic-stores
+;;   ;;                   else collect store into non-dynamic-stores
+;;   ;;                 finally (return (values dynamic-stores non-dynamic-stores)))
+;;   ;;         (labels ((dynamic-transactions (stores)
+;;   ;;                    (if (null stores)
+;;   ;;                        (eval-dynamic-hooks hooks)
+;;   ;;                        (dynamic-transaction
+;;   ;;                         (car stores)
+;;   ;;                         (f0 (dynamic-transactions (cdr stores))))))
+;;   ;;                  (handle-error (error)
+;;   ;;                    (declare (ignore error))
+;;   ;;                    (mapc #'rollback-transaction non-dynamic-stores)
+;;   ;;                    (setf tx-error-occurred-p t)))
+;;   ;;           (unwind-protect
+;;   ;;                (handler-bind ((error #'handle-error))
+;;   ;;                  (mapc #'begin-transaction non-dynamic-stores)
+;;   ;;                  (dynamic-transactions dynamic-stores))
+;;   ;;             (unless tx-error-occurred-p
+;;   ;;               (mapc #'commit-transaction non-dynamic-stores))))))
+;;   ;;     (eval-dynamic-hooks hooks))
+;;   )
 
