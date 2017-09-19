@@ -84,6 +84,7 @@ bound to this variable by `prepare-hooks' macro.")
                   ;; Call next-hooks if it wasn't called during somewhere in the body
                   (unless next-hook-was-called
                     (call-next-hook))))))
+
        (add-hook ,hook-storage ,hook-name ',callback-name
                  #',callback-name))))
 
@@ -205,16 +206,17 @@ list bound to a current request."
       (log:info \"Before calling\" action-object)
       (process action-object)
       (log:info \"After calling\" action-object))"
-  (metatilities:with-gensyms (null-list ignored-args)
-    `(eval-next-hooks 
-      (append (get-callbacks *application-hooks* ,name)
-              (get-callbacks *session-hooks* ,name)
-              (get-callbacks *request-hooks* ,name)
-              (list (lambda (,null-list &rest ,ignored-args)
-                      (declare (ignorable ,ignored-args))
-                      (check-type ,null-list null)
-                      ,@body)))
-      ,@args)))
+  (metatilities:with-gensyms (null-list ignored-args hooks-chain)
+    `(let ((,hooks-chain (append (get-callbacks *application-hooks* ,name)
+                                 (get-callbacks *session-hooks* ,name)
+                                 (get-callbacks *request-hooks* ,name))))
+       (eval-next-hooks 
+        (append ,hooks-chain
+                (list (lambda (,null-list &rest ,ignored-args)
+                        (declare (ignorable ,ignored-args))
+                        (check-type ,null-list null)
+                        ,@body)))
+        ,@args))))
 
 
 (defmacro call-hook (name &rest args)
