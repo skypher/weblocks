@@ -281,12 +281,17 @@ declared AUTOSTART."
   ;; TODO: Investigate if it closes all stores declared via 'defstore'.
   
   (when (not (null *server*))
-    (dolist (app weblocks::*active-webapps*)
-      (weblocks::stop-webapp (weblocks::weblocks-webapp-name app)))
-    (setf weblocks.session::*last-session* nil)
+    (weblocks.hooks:with-hook
+        (:stop-weblocks)
+        
+        (dolist (app weblocks::*active-webapps*)
+          (weblocks::stop-webapp (weblocks::weblocks-webapp-name app)))
 
-    ;; TODO: Replace with CLACK's sessions
-    ;; (weblocks::reset-sessions)
-    (when *server*
-      (stop *server*))
-    (setf *server* nil)))
+        ;; Was commented because *last-session* is unknown
+        ;; (setf weblocks.session::*last-session* nil)
+
+        ;; TODO: Replace with CLACK's sessions
+        ;; (weblocks::reset-sessions)
+        (when *server*
+          (stop *server*))
+        (setf *server* nil))))

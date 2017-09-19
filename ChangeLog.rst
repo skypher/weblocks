@@ -2,6 +2,8 @@
  ChangeLog
 ===========
 
+* :feature:`-` Added ``:stop-weblocks`` hook.
+
 * :release:`0.13.11 <2017-09-12>`
 
 * :feature:`-` Added ``weblocks.hooks:call-hook`` helper.

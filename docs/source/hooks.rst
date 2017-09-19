@@ -31,6 +31,7 @@ Here are hook names, defined by Weblocks:
 * ``:handle-request`` – Dynamic hook called around request handling
   code. Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*``
   are already bound.
+* ``stop-weblocks`` – Wraps code inside of ``weblocks.server:stop-weblocks`` function.
 
 TODO: Add example of a custom hook.
 
