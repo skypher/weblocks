@@ -23,7 +23,10 @@
   * ``with-html-form`` macro -> ``weblocks-ui``;
   * ``*approved-return-codes*`` variable -> ``weblocks.variables``;
   * ``handle-ajax-request`` method -> ``weblocks.request-handler``;
-  * ``update-location-hash-dependents`` function -> ``weblocks.request-handler``.
+  * ``update-location-hash-dependents`` function ->
+    ``weblocks.request-handler``.
+  * ``render-link`` function was moved to ``weblocks-ui.form`` in
+    separate system.
 
 * :release:`0.13.11 <2017-09-12>`
 
