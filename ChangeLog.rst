@@ -2,6 +2,7 @@
  ChangeLog
 ===========
 
+* :release:`0.14.0 <2017-09-20>`
 * :support:`-` ``html``, ``menu``, ``suggest`` and ``repl`` utilities
   were excluded.
 * :support:`-` Code which was in ``request-handler.lisp``, was excluded
