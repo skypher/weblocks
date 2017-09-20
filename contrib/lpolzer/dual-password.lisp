@@ -39,7 +39,7 @@
                  :id name2 :maxlength maxlength
                  :class "password confirm"
                  :style (when value "border:1px solid green"))))
-    (send-script
+    (weblocks.response:send-script
       (concatenate 'string
         "function checkPasswordFields() {
           var f1 = $('" name1 "'),

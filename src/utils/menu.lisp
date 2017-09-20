@@ -31,7 +31,7 @@
              (htm (:ol (str menu-content)))
              (htm (:ul (str menu-content))))))))
 
-(defun render-menu (options &key selected-pane header (container-id (gen-id)) (base "")
+(defun render-menu (options &key selected-pane header (container-id (weblocks.session:gen-id)) (base "")
                     ordered-list-p (empty-message *menu-empty-message*)
                     disabled-pane-names 
                     (menu-template #'render-menu-wt)

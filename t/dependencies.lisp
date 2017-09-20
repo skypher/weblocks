@@ -1,3 +1,4 @@
+(in-package :cl-user)
 (defpackage #:weblocks.test.dependencies
   (:use #:cl
         #:cl-mock
@@ -8,7 +9,7 @@
 (in-package weblocks.test.dependencies)
 
 
-(plan 8)
+(plan 9)
 
 
 (subtest "Infer type"
@@ -171,5 +172,14 @@
           nil
           "Cached dependency should have a route.")))
 
+
+(subtest "Dependencies should be deduplicated on collection."
+  (with-collected-dependencies
+      (push-dependency (make-dependency #P"/tmp/some.js"))
+    (push-dependency (make-dependency #P"/tmp/some.js"))
+    
+    (let ((collected (get-collected-dependencies)))
+      (is (length collected)
+          1))))
 
 (finalize)

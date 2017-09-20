@@ -34,7 +34,7 @@
       (let ((*weblocks-output-stream* (make-string-output-stream)))
         (declare (special *weblocks-output-stream*))
         (render-suggest 'some-name (lambda (a) '("a" "b" "c")) :input-id 'i1 :choices-id 'c1))
-      (do-request `(("pure" . "true") (,weblocks::*action-string* . "abc123"))))
+      (do-request `(("pure" . "true") (,weblocks.variables:*action-string* . "abc123"))))
   "<ul><li>a</li><li>b</li><li>c</li></ul>")
 
 (deftest-html render-suggest-4

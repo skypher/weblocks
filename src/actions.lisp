@@ -117,7 +117,7 @@ Ex:
   (concatenate 'string
                (weblocks.request:request-path-info) ; we need this for w3m
                (if include-question-mark-p "?" "")
-               *action-string* "="
+               weblocks.variables:*action-string* "="
                (quri:url-encode (princ-to-string action-code))))
 
 

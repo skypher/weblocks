@@ -81,14 +81,18 @@
   "Detects if the current request was initiated via AJAX by looking
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
-  (equal (request-header "X-Requested-With" :request request)
-         "XMLHttpRequest"))
+  ;; Sometimes this function may be called not in the context of request,
+  ;; to update an instance of the widgets in asyncrounous code and to send
+  ;; it via websocket.
+  (and request
+       (equal (request-header "X-Requested-With" :request request)
+              "XMLHttpRequest")))
 
 
 (defun get-action-name-from-request ()
   "Returns called action name if any action was called"
   (request-parameter
-   weblocks::*action-string*))
+   weblocks.variables:*action-string*))
 
 
 (defun refresh-request-p ()
@@ -98,5 +102,5 @@ if there is an action involved (even if the user hits refresh)."
   (let ((action-name (get-action-name-from-request)))
     (and
      (null (weblocks::get-request-action action-name))
-     (equalp (weblocks.request::all-tokens weblocks::*uri-tokens*)
+     (equalp (weblocks::all-tokens weblocks::*uri-tokens*)
              (weblocks.session:get-value 'weblocks::last-request-uri)))))

@@ -1,5 +1,7 @@
 (defpackage #:weblocks.dependencies
   (:use #:cl)
+  (:import-from #:weblocks
+                #:defvar-unbound)
   (:export
    #:dependency
    #:local-dependency
@@ -10,7 +12,6 @@
    #:make-local-css-dependency
    #:get-route
    #:get-dependencies
-   #:*page-dependencies*
    #:render-in-head
    #:remote-dependency
    #:make-remote-js-dependency
@@ -23,11 +24,16 @@
    #:infer-type-from
    #:make-dependency
    #:get-type
-   #:render-in-ajax-response))
+   #:render-in-ajax-response
+   #:register-dependencies
+   #:with-collected-dependencies
+   #:push-dependency
+   #:get-collected-dependencies
+   #:push-dependencies))
 (in-package weblocks.dependencies)
 
 
-(defvar *page-dependencies* nil
+(defvar-unbound *page-dependencies*
   "A list which contains all page dependencies.
 
 Weblocks fills this list during page rendering.")
@@ -170,13 +176,13 @@ as a response to some action.")
      (let ((script (parenscript:ps* `(include_dom
                                       ,(get-url dependency)))))
        (log:debug "Rendering js dependency in ajax response" dependency)
-       (weblocks:send-script script :before-load)))
+       (weblocks.response:send-script script :before-load)))
 
     (:css
      (let ((script (parenscript:ps* `(include_css
                                       ,(get-url dependency)))))
        (log:debug "Rendering css dependency in ajax response" dependency)
-       (weblocks:send-script script :before-load)))))
+       (weblocks.response:send-script script :before-load)))))
 
 
 (defmethod render-in-head ((dependency remote-dependency))
@@ -234,8 +240,8 @@ a browser."
     ;; And now we will bind a route to dependency and vice-versa.
     (setf (slot-value dependency
                       'route)
-          (weblocks.routes:make-route url
-                                      dependency))))
+          (make-route url
+                      dependency))))
 
 
 (defmethod initialize-instance :after ((dependency remote-dependency)
@@ -259,7 +265,7 @@ a browser."
       ;; And now we will bind a route to dependency and vice-versa.
       (setf (slot-value dependency
                         'route)
-            (weblocks.routes:make-route url
+            (make-route url
                                         dependency)))))
 
 
@@ -466,4 +472,82 @@ For local-dependency it is :local."
     (merge-pathnames hash *cache-remote-dependencies-in*)))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Routes related part ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO: rename to register-routes or may be move this code to push-dependency?
+(defun register-dependencies (dependencies)
+  "Adds dependencies to the router to make HTTP server handle them."
+  (dolist (dependency dependencies)
+    ;; to not create a circular dependency between weblocks.dependencies and weblocsk.routes
+    ;; we have to intern this symbol at runtime
+    (let ((route (get-route dependency)))
+      (when route
+        (weblocks.routes:connect route)))))
+
+
+(defclass dependency-route (routes:route)
+  ((dependency :initform nil
+               :initarg :dependency
+               :reader get-dependency)))
+
+
+(defun make-route (uri dependency)
+  "Makes a route for dependency.
+
+Automatically adds a prefix depending on current webapp and widget."
+
+  (make-instance 'dependency-route
+                 :template (routes:parse-template uri)
+                 :dependency dependency))
+
+
+
+(defmethod weblocks.routes:serve ((route dependency-route) env)
+  (declare (ignorable env))
+  
+  (let ((dependency (get-dependency route)))
+    (multiple-value-bind (content content-type)
+        (serve dependency)
+              
+      (let ((content (typecase content
+                       (string (list content))
+                       (t content))))
+        (list 200
+              (list :content-type content-type)
+              content)))))
+
+
+(defmacro with-collected-dependencies (&body body)
+  "Use this macro to wrap code which may push new dependencies for
+the page or an action."
+  `(let (*page-dependencies*)
+     ,@body))
+
+
+(defun push-dependency (dependency)
+  "Pushes dependency into the currently collected list of dependencies.
+
+Makes deduplication by comparing dependencies' urls."
+  
+  (unless (boundp '*page-dependencies*)
+    (error "Please, use push-dependency in code, wrapped with with-collected-dependencies macro."))
+  (pushnew dependency *page-dependencies*
+           :key #'get-url
+           :test #'string-equal))
+
+
+(defun push-dependencies (list-of-dependencies)
+  "Same as `push-dependency' but for the list."
+  (mapc #'push-dependency
+        list-of-dependencies))
+
+
+(defun get-collected-dependencies ()
+  (unless (boundp '*page-dependencies*)
+    (error "Please, use push-dependency in code, wrapped with with-collected-dependencies macro."))
+
+  ;; Dependencies returned as reversed list because that way
+  ;; they will have same order as they were pushed.
+  (reverse *page-dependencies*))

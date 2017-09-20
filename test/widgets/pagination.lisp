@@ -112,12 +112,12 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "10")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         (render-widget-body p)
         ; go to valid page
         (weblocks::eval-hook :pre-action)
         (do-request `(("page-number" . "2")
-                      (,weblocks::*action-string* . "abc126")))
+                      (,weblocks.variables:*action-string* . "abc126")))
         (render-widget-body p)))
   (htm
    ; render pagination widget
@@ -147,7 +147,7 @@
         ; render pagination widget
         (render-widget-body p)
         ; go to next page
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (render-widget-body p)))
   (htm
    ; render pagination widget
@@ -171,7 +171,7 @@
         ; render pagination widget
         (render-widget-body p)
         ; go to next page
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (render-widget-body p)))
   (htm
    ; render pagination widget
@@ -200,7 +200,7 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "10")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         on-change-called-p))
   nil)
 
@@ -217,7 +217,7 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "2")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         on-change-called-p))
   t)
 
@@ -233,7 +233,7 @@
         ; render pagination widget
         (render-widget-body p)
         ; go to invalid page
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         on-change-called-p))
   t)
 
@@ -249,7 +249,7 @@
         ; render pagination widget
         (render-widget-body p)
         ; go to invalid page
-        (do-request `((,weblocks::*action-string* . "abc124")))
+        (do-request `((,weblocks.variables:*action-string* . "abc124")))
         on-change-called-p))
   t)
 
@@ -267,7 +267,7 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "10")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         on-error-called-p))
   t)
 
@@ -284,7 +284,7 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "2")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         on-error-called-p))
   nil)
 
@@ -300,7 +300,7 @@
         (render-widget-body p)
         ; go to invalid page
         (do-request `(("page-number" . "10")
-                      (,weblocks::*action-string* . "abc124")))
+                      (,weblocks.variables:*action-string* . "abc124")))
         (mapcar #'weblocks::string-widget-content (flash-messages f))))
   ("Page number must be an integer between 1 and 4."))
 

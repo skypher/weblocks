@@ -38,7 +38,7 @@
           (fmakunbound 'hcr1-init-user-session)
           ;; fake user clicking on "modify"
           (setf (slot-value *request* 'get-parameters)
-                `((,weblocks::*action-string* . "abc123")))
+                `((,weblocks.variables:*action-string* . "abc123")))
           ;; handle another request, this time AJAX (make sure form is drawn)
           (setf (slot-value *request* 'hunchentoot::headers-in)
                 (cons '("X-Requested-With" . "blah")
@@ -270,7 +270,7 @@ onclick='disableIrrelevantButtons(this);' />~
 ;; Removed because we do not depend on hunchentoot directly
 ;; (deftest handle-client-request-8
 ;;   (with-test-webapp (:class-name 'hcr-hello-webapp)
-;;     (with-request :get `(("pure" . true) (,weblocks::*action-string* . "abc123"))
+;;     (with-request :get `(("pure" . true) (,weblocks.variables:*action-string* . "abc123"))
 ;;                   :uri "/hcr-hello-webapp/"
 ;;                   (let ((res 0))
 ;;                     ;; start the session

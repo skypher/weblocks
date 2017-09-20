@@ -1,7 +1,16 @@
-(eval-when (:compile-toplevel)
-  (format t "~3&Loading weblocks.misc.utils~3%"))
-
 (in-package :weblocks)
+
+
+(defmacro defvar-unbound (variable-name documentation)
+  "Like DEFVAR, but the variable will be unbound rather than getting
+an initial value.  This is useful for variables which should have no
+global value but might have a dynamically bound value."
+  ;; stolen from comp.lang.lisp article <k7727i3s.fsf@comcast.net> by
+  ;; "prunesquallor@comcast.net"
+  `(eval-when (:load-toplevel :compile-toplevel :execute)
+    (defvar ,variable-name)
+    (setf (documentation ',variable-name 'variable)
+            ,documentation)))
 
 ;; (wexport '(gen-id
 ;;            safe-apply
@@ -26,13 +35,6 @@
 ;;            gzip-file md5
 ;;            concatenate-keywords)
 ;;          '(t util))
-
-(defun gen-id (&optional (prefix "dom"))
-  "Generates an ID unique accross the session. The generated ID can be
-used to create IDs for html elements, widgets, etc."
-  (let ((new-widget-id (1+ (or (weblocks.session:get-value 'last-unique-id) -1))))
-    (weblocks.session:set-value 'last-unique-id new-widget-id)
-    (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
 
 (defun safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."

@@ -365,7 +365,7 @@ form-view-buttons for a given view.")
                              &allow-other-keys)
   (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
 
-  (let ((form-id (gen-id))
+  (let ((form-id (weblocks.session:gen-id))
         (header-class (format nil "view form ~A"
                               (attributize-name (object-class-name obj)))))
 
@@ -392,7 +392,7 @@ form-view-buttons for a given view.")
       :form-view-buttons (capture-weblocks-output (apply #'render-form-view-buttons view obj widget args))
       :content (capture-weblocks-output (apply body-fn view obj args)))
     (when (form-view-focus-p view)
-      (send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
+      (weblocks.response:send-script (ps* `((@ ($ ,form-id) focus-first-element)))))))
 
 (defun form-view-field-wt(&key label-class id show-required-indicator required-indicator-label 
                                show-field-label field-label validation-error content 
@@ -429,7 +429,7 @@ form-view-buttons for a given view.")
          (validation-error (assoc field validation-errors))
          (field-class (concatenate 'string (aif attributized-slot-name it "")
                                    (when validation-error " item-not-validated")))
-         (*presentation-dom-id* (gen-id))
+         (*presentation-dom-id* (weblocks.session:gen-id))
          (required-indicator (form-view-field-required-indicator field))
          (show-required-indicator (and (form-view-field-required-p field)
                                        required-indicator)))

@@ -225,7 +225,7 @@ webapp in my context."
 ;;            (generate-widget-id-orig #'weblocks::gen-id)
 ;;            (dummy-action-count 123)
 ;;            (*uri-tokens* '("foo" "bar"))
-;;            weblocks::*page-dependencies* *session*
+;;            *session*
 ;;            *on-ajax-complete-scripts*
 ;;            weblocks::*rendered-actions*)
 ;;       (unwind-protect (progn
@@ -321,7 +321,7 @@ URI - Set the Hunchentoot request URI to this."
 (defun do-action (action-name &rest args)
   "A friendlier interface for do-request-and-render-dirty."
   (do-request-and-render-dirty
-    (cons (cons weblocks::*action-string* action-name)
+    (cons (cons weblocks.variables:*action-string* action-name)
           (loop
              for i on args by #'cddr
              collect (cons (car i) (cadr i))))))

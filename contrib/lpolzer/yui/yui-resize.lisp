@@ -14,7 +14,7 @@
   (declare (ignore args))
   (if (resize-panel widget) 
     (progn 
-      (send-script
+      (weblocks.response:send-script
         (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
                 ;(|:YAHOO.util.:Event.:addListener| (global-variable ,(resize-panel widget)) "init" 
                 (|:YAHOO.util.:Event.:onAvailable| ,(format nil "~A_c" (yui-target-id widget)) ; fragile hack

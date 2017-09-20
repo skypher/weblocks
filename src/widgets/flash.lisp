@@ -40,10 +40,10 @@
                   (when (and (ajax-request-p)
                              (flash-old-messages obj))
                     (if (flash-messages obj)
-                        (send-script
+                        (weblocks.response:send-script
                          (ps* `(new ((slot-value *effect '*pulsate) ,(dom-id obj)
                                      (create :pulses 3 :duration 0.5)))))
-                        (send-script
+                        (weblocks.response:send-script
                          (ps* `(new ((slot-value *effect '*blind-up) ,(dom-id obj)))))))))
   (add-request-hook :session :post-render
                     (lambda ()
@@ -109,5 +109,5 @@ messages that need to be shown for AJAX effects."
                          :content (capture-weblocks-output 
                                     (apply #'render-widget msg args))))
                      messages)))
-      (send-script (ps* `((@ ($ ,(dom-id obj)) show)))))))
+      (weblocks.response:send-script (ps* `((@ ($ ,(dom-id obj)) show)))))))
 

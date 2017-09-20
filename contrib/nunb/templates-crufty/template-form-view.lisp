@@ -118,10 +118,10 @@
                              &allow-other-keys)
   (declare (special *on-ajax-complete-scripts* *form-submit-dependencies* *out-of-band-template-vars*))
   (warn "My special template rendering takes place (with-view-header)")
-  (let ((form-id (gen-id))
+  (let ((form-id (weblocks.session:gen-id))
         (header-class (format nil "view form ~A"
                               (attributize-name (object-class-name obj)))))
-    ; DOES NOT WORK (send-script (format nil "document.onkeypress = function(){if( window.event.keyCode == 13 ){return false;}}"))
+    ; DOES NOT WORK (weblocks.response:send-script (format nil "document.onkeypress = function(){if( window.event.keyCode == 13 ){return false;}}"))
     (when (>= (count-view-fields view)
               (form-view-error-summary-threshold view))
       (setf header-class (concatenate 'string header-class " long-not form")))
@@ -159,8 +159,8 @@
                               :use-ajax-p (form-view-use-ajax-p view))
         (write-string form-body *weblocks-output-stream*)))
      (when 1 ;(form-view-focus-p view)
-       (send-script (format nil "(function() { $('~A').observe('keypress', function(e){ var el = e.element(); if( e.keyCode == 13 ){return false;} } ); }) ();" form-id))
-       (send-script (ps* `(.focus-first-element ($ ,form-id)))))))
+       (weblocks.response:send-script (format nil "(function() { $('~A').observe('keypress', function(e){ var el = e.element(); if( e.keyCode == 13 ){return false;} } ); }) ();" form-id))
+       (weblocks.response:send-script (ps* `(.focus-first-element ($ ,form-id)))))))
 
 
 ;; (apply #'render-view-field
@@ -294,7 +294,7 @@
     ;(break "my validation summary called")
     (when errors
       ;  new Effect.Highlight ( $$('.validation-error-site')[0] ); REMOVED new Effect.Highlight ( $$('.validation-error')[0] );
-      (send-script " $$('.validation-error-scrollto')[0].scrollTo(); "))
+      (weblocks.response:send-script " $$('.validation-error-scrollto')[0].scrollTo(); "))
     (when errors ;
       (and nil errors)
       (let ((non-field-errors (find-all errors #'null :key #'car))

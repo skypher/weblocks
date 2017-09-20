@@ -120,8 +120,7 @@
 
 ;;; Test render-view (we'll test on data view)
 (deftest-html render-view-1
-    (let (weblocks::*page-dependencies*)
-      (declare (special weblocks::*page-dependencies*))
+    (weblocks.dependencies:with-collected-dependencies
       (render-view (defview nil ()
                      hello world)
                    :class-name 'render-view-test-class))

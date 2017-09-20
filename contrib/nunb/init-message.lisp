@@ -19,7 +19,7 @@
 ;;                                                          :maxlength (input-presentation-max-length presentation)))
 
 
-;;       (send-script (format nil "
+;;       (weblocks.response:send-script (format nil "
 ;;                      document.getElementById('~A').onfocus = function () { document.getElementById('~A').value = ''; };"
 ;;                         a-slot-name a-slot-name ;(get-init-message presentation)
 

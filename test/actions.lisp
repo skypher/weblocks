@@ -72,7 +72,7 @@
 (deftest eval-action-1
     (with-request :get `(("name" . "Bob")
                          ("cancel" . "Cancel")
-                         (,weblocks::*action-string* . "abc123"))
+                         (,weblocks.variables:*action-string* . "abc123"))
       (make-action (lambda (&key name cancel &allow-other-keys)
                      (concatenate 'string name cancel)))
       (weblocks::eval-action))

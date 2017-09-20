@@ -100,13 +100,19 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
 
     (cond
       (new-window-p
-       (send-script
+       (weblocks.response:send-script
         (ps:ps*
          `((slot-value window 'open) ,uri ,window-title))))
       ((eq defer :post-action)
-       (weblocks.hooks:add-request-hook :post-action #'do-redirect))
+       (weblocks.hooks:add-request-hook :action
+           make-redirect-after-action
+           (call-next-hook)
+           (do-redirect)))
       ((eq defer :post-render)
-       (weblocks.hooks:add-request-hook :post-render #'do-redirect))
+       (weblocks.hooks:add-request-hook :post-render
+           make-redirect-after-render
+           (call-next-hook)
+           (do-redirect)))
       (t (do-redirect)))))
 
 ;;; legacy wrappers for redirect

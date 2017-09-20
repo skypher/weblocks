@@ -11,17 +11,16 @@
 ;;; test with-page
 (deftest-html with-page-1
     (with-test-webapp (:class-name 'some-name)
-      (let ((weblocks::*page-dependencies*
-             (mapcar (curry #'apply
+      (let ((*current-page-description* "Some Page")
+            (*current-page-title*  "Some Page")
+            (*current-page-keywords* nil)
+            (*current-page-headers* nil))
+        (declare (special *current-page-description* *current-page-title* *current-page-keywords* *current-page-headers*))
+        (weblocks.dependencies:push-dependencies
+         (mapcar (curry #'apply
                             (curry-after #'make-local-dependency :do-not-probe t))
                      '((:stylesheet "foo")
                        (:stylesheet "bar"))))
-            (*current-page-description* "Some Page")
-      (*current-page-title*  "Some Page")
-      (*current-page-keywords* nil)
-      (*current-page-headers* nil))
-        (declare (special weblocks::*page-dependencies*
-                          *current-page-description* *current-page-title* *current-page-keywords* *current-page-headers*))
         (with-html
           (:div "test"))
         (weblocks::render-page (weblocks::current-webapp))))

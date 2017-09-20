@@ -78,7 +78,7 @@ its subclasses."))
 		    *presentation-dom-id*
 		    *form-submit-dependencies*))
   (let ((widget-variable (ps-gensym "$yui_widget")))
-    (send-script (create-and-configure-editor-script presentation
+    (weblocks.response:send-script (create-and-configure-editor-script presentation
 						     widget-variable
 						     *presentation-dom-id*))
     (push (make-instance 'javascript-code-dependency
@@ -207,7 +207,7 @@ its subclasses."))
 
 (defmethod render-widget-body ((obj yui-tabview) &rest args)
   (declare (ignore args))
-  (send-script (tabview-script (yui-widget-variable obj) (dom-id obj)))
+  (weblocks.response:send-script (tabview-script (yui-widget-variable obj) (dom-id obj)))
   (let ((tab-counter 0))
     (with-html
       (:ul :class "yui-nav"

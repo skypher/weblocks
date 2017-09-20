@@ -438,17 +438,16 @@ header ('with-widget-header'). If 'inlinep' is true, renders the
 widget without a header.
 
 Additionally, calls 'dependencies' and adds the returned items to
-*page-dependencies*. This is later used by Weblocks to declare
+page dependencies. This is later used by Weblocks to declare
 stylesheets and javascript links in the page header."))
 
 (defmethod render-widget (obj &rest args &key inlinep &allow-other-keys)
-  (log:debug "Rendering widget" obj "with" weblocks.dependencies:*page-dependencies*)
+  (log:debug "Rendering widget" obj "with" (weblocks.dependencies:get-collected-dependencies))
   
   (let ((widget-dependencies (weblocks.dependencies:get-dependencies obj)))
     ;; Update new-style dependencies
-    (setf weblocks.dependencies:*page-dependencies*
-          (append weblocks.dependencies:*page-dependencies*
-                  widget-dependencies))
+    (weblocks.dependencies:push-dependencies
+     widget-dependencies)
     
     (when (weblocks.request:ajax-request-p)
       ;; Return a code to embed new dependencies into new page

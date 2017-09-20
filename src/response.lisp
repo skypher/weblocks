@@ -5,7 +5,8 @@
    #:*content-type*
    #:abort-processing
    #:add-header
-   #:*headers*))
+   #:*headers*
+   #:send-script))
 (in-package weblocks.response)
 
 
@@ -67,3 +68,26 @@ HTTP code and headers are taken from *code* and *content-type*."
     (setf *headers* headers))
 
   (throw 'abort-processing content))
+
+
+(defun send-script (script &optional (place :after-load))
+  "Send JavaScript to the browser. The way of sending depends
+  on whether the current request is via AJAX or not.
+
+  Script may be either a string or a list; if it is a list
+  it will be compiled through Parenscript first.
+  
+  FIXME: is using PUSH or PUSHLAST correct?"
+  (let ((script (etypecase script
+                  (string script)
+                  (list (ps:ps* script)))))
+    (if (weblocks.request:ajax-request-p)
+        (let ((code (if (equalp (weblocks.request:request-header "X-Weblocks-Client")
+                                "JQuery")
+                        script
+                        (weblocks:with-javascript-to-string script))))
+          (ecase place
+            (:before-load (push code weblocks.variables:*before-ajax-complete-scripts*))
+            (:after-load (push code weblocks.variables:*on-ajax-complete-scripts*))))
+        (weblocks:with-javascript
+          script))))

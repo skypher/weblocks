@@ -26,7 +26,7 @@
            (weblocks::*presentation-dom-id* "id-123"))
         (render-widget quickform)
         ;; click submit
-        (do-request `((,weblocks::*action-string* . "abc123")
+        (do-request `((,weblocks.variables:*action-string* . "abc123")
                       ("submit" . "Submit")))
         (render-widget quickform)))
   (htm
@@ -75,7 +75,7 @@
             (setf res (yield quickform)))
           (render-widget c2)
           ;; click submit
-          (do-request `((,weblocks::*action-string* . "abc123")
+          (do-request `((,weblocks.variables:*action-string* . "abc123")
                         ("submit" . "Submit")
                         ("test" . "testing123")))
           res)))
@@ -97,7 +97,7 @@
                                       (setf res (yield quickform)))
                            (render-widget c2)
                            ;; click submit
-                           (do-request `((,weblocks::*action-string* . "abc123")
+                           (do-request `((,weblocks.variables:*action-string* . "abc123")
                                          ("submit" . "Submit")
                                          ("test" . "testing123")))
                            (type-of res))))

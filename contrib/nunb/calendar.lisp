@@ -60,7 +60,7 @@
                            (:div :id cal-div :class "innercalendar")))))
 
       ;; (yui) calendar inside frame, but clickable and should update field itself. ;metatilities:date-string
-      (send-script (format nil "
+      (weblocks.response:send-script (format nil "
                         var dialog, calendar;
                         calendar = new YAHOO.widget.Calendar('~A', {
                             iframe:true,          // Turn iframe off, since container has iframe support.

@@ -8,8 +8,6 @@
 
 (plan 1)
 
-
-
 (subtest "refresh-request-p-1"
   (with-session
     (with-request ("/foo/bar")

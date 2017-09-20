@@ -195,7 +195,7 @@
         (make-request-ajax)
         (with-call/cc (setf res (do-choice "Please choose" (list (cons :a (humanize-name :a)) (cons :b (humanize-name :b))))))
         (do-request `(("b" . "B")
-                      (,weblocks::*action-string* . "abc123"))))
+                      (,weblocks.variables:*action-string* . "abc123"))))
       res)
   :b)
 
@@ -238,7 +238,7 @@
         (make-request-ajax)
         (with-call/cc (setf res (do-confirmation "Please confirm")))
         (do-request `(("ok" . "Ok")
-                      (,weblocks::*action-string* . "abc123"))))
+                      (,weblocks.variables:*action-string* . "abc123"))))
       res)
   :ok)
 

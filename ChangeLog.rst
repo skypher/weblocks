@@ -2,7 +2,27 @@
  ChangeLog
 ===========
 
+* :support:`-` ``html``, ``menu``, ``suggest`` and ``repl`` utilities
+  were excluded.
+* :support:`-` Code which was in ``request-handler.lisp``, was excluded
+  from build and partly moved to ``request-handler2.lisp``.
 * :feature:`-` Added ``:stop-weblocks`` hook.
+* :support:`-` Misc helper for repl were removed: ``sessions``,
+  ``in-session`` and ``pt``. May be the will be restored in separate
+  package.
+* :support:`-` Page boilerplate rendering method ``render-page`` now
+  does not use complex templating with contextes.
+* :support:`-` Symbols refactoring:
+  * ``*style-warn-on-circular-dirtying*`` variable ->
+    ``weblocks.variables``;
+  * ``*style-warn-on-late-propagation*`` variable ->
+    ``weblocks.variables``;
+  * ``gen-id`` function -> ``weblocks.session``;
+  * ``send-script`` function -> ``weblocks.response``;
+  * ``with-html-form`` macro -> ``weblocks-ui``;
+  * ``*approved-return-codes*`` variable -> ``weblocks.variables``;
+  * ``handle-ajax-request`` method -> ``weblocks.request-handler``;
+  * ``update-location-hash-dependents`` function -> ``weblocks.request-handler``.
 
 * :release:`0.13.11 <2017-09-12>`
 

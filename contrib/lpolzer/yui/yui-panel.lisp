@@ -10,7 +10,7 @@
 
 (defmethod render-widget-body ((widget yui-panel) &rest args)
   (declare (ignore args))
-  (send-script
+  (weblocks.response:send-script
     (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
             (setf (global-variable ,(yui-widget-variable widget))
                   (new (,(yui-class-name widget) ,(yui-target-id widget)

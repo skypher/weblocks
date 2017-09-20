@@ -208,7 +208,7 @@
        (declare (special *weblocks-output-stream*))
        (with-request :get nil
          (render-widget (make-instance 'dataform :data *joe*))
-         (format nil "~A" (car (mapcar #'dependency-url weblocks::*page-dependencies*)))))
+         (format nil "~A" (car (mapcar #'dependency-url (weblocks.dependencies::get-collected-dependencies)))))
      (make-versioned-regex "dataform-import" "css")
      :test (lambda (x y) (cl-ppcre:scan y x))))
 

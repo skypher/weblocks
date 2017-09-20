@@ -80,7 +80,7 @@
           (dataseq-update-sort-column grid)
           (render-dataseq-body grid)
           ;; sort by name (should be descending)
-          (do-request `((,weblocks::*action-string* . "abc126")))
+          (do-request `((,weblocks.variables:*action-string* . "abc126")))
           ;; output result
           (with-html (str res)))))
   (htm
@@ -129,7 +129,7 @@
        (progn
          (render-dataseq-body grid)
          ;; sort by name (should be descending)
-         (do-request `((,weblocks::*action-string* . "abc126"))))
+         (do-request `((,weblocks.variables:*action-string* . "abc126"))))
        (htm
         (:div :class "datagrid-body"
               #.(table-header-template
@@ -175,7 +175,7 @@
           (dataseq-update-sort-column grid)
           (render-dataseq-body grid)
           ;; sort by name (should be descending)
-          (do-request `((,weblocks::*action-string* . "abc126")))
+          (do-request `((,weblocks.variables:*action-string* . "abc126")))
           ;; output result
           (with-html (str res)))))
   (htm

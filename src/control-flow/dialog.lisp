@@ -43,8 +43,8 @@ the widget inside."
              (render-widget widget)
              (get-output-stream-string *weblocks-output-stream*))))
     ;(format t "widget-html: ~S~%" (widget-html widget))
-    (let ((inner (intern (string-upcase (gen-id "inner"))))
-          (close-action (intern (string-upcase (gen-id "close")))))
+    (let ((inner (intern (string-upcase (weblocks.session:gen-id "inner"))))
+          (close-action (intern (string-upcase (weblocks.session:gen-id "close")))))
       `(progn
          (setf ,inner ,(widget-html widget))
          (setf ,close-action ,(when close (make-close-action)) )
@@ -86,9 +86,9 @@ scales down to 'do-modal' instead."
                                                              :widget new-callee
                                                              :close close
                                                              :css-class css-class))
-                         (send-script (ps* (make-dialog-js title new-callee css-class close)))))
+                         (weblocks.response:send-script (ps* (make-dialog-js title new-callee css-class close)))))
         (setf (current-dialog) nil)
-        (send-script (ps (remove-dialog))))
+        (weblocks.response:send-script (ps (remove-dialog))))
       (do-modal title callee :css-class css-class)))
 
 (defun choices-get-wt (&key message content)

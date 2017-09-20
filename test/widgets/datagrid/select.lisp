@@ -76,10 +76,10 @@
         ;; render datagrid
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; select all
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; select none
-        (do-request `((,weblocks::*action-string* . "abc129")))
+        (do-request `((,weblocks.variables:*action-string* . "abc129")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; initial

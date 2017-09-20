@@ -118,7 +118,7 @@
         ;; add another item
         (persist-object *default-store* *employee4*)
         ;; go to next page
-        (do-request `((,weblocks::*action-string* . "abc126")))
+        (do-request `((,weblocks.variables:*action-string* . "abc126")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ; Page 1
@@ -187,11 +187,11 @@
         (dataseq-update-sort-column grid)
         (render-dataseq-body grid)
         ;; sort by name (should be descending)
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (dataseq-update-sort-column grid)
         (render-dataseq-body grid)
         ;; refresh the action (should still be descending)
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (dataseq-update-sort-column grid)
         (render-dataseq-body grid)))
   (htm
@@ -295,7 +295,7 @@
         ;; render datagrid
         (render-dataseq-body grid)
         ;; sort by name (should be descending)
-        (do-request `((,weblocks::*action-string* . "abc123")))
+        (do-request `((,weblocks.variables:*action-string* . "abc123")))
         (render-dataseq-body grid)))
   (htm
    (:div :class "datagrid-body"

@@ -13,10 +13,6 @@
           *current-page-headers*
           *accumulate-page-keywords*))
 
-;; Moved to weblocks.dependencies
-;; (defvar *page-dependencies*)
-;; (setf (documentation '*page-dependencies* 'variable)
-;;       "A list of dependencies of the currently rendered page.")
 
 (defvar *accumulate-page-keywords* t
   "Whether to accumulate widgets' keywords for the keywords
@@ -55,52 +51,37 @@
 the HTML already rendered to *weblocks-output-stream* with boilerplate
 page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 
-(defun page-wt (&key title header-content body-content)
-  (with-html-output-to-string (*weblocks-output-stream* nil :prologue t)
-    (:html :xmlns "http://www.w3.org/1999/xhtml"
-     (:head
-       (:title (str title))
-       (str header-content))
-     (:body
-       (str body-content)
-       (with-javascript "updateWidgetStateFromHash();")))))
-
-(deftemplate :page-wt 'page-wt)
 
 (defmethod render-page ((app weblocks-webapp))
   "Default page rendering template and protocol"
-  ; Note, anything that precedes the doctype puts IE6 in quirks mode
-  ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
+                                        ; Note, anything that precedes the doctype puts IE6 in quirks mode
+                                        ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
   (log:debug "Rendering page for" app)
   
-  (let ((rendered-html (get-output-stream-string *weblocks-output-stream*))
-        ;; TODO: understand how dependency compaction worked before
-        ;;       and may be reimplement it.
-        ;; (all-dependencies (timing "compact-dependencies"
-        ;;                     (compact-dependencies (append (webapp-application-dependencies)
-        ;;                                                   *page-dependencies*))))
-        (all-dependencies weblocks.dependencies:*page-dependencies*))
-    
-    (render-wt :page-wt (list :app app) 
-               :title (application-page-title app)
-               :header-content (capture-weblocks-output 
-                                 (render-page-headers app)
-                                 (mapc #'weblocks.dependencies:render-in-head all-dependencies))
-               :body-content (capture-weblocks-output (render-page-body app rendered-html)))))
+  (let* ((rendered-html (get-output-stream-string *weblocks-output-stream*))
+         ;; TODO: understand how dependency compaction worked before
+         ;;       and may be reimplement it.
+         ;; (all-dependencies (timing "compact-dependencies"
+         ;;                     (compact-dependencies (append (webapp-application-dependencies)
+         ;;                                                   (weblocks.dependencies:get-collected-dependencies)))))
+         (all-dependencies (weblocks.dependencies:get-collected-dependencies))
+         (title (application-page-title app))
+         (header-content (with-html
+                           (render-page-headers app)
+                           (mapc #'weblocks.dependencies:render-in-head
+                                 all-dependencies)))
+         (body-content (render-page-body app
+                                         rendered-html)))
 
-;;
-;; Render header entries
-;;
-(defun page-headers-wt (&key content-type description keywords content &allow-other-keys)
-  (with-html-to-string 
-    (:meta :http-equiv "Content-type" :content content-type)
-    (when description
-      (htm (:meta :name "description" :content description)))
-    (when keywords
-      (htm (:meta :name "keywords" :content (format nil "~{~A~^,~}" it))))
-    (str content)))
+    (with-html-output-to-string (*weblocks-output-stream* nil :prologue t)
+      (:html :xmlns "http://www.w3.org/1999/xhtml"
+             (:head
+              (:title (str title))
+              (str header-content))
+             (:body
+              (str body-content)
+              (with-javascript "updateWidgetStateFromHash();"))))))
 
-(deftemplate :page-headers-wt 'page-headers-wt)
 
 (defmethod render-page-headers ((app weblocks-webapp))
   "A placeholder to add :meta entries, :expires headers and other 
@@ -109,17 +90,28 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
    here to customize header rendering on a per-request basis.  By default
    this function renders the current content type."
   (declare (special *current-page-headers*))
-  (render-wt :page-headers-wt 
-             (list :app app)
-             :content-type *default-content-type*
-             :description (application-page-description app)
-             :keywords (application-page-keywords app)
-             :content (capture-weblocks-output 
-                        (with-html 
-                          (dolist (header *current-page-headers*)
-                            (etypecase header
-                              (string (htm (str header)))
-                              ((or function symbol) (funcall header))))))))
+  (let ((description (application-page-description app))
+        (keywords (application-page-keywords app)))
+    (with-html
+      (:meta :http-equiv "Content-type"
+             :content *default-content-type*)
+    
+      (when description
+        (htm (:meta :name "description"
+                    :content description)))
+      (when keywords
+        (htm (:meta :name "keywords"
+                    :content (format nil "~{~A~^,~}" keywords))))
+
+      ;; Headers aren't tags but any code snippets or functions
+      ;; returning strings.
+      (dolist (header *current-page-headers*)
+        (etypecase header
+          (string (htm (str header)))
+          ;; TODO: Right now (old code) expects that function will write
+          ;; to special stream, but we need to make it return a value
+          ;; to be consistent with string headers.
+          ((or function symbol) (funcall header)))))))
 
 ;;
 ;; Render the page body

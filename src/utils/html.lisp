@@ -19,9 +19,7 @@
           scriptonly
           noscript
           render-message
-          send-script))
-
-(declaim (special *action-string*))     ;early
+          weblocks.response:send-script))
 
 (defmacro capture-weblocks-output (&body body)
   `(weblocks.utils.html-parts:nested-html-part 
@@ -38,24 +36,25 @@
   "The name of the control responsible for cancellation of form
   submission.")
 
-(defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t) extra-submit-code
-                          (submit-fn "initiateFormAction(\"~A\", $(this), \"~A\")")) &body body)
-  "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
-  (let ((action-code (gensym)))
-    `(let ((,action-code (function-or-action->action ,action)))
-       (with-html
-         (:form :id ,id :class ,class :action (weblocks.request:request-path-info)
-                :method (attributize-name ,method-type) :enctype ,enctype
-                :onsubmit (when ,use-ajax-p
-                            (format nil "~@[~A~]~A; return false;"
-                                    ,extra-submit-code
-                                    (format nil ,submit-fn
-                                            (quri:url-encode (or ,action-code ""))
-                                            (session-name-string-pair))))
-                (:fieldset
-                 ,@body
-                 (:input :name *action-string* :type "hidden" :value ,action-code))))
-       (log-form ,action-code :id ,id :class ,class))))
+;; Moved to weblocks-ui
+;; (defmacro with-html-form ((method-type action &key id class enctype (use-ajax-p t) extra-submit-code
+;;                           (submit-fn "initiateFormAction(\"~A\", $(this), \"~A\")")) &body body)
+;;   "Transforms to cl-who (:form) with standard form code (AJAX support, actions, etc.)"
+;;   (let ((action-code (gensym)))
+;;     `(let ((,action-code (function-or-action->action ,action)))
+;;        (with-html
+;;          (:form :id ,id :class ,class :action (weblocks.request:request-path-info)
+;;                 :method (attributize-name ,method-type) :enctype ,enctype
+;;                 :onsubmit (when ,use-ajax-p
+;;                             (format nil "~@[~A~]~A; return false;"
+;;                                     ,extra-submit-code
+;;                                     (format nil ,submit-fn
+;;                                             (quri:url-encode (or ,action-code ""))
+;;                                             (session-name-string-pair))))
+;;                 (:fieldset
+;;                  ,@body
+;;                  (:input :name weblocks.variables:*action-string* :type "hidden" :value ,action-code))))
+;;        (log-form ,action-code :id ,id :class ,class))))
 
 (defun html-link-wt (&key id class href onclick title content &allow-other-keys)
   (with-html-to-string
@@ -366,7 +365,7 @@ for the value.
 
 (deftemplate :password-field-visibility-option-wt 'password-field-visibility-option-wt)
 
-(defun render-password (name value &key (id (gen-id)) (class "password") maxlength style
+(defun render-password (name value &key (id (weblocks.session:gen-id)) (class "password") maxlength style
                         default-value size visibility-option-p tabindex disabledp)
     "Renders a password in a form.
 'name' - name of the html control. The name is attributized before being rendered.
@@ -385,7 +384,7 @@ for the value.
                                 (format nil "if (this.value==\"\") this.value=\"~A\";" default-value))
                       :disabledp disabledp)
   (when visibility-option-p
-    (send-script (ps:ps*
+    (weblocks.response:send-script (ps:ps*
                    `(defun toggle-password-visibility (field)
                       (let ((it ($ field)))
                         (if (== (slot-value it 'type) "password")
@@ -395,7 +394,7 @@ for the value.
       :password-field-visibility-option-wt 
       nil
       :content (capture-weblocks-output 
-                 (render-checkbox (gen-id) nil
+                 (render-checkbox (weblocks.session:gen-id) nil
                                   :onclick (format nil "togglePasswordVisibility(\"~A\")" id))))))
 
 (defun textarea-field-wt (&key name id rows cols class disabledp content &allow-other-keys)
@@ -498,28 +497,6 @@ in addition."
        (:noscript
          ,@body))))
 
-(defun send-script (script &optional (place :after-load))
-  "Send JavaScript to the browser. The way of sending depends
-  on whether the current request is via AJAX or not.
-
-  Script may be either a string or a list; if it is a list
-  it will be compiled through Parenscript first.
-  
-  FIXME: is using PUSH or PUSHLAST correct?"
-  (let ((script (etypecase script
-                  (string script)
-                  (list (ps* script)))))
-    (if (weblocks.request:ajax-request-p)
-        (let ((code (if (equalp (weblocks.request:request-header "X-Weblocks-Client")
-                                "JQuery")
-                        script
-                        (with-javascript-to-string script))))
-          (declare (special *before-ajax-complete-scripts* *on-ajax-complete-scripts*))
-          (ecase place
-            (:before-load (push code *before-ajax-complete-scripts*))
-            (:after-load (push code *on-ajax-complete-scripts*))))
-        (with-javascript
-          script))))
 
 (defun render-message-wt (&key message caption)
   (with-html-to-string

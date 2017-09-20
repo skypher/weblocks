@@ -9,27 +9,12 @@
           *style-warn-on-late-propagation*
           *approved-return-codes*))
 
-(defvar *current-page-description* nil)
-
-(defvar *approved-return-codes* (list 200))
-
-(defvar *before-ajax-complete-scripts*)
-(setf (documentation '*before-ajax-complete-scripts* 'variable)
-      "A list of client-side scripts to be sent over to the browser at
-      the end of ajax request execution.  TODO when executed?")
-
-(defvar *on-ajax-complete-scripts*)
-(setf (documentation '*on-ajax-complete-scripts* 'variable)
-      "A list of client-side scripts to be sent over to the browser at
-      the end of ajax request execution.")
 
 (defvar *request-timeout* 180
   "Seconds until we abort a request because it took too long.
   This prevents threads from hogging the CPU indefinitely.
   
   You can set this to NIL to disable timeouts (not recommended).")
-
-(defvar *backtrace-on-session-init-error* t)
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -136,7 +121,6 @@ customize behavior."))
             (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
             *before-ajax-complete-scripts*
             *on-ajax-complete-scripts*
-            *page-dependencies*
             *current-page-title*
             *current-page-description*
             *current-page-keywords*
@@ -175,139 +159,10 @@ customize behavior."))
             (get-output-stream-string *weblocks-output-stream*))
           (handle-http-error app (return-code*)))))))
 
-(defmethod handle-ajax-request ((app weblocks-webapp))
-  (log:debug "Handling AJAX request")
-  
-  (webapp-update-thread-status "Handling AJAX request")
-  (timing "handle-ajax-request"
-    (update-location-hash-dependents)
-    (render-dirty-widgets)
-
-    ;; TODO: only add new routes
-    (weblocks.routes:register-dependencies
-     weblocks.dependencies:*page-dependencies*)))
-
-(defun update-location-hash-dependents ()
-  (let ((hash (parse-location-hash)))
-    (when hash
-      (mapc (lambda (w)
-              (update-state-from-location-hash w hash))
-           (get-widgets-by-type 'location-hash-dependent)))))
-
-(defun update-widget-tree ()
-  (let ((*tree-update-pending* t)
-        (depth 0)
-        page-title
-        page-description
-        page-keywords)
-
-    (walk-widget-tree (root-widget)
-                      (lambda (widget d)
-                        (update-widget-parameters widget
-                                                  (weblocks.request:request-method)
-                                                  (weblocks.request:request-parameters))
-                        (update-children widget)
-                        (let ((title (page-title widget))
-                              (description (page-description widget))
-                              (keywords (page-keywords widget))
-                              (headers (page-headers widget)))
-                          (when (and (> d depth) title)
-                            (setf page-title title))
-                          (when (and (> d depth) description)
-                            (setf page-description description))
-                          (when headers
-                            (setf *current-page-headers*
-                                  (append (page-headers widget)
-                                          *current-page-headers*)))
-                          (cond
-                            ((and keywords *accumulate-page-keywords*)
-                             (setf page-keywords
-                                   (append keywords page-keywords)))
-                            ((and keywords (> d depth))
-                             (setf page-keywords keywords)))
-                          (when (> d depth)
-                            (setf depth d)))))
-    (when page-title
-      (setf *current-page-title* page-title))
-    (when page-description
-      (setf *current-page-description* page-description))
-    (when page-keywords
-      (setf *current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
 
 (defun remove-session-from-uri (uri)
   "Removes the session info from a URI."
   (remove-parameter-from-uri uri (session-cookie-name *weblocks-server*)))
-
-(defun remove-action-from-uri (uri)
-  "Removes the action info from a URI."
-  (remove-parameter-from-uri uri *action-string*))
-
-(defparameter *style-warn-on-circular-dirtying* nil
-  "Whether to emit a style-warning when widgets are
-marked dirty after the rendering phase.")
-
-(defparameter *style-warn-on-late-propagation* nil
-  "Whether to emit a style-warning when widgets are
-marked dirty in the rendering phase.")
-
-(defun render-dirty-widgets ()
-  "Renders widgets that have been marked as dirty into a JSON
-association list. This function is normally called by
-'handle-client-request' to service AJAX requests."
-
-  (log:debug "Rendering dirty widgets")
-
-  (flet ((remove-duplicate-dirty-widgets ()
-           "Removes all widgets that should be rendered through rendering their parent"
-           (loop for widget in *dirty-widgets* do 
-                 (loop for widget2 in *dirty-widgets* do 
-                       (when (and (not (equal widget widget2))
-                                  (child-of-p widget widget2))
-                         (setf *dirty-widgets* (remove widget2 *dirty-widgets*)))))))
-
-    (remove-duplicate-dirty-widgets))
-
-  (setf weblocks.response:*content-type*
-        *json-content-type*)
-  
-  (let ((render-state (make-hash-table :test 'eq)))
-    (labels ((circularity-warn (w)
-               (when *style-warn-on-circular-dirtying*
-                 (style-warn 'non-idempotent-rendering
-                  :change-made
-                  (format nil "~A was marked dirty and skipped after ~
-                               already being rendered" w))))
-             (render-enqueued (dirty)
-               (loop for w in dirty
-                     if (gethash w render-state)
-                       do (circularity-warn w)
-                     else
-                       do (render-widget w)
-                          (setf (gethash w render-state) t)
-                       and collect (cons (dom-id w)
-                                         (get-output-stream-string
-                                             *weblocks-output-stream*))))
-             (late-propagation-warn (ws)
-               (when *style-warn-on-late-propagation*
-                 (style-warn 'non-idempotent-rendering
-                  :change-made
-                  (format nil "~A widgets were marked dirty: ~S" (length ws) ws))))
-             (absorb-dirty-widgets ()
-               (loop for dirty = *dirty-widgets*
-                     while dirty
-                     count t into runs
-                     when (= 2 runs)
-                       do (late-propagation-warn dirty)
-                     do (setf *dirty-widgets* '())
-                     nconc (render-enqueued dirty))))
-      (let ((rendered-widgets (absorb-dirty-widgets)))
-        (write 
-          (encode-json-alist-to-string
-            `(("widgets" . ,rendered-widgets)
-              ("before-load" . ,*before-ajax-complete-scripts*)
-              ("on-load" . ,*on-ajax-complete-scripts*)))
-          :stream *weblocks-output-stream*
-          :escape nil)))))
 
 
 ;; TODO: move this code to weblocks.stores

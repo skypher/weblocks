@@ -25,7 +25,7 @@
     (if (slot-boundp obj 'dom-id)
         (slot-value obj 'dom-id)
         (when (boundp 'weblocks.session::*session*)
-          (setf (slot-value obj 'dom-id) (gen-id))))))
+          (setf (slot-value obj 'dom-id) (weblocks.session:gen-id))))))
 
 (defgeneric dom-id (obj)
   (:documentation "Provides a consistent interface to identifying widgets

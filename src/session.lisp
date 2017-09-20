@@ -7,7 +7,8 @@
    #:delete-value
    #:get-value
    #:reset-latest-session
-   #:set-value))
+   #:set-value
+   #:gen-id))
 (in-package weblocks.session)
 
 
@@ -55,3 +56,12 @@ KEY is compared using EQUAL."
 (defun reset-latest-session ()
   (when *latest-session*
     (clrhash *latest-session*)))
+
+
+(defun weblocks.session:gen-id (&optional (prefix "dom"))
+  "Generates an ID unique accross the session. The generated ID can be
+used to create IDs for html elements, widgets, etc."
+  (let ((new-widget-id (1+ (or (get-value 'last-unique-id) -1))))
+    (set-value 'last-unique-id new-widget-id)
+    (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
+

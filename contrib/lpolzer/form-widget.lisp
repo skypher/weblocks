@@ -83,7 +83,7 @@
 (define-widget form-widget ()
   ((caption :type (or string function null) :initform nil)
    (instructions :type (or string function null) :initform nil)
-   (form-id :initform (gen-id))
+   (form-id :initform (weblocks.session:gen-id))
    (focusp :type boolean :initform t)
    (validators :initform nil)
    (error-messages :type list :initform nil)
@@ -228,7 +228,7 @@
 (defmethod render-widget-children :after ((widget form-widget) &rest args)
   (declare (ignore args))
   (when (focusp-of widget)
-    (send-script
+    (weblocks.response:send-script
       `((@ ($ ,(form-id-of widget)) focus-first-element)))))
 
 
@@ -253,7 +253,7 @@
   (unless (getf initargs :name)
     (setf (name-of widget) (aif (label-of widget)
                              (attributize-name it)
-                             (gen-id)))))
+                             (weblocks.session:gen-id)))))
 
 (defmethod pretty-intermediate-value-of ((widget field-widget))
   (or (intermediate-value-of widget) "-"))

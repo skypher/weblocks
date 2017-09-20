@@ -162,15 +162,15 @@ when new dependencies appeared in AJAX page updates.")
 
 (defmethod render-dependency-in-page-head ((obj javascript-code-dependency))
   (log:debug "Rendering javascript code dependency" obj)
-  (send-script (javascript-code obj)))
+  (weblocks.response:send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-page-body-top ((obj javascript-code-dependency))
   (log:debug "Rendering js dependency at the body top" obj)
-  (send-script (javascript-code obj)))
+  (weblocks.response:send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-page-body-bottom ((obj javascript-code-dependency))
   (log:debug "Rendering js dependency at the body bottom" obj)
-  (send-script (javascript-code obj)))
+  (weblocks.response:send-script (javascript-code obj)))
 
 (defmethod render-dependency-in-form-submit ((obj javascript-code-dependency))
   (log:debug "Rendering js dependency in form submit" obj)
@@ -178,14 +178,14 @@ when new dependencies appeared in AJAX page updates.")
 
 (defmethod render-dependency-in-ajax-response ((obj stylesheet-dependency))
   (log:debug "Rendering css dependency in ajax response" obj)
-  (send-script
+  (weblocks.response:send-script
    (ps* `(include_css
           ,(puri:render-uri (dependency-url obj) nil)))
    :before-load))
 
 (defmethod render-dependency-in-ajax-response ((obj script-dependency))
   (log:debug "Rendering js dependency in ajax response" obj)
-  (send-script
+  (weblocks.response:send-script
    (ps* `(include_dom
           ,(puri:render-uri (dependency-url obj) nil)))
    :before-load))

@@ -24,8 +24,8 @@
 
 (defmethod render-widget-body ((widget buddy-manager) &rest args)
   (call-next-method) ; render tabview
-  (let ((panel (intern (gen-id "yuiWidget")))
-        (resize (intern (gen-id "yuiWidget"))))
+  (let ((panel (intern (weblocks.session:gen-id "yuiWidget")))
+        (resize (intern (weblocks.session:gen-id "yuiWidget"))))
     (let ((panel (make-instance 'buddy-manager-panel :widget-variable panel)))
       (add-component-config panel :draggable (js-bool (draggable widget))
                                   :closeable (js-bool (closable widget)))

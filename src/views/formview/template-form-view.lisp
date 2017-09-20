@@ -42,13 +42,13 @@
   (declare (special *on-ajax-complete-scripts* *form-submit-dependencies*))
 
   (with-slots (template additional-variables-fn) view
-    (let ((form-id (gen-id))
+    (let ((form-id (weblocks.session:gen-id))
           (fields-data)
           (field-values-data)
           (labels-data))
       (apply #'map-view-fields 
              (lambda (field-info)
-               (let ((*presentation-dom-id* (gen-id)))
+               (let ((*presentation-dom-id* (weblocks.session:gen-id)))
                  (setf field-values-data 
                        (append field-values-data 
                                (list (alexandria:make-keyword (view-field-slot-name (field-info-field field-info))) 
@@ -116,4 +116,4 @@
                            value))
             (safe-apply additional-variables-fn (list :view view :object obj :widget widget)))))))
   (when (form-view-focus-p view)
-    (send-script (ps* `((@ ($ ,form-id) focus-first-element))))))
+    (weblocks.response:send-script (ps* `((@ ($ ,form-id) focus-first-element))))))

@@ -45,7 +45,7 @@
                          (do-request `(("submit" . "Login")
                                        ("email" . "Foo")
                                        ("password" . "Bar")
-                                       (,weblocks::*action-string* . "abc123")))
+                                       (,weblocks.variables:*action-string* . "abc123")))
                          (authenticatedp)))
          "Foo")
 

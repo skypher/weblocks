@@ -81,8 +81,7 @@
 
 ;;; Test table view render-object-view
 (deftest-html table-view-render-object-view-1
-    (let (weblocks::*page-dependencies*)
-      (declare (special weblocks::*page-dependencies*))
+    (weblocks.dependencies:with-collected-dependencies
       (render-object-view (list *joe* *bob*) '(table employee)))
   #.(table-header-template
      '((:th :class "name" (:span :class "label" "Name"))

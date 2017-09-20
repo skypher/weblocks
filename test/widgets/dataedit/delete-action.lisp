@@ -11,7 +11,7 @@
                                  :allow-pagination-p nil)))
         (dataedit-delete-items-flow grid (cons :none (list (object-id *joe*))))
         (do-request `(("yes" . "Yes")
-                      (,weblocks::*action-string* . "abc123")))
+                      (,weblocks.variables:*action-string* . "abc123")))
         (mapcar #'first-name (dataseq-data grid))))
   ("Bob"))
 
@@ -24,7 +24,7 @@
                                  :allow-pagination-p nil)))
         (dataedit-delete-items-flow grid (cons :none (list (object-id *joe*) (object-id *bob*))))
         (do-request `(("yes" . "Yes")
-                      (,weblocks::*action-string* . "abc123")))
+                      (,weblocks.variables:*action-string* . "abc123")))
         (mapcar #'first-name (dataseq-data grid))))
   nil)
 
@@ -37,7 +37,7 @@
                                  :allow-pagination-p nil)))
         (dataedit-delete-items-flow grid (cons :none (list (object-id *joe*))))
         (do-request `(("yes" . "Yes")
-                      (,weblocks::*action-string* . "abc123")))
+                      (,weblocks.variables:*action-string* . "abc123")))
         (not (null (widget-dirty-p grid)))))
   t)
 

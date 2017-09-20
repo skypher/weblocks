@@ -15,7 +15,7 @@
   nil)
 
 (deftest refresh-request-p-3
-    (with-request :get `((,weblocks::*action-string* . "abc123"))
+    (with-request :get `((,weblocks.variables:*action-string* . "abc123"))
       (make-action (lambda () nil))
       (setf (session-value 'weblocks::last-request-uri) '("foo" "bar"))
       (refresh-request-p))

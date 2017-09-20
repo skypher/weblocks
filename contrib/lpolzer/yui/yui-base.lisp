@@ -31,7 +31,7 @@
 (defwidget yui-widget (widget yui-settings-mixin)
   ((widget-variable :reader yui-widget-variable
                     :initarg :widget-variable
-                    :initform (intern (gen-id "yuiWidget")) ; ps-gensym is broken on some lisps
+                    :initform (intern (weblocks.session:gen-id "yuiWidget")) ; ps-gensym is broken on some lisps
                     :documentation "Global JavaScript variable that will
                     hold the YUI widget.")
    (target-id :accessor yui-target-id
@@ -68,7 +68,7 @@
 
 (defmethod render-widget-body ((widget yui-widget) &rest args)
   (declare (ignore args))
-  (send-script
+  (weblocks.response:send-script
     (ps* `(with-lazy-loaded-modules (,(yui-modules widget) ,@(yui-loader-args widget))
             (setf (global-variable ,(yui-widget-variable widget))
                   (new (,(yui-class-name widget) ,(yui-target-id widget)

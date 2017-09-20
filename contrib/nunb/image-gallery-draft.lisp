@@ -40,7 +40,7 @@
       (:img :src img :height "90px")
       (:a :href (string+ url "&pure=true") 
           :class "lbOn" "Click to view"))
-    (send-script "mylightboxinitialize();")))
+    (weblocks.response:send-script "mylightboxinitialize();")))
 
 ;weird old shit, action is ok, but the bottom with0html makesn o sense
 (defun old-shitrender-gallery-link (url &key (ajaxp t))

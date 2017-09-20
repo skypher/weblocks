@@ -43,9 +43,9 @@
       (:div :class "yui-content"
         (loop for child in (mapcar #'cdr (yui-tabview-tabs widget))
               do (htm (:div (render-widget child))))))
-    #+OLD(send-script
+    #+OLD(weblocks.response:send-script
       (ps:ps* `(new (|:YAHOO.widget.:TabView| ,(widget-dom-id widget)))))
-    (send-script
+    (weblocks.response:send-script
       (ps* `(with-lazy-loaded-modules (,(yui-modules widget) 
                                        ,@(yui-loader-args widget))
          (setf ,(yui-widget-variable widget)

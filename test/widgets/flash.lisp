@@ -54,7 +54,7 @@ widget."
   3)
 
 (deftest render-widget-body-flash-3
-    (with-request :get `((,weblocks::*action-string* . "abc123"))
+    (with-request :get `((,weblocks.variables:*action-string* . "abc123"))
       (make-action (lambda () nil))
       (let ((*weblocks-output-stream* (make-string-output-stream))
             (w (make-instance 'flash)))
@@ -67,7 +67,7 @@ widget."
   nil)
 
 (defjstest render-widget-body-flash-4
-    (with-request :get `((,weblocks::*action-string* . "abc123"))
+    (with-request :get `((,weblocks.variables:*action-string* . "abc123"))
       (make-action (lambda () nil))
       (let ((*weblocks-output-stream* (make-string-output-stream))
             (w (make-instance 'flash))

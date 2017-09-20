@@ -77,11 +77,11 @@
   (if (dataedit-item-widget obj)
       (progn 
         ;Some JS to make a diff loading effect
-        #+OLD(send-script (ps* (progn `(*effect.toggle ,(format nil "~A" (dom-id obj)) "blind") 
+        #+OLD(weblocks.response:send-script (ps* (progn `(*effect.toggle ,(format nil "~A" (dom-id obj)) "blind") 
                                  ))
                                 
                      :before-load)
-        #+OLD(send-script (ps* (progn `(*effect.appear ,(format nil "~A" (dom-id obj)) "blind") 
+        #+OLD(weblocks.response:send-script (ps* (progn `(*effect.appear ,(format nil "~A" (dom-id obj)) "blind") 
                                  ))
                                         ;`(*effect.toggle ,(format nil "~A"(dom-id obj)) "blind" )))
                      :after-load)

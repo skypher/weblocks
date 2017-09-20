@@ -204,13 +204,13 @@
                             :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "Add"
         (do-request `(("add" . "Add")
-                      (,weblocks::*action-string* . "abc125")))
+                      (,weblocks.variables:*action-string* . "abc125")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "submit"
         (do-request `(("name" . "Jill")
                       ("manager" . "Jim")
                       ("submit" . "Submit")
-                      (,weblocks::*action-string* . "abc133")))
+                      (,weblocks.variables:*action-string* . "abc133")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -376,9 +376,9 @@
         ;; click "Delete"
         (do-request `(("item-1" . "on")
                       ("delete" . "Delete")
-                      (,weblocks::*action-string* . "abc125")))
+                      (,weblocks.variables:*action-string* . "abc125")))
         (do-request `(("yes" . "Yes")
-                      (,weblocks::*action-string* . "abc128")))
+                      (,weblocks.variables:*action-string* . "abc128")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -471,13 +471,13 @@
         ;; render datagrid
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; Drilldown
-        (do-request `((,weblocks::*action-string* . "abc128")))
+        (do-request `((,weblocks.variables:*action-string* . "abc128")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "submit"
         (do-request `(("name" . "Jill")
                       ("manager" . "Jim")
                       ("submit" . "Submit")
-                      (,weblocks::*action-string* . "abc135")))
+                      (,weblocks.variables:*action-string* . "abc135")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -652,10 +652,10 @@
         ;; render datagrid
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; Drilldown
-        (do-request `((,weblocks::*action-string* . "abc128")))
+        (do-request `((,weblocks.variables:*action-string* . "abc128")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "Close"
-        (do-request `((,weblocks::*action-string* . "abc136")))
+        (do-request `((,weblocks.variables:*action-string* . "abc136")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -879,7 +879,7 @@
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "Add"
         (do-request `(("add" . "Add")
-                      (,weblocks::*action-string* . "abc125")))
+                      (,weblocks.variables:*action-string* . "abc125")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
@@ -992,13 +992,13 @@
                             :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "Add"
         (do-request `(("add" . "Add")
-                      (,weblocks::*action-string* . "abc125")))
+                      (,weblocks.variables:*action-string* . "abc125")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")
         ;; click "submit"
         (do-request `(("name" . "Jill")
                       ("manager" . "Jim")
                       ("submit" . "Submit")
-                      (,weblocks::*action-string* . "abc133")))
+                      (,weblocks.variables:*action-string* . "abc133")))
         (render-widget-body grid :form-id "I1" :input-id "I2" :search-id "I3")))
   (htm
    ;; datagrid
