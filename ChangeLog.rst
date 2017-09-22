@@ -2,6 +2,13 @@
  ChangeLog
 ===========
 
+* :release:`0.14.1 <2017-09-22>`
+* :support:`-` Added function
+  ``weblocks.request:remove-request-header``.
+* :support:`-` Added a hook ``(:reset-session session)``, which is
+  called around a code for clearing given session. Right now it is
+  called only from ``weblocks.sessions:reset-latest-session``.
+
 * :release:`0.14.0 <2017-09-20>`
 * :support:`-` ``html``, ``menu``, ``suggest`` and ``repl`` utilities
   were excluded.

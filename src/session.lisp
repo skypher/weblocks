@@ -1,6 +1,3 @@
-(eval-when (:compile-toplevel)
-  (format t "~3&Loading weblocks.session~3%"))
-
 (defpackage #:weblocks.session
   (:use #:cl)
   (:export
@@ -55,7 +52,8 @@ KEY is compared using EQUAL."
 
 (defun reset-latest-session ()
   (when *latest-session*
-    (clrhash *latest-session*)))
+    (weblocks.hooks:with-hook (:reset-session *latest-session*)
+                              (clrhash *latest-session*))))
 
 
 (defun weblocks.session:gen-id (&optional (prefix "dom"))

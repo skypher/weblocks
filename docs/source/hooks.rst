@@ -31,7 +31,12 @@ Here are hook names, defined by Weblocks:
 * ``:handle-request`` – Dynamic hook called around request handling
   code. Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*``
   are already bound.
-* ``stop-weblocks`` – Wraps code inside of ``weblocks.server:stop-weblocks`` function.
+* ``stop-weblocks`` – Wraps code inside of
+  ``weblocks.server:stop-weblocks`` function.
+* ``reset-session``, which is called around a code for clearing given
+  session. Has one parameter – session hash. Right now it is
+  called only from ``weblocks.sessions:reset-latest-session``.
+
 
 TODO: Add example of a custom hook.
 
