@@ -11,7 +11,8 @@
    #:request-uri
    #:request-method
    #:request-path-info
-   #:refresh-request-p))
+   #:refresh-request-p
+   #:remove-request-header))
 (in-package weblocks.request)
 
 
@@ -74,6 +75,14 @@
   (let ((headers (lack.request:request-headers request))
         (lowercased-name (string-downcase name)))
     (gethash lowercased-name
+             headers)))
+
+
+(defun remove-request-header (name &key (request *request*))
+  "Removes a HTTP header by name."
+  (let ((headers (lack.request:request-headers request))
+        (lowercased-name (string-downcase name)))
+    (remhash lowercased-name
              headers)))
 
 
