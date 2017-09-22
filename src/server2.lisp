@@ -80,9 +80,6 @@ This function serves all started applications and their static files."
     (weblocks.hooks:with-hook (:handle-request)
       (setf weblocks.request::*latest-request*
             weblocks.request:*request*)
-      (setf weblocks.session::*latest-session*
-            weblocks.session::*session*)
-
 
       (let* ((path-info (getf env :path-info))
              (hostname (getf env :server-name))

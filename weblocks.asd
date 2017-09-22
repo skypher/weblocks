@@ -82,6 +82,10 @@
                              (:file "variables")
                              
                              (:file "session")
+                             (:file "hooks"
+                                    ;;                              :depends-on ;; ("weblocks" "debug-mode")
+                                    )
+                             (:file "debug")
                              (:file "weblocks"
                                     ;; :depends-on ("session"
                                     ;;              "package")
@@ -136,9 +140,6 @@
                                     )
                              (:file "uri-tokens"
                                     ;;                              :depends-on ;; ("weblocks")
-                                    )
-                             (:file "hooks"
-                                    ;;                              :depends-on ;; ("weblocks" "debug-mode")
                                     )
                              ;;                             (:file "response2")
                              (:file "error-handler"

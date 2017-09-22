@@ -2,6 +2,10 @@
  ChangeLog
 ===========
 
+* :release:`0.14.2 <2017-09-22>`
+* :support:`-` Added package ``weblocks.debug`` and keeping latest
+  session was rewritten using ``:process-request`` hook.
+
 * :release:`0.14.1 <2017-09-22>`
 * :support:`-` Added function
   ``weblocks.request:remove-request-header``.

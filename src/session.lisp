@@ -3,7 +3,6 @@
   (:export
    #:delete-value
    #:get-value
-   #:reset-latest-session
    #:set-value
    #:gen-id))
 (in-package weblocks.session)
@@ -12,11 +11,6 @@
 (defvar *session* nil
   "Stores current requests's session")
 
-
-(defvar *latest-session* nil
-  "Stores last session, to be able to clear it during development.
-
-To clear, use function \(reset-last-session\).")
 
 
 ;; previously webapp-session-value
@@ -48,12 +42,6 @@ KEY is compared using EQUAL."
   (declare (ignorable webapp))
 
   (remhash key *session*))
-
-
-(defun reset-latest-session ()
-  (when *latest-session*
-    (weblocks.hooks:with-hook (:reset-session *latest-session*)
-                              (clrhash *latest-session*))))
 
 
 (defun weblocks.session:gen-id (&optional (prefix "dom"))
