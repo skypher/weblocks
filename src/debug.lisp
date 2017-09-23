@@ -1,5 +1,8 @@
 (defpackage #:weblocks.debug
-  (:use #:cl))
+  (:use #:cl)
+  (:export #:*on*
+           #:*latest-session*
+           #:reset-latest-session))
 (in-package weblocks.debug)
 
 
@@ -29,5 +32,5 @@ To clear, use function \(reset-last-session\).")
     track-latest-session ()
 
   (when *on*
-   (setf weblocks.session::*latest-session*
+   (setf *latest-session*
          weblocks.session::*session*)))
