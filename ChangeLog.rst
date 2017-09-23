@@ -2,6 +2,13 @@
  ChangeLog
 ===========
 
+* :release:`0.14.3 <2017-09-23>`
+* :support:`-` Fixed a way how weblocks.debug:*latest-session* is
+  processed.
+* :support:`-` Function ``weblocks.request:remove-request-header`` now
+  returns a new instance of request object and does not modify the
+  original request. This fixes issue in ``weblocks-websocket``.
+
 * :release:`0.14.2 <2017-09-22>`
 * :support:`-` Added package ``weblocks.debug`` and keeping latest
   session was rewritten using ``:process-request`` hook.

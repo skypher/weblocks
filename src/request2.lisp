@@ -79,11 +79,21 @@
 
 
 (defun remove-request-header (name &key (request *request*))
-  "Removes a HTTP header by name."
-  (let ((headers (lack.request:request-headers request))
-        (lowercased-name (string-downcase name)))
+  "Removes a HTTP header by name, returns new instance of request
+without given header."
+  
+  (let ((lowercased-name (string-downcase name))
+        ;; make shallow copy of the request
+        (new-request (copy-structure request))
+        (new-headers (metacopy:copy-thing (lack.request:request-headers request))))
+    
     (remhash lowercased-name
-             headers)))
+             new-headers)
+    
+    (setf (lack.request:request-headers new-request)
+          new-headers)
+
+    new-request))
 
 
 (defun ajax-request-p (&optional (request *request*))

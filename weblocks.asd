@@ -47,6 +47,7 @@
    :parse-number 
    :pretty-function 
    :babel
+   :metacopy
    :split-sequence)
   :serial t
   :components ((:module src
