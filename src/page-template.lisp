@@ -53,11 +53,13 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
 
 
 (defmethod render-page ((app weblocks-webapp))
-  "Default page rendering template and protocol"
-                                        ; Note, anything that precedes the doctype puts IE6 in quirks mode
-                                        ; (format *weblocks-output-stream* "<?xml version=\"1.0\" encoding=\"utf-8\" ?>")
+  "Default page rendering template and protocol."
   (log:debug "Rendering page for" app)
-  
+
+  ;; At the moment when this method is called, there is already
+  ;; rendered page's content in the *weblocks-output-stream* stream.
+  ;; All we need to do now – is to render dependencies in the header
+  ;; and paste content into the body.
   (let* ((rendered-html (get-output-stream-string *weblocks-output-stream*))
          ;; TODO: understand how dependency compaction worked before
          ;;       and may be reimplement it.
@@ -65,21 +67,19 @@ page HTML (title, stylesheets, etc.).  Can be overridden by subclasses"))
          ;;                     (compact-dependencies (append (webapp-application-dependencies)
          ;;                                                   (weblocks.dependencies:get-collected-dependencies)))))
          (all-dependencies (weblocks.dependencies:get-collected-dependencies))
-         (title (application-page-title app))
-         (header-content (with-html
-                           (render-page-headers app)
-                           (mapc #'weblocks.dependencies:render-in-head
-                                 all-dependencies)))
-         (body-content (render-page-body app
-                                         rendered-html)))
+         (title (application-page-title app)))
 
-    (with-html-output-to-string (*weblocks-output-stream* nil :prologue t)
+    (with-html-output (*weblocks-output-stream* nil :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml"
              (:head
-              (:title (str title))
-              (str header-content))
+              (:title (esc title))
+              
+              (render-page-headers app)
+              (mapc #'weblocks.dependencies:render-in-head
+                    all-dependencies))
              (:body
-              (str body-content)
+              (render-page-body app
+                                rendered-html)
               (with-javascript "updateWidgetStateFromHash();"))))))
 
 

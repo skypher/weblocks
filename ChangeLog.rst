@@ -3,6 +3,8 @@
 ===========
 
 * :release:`0.14.3 <2017-09-23>`
+* :fix:`-` Default method of ``render-page`` was fixed to really wrap
+  page with ``<html>...`` block.
 * :support:`-` Fixed a way how weblocks.debug:*latest-session* is
   processed.
 * :support:`-` Function ``weblocks.request:remove-request-header`` now
