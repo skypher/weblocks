@@ -4,6 +4,8 @@
 
 * :fix:`-` No more ``declaim optimize`` in different places. These
   declarations changed compiler's settings at unexpected moments.
+* :fix:`-` Fixed error happened when "File not found", and now
+  ``with-hook`` macro returns the value of the last form's evaluation.
 
 * :release:`0.14.3 <2017-09-23>`
 * :fix:`-` Default method of ``render-page`` was fixed to really wrap

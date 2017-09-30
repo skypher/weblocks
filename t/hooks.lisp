@@ -43,8 +43,8 @@
                   'callback-was-called))
           
           (weblocks.hooks:with-hook (:action)
-                                    ;; do nothing
-                                    )
+            ;; do nothing
+            )
 
           (is call-result
               'callback-was-called)))))
@@ -62,7 +62,18 @@
           (weblocks.hooks:with-hook (:some-hook 'minor))
 
           (is call-result
-              '(minor blah)))))))
+              '(minor blah))))))
+
+
+  (subtest "Hook should return last form's value"
+    (with-session
+      (with-request ("/")
+        (let ((result (weblocks.hooks:with-hook (:action)
+                        'foo
+                        'bar)))
+
+          (is result
+              'bar))))))
 
 
 (subtest "Nested evaluation"

@@ -206,17 +206,22 @@ list bound to a current request."
       (log:info \"Before calling\" action-object)
       (process action-object)
       (log:info \"After calling\" action-object))"
-  (metatilities:with-gensyms (null-list ignored-args hooks-chain)
+  (metatilities:with-gensyms (null-list ignored-args hooks-chain result)
     `(let ((,hooks-chain (append (get-callbacks *application-hooks* ,name)
                                  (get-callbacks *session-hooks* ,name)
-                                 (get-callbacks *request-hooks* ,name))))
+                                 (get-callbacks *request-hooks* ,name)))
+           ,result)
        (eval-next-hooks 
         (append ,hooks-chain
                 (list (lambda (,null-list &rest ,ignored-args)
                         (declare (ignorable ,ignored-args))
                         (check-type ,null-list null)
-                        ,@body)))
-        ,@args))))
+                        (setf ,result
+                              (progn ,@body)))))
+        ,@args)
+
+       ;; Returning result of body's evaluation
+       ,result)))
 
 
 (defmacro call-hook (name &rest args)
