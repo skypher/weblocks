@@ -1,9 +1,6 @@
 
 (in-package weblocks)
 
-;; make SBCL use and verify type information for slots
-(declaim (optimize (safety 3)))
-
 (export '(defwebapp
           weblocks-webapp
           start-webapp

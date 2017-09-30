@@ -1,7 +1,5 @@
 (in-package :weblocks)
 
-(declaim (optimize (speed 3) (safety 2) (debug 1) (space 1)))
-
 (export '(dependency url-dependency-mixin stylesheet-dependency script-dependency
           javascript-code-dependency
           dependency-url
