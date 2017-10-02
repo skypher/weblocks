@@ -111,5 +111,4 @@
                           :value "Add"))))))))
 
 (progn (weblocks:restart-webapp 'tasks)
-       (weblocks.session:reset-latest-session))
-
+       (weblocks.debug:reset-latest-session))

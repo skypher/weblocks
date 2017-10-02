@@ -5,7 +5,7 @@
 Load weblocks and create a package for a sandbox:
 
 .. code-block:: common-lisp-repl
-          
+
    CL-USER> (ql:quickload :weblocks)
    CL-USER> (defpackage todo (:use :cl :weblocks))
    #<PACKAGE "TODO">
@@ -39,7 +39,7 @@ text like that::
   (defwebapp your-app
      ;; some-options
      :init-user-session 'init-user-session)
-               
+
   Read more in documentaion.
 
 It means that you didn't write any code for your application. Let's do
@@ -69,8 +69,8 @@ Restart application:
 .. code-block:: common-lisp-repl
 
    TODO> (progn (weblocks:restart-webapp 'tasks)
-                (weblocks.session:reset-latest-session))
-   
+                (weblocks.debug:reset-latest-session))
+
 Right now it should looks like:
 
 TODO: add an image.
@@ -81,7 +81,7 @@ into it.
 Write a new ``init-user-session`` in the repl:
 
 .. code-block:: common-lisp-repl
-                                  
+
    TODO> (defun init-user-session (root)
            (let ((tasks '("Make my first app in Weblocks"
                           "Deploy it somewhere"
@@ -199,7 +199,7 @@ This code have following significant changes:
 
 * Now we store our tasks as structures to be able to change their state
   easily:
-  
+
   .. code-block:: common-lisp
 
      (defstruct task
