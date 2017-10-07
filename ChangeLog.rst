@@ -2,6 +2,7 @@
  ChangeLog
 ===========
 
+* :release:`0.14.4 <2017-10-07>`
 * :fix:`-` No more ``declaim optimize`` in different places. These
   declarations changed compiler's settings at unexpected moments.
 * :fix:`-` Fixed error happened when "File not found", and now
