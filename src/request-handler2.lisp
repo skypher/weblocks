@@ -5,8 +5,16 @@
    #:handle-client-request
    #:abort-request-handler
    #:page-not-found-handler
+   *request-timeout*
    #:handle-ajax-request))
 (in-package weblocks.request-handler)
+
+
+(defvar *request-timeout* 180
+  "Seconds until we abort a request because it took too long.
+  This prevents threads from hogging the CPU indefinitely.
+
+  You can set this to NIL to disable timeouts (not recommended).")
 
 
 (defgeneric handle-client-request (app)
@@ -56,10 +64,10 @@ customize behavior."))
   "This wrapper sets a timeout on the request and reports response timings."
 
   (log:debug "Handling client request for" app)
-  
+
 
   ;; TODO: understand how to use it and write a doc.
-  
+
   (handler-bind ((trivial-timeout::timeout-error
                    (lambda (c)
                      (declare (ignorable c))
@@ -67,8 +75,8 @@ customize behavior."))
                      (error "Your request timed out."))))
     ;; TRIVIAL-TIMEOUT seems to be broken on CCL and in yet another way on
     ;; Lispworks. For now let's only enable it on SBCL.
-    (#-sbcl progn 
-     #+sbcl trivial-timeout:with-timeout #+sbcl (weblocks::*request-timeout*)
+    (#-sbcl progn
+     #+sbcl trivial-timeout:with-timeout #+sbcl (*request-timeout*)
      (weblocks::webapp-update-thread-status "Request prelude")
      (unwind-protect
           (let* ((timings nil)
