@@ -412,7 +412,9 @@ association list. This function is normally called by
     (abort ()
       :report "abort request processing and return 500"
       (log:error "Aborting request processing")
-      (weblocks.response:abort-processing "" :code 500))))
+      (weblocks.response:abort-processing "Unhandled condition"
+                                          :code 500
+                                          :content-type "plain/text"))))
 
 
 

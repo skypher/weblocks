@@ -2,6 +2,8 @@
  ChangeLog
 ===========
 
+* :fix:`-` Now weblocks does not open a new tab or window on 500 error
+  during an action execution.
 * :release:`0.14.4 <2017-10-07>`
 * :fix:`-` No more ``declaim optimize`` in different places. These
   declarations changed compiler's settings at unexpected moments.

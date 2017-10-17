@@ -259,10 +259,8 @@ function execJsonCalls (calls) {
 }
 
 function onActionFailure(response) {
-    log('Action failure', response);
-  window.temp = window.open();
+  log('Action failure', response);
   try{
-    window.temp.document.write(response.responseText);
     alert('Oops, we could not complete your request because of an internal error.');
   }catch(e){
     window.console && console.log(e, e.toString());
