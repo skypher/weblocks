@@ -2,6 +2,13 @@
  ChangeLog
 ===========
 
+* :feature:`-` New system ``weblocks-testutils`` was introduced. It
+  compiles ``weblocks.t.utils`` package which macroses useful for
+  unittesting.
+
+  Also, a new macro ``catch-hooks`` was added to check if some
+  hooks were called during a unittest.
+  
 * :fix:`-` Now weblocks does not open a new tab or window on 500 error
   during an action execution.
 * :release:`0.14.4 <2017-10-07>`
