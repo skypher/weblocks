@@ -1,3 +1,4 @@
+(in-package :cl-user)
 (defpackage #:weblocks.t.utils
   (:use #:cl
         #:weblocks
@@ -68,9 +69,16 @@ Call assert-hooks-contains inside the body, to check if proper hooks were called
          (let* ((,hook-calls nil)) 
            ,@hook-handlers
 
-           (macrolet ((assert-hooks-called (&body matchers)
+           (macrolet ((assert-hooks-called (&body fact-matchers)
+                        "Returns a matcher which checks if all called hooks are match to given matchers.
+                         Example:
+
+                             \(assert-hooks-called
+                                  (:fact-created contact email\)\)"
                         `(assert-that 
-                          ,',hook-calls
+                          (reverse ,',hook-calls)
                           (contains
-                           ,@matchers))))
+                           ,@(mapcar (lambda (matcher)
+                                       (cons 'contains matcher))
+                                     fact-matchers)))))
              ,@body))))))

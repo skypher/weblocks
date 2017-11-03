@@ -4,10 +4,20 @@
 
 * :release:`0.15.0 <2017-11-03>`
 
-  Now weblocks does not checks if all tokens from URL were consumed by
-  app during root widget rendering. Previously it returned 404 if some
-  token weren't consumed. Implement this logic in your app if needed.
-  
+*  Now weblocks does not checks if all tokens from URL were consumed by
+   app during root widget rendering. Previously it returned 404 if some
+   token weren't consumed. Implement this logic in your app if needed.
+
+* Macro ``assert-hooks-called`` was changed to return hooks in the order
+  they were called. Also, now it waits hooks description as a DSL,
+  like:
+
+  .. code:: common-lisp
+
+     (assert-hooks-called
+       (:fact-created contact "vasya@pupkin.com")
+       (:fact-removed contact "vasya@pupkin.com"))
+
 * :feature:`-` New system ``weblocks-testutils`` was introduced. It
   compiles ``weblocks.t.utils`` package which macroses useful for
   unittesting.
