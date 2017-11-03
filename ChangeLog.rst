@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+* :release:`0.15.0 <2017-11-03>`
+
+  Now weblocks does not checks if all tokens from URL were consumed by
+  app during root widget rendering. Previously it returned 404 if some
+  token weren't consumed. Implement this logic in your app if needed.
+  
 * :feature:`-` New system ``weblocks-testutils`` was introduced. It
   compiles ``weblocks.t.utils`` package which macroses useful for
   unittesting.

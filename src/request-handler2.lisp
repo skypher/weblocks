@@ -273,11 +273,7 @@ association list. This function is normally called by
   ;; *weblocks-output-stream* with necessary boilerplate HTML
   (weblocks::webapp-update-thread-status "Handling normal request [rendering page]")
   (weblocks::timing "page render"
-    (weblocks::render-page app))
-  ;; make sure all tokens were consumed (FIXME: still necessary?)
-  (unless (or (weblocks::tokens-fully-consumed-p weblocks::*uri-tokens*)
-              (null (weblocks::all-tokens weblocks::*uri-tokens*)))
-    (page-not-found-handler app)))
+    (weblocks::render-page app)))
 
 
 (defun remove-action-from-uri (uri)
@@ -305,7 +301,7 @@ association list. This function is normally called by
 
         (let ((uri (weblocks.request:request-uri)))
           (log:debug "Handling client request" uri))
-    
+
         (weblocks.hooks:prepare-hooks
           (let (weblocks::*dirty-widgets*)
             (when (null (weblocks::root-widget))

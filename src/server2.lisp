@@ -103,6 +103,9 @@ This function serves all started applications and their static files."
                      (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                                  (weblocks::tokenize-uri app-pub-prefix nil)
                                                  :test #'string=)))
+               
+               ;; TODO: Remove this block because it is related to an old way to serve static
+               
                (let* (;; (virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
                       ;; (physical-folder (weblocks::compute-webapp-public-files-path app))
                       ;; TODO send-gzip-rules move to this file
@@ -138,7 +141,7 @@ This function serves all started applications and their static files."
                         (weblocks.response:*headers* nil)
                         (content (catch 'weblocks.response::abort-processing
                                    (weblocks.request-handler:handle-client-request app))))
-                   
+
                    (list weblocks.response:*code* ;; this value can be changed somewhere in
                          ;; handle-client-request
                          (append (list :content-type weblocks.response:*content-type*)

@@ -57,7 +57,7 @@ HTTP code and headers are taken from *code* and *content-type*."
              code
              content-type
              headers)
-  
+
   (when content-type-given
     (setf *content-type* content-type))
 
