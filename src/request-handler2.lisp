@@ -401,23 +401,21 @@ association list. This function is normally called by
         
 
                 ;; TODO: replace return-code with something else
-                (if (member weblocks.response:*code*
-                            weblocks.variables:*approved-return-codes*)
+                (if (eql weblocks.response:*code* 200)
                     (let ((content (get-output-stream-string weblocks::*weblocks-output-stream*)))
                       (unless (weblocks.request:ajax-request-p)
                         (weblocks.session:set-value 'last-request-uri
                                                     (weblocks::all-tokens weblocks::*uri-tokens*)))
                       ;; Return rendered content as a response on request.
                       content)
+                    ;; TODO: use weblocks.error-handler here
                     (weblocks::handle-http-error app weblocks.response:*code*)))))))
 
     ;; Restart
     (abort ()
       :report "abort request processing and return 500"
       (log:error "Aborting request processing")
-      (weblocks.response:abort-processing "Unhandled condition"
-                                          :code 500
-                                          :content-type "text/plain"))))
+      (weblocks.error-handler:on-error app))))
 
 
 

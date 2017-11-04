@@ -7,6 +7,9 @@
 
 * Now class ``route`` is exported from ``weblocks.routes`` and should be
   used instead of ``routes:route``.
+* New package ``weblocks.error-handler`` was introduced. It contains a
+  ``on-error`` generic method which is called when some unhandled error
+  raise by application.
 * Fixed issue of adding multuple routes mapped to the same path. Now if
   url mapper already have a route all subsequent attempts to add a route
   with same path are ignored.
