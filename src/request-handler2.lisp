@@ -330,8 +330,7 @@ association list. This function is normally called by
                          (setf finished? t))
                     (unless finished?
                       (weblocks.session:set-value 'weblocks::root-widget
-                                                  nil)
-                      (weblocks::reset-webapp-session))))
+                                                  nil))))
           
                 ;; TODO: understand why there is coupling with Dialog here and
                 ;;       how to move it into the Dialog's code.

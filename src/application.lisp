@@ -742,7 +742,10 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
 
 (defun reset-webapp-session (&optional (app *current-webapp*))
   "Reset sessions on a per-webapp basis"
-  (setf (session-value (webapp-session-key app)) nil))
+  ;; TODO: seems I've removed some code, related to per-webapp sessions
+  ;;       probably all code which uses it, should be removed
+  (setf (session-value (webapp-session-key app)) nil)
+  )
 
 ;; Removed in preference to new dependencies
 ;; (defun webapp-application-dependencies (&optional (app *current-webapp*))

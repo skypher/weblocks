@@ -10,6 +10,9 @@
 * Fixed issue of adding multuple routes mapped to the same path. Now if
   url mapper already have a route all subsequent attempts to add a route
   with same path are ignored.
+* Fixed error::
+
+    Undefined function WEBLOCKS:WEBAPP-SESSION-KEY called with arguments (#<APP::APP #x3020052F01DD>)
 
 * :release:`0.15.0 <2017-11-03>`
 
