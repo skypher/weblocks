@@ -1,5 +1,7 @@
 (defpackage #:weblocks.routes
   (:use #:cl)
+  (:import-from #:routes
+                #:route)
   (:export
    #:connect
    #:route
