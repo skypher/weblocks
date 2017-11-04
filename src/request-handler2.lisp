@@ -417,7 +417,7 @@ association list. This function is normally called by
       (log:error "Aborting request processing")
       (weblocks.response:abort-processing "Unhandled condition"
                                           :code 500
-                                          :content-type "plain/text"))))
+                                          :content-type "text/plain"))))
 
 
 

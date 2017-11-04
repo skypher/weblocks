@@ -12,7 +12,13 @@
   with same path are ignored.
 * Fixed error::
 
-    Undefined function WEBLOCKS:WEBAPP-SESSION-KEY called with arguments (#<APP::APP #x3020052F01DD>)
+    Undefined function WEBLOCKS:WEBAPP-SESSION-KEY called with arguments
+    (#<APP::APP #x3020052F01DD>)
+* Fixed ``Content-Type`` of the default 500 page. Previously it was
+  ``plain/text`` and browser didn't undestand that and downloaded the
+  file.
+
+  Now ``Content-Type`` is ``text/plain``.
 
 * :release:`0.15.0 <2017-11-03>`
 
