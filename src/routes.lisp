@@ -17,7 +17,8 @@
 
 (defun connect (route)
   "Inserts a new route into the routing table."
-  (routes:connect *routes* route))
+  (unless (routes:match *routes* route)
+    (routes:connect *routes* route)))
 
 
 (defun reset-routes ()

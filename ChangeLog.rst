@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+0.15.1 (2017-11-04)
+===================
+
+* Now class ``route`` is exported from ``weblocks.routes`` and should be
+  used instead of ``routes:route``.
+* Fixed issue of adding multuple routes mapped to the same path. Now if
+  url mapper already have a route all subsequent attempts to add a route
+  with same path are ignored.
+
 * :release:`0.15.0 <2017-11-03>`
 
 *  Now weblocks does not checks if all tokens from URL were consumed by
