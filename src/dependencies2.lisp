@@ -480,8 +480,6 @@ For local-dependency it is :local."
 (defun register-dependencies (dependencies)
   "Adds dependencies to the router to make HTTP server handle them."
   (dolist (dependency dependencies)
-    ;; to not create a circular dependency between weblocks.dependencies and weblocsk.routes
-    ;; we have to intern this symbol at runtime
     (let ((route (get-route dependency)))
       (when route
         (weblocks.routes:connect route)))))

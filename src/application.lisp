@@ -442,6 +442,7 @@ to my `application-dependencies' slot."
     (let ((*default-webapp* app))
       (declare (special *default-webapp*))
       (initialize-webapp app)
+      ;; TODO: remove store manipulation from Weblocks core
       (unless (webapp-default-store-name app)
         (style-warn 'missing-default-store :webapp app))
       (enable-webapp app)
