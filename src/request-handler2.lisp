@@ -171,6 +171,16 @@ customize behavior."))
               (weblocks::update-state-from-location-hash w hash))
            (weblocks::get-widgets-by-type 'location-hash-dependent)))))
 
+(defun remove-duplicate-dirty-widgets ()
+  "Removes all widgets that should be rendered through rendering their parent"
+  ;; Obvously, this algorithm have not the best performance, and
+  ;; may be will require some optimizations.
+  (dolist (widget weblocks::*dirty-widgets*)
+    (dolist (widget2 weblocks::*dirty-widgets*)
+      (when (and (not (equal widget widget2))
+                 (weblocks::child-of-p widget widget2))
+        (setf weblocks::*dirty-widgets*
+              (remove widget2 weblocks::*dirty-widgets*))))))
 
 
 (defun render-dirty-widgets ()
@@ -180,18 +190,7 @@ association list. This function is normally called by
 
   (log:debug "Rendering dirty widgets")
 
-  (flet ((remove-duplicate-dirty-widgets ()
-           "Removes all widgets that should be rendered through rendering their parent"
-
-           ;; TODO (svetlyak40wt): repace loops with dolists
-           (loop for widget in weblocks::*dirty-widgets* do 
-                 (loop for widget2 in weblocks::*dirty-widgets* do 
-                       (when (and (not (equal widget widget2))
-                                  (weblocks::child-of-p widget widget2))
-                         (setf weblocks::*dirty-widgets*
-                               (remove widget2 weblocks::*dirty-widgets*)))))))
-
-    (remove-duplicate-dirty-widgets))
+  (remove-duplicate-dirty-widgets)
 
   (setf weblocks.response:*content-type*
         weblocks::*json-content-type*)
