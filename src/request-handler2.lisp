@@ -257,6 +257,10 @@ association list. This function is normally called by
   
   (weblocks::webapp-update-thread-status "Handling normal request [tree shakedown]")
   (bordeaux-threads:with-lock-held ((weblocks.session-lock:get-lock))
+    ;; TODO: Probably it is good idea to remove this widget tree protocol
+    ;;       from Weblocks and leave only rendering. Because update-widget-tree
+    ;;       only collects page's title, description and keywords.
+    ;;       And they can be set during root widget rendering phase
     (handler-case (weblocks::timing "tree shakedown"
                     (update-widget-tree))
       (weblocks::http-not-found ()
