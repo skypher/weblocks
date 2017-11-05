@@ -3,6 +3,7 @@
 
 (export '(uri-parameters-mixin uri-parameters-slotmap))
 
+;; TODO: Remove this completely, because I don't understand it.
 (defclass uri-parameters-mixin ()
   ())
 

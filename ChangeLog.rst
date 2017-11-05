@@ -5,6 +5,9 @@
 0.15.1 (2017-11-04)
 ===================
 
+* New package was introduced - ``weblocks.widget`` it contains a new
+  ``widget`` class with simplified rendering based on ``spinneret``
+  templating library.
 * Now class ``route`` is exported from ``weblocks.routes`` and should be
   used instead of ``routes:route``.
 * New package ``weblocks.error-handler`` was introduced. It contains a

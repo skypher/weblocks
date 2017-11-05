@@ -31,6 +31,7 @@
    :puri
    :cl-json
    :cl-who
+   :spinneret
    :parenscript
    :cl-fad
    :optima
@@ -48,7 +49,8 @@
    :pretty-function 
    :babel
    :metacopy
-   :split-sequence)
+   :split-sequence
+   :cl-strings)
   :serial t
   :components ((:module src
                 :components (
@@ -162,16 +164,10 @@
                               :components ((:module widget
                                             :components ((:file "widget-mop")
                                                          (:file "uri-parameters-mixin")
-                                                         (:file "widget"
-                                                                ;;                                                          :depends-on ;; ("widget-mop"
-                                                                ;;  "uri-parameters-mixin")
-                                                                )
-                                                         (:file "string-widget"
-                                                                ;;                                                          :depends-on ;; ("widget")
-                                                                )
-                                                         (:file "funcall-widget"
-                                                                ;;                                                          :depends-on ;; ("widget")
-                                                                )))
+                                                         (:file "widget")
+                                                         (:file "widget2")
+                                                         (:file "string-widget")
+                                                         (:file "funcall-widget")))
                                            (:file "composite"
                                                   ;;                                            :depends-on ;; (widget)
                                                   )

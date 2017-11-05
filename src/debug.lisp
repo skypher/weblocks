@@ -21,6 +21,9 @@ To clear, use function \(reset-last-session\).")
 
 
 (defun reset-latest-session ()
+  (unless *on*
+    (error "Debugging wasn't turned on and I know nothing about latest session."))
+  
   (when *latest-session*
     (weblocks.hooks:with-hook (:reset-session *latest-session*)
                               (clrhash *latest-session*))))
