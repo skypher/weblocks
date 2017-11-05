@@ -2,7 +2,7 @@
  ChangeLog
 ===========
 
-0.15.1 (2017-11-04)
+0.16.0 (2017-11-04)
 ===================
 
 * New package was introduced - ``weblocks.widget`` it contains a new
