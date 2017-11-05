@@ -26,12 +26,12 @@
 
   Now ``Content-Type`` is ``text/plain``.
 
-* :release:`0.15.0 <2017-11-03>`
+0.15.0 (2017-11-03)
+===================
 
-*  Now weblocks does not checks if all tokens from URL were consumed by
-   app during root widget rendering. Previously it returned 404 if some
-   token weren't consumed. Implement this logic in your app if needed.
-
+* Now weblocks does not checks if all tokens from URL were consumed by
+  app during root widget rendering. Previously it returned 404 if some
+  token weren't consumed. Implement this logic in your app if needed.
 * Macro ``assert-hooks-called`` was changed to return hooks in the order
   they were called. Also, now it waits hooks description as a DSL,
   like:
@@ -42,53 +42,65 @@
        (:fact-created contact "vasya@pupkin.com")
        (:fact-removed contact "vasya@pupkin.com"))
 
-* :feature:`-` New system ``weblocks-testutils`` was introduced. It
+* New system ``weblocks-testutils`` was introduced. It
   compiles ``weblocks.t.utils`` package which macroses useful for
   unittesting.
 
   Also, a new macro ``catch-hooks`` was added to check if some
   hooks were called during a unittest.
   
-* :fix:`-` Now weblocks does not open a new tab or window on 500 error
+* Now weblocks does not open a new tab or window on 500 error
   during an action execution.
-* :release:`0.14.4 <2017-10-07>`
-* :fix:`-` No more ``declaim optimize`` in different places. These
+  
+0.14.4 (2017-10-07)
+===================
+
+* No more ``declaim optimize`` in different places. These
   declarations changed compiler's settings at unexpected moments.
-* :fix:`-` Fixed error happened when "File not found", and now
+* Fixed error happened when "File not found", and now
   ``with-hook`` macro returns the value of the last form's evaluation.
 
-* :release:`0.14.3 <2017-09-23>`
-* :fix:`-` Default method of ``render-page`` was fixed to really wrap
+0.14.3 (2017-09-23)
+===================
+
+* Default method of ``render-page`` was fixed to really wrap
   page with ``<html>...`` block.
-* :support:`-` Fixed a way how weblocks.debug:*latest-session* is
+  
+* Fixed a way how weblocks.debug:*latest-session* is
   processed.
-* :support:`-` Function ``weblocks.request:remove-request-header`` now
+  
+* Function ``weblocks.request:remove-request-header`` now
   returns a new instance of request object and does not modify the
   original request. This fixes issue in ``weblocks-websocket``.
 
-* :release:`0.14.2 <2017-09-22>`
-* :support:`-` Added package ``weblocks.debug`` and keeping latest
+0.14.2 (2017-09-22)
+===================
+
+* Added package ``weblocks.debug`` and keeping latest
   session was rewritten using ``:process-request`` hook.
 
-* :release:`0.14.1 <2017-09-22>`
-* :support:`-` Added function
-  ``weblocks.request:remove-request-header``.
-* :support:`-` Added a hook ``(:reset-session session)``, which is
+0.14.1 (2017-09-22)
+===================
+
+* Added function ``weblocks.request:remove-request-header``.
+* Added a hook ``(:reset-session session)``, which is
   called around a code for clearing given session. Right now it is
   called only from ``weblocks.sessions:reset-latest-session``.
 
-* :release:`0.14.0 <2017-09-20>`
-* :support:`-` ``html``, ``menu``, ``suggest`` and ``repl`` utilities
+0.14.0 (2017-09-20)
+===================
+
+* ``html``, ``menu``, ``suggest`` and ``repl`` utilities
   were excluded.
-* :support:`-` Code which was in ``request-handler.lisp``, was excluded
+* Code which was in ``request-handler.lisp``, was excluded
   from build and partly moved to ``request-handler2.lisp``.
-* :feature:`-` Added ``:stop-weblocks`` hook.
-* :support:`-` Misc helper for repl were removed: ``sessions``,
+* Added ``:stop-weblocks`` hook.
+* Misc helper for repl were removed: ``sessions``,
   ``in-session`` and ``pt``. May be the will be restored in separate
   package.
-* :support:`-` Page boilerplate rendering method ``render-page`` now
+* Page boilerplate rendering method ``render-page`` now
   does not use complex templating with contextes.
-* :support:`-` Symbols refactoring:
+* Symbols refactoring:
   * ``*style-warn-on-circular-dirtying*`` variable ->
     ``weblocks.variables``;
   * ``*style-warn-on-late-propagation*`` variable ->
@@ -103,13 +115,15 @@
   * ``render-link`` function was moved to ``weblocks-ui.form`` in
     separate system.
 
-* :release:`0.13.11 <2017-09-12>`
+0.13.11 (2017-09-12)
+====================
 
-* :feature:`-` Added ``weblocks.hooks:call-hook`` helper.
-* :feature:`-` Now ``call-next-hook`` is called automatically if it
+* Added ``weblocks.hooks:call-hook`` helper.
+* Now ``call-next-hook`` is called automatically if it
   wasn't called explicitly.
 
-* :release:`0.13.10 <2017-09-06>`
+0.13.10 (2017-09-06)
+====================
   
 Changes in weblocks.request-hooks:
 ----------------------------------
@@ -136,28 +150,38 @@ Changes in weblocks.request-hooks:
            first-param
            second-param)
            
-* :release:`0.13.10 <2017-09-06>`
+0.13.10 (2017-09-06)
+====================
+
 * Added ``:handle-request`` dynamic hook called around request handling code.
 
   Called when ``weblocks.request:*request*`` and ``weblocks.session:*session*`` are already bound.
 
-* :release:`0.13.9 <2017-09-02>`
-* :feature:`-` Added integrity field for remove javascript dependencies.
+0.13.9 (2017-09-02)
+===================
+
+* Added integrity field for remove javascript dependencies.
   Also, ``get-cross-origin`` and ``:cross-origin`` were removed to
   ``get-crossorigin`` and ``:crossorigin``, to conform the html
   attibute's spelling.
-* :release:`0.13.8 <2017-09-02>`
-* :bug:`-` Fixed error on ``(weblocks:redirect...)`` call.
-* :bug:`-` Fixed dependency handling in ajax requests.
-* :feature:`-` Now if unhandled exception occure, Woo's handler remains
+  
+0.13.8 (2017-09-02)
+===================
+
+* Fixed error on ``(weblocks:redirect...)`` call.
+* Fixed dependency handling in ajax requests.
+* Now if unhandled exception occure, Woo's handler remains
   working. Previously, handler's thread shut down on any unhandled exception.
-* :feature:`-` Ajax progress now does not inserted into the document,
+* Ajax progress now does not inserted into the document,
   but if element with id ``ajax-progress`` is present, it will be shown
   and hidden by jQuery's ``.show`` and ``.hide`` methods. Also, they
   take optional speed parameters from ``data-*`` attributes
   ``data-show-speed`` and ``data-hide-speed``.
 
-* :feature:`-` Reformatted documentation. Started to `keep a changelog
+* Reformatted documentation. Started to `keep a changelog
   <http://keepachangelog.com/>`_.
-* :release:`0.13.7 <2017-04-15>`
-* :bug:`-` Previous history wasn't tracked.
+  
+0.13.7 (2017-04-15)
+===================
+
+* Previous history wasn't tracked.
