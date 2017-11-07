@@ -135,6 +135,7 @@
                                     ;;  "session"
                                     ;;  utils)
                                     )
+                             (:file "actions2")
                              (:file "log-actions"
                                     ;;                              :depends-on ;; ("weblocks")
                                     )

@@ -227,10 +227,12 @@ association list. This function is normally called by
                      nconc (render-enqueued dirty))))
       (let ((rendered-widgets (absorb-dirty-widgets)))
         (write 
-          (weblocks::encode-json-alist-to-string
-            `(("widgets" . ,rendered-widgets)
-              ("before-load" . ,weblocks.variables:*before-ajax-complete-scripts*)
-              ("on-load" . ,weblocks.variables:*on-ajax-complete-scripts*)))
+         (jonathan:to-json
+          ;; For now, we are mixing old-style payload and newstyle
+          (list :|widgets| rendered-widgets
+                :|before-load| weblocks.variables:*before-ajax-complete-scripts*
+                :|on-load| weblocks.variables:*on-ajax-complete-scripts*
+                :|commands| weblocks.actions::*commands*))
           :stream weblocks:*weblocks-output-stream*
           :escape nil)))))
 

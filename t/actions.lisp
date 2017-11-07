@@ -1,12 +1,13 @@
 (defpackage #:weblocks.t.actions
   (:use #:cl
         #:prove
+        #:hamcrest.prove
         #:weblocks
         #:weblocks.t.utils))
 (in-package weblocks.t.actions)
 
 
-(plan 4)
+(plan 5)
 
 
 (subtest "get-action-name-from-request"
@@ -53,5 +54,17 @@
         "abc123"
         "This also should work if a function was given as an argument")))
 
+
+(subtest "Function create-command should return a plist with a JSON-rpc method call"
+  (let ((result (weblocks.actions::create-command :update-widget
+                                                  :widget "some-string"
+                                                  :dom-id 42)))
+    (assert-that result
+                 (has-plist-entries
+                  :|jsonrpc| "2.0"
+                  :|method| :|updateWidget|
+                  :|params| (has-plist-entries
+                             :|widget| "some-string"
+                             :|domId| 42)))))
 
 (finalize)

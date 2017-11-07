@@ -8,7 +8,8 @@
    #:get-css-classes
    #:get-html-tag
    #:render-widget
-   #:mark-dirty))
+   #:mark-dirty
+   #:update))
 (in-package weblocks.widget)
 
 
@@ -154,3 +155,36 @@ of calling MARK-DIRTY on the list of dependents \(propagate-dirty\)."))
     (values t (when (and propagate (slot-boundp w 'propagate-dirty))
                 (mapc #'mark-dirty
                       (remove nil (widget-propagate-dirty w)))))))
+
+
+(defgeneric update (w &key inserted-after inserted-before)
+  (:documentation "This method should be called to update widget on a client.
+
+Usually this required as a result of an action execution.
+
+In old weblocks there was a mark-dirty method. This one replaces it.
+To make everything easier, new protocol excludes \"propagation\". If you
+need to update other widgets, please define \"update\" method for you widget.
+You can use :before or :after modifier, to keep current behavior and to add
+propagation code."))
+
+
+(defmethod update ((w widget) &key inserted-after inserted-before)
+  (log:debug "Updating widget" w inserted-after inserted-before)
+  (cond
+    ((and inserted-after inserted-before)
+     (error "Arguments inserted-after and inserted-before can't be used together."))
+    (inserted-after (weblocks.actions:add-command
+                     :insert-widget
+                     :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
+                               (render-widget w))
+                     :after (weblocks:dom-id inserted-after)))
+    (inserted-before (weblocks.actions:add-command
+                      :insert-widget
+                      :widget (render w)
+                      :before (weblocks:dom-id inserted-before)))
+    (t (weblocks.actions:add-command
+        :update-widget
+        :dom-id (weblocks:dom-id w)
+        :widget (render w)))))
+

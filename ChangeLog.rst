@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+* Added a ``weblocks.actions`` package.
+* Also, a ``commands`` were introduced. Commands describe remote calls
+  which have to be applied on a client as a result of action's
+  execution. Previously, weblocks used similar technic to replace dirty
+  widgets and to execute some javascript code before or after
+  replacement. The new mechanism of "commands" is more generic and uses
+  the JSON-RPC to pass function name and parameters from backend to
+  client-side.
+
 0.16.0 (2017-11-04)
 ===================
 

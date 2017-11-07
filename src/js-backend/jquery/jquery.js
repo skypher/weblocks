@@ -224,6 +224,32 @@ function updateElementForTree(tree){
   }
 }
 
+window.commandHandlers = {
+    'insertWidget': function(params) {
+        var widget = jQuery(params.widget);
+        if (params.after) {
+            var target = jQuery('#' + params.after);
+            widget.insertAfter(target);
+        } else {
+            if (params.before) {
+                var target = jQuery('#' + params.before);
+                widget.insertBefore(target);
+            }
+        }
+    }
+};
+
+function processCommand(command) {
+    var method = command.method;
+    var handler = window.commandHandlers[method];
+    if (handler === undefined) {
+        console.warn('No handler for ' + method + ' method');
+    } else {
+        var params = command.params;
+        handler(params);
+    }
+}
+
 function onActionSuccess(json){
     log('Action success', json);
   // See if there are redirects
@@ -241,6 +267,8 @@ function onActionSuccess(json){
 
   updateElementForTree(widgetsJsonToTree(dirtyWidgets));
 
+  var commands = json['commands'] || [];
+  commands.forEach(processCommand);
 
   execJsonCalls(json['on-load']);
   applySubmitClickEvent();
