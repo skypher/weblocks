@@ -10,6 +10,8 @@
   replacement. The new mechanism of "commands" is more generic and uses
   the JSON-RPC to pass function name and parameters from backend to
   client-side.
+* Added ``weblocks.session:in-session-p`` function which returns ``t``
+  if session data can be retrived or stored without error.
 
 0.16.0 (2017-11-04)
 ===================

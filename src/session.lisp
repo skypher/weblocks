@@ -4,13 +4,19 @@
    #:delete-value
    #:get-value
    #:set-value
-   #:gen-id))
+   #:gen-id
+   #:in-session-p))
 (in-package weblocks.session)
 
 
 (defvar *session* nil
   "Stores current requests's session")
 
+
+(defun in-session-p ()
+  "Checks if session is active and data can be safely retrived or stored."
+  (when *session*
+    t))
 
 
 ;; previously webapp-session-value
