@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.17.2 (2017-11-11)
+===================
+
+* Error handling code was fixed. It was broken in 0.17.1 and prevented
+  system loading.
+
 0.17.1 (2017-11-11)
 ===================
 
