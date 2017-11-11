@@ -2,6 +2,9 @@
  ChangeLog
 ===========
 
+0.17.0 (2017-11-11)
+===================
+
 * Added a ``weblocks.actions`` package.
 * Also, a ``commands`` were introduced. Commands describe remote calls
   which have to be applied on a client as a result of action's
