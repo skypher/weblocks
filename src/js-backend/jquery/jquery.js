@@ -327,25 +327,30 @@ function initiateActionWithArgs(actionCode, sessionString, args, method, url) {
 }
 
 function initiateActionWithArgsAndCallback(actionCode, sessionString, args){
-  startProgress();
+    startProgress();
 
-  var method = args.method || 'get';
-  var complete = args.complete;
-  var url = args.url || getActionUrl(actionCode, sessionString);
-  delete args['method'];
-  delete args['complete'];
-  delete args['url'];
-  args.action = actionCode;
+    var method = args.method || 'get';
+    var complete = args.complete;
+    var url = args.url || getActionUrl(actionCode, sessionString);
+    delete args['method'];
+    delete args['complete'];
+    delete args['url'];
+    args.action = actionCode;
 
-  jQuery.ajax(args.url, {
-    type: method,
-    success: function(first, second, third){ 
-      onActionSuccess(first, second, third);
-      complete && complete();
-    },
-    error: onActionFailure,
-    data: args
-  });
+    options = {
+        type: method,
+        success: function(first, second, third) { 
+            onActionSuccess(first, second, third);
+            complete && complete();
+        },
+        error: onActionFailure,
+        data: args,
+    }
+    if (method == 'post') {
+        options.contentType = 'application/json';
+        options.data = JSON.stringify(args)
+    }
+    jQuery.ajax(args.url, options);
 }
 
 var answerDeferred = jQuery.Deferred();

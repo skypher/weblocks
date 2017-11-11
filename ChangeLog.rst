@@ -12,6 +12,8 @@
   client-side.
 * Added ``weblocks.session:in-session-p`` function which returns ``t``
   if session data can be retrived or stored without error.
+* Now function ``initiateActionWithArgsAndCallback`` send arguments as
+  JSON payload. This allows to send any datastructures as action's params.
 
 0.16.0 (2017-11-04)
 ===================
