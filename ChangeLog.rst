@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.17.1 (2017-11-11)
+===================
+
+* Fixed error handling when debug mode is "off". Now weblocks returns
+  result of ``(weblocks.error-handler:on-error app)`` call.
+
 0.17.0 (2017-11-11)
 ===================
 
