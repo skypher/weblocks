@@ -14,7 +14,13 @@
   if session data can be retrived or stored without error.
 * Now function ``initiateActionWithArgsAndCallback`` send arguments as
   JSON payload. This allows to send any datastructures as action's params.
-
+* Function ``weblocks.response:send-script`` was changed to use new
+  mechanizm with commands. When you send script from the action, it will
+  add a command ``:execute-code`` to the stack. All commands are
+  executed in same order as they were added. If you want some code to be
+  executed before widget update, just execute ``send-code`` before
+  ``weblocks.widget:update``.
+  
 0.16.0 (2017-11-04)
 ===================
 

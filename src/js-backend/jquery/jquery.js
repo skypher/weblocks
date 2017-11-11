@@ -236,6 +236,9 @@ window.commandHandlers = {
                 widget.insertBefore(target);
             }
         }
+    },
+    'executeCode': function(params) {
+        jQuery(params.code).appendTo('body');
     }
 };
 

@@ -101,6 +101,8 @@
                              (:file "bundling"
                                     ;;                              :depends-on ;; ("weblocks" "session" utils)
                                     )
+                             (:file "actions")
+                             (:file "actions2")
                              (:file "response")
                              (:file "dependencies"
                                     ;;                              :depends-on ;; ("weblocks" "server" "bundling" "versioning" "session" utils)
@@ -130,12 +132,6 @@
                              (:file "page-template"
                                     ;;                              :depends-on ;; ("weblocks" "session" utils "application")
                                     )
-                             (:file "actions"
-                                    ;;                              :depends-on ;; ("weblocks"
-                                    ;;  "session"
-                                    ;;  utils)
-                                    )
-                             (:file "actions2")
                              (:file "log-actions"
                                     ;;                              :depends-on ;; ("weblocks")
                                     )
@@ -146,11 +142,6 @@
                                     ;;                              :depends-on ;; ("weblocks")
                                     )
                              ;;                             (:file "response2")
-                             (:file "error-handler"
-                                    ;;                              :depends-on ;; ("weblocks"
-                                    ;;  "application"
-                                    ;;  "request2")
-                                    )
                              ;; (:file "request-handler"
                              ;; ;;                              :depends-on ;; ("session"
                              ;;                                           ;;  utils "weblocks" "page-template" "debug-mode"
@@ -253,24 +244,9 @@
                               ;;:depends-on ;; (views "session" utils "dependencies" "actions" "server" "request"
                               ;;        "request-hooks" "dom-object" linguistic "widget-translation")
                               )
-                             (:file "request-handler2"
-                                    ;;                              :depends-on ;; ("session"
-                                    ;;  utils
-                                    ;;  "weblocks"
-                                    ;;  "page-template"
-                                    ;;  "debug-mode"
-                                    ;;  "actions"
-                                    ;;  "request-hooks"
-                                    ;;  "application"
-                                    ;;  "request"
-                                    ;;  "dependencies"
-                                    ;;  "uri-tokens"
-                                    ;;  "error-handler"
-                                    ;;  "routes"
-                                    ;;  "request2"
-                                    ;;  "variables"
-                                    ;;  "session-lock")
-                                    )
+                             (:file "error-handler")
+                             (:file "error-handler2")
+                             (:file "request-handler2")
                              (:module linguistic
                               :components ((:file "grammar"))
                               ;;                              :depends-on ;; ("weblocks" "session" utils)

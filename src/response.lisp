@@ -86,8 +86,12 @@ HTTP code and headers are taken from *code* and *content-type*."
                                 "JQuery")
                         script
                         (weblocks:with-javascript-to-string script))))
-          (ecase place
-            (:before-load (push code weblocks.variables:*before-ajax-complete-scripts*))
-            (:after-load (push code weblocks.variables:*on-ajax-complete-scripts*))))
+          (weblocks.actions:add-command :execute-code
+                                        :code code)
+          ;; TODO remove before-ajax-complete-scripts and on-ajax-complete-scripts completely
+          ;; (ecase place
+          ;;   (:before-load (push code weblocks.variables:*before-ajax-complete-scripts*))
+          ;;   (:after-load (push code weblocks.variables:*on-ajax-complete-scripts*)))
+          )
         (weblocks:with-javascript
           script))))
