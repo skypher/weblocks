@@ -1,7 +1,7 @@
 
 (in-package :weblocks)
 
-(export '(handle-http-error handle-error-condition print-trivial-backtrace))
+(export '(handle-http-error handle-error-condition))
 
 (defun error-page-html-wt (&key title heading description content &allow-other-keys)
   (with-html-to-string

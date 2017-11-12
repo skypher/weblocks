@@ -105,7 +105,7 @@ customize behavior."))
                    (handler-bind ((error (lambda (c) 
                                            (warn "Error initializing user session: ~A" c)
                                            (when *backtrace-on-session-init-error*
-                                             (format t "~%~A~%" (print-trivial-backtrace c)))
+                                             (format t "~%~A~%" (trivial-backtrace:print-backtrace c :output nil)))
                                            (signal c))))
                        (funcall (webapp-init-user-session) root-widget))
                    (setf finished? t))

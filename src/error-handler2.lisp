@@ -26,10 +26,6 @@
 
 
 
-;;; 500 errors deserve special attention
-(defun print-trivial-backtrace (c)
-  (trivial-backtrace:print-backtrace c :output nil))
-
 ;; TODO: rethink this method implementation
 (defmethod weblocks::handle-error-condition ((app weblocks:weblocks-webapp) c)
   "Print a pretty platform-specific backtrace if possible;
@@ -63,7 +59,7 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
   ;;                   (:p "TODO")
   ;;                   (:h2 "Backtrace")
   ;;                   #-sbcl
-  ;;                   (:pre (esc (format nil "~A" (print-trivial-backtrace c))))
+  ;;                   (:pre (esc (format nil "~A"  (print-trivial-backtrace c :output nil))))
   ;;                   #+sbcl
   ;;                   (let ((frames (sb-debug:backtrace-as-list))
   ;;                         (*print-circle* t))
@@ -88,7 +84,7 @@ otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
   ;;                 ;; otherwise - just render a short message
   ;;                 (weblocks.error-handler:on-error )))))
 
-  (let ((traceback (print-trivial-backtrace c)))
+  (let ((traceback (trivial-backtrace:print-backtrace c :output nil)))
     (log:error "Returning 500 error to user" traceback))
   
   ;; TODO: return code with stack trace rendering

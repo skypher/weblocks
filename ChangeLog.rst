@@ -8,7 +8,9 @@
   because I've removed selector's code previously.
 
   .. warning:: Probably parent/children handling code will be removed soon.
-
+* Backtrace printing code was replaced with direct usage of
+  ``trivial-backtrace:print-backtrace``.
+  
 0.17.2 (2017-11-11)
 ===================
 
