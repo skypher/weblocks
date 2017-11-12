@@ -2,6 +2,9 @@
  ChangeLog
 ===========
 
+0.18.0 (2017-11-12)
+===================
+
 * Commented out call to ``update-widget-tree`` inside of ``(setf
   widget-children)``, because it breaks on
   ``(get-widgets-by-type 'selector :root obj)`` sometimes. Seems this is
