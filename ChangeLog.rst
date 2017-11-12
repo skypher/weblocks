@@ -10,6 +10,10 @@
   .. warning:: Probably parent/children handling code will be removed soon.
 * Backtrace printing code was replaced with direct usage of
   ``trivial-backtrace:print-backtrace``.
+
+* Call to ``prepare-hooks`` was moved from ``weblocks.request-handler:handle-client-request``
+  to the the weblocks.server:handler-request, to fix session hooks processing when
+  ``:process-request`` hook is called.
   
 0.17.2 (2017-11-11)
 ===================

@@ -77,85 +77,86 @@ This function serves all started applications and their static files."
     ;; Dynamic hook :handle-request makes possible to write
     ;; some sort of middlewares, which change *request* and *session*
     ;; variables or make some sort
-    (weblocks.hooks:with-hook (:handle-request)
-      (setf weblocks.request::*latest-request*
-            weblocks.request:*request*)
+    (weblocks.hooks:prepare-hooks
+      (weblocks.hooks:with-hook (:handle-request)
+          (setf weblocks.request::*latest-request*
+                weblocks.request:*request*)
 
-      (let* ((path-info (getf env :path-info))
-             (hostname (getf env :server-name))
-             (route (routes:match weblocks.routes:*routes* path-info)))
+          (let* ((path-info (getf env :path-info))
+                 (hostname (getf env :server-name))
+                 (route (routes:match weblocks.routes:*routes* path-info)))
 
-        ;; If dependency found, then return it's content along with content-type
-        (when route
-          (return-from handle-request
-                     (weblocks.routes:serve route env)))
+            ;; If dependency found, then return it's content along with content-type
+            (when route
+              (return-from handle-request
+                (weblocks.routes:serve route env)))
 
-        (dolist (app weblocks::*active-webapps*)
-          (let ((app-prefix (weblocks::webapp-prefix app))
-                (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app)))
+            (dolist (app weblocks::*active-webapps*)
+              (let ((app-prefix (weblocks::webapp-prefix app))
+                    (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app)))
 
-            (log:debug "Searching handler in" app app-prefix app-pub-prefix)
+                (log:debug "Searching handler in" app app-prefix app-pub-prefix)
 
-            (cond
-              ((or 
-                (find path-info weblocks::*force-files-to-serve* :test #'string=)
-                (and (weblocks::webapp-serves-hostname hostname app)
-                     (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
-                                                 (weblocks::tokenize-uri app-pub-prefix nil)
-                                                 :test #'string=)))
-               
-               ;; TODO: Remove this block because it is related to an old way to serve static
-               
-               (let* (;; (virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
-                      ;; (physical-folder (weblocks::compute-webapp-public-files-path app))
-                      ;; TODO send-gzip-rules move to this file
-                      ;; (content-type (weblocks::send-gzip-rules (weblocks::gzip-dependency-types* app)
-                      ;;                                          path-info env virtual-folder physical-folder))
-                      )
-                 ;; TODO send-cache-rules
-                 (weblocks::send-cache-rules (weblocks::weblocks-webapp-public-files-cache-time app))
+                (cond
+                  ((or 
+                    (find path-info weblocks::*force-files-to-serve* :test #'string=)
+                    (and (weblocks::webapp-serves-hostname hostname app)
+                         (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
+                                                     (weblocks::tokenize-uri app-pub-prefix nil)
+                                                     :test #'string=)))
+                                         
+                   ;; TODO: Remove this block because it is related to an old way to serve static
+                                         
+                   (let* ( ;; (virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
+                          ;; (physical-folder (weblocks::compute-webapp-public-files-path app))
+                          ;; TODO send-gzip-rules move to this file
+                          ;; (content-type (weblocks::send-gzip-rules (weblocks::gzip-dependency-types* app)
+                          ;;                                          path-info env virtual-folder physical-folder))
+                          )
+                     ;; TODO send-cache-rules
+                     (weblocks::send-cache-rules (weblocks::weblocks-webapp-public-files-cache-time app))
 
-                 ;; This is not optimal, because a new dispatcher created for each request
-                 ;; TODO: find out how to serve directory in Clack
-                 ;;       and move route creation into app initialization code
-                 ;; (return-from handle-request
-                 ;;   (funcall (weblocks::create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                 ;;            env))
-                 ))
-              ((and (weblocks::webapp-serves-hostname hostname app)
-                    (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
-                                                (weblocks::tokenize-uri app-prefix nil)
-                                                :test #'string=))
+                     ;; This is not optimal, because a new dispatcher created for each request
+                     ;; TODO: find out how to serve directory in Clack
+                     ;;       and move route creation into app initialization code
+                     ;; (return-from handle-request
+                     ;;   (funcall (weblocks::create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
+                     ;;            env))
+                     ))
+                  ((and (weblocks::webapp-serves-hostname hostname app)
+                        (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
+                                                    (weblocks::tokenize-uri app-prefix nil)
+                                                    :test #'string=))
 
-               ;; TODO это внутри использует hunchentoot
-               ;;      но при запуске на Woo вызывает ошибку
-               ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
-               ;; (weblocks::no-cache)    ; disable caching for dynamic pages
+                   ;; TODO это внутри использует hunchentoot
+                   ;;      но при запуске на Woo вызывает ошибку
+                   ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
+                   ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
-               (return-from handle-request
-                 (let* ((weblocks.response:*code* 200)
-                        (weblocks.response:*content-type*
-                          (if (weblocks.request:ajax-request-p)
-                              "application/json"
-                              "text/html"))
-                        (weblocks.response:*headers* nil)
-                        (content (catch 'weblocks.response::abort-processing
-                                   (weblocks.request-handler:handle-client-request app))))
+                   (return-from handle-request
+                     (let* ((weblocks.response:*code* 200)
+                            (weblocks.response:*content-type*
+                              (if (weblocks.request:ajax-request-p)
+                                  "application/json"
+                                  "text/html"))
+                            (weblocks.response:*headers* nil)
+                            (content (catch 'weblocks.response::abort-processing
+                                       (weblocks.request-handler:handle-client-request app))))
 
-                   (list weblocks.response:*code* ;; this value can be changed somewhere in
-                         ;; handle-client-request
-                         (append (list :content-type weblocks.response:*content-type*)
-                                 weblocks.response:*headers*)
-                         ;; Here we use catch to allow to abort usual response
-                         ;; processing and to return data immediately
-                         (list content))))))))
-        
-        (log:debug "Application dispatch failed for" path-info)
+                       (list weblocks.response:*code* ;; this value can be changed somewhere in
+                             ;; handle-client-request
+                             (append (list :content-type weblocks.response:*content-type*)
+                                     weblocks.response:*headers*)
+                             ;; Here we use catch to allow to abort usual response
+                             ;; processing and to return data immediately
+                             (list content))))))))
+                                  
+            (log:debug "Application dispatch failed for" path-info)
 
-        (list 404
-              (list :content-type "text/html")
-              (list (format nil "File \"~A\" was not found"
-                            path-info)))))))
+            (list 404
+                  (list :content-type "text/html")
+                  (list (format nil "File \"~A\" was not found"
+                                path-info))))))))
 
 
 (defmethod start ((server server) &key debug)
