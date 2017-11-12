@@ -208,12 +208,16 @@ children of w (e.g. may be rendered when w is rendered).")
                (remove type children :key #'car))
               (widgets
                (cons (cons type (ensure-list widgets)) children))))
-      (when (and (weblocks.request:ajax-request-p)
-                 (not *tree-update-pending*)
-                 (get-widgets-by-type 'selector :root obj))
-        (handler-case (update-widget-tree)
-          (http-not-found () (abort-request-handler
-                               (page-not-found-handler *current-webapp*)))))
+      ;; TODO: remove this code with widget replacement because it is too complex.
+      ;; I commented this because it caused and error because type 'selector is
+      ;; undefined now due previous code removal.
+      ;; (when (and (weblocks.request:ajax-request-p)
+      ;;            (not *tree-update-pending*)
+      ;;            (get-widgets-by-type 'selector :root obj)
+      ;;            )
+      ;;   (handler-case (update-widget-tree)
+      ;;     (http-not-found () (abort-request-handler
+      ;;                          (page-not-found-handler *current-webapp*)))))
       (update-parent-for-children obj))))
 
 (defgeneric map-subwidgets (function widget)
