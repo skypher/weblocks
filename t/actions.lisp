@@ -7,7 +7,7 @@
 (in-package weblocks.t.actions)
 
 
-(plan 5)
+(plan 6)
 
 
 (subtest "get-action-name-from-request"
@@ -24,14 +24,29 @@
           "And with POSTs"))))
 
 
-(subtest "make-action/get-request-action-1"
+(subtest "eval-action should return action function's result"
   (with-session
     (let ((action-name (make-action (lambda (&rest keys)
                                       (declare (ignore keys))
                                       123))))
-      (is (weblocks::eval-action action-name nil)
+      (is (weblocks.actions:eval-action nil action-name nil)
           123
           "This action just returns 123 when evaluated."))))
+
+
+(subtest "eval-action should call weblocks.actions:on-missing-action if action is not found"
+  (with-session
+    (defclass someapp ()
+      ())
+    (let ((app (make-instance 'someapp))
+          result)
+      (defmethod weblocks.actions:on-missing-action ((app someapp) action-name)
+        (setf result (format nil "Action \"~a\" is missing." action-name)))
+
+      (weblocks.actions:eval-action app "missing-action" nil)
+      (is result
+          "Action \"missing-action\" is missing."
+          "Result should be changed as a side-effect of method call."))))
 
 
 (subtest "function-or-action->action-error"

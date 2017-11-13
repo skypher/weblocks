@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+* Variable ``*expired-action-handler*``, method
+  ``expired-action-handler`` and function
+  ``default-expired-action-handler`` were replaced with method
+  ``weblocks.actions:on-missing-action``.
+
+
 0.18.0 (2017-11-12)
 ===================
 

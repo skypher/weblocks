@@ -1,31 +1,8 @@
-
 (in-package :weblocks)
 
-(export '(*expired-action-handler* expired-action-handler page-not-found-handler
+(export '(page-not-found-handler
           make-action-url make-action function-or-action->action
           *ignore-missing-actions*))
-
-(defvar *expired-action-handler* 'default-expired-action-handler
-  "Must be bound to a designator of a function with a single optional
-argument - the application. The function gets called when the user
-tries to invoke an expired action (due to a session timeout). The
-function should determine the behavior in this
-situation (e.g. redirect, signal an error, etc.)  Default function
-redirects to the root of the application.")
-
-(defgeneric expired-action-handler (app)
-  (:documentation "Webapp specific protocol now used in action 
-   handler.  This method provides backwards compatibility.")
-  (:method ((app t))
-    (funcall *expired-action-handler* app)))
-
-(defun default-expired-action-handler (&optional (app *current-webapp*))
-  "Default value of *expired-action-handler*. Redirects to application
-root and sets a query parameter 'timeout' to true, so that the home
-page may display a relevant message, if necessary."
-  (redirect
-    (concatenate 'string (make-webapp-uri "/") "?timeout=t")
-    :defer nil))
 
 
 (defun generate-action-code ()
@@ -136,19 +113,11 @@ raises an assertion."
                                          (make-hash-table :test #'equal)))
            (session-action (gethash action-name code->action))
            (request-action (or permanent-action session-action)))
+      ;; TODO: rethink this form. May be throw a special condition instead of string
       (unless *ignore-missing-actions*
         (assert request-action (request-action)
                 (concatenate 'string "Cannot find action: " action-name)))
       request-action)))
-
-
-(defun eval-action (action-name arguments)
-  "Evaluates the action that came with the request."
-  (let ((action (get-request-action action-name)))
-    
-    (log:debug "Calling" action "with" arguments "and" action-name)
-    (safe-apply action
-                arguments)))
 
 
 ;; TODO add to documentation
