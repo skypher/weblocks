@@ -81,83 +81,84 @@ customize behavior."))
           result)
         (webapp-update-thread-status "Request complete/idle")))))
 
-(defmethod handle-client-request ((app weblocks-webapp))
+;; (defmethod handle-client-request ((app weblocks-webapp))
 
-  (progn                                ;save it for splitting this up
-    (when (null *session*)
-      (when (get-request-action-name)
-        (expired-action-handler app))
-      (start-session)
-      (setf (weblocks.session:get-value 'last-request-uri) :none)
-      (when *rewrite-for-session-urls*
-        (redirect (request-uri*))))
-    (when *maintain-last-session*
-      (bordeaux-threads:with-lock-held (*maintain-last-session*)
-        (setf *last-session* *session*)))
-    (let ((*request-hook* (make-instance 'request-hooks))
-          *dirty-widgets*)
-      (when (null (root-widget))
-        (let ((root-widget (make-instance 'widget :name "root")))
-          (setf (root-widget) root-widget)
-          (let (finished?)
-            (unwind-protect
-                 (progn
-                   (handler-bind ((error (lambda (c) 
-                                           (warn "Error initializing user session: ~A" c)
-                                           (when *backtrace-on-session-init-error*
-                                             (format t "~%~A~%" (trivial-backtrace:print-backtrace c :output nil)))
-                                           (signal c))))
-                       (funcall (webapp-init-user-session) root-widget))
-                   (setf finished? t))
-              (unless finished?
-                (setf (root-widget) nil)
-                (reset-webapp-session))))
-          (weblocks.hooks:add-session-hook :post-action 'update-dialog-on-request))
-        (when (and *rewrite-for-session-urls*
-                   (cookie-in (session-cookie-name *weblocks-server*)))
-          (redirect (remove-session-from-uri (request-uri*)))))
+;;   (progn                                ;save it for splitting this up
+;;     ;; TODO: implement this in new code
+;;     (when (null *session*)
+;;       (when (get-request-action-name)
+;;         (expired-action-handler app))
+;;       (start-session)
+;;       (setf (weblocks.session:get-value 'last-request-uri) :none)
+;;       (when *rewrite-for-session-urls*
+;;         (redirect (request-uri*))))
+;;     (when *maintain-last-session*
+;;       (bordeaux-threads:with-lock-held (*maintain-last-session*)
+;;         (setf *last-session* *session*)))
+;;     (let ((*request-hook* (make-instance 'request-hooks))
+;;           *dirty-widgets*)
+;;       (when (null (root-widget))
+;;         (let ((root-widget (make-instance 'widget :name "root")))
+;;           (setf (root-widget) root-widget)
+;;           (let (finished?)
+;;             (unwind-protect
+;;                  (progn
+;;                    (handler-bind ((error (lambda (c) 
+;;                                            (warn "Error initializing user session: ~A" c)
+;;                                            (when *backtrace-on-session-init-error*
+;;                                              (format t "~%~A~%" (trivial-backtrace:print-backtrace c :output nil)))
+;;                                            (signal c))))
+;;                        (funcall (webapp-init-user-session) root-widget))
+;;                    (setf finished? t))
+;;               (unless finished?
+;;                 (setf (root-widget) nil)
+;;                 (reset-webapp-session))))
+;;           (weblocks.hooks:add-session-hook :post-action 'update-dialog-on-request))
+;;         (when (and *rewrite-for-session-urls*
+;;                    (cookie-in (session-cookie-name *weblocks-server*)))
+;;           (redirect (remove-session-from-uri (request-uri*)))))
 
-      (let ((*weblocks-output-stream* (make-string-output-stream))
-            (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
-            *before-ajax-complete-scripts*
-            *on-ajax-complete-scripts*
-            *current-page-title*
-            *current-page-description*
-            *current-page-keywords*
-            *current-page-headers*
-            (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
+;;       (let ((*weblocks-output-stream* (make-string-output-stream))
+;;             (*uri-tokens* (make-instance 'uri-tokens :tokens (tokenize-uri (request-uri*))))
+;;             *before-ajax-complete-scripts*
+;;             *on-ajax-complete-scripts*
+;;             *current-page-title*
+;;             *current-page-description*
+;;             *current-page-keywords*
+;;             *current-page-headers*
+;;             (cl-who::*indent* (weblocks-webapp-html-indent-p app)))
 
-        (when (pure-request-p)
-          (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
+;;         (when (pure-request-p)
+;;           (abort-request-handler (eval-action))) ; FIXME: what about the txn hook?
 
-        (webapp-update-thread-status "Processing action")
-        (timing "action processing (w/ hooks)"
-          (eval-hook :pre-action)
-          (with-dynamic-hooks (:dynamic-action)
-            (eval-action))
-          (eval-hook :post-action))
+;;         (webapp-update-thread-status "Processing action")
+;;         (timing "action processing (w/ hooks)"
+;;           (eval-hook :pre-action)
+;;           (with-dynamic-hooks (:dynamic-action)
+;;             (eval-action))
+;;           (eval-hook :post-action))
 
-        (when (and (not (weblocks.request:ajax-request-p))
-                   (find *action-string* (get-parameters*)
-                         :key #'car :test #'string-equal))
-          (redirect (remove-action-from-uri (request-uri*))))
+;;         (when (and (not (weblocks.request:ajax-request-p))
+;;                    (find *action-string* (get-parameters*)
+;;                          :key #'car :test #'string-equal))
+;;           (redirect (remove-action-from-uri (request-uri*))))
 
-        (timing "rendering (w/ hooks)"
-          (eval-hook :pre-render)
-          (with-dynamic-hooks (:dynamic-render)
-            (if (weblocks.request:ajax-request-p)
-              (handle-ajax-request app)
-              (handle-normal-request app)))
-          (eval-hook :post-render))
+;;         (timing "rendering (w/ hooks)"
+;;           (eval-hook :pre-render)
+;;           (with-dynamic-hooks (:dynamic-render)
+;;             (if (weblocks.request:ajax-request-p)
+;;               (handle-ajax-request app)
+;;               (handle-normal-request app)))
+;;           (eval-hook :post-render))
 
         
 
-        (if (member (return-code*) *approved-return-codes*)
-          (progn 
-            (unless (weblocks.request:ajax-request-p)
-              (setf (weblocks.session:get-value 'last-request-uri) (all-tokens *uri-tokens*)))
-            (get-output-stream-string *weblocks-output-stream*))
-          (handle-http-error app (return-code*)))))))
+;;         (if (member (return-code*) *approved-return-codes*)
+;;           (progn 
+;;             (unless (weblocks.request:ajax-request-p)
+;;               (setf (weblocks.session:get-value 'last-request-uri) (all-tokens *uri-tokens*)))
+;;             (get-output-stream-string *weblocks-output-stream*))
+;;           (handle-http-error app (return-code*)))))))
 
 
 (defun remove-session-from-uri (uri)

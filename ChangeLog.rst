@@ -7,6 +7,9 @@
   ``default-expired-action-handler`` were replaced with method
   ``weblocks.actions:on-missing-action``.
 * Now we are trying to call action only if action's name was given.
+* Old method ``weblocks:handle-client-request ((app weblocks-webapp))``
+  was removed. Look at it's newer version in ``weblocks.request-handler``.
+  
 
 0.18.0 (2017-11-12)
 ===================
