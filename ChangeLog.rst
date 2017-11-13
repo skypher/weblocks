@@ -2,6 +2,9 @@
  ChangeLog
 ===========
 
+0.19.0 (2017-11-13)
+===================
+
 * Variable ``*expired-action-handler*``, method
   ``expired-action-handler`` and function
   ``default-expired-action-handler`` were replaced with method
