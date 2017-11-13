@@ -371,17 +371,22 @@ association list. This function is normally called by
               (let ((action-name (weblocks.request::get-action-name-from-request))
                     (action-arguments
                       (weblocks::alist->plist (weblocks.request:request-parameters))))
-                
-                (when (weblocks::pure-request-p)
-                  (weblocks.response:abort-processing
-                   (weblocks::eval-action action-name
-                                          action-arguments))) ; FIXME: what about the txn hook?
 
-                (weblocks::webapp-update-thread-status "Processing action")
-                (weblocks::timing "action processing (w/ hooks)"
-                  (weblocks.hooks:with-hook (:action)
-                                            (weblocks::eval-action action-name
-                                                                   action-arguments))))
+                (when action-name
+                  (when (weblocks::pure-request-p)
+                    (weblocks.response:abort-processing
+                     (weblocks.actions:eval-action
+                      app
+                      action-name
+                      action-arguments)))
+
+                  (weblocks::webapp-update-thread-status "Processing action")
+                  (weblocks::timing "action processing (w/ hooks)"
+                    (weblocks.hooks:with-hook (:action)
+                                              (weblocks.actions:eval-action
+                                               app
+                                               action-name
+                                               action-arguments)))))
 
               ;; Remove "action" parameter for the GET parameters
               ;; it it is not an AJAX request

@@ -6,7 +6,7 @@
   ``expired-action-handler`` and function
   ``default-expired-action-handler`` were replaced with method
   ``weblocks.actions:on-missing-action``.
-
+* Now we are trying to call action only if action's name was given.
 
 0.18.0 (2017-11-12)
 ===================
