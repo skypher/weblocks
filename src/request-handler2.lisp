@@ -201,24 +201,26 @@ association list. This function is normally called by
     (labels ((circularity-warn (w)
                (when weblocks.variables:*style-warn-on-circular-dirtying*
                  (weblocks::style-warn 'non-idempotent-rendering
-                  :change-made
-                  (format nil "~A was marked dirty and skipped after ~
+                                       :change-made
+                                       (format nil "~A was marked dirty and skipped after ~
                                already being rendered" w))))
              (render-enqueued (dirty)
+               "Returns a plist of dirty widgets where keys are their
+                dom ids."
                (loop for w in dirty
                      if (gethash w render-state)
                        do (circularity-warn w)
                      else
                        do (weblocks::render-widget w)
                           (setf (gethash w render-state) t)
-                       and collect (cons (weblocks::dom-id w)
-                                         (get-output-stream-string
-                                             weblocks::*weblocks-output-stream*))))
+                       and appending (list (alexandria:make-keyword (weblocks::dom-id w))
+                                           (get-output-stream-string
+                                            weblocks::*weblocks-output-stream*))))
              (late-propagation-warn (ws)
                (when weblocks.variables:*style-warn-on-late-propagation*
                  (weblocks::style-warn 'non-idempotent-rendering
-                  :change-made
-                  (format nil "~A widgets were marked dirty: ~S" (length ws) ws))))
+                                       :change-made
+                                       (format nil "~A widgets were marked dirty: ~S" (length ws) ws))))
              (absorb-dirty-widgets ()
                (loop for dirty = weblocks::*dirty-widgets*
                      while dirty
@@ -235,8 +237,8 @@ association list. This function is normally called by
                 :|before-load| weblocks.variables:*before-ajax-complete-scripts*
                 :|on-load| weblocks.variables:*on-ajax-complete-scripts*
                 :|commands| weblocks.actions::*commands*))
-          :stream weblocks:*weblocks-output-stream*
-          :escape nil)))))
+         :stream weblocks:*weblocks-output-stream*
+         :escape nil)))))
 
 
 
