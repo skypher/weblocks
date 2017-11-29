@@ -72,7 +72,10 @@ Make instance, then start it with ``start`` method."
 This function serves all started applications and their static files."
 
   (let* ((weblocks.request:*request* (lack.request:make-request env))
-         (weblocks.session::*session* (getf env :lack.session)))
+         (weblocks.session::*session* (getf env :lack.session))
+         ;; This "hack" is needed to allow widgets to change *random-state*
+         ;; and don't interfere with other threads and requests
+         (*random-state* *random-state*))
 
     ;; Dynamic hook :handle-request makes possible to write
     ;; some sort of middlewares, which change *request* and *session*

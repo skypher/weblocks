@@ -2,6 +2,13 @@
  ChangeLog
 ===========
 
+0.19.2 (2017-11-29)
+===================
+
+* Now weblocks rebinds ``*random-state*`` to itself for each request to
+  allow it to use ``setf`` and change ``*random-state*`` until the end
+  of request processing.
+
 0.19.1 (2017-11-23)
 ===================
 
