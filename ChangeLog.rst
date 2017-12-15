@@ -7,6 +7,16 @@
 
 * Package ``weblocks.debug`` now does not export ``*on`` variable,
   but provides three functions ``on``, ``off`` and ``status``.
+* New method ``weblocks.server:serve-static-file`` was introduced.
+  It can be used to create static routes which will respond with
+  file's content. For example, you could add this to your app's
+  ``initialize-instance`` method:
+
+  .. code:: common-lisp
+
+     (weblocks.server:serve-static-file
+        "/favicon.png"
+        (asdf:system-relative-pathname :app "favicon.png"))
 
 0.19.2 (2017-11-29)
 ===================

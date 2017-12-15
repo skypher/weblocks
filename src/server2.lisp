@@ -9,7 +9,8 @@
            #:handle-request
            #:*server*
            #:stop-weblocks
-           #:start-weblocks))
+           #:start-weblocks
+           #:serve-static-file))
 (in-package weblocks.server)
 
 
@@ -285,3 +286,32 @@ declared AUTOSTART."
         (when *server*
           (stop *server*))
         (setf *server* nil))))
+
+
+;;;; Static files
+
+(defclass static-route-from-file (weblocks.routes:route)
+  ((path :initarg :path
+         :reader get-path)
+   (content-type :initarg :content-type
+                 :reader get-content-type)))
+
+
+(defmethod weblocks.routes:serve ((route static-route-from-file) env)
+  "Returns a file's content"
+  (declare (ignorable env))
+  (list 200
+        (list :content-type (get-content-type route))
+        (get-path route)))
+
+
+(defgeneric serve-static-file (uri object &key content-type)
+  (:documentation "Adds a route to serve given object by static URI."))
+
+
+(defmethod serve-static-file (uri (path pathname) &key (content-type "text/plain"))
+  (let* ((route (make-instance 'static-route-from-file
+                               :template (routes:parse-template uri)
+                               :path path
+                               :content-type content-type)))
+    (routes:connect weblocks.routes:*routes* route)))
