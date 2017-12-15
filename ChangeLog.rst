@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.20.0 (2017-12-15)
+===================
+
+* Package ``weblocks.debug`` now does not export ``*on`` variable,
+  but provides three functions ``on``, ``off`` and ``status``.
+
 0.19.2 (2017-11-29)
 ===================
 
