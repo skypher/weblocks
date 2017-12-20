@@ -5,35 +5,17 @@ exec ros dynamic-space-size=4096 -Q -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
-  
-  (handler-case (ql:quickload :weblocks-test)
-    (error (c)
-      (format t "~%Unable to load :WEBLOCKS-TEST~%Error was: ~a~2%"
-              c)
-      (uiop:quit 3))))
+  (ql:quickload :prove))
 
 
-(defpackage :ros.script.run-tests.3700466499
+(defpackage :ros.script.run-tests
   (:use :cl))
-(in-package :ros.script.run-tests.3700466499)
+(in-package :ros.script.run-tests)
 
 
 (defun main (&rest argv)
   (declare (ignorable argv))
 
-  (format t "~%WEBLOCKS-TEST's location: ~a~2%"
-          (ql:where-is-system :weblocks-test))
-  
-  (ignore-errors
-   (let ((result (weblocks-test:test-weblocks)))
-
-     (if (lift:errors result)
-         (progn (format t "~3&There were some errors in tests.~%")
-                (uiop:quit 1))
-         (progn (format t "~3&Success.~%")
-                (uiop:quit 0)))))
-  
-  (format t "~3&There were some errors from test framework.~%")
-  (uiop:quit 2))
+  (prove:run-test-system :weblocks-test2))
 
 ;;; vim: set ft=lisp lisp:
