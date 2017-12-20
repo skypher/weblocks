@@ -107,26 +107,21 @@ function stopProgress(){
     progress.hide(progress.data('hide-speed'));
 }
 
-log('LOADED');
-
 function log(message, arg) {
     window.console && console.log(message, arg);
 }
 
 // Register global AJAX handlers to show progress
 jQuery(document).ajaxStart(function() {
-    try{
-        log('Starting AJAX');
-    startProgress();
-    }catch(e){
-        console.log('Some AJAX error');
-    window.console && console.log(e, e.message);
+    try {
+        startProgress();
+    } catch(e) {
+        window.console && console.log(e, e.message);
   }
 });
 
 jQuery(document).ajaxStop(function() {
-    log('Stopping AJAX progress');
-  stopProgress();
+    stopProgress();
 });
 
 Object.values = function (obj) {
@@ -254,7 +249,6 @@ function processCommand(command) {
 }
 
 function onActionSuccess(json){
-    log('Action success', json);
   // See if there are redirects
   var redirect = json['redirect'];
   if (redirect)

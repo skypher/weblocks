@@ -2,6 +2,17 @@
  ChangeLog
 ===========
 
+0.20.1 (2017-12-20)
+===================
+
+* Removed debug these debug messages from client-side JS:
+
+  * LOADED;
+  * Starting AJAX;
+  * Stopping AJAX progress;
+  * Some AJAX error;
+  * Action success.
+
 0.20.0 (2017-12-15)
 ===================
 
