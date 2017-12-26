@@ -78,6 +78,13 @@ TODO: add an image.
 Now, we'll add some ability to interact with a list – to add some tasks
 into it.
 
+Import a new module, ``weblocks-ui`` to help in creating forms and other UI elements:
+
+.. code-block:: common-lisp-repl
+
+   TODO> (ql:quickload "weblocks-ui")
+   TODO> (use-package :weblocks.ui.form)
+
 Write a new ``init-user-session`` in the repl:
 
 .. code-block:: common-lisp-repl
