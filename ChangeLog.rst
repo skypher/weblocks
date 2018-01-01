@@ -2,6 +2,14 @@
  ChangeLog
 ===========
 
+0.21.0 (2017-01-01)
+===================
+
+* Macro ``weblocks.session:get-value`` was replaced with a regular
+  function.
+* Function ``weblocks.session:set-value`` was removed and replaced with
+  a setter ``(setf get-value)``.
+
 0.20.1 (2017-12-20)
 ===================
 

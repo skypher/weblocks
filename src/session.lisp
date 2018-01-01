@@ -20,20 +20,21 @@
 
 
 ;; previously webapp-session-value
-(defmacro get-value (key &optional default)
+(defun get-value (key &optional default)
   "Get a session value from the currently running webapp.
 KEY is compared using EQUAL.
 
 It was made as a macro to not evaluate 'default' on each call."
 
-  `(progn (unless *session*
-            (error "Session was not created for this request!"))
-          ;; TODO: seems, previously keys were separated for different weblocks apps
-          ;;       but I've simplified it for now
-          (alexandria:ensure-gethash ,key *session* ,default)))
+  (unless *session*
+    (error "Session was not created for this request!"))
+  ;; TODO: seems, previously keys were separated for different weblocks apps
+  ;;       but I've simplified it for now
+  
+  (alexandria:ensure-gethash key *session* default))
 
 
-(defun set-value (key value)
+(defun (setf get-value) (value key)
   "Set a session value for the currently running webapp.
 KEY is compared using EQUAL."
   
@@ -54,6 +55,7 @@ KEY is compared using EQUAL."
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (get-value 'last-unique-id) -1))))
-    (set-value 'last-unique-id new-widget-id)
+    (setf (get-value 'last-unique-id)
+          new-widget-id)
     (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
 

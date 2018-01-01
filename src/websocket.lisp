@@ -23,7 +23,8 @@
                   ;; Bind websocket server to user's session.
                   ;; This way we'll be able to send him commands
                   ;; from other pieces of the server-side code.
-                  (weblocks.session:set-value :websocket ws)
+                  (setf (weblocks.session:get-value :websocket)
+                        ws)
 
                   (wsd:on :message ws
                           (lambda (message)

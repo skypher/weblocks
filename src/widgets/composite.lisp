@@ -28,4 +28,5 @@ composite."
   (weblocks.session:get-value 'root-widget))
 
 (defun (setf root-composite) (value)
-  (weblocks.session:set-value 'root-widget value))
+  (setf (weblocks.session:get-value 'root-widget)
+        value))

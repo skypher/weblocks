@@ -322,8 +322,8 @@ association list. This function is normally called by
         (let (weblocks::*dirty-widgets*)
           (when (null (weblocks::root-widget))
             (let ((root-widget (weblocks::make-root-widget app)))
-              (weblocks.session:set-value 'weblocks::root-widget
-                                          root-widget)
+              (setf (weblocks.session:get-value 'weblocks::root-widget)
+                    root-widget)
               (let (finished?
                     (init-user-session-func (weblocks::webapp-init-user-session)))
                 (unwind-protect
@@ -337,8 +337,8 @@ association list. This function is normally called by
                                   root-widget))
                        (setf finished? t))
                   (unless finished?
-                    (weblocks.session:set-value 'weblocks::root-widget
-                                                nil))))
+                    (setf (weblocks.session:get-value 'weblocks::root-widget)
+                          nil))))
               
               ;; TODO: understand why there is coupling with Dialog here and
               ;;       how to move it into the Dialog's code.
@@ -417,8 +417,8 @@ association list. This function is normally called by
               (if (eql weblocks.response:*code* 200)
                   (let ((content (get-output-stream-string weblocks::*weblocks-output-stream*)))
                     (unless (weblocks.request:ajax-request-p)
-                      (weblocks.session:set-value 'last-request-uri
-                                                  (weblocks::all-tokens weblocks::*uri-tokens*)))
+                      (setf (weblocks.session:get-value 'last-request-uri)
+                            (weblocks::all-tokens weblocks::*uri-tokens*)))
                     ;; Return rendered content as a response on request.
                     content)
                   ;; TODO: use weblocks.error-handler here

@@ -44,7 +44,8 @@ etc."
   (setf *redirect-request-p*
         (weblocks.session:get-value 'redirect-p))
   ;; Next, reset this flag in the session
-  (weblocks.session:set-value 'redirect-p nil))
+  (setf (weblocks.session:get-value 'redirect-p)
+        nil))
 
 (defun clear-redirect-var ()
   (declare (special *redirect-request-p*))
@@ -60,7 +61,8 @@ etc."
 
 
 (defun set-redirect-true ()
-  (weblocks.session:set-value 'redirect-p t))
+  (setf (weblocks.session:get-value 'redirect-p)
+        t))
 
 
 (defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)

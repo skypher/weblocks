@@ -25,7 +25,8 @@
 
 (defun reset-session-hooks ()
   (let ((hooks (make-instance 'hooks)))
-    (weblocks.session:set-value 'hooks hooks)
+    (setf (weblocks.session:get-value 'hooks)
+          hooks)
     hooks))
 
 
