@@ -1,9 +1,11 @@
 ;; Part 1
 (declaim (optimize (debug 3)))
 
-(ql:quickload :weblocks)
+(ql:quickload '(:weblocks :weblocks-ui))
 
-(defpackage todo (:use :cl :weblocks))
+(defpackage todo (:use :cl
+                       :weblocks
+                       :weblocks.ui.form))
 (in-package todo)
 
 
@@ -12,6 +14,7 @@
 (weblocks.server:start-weblocks)
 
 (setf weblocks.variables:*catch-errors-p* nil)
+(weblocks.debug:on)
 
 
 ;; Part 2
@@ -32,7 +35,7 @@
      :init-user-session #'init-user-session)
 
 (progn (weblocks:restart-webapp 'tasks)
-       (weblocks.session:reset-latest-session))
+       (weblocks.debug:reset-latest-session))
 
 
 ;; Part 3
@@ -59,7 +62,7 @@
                           :value "Add"))))))))
 
 (progn (weblocks:restart-webapp 'tasks)
-       (weblocks.session:reset-latest-session))
+       (weblocks.debug:reset-latest-session))
 
 
 ;; Part 4
