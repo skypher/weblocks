@@ -30,7 +30,7 @@ satisfied, the actions have access to the session, the widgets, and
 all other parameters. However, none of the callbacks (see
 *on-pre-request*) are executed, no widgets are sent to the client,
 etc."
-  (string-equal (weblocks.request:request-parameter "pure") "true"))
+  (string-equal (weblocks.request:get-parameter "pure") "true"))
 
 (defvar *redirect-request-p* nil)
 
@@ -128,6 +128,6 @@ NEW-WINDOW functionality will only work when Javascript is enabled."
 
 
 (defun parse-location-hash ()
-  (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
+  (let ((raw-hash (weblocks.request:get-parameter "weblocks-internal-location-hash")))
     (when raw-hash
       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))

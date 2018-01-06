@@ -393,7 +393,7 @@ association list. This function is normally called by
               ;; Remove "action" parameter for the GET parameters
               ;; it it is not an AJAX request
               (when (and (not (weblocks.request:ajax-request-p))
-                         (weblocks.request:request-parameter weblocks.variables:*action-string*))
+                         (weblocks.request:get-parameter weblocks.variables:*action-string*))
                 (weblocks::redirect (remove-action-from-uri
                                      (weblocks.request:get-path :with-params t))))
 

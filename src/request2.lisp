@@ -126,8 +126,7 @@ in a dynamic hunchentoot environment."
 
 (defun get-action-name-from-request ()
   "Returns called action name if any action was called"
-  (request-parameter
-   weblocks.variables:*action-string*))
+  (get-parameter weblocks.variables:*action-string*)) 
 
 
 (defun refresh-request-p ()

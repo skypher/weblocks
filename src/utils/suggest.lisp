@@ -61,7 +61,7 @@ the client. Accepts a list of results.
                         (make-action
                          (lambda (&rest keys)
                            (declare (ignore keys))
-                           (funcall format-fn (funcall resultset (request-parameter a-input-name)))))))
+                           (funcall format-fn (funcall resultset (get-parameter a-input-name)))))))
             (session-name-string-pair))))))
 
 (defun format-suggest-list (results)

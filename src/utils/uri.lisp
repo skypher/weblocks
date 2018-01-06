@@ -88,7 +88,7 @@ ex:
 
 ;; Moved to weblocks.request
 ;; (defun parse-location-hash ()
-;;   (let ((raw-hash (weblocks.request:request-parameter "weblocks-internal-location-hash")))
+;;   (let ((raw-hash (weblocks.request:get-parameter "weblocks-internal-location-hash")))
 ;;     (when raw-hash
 ;;       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 

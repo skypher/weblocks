@@ -1,8 +1,7 @@
 (in-package :weblocks)
 
 (export '(page-not-found-handler
-          make-action-url make-action function-or-action->action
-          *ignore-missing-actions*))
+          make-action-url make-action function-or-action->action))
 
 
 (defun generate-action-code ()
@@ -92,13 +91,11 @@ Ex:
 
 \(make-action-url \"test-action\") => \"?action=test-action\""
   (concatenate 'string
-               (weblocks.request:request-path-info) ; we need this for w3m
+               (weblocks.request:get-path) ; we need this for w3m
                (if include-question-mark-p "?" "")
                weblocks.variables:*action-string* "="
                (quri:url-encode (princ-to-string action-code))))
 
-
-(defvar *ignore-missing-actions* t)
 
 (defun get-request-action (action-name)
   "Gets an action from the request. If the request contains

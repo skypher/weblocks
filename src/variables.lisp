@@ -15,6 +15,8 @@
 ;;; Set outgoing encoding to utf-8
 (defvar *default-content-type* "text/html; charset=utf-8")
 
+(defvar *ignore-missing-actions* t)
+
 
 (defpackage #:weblocks.variables
   (:use #:cl)
@@ -64,5 +66,3 @@ marked dirty after the rendering phase.")
 (defparameter *style-warn-on-late-propagation* nil
   "Whether to emit a style-warning when widgets are
 marked dirty in the rendering phase.")
-
-

@@ -28,7 +28,8 @@ The value of this variable is returned by (status) call as a second value.")
 To clear, use function \(reset-last-session\).")
 
 
-(defun on (&key (track-latest-session t))
+(defun on (&key (track-latest-session t) (debug-actions t))
+  ;; TODO: think about pluggable switchers to not hardcode them into this function
   (setf *on* t)
   
   (when track-latest-session
@@ -37,13 +38,35 @@ To clear, use function \(reset-last-session\).")
         track-latest-session ()
       
       (setf *latest-session*
-            weblocks.session::*session*)))
+            weblocks.session::*session*))
+    
+    ;; Remember that we turned this on
+    (setf (getf *config* :track-latest-session)
+          t))
+
+  (when debug-actions
+    (setf weblocks::*ignore-missing-actions*
+          nil
+          (getf *config* :debug-actions)
+          t))
 
   (values))
 
 
 (defun off ()
   (setf *on* t)
+
+  (when (getf *config* :track-latest-session)
+    ;; TODO: implement hook removal
+    ;; (weblocks.hooks:remove-application-hook :handle-request
+    ;;                                         track-latest-session)
+    )
+  
+  (when (getf *config* :debug-actions)
+    (setf weblocks::*ignore-missing-actions*
+          t))
+  
+  (setf *config* nil)
   (values))
 
 

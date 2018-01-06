@@ -6,7 +6,7 @@
 (in-package weblocks.t.request)
 
 
-(plan 1)
+(plan 2)
 
 (subtest "refresh-request-p-1"
   (with-session

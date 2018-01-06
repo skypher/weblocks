@@ -167,8 +167,8 @@ submission behavior.")
     update-form-intermediate-values-on-form-action ()
   
   (when (and (weblocks.request:get-parameters)
-             (weblocks.request:request-parameter "form-id"))
-    (let ((form (get-widget-by-id (weblocks.request:request-parameter "form-id"))))
+             (weblocks.request:get-parameter "form-id"))
+    (let ((form (get-widget-by-id (weblocks.request:get-parameter "form-id"))))
       (when (subtypep (type-of form) 'dataform)
         (setf 
          (slot-value form 'intermediate-form-values)

@@ -98,7 +98,7 @@ HTTP code and headers are taken from *code* and *content-type*."
                   (string script)
                   (list (ps:ps* script)))))
     (if (weblocks.request:ajax-request-p)
-        (let ((code (if (equalp (weblocks.request:request-header "X-Weblocks-Client")
+        (let ((code (if (equalp (weblocks.request:get-header "X-Weblocks-Client")
                                 "JQuery")
                         script
                         (weblocks:with-javascript-to-string script))))
