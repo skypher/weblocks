@@ -129,8 +129,8 @@ customize behavior."))
      (weblocks:root-widget)
      (lambda (widget d)
        (weblocks::update-widget-parameters widget
-                                           (weblocks.request:request-method)
-                                           (weblocks.request:request-parameters))
+                                           (weblocks.request:get-method)
+                                           (weblocks.request:get-parameters))
        (weblocks:update-children widget)
        (let ((title (weblocks:page-title widget))
              (description (weblocks:page-description widget))
@@ -316,7 +316,7 @@ association list. This function is normally called by
         ;;     (setf weblocks::*last-session*
         ;;           weblocks::*session*)))
 
-        (let ((uri (weblocks.request:request-uri)))
+        (let ((uri (weblocks.request:get-path)))
           (log:debug "Handling client request" uri))
 
         (let (weblocks::*dirty-widgets*)
@@ -357,7 +357,7 @@ association list. This function is normally called by
                     (make-string-output-stream))
                   (weblocks::*uri-tokens*
                     (make-instance 'weblocks::uri-tokens
-                                   :tokens (weblocks::tokenize-uri (weblocks.request:request-uri))))
+                                   :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
                   weblocks.variables:*before-ajax-complete-scripts*
                   weblocks.variables:*on-ajax-complete-scripts*
                   weblocks::*current-page-title*
@@ -372,7 +372,7 @@ association list. This function is normally called by
               
               (let ((action-name (weblocks.request::get-action-name-from-request))
                     (action-arguments
-                      (weblocks::alist->plist (weblocks.request:request-parameters))))
+                      (weblocks::alist->plist (weblocks.request:get-parameters))))
 
                 (when action-name
                   (when (weblocks::pure-request-p)
@@ -395,7 +395,7 @@ association list. This function is normally called by
               (when (and (not (weblocks.request:ajax-request-p))
                          (weblocks.request:request-parameter weblocks.variables:*action-string*))
                 (weblocks::redirect (remove-action-from-uri
-                                     (weblocks.request:request-uri))))
+                                     (weblocks.request:get-path :with-params t))))
 
               (weblocks::timing "rendering (w/ hooks)"
                 (weblocks.hooks:with-hook (:render)

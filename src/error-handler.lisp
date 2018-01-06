@@ -26,8 +26,8 @@
                    (:td 
                     "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
                     " running on " (esc (format nil "~A:~A"
-                                                (weblocks.request:request-server-name)
-                                                (weblocks.request:request-server-port))))))))))
+                                                (weblocks.request:get-host)
+                                                (weblocks.request:get-port))))))))))
 
 (deftemplate :error-page-html-wt 'error-page-html-wt)
 

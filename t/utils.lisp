@@ -32,7 +32,7 @@
             (weblocks::*current-webapp* (make-instance 'test-app))
             (weblocks::*uri-tokens*
               (make-instance 'weblocks::uri-tokens
-                             :tokens (weblocks::tokenize-uri (weblocks.request:request-uri)))))
+                             :tokens (weblocks::tokenize-uri (weblocks.request:get-path)))))
        ,@body)))
 
 

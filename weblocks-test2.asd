@@ -29,6 +29,7 @@
                  (:test-file "hooks")
                  (:test-file "weblocks")
                  (:test-file "actions")
-                 (:test-file "request")))))
+                 (:test-file "request")
+                 (:test-file "response")))))
 
 

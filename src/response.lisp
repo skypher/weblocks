@@ -6,7 +6,8 @@
    #:abort-processing
    #:add-header
    #:*headers*
-   #:send-script))
+   #:send-script
+   #:make-uri))
 (in-package weblocks.response)
 
 
@@ -43,6 +44,21 @@ returning response. To change content type, set *content-type*.")
            (type string value))
   (push value *headers*)
   (push name *headers*))
+
+
+(defun make-uri (new-path)
+  "Makes a new URL, based on the current request's URL.
+
+   If new-path can be absolute, like /logout or relative,
+   like ./stories.
+
+   Also, it can contain a query params like /login?code=100500"
+  (let* ((base (weblocks.request:get-uri))
+         (parsed-base (quri:uri base))
+         (parsed-new-path (quri:uri new-path))
+         (new-url (quri:merge-uris parsed-new-path
+                                   parsed-base)))
+    (quri:render-uri new-url)))
 
 
 (defun abort-processing (content &key (content-type nil content-type-given)

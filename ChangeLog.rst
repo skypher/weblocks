@@ -2,7 +2,40 @@
  ChangeLog
 ===========
 
-0.21.0 (2017-01-01)
+0.22.0 (2018-01-06)
+===================
+
+Most functions from ``weblocks.request`` were refactored and renamed:
+
+* ``request-parameters`` -> ``get-parameters``;
+* ``request-parameter`` -> ``get-parameter``;
+* ``request-header`` -> ``get-header``;
+* ``remove-request-header`` -> ``remove-header``;
+* ``request-server-name`` -> ``get-host``;
+* ``request-server-port`` -> ``get-port``;
+* ``request-uri`` -> ``get-uri`` (and now it returns full URI with
+  scheme, host and port;
+* ``request-path-info`` -> ``get-path`` (and now it has keyword argument
+  ``with-params`` to copy behaviour of old ``request-uri`` and return
+  strings like ``/some/path?with=parameters``;
+* ``request-method`` -> ``get-method``.
+
+All these function now accept keyword argument ``:request``. Previously
+it was ``&optional``.
+
+Another change is a new function ``weblocks.response:make-uri``. It can
+be used to build new uri, based on the uri of the current request. This
+can be useful when embedding links into emails, for example.
+
+.. warning:: These changes require a newer version of Lack.
+
+   I've made a pull request https://github.com/fukamachi/lack/pull/31
+   it is not merged yet, so, alternative version of Lack can be used, by
+   installing it using Qlot, from here:
+
+   https://github.com/40ants/lack
+
+0.21.0 (2018-01-01)
 ===================
 
 * Macro ``weblocks.session:get-value`` was replaced with a regular

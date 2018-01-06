@@ -2,17 +2,18 @@
   (:use #:cl)
   (:export
    #:*request*
-   #:request-parameters
-   #:request-parameter
-   #:request-header
+   #:get-parameters
+   #:get-parameter
+   #:get-header
    #:ajax-request-p
-   #:request-server-name
-   #:request-server-port
-   #:request-uri
-   #:request-method
-   #:request-path-info
+   #:get-host
+   #:get-port
+   #:get-uri
+   #:get-method
    #:refresh-request-p
-   #:remove-request-header))
+   #:remove-header
+   #:get-uri
+   #:get-path))
 (in-package weblocks.request)
 
 
@@ -24,53 +25,68 @@
   "For debugging")
 
 
-(defun request-uri (&optional (request *request*))
-  "For URL http://example.com/foo/bar?blah=minor returns
-/foo/bar?blah=minor path of the request's URL."
-  (lack.request:request-uri request))
+(defun get-uri (&key (request *request*))
+  "For URL http://example.com/foo/bar?blah=minor returns it as is."
+  (let ((host (get-host :request request))
+        (port (get-port :request request))
+        (scheme (lack.request:request-uri-scheme request))
+        (path (get-path :request request))
+        (query (lack.request:request-query-string request)))
+    (quri:render-uri (quri:make-uri :scheme scheme
+                                    :host host
+                                    :port port
+                                    :path path
+                                    :query query))))
 
 
-(defun request-path-info (&optional (request *request*))
+(defun get-path (&key (request *request*) with-params)
   "For URL http://example.com/foo/bar?blah=minor returns
 /foo/bar path of the request's URL."
-  (lack.request:request-path-info request))
+  (if with-params
+      ;; request-uri returns path-info + GET params
+      (lack.request:request-uri request)
+      ;; Otherwice, return only a path
+      (lack.request:request-path-info request)))
 
-
-(defun request-host (&optional (request *request*))
+(defun get-path (&key (request *request*) with-params)
   "For URL http://example.com/foo/bar?blah=minor returns
 /foo/bar path of the request's URL."
-  (lack.request:request-path-info request))
+  (if with-params
+      ;; request-uri returns path-info + GET params
+      (lack.request:request-uri request)
+      ;; Otherwice, return only a path
+      (lack.request:request-path-info request)))
 
 
-(defun request-server-name (&optional (request *request*))
+(defun get-host (&key (request *request*))
   (lack.request:request-server-name request))
 
 
-(defun request-server-port (&optional (request *request*))
+(defun get-port (&key (request *request*))
   (lack.request:request-server-port request))
 
 
-(defun request-method (&key (request *request*))
+(defun get-method (&key (request *request*))
   "Returns association list with GET or POST parameters for current request."
   (lack.request:request-method request))
 
 
-(defun request-parameters (&key (request *request*))
+(defun get-parameters (&key (request *request*))
   "Returns association list with GET or POST parameters for current request."
   (lack.request:request-parameters request))
 
 
-(defun request-parameter (name &key (request *request*))
+(defun get-parameter (name &key (request *request*))
   "Returns GET or POST parameter by name."
   (declare (type string name))
 
-  (let ((params (request-parameters :request request)))
+  (let ((params (get-parameters :request request)))
     (alexandria:assoc-value params
                             name
                             :test #'equal)))
 
 
-(defun request-header (name &key (request *request*))
+(defun get-header (name &key (request *request*))
   "Returns value of the HTTP header or nil. Name is case insensitive."
   (let ((headers (lack.request:request-headers request))
         (lowercased-name (string-downcase name)))
@@ -78,7 +94,7 @@
              headers)))
 
 
-(defun remove-request-header (name &key (request *request*))
+(defun remove-header (name &key (request *request*))
   "Removes a HTTP header by name, returns new instance of request
 without given header."
   
@@ -96,7 +112,7 @@ without given header."
     new-request))
 
 
-(defun ajax-request-p (&optional (request *request*))
+(defun ajax-request-p (&key (request *request*))
   "Detects if the current request was initiated via AJAX by looking
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
@@ -104,7 +120,7 @@ in a dynamic hunchentoot environment."
   ;; to update an instance of the widgets in asyncrounous code and to send
   ;; it via websocket.
   (and request
-       (equal (request-header "X-Requested-With" :request request)
+       (equal (get-header "X-Requested-With" :request request)
               "XMLHttpRequest")))
 
 
