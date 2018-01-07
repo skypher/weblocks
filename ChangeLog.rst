@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.22.2 (2018-01-07)
+===================
+
+* Class ``weblocks.widget:widget`` was exported, to make possible to
+  define widgets based on it and some mixins.
+
 0.22.1 (2018-01-07)
 ===================
 

@@ -9,7 +9,8 @@
    #:get-html-tag
    #:render-widget
    #:mark-dirty
-   #:update))
+   #:update
+   #:widget))
 (in-package weblocks.widget)
 
 
