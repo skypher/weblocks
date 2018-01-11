@@ -2,6 +2,13 @@
  ChangeLog
 ===========
 
+0.23.0 (2018-01-11)
+===================
+
+* Symbol ``weblocks.routes:*routes*`` is not external anymore.
+  Use ``weblocks.routes:add-route`` and ``weblocks.routes:get-route``
+  to add new routes and to search a route matched on a path.
+
 0.22.2 (2018-01-07)
 ===================
 

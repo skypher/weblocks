@@ -60,7 +60,7 @@ Automatically adds a prefix depending on current webapp and widget."
 
   (let ((route (make-instance 'websocket-route
                               :template (routes:parse-template uri))))
-    (routes:connect weblocks.routes:*routes* route)))
+    (weblocks.routes:add-route route)))
 
 
 (weblocks:defwidget websocket-widget ()

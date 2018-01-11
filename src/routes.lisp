@@ -3,11 +3,11 @@
   (:import-from #:routes
                 #:route)
   (:export
-   #:connect
+   #:add-route
    #:route
-   #:*routes*
    #:reset-routes
-   #:serve))
+   #:serve
+   #:get-route))
 (in-package weblocks.routes)
 
 
@@ -15,7 +15,16 @@
   "We will store mapping from URL to dependency here.")
 
 
-(defun connect (route)
+(defun get-route (path)
+  "Returns a route, matched on given path.
+   If none matched, then returns nil.
+ 
+   Path should be a string."
+  (check-type path string)
+  (routes:match *routes* path))
+
+
+(defun add-route (route)
   "Inserts a new route into the routing table."
   (unless (routes:match *routes* route)
     (routes:connect *routes* route)))

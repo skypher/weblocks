@@ -482,7 +482,7 @@ For local-dependency it is :local."
   (dolist (dependency dependencies)
     (let ((route (get-route dependency)))
       (when route
-        (weblocks.routes:connect route)))))
+        (weblocks.routes:add-route route)))))
 
 
 (defclass dependency-route (routes:route)

@@ -88,7 +88,7 @@ This function serves all started applications and their static files."
 
           (let* ((path-info (getf env :path-info))
                  (hostname (getf env :server-name))
-                 (route (routes:match weblocks.routes:*routes* path-info)))
+                 (route (weblocks.routes:get-route path-info)))
 
             ;; If dependency found, then return it's content along with content-type
             (when route
@@ -314,4 +314,4 @@ declared AUTOSTART."
                                :template (routes:parse-template uri)
                                :path path
                                :content-type content-type)))
-    (routes:connect weblocks.routes:*routes* route)))
+    (weblocks.routes:add-route route)))
