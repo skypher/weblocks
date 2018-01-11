@@ -70,7 +70,7 @@ bound to this variable by `prepare-hooks' macro.")
               (gethash hook-name hooks-hash)))))
 
 
-
+;; TODO: Add (declare...) processing for body
 (eval-when  (:compile-toplevel :load-toplevel :execute)
   (defun add-hook-helper (hook-storage hook-name callback-name args body)
     `(flet ((,callback-name (next-hooks ,@args)
