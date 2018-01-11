@@ -59,15 +59,6 @@ Make instance, then start it with ``start`` method."
                  :server-type server-type))
 
 
-;; (let ((dependency (weblocks.dependencies:make-static-css-dependency "/tmp/bar.css")))
-;;   (routes:connect *routes* (weblocks.dependencies:get-route dependency)))
-
-
-;; (alexandria:read-file-into-string
-;;  "/Users/art/common-lisp/weblocks-twitter-bootstrap-application/twitter-bootstrap.css")
-
-
-
 (defmethod handle-request ((server server) env)
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
