@@ -8,6 +8,10 @@
 * Symbol ``weblocks.routes:*routes*`` is not external anymore.
   Use ``weblocks.routes:add-route`` and ``weblocks.routes:get-route``
   to add new routes and to search a route matched on a path.
+* Fixed getting the rendered widgets in ``weblocks.widget:update``
+  method when making ``:update-widget`` or ``:insert-widget (before)``
+  commands.
+
 
 0.22.2 (2018-01-07)
 ===================

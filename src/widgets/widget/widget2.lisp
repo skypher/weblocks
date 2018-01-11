@@ -182,10 +182,12 @@ propagation code."))
                      :after (weblocks:dom-id inserted-after)))
     (inserted-before (weblocks.actions:add-command
                       :insert-widget
-                      :widget (render w)
+                      :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
+                                (render w))
                       :before (weblocks:dom-id inserted-before)))
     (t (weblocks.actions:add-command
         :update-widget
         :dom-id (weblocks:dom-id w)
-        :widget (render w)))))
+        :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
+                  (render w))))))
 
