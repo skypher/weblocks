@@ -11,7 +11,8 @@
 * Fixed getting the rendered widgets in ``weblocks.widget:update``
   method when making ``:update-widget`` or ``:insert-widget (before)``
   commands.
-
+* Temporary added method ``weblocks::child-of-p`` for new type of
+  widget. This should fix some issues, with widgets updating.
 
 0.22.2 (2018-01-07)
 ===================

@@ -67,6 +67,7 @@ inherits from 'widget' if no direct superclasses are provided."
                         class-name))))))
 
 
+;; TODO: REPLACE THIS with render :around
 (defun render-widget (widget)
   "This function is intended for internal usage only.
    It renders widget with surrounding HTML tag and attributes."
@@ -100,6 +101,12 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; TODO: remove this too
 (defmethod weblocks::walk-widget-tree (obj fn &optional depth)
   (declare (ignorable obj fn depth)))
+
+;; TODO: may be remove or may be in the weblocks.widget
+(defmethod weblocks::child-of-p ((parent widget) (child t))
+  nil)
+(defmethod weblocks::child-of-p ((parent t) (child widget))
+  nil)
 
 
 (defgeneric get-html-tag (widget)
