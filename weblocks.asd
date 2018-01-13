@@ -9,7 +9,7 @@
 (defsystem weblocks
   :name "weblocks"
   :version (:read-file-form "version.lisp-expr")
-  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
+  :maintainer "Alexander Artemenko, Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A Common Lisp web framework."
@@ -22,11 +22,6 @@
    :local-time
    :local-time-duration
    :dexador ;; to retrive remote dependencies and put them into the cache
-   ;;   :weblocks-util
-
-   ;; TODO: remove this dependency and reverse it
-   ;;:weblocks-stores
-   
    :closer-mop
    :puri
    :cl-json
@@ -56,102 +51,42 @@
                              (:file "package")
                              (:module utils
                               :components ((:file "clos")
-                                           (:file "misc"
-                                                  ;;                                            :depends-on ;; (
-                                                  ;;  ;; utils/misc stores unique ids in a session
-                                                  ;;  "repl"
-                                                  ;;  ;;  "session"
-                                                  ;;  )
-                                                  )
+                                           (:file "misc")
                                            (:file "runtime-class")
                                            (:file "string")
                                            (:file "list")
                                            (:file "uri")
                                            (:file "html-parts")
-                                           ;; (:file "templates")
-                                           ;; (:file "html")
-                                           ;; (:file "menu"
-                                           ;;        ;;                                            :depends-on ;; ("html")
-                                           ;;        )
-                                           ;; (:file "suggest")
                                            (:file "timing")
-                                           ;; (:file "repl")
                                            )
-                                      ;;                              :depends-on ;; ("session"
-                                      ;;  "weblocks"
-                                      ;;  )
                                       )
                              (:file "variables")
                              (:file "html")
                              (:file "session")
-                             (:file "hooks"
-                                    ;;                              :depends-on ;; ("weblocks" "debug-mode")
-                                    )
+                             (:file "hooks")
                              (:file "debug")
-                             (:file "weblocks"
-                                    ;; :depends-on ("session"
-                                    ;;              "package")
-                                    )
+                             (:file "weblocks")
                              (:file "request2")
 
-                             (:file "versioning"
-                                    ;;                              :depends-on ;; ("weblocks" "session" utils)
-                                    )
-                             (:file "bundling"
-                                    ;;                              :depends-on ;; ("weblocks" "session" utils)
-                                    )
+                             (:file "versioning")
+                             (:file "bundling")
                              (:file "actions")
                              (:file "actions2")
                              (:file "response")
-                             (:file "dependencies"
-                                    ;;                              :depends-on ;; ("weblocks" "server" "bundling" "versioning" "session" utils)
-                                    )
+                             (:file "dependencies")
                              (:file "routes")
-                             (:file "dependencies2"
-                                    ;;                              :depends-on ;; ("weblocks"
-                                    ;;  "bundling"
-                                    ;;  "versioning"
-                                    ;;  "session"
-                                    ;;  utils
-                                    ;;  "routes")
-                                    )
-                             (:file "dom-object"
-                                    ;;                              :depends-on ;; ("weblocks" "session" utils)
-                                    )
-                             (:file "application-mop"
-                                    ;;:depends-on ;; ("weblocks" "server")
-                                    )
+                             (:file "dependencies2")
+                             (:file "dom-object")
+                             (:file "application-mop")
                              (:module "js-backend"
                               :components ((:file "base")
                                            (:file "jquery")))
-                             (:file "application"
-                                    ;;:depends-on ;; ("weblocks"
-                                    ;;  "application-mop")
-                                    )
-                             (:file page)
-                             ;; (:file "page-template"
-                             ;;        ;;                              :depends-on ;; ("weblocks" "session" utils "application")
-                             ;;        )
-                             (:file "log-actions"
-                                    ;;                              :depends-on ;; ("weblocks")
-                                    )
-                             (:file "debug-mode"
-                                    ;;                              :depends-on ;; ("weblocks" "actions")
-                                    )
-                             (:file "uri-tokens"
-                                    ;;                              :depends-on ;; ("weblocks")
-                                    )
-                             ;;                             (:file "response2")
-                             ;; (:file "request-handler"
-                             ;; ;;                              :depends-on ;; ("session"
-                             ;;                                           ;;  utils "weblocks" "page-template" "debug-mode"
-                             ;;                                           ;;  "actions" "request-hooks" "application"
-                             ;;                                           ;;  "request" "dependencies" "uri-tokens"
-                             ;;                                           ;;  "error-handler")
-                             ;;                               )
-                             (:file "session-lock"
-                                    ;;                              :depends-on ;; ("session")
-                                    )
+                             (:file "application")
+                             (:file "page")
+                             (:file "log-actions")
+                             (:file "debug-mode")
+                             (:file "uri-tokens")
+                             (:file "session-lock")
                              (:module widgets
                               :components ((:module widget
                                             :components ((:file "widget-mop")
@@ -159,223 +94,19 @@
                                                          (:file "widget")
                                                          (:file "widget2")
                                                          (:file "string-widget")
-                                                         (:file "funcall-widget")))
-                                           ;; (:file "composite"
-                                           ;;        ;;                                            :depends-on ;; (widget)
-                                           ;;        )
-                                           ;; (:file "flash"
-                                           ;;        ;;                                            :depends-on ;; (widget)
-                                           ;;        )
-                                           ;; (:file "data-editor"
-                                           ;;        ;;                                            :depends-on ;; (widget)
-                                           ;;        )
-                                           ;; (:file "dataform"
-                                           ;;        ;;depends-on ;; (widget "data-editor")
-                                           ;;        )
-                                           ;; (:file "quickform"
-                                           ;;        ;;:depends-on ;; (widget "dataform")
-                                           ;;        )
-                                           ;; depends on form view
-                                           ;; (:file "simpleform"
-                                           ;;  ;;:depends-on ;; (widget "quickform")
-                                           ;;        )
-                                           ;; depends on form view
-                                           ;; (:file "wizard"
-                                           ;;  ;;:depends-on ;; (widget "dataform")
-                                           ;;        )
-                                           (:file "template-block"
-                                                  ;;:depends-on ;; (widget)
-                                                  )
-                                           ;; defined in 
-                                           ;; (:file "login"
-                                           ;;  ;;:depends-on ;; (widget "quickform")
-                                           ;;        )
-                                           ;; (:module dataseq
-                                           ;;  :components ((:file "dataseq")
-                                           ;;               #-cmu (:file "operations-action"))
-                                           ;;          ;;:depends-on ;; (widget "flash")
-                                           ;;          )
-                                           ;; depends on WEBLOCKS::TABLE-VIEW-FIELD
-                                           ;; (:module datagrid
-                                           ;;  :components ((:file "datagrid")
-                                           ;;               (:file "sort"
-                                           ;;                ;;:depends-on ;; ("datagrid")
-                                           ;;                      )
-                                           ;;               (:file "select"
-                                           ;;                ;;:depends-on ;; ("datagrid")
-                                           ;;                      )
-                                           ;;               (:file "drilldown"
-                                           ;;                ;;:depends-on ;; ("datagrid")
-                                           ;;                      ))
-                                           ;;  ;;:depends-on ;; (widget "dataseq")
-                                           ;;          )
-                                           ;; (:module dataedit
-                                           ;;  :components ((:file "dataedit"
-                                           ;;                      ;;:depends-on ;; (#-cmu "delete-action")
-                                           ;;                      )
-                                           ;;               #-cmu (:file "delete-action"))
-                                           ;;          ;;:depends-on ;; (widget dataseq)
-                                           ;;          )
-                                           ;; (:file "gridedit"
-                                           ;;  ;;:depends-on ;; (datagrid dataedit "dataform")
-                                           ;;        )
-                                           ;; (:file "listedit"
-                                           ;;  ;;:depends-on ;; (datalist dataedit "dataform" "quickform")
-                                           ;;        )
-                                           ;; (:file "datalist"
-                                           ;;  ;;:depends-on ;; (widget "dataseq")
-                                           ;;        )
-                                           ;; (:file "pagination"
-                                           ;;  ;;:depends-on ;; (widget "flash")
-                                           ;;        )
-                                           ;; (:file "selector"
-                                           ;;  ;;:depends-on ;; (widget)
-                                           ;;        )
-                                           ;; (:file "on-demand-selector"
-                                           ;;  ;;:depends-on ;; ("selector")
-                                           ;;        )
-                                           ;; (:file "navigation"
-                                           ;;  ;;:depends-on ;; ("selector" widget)
-                                           ;;        )
-                                           ;; (:file "breadcrumbs"
-                                           ;;  ;;:depends-on ;; ("navigation")
-                                           ;;        )
-                                           )
-                                      ;;:depends-on ;; (views "session" utils "dependencies" "actions" "server" "request"
-                                      ;;        "request-hooks" "dom-object" linguistic "widget-translation")
-                                      )
-                             ;; (:file "error-handler")
+                                                         (:file "funcall-widget")))))
                              (:file "error-handler2")
                              (:file "request-handler2")
                              (:module linguistic
-                              :components ((:file "grammar"))
-                                      ;;                              :depends-on ;; ("weblocks" "session" utils)
-                                      )
-                             ;; (:module views
-                             ;;                               :components ((:module view
-                             ;;                                             :components ((:file "view")
-                             ;;                                                          (:file "utils"
-                             ;; ;;                                                          :depends-on ;; ("view")
-                             ;;                                                                 )
-                             ;;                                                          (:file "compiler"
-                             ;; ;;                                                          :depends-on ;; ("view")
-                             ;;                                                                 )
-                             ;;                                                          (:file "scaffold"
-                             ;; ;;                                                          :depends-on ;; ("view" "utils")
-                             ;;                                                                 )
-                             ;;                                                          (:file "presentation"
-                             ;; ;;                                                          :depends-on ;; ("view" "compiler")
-                             ;;                                                                 )))
-                             ;;                                            (:file "dataview"
-                             ;; ;;                                            :depends-on ;; (view)
-                             ;;                                                   )
-                             ;;                                            (:module formview
-                             ;;                                             :components ((:file "formview")
-                             ;;                                                          (:file "helpers")
-                             ;;                                                          (:file "parser"
-                             ;; ;;                                                          :depends-on ;; ("formview")
-                             ;;                                                                 )
-                             ;;                                                          (:file "scaffold"
-                             ;; ;;                                                          :depends-on ;; ("formview" "parser")
-                             ;;                                                                 )
-                             ;;                                                          (:file "validation"
-                             ;; ;;                                                          :depends-on ;; ("formview")
-                             ;;                                                                 )
-                             ;;                                                          (:file "request-deserialization"
-                             ;; ;;                                                          :depends-on ;; ("formview" "parser"
-                             ;;                                                                       ;;             "validation")
-                             ;;                                                                 )
-                             ;;                                                          (:file "template-form-view"
-                             ;;                                                           ;;:depends-on ;; ("formview")
-                             ;;                                                                 ))
-                             ;; ;;                                            :depends-on ;; (view)
-                             ;;                                                     )
-                             ;;                                            (:file "sequence-view"
-                             ;; ;;                                            :depends-on ;; (view)
-                             ;;                                                   )
-                             ;;                                            (:file "tableview"
-                             ;; ;;                                            :depends-on ;; (view dataview "sequence-view")
-                             ;;                                                   )
-                             ;;                                            (:module
-                             ;;                                             types
-                             ;;                                             :components ((:file "file-upload")
-                             ;;                                                          (:file "us-states")
-                             ;;                                                          (:file "boolean")
-                             ;;                                                          (:file "member"
-                             ;; ;;                                                          :depends-on ;; (presentations parsers)
-                             ;;                                                                 )
-                             ;;                                                          (:file "password")
-                             ;;                                                          (:module
-                             ;;                                                           presentations
-                             ;;                                                           :components ((:file "hidden")
-                             ;;                                                                        (:file "choices")
-                             ;;                                                                        (:file "date")
-                             ;;                                                                        (:file "radio"
-                             ;; ;;                                                                        :depends-on ;; ("choices")
-                             ;;                                                                               )
-                             ;;                                                                        (:file "dropdown"
-                             ;; ;;                                                                        :depends-on ;; ("choices")
-                             ;;                                                                               )
-                             ;;                                                                        (:file "textarea")
-                             ;;                                                                        (:file "paragraph")
-                             ;;                                                                        (:file "excerpt")
-                             ;;                                                                        (:file "image")
-                             ;;                                                                        (:file "checkboxes")
-                             ;;                                                                        (:file "url")
-                             ;;                                                                        (:file "html")
-                             ;;                                                                        (:file "widget")))
-                             ;;                                                          (:module
-                             ;;                                                           parsers
-                             ;;                                                           :components ((:file "common"))))
-                             ;; ;;                                            :depends-on ;; (view formview dataview)
-                             ;;                                             ))
-                             ;; ;;                              :depends-on ;; ("weblocks"
-                             ;;                                           ;;  "dependencies"
-                             ;;                                           ;;  "dependencies2"
-                             ;;                                           ;;  "session"
-                             ;;                                           ;;  utils
-                             ;;                                           ;;  "widget-translation")
-                             ;;                               )
-
+                              :components ((:file "grammar")))
                              (:module control-flow
                               :components ((:file "call-answer")
-                                           (:file "dialog"
-                                                  ;;:depends-on ;; ("call-answer")
-                                                  )
-                                           (:file "workflow"
-                                                  ;;:depends-on ;; ("call-answer")
-                                                  ))
-                                      ;;:depends-on ;; ("weblocks" "widgets" "request-handler")
-                                      )
-                             ;; Removed because it was used specially for Hunchentoot
-                             ;; and dont needed anymore after migration to Woo.
-                             ;; (:file "acceptor"
-                             ;;  ;;:depends-on ;; ("weblocks")
-                             ;;  )
-                             (:file "server"
-                                    ;;:depends-on ;; ("weblocks" "acceptor" "debug-mode" "session" utils)
-                                    )
-                             ;; (:file "websocket")
-                             (:file "server2"
-                                    ;;:depends-on ;; ("weblocks"
-                                    ;;  "acceptor"
-                                    ;;  "session"
-                                    ;;  utils
-                                    ;;  "routes"
-                                    ;;  "request-handler2"
-                                    ;;  "dependencies2")
-                                    )
-                             (:file "request"
-                                    ;;:depends-on ;; ("weblocks" "request-hooks" "actions")
-                                    )
-                             (:file "default-application"
-                                    ;;:depends-on ;; ("server"
-                                    ;;  "weblocks"
-                                    ;;  "session"
-                                    ;;  utils
-                                    ;;  "request-handler"
-                                    ;;  "request-handler2")
-                                    )
+                                           (:file "dialog")
+                                           (:file "workflow")))
+                             (:file "server")
+                             (:file "server2")
+                             (:file "request")
+                             (:file "default-application")
                              (:file "widget-translation"))))
   ;;  :in-order-to ;; ((test-op (load-op "weblocks-test"))
   ;;  (doc-op (load-op "weblocks-scripts"))
