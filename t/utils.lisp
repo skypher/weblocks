@@ -37,11 +37,10 @@
 
 
 (defmacro is-html (form expected &optional message)
-  `(let ((result (with-output-to-string
-                     (weblocks:*weblocks-output-stream*)
+  `(let ((result (weblocks.html:with-html-string
                    ,form)))
      (prove:like result ,expected
-               ,message)))
+                 ,message)))
 
 
 (defmacro catch-hooks ((&rest hook-names) &body body)

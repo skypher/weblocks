@@ -83,14 +83,13 @@ inherits from 'widget' if no direct superclasses are provided."
       (mapc #'weblocks.dependencies:render-in-ajax-response
             widget-dependencies)))
   
-  (let ((spinneret:*html* weblocks:*weblocks-output-stream*))
-    (with-html
-      (:tag
-       :name (get-html-tag widget)
-       :class (get-css-classes-as-string widget)
-       :id (weblocks::dom-id widget)
-       (progn (render widget)
-              nil)))))
+  (weblocks.html:with-html
+    (:tag
+     :name (get-html-tag widget)
+     :class (get-css-classes-as-string widget)
+     :id (weblocks::dom-id widget)
+     (progn (render widget)
+            nil))))
 
 
 ;; TODO: remove this completely with old widget code
@@ -184,17 +183,17 @@ propagation code."))
      (error "Arguments inserted-after and inserted-before can't be used together."))
     (inserted-after (weblocks.actions:add-command
                      :insert-widget
-                     :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
+                     :widget (weblocks.html:with-html-string
                                (render-widget w))
                      :after (weblocks:dom-id inserted-after)))
     (inserted-before (weblocks.actions:add-command
                       :insert-widget
-                      :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
-                                (render w))
+                      :widget (weblocks.html:with-html-string
+                                (render-widget w))
                       :before (weblocks:dom-id inserted-before)))
     (t (weblocks.actions:add-command
         :update-widget
         :dom-id (weblocks:dom-id w)
-        :widget (with-output-to-string (weblocks:*weblocks-output-stream*)
-                  (render w))))))
+        :widget (weblocks.html:with-html-string
+                  (render-widget w))))))
 

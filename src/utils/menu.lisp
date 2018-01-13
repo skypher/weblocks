@@ -32,10 +32,10 @@
              (htm (:ul (str menu-content))))))))
 
 (defun render-menu (options &key selected-pane header (container-id (weblocks.session:gen-id)) (base "")
-                    ordered-list-p (empty-message *menu-empty-message*)
-                    disabled-pane-names 
-                    (menu-template #'render-menu-wt)
-                    (item-template #'render-menu-item-wt))
+                              ordered-list-p (empty-message *menu-empty-message*)
+                              disabled-pane-names 
+                              (menu-template #'render-menu-wt)
+                              (item-template #'render-menu-item-wt))
   "Renders a menu snippet based on given options and selected
 option. An option may be a dotted pair of a label and \(URL to link to
 or function to call on the item's label and selection state \(a boolean)),
@@ -69,35 +69,34 @@ the navigation as disabled."
                                                    (pane-selected-p "selected-item")
                                                    (pane-disabled-p "disabled-item"))))
                                 (if (functionp label)
-                                  (capture-weblocks-output (funcall label))
-                                  (funcall 
-                                    item-template
-                                    :item-id (unattributized-name (format nil "~A-~A" container-id label)
-                                                                  'menu-item)
-                                    :pane-class pane-class
-                                    :span-class (concatenate 'string
-                                                             "item-wrapper"
-                                                             (when ordered-list-p
-                                                               (format nil " item-number-~A" item-number)))
-                                    :target-is-function (functionp target)
-                                    :pane-selected-or-disabled (or pane-selected-p pane-disabled-p)
-                                    :item-href (when (and (stringp target) (not (or pane-selected-p pane-disabled-p)))
-                                                 (concatenate 'string
-                                                              (string-right-trim "/" base)
-                                                              "/"
-                                                              (string-left-trim "/" target)))
-                                    :content (etypecase target
-                                               (string label)
-                                               (function
+                                    (capture-weblocks-output (funcall label))
+                                    (funcall 
+                                     item-template
+                                     :item-id (unattributized-name (format nil "~A-~A" container-id label)
+                                                                   'menu-item)
+                                     :pane-class pane-class
+                                     :span-class (concatenate 'string
+                                                              "item-wrapper"
+                                                              (when ordered-list-p
+                                                                (format nil " item-number-~A" item-number)))
+                                     :target-is-function (functionp target)
+                                     :pane-selected-or-disabled (or pane-selected-p pane-disabled-p)
+                                     :item-href (when (and (stringp target) (not (or pane-selected-p pane-disabled-p)))
+                                                  (concatenate 'string
+                                                               (string-right-trim "/" base)
+                                                               "/"
+                                                               (string-left-trim "/" target)))
+                                     :content (etypecase target
+                                                (string label)
+                                                (function
                                                  (capture-weblocks-output 
                                                    (funcall target label pane-selected-p))))))))))))
-    (write-string 
-      (funcall menu-template 
-               :menu-id (unattributized-name container-id 'menu)
-               :menu-header header 
-               :menu-empty-p (null options)
-               :menu-empty-message empty-message
-               :menu-ordered-list-p ordered-list-p
-               :menu-content items-content)
-      *weblocks-output-stream* )))
+    (weblocks.html:with-html
+      (:raw (funcall menu-template 
+                     :menu-id (unattributized-name container-id 'menu)
+                     :menu-header header 
+                     :menu-empty-p (null options)
+                     :menu-empty-message empty-message
+                     :menu-ordered-list-p ordered-list-p
+                     :menu-content items-content)))))
 

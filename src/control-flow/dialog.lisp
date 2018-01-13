@@ -21,7 +21,9 @@ of type 'dialog'."
      :onmouseover "this.style.cursor = \"pointer\";"
      :style "cursor: expression(\"hand\");")))
 
-(deftemplate :dialog-js-wt 'dialog-js-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :dialog-js-wt 'dialog-js-wt)
 
 (defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
@@ -38,10 +40,8 @@ the widget inside."
                :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
                :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
          (widget-html (widget)
-           (let ((*weblocks-output-stream* (make-string-output-stream)))
-             (declare (special *weblocks-output-stream*))
-             (render-widget widget)
-             (get-output-stream-string *weblocks-output-stream*))))
+           (weblocks.html:with-html-string
+             (render-widget widget))))
     ;(format t "widget-html: ~S~%" (widget-html widget))
     (let ((inner (intern (string-upcase (weblocks.session:gen-id "inner"))))
           (close-action (intern (string-upcase (weblocks.session:gen-id "close")))))
@@ -96,7 +96,9 @@ scales down to 'do-modal' instead."
     (:p (str message))
     (str content)))
 
-(deftemplate :choices-get-wt 'choices-get-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :choices-get-wt 'choices-get-wt)
 
 (defun render-choices-get (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
@@ -120,7 +122,9 @@ scales down to 'do-modal' instead."
     (:p (str message)) 
     (str content)))
 
-(deftemplate :choices-post-wt 'choices-post-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :choices-post-wt 'choices-post-wt)
 
 (defun render-choices-post (msg choices k &rest args)
   "Renders the contents of a choice dialog with choices displayed as

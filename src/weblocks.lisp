@@ -6,8 +6,7 @@
 (do-external-symbols (s (find-package :cont))
   (export (list s)))
 
-(export '(*weblocks-output-stream* with-html with-html-to-string
-          reset-sessions str with-javascript with-javascript-to-string root-widget))
+(export '(reset-sessions str with-javascript with-javascript-to-string root-widget))
 
 (defun wexport (symbols-designator &optional (package-specs t))
   "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',
@@ -28,11 +27,6 @@ case, the symbols will be imported first if need be."
         (import symbols-designator pkg))
       (export symbols-designator pkg))))
 
-(defparameter *weblocks-output-stream* nil
-  "Output stream for Weblocks framework created for each request
-and available to code executed within a request as a special
-variable. All html should be rendered to this stream.")
-
 (defvar *dirty-widgets* "Top-level value. Causes widget-dirty-p to error."
   "Contains a list of dirty widgets at the current point in rendering
   cycle. This is a special variable modified by the actions that
@@ -45,49 +39,16 @@ variable. All html should be rendered to this stream.")
   "A list of running applications.  Applications are only available
    after they have been started.")
 
-(defun cl-escape-string (maybe-string)
-  "Force quoting of special characters by cl-who for with-html."
-  ;(format t "cl-escape-string: ~s~%" (describe maybe-string))
-  (cond
-    ((stringp maybe-string)
-     (cl-who:escape-string-minimal-plus-quotes maybe-string))
-    (t maybe-string)))
-
-(defmethod convert-tag-to-string-list (tag (attr-list list) body body-fn)
-  "The method convert-tag-to-string-list is a hook into cl-who's
-  output system; here we use it to automatically escape special
-  characters."
-  ;(format *standard-output* "non-cl-who tag: ~s, attr-list ~s.~%" tag attr-list)
-  (call-next-method
-    tag
-    (loop for inner-attr-list in attr-list
-        collect
-        (progn
-          (cons
-            (car inner-attr-list)
-            (cons 'cl-escape-string (list (cdr inner-attr-list))))))
-    body
-    body-fn))
-
-(defmacro with-html (&body body)
-  "A wrapper around cl-who with-html-output macro."
-  `(with-html-output (*weblocks-output-stream* nil)
-     ,@body))
-
+;; TODO: remove templates completely
 (defun render-wt (template context &rest args)
-  "Calculates effective template and renders it to *weblocks-output-stream*.  
+  "Calculates effective template and renders it to weblocks.html::*stream*.  
    Effective template is template with max priority.
    template is template name which will be rendered
    context is a plist which is used for effective template finding.
    Other arguments are used as template parameters."
   (write-string 
     (apply #'render-wt-to-string (list* template context args))
-    *weblocks-output-stream*))
-
-(defmacro with-html-to-string (&body body)
-  "A wrapper around cl-who with-html-output-to-string macro."
-  `(with-html-output-to-string (*weblocks-output-stream* nil)
-     ,@body))
+    weblocks.html::*stream*))
 
 (defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
   "Escape script blocks inside scripts."
@@ -101,19 +62,19 @@ variable. All html should be rendered to this stream.")
 (defun %js (source &rest args)
   "Helper function for WITH-JAVASCRIPT macros."
   `(:script :type "text/javascript"
-            (fmt "~%// <![CDATA[~%")
-            (str (escape-script-tags (format nil ,source ,@args)))
-            (fmt "~%// ]]>~%")))
+            (:raw "~%// <![CDATA[~%")
+            (:raw (escape-script-tags (format nil ,source ,@args)))
+            (:raw "~%// ]]>~%")))
 
 (defmacro with-javascript (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
-  `(with-html ,(apply #'%js source args)))
+  `(weblocks.html:with-html ,(apply #'%js source args)))
 
 (defmacro with-javascript-to-string (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
-  `(with-html-to-string ,(apply #'%js source args)))
+  `(weblocks.html:with-html-string ,(apply #'%js source args)))
 
 (defmacro root-widget ()
   "Expands to code that can be used as a place to access to the root

@@ -118,46 +118,48 @@ customize behavior."))
 
 
 ;; NOTE (svetlyak40wt): not sure if we need all this complexity
-(defun update-widget-tree ()
-  (let ((weblocks::*tree-update-pending* t)
-        (depth 0)
-        page-title
-        page-description
-        page-keywords)
+;; (defun update-widget-tree ()
+;;   (let ((weblocks::*tree-update-pending* t)
+;;         (depth 0)
+;;         page-title
+;;         page-description
+;;         page-keywords)
 
-    (weblocks:walk-widget-tree
-     (weblocks:root-widget)
-     (lambda (widget d)
-       (weblocks::update-widget-parameters widget
-                                           (weblocks.request:get-method)
-                                           (weblocks.request:get-parameters))
-       (weblocks:update-children widget)
-       (let ((title (weblocks:page-title widget))
-             (description (weblocks:page-description widget))
-             (keywords (weblocks:page-keywords widget))
-             (headers (weblocks:page-headers widget)))
-         (when (and (> d depth) title)
-           (setf page-title title))
-         (when (and (> d depth) description)
-           (setf page-description description))
-         (when headers
-           (setf weblocks:*current-page-headers*
-                 (append (weblocks:page-headers widget)
-                         weblocks:*current-page-headers*)))
-         (cond
-           ((and keywords weblocks:*accumulate-page-keywords*)
-            (setf page-keywords
-                  (append keywords page-keywords)))
-           ((and keywords (> d depth))
-            (setf page-keywords keywords)))
-         (when (> d depth)
-           (setf depth d)))))
-    (when page-title
-      (setf weblocks:*current-page-title* page-title))
-    (when page-description
-      (setf weblocks::*current-page-description* page-description))
-    (when page-keywords
-      (setf weblocks:*current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
+;;     (weblocks:walk-widget-tree
+;;      (weblocks:root-widget)
+;;      (lambda (widget d)
+;;        (weblocks::update-widget-parameters widget
+;;                                            (weblocks.request:get-method)
+;;                                            (weblocks.request:get-parameters))
+;;        (weblocks:update-children widget)
+;;        (let ((title (weblocks:page-title widget))
+;;              (description (weblocks:page-description widget))
+;;              (keywords (weblocks:page-keywords widget))
+;;              (headers (weblocks:page-headers widget)))
+;;          (when (and (> d depth) title)
+;;            (setf page-title title))
+;;          (when (and (> d depth) description)
+;;            (setf page-description description))
+;;          ;; TODO: remove?
+;;          ;; Not sure if we need this
+;;          ;; (when headers
+;;          ;;   (setf weblocks:*current-page-headers*
+;;          ;;         (append (weblocks:page-headers widget)
+;;          ;;                 weblocks:*current-page-headers*)))
+;;          (cond
+;;            ((and keywords weblocks:*accumulate-page-keywords*)
+;;             (setf page-keywords
+;;                   (append keywords page-keywords)))
+;;            ((and keywords (> d depth))
+;;             (setf page-keywords keywords)))
+;;          (when (> d depth)
+;;            (setf depth d)))))
+;;     (when page-title
+;;       (setf weblocks:*current-page-title* page-title))
+;;     (when page-description
+;;       (setf weblocks::*current-page-description* page-description))
+;;     (when page-keywords
+;;       (setf weblocks:*current-page-keywords* (remove-duplicates page-keywords :test #'equalp)))))
 
 
 (defun update-location-hash-dependents ()
@@ -207,15 +209,17 @@ association list. This function is normally called by
              (render-enqueued (dirty)
                "Returns a plist of dirty widgets where keys are their
                 dom ids."
-               (loop for w in dirty
+               (loop with widget-html = nil
+                     for w in dirty
                      if (gethash w render-state)
                        do (circularity-warn w)
                      else
-                       do (weblocks::render-widget w)
+                       do (setf widget-html
+                                (weblocks.html:with-html-string
+                                  (weblocks::render-widget w)))
                           (setf (gethash w render-state) t)
                        and appending (list (alexandria:make-keyword (weblocks::dom-id w))
-                                           (get-output-stream-string
-                                            weblocks::*weblocks-output-stream*))))
+                                           widget-html)))
              (late-propagation-warn (ws)
                (when weblocks.variables:*style-warn-on-late-propagation*
                  (weblocks::style-warn 'non-idempotent-rendering
@@ -237,7 +241,9 @@ association list. This function is normally called by
                 :|before-load| weblocks.variables:*before-ajax-complete-scripts*
                 :|on-load| weblocks.variables:*on-ajax-complete-scripts*
                 :|commands| weblocks.actions::*commands*))
-         :stream weblocks:*weblocks-output-stream*
+         ;; seems like a hack, because we have use implementation
+         ;; details here
+         :stream weblocks.html::*stream*
          :escape nil)))))
 
 
@@ -267,11 +273,11 @@ association list. This function is normally called by
     ;;       from Weblocks and leave only rendering. Because update-widget-tree
     ;;       only collects page's title, description and keywords.
     ;;       And they can be set during root widget rendering phase
-    (handler-case (weblocks::timing "tree shakedown"
-                    (update-widget-tree))
-      (weblocks::http-not-found ()
-        (return-from handle-normal-request
-          (page-not-found-handler app))))
+    ;; (handler-case (weblocks::timing "tree shakedown"
+    ;;                 (update-widget-tree))
+    ;;   (weblocks::http-not-found ()
+    ;;     (return-from handle-normal-request
+    ;;       (page-not-found-handler app))))
 
     (weblocks::webapp-update-thread-status "Handling normal request [rendering widgets]")
     (weblocks::timing "widget tree rendering"
@@ -287,10 +293,12 @@ association list. This function is normally called by
           (weblocks::humanize-name (weblocks::last-item
                                     (weblocks::all-tokens weblocks::*uri-tokens*)))))
   ;; render page will wrap the HTML already rendered to
-  ;; *weblocks-output-stream* with necessary boilerplate HTML
+  ;; weblocks.html::*stream* with necessary boilerplate HTML
   (weblocks::webapp-update-thread-status "Handling normal request [rendering page]")
   (weblocks::timing "page render"
-    (weblocks::render-page app)))
+    ;; Here we are using internal symbol, because we don't want to expose
+    ;; this method for usage outside of the weblocks.
+    (weblocks.page::render-page-with-widgets app)))
 
 
 (defun remove-action-from-uri (uri)
@@ -353,8 +361,7 @@ association list. This function is normally called by
             )
 
           (weblocks.dependencies:with-collected-dependencies
-            (let ((weblocks::*weblocks-output-stream*
-                    (make-string-output-stream))
+            (let ((content nil) ;; this variable will be set to HTML string after rendering
                   (weblocks::*uri-tokens*
                     (make-instance 'weblocks::uri-tokens
                                    :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
@@ -363,8 +370,7 @@ association list. This function is normally called by
                   weblocks::*current-page-title*
                   weblocks::*current-page-description*
                   weblocks::*current-page-keywords*
-                  weblocks::*current-page-headers*
-                  (cl-who::*indent* (weblocks::weblocks-webapp-html-indent-p app)))
+                  weblocks::*current-page-headers*)
 
               
               (weblocks.dependencies:push-dependencies
@@ -385,10 +391,10 @@ association list. This function is normally called by
                   (weblocks::webapp-update-thread-status "Processing action")
                   (weblocks::timing "action processing (w/ hooks)"
                     (weblocks.hooks:with-hook (:action)
-                                              (weblocks.actions:eval-action
-                                               app
-                                               action-name
-                                               action-arguments)))))
+                      (weblocks.actions:eval-action
+                       app
+                       action-name
+                       action-arguments)))))
 
               ;; Remove "action" parameter for the GET parameters
               ;; it it is not an AJAX request
@@ -397,25 +403,25 @@ association list. This function is normally called by
                 (weblocks::redirect (remove-action-from-uri
                                      (weblocks.request:get-path :with-params t))))
 
-              (weblocks::timing "rendering (w/ hooks)"
-                (weblocks.hooks:with-hook (:render)
-                                          (if (weblocks.request:ajax-request-p)
-                                              (handle-ajax-request app)
-                                              (handle-normal-request app))
+              (setf content
+                    (weblocks.html:with-html-string
+                      (weblocks::timing "rendering (w/ hooks)"
+                        (weblocks.hooks:with-hook (:render)
+                          (if (weblocks.request:ajax-request-p)
+                              (handle-ajax-request app)
+                              (handle-normal-request app))
 
-                                          ;; Now we'll add routes for each page dependency.
-                                          ;; This way, a dependency for widgets, created by action
-                                          ;; can be served when browser will follow up with next request.
-                                          ;;
-                                          ;; TODO: only add new routes
-                                          (weblocks.dependencies:register-dependencies
-                                           (weblocks.dependencies:get-collected-dependencies))))
-
-              
+                          ;; Now we'll add routes for each page dependency.
+                          ;; This way, a dependency for widgets, created by action
+                          ;; can be served when browser will follow up with next request.
+                          ;;
+                          ;; TODO: only add new routes
+                          (weblocks.dependencies:register-dependencies
+                           (weblocks.dependencies:get-collected-dependencies))))))
 
               ;; TODO: replace return-code with something else
               (if (eql weblocks.response:*code* 200)
-                  (let ((content (get-output-stream-string weblocks::*weblocks-output-stream*)))
+                  (progn
                     (unless (weblocks.request:ajax-request-p)
                       (setf (weblocks.session:get-value 'last-request-uri)
                             (weblocks::all-tokens weblocks::*uri-tokens*)))

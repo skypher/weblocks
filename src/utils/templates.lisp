@@ -50,7 +50,7 @@
       0)))
 
 (defun render-wt-to-string (template context &rest args)
-  "Similar to render-wt but renders template to string instead of *weblocks-output-stream*"
+  "Similar to render-wt but renders template to string instead of weblocks.html::*stream*"
   (let* ((templates (reverse (gethash template *templates*)))
          (context (append 
                     context 

@@ -179,7 +179,6 @@ and then compares the string to the expected result."
   (remf initargs :class-name)
   (let* ((app (apply #'make-instance (or class-name 'weblocks::weblocks-webapp)
                      `(,@initargs ,@(and (not class-name) '(:prefix ""))
-                       :html-indent-p nil 
                        :js-backend :jquery)))
          (weblocks::*current-webapp* app))
      (declare (special weblocks::*current-webapp*))

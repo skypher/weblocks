@@ -127,7 +127,9 @@ widget and reactivates the computation."
      (:div :class css-class
       (str content)))))
 
-(deftemplate :modal-wt 'modal-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :modal-wt 'modal-wt)
 
 (defun/cc do-modal (title callee &key css-class)
   "Same as DO-PAGE, but wraps CALLEE in a div container
@@ -136,14 +138,13 @@ for styling purposes."
              (lambda (new-callee)
                (lambda (&rest args)
                  (declare (ignore args))
-                 (let ((weblocks-stream *weblocks-output-stream*))
-                   ; Does not work when replacing code with render-wt
-                   (write-string 
-                     (render-wt-to-string 
-                       :modal-wt 
-                       (list :css-class css-class :callee callee)
-                       :title title 
-                       :content (capture-weblocks-output (render-widget new-callee))
-                       :css-class css-class)
-                     weblocks-stream))))))
+                 ;; Does not work when replacing code with render-wt
+                 (write-string 
+                  (render-wt-to-string 
+                   :modal-wt 
+                   (list :css-class css-class :callee callee)
+                   :title title 
+                   :content (capture-weblocks-output (render-widget new-callee))
+                   :css-class css-class)
+                  weblocks.html::*stream*)))))
 

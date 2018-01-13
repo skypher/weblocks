@@ -190,9 +190,7 @@
     bound during request handlers.")
    (session-key :type symbol :accessor weblocks-webapp-session-key :initarg :session-key)
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil 
-          :documentation "Responsible for debug mode, use WEBAPP-DEBUG function for getting slot value")
-   (html-indent-p :accessor weblocks-webapp-html-indent-p :initarg :html-indent-p :initform nil
-                  :documentation "Turns on indentation of HTML for easier visual inspection."))
+          :documentation "Responsible for debug mode, use WEBAPP-DEBUG function for getting slot value"))
   (:metaclass webapp-class)
   (:documentation 
 "A class that encapsulates a unique web application and all relevant rnesources.
@@ -361,7 +359,7 @@ to my `application-dependencies' slot."
                (slot-value self 'public-files-path)))
     (slot-default default-store-name
                   (webapp-default-store-name (class-of self)))
-    (slot-default html-indent-p (weblocks-webapp-debug self))
+
     (let ((class-name (class-name (class-of self))))
       (slot-default session-key class-name)
       (slot-default name (attributize-name class-name))

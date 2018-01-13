@@ -1,4 +1,4 @@
-
+;; REMOVED
 (in-package :weblocks)
 
 (export '(render-page

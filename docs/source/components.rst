@@ -216,9 +216,12 @@ is mostly templates and their definitions. Look there for more examples.
 Template rendering
 ------------------
 
+TODO: remove this section because templates were removed from the core
+of the framework.
+
 Template rendering is done via two functions - ``RENDER-WT`` and
 ``RENDER-WT-TO-STRING``. First one renders template to
-``*weblocks-output-stream*``, other one returns a string with rendered
+``weblocks.html:*html*``, other one returns a string with rendered
 template.
 
 Rendering function takes template name, template context parameters and

@@ -139,9 +139,8 @@ It is used when dependency is served locally."
 (defgeneric render-in-head (dependency)
   (:documentation "Renders a piece of html.")
   (:method (dependency)
-    (format weblocks:*weblocks-output-stream*
-            "<!-- Dependency ~S -->"
-            dependency)))
+    (weblocks.html:with-html
+      (:comment (format nil "Dependency ~S" dependency)))))
 
 
 (defgeneric render-in-ajax-response (dependency)
@@ -159,12 +158,12 @@ as a response to some action.")
   (case (get-type dependency)
 
     (:js
-     (weblocks::with-html
+     (weblocks.html:with-html
        (:script :src (get-url dependency)
                 :type "text/javascript" "")))
 
     (:css
-     (weblocks::with-html
+     (weblocks.html:with-html
        (:link :rel "stylesheet" :type "text/css"
               :href (get-url dependency)
               :media "screen")))))
@@ -189,14 +188,14 @@ as a response to some action.")
   (case (get-type dependency)
     ;; Javascript
     (:js
-     (weblocks::with-html
+     (weblocks.html:with-html
        (:script :src (get-url dependency)
                 :type "text/javascript"
                 :integrity (get-integrity dependency)
                 :crossorigin (get-crossorigin dependency))))
     ;; CSS
     (:css
-     (weblocks::with-html
+     (weblocks.html:with-html
        (:link :rel "stylesheet" :type "text/css"
               :href (get-url dependency)
               :media "screen"

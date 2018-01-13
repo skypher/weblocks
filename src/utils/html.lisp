@@ -23,10 +23,9 @@
 
 (defmacro capture-weblocks-output (&body body)
   `(weblocks.utils.html-parts:nested-html-part 
-     (list :type :capture-weblocks-output)
-     (let ((*weblocks-output-stream* (make-string-output-stream)))
-       ,@body 
-       (get-output-stream-string *weblocks-output-stream*))))
+       (list :type :capture-weblocks-output)
+     (weblocks.html:with-html-string
+       ,@body)))
 
 
 (defparameter *submit-control-name* "submit"
@@ -476,16 +475,13 @@ with the item as a single argument."
 (defmacro scriptonly (&body body)
   "Outputs HTML defined in the body in such a way that it takes effect
 on the client only if client-side scripting is enabled."
-  (let ((output (gensym)))
-    `(let (,output)
-       (let ((*weblocks-output-stream* (make-string-output-stream)))
-         (with-html
-           ,@body)
-         (setf ,output (get-output-stream-string *weblocks-output-stream*)))
-       (if (weblocks.request:ajax-request-p)
-           (write-string ,output *weblocks-output-stream*)
-           (with-javascript
-             (ps:ps* `(funcall (slot-value document 'write) ,,output)))))))
+  `(if (weblocks.request:ajax-request-p)
+       (weblocks.html:with-html
+         ,@body)
+       (with-javascript
+           (ps:ps* `(funcall (slot-value document 'write)
+                             (weblocks.html:with-html-string
+                               ,@body))))))
 
 (defmacro noscript (&body body)
   "Outputs HTML in a way that it takes effect on the client only if

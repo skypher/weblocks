@@ -2,6 +2,31 @@
  ChangeLog
 ===========
 
+0.24.0 (2018-01-12)
+===================
+
+All rendering code was refactored.
+
+Macroses ``with-html`` and ``with-html-to-string`` replaced
+with ``weblocks.html:with-html`` and ``weblocks.html:with-html-string``.
+Stream ``*weblocks-output-stream*`` was moved to
+``weblocks.html::*stream*`` and is not external anymore. Please, don't
+use it directly.
+
+Widget refactorings
+===================
+
+Procedure ``update-widget-tree`` was removed and not widgets can't
+change html header's tags, description, title, etc. If you need this,
+change them in the ``render`` method.
+
+Application level
+=================
+
+Application's slot ``html-indent-p`` and corresponding accessor
+``weblocks-webapp-html-indent-p`` were removed because now spinneret
+generates non indented code.
+
 0.23.0 (2018-01-11)
 ===================
 

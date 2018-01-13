@@ -30,7 +30,6 @@
    :closer-mop
    :puri
    :cl-json
-   :cl-who
    :spinneret
    :parenscript
    :cl-fad
@@ -69,7 +68,7 @@
                                            (:file "list")
                                            (:file "uri")
                                            (:file "html-parts")
-                                           (:file "templates")
+                                           ;; (:file "templates")
                                            ;; (:file "html")
                                            ;; (:file "menu"
                                            ;;        ;;                                            :depends-on ;; ("html")
@@ -78,12 +77,12 @@
                                            (:file "timing")
                                            ;; (:file "repl")
                                            )
-                              ;;                              :depends-on ;; ("session"
-                              ;;  "weblocks"
-                              ;;  )
-                              )
+                                      ;;                              :depends-on ;; ("session"
+                                      ;;  "weblocks"
+                                      ;;  )
+                                      )
                              (:file "variables")
-                             
+                             (:file "html")
                              (:file "session")
                              (:file "hooks"
                                     ;;                              :depends-on ;; ("weblocks" "debug-mode")
@@ -129,9 +128,10 @@
                                     ;;:depends-on ;; ("weblocks"
                                     ;;  "application-mop")
                                     )
-                             (:file "page-template"
-                                    ;;                              :depends-on ;; ("weblocks" "session" utils "application")
-                                    )
+                             (:file page)
+                             ;; (:file "page-template"
+                             ;;        ;;                              :depends-on ;; ("weblocks" "session" utils "application")
+                             ;;        )
                              (:file "log-actions"
                                     ;;                              :depends-on ;; ("weblocks")
                                     )
@@ -152,7 +152,7 @@
                              (:file "session-lock"
                                     ;;                              :depends-on ;; ("session")
                                     )
-                                                          (:module widgets
+                             (:module widgets
                               :components ((:module widget
                                             :components ((:file "widget-mop")
                                                          (:file "uri-parameters-mixin")
@@ -160,21 +160,21 @@
                                                          (:file "widget2")
                                                          (:file "string-widget")
                                                          (:file "funcall-widget")))
-                                           (:file "composite"
-                                                  ;;                                            :depends-on ;; (widget)
-                                                  )
-                                           (:file "flash"
-                                                  ;;                                            :depends-on ;; (widget)
-                                                  )
-                                           (:file "data-editor"
-                                                  ;;                                            :depends-on ;; (widget)
-                                                  )
-                                           (:file "dataform"
-                                                  ;;depends-on ;; (widget "data-editor")
-                                                  )
-                                           (:file "quickform"
-                                                  ;;:depends-on ;; (widget "dataform")
-                                                  )
+                                           ;; (:file "composite"
+                                           ;;        ;;                                            :depends-on ;; (widget)
+                                           ;;        )
+                                           ;; (:file "flash"
+                                           ;;        ;;                                            :depends-on ;; (widget)
+                                           ;;        )
+                                           ;; (:file "data-editor"
+                                           ;;        ;;                                            :depends-on ;; (widget)
+                                           ;;        )
+                                           ;; (:file "dataform"
+                                           ;;        ;;depends-on ;; (widget "data-editor")
+                                           ;;        )
+                                           ;; (:file "quickform"
+                                           ;;        ;;:depends-on ;; (widget "dataform")
+                                           ;;        )
                                            ;; depends on form view
                                            ;; (:file "simpleform"
                                            ;;  ;;:depends-on ;; (widget "quickform")
@@ -190,11 +190,11 @@
                                            ;; (:file "login"
                                            ;;  ;;:depends-on ;; (widget "quickform")
                                            ;;        )
-                                           (:module dataseq
-                                            :components ((:file "dataseq")
-                                                         #-cmu (:file "operations-action"))
-                                                    ;;:depends-on ;; (widget "flash")
-                                                    )
+                                           ;; (:module dataseq
+                                           ;;  :components ((:file "dataseq")
+                                           ;;               #-cmu (:file "operations-action"))
+                                           ;;          ;;:depends-on ;; (widget "flash")
+                                           ;;          )
                                            ;; depends on WEBLOCKS::TABLE-VIEW-FIELD
                                            ;; (:module datagrid
                                            ;;  :components ((:file "datagrid")
@@ -209,13 +209,13 @@
                                            ;;                      ))
                                            ;;  ;;:depends-on ;; (widget "dataseq")
                                            ;;          )
-                                           (:module dataedit
-                                            :components ((:file "dataedit"
-                                                                ;;:depends-on ;; (#-cmu "delete-action")
-                                                                )
-                                                         #-cmu (:file "delete-action"))
-                                                    ;;:depends-on ;; (widget dataseq)
-                                                    )
+                                           ;; (:module dataedit
+                                           ;;  :components ((:file "dataedit"
+                                           ;;                      ;;:depends-on ;; (#-cmu "delete-action")
+                                           ;;                      )
+                                           ;;               #-cmu (:file "delete-action"))
+                                           ;;          ;;:depends-on ;; (widget dataseq)
+                                           ;;          )
                                            ;; (:file "gridedit"
                                            ;;  ;;:depends-on ;; (datagrid dataedit "dataform")
                                            ;;        )
@@ -241,16 +241,16 @@
                                            ;;  ;;:depends-on ;; ("navigation")
                                            ;;        )
                                            )
-                              ;;:depends-on ;; (views "session" utils "dependencies" "actions" "server" "request"
-                              ;;        "request-hooks" "dom-object" linguistic "widget-translation")
-                              )
-                             (:file "error-handler")
+                                      ;;:depends-on ;; (views "session" utils "dependencies" "actions" "server" "request"
+                                      ;;        "request-hooks" "dom-object" linguistic "widget-translation")
+                                      )
+                             ;; (:file "error-handler")
                              (:file "error-handler2")
                              (:file "request-handler2")
                              (:module linguistic
                               :components ((:file "grammar"))
-                              ;;                              :depends-on ;; ("weblocks" "session" utils)
-                              )
+                                      ;;                              :depends-on ;; ("weblocks" "session" utils)
+                                      )
                              ;; (:module views
                              ;;                               :components ((:module view
                              ;;                                             :components ((:file "view")
@@ -345,8 +345,8 @@
                                            (:file "workflow"
                                                   ;;:depends-on ;; ("call-answer")
                                                   ))
-                              ;;:depends-on ;; ("weblocks" "widgets" "request-handler")
-                              )
+                                      ;;:depends-on ;; ("weblocks" "widgets" "request-handler")
+                                      )
                              ;; Removed because it was used specially for Hunchentoot
                              ;; and dont needed anymore after migration to Woo.
                              ;; (:file "acceptor"

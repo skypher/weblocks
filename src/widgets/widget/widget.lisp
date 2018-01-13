@@ -390,7 +390,7 @@ that will be applied before and after the body is rendered.")
             &allow-other-keys)
     (remf args :widget-prefix-fn)
     (remf args :widget-suffix-fn)
-    (with-html
+    (weblocks.html:with-html
       (:div :class (dom-classes obj)
             :id (dom-id obj)
             (safe-apply widget-prefix-fn obj args)
@@ -458,29 +458,24 @@ stylesheets and javascript links in the page header."))
       (mapc #'weblocks.dependencies:render-in-ajax-response
             widget-dependencies)))
 
-  (write-string 
-   (weblocks.utils.html-parts:nested-html-part 
-       (list :type :widget :widget obj)
-     (let ((*current-widget* obj)
-           (*weblocks-output-stream* (make-string-output-stream)))
+  (weblocks.utils.html-parts:nested-html-part 
+      (list :type :widget :widget obj)
+    (let ((*current-widget* obj))
 
-       (if inlinep
-           (progn (apply #'render-widget-body obj args)
-                  (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-           (apply #'with-widget-header
-                  obj
-                  (lambda (obj &rest args)
-                    (apply #'render-widget-body obj args)
-                    (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
-                  (append
-                   (when (widget-prefix-fn obj)
-                     (list :widget-prefix-fn (widget-prefix-fn obj)))
-                   (when (widget-suffix-fn obj)
-                     (list :widget-suffix-fn (widget-suffix-fn obj)))
-                   args)))
-
-       (get-output-stream-string *weblocks-output-stream*)))
-   *weblocks-output-stream*))
+      (if inlinep
+          (progn (apply #'render-widget-body obj args)
+                 (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+          (apply #'with-widget-header
+                 obj
+                 (lambda (obj &rest args)
+                   (apply #'render-widget-body obj args)
+                   (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))
+                 (append
+                  (when (widget-prefix-fn obj)
+                    (list :widget-prefix-fn (widget-prefix-fn obj)))
+                  (when (widget-suffix-fn obj)
+                    (list :widget-suffix-fn (widget-suffix-fn obj)))
+                  args))))))
 
 (defgeneric mark-dirty (w &key propagate putp)
   (:documentation

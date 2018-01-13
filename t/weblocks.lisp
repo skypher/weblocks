@@ -24,12 +24,12 @@
 
 (subtest "with-javascript-1"
     (is
-      (with-output-to-string (*weblocks-output-stream*)
+      (weblocks.html:with-html-string
         (with-javascript
           "foo~A" "bar"))
       (with-javascript-to-string "foo~A" "bar")
       
-      "Macro with-javascript should write into *weblocks-output-stream*"))
+      "Macro with-javascript should write into weblocks.html:*stream*"))
 
 
 (finalize)

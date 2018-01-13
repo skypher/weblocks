@@ -94,6 +94,7 @@ HTTP code and headers are taken from *code* and *content-type*."
   it will be compiled through Parenscript first.
   
   FIXME: is using PUSH or PUSHLAST correct?"
+  (declare (ignorable place))
   (let ((script (etypecase script
                   (string script)
                   (list (ps:ps* script)))))
