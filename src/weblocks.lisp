@@ -62,9 +62,10 @@ case, the symbols will be imported first if need be."
 (defun %js (source &rest args)
   "Helper function for WITH-JAVASCRIPT macros."
   `(:script :type "text/javascript"
-            (:raw "~%// <![CDATA[~%")
+            (:raw #.(format nil "~%// <![CDATA[~%"))
             (:raw (escape-script-tags (format nil ,source ,@args)))
-            (:raw "~%// ]]>~%")))
+            (:raw #.(format nil "~%// ]]>~%"))
+            ))
 
 (defmacro with-javascript (source &rest args)
   "Places 'source' between script and CDATA elements. Used to avoid
