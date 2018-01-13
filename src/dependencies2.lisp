@@ -185,6 +185,14 @@ as a response to some action.")
 
 
 (defmethod render-in-head ((dependency remote-dependency))
+  ;; For cached dependencies remote and local urls are different
+  ;; to make life easier, we'll render a comment with original
+  ;; dependency's URL.
+  (unless (string-equal (get-url dependency)
+                        (get-remote-url dependency))
+    (weblocks.html:with-html
+      (:comment (get-remote-url dependency))))
+
   (case (get-type dependency)
     ;; Javascript
     (:js
@@ -453,11 +461,13 @@ For local-dependency it is :local."
 
 
 (defmethod get-url ((dependency remote-dependency))
+  (get-remote-url dependency))
+
+
+(defmethod get-url ((dependency cached-remote-dependency))
   (let* ((remote-url (get-remote-url dependency)))
-    (if *cache-remote-dependencies-in*
-        (concatenate 'string "/remote-deps-cache/"
-                     (weblocks::md5 remote-url))
-        remote-url)))
+    (concatenate 'string "/remote-deps-cache/"
+                 (weblocks::md5 remote-url))))
 
 
 (defmethod get-path ((dependency remote-dependency))

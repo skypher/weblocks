@@ -27,6 +27,9 @@ Application's slot ``html-indent-p`` and corresponding accessor
 ``weblocks-webapp-html-indent-p`` were removed because now spinneret
 generates non indented code.
 
+Slot ``init-user-session`` was completely removed and replace with a generic
+method ``init-session``.
+
 Removals
 ========
 
@@ -34,6 +37,11 @@ To make Weblocks core smaller, many files were removed: views, widgets,
 html-parts, utilities.
 
 Systems weblocks-util, weblocks-testutils were removed.
+
+Dependencies
+============
+
+Rendering of remote (non cached) dependencies was fixed.
 
 0.23.0 (2018-01-11)
 ===================
