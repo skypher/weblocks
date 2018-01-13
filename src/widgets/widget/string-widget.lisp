@@ -1,28 +1,36 @@
+(defpackage #:weblocks.widgets.string-widget
+  (:use #:cl)
+  (:export
+   #:make-string-widget
+   #:string-widget
+   #:get-content
+   #:escape-p))
+(in-package weblocks.widgets.string-widget)
 
-(in-package :weblocks)
 
-(export '(string-widget string-widget-content string-widget-escape-p))
-
-(defwidget string-widget ()
+(weblocks.widget:defwidget string-widget ()
   ((content :type string
-            :accessor string-widget-content
+            :accessor get-content
             :initarg :content)
    (escape-p :type boolean
-             :accessor string-widget-escape-p
+             :accessor escape-p
              :initarg :escape-p
              :initform t
              :documentation "Whether to escape the output
              for HTML.")))
 
-(defmethod render-widget-body ((widget string-widget) &rest args &key id class &allow-other-keys)
-  (declare (ignore args))
-  (let ((content (if (string-widget-escape-p widget)
-                   (escape-string (string-widget-content widget))
-                   (string-widget-content widget))))
-    (with-html
-      (:p :id id :class class (str content)))))
-                   
-(defmethod make-widget ((obj string))
+(defmethod weblocks.widget:render ((widget string-widget))
+  (let ((content (get-content widget)))
+    (if (escape-p widget)
+        (weblocks.html:with-html
+          (:p content))
+        (weblocks.html:with-html
+          (:p (:raw content))))))
+
+
+(defun make-string-widget (string &key (escape-p t))
   "Create a widget from a string."
-  (make-instance 'string-widget :content obj))
+  (make-instance 'string-widget
+                 :content string
+                 :escape-p escape-p))
 

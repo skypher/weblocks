@@ -69,7 +69,6 @@ returning response. To change content type, set *content-type*.")
 HTTP code and headers are taken from *code* and *content-type*."
 
   (log:debug "Aborting request processing"
-             content
              code
              content-type
              headers)

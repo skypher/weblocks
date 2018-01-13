@@ -72,6 +72,7 @@
                              (:file "actions")
                              (:file "actions2")
                              (:file "response")
+                             ;; TODO: remove
                              (:file "dependencies")
                              (:file "routes")
                              (:file "dependencies2")
@@ -80,20 +81,20 @@
                              (:module "js-backend"
                               :components ((:file "base")
                                            (:file "jquery")))
+                             (:module widgets
+                              :components ((:module widget
+                                            :components ((:file "widget-mop")
+                                                         (:file "uri-parameters-mixin")
+                                                         ;; (:file "widget")
+                                                         (:file "widget2")
+                                                         (:file "string-widget")
+                                                         (:file "funcall-widget")))))
                              (:file "application")
                              (:file "page")
                              (:file "log-actions")
                              (:file "debug-mode")
                              (:file "uri-tokens")
                              (:file "session-lock")
-                             (:module widgets
-                              :components ((:module widget
-                                            :components ((:file "widget-mop")
-                                                         (:file "uri-parameters-mixin")
-                                                         (:file "widget")
-                                                         (:file "widget2")
-                                                         (:file "string-widget")
-                                                         (:file "funcall-widget")))))
                              (:file "error-handler2")
                              (:file "request-handler2")
                              (:module linguistic
@@ -105,7 +106,8 @@
                              (:file "server")
                              (:file "server2")
                              (:file "request")
-                             (:file "default-application"))))
+                             ;; (:file "default-application")
+                             )))
   ;;  :in-order-to ;; ((test-op (load-op "weblocks-test"))
   ;;  (doc-op (load-op "weblocks-scripts"))
   ;;  (make-app-op (load-op "weblocks-scripts")))

@@ -10,7 +10,7 @@
           get-webapps-for-class
           initialize-webapp
           finalize-webapp
-;;          webapp-application-dependencies
+          init-session
           webapp-name in-webapp
           bundle-dependency-types
           version-dependency-types
@@ -52,33 +52,6 @@
 (defvar *current-webapp*)
 (setf (documentation '*current-webapp* 'variable)
       "A currently active web application.")
-
-
-(defun default-init-user-session (root)
-  (setf (widget-children root)
-        (f_%
-          (with-html
-            (:h1 "No init-user-session")
-            (:p "Please create a function to initialize a session and pass it to the
-  defwebapp as :init-user-session argument.")
-            (:p "It could be something simple, like this one:")
-            (:pre
-             (:code
-              "(defun init-user-session (root)
-  (setf (widget-children root)
-        (lambda ()
-          (with-html
-            (:h1 \"Hello world!\")))))
-
-(defwebapp your-app
-   ;; some-options
-   :init-user-session \'init-user-session)"))
-
-            ;; TODO: add a link to a Quickstart
-            (:p "Read more in "
-                (:a :href ""
-                    "documentaion")
-                ".")))) )
 
 
 (defclass weblocks-webapp ()
@@ -176,14 +149,6 @@
                           :initform '(:stylesheet :script)
                           :documentation "This enables gziping of css, js files.
                                           When debug is on, gzip is turned off.")
-   (init-user-session :type (or symbol function)
-                      :accessor weblocks-webapp-init-user-session
-                      :initarg :init-user-session
-                      :initform #'default-init-user-session
-                      :documentation "'init-user-session' must be defined by weblocks client in the
-                         same package as 'name'. This function will accept a single parameter - a 
-                         widget at the root of the application. 'init-user-session' is
-                         responsible for adding initial children to this widget.")
    (default-store-name
     :accessor webapp-default-store-name :initarg :default-store :type symbol
     :documentation "If non-nil, the name of the `*default-store*'
@@ -242,6 +207,28 @@ layout and dependencies running on the same server."))
   "Set the public files URI prefix of the webapp. Ensures normalization."
   (setf (slot-value app 'public-files-path) (maybe-add-trailing-slash path)))
 
+(defgeneric init-session (app)
+  (:documentation "This method should be defined for weblocks application.
+                   it should return a widget which become a root widget."))
+
+
+(defmethod init-session ((app weblocks-webapp))
+  (let ((quickstart-url "http://40ants.com/weblocks/quickstart.html"))
+    (weblocks.widgets.string-widget:make-string-widget
+     (weblocks.html:with-html-string
+       (:h1 "No init-session method defined.")
+       (:p "Please define a method init-session to initialize a session.")
+       (:p "It could be something simple, like this one:")
+       (:pre
+        (:code
+         "(defmethod init-session ((app your-app-class))
+            \"Hello world!\")"))
+
+       (:p ("Read more in [documentaion]()."
+            quickstart-url)))
+     :escape-p nil)))
+
+
 ;; abstraction macro
 (defmacro defwebapp (name &rest initargs &key 
                      subclasses
@@ -291,11 +278,6 @@ the uri to the path specified by public-files-path.
 
 :public-files-cache-time - make the client cache public files for N
 seconds (default 3600). Caching is disabled in debug mode.
-
-:init-user-session - A function object that is used to initialize new
-user sessions. If it is not passed, a function named
-'init-user-session' is looked up in the package where the web
-application name symbol is defined.
 
 :autostart - Whether this webapp is started automatically when start-weblocks is
 called (primarily for backward compatibility"
@@ -363,12 +345,6 @@ to my `application-dependencies' slot."
     (let ((class-name (class-name (class-of self))))
       (slot-default session-key class-name)
       (slot-default name (attributize-name class-name))
-      (slot-default init-user-session
-                    (or (find-symbol (symbol-name 'init-user-session)
-                                     (symbol-package class-name))
-                        (error "Cannot initialize application ~A because ~
-                                no init-user-session function is found."
-                               (weblocks-webapp-name self))))
       (slot-default prefix
                     (concatenate 'string "/" (attributize-name class-name))))
     (unless ignore-default-dependencies
@@ -795,13 +771,6 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
 
 (defun webapp-public-files-path (&optional (app *current-webapp*))
   (weblocks-webapp-public-files-path app))
-
-(defun webapp-init-user-session (&optional (app *current-webapp*))
-  "Returns the init function for the user session."
-  (let ((init (weblocks-webapp-init-user-session app)))
-    (etypecase init
-      (function init)
-      (symbol (symbol-function init)))))
 
 (defun webapp-update-thread-status (status &optional (app (ignore-errors *current-webapp*)))
   (update-thread-status app status))

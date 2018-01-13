@@ -25,7 +25,7 @@ dynamic variables. The default implementation executes a user
 action (if any) and renders the root widget wrapped in HTML
 provided by 'render-page'. If the request is an AJAX request, only the
 dirty widgets are rendered into a JSON data structure. It also invokes
-user supplied 'init-user-session' on the first request that has no
+user supplied 'init-session' method on the first request that has no
 session setup.
 
 'handle-client-request' immediately returns '+http-not-found+' if it
@@ -254,11 +254,7 @@ association list. This function is normally called by
   (weblocks:webapp-update-thread-status "Handling AJAX request")
   (weblocks::timing "handle-ajax-request"
     (update-location-hash-dependents)
-    (render-dirty-widgets)
-
-    ;; TODO: only add new routes
-    (weblocks.dependencies:register-dependencies
-     (weblocks.dependencies:get-collected-dependencies))))
+    (render-dirty-widgets)))
 
 
 (defmethod handle-normal-request ((app weblocks:weblocks-webapp))
@@ -281,10 +277,7 @@ association list. This function is normally called by
 
     (weblocks::webapp-update-thread-status "Handling normal request [rendering widgets]")
     (weblocks::timing "widget tree rendering"
-      (weblocks::render-widget (weblocks::root-widget))))
-
-  (log:debug "Page's new-style dependencies"
-             (weblocks.dependencies:get-collected-dependencies))
+      (weblocks.widget:render-widget (weblocks::root-widget))))
 
   ;; set page title if it isn't already set
   (when (and (null weblocks::*current-page-description*)
@@ -329,36 +322,20 @@ association list. This function is normally called by
 
         (let (weblocks::*dirty-widgets*)
           (when (null (weblocks::root-widget))
-            (let ((root-widget (weblocks::make-root-widget app)))
+            (handler-bind ((error (lambda (c) 
+                                    (warn "Error initializing user session: ~A" c)
+                                    (when weblocks.variables:*backtrace-on-session-init-error*
+                                      (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
+                                    (signal c))))
               (setf (weblocks.session:get-value 'weblocks::root-widget)
-                    root-widget)
-              (let (finished?
-                    (init-user-session-func (weblocks::webapp-init-user-session)))
-                (unwind-protect
-                     (progn
-                       (handler-bind ((error (lambda (c) 
-                                               (warn "Error initializing user session: ~A" c)
-                                               (when weblocks.variables:*backtrace-on-session-init-error*
-                                                 (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
-                                               (signal c))))
-                         (funcall init-user-session-func
-                                  root-widget))
-                       (setf finished? t))
-                  (unless finished?
-                    (setf (weblocks.session:get-value 'weblocks::root-widget)
-                          nil))))
+                    (weblocks::init-session app)))
               
-              ;; TODO: understand why there is coupling with Dialog here and
-              ;;       how to move it into the Dialog's code.
-              (weblocks.hooks:add-session-hook :action
-                  update-dialog ()
-                (weblocks::update-dialog-on-request)))
-            
-            ;; (when (and weblocks::*rewrite-for-session-urls*
-            ;;            (weblocks::cookie-in (weblocks::session-cookie-name
-            ;;                                  weblocks::*weblocks-server*)))
-            ;;   (weblocks::redirect (weblocks::remove-session-from-uri (weblocks::request-uri*))))
-            )
+            ;; TODO: understand why there is coupling with Dialog here and
+            ;;       how to move it into the Dialog's code.
+              
+            (weblocks.hooks:add-session-hook :action
+                update-dialog ()
+              (weblocks::update-dialog-on-request)))
 
           (weblocks.dependencies:with-collected-dependencies
             (let ((content nil) ;; this variable will be set to HTML string after rendering
@@ -414,10 +391,12 @@ association list. This function is normally called by
                           ;; Now we'll add routes for each page dependency.
                           ;; This way, a dependency for widgets, created by action
                           ;; can be served when browser will follow up with next request.
-                          ;;
-                          ;; TODO: only add new routes
-                          (weblocks.dependencies:register-dependencies
-                           (weblocks.dependencies:get-collected-dependencies))))))
+                          (let ((dependencies (weblocks.dependencies:get-collected-dependencies)))
+                            (log:debug "Collected dependencies"
+                                       dependencies)
+
+                            (weblocks.dependencies:register-dependencies
+                             dependencies))))))
 
               ;; TODO: replace return-code with something else
               (if (eql weblocks.response:*code* 200)

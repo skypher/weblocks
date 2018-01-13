@@ -460,6 +460,7 @@ stylesheets and javascript links in the page header."))
 
   (let ((*current-widget* obj))
 
+    
     (if inlinep
         (progn (apply #'render-widget-body obj args)
                (apply #'render-widget-children obj (remove-keyword-parameter args :inlinep)))

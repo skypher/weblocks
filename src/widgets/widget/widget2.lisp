@@ -140,28 +140,28 @@ inherits from 'widget' if no direct superclasses are provided."
     (cl-strings:join stringified :separator " ")))
 
 
-(defgeneric mark-dirty (w &key propagate)
-  (:documentation
-   "Default implementation adds a widget to a list of dirty
-widgets. Normally used during an AJAX request. If there are any
-widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
-\(the default\), these widgets are added to the dirty list as well.
+;; (defgeneric mark-dirty (w &key propagate)
+;;   (:documentation
+;;    "Default implementation adds a widget to a list of dirty
+;; widgets. Normally used during an AJAX request. If there are any
+;; widgets in the 'propagate-dirty' slot of 'w' and 'propagate' is true
+;; \(the default\), these widgets are added to the dirty list as well.
 
-Note that this function is automatically called when widget slots are
-modified, if slots are marked have affects-dirty-status-p flag.
+;; Note that this function is automatically called when widget slots are
+;; modified, if slots are marked have affects-dirty-status-p flag.
 
-Returns NIL if the widget is already dirty or T and the results
-of calling MARK-DIRTY on the list of dependents \(propagate-dirty\)."))
+;; Returns NIL if the widget is already dirty or T and the results
+;; of calling MARK-DIRTY on the list of dependents \(propagate-dirty\)."))
 
 
-(defmethod mark-dirty ((w widget) &key (propagate t))
-  (unless (weblocks:widget-dirty-p w)
-    (pushnew w weblocks::*dirty-widgets*)
-    ;; NOTE: we have to check for unbound slots because this function
-    ;; may get called at initialization time before those slots are bound
-    (values t (when (and propagate (slot-boundp w 'propagate-dirty))
-                (mapc #'mark-dirty
-                      (remove nil (widget-propagate-dirty w)))))))
+;; (defmethod mark-dirty ((w widget) &key (propagate t))
+;;   (unless (weblocks:widget-dirty-p w)
+;;     (pushnew w weblocks::*dirty-widgets*)
+;;     ;; NOTE: we have to check for unbound slots because this function
+;;     ;; may get called at initialization time before those slots are bound
+;;     (values t (when (and propagate (slot-boundp w 'propagate-dirty))
+;;                 (mapc #'mark-dirty
+;;                       (remove nil (widget-propagate-dirty w)))))))
 
 
 (defgeneric update (w &key inserted-after inserted-before)
