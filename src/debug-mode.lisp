@@ -19,9 +19,6 @@
   ;; It renders a html page with a backtrace on error.
   ;; (setf *show-lisp-errors-p* t)
   
-  ;; Some thing for html rendering debugging
-  (setf weblocks.utils.html-parts::*process-html-parts-p*
-        (constantly t))
   ;(setf *show-lisp-backtraces-p* t)
   ;; Set session maintenance (for everyone)
   (unless *maintain-last-session*
@@ -33,8 +30,6 @@
   (setf *weblocks-global-debug* nil)
   (setf weblocks.variables:*catch-errors-p* t)
   (setf *show-lisp-errors-p* nil)
-  (setf weblocks.utils.html-parts::*process-html-parts-p*
-        (constantly nil))
   ;(setf *show-lisp-backtraces-p* nil)
   (setf *maintain-last-session* nil))
 

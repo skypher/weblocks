@@ -39,17 +39,6 @@ case, the symbols will be imported first if need be."
   "A list of running applications.  Applications are only available
    after they have been started.")
 
-;; TODO: remove templates completely
-(defun render-wt (template context &rest args)
-  "Calculates effective template and renders it to weblocks.html::*stream*.  
-   Effective template is template with max priority.
-   template is template name which will be rendered
-   context is a plist which is used for effective template finding.
-   Other arguments are used as template parameters."
-  (write-string 
-    (apply #'render-wt-to-string (list* template context args))
-    weblocks.html::*stream*))
-
 (defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
   "Escape script blocks inside scripts."
   (ppcre:regex-replace-all

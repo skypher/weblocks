@@ -228,7 +228,6 @@ webapp in my context."
 ;;            *on-ajax-complete-scripts*
 ;;            weblocks::*rendered-actions*)
 ;;       (unwind-protect (progn
-;;                         (weblocks.utils.html-parts:reset)
 
 ;;                         (weblocks::open-stores)
 ;;                         (start-session)

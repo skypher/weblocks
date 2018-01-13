@@ -56,7 +56,6 @@
                                            (:file "string")
                                            (:file "list")
                                            (:file "uri")
-                                           (:file "html-parts")
                                            (:file "timing")
                                            )
                                       )

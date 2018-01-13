@@ -30,7 +30,10 @@ generates non indented code.
 Removals
 ========
 
-To make Weblocks core smaller, many files were removed: views, widgets, utilities.
+To make Weblocks core smaller, many files were removed: views, widgets,
+html-parts, utilities.
+
+Systems weblocks-util, weblocks-testutils were removed.
 
 0.23.0 (2018-01-11)
 ===================

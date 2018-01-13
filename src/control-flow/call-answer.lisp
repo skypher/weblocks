@@ -120,12 +120,12 @@ widget and reactivates the computation."
   (mark-dirty (root-widget))
   (do-widget nil callee))
 
-(defun modal-wt (&key title content css-class)
-  (with-html-to-string
+(defun render-modal-window (&key title content css-class)
+  (weblocks.html:with-html
     (:div :class "modal"
-     (:h1 (:span (str title)))
-     (:div :class css-class
-      (str content)))))
+          (:h1 (:span title))
+          (:div :class css-class
+                content))))
 
 ;; TODO: think what to do with this, because templates were
 ;; removed from the core framework
@@ -138,13 +138,9 @@ for styling purposes."
              (lambda (new-callee)
                (lambda (&rest args)
                  (declare (ignore args))
-                 ;; Does not work when replacing code with render-wt
-                 (write-string 
-                  (render-wt-to-string 
-                   :modal-wt 
-                   (list :css-class css-class :callee callee)
-                   :title title 
-                   :content (capture-weblocks-output (render-widget new-callee))
-                   :css-class css-class)
-                  weblocks.html::*stream*)))))
+                 (render-modal-window 
+                  :title title 
+                  :content (weblocks.html:with-html-string
+                             (render-widget new-callee))
+                  :css-class css-class)))))
 

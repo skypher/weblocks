@@ -14,8 +14,8 @@ about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
   `(weblocks.session:get-value 'dialog-contents))
 
-(defun dialog-js-wt (&key image-src image-onclick &allow-other-keys)
-  (with-html-to-string
+(defun render-dialog-js (&key image-src image-onclick &allow-other-keys)
+  (weblocks.html:with-html
     (:img :src  image-src
      :onclick image-onclick
      :onmouseover "this.style.cursor = \"pointer\";"
@@ -34,15 +34,12 @@ the widget inside."
                                 close
                                 (f_% (answer widget))))
                   (close-action (make-action close-fn)))
-             (render-wt-to-string 
-               :dialog-js-wt
-               nil
-               :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
-               :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
+             (render-dialog-js
+              :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
+              :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
          (widget-html (widget)
            (weblocks.html:with-html-string
              (render-widget widget))))
-    ;(format t "widget-html: ~S~%" (widget-html widget))
     (let ((inner (intern (string-upcase (weblocks.session:gen-id "inner"))))
           (close-action (intern (string-upcase (weblocks.session:gen-id "close")))))
       `(progn
@@ -92,8 +89,8 @@ scales down to 'do-modal' instead."
       (do-modal title callee :css-class css-class)))
 
 (defun choices-get-wt (&key message content)
-  (with-html-to-string
-    (:p (str message))
+  (weblocks.html:with-html
+      (:p message)
     (str content)))
 
 ;; TODO: think what to do with this, because templates were
@@ -103,19 +100,19 @@ scales down to 'do-modal' instead."
 (defun render-choices-get (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
    links."
-  (render-wt 
-    :choices-get-wt 
-    nil 
-    :message msg
-    :content (capture-weblocks-output 
-               (with-html 
-                 (mapc (lambda (choice)
-                         (render-link (lambda (&rest args)
-                                        (declare (ignore args))
-                                        (answer k (car choice)))
-                                      (cdr choice))
-                         (htm "&nbsp;"))
-                       choices)))))
+  (weblocks.html:with-html
+    (:p msg)
+    (mapc (lambda (choice)
+            (weblocks.html:with-html
+              ;; TODO: May be return such basic helper as render-link.
+              ;;       Right now it does not work because was removed
+              ;;       during refactoring.
+              (render-link (lambda (&rest args)
+                             (declare (ignore args))
+                             (answer k (car choice)))
+                           (cdr choice))
+              (:raw "&nbsp;")))
+          choices)))
 
 (defun choices-post-wt (&key message content &allow-other-keys)
   (with-html-to-string 
