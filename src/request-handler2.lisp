@@ -47,7 +47,7 @@ Override this method (along with :before and :after specifiers) to
 customize behavior."))
 
 
-(defmethod handle-client-request :around ((app weblocks::weblocks-webapp))
+(defmethod handle-client-request :around ((app weblocks.app:app))
   "This wrapper sets current application and suppresses error output from Hunchentoot."
   (handler-bind ((error (lambda (c)
                           (if weblocks.variables:*catch-errors-p*
@@ -57,7 +57,7 @@ customize behavior."))
     (let ((*print-pretty* t)
           ; Hunchentoot already displays warnings into log file, we just suppress output
           (*error-output* (make-string-output-stream)))
-      (weblocks::with-webapp app
+      (weblocks.app:with-app app
         ;;(log4cl-json:with-log-unhandled ())
         (call-next-method)))))
 
@@ -79,7 +79,6 @@ customize behavior."))
     ;; Lispworks. For now let's only enable it on SBCL.
     (#-sbcl progn
      #+sbcl trivial-timeout:with-timeout #+sbcl (*request-timeout*)
-     (weblocks::webapp-update-thread-status "Request prelude")
      (unwind-protect
           (let* ((timings nil)
                  (weblocks::*timing-level* 0)
@@ -97,8 +96,7 @@ customize behavior."))
               (finish-output)
               (format t "~A time (real/cpu): ~F/~F~%" (car timing)
                       (cadr timing) (caddr timing)))
-            result)
-       (weblocks::webapp-update-thread-status "Request complete/idle")))))
+            result)))))
 
 
 (defgeneric page-not-found-handler (app)
@@ -248,22 +246,20 @@ association list. This function is normally called by
 
 
 
-(defmethod handle-ajax-request ((app weblocks:weblocks-webapp))
+(defmethod handle-ajax-request ((app weblocks.app:app))
   (log:debug "Handling AJAX request")
   
-  (weblocks:webapp-update-thread-status "Handling AJAX request")
   (weblocks::timing "handle-ajax-request"
     (update-location-hash-dependents)
     (render-dirty-widgets)))
 
 
-(defmethod handle-normal-request ((app weblocks:weblocks-webapp))
+(defmethod handle-normal-request ((app weblocks.app:app))
   ;; we need to render widgets before the boilerplate HTML
   ;; that wraps them in order to collect a list of script and
   ;; stylesheet dependencies.
   (log:debug "Handling normal request")
   
-  (weblocks::webapp-update-thread-status "Handling normal request [tree shakedown]")
   (bordeaux-threads:with-lock-held ((weblocks.session-lock:get-lock))
     ;; TODO: Probably it is good idea to remove this widget tree protocol
     ;;       from Weblocks and leave only rendering. Because update-widget-tree
@@ -275,19 +271,18 @@ association list. This function is normally called by
     ;;     (return-from handle-normal-request
     ;;       (page-not-found-handler app))))
 
-    (weblocks::webapp-update-thread-status "Handling normal request [rendering widgets]")
     (weblocks::timing "widget tree rendering"
       (weblocks.widget:render-widget (weblocks::root-widget))))
 
   ;; set page title if it isn't already set
-  (when (and (null weblocks::*current-page-description*)
-             (last (weblocks::all-tokens weblocks::*uri-tokens*)))
-    (setf weblocks::*current-page-description* 
-          (weblocks::humanize-name (weblocks::last-item
-                                    (weblocks::all-tokens weblocks::*uri-tokens*)))))
+  ;; TODO: removed because uri-tokens are removed
+  ;; (when (and (null weblocks::*current-page-description*)
+  ;;            (last (weblocks::all-tokens weblocks::*uri-tokens*)))
+  ;;   (setf weblocks::*current-page-description* 
+  ;;         (weblocks::humanize-name (weblocks::last-item
+  ;;                                   (weblocks::all-tokens weblocks::*uri-tokens*)))))
   ;; render page will wrap the HTML already rendered to
   ;; weblocks.html::*stream* with necessary boilerplate HTML
-  (weblocks::webapp-update-thread-status "Handling normal request [rendering page]")
   (weblocks::timing "page render"
     ;; Here we are using internal symbol, because we don't want to expose
     ;; this method for usage outside of the weblocks.
@@ -299,7 +294,7 @@ association list. This function is normally called by
   (weblocks::remove-parameter-from-uri uri weblocks.variables:*action-string*))
 
 
-(defmethod handle-client-request ((app weblocks:weblocks-webapp))
+(defmethod handle-client-request ((app weblocks.app:app))
   (restart-case
       (progn                            ;save it for splitting this up
         ;; TODO: replace with lack.session
@@ -328,7 +323,7 @@ association list. This function is normally called by
                                       (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
                                     (signal c))))
               (setf (weblocks.session:get-value 'weblocks::root-widget)
-                    (weblocks::init-session app)))
+                    (weblocks.app:init-session app)))
               
             ;; TODO: understand why there is coupling with Dialog here and
             ;;       how to move it into the Dialog's code.
@@ -339,9 +334,10 @@ association list. This function is normally called by
 
           (weblocks.dependencies:with-collected-dependencies
             (let ((content nil) ;; this variable will be set to HTML string after rendering
-                  (weblocks::*uri-tokens*
-                    (make-instance 'weblocks::uri-tokens
-                                   :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
+                  ;; TODO: may be remove uri-tokens
+                  ;; (weblocks::*uri-tokens*
+                  ;;   (make-instance 'weblocks::uri-tokens
+                  ;;                  :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
                   weblocks.variables:*before-ajax-complete-scripts*
                   weblocks.variables:*on-ajax-complete-scripts*
                   weblocks::*current-page-title*
@@ -365,7 +361,6 @@ association list. This function is normally called by
                       action-name
                       action-arguments)))
 
-                  (weblocks::webapp-update-thread-status "Processing action")
                   (weblocks::timing "action processing (w/ hooks)"
                     (weblocks.hooks:with-hook (:action)
                       (weblocks.actions:eval-action
@@ -401,9 +396,10 @@ association list. This function is normally called by
               ;; TODO: replace return-code with something else
               (if (eql weblocks.response:*code* 200)
                   (progn
-                    (unless (weblocks.request:ajax-request-p)
-                      (setf (weblocks.session:get-value 'last-request-uri)
-                            (weblocks::all-tokens weblocks::*uri-tokens*)))
+                    ;; TODO: Removed, because uri-tokens were removed
+                    ;; (unless (weblocks.request:ajax-request-p)
+                    ;;   (setf (weblocks.session:get-value 'last-request-uri)
+                    ;;         (weblocks::all-tokens weblocks::*uri-tokens*)))
                     ;; Return rendered content as a response on request.
                     content)
                   ;; TODO: use weblocks.error-handler here

@@ -27,7 +27,7 @@
 
 
 ;; TODO: rethink this method implementation
-(defmethod weblocks::handle-error-condition ((app weblocks:weblocks-webapp) c)
+(defmethod weblocks::handle-error-condition ((app weblocks.app:app) c)
   "Print a pretty platform-specific backtrace if possible;
 otherwise just call TRIVIAL-BACKTRACE to get a basic stack report."
 

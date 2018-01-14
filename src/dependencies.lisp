@@ -210,39 +210,40 @@ when new dependencies appeared in AJAX page updates.")
 
 ;; Dependency gathering
 
-(defun make-local-dependency (type file-name &key do-not-probe media (webapp *current-webapp*) (import-p nil))
-  "Make a local (e.g. residing on the same web server) dependency of
-type :stylesheet or :script. Unless :do-not-probe is set, checks if
-file-name exists in the server's public files directory, and if it does,
-returns a dependency object."
+;; REMOVED because there are new dependencies in dependencies2.lisp
+;; (defun make-local-dependency (type file-name &key do-not-probe media (webapp *current-webapp*) (import-p nil))
+;;   "Make a local (e.g. residing on the same web server) dependency of
+;; type :stylesheet or :script. Unless :do-not-probe is set, checks if
+;; file-name exists in the server's public files directory, and if it does,
+;; returns a dependency object."
   
-  (log:debug "Making local dependency of" type "from" file-name)
+;;   (log:debug "Making local dependency of" type "from" file-name)
   
-  (let* ((relative-path (public-file-relative-path type file-name))
-         (physical-path (princ-to-string (merge-pathnames relative-path
-                                                          (compute-webapp-public-files-path webapp))))
-         (file-exists (probe-file physical-path)))
+;;   (let* ((relative-path (public-file-relative-path type file-name))
+;;          (physical-path (princ-to-string (merge-pathnames relative-path
+;;                                                           (compute-webapp-public-files-path webapp))))
+;;          (file-exists (probe-file physical-path)))
     
-    (if (or do-not-probe file-exists)
-      (let ((virtual-path (concatenate 'string
-                                       (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
-                                       relative-path)))
-        (unless do-not-probe
-          (when (find type (version-dependency-types* webapp))
-            (multiple-value-setq (physical-path virtual-path)
-              (update-versioned-dependency-path physical-path virtual-path)))
-          (when import-p
-            (update-import-css-content physical-path))    
-          (when (find type (gzip-dependency-types* webapp))
-            (create-gziped-dependency-file physical-path)))
-        (ecase type
-          (:stylesheet (make-instance 'stylesheet-dependency
-                                      :url virtual-path :media media
-                                      :local-path physical-path))
-          (:script (make-instance 'script-dependency :url virtual-path
-                                                     :local-path physical-path))))
-      (log:warn "Depdendency wasn't found locally"
-                physical-path))))
+;;     (if (or do-not-probe file-exists)
+;;       (let ((virtual-path (concatenate 'string
+;;                                        (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
+;;                                        relative-path)))
+;;         (unless do-not-probe
+;;           (when (find type (version-dependency-types* webapp))
+;;             (multiple-value-setq (physical-path virtual-path)
+;;               (update-versioned-dependency-path physical-path virtual-path)))
+;;           (when import-p
+;;             (update-import-css-content physical-path))    
+;;           (when (find type (gzip-dependency-types* webapp))
+;;             (create-gziped-dependency-file physical-path)))
+;;         (ecase type
+;;           (:stylesheet (make-instance 'stylesheet-dependency
+;;                                       :url virtual-path :media media
+;;                                       :local-path physical-path))
+;;           (:script (make-instance 'script-dependency :url virtual-path
+;;                                                      :local-path physical-path))))
+;;       (log:warn "Depdendency wasn't found locally"
+;;                 physical-path))))
 
 
 (defun build-dependencies (dep-list &optional (app *current-webapp*))

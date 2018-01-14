@@ -43,11 +43,10 @@ KEY is compared using EQUAL."
 
 
 ;; Previously delete-webapp-session-value
-(defun delete-value (key &optional (webapp weblocks::*current-webapp*))
-  "Clear the session value for the currently running webapp.
-KEY is compared using EQUAL."
-  (declare (ignorable webapp))
+(defun delete-value (key)
+  "Clear the session value for the currently running app.
 
+   KEY is compared using EQUAL."
   (remhash key *session*))
 
 

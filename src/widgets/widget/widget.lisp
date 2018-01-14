@@ -592,7 +592,6 @@ Slots will be copied shallowly except for CHILDREN."
 
 (defmethod render-widget-body :around ((widget widget) &rest args)
   "Record profiling information."
-  (webapp-update-thread-status (concatenate 'string "rendering widget " (princ-to-string widget)))
   (timing (concatenate 'string "render-widget " (princ-to-string widget))
     (call-next-method)))
 

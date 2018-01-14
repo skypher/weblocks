@@ -69,7 +69,7 @@ it does not, signals an error."
       
       ;; if it is an action code
       (multiple-value-bind (res presentp)
-          (webapp-permanent-action function-or-action)
+          (weblocks.app:get-action function-or-action)
         (declare (ignore res))
         (if presentp
             function-or-action
@@ -104,12 +104,12 @@ appropriate function is returned. If no action is in the parameter,
 returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
   (when action-name
-    (let* ((permanent-action (webapp-permanent-action action-name))
+    (let* ((app-wide-action (weblocks.app:get-action action-name))
            (code->action 
              (weblocks.session:get-value 'code->action
                                          (make-hash-table :test #'equal)))
            (session-action (gethash action-name code->action))
-           (request-action (or permanent-action session-action)))
+           (request-action (or app-wide-action session-action)))
       ;; TODO: rethink this form. May be throw a special condition instead of string
       (unless *ignore-missing-actions*
         (assert request-action (request-action)

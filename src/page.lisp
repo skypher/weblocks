@@ -37,7 +37,7 @@
 (def-get-set language)
 
 
-(defmethod render-headers ((app weblocks:weblocks-webapp))
+(defmethod render-headers ((app weblocks.app:app))
   "A placeholder to add :meta entries, :expires headers and other 
    header content on a per-webapp basis.  For example, using a dynamic 
    hook on rendering you can bind special variables that are dereferenced 
@@ -66,14 +66,14 @@
     ))
 
 
-(defmethod render-body ((app weblocks:weblocks-webapp) body-string)
+(defmethod render-body ((app weblocks.app:app) body-string)
   "Default page-body rendering method"
   
   (spinneret:with-html
     (:raw body-string)))
 
 
-(defmethod render-dependencies ((app weblocks:weblocks-webapp) dependencies)
+(defmethod render-dependencies ((app weblocks.app:app) dependencies)
   (etypecase dependencies
     (list (mapc #'weblocks.dependencies:render-in-head
                  dependencies))
@@ -81,7 +81,7 @@
               (:raw dependencies)))))
 
 
-(defmethod render ((app weblocks:weblocks-webapp)
+(defmethod render ((app weblocks.app:app)
                    inner-html
                    &key (dependencies (weblocks.dependencies:get-dependencies
                                        app)))
@@ -111,7 +111,7 @@
         )))))
 
 
-(defmethod render-page-with-widgets ((app weblocks:weblocks-webapp))
+(defmethod render-page-with-widgets ((app weblocks.app:app))
   "Renders a full HTML by collecting header elements, dependencies and inner
    HTML and inserting them into the `render' method."
   (log:debug "Special Rendering page for" app)

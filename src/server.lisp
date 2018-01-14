@@ -113,13 +113,13 @@
 ;;       (mapcar (lambda (class)
 ;;                 (unless (get-webapps-for-class class)
 ;;                   (start-webapp class :debug debug)))
-;;               *autostarting-webapps*))))
+;;               (weblocks.app:get-autostarting-webapps)))))
 
 ;; Moved to weblocks.server
 ;; (defun stop-weblocks ()
 ;;   "Stops weblocks. Closes all stores declared via 'defstore'."
 ;;   (when (not (null *weblocks-server*))
-;;     (dolist (app *active-webapps*)
+;;     (dolist (app (weblocks.app:get-active-webapps))
 ;;       (stop-webapp (weblocks-webapp-name app)))
 ;;     (setf *last-session* nil)
 ;;     (reset-sessions)
@@ -176,7 +176,7 @@
 ;;   and their static files."
 ;;   (log:debug "Serving" request)
   
-;;   (dolist (app *active-webapps*)
+;;   (dolist (app (weblocks.app:get-active-webapps))
 ;;     (log:debug "Searching file in" app)
     
 ;;     (let* ((script-name (script-name request))

@@ -32,13 +32,6 @@ case, the symbols will be imported first if need be."
   cycle. This is a special variable modified by the actions that
   change state of widgets.")
 
-(defvar *autostarting-webapps* nil
-  "A list of webapps to start when start-weblocks is called")
-
-(defvar *active-webapps* nil
-  "A list of running applications.  Applications are only available
-   after they have been started.")
-
 (defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
   "Escape script blocks inside scripts."
   (ppcre:regex-replace-all

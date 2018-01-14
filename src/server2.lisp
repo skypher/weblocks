@@ -86,39 +86,13 @@ This function serves all started applications and their static files."
               (return-from handle-request
                 (weblocks.routes:serve route env)))
 
-            (dolist (app weblocks::*active-webapps*)
-              (let ((app-prefix (weblocks::webapp-prefix app))
-                    (app-pub-prefix (weblocks::compute-webapp-public-files-uri-prefix app)))
+            (dolist (app (weblocks.app:get-active-apps))
+              (let ((app-prefix (weblocks.app:get-prefix app)))
 
-                (log:debug "Searching handler in" app app-prefix app-pub-prefix)
+                (log:debug "Searching handler in" app app-prefix)
 
                 (cond
-                  ((or 
-                    (find path-info weblocks::*force-files-to-serve* :test #'string=)
-                    (and (weblocks::webapp-serves-hostname hostname app)
-                         (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
-                                                     (weblocks::tokenize-uri app-pub-prefix nil)
-                                                     :test #'string=)))
-                                         
-                   ;; TODO: Remove this block because it is related to an old way to serve static
-                                         
-                   (let* ( ;; (virtual-folder (weblocks::maybe-add-trailing-slash app-pub-prefix))
-                          ;; (physical-folder (weblocks::compute-webapp-public-files-path app))
-                          ;; TODO send-gzip-rules move to this file
-                          ;; (content-type (weblocks::send-gzip-rules (weblocks::gzip-dependency-types* app)
-                          ;;                                          path-info env virtual-folder physical-folder))
-                          )
-                     ;; TODO send-cache-rules
-                     (weblocks::send-cache-rules (weblocks::weblocks-webapp-public-files-cache-time app))
-
-                     ;; This is not optimal, because a new dispatcher created for each request
-                     ;; TODO: find out how to serve directory in Clack
-                     ;;       and move route creation into app initialization code
-                     ;; (return-from handle-request
-                     ;;   (funcall (weblocks::create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-                     ;;            env))
-                     ))
-                  ((and (weblocks::webapp-serves-hostname hostname app)
+                  ((and (weblocks.app:app-serves-hostname-p app hostname)
                         (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
                                                     (weblocks::tokenize-uri app-prefix nil)
                                                     :test #'string=))
@@ -186,14 +160,7 @@ This function serves all started applications and their static files."
                                :address interface
                                :server (get-server-type server)
                                :port port
-                               :debug debug)))
-
-        (log:info "Starting webapps flagged as ``autostarted``")
-        
-        (mapcar (lambda (class)
-                  (unless (weblocks:get-webapps-for-class class)
-                    (weblocks:start-webapp class :debug debug)))
-                weblocks::*autostarting-webapps*)))
+                               :debug debug)))))
   server)
 
 
@@ -251,10 +218,12 @@ declared AUTOSTART."
                                :interface interface
                                :server-type server-type))
             :debug debug)
+     
+     (log:info "Starting webapps flagged as ``autostarted``")
      (mapcar (lambda (class)
-               (unless (weblocks::get-webapps-for-class class)
+               (unless (weblocks.app:app-active-p class)
                  (weblocks::start-webapp class :debug debug)))
-             weblocks::*autostarting-webapps*))))
+             (weblocks.app:get-autostarting-apps)))))
 
 
 (defun stop-weblocks ()
@@ -266,7 +235,7 @@ declared AUTOSTART."
     (weblocks.hooks:with-hook
         (:stop-weblocks)
         
-        (dolist (app weblocks::*active-webapps*)
+        (dolist (app (weblocks.app:get-active-apps))
           (weblocks::stop-webapp (weblocks::weblocks-webapp-name app)))
 
         ;; Was commented because *last-session* is unknown

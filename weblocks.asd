@@ -25,6 +25,8 @@
    :closer-mop
    :puri
    :cl-json
+   :alexandria
+   :serapeum ;; utilities, like alexandria
    :spinneret
    :parenscript
    :cl-fad

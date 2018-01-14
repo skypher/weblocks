@@ -23,12 +23,82 @@ change them in the ``render`` method.
 Application level
 =================
 
+All code, related to application class, was moved to the package
+``weblocks.app``. Base aplication class was renamed to
+``weblocks.app:app``, and macro for definition of the new
+application was renamed to ``weblocks.app:defapp``.
+
+All code related to application's metaclass, was moved to
+the package ``weblocks.app-mop``. Metaclass was renamed to
+``weblocks.app-mop:app-class``.
+
 Application's slot ``html-indent-p`` and corresponding accessor
 ``weblocks-webapp-html-indent-p`` were removed because now spinneret
 generates non indented code.
 
 Slot ``init-user-session`` was completely removed and replace with a generic
 method ``init-session``.
+
+Function ``update-thread-status`` and method ``webapp-update-thread-status``
+were removed.
+
+Function ``get-webapps-for-class`` was renamed to ``app-active-p`` and
+now returns ``t`` if application of given class is already active.
+
+Function ``start-webapp`` was renamed to ``weblocks.app:start``.
+
+Function ``get-webapp`` was renamed to ``get-active-app`` and optional
+argument ``error-p`` was renamed to keyword argument ``signal-error``.
+
+Function ``find-app`` was removed.
+
+Variable ``*default-webapp*`` was removed.
+
+Variable ``*active-webapps*`` was renamed to
+``weblocks.app::*active-apps*`` and made internal. Use
+``weblocks.app:get-active-apps`` function.
+
+Reader ``weblocks-webapp-prefix`` was renamed to
+``weblocks.app:get-prefix``.
+
+Slot ``default-store-name`` and its accessor
+``webapp-default-store-name`` were removed.
+
+Variable ``*current-webapp*`` was moved to
+``weblocks.app::*current-app*``.
+
+Functions ``compute-webapp-public-files-uri-prefix``,
+``compute-webapp-public-files-uri-prefix``,
+``compute-webapp-public-files-path``,
+``make-webapp-public-file-uri``,
+``weblocks-webapp-public-files-cache-time`` and variable
+``*default-public-files-path*`` were removed because
+now there is another way to serve static.
+
+Function ``webapp-serves-hostname`` was renamed to
+``weblocks.app:app-serves-hostname-p`` and now accepts app as the first
+argument and hostname as the second.
+
+
+Variable ``*uri-tokens*`` was removed and weblocks does not set
+'last-request-uri session value to all uri tokens anymore.
+
+Macro ``with-webapp`` was moved to ``weblocks.app:with-app``.
+
+Function ``webapp-permanent-action`` was moved to
+``weblocks.app:get-action``.
+
+Function ``add-webapp-permanent-action`` was moved to
+``weblocks.app:add-action`` and ``remove-webapp-permanent-action`` to
+``weblocks.app:remove-action``.
+
+Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
+were moved to ``weblocks.app:define-action`` and ``weblocks.app:define-action/cc``.
+
+These functions were moved into the separate package
+``weblocks.current-app`` and renamed:
+
+* ``webapp-prefix`` -> ``get-prefix``;
 
 Removals
 ========
