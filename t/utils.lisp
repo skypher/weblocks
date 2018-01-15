@@ -1,7 +1,6 @@
 (in-package :cl-user)
 (defpackage #:weblocks.t.utils
   (:use #:cl
-        #:weblocks
         #:hamcrest.prove)
   (:export
    #:with-request
@@ -17,7 +16,7 @@
      ,@body))
 
 
-(defwebapp test-app
+(weblocks.app:defapp test-app
   :prefix "/"
   :autostart nil)
 
@@ -26,14 +25,11 @@
   "Argument 'data' should be an alist with POST parameters if method is :POST."
   `(weblocks.hooks:prepare-hooks
      (let* ((env (lack.test:generate-env ,uri :method ,method :content ,data))
-            (weblocks.request::*request* (lack.request:make-request env))
             ;; we need to setup a current webapp, because
             ;; uri tokenizer needs to know app's uri prefix
-            (weblocks::*current-webapp* (make-instance 'test-app))
-            (weblocks::*uri-tokens*
-              (make-instance 'weblocks::uri-tokens
-                             :tokens (weblocks::tokenize-uri (weblocks.request:get-path)))))
-       ,@body)))
+            (weblocks.app::*current-app* (make-instance 'test-app)))
+       (weblocks.request:with-request ((lack.request:make-request env))
+        ,@body))))
 
 
 (defmacro is-html (form expected &optional message)

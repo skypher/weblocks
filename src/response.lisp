@@ -7,7 +7,8 @@
    #:add-header
    #:*headers*
    #:send-script
-   #:make-uri))
+   #:make-uri
+   #:redirect))
 (in-package weblocks.response)
 
 
@@ -111,3 +112,15 @@ HTTP code and headers are taken from *code* and *content-type*."
           )
         (weblocks:with-javascript
           script))))
+
+
+(defun redirect (uri)
+  "Redirects the client to a new URI."
+  (if (weblocks.request:ajax-request-p)
+      (weblocks.response:abort-processing
+       (format nil "{\"redirect\":\"~A\"}" uri)
+       :content-type "application/json")
+      (weblocks.response:abort-processing
+       ""
+       :headers (list :location uri)
+       :code 302)))

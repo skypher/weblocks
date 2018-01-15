@@ -11,11 +11,11 @@
 (subtest "refresh-request-p-1"
   (with-session
     (with-request ("/foo/bar")
-      (setf (weblocks.session:get-value 'weblocks::last-request-uri)
-            '("foo" "bar"))
+      (setf (weblocks.session:get-value 'weblocks.request::last-request-path)
+            "/foo/bar")
       (is (weblocks.request:refresh-request-p)
           t
-          "Refresh-request-p should return true, because current URI has same tokens as last-request-uri."))))
+          "Refresh-request-p should return true, because current URI has same tokens as last-request-path."))))
 
 
 (subtest "Getting full uri for request"

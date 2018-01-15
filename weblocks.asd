@@ -63,27 +63,29 @@
                                       )
                              (:file "variables")
                              (:file "html")
-                             (:file "session")
-                             (:file "hooks")
-                             (:file "debug")
                              (:file "weblocks")
-                             (:file "request2")
-
                              (:file "versioning")
                              (:file "bundling")
-                             (:file "actions")
-                             (:file "actions2")
-                             (:file "response")
-                             ;; TODO: remove
+                             (:file "response"
+                              :depends-on ("request2"
+                                           "actions2"))
                              (:file "dependencies")
-                             (:file "routes")
-                             (:file "dependencies2")
-                             (:file "dom-object")
-                             (:file "application-mop")
+                             (:file "dependencies2"
+                              :depends-on ("response"
+                                           "routes"))
                              (:module "js-backend"
                               :components ((:file "base")
                                            (:file "jquery")))
+                             (:file "application-mop")
+                             (:file "application")
+                             (:file "actions")
+                             (:file "actions2"
+                              :depends-on ("hooks"))
+                             ;; TODO: remove
+                             (:file "routes")
+                             (:file "dom-object")
                              (:module widgets
+                              :depends-on ("dependencies2")
                               :components ((:module widget
                                             :components ((:file "widget-mop")
                                                          (:file "uri-parameters-mixin")
@@ -91,7 +93,15 @@
                                                          (:file "widget2")
                                                          (:file "string-widget")
                                                          (:file "funcall-widget")))))
-                             (:file "application")
+                             (:file "session")
+                             (:file "default-init"
+                              :depends-on ("session"
+                                           "widgets"
+                                           "html"))
+                             (:file "request2"
+                              :depends-on ("session"))
+                             (:file "hooks")
+                             (:file "debug")
                              (:file "page")
                              (:file "log-actions")
                              (:file "debug-mode")
@@ -107,7 +117,6 @@
                                            (:file "workflow")))
                              (:file "server")
                              (:file "server2")
-                             (:file "request")
                              ;; (:file "default-application")
                              )))
   ;;  :in-order-to ;; ((test-op (load-op "weblocks-test"))

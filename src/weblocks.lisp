@@ -6,7 +6,7 @@
 (do-external-symbols (s (find-package :cont))
   (export (list s)))
 
-(export '(reset-sessions str with-javascript with-javascript-to-string root-widget))
+(export '(str with-javascript with-javascript-to-string))
 
 (defun wexport (symbols-designator &optional (package-specs t))
   "Export SYMBOLS-DESIGNATOR from PACKAGE-SPECS.  Over `export',
@@ -58,11 +58,6 @@ having to worry about special characters in JavaScript code."
   "Places 'source' between script and CDATA elements. Used to avoid
 having to worry about special characters in JavaScript code."
   `(weblocks.html:with-html-string ,(apply #'%js source args)))
-
-(defmacro root-widget ()
-  "Expands to code that can be used as a place to access to the root
-composite."
-  `(weblocks.session:get-value 'root-widget))
 
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

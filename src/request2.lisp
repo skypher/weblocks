@@ -1,7 +1,6 @@
 (defpackage #:weblocks.request
   (:use #:cl)
   (:export
-   #:*request*
    #:get-parameters
    #:get-parameter
    #:get-header
@@ -13,16 +12,13 @@
    #:refresh-request-p
    #:remove-header
    #:get-uri
-   #:get-path))
+   #:get-path
+   #:with-request))
 (in-package weblocks.request)
 
 
 (defvar *request* nil
   "Holds current request from a browser.")
-
-
-(defvar *latest-request* nil
-  "For debugging")
 
 
 (defun get-uri (&key (request *request*))
@@ -136,5 +132,36 @@ if there is an action involved (even if the user hits refresh)."
   (let ((action-name (get-action-name-from-request)))
     (and
      (null (weblocks::get-request-action action-name))
-     (equalp (weblocks::all-tokens weblocks::*uri-tokens*)
-             (weblocks.session:get-value 'weblocks::last-request-uri)))))
+     (equalp (weblocks.request:get-path)
+             (weblocks.session:get-value 'last-request-path)))))
+
+
+(defun parse-location-hash ()
+  (let ((raw-hash (weblocks.request:get-parameter "weblocks-internal-location-hash")))
+    (when raw-hash
+      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
+
+
+;; (defmacro with-path ((path) &body body)
+;;   "This macro stores given uri in the session if requiest is not AJAX.
+
+;;    Later, this value is used to determine if user refreshed the page."
+;;   `(progn
+;;      ,@body
+;;      (unless (ajax-request-p)
+;;        (setf (weblocks.session:get-value 'last-request-path)
+;;              ,path))))
+
+
+(defmacro with-request ((request) &body body)
+  "This macro binds current request and stores request path in the session if requiest is not AJAX.
+
+   Later, this value is used to determine if user refreshed the page."
+  `(let ((*request* ,request))
+     ,@body
+     (unless (ajax-request-p)
+       (setf (weblocks.session:get-value 'last-request-path)
+             (get-path)))))
+
+
+

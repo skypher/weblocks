@@ -25,7 +25,7 @@ dynamic variables. The default implementation executes a user
 action (if any) and renders the root widget wrapped in HTML
 provided by 'render-page'. If the request is an AJAX request, only the
 dirty widgets are rendered into a JSON data structure. It also invokes
-user supplied 'init-session' method on the first request that has no
+user supplied 'weblocks.session:init' method on the first request that has no
 session setup.
 
 'handle-client-request' immediately returns '+http-not-found+' if it
@@ -195,7 +195,7 @@ association list. This function is normally called by
   (remove-duplicate-dirty-widgets)
 
   (setf weblocks.response:*content-type*
-        weblocks::*json-content-type*)
+        "application/json; charset=utf-8")
   
   (let ((render-state (make-hash-table :test 'eq)))
     (labels ((circularity-warn (w)
@@ -302,8 +302,6 @@ association list. This function is normally called by
         ;;   (when (get-action-name-from-request)
         ;;     (weblocks::expired-action-handler app))
         ;;   (weblocks::start-session)
-        ;;   (setf (weblocks::weblocks.session:get-value 'last-request-uri)
-        ;;         :none)
         ;;   (when weblocks::*rewrite-for-session-urls*
         ;;     (weblocks::redirect (weblocks::request-uri*))))
         ;;
@@ -312,98 +310,90 @@ association list. This function is normally called by
         ;;     (setf weblocks::*last-session*
         ;;           weblocks::*session*)))
 
-        (let ((uri (weblocks.request:get-path)))
-          (log:debug "Handling client request" uri))
+        (let ((path (weblocks.request:get-path)))
+          (log:debug "Handling client request" path)
 
-        (let (weblocks::*dirty-widgets*)
-          (when (null (weblocks::root-widget))
-            (handler-bind ((error (lambda (c) 
-                                    (warn "Error initializing user session: ~A" c)
-                                    (when weblocks.variables:*backtrace-on-session-init-error*
-                                      (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
-                                    (signal c))))
-              (setf (weblocks.session:get-value 'weblocks::root-widget)
-                    (weblocks.app:init-session app)))
+          (let (weblocks::*dirty-widgets*)
+            ;; TODO: Probably, replace this with a macro like
+            ;;       (weblocks.session:with-session ...)
+            (when (null (weblocks::root-widget))
+              (handler-bind ((error (lambda (c) 
+                                      (warn "Error initializing user session: ~A" c)
+                                      (when weblocks.variables:*backtrace-on-session-init-error*
+                                        (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
+                                      (signal c))))
+                (setf (weblocks.session:get-value 'weblocks::root-widget)
+                      (weblocks.session:init app)))
               
-            ;; TODO: understand why there is coupling with Dialog here and
-            ;;       how to move it into the Dialog's code.
+              ;; TODO: understand why there is coupling with Dialog here and
+              ;;       how to move it into the Dialog's code.
               
-            (weblocks.hooks:add-session-hook :action
-                update-dialog ()
-              (weblocks::update-dialog-on-request)))
+              (weblocks.hooks:add-session-hook :action
+                  update-dialog ()
+                (weblocks::update-dialog-on-request)))
 
-          (weblocks.dependencies:with-collected-dependencies
-            (let ((content nil) ;; this variable will be set to HTML string after rendering
-                  ;; TODO: may be remove uri-tokens
-                  ;; (weblocks::*uri-tokens*
-                  ;;   (make-instance 'weblocks::uri-tokens
-                  ;;                  :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
-                  weblocks.variables:*before-ajax-complete-scripts*
-                  weblocks.variables:*on-ajax-complete-scripts*
-                  weblocks::*current-page-title*
-                  weblocks::*current-page-description*
-                  weblocks::*current-page-keywords*
-                  weblocks::*current-page-headers*)
+            (weblocks.dependencies:with-collected-dependencies
+              (let ((content nil) ;; this variable will be set to HTML string after rendering
+                    ;; TODO: may be remove uri-tokens
+                    ;; (weblocks::*uri-tokens*
+                    ;;   (make-instance 'weblocks::uri-tokens
+                    ;;                  :tokens (weblocks::tokenize-uri (weblocks.request:get-path))))
+                    weblocks.variables:*before-ajax-complete-scripts*
+                    weblocks.variables:*on-ajax-complete-scripts*
+                    weblocks::*current-page-title*
+                    weblocks::*current-page-description*
+                    weblocks::*current-page-keywords*
+                    weblocks::*current-page-headers*)
 
-              
-              (weblocks.dependencies:push-dependencies
-               (weblocks.dependencies:get-dependencies app))
-              
-              (let ((action-name (weblocks.request::get-action-name-from-request))
-                    (action-arguments
-                      (weblocks::alist->plist (weblocks.request:get-parameters))))
+                
+                (weblocks.dependencies:push-dependencies
+                 (weblocks.dependencies:get-dependencies app))
+                
+                (let ((action-name (weblocks.request::get-action-name-from-request))
+                      (action-arguments
+                        (weblocks::alist->plist (weblocks.request:get-parameters))))
 
-                (when action-name
-                  (when (weblocks::pure-request-p)
-                    (weblocks.response:abort-processing
-                     (weblocks.actions:eval-action
-                      app
-                      action-name
-                      action-arguments)))
+                  (when action-name
+                    (when (weblocks::pure-request-p)
+                      (weblocks.response:abort-processing
+                       (weblocks.actions:eval-action
+                        app
+                        action-name
+                        action-arguments)))
 
-                  (weblocks::timing "action processing (w/ hooks)"
-                    (weblocks.hooks:with-hook (:action)
-                      (weblocks.actions:eval-action
-                       app
-                       action-name
-                       action-arguments)))))
+                    (weblocks::timing "action processing (w/ hooks)"
+                      (weblocks.hooks:with-hook (:action)
+                        (weblocks.actions:eval-action
+                         app
+                         action-name
+                         action-arguments)))))
 
-              ;; Remove "action" parameter for the GET parameters
-              ;; it it is not an AJAX request
-              (when (and (not (weblocks.request:ajax-request-p))
-                         (weblocks.request:get-parameter weblocks.variables:*action-string*))
-                (weblocks::redirect (remove-action-from-uri
-                                     (weblocks.request:get-path :with-params t))))
+                ;; Remove "action" parameter for the GET parameters
+                ;; it it is not an AJAX request
+                (when (and (not (weblocks.request:ajax-request-p))
+                           (weblocks.request:get-parameter weblocks.variables:*action-string*))
+                  (weblocks::redirect (remove-action-from-uri
+                                       (weblocks.request:get-path :with-params t))))
 
-              (setf content
-                    (weblocks.html:with-html-string
-                      (weblocks::timing "rendering (w/ hooks)"
-                        (weblocks.hooks:with-hook (:render)
-                          (if (weblocks.request:ajax-request-p)
-                              (handle-ajax-request app)
-                              (handle-normal-request app))
+                (setf content
+                      (weblocks.html:with-html-string
+                        (weblocks::timing "rendering (w/ hooks)"
+                          (weblocks.hooks:with-hook (:render)
+                            (if (weblocks.request:ajax-request-p)
+                                (handle-ajax-request app)
+                                (handle-normal-request app))
 
-                          ;; Now we'll add routes for each page dependency.
-                          ;; This way, a dependency for widgets, created by action
-                          ;; can be served when browser will follow up with next request.
-                          (let ((dependencies (weblocks.dependencies:get-collected-dependencies)))
-                            (log:debug "Collected dependencies"
-                                       dependencies)
+                            ;; Now we'll add routes for each page dependency.
+                            ;; This way, a dependency for widgets, created by action
+                            ;; can be served when browser will follow up with next request.
+                            (let ((dependencies (weblocks.dependencies:get-collected-dependencies)))
+                              (log:debug "Collected dependencies"
+                                         dependencies)
 
-                            (weblocks.dependencies:register-dependencies
-                             dependencies))))))
+                              (weblocks.dependencies:register-dependencies
+                               dependencies))))))
 
-              ;; TODO: replace return-code with something else
-              (if (eql weblocks.response:*code* 200)
-                  (progn
-                    ;; TODO: Removed, because uri-tokens were removed
-                    ;; (unless (weblocks.request:ajax-request-p)
-                    ;;   (setf (weblocks.session:get-value 'last-request-uri)
-                    ;;         (weblocks::all-tokens weblocks::*uri-tokens*)))
-                    ;; Return rendered content as a response on request.
-                    content)
-                  ;; TODO: use weblocks.error-handler here
-                  (weblocks::handle-http-error app weblocks.response:*code*))))))
+                content)))))
 
     ;; Restart
     (abort ()

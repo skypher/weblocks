@@ -10,7 +10,6 @@
    #:get-autostarting-apps
    #:get-registered-apps
    #:app-active-p
-   #:init-session
    #:start
    #:find-active-app
    #:get-active-apps
@@ -35,7 +34,6 @@
 ;;           get-webapps-for-class
 ;;           initialize-webapp
 ;;           finalize-webapp
-;;           init-session
 ;;           webapp-name in-webapp
 ;;           bundle-dependency-types
 ;;           version-dependency-types
@@ -193,28 +191,6 @@ layout and dependencies running on the same server."))
   (unless (string= prefix "/") ;; XXX multiple slashes?
     (setf (slot-value app 'prefix)
           (weblocks::strip-trailing-slashes prefix))))
-
-
-(defgeneric init-session (app)
-  (:documentation "This method should be defined for weblocks application.
-                   it should return a widget which become a root widget."))
-
-
-(defmethod init-session ((app app))
-  (let ((quickstart-url "http://40ants.com/weblocks/quickstart.html"))
-    (weblocks.widgets.string-widget:make-string-widget
-     (weblocks.html:with-html-string
-       (:h1 "No init-session method defined.")
-       (:p "Please define a method init-session to initialize a session.")
-       (:p "It could be something simple, like this one:")
-       (:pre
-        (:code
-         "(defmethod init-session ((app your-app-class))
-            \"Hello world!\")"))
-
-       (:p ("Read more in [documentaion]()."
-            quickstart-url)))
-     :escape-p nil)))
 
 
 ;; abstraction macro
@@ -468,7 +444,7 @@ prefix and the provided uri)."
            *apps-actions*))
 
 (defun get-action (action)
-  "Returns the action function associated with this symbol in the current webapp"
+  "Returns the action function associated with this symbol in the current app"
   (when (boundp '*current-app*)
     (let ((action-table (get-app-actions *current-app*)))
       (when action-table
@@ -533,23 +509,18 @@ prefix and the provided uri)."
         when (eql package (weblocks::webapp-class-home-package class))
           collect class))
 
+
 (defun call-in-webapp (app proc)
   "Helper for `in-webapp'."
   (let ((*current-app* app))
     (funcall proc)))
+
 
 (defmacro with-app (app &body forms)
   "Bind variables that are both webapp-specific, or applicable to just
 this app, and webapp-general, or not particular to some request to
 this app, with regard to WEBAPP."
   `(call-in-webapp ,app (f0 . ,forms)))
-
-(defun in-webapp (&optional name)
-  "Set the current webapp to NAME, or the last webapp registered if NAME is
-not supplied. Returns the selected webapp. Convenience function for the REPL."
-  (setf *current-app*
-        (find-active-app (or name
-                             (first (get-registered-apps))))))
 
 
 (defun webapp-name (&optional (app *current-app*))

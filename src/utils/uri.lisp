@@ -48,32 +48,33 @@
 (defun remove-url-query-string (str)
   (cl-ppcre:regex-replace "\\?.*" str ""))
 
-(defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
-                                                                (weblocks.app:get-current))))
-  "Tokenizes an URI into a list of elements.
+;; TODO: remove, because we don't need URI tokenization anymore
+;; (defun tokenize-uri (uri &optional (remove-app-prefix t) (app (when remove-app-prefix
+;;                                                                 (weblocks.app:get-current))))
+;;   "Tokenizes an URI into a list of elements.
 
-ex:
-\(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
-=> (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
-  (flet ((remove-first-and-last-empty-strings (list)
-           (when (string= "" (first list))
-             (setf list (cdr list)))
+;; ex:
+;; \(tokenize-uri \"/hello/world/blah\\test\\hala/world?hello=5;blah=7\"
+;; => (\"hello\" \"world\" \"blah\" \"test\" \"hala\" \"world\")"
+;;   (flet ((remove-first-and-last-empty-strings (list)
+;;            (when (string= "" (first list))
+;;              (setf list (cdr list)))
 
-           (when (string= "" (car (last list)))
-             (setf list (butlast list)))
-           list))
+;;            (when (string= "" (car (last list)))
+;;              (setf list (butlast list)))
+;;            list))
 
-    (remove-first-and-last-empty-strings 
-      (loop for token in (split-sequence:split-sequence 
-                           #\/
-                           (remove-url-query-string 
-                             (if remove-app-prefix
-                               (subseq uri
-                                       (length
-                                         (webapp-prefix
-                                           app)))
-                               uri)))
-            collect (quri:url-decode token)))))
+;;     (remove-first-and-last-empty-strings 
+;;       (loop for token in (split-sequence:split-sequence 
+;;                            #\/
+;;                            (remove-url-query-string 
+;;                              (if remove-app-prefix
+;;                                (subseq uri
+;;                                        (length
+;;                                          (webapp-prefix
+;;                                            app)))
+;;                                uri)))
+;;             collect (quri:url-decode token)))))
 
 (defun query-string->alist (query-string)
   ;; stolen from cl-oauth -- does one of ours deps already offer this?

@@ -63,69 +63,65 @@ Make instance, then start it with ``start`` method."
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
 
-  (let* ((weblocks.request:*request* (lack.request:make-request env))
-         (weblocks.session::*session* (getf env :lack.session))
+  (let* ((weblocks.session::*session* (getf env :lack.session))
          ;; This "hack" is needed to allow widgets to change *random-state*
          ;; and don't interfere with other threads and requests
          (*random-state* *random-state*))
+    (weblocks.request:with-request ((lack.request:make-request env))
+     ;; Dynamic hook :handle-request makes possible to write
+     ;; some sort of middlewares, which change *request* and *session*
+     ;; variables.
+     (weblocks.hooks:prepare-hooks
+       (weblocks.hooks:with-hook (:handle-request)
 
-    ;; Dynamic hook :handle-request makes possible to write
-    ;; some sort of middlewares, which change *request* and *session*
-    ;; variables or make some sort
-    (weblocks.hooks:prepare-hooks
-      (weblocks.hooks:with-hook (:handle-request)
-          (setf weblocks.request::*latest-request*
-                weblocks.request:*request*)
+         (let* ((path-info (getf env :path-info))
+                (hostname (getf env :server-name))
+                (route (weblocks.routes:get-route path-info)))
 
-          (let* ((path-info (getf env :path-info))
-                 (hostname (getf env :server-name))
-                 (route (weblocks.routes:get-route path-info)))
+           ;; If dependency found, then return it's content along with content-type
+           (when route
+             (return-from handle-request
+               (weblocks.routes:serve route env)))
 
-            ;; If dependency found, then return it's content along with content-type
-            (when route
-              (return-from handle-request
-                (weblocks.routes:serve route env)))
+           (dolist (app (weblocks.app:get-active-apps))
+             (let ((app-prefix (weblocks.app:get-prefix app)))
 
-            (dolist (app (weblocks.app:get-active-apps))
-              (let ((app-prefix (weblocks.app:get-prefix app)))
+               (log:debug "Searching handler in" app app-prefix)
 
-                (log:debug "Searching handler in" app app-prefix)
+               (cond
+                 ((and (weblocks.app:app-serves-hostname-p app hostname)
+                       (cl-strings:starts-with app-prefix
+                                               path-info))
 
-                (cond
-                  ((and (weblocks.app:app-serves-hostname-p app hostname)
-                        (weblocks::list-starts-with (weblocks::tokenize-uri path-info nil)
-                                                    (weblocks::tokenize-uri app-prefix nil)
-                                                    :test #'string=))
+                  ;; TODO это внутри использует hunchentoot
+                  ;;      но при запуске на Woo вызывает ошибку
+                  ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
+                  ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
-                   ;; TODO это внутри использует hunchentoot
-                   ;;      но при запуске на Woo вызывает ошибку
-                   ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
-                   ;; (weblocks::no-cache)    ; disable caching for dynamic pages
+                  (return-from handle-request
+                    (let* ((weblocks.response:*code* 200)
+                           (weblocks.response:*content-type*
+                             (if (weblocks.request:ajax-request-p)
+                                 "application/json"
+                                 "text/html"))
+                           (weblocks.response:*headers* nil)
+                           (content (catch 'weblocks.response::abort-processing
+                                      (weblocks.request-handler:handle-client-request app))))
 
-                   (return-from handle-request
-                     (let* ((weblocks.response:*code* 200)
-                            (weblocks.response:*content-type*
-                              (if (weblocks.request:ajax-request-p)
-                                  "application/json"
-                                  "text/html"))
-                            (weblocks.response:*headers* nil)
-                            (content (catch 'weblocks.response::abort-processing
-                                       (weblocks.request-handler:handle-client-request app))))
-
-                       (list weblocks.response:*code* ;; this value can be changed somewhere in
-                             ;; handle-client-request
-                             (append (list :content-type weblocks.response:*content-type*)
-                                     weblocks.response:*headers*)
-                             ;; Here we use catch to allow to abort usual response
-                             ;; processing and to return data immediately
-                             (list content))))))))
+                      (list weblocks.response:*code* ;; this value can be changed somewhere in
+                            ;; handle-client-request
+                            (append (list :content-type weblocks.response:*content-type*)
+                                    weblocks.response:*headers*)
+                            ;; Here we use catch to allow to abort usual response
+                            ;; processing and to return data immediately
+                            (list content))))))))
                                   
-            (log:debug "Application dispatch failed for" path-info)
+           (log:debug "Application dispatch failed for" path-info)
 
-            (list 404
-                  (list :content-type "text/html")
-                  (list (format nil "File \"~A\" was not found"
-                                path-info))))))))
+           (list 404
+                 (list :content-type "text/html")
+                 (list (format nil "File \"~A\" was not found"
+                               path-info)))))))))
 
 
 (defmethod start ((server server) &key debug)

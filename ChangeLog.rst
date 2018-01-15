@@ -20,6 +20,28 @@ Procedure ``update-widget-tree`` was removed and not widgets can't
 change html header's tags, description, title, etc. If you need this,
 change them in the ``render`` method.
 
+Macro ``root-widget`` was removed.
+
+Request level
+=============
+
+Functions ``pure-request-p``, ``post-action-redirect`` and
+``post-render-redirect``, ``initial-request-p`` were removed from
+``weblocks`` package.
+
+Variable ``*json-content-type*`` was removed.
+
+Variable ``*latest-request*`` was moved to
+``weblocks.debug:*latest-request*``.
+
+Functions ``parse-location-hash``, ``ajax-request-p`` were moved to
+``weblocks.request`` package.
+
+Function ``redirect`` was moved to ``weblocks.response:redirect``.
+Functionality, related to opening another window instead of redirection
+or deferring redirection until the end of action or rendering was
+removed.
+
 Application level
 =================
 
@@ -37,7 +59,7 @@ Application's slot ``html-indent-p`` and corresponding accessor
 generates non indented code.
 
 Slot ``init-user-session`` was completely removed and replace with a generic
-method ``init-session``.
+``weblocks.session:init``.
 
 Function ``update-thread-status`` and method ``webapp-update-thread-status``
 were removed.
@@ -51,6 +73,8 @@ Function ``get-webapp`` was renamed to ``get-active-app`` and optional
 argument ``error-p`` was renamed to keyword argument ``signal-error``.
 
 Function ``find-app`` was removed.
+
+Function ``in-webapp`` was moved to ``weblocks.debug:in-app``.
 
 Variable ``*default-webapp*`` was removed.
 
@@ -93,7 +117,8 @@ Function ``add-webapp-permanent-action`` was moved to
 ``weblocks.app:remove-action``.
 
 Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
-were moved to ``weblocks.app:define-action`` and ``weblocks.app:define-action/cc``.
+were moved to ``weblocks.app:define-action`` and
+``weblocks.app:define-action/cc``.
 
 These functions were moved into the separate package
 ``weblocks.current-app`` and renamed:

@@ -5,7 +5,8 @@
    #:get-value
    #:set-value
    #:gen-id
-   #:in-session-p))
+   #:in-session-p
+   #:init))
 (in-package weblocks.session)
 
 
@@ -50,11 +51,17 @@ KEY is compared using EQUAL."
   (remhash key *session*))
 
 
-(defun weblocks.session:gen-id (&optional (prefix "dom"))
+(defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (get-value 'last-unique-id) -1))))
     (setf (get-value 'last-unique-id)
           new-widget-id)
     (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
+
+
+(defgeneric init (app)
+  (:documentation "This method should be defined for weblocks application.
+                   it should return a widget which become a root widget."))
+
 
