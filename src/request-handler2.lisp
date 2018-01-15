@@ -272,7 +272,7 @@ association list. This function is normally called by
     ;;       (page-not-found-handler app))))
 
     (weblocks::timing "widget tree rendering"
-      (weblocks.widget:render-widget (weblocks::root-widget))))
+      (weblocks.widget:render-widget (weblocks.widgets.root:get))))
 
   ;; set page title if it isn't already set
   ;; TODO: removed because uri-tokens are removed
@@ -313,16 +313,17 @@ association list. This function is normally called by
         (let ((path (weblocks.request:get-path)))
           (log:debug "Handling client request" path)
 
+          ;; TODO: write a test
           (let (weblocks::*dirty-widgets*)
             ;; TODO: Probably, replace this with a macro like
             ;;       (weblocks.session:with-session ...)
-            (when (null (weblocks::root-widget))
+            (when (null (weblocks.widgets.root:get))
               (handler-bind ((error (lambda (c) 
                                       (warn "Error initializing user session: ~A" c)
                                       (when weblocks.variables:*backtrace-on-session-init-error*
                                         (format t "~%~A~%" (trivial-backtrace:print-backtrace c)))
                                       (signal c))))
-                (setf (weblocks.session:get-value 'weblocks::root-widget)
+                (setf (weblocks.widgets.root:get)
                       (weblocks.session:init app)))
               
               ;; TODO: understand why there is coupling with Dialog here and
@@ -354,7 +355,7 @@ association list. This function is normally called by
                         (weblocks::alist->plist (weblocks.request:get-parameters))))
 
                   (when action-name
-                    (when (weblocks::pure-request-p)
+                    (when (weblocks.request:pure-request-p)
                       (weblocks.response:abort-processing
                        (weblocks.actions:eval-action
                         app
@@ -372,8 +373,8 @@ association list. This function is normally called by
                 ;; it it is not an AJAX request
                 (when (and (not (weblocks.request:ajax-request-p))
                            (weblocks.request:get-parameter weblocks.variables:*action-string*))
-                  (weblocks::redirect (remove-action-from-uri
-                                       (weblocks.request:get-path :with-params t))))
+                  (weblocks.response:redirect (remove-action-from-uri
+                                                (weblocks.request:get-path :with-params t))))
 
                 (setf content
                       (weblocks.html:with-html-string

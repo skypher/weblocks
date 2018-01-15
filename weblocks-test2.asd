@@ -7,7 +7,7 @@
 (defsystem weblocks-test2
   :name "weblocks-test"
   :version "0.2.0"
-  :maintainer "Olexiy Zamkoviy, Scott L. Burson"
+  :maintainer "Alexander Artemenko, Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
   :licence "LLGPL"
   :description "A test harness for weblocks framework."
@@ -30,6 +30,5 @@
                  (:test-file "weblocks")
                  (:test-file "actions")
                  (:test-file "request")
-                 (:test-file "response")))))
-
-
+                 (:test-file "response")
+                 (:test-file "request-handler")))))

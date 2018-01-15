@@ -94,6 +94,8 @@
                                                          (:file "string-widget")
                                                          (:file "funcall-widget")))))
                              (:file "session")
+                             (:file "root-widget"
+                              :depends-on ("session"))
                              (:file "default-init"
                               :depends-on ("session"
                                            "widgets"

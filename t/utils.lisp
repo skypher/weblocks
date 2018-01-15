@@ -16,18 +16,21 @@
      ,@body))
 
 
-(weblocks.app:defapp test-app
+(weblocks.app:defapp empty-app
   :prefix "/"
   :autostart nil)
 
 
-(defmacro with-request ((uri &key (method :get) data) &body body)
+(defmacro with-request ((uri &key
+                               data
+                               (method :get)
+                               (app 'empty-app)) &body body)
   "Argument 'data' should be an alist with POST parameters if method is :POST."
   `(weblocks.hooks:prepare-hooks
      (let* ((env (lack.test:generate-env ,uri :method ,method :content ,data))
             ;; we need to setup a current webapp, because
             ;; uri tokenizer needs to know app's uri prefix
-            (weblocks.app::*current-app* (make-instance 'test-app)))
+            (weblocks.app::*current-app* (make-instance ',app)))
        (weblocks.request:with-request ((lack.request:make-request env))
         ,@body))))
 

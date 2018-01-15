@@ -20,14 +20,16 @@ Procedure ``update-widget-tree`` was removed and not widgets can't
 change html header's tags, description, title, etc. If you need this,
 change them in the ``render`` method.
 
-Macro ``root-widget`` was removed.
+Macro ``root-widget`` was removed and replaced with function
+``weblocks.widgets.root:get``.
 
 Request level
 =============
 
-Functions ``pure-request-p``, ``post-action-redirect`` and
-``post-render-redirect``, ``initial-request-p`` were removed from
-``weblocks`` package.
+Functions ``post-action-redirect``, ``post-render-redirect`` and
+``initial-request-p`` were removed from ``weblocks`` package.
+
+Function ``pure-request-p`` was moved to ``weblocks.request`` package.
 
 Variable ``*json-content-type*`` was removed.
 

@@ -13,7 +13,8 @@
    #:remove-header
    #:get-uri
    #:get-path
-   #:with-request))
+   #:with-request
+   #:pure-request-p))
 (in-package weblocks.request)
 
 
@@ -136,10 +137,23 @@ if there is an action involved (even if the user hits refresh)."
              (weblocks.session:get-value 'last-request-path)))))
 
 
+(defun pure-request-p ()
+  "Detects if the current request is declared as 'pure', i.e. affects
+no widgets or internal application state, but merely is a request for
+information. Such requests simply return the result of the function
+that represents the action and are used by some AJAX operations to
+retreive information (suggest block, etc). When such requests are
+satisfied, the actions have access to the session, the widgets, and
+all other parameters. However, none of the callbacks (see
+*on-pre-request*) are executed, no widgets are sent to the client,
+etc."
+  (string-equal (get-parameter "pure") "true"))
+
+
 (defun parse-location-hash ()
-  (let ((raw-hash (weblocks.request:get-parameter "weblocks-internal-location-hash")))
+  (let ((raw-hash (get-parameter "weblocks-internal-location-hash")))
     (when raw-hash
-      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
+      (weblocks::query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 
 
 ;; (defmacro with-path ((path) &body body)
