@@ -181,17 +181,17 @@ propagation code."))
   (cond
     ((and inserted-after inserted-before)
      (error "Arguments inserted-after and inserted-before can't be used together."))
-    (inserted-after (weblocks.actions:add-command
+    (inserted-after (weblocks.commands:add-command
                      :insert-widget
                      :widget (weblocks.html:with-html-string
                                (render-widget w))
                      :after (weblocks:dom-id inserted-after)))
-    (inserted-before (weblocks.actions:add-command
+    (inserted-before (weblocks.commands:add-command
                       :insert-widget
                       :widget (weblocks.html:with-html-string
                                 (render-widget w))
                       :before (weblocks:dom-id inserted-before)))
-    (t (weblocks.actions:add-command
+    (t (weblocks.commands:add-command
         :update-widget
         :dom-id (weblocks:dom-id w)
         :widget (weblocks.html:with-html-string

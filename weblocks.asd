@@ -68,7 +68,7 @@
                              (:file "bundling")
                              (:file "response"
                               :depends-on ("request2"
-                                           "actions2"))
+                                           "commands"))
                              (:file "dependencies")
                              (:file "dependencies2"
                               :depends-on ("response"
@@ -78,14 +78,18 @@
                                            (:file "jquery")))
                              (:file "application-mop")
                              (:file "application")
+                             (:file "commands"
+                              :depends-on ("hooks"))
                              (:file "actions")
                              (:file "actions2"
-                              :depends-on ("hooks"))
+                              :depends-on ("response"
+                                           "commands"))
                              ;; TODO: remove
                              (:file "routes")
                              (:file "dom-object")
                              (:module widgets
-                              :depends-on ("dependencies2")
+                              :depends-on ("dependencies2"
+                                           "commands")
                               :components ((:module widget
                                             :components ((:file "widget-mop")
                                                          (:file "uri-parameters-mixin")
@@ -119,6 +123,8 @@
                                            (:file "workflow")))
                              (:file "server")
                              (:file "server2")
+                             (:file "current-app"
+                              :depends-on ("application"))
                              ;; (:file "default-application")
                              )))
   ;;  :in-order-to ;; ((test-op (load-op "weblocks-test"))

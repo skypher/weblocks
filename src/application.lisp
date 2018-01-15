@@ -21,7 +21,8 @@
    #:add-action
    #:remove-action
    #:define-action
-   #:define-action/cc))
+   #:define-action/cc
+   #:make-uri))
 (in-package weblocks.app)
 ;; (in-package weblocks)
 
@@ -41,7 +42,6 @@
 ;;           webapp-prefix
 ;;           webapp-debug
 ;;           running-webapp
-;;           make-webapp-uri
 ;;           make-webapp-public-file-uri
 ;;           reset-webapp-session
 ;;           webapp-session-key
@@ -421,11 +421,11 @@ to my `application-dependencies' slot."
   (start-webapp name))
 
 ;;; building webapp uris
-(defun make-webapp-uri (uri &optional (app *current-app*))
+(defun make-uri (app uri)
   "Makes a URI for a weblocks application (by concatenating the app
 prefix and the provided uri)."
   (weblocks::remove-spurious-slashes
-    (concatenate 'string "/" (weblocks::webapp-prefix app) "/" uri)))
+    (concatenate 'string "/" (get-prefix app) "/" uri)))
 
 
 ;;

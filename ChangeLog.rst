@@ -122,10 +122,18 @@ Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
 were moved to ``weblocks.app:define-action`` and
 ``weblocks.app:define-action/cc``.
 
+Function ``make-webapp-uri`` was replaced with ``weblocks.app:make-uri``
+and ``weblocks.current-app:make-uri``.
+
 These functions were moved into the separate package
 ``weblocks.current-app`` and renamed:
 
 * ``webapp-prefix`` -> ``get-prefix``;
+
+Actions and commands
+====================
+
+Function ``weblocks.actions:add-command`` was moved to ``weblocks.commands``.
 
 Removals
 ========

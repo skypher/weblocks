@@ -8,7 +8,8 @@
    #:*headers*
    #:send-script
    #:make-uri
-   #:redirect))
+   #:redirect
+   #:catch-possible-abort))
 (in-package weblocks.response)
 
 
@@ -86,6 +87,14 @@ HTTP code and headers are taken from *code* and *content-type*."
   (throw 'abort-processing content))
 
 
+(defmacro catch-possible-abort (&body body)
+  "Catches throwed 'abort-processing and returns the value.
+
+   Used in the server code and in tests."
+  `(catch 'abort-processing
+     ,@body))
+
+
 (defun send-script (script &optional (place :after-load))
   "Send JavaScript to the browser. The way of sending depends
   on whether the current request is via AJAX or not.
@@ -103,8 +112,8 @@ HTTP code and headers are taken from *code* and *content-type*."
                                 "JQuery")
                         script
                         (weblocks:with-javascript-to-string script))))
-          (weblocks.actions:add-command :execute-code
-                                        :code code)
+          (weblocks.commands:add-command :execute-code
+                                         :code code)
           ;; TODO remove before-ajax-complete-scripts and on-ajax-complete-scripts completely
           ;; (ecase place
           ;;   (:before-load (push code weblocks.variables:*before-ajax-complete-scripts*))

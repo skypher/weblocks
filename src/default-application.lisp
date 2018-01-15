@@ -33,7 +33,7 @@
       (render-list (remove-classname 'weblocks-default (weblocks.app:get-active-apps))
                    :render-fn (lambda (app)
                                 (with-html
-                                  (:a :href (make-webapp-uri "/" app)
+                                  (:a :href (weblocks.app:make-uri app "/")
                                       (esc (format nil "~A"
                                                    (class-name (class-of app))))))))
       (:h3 "Registered webapps:")

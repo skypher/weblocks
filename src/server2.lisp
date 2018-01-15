@@ -106,7 +106,7 @@ This function serves all started applications and their static files."
                                   "text/html"))
                             (weblocks.response:*headers* nil)
                             ;; TODO: make a macro to catch aborting
-                            (content (catch 'weblocks.response:abort-processing
+                            (content (weblocks.response:catch-possible-abort
                                        (weblocks.request-handler:handle-client-request app))))
 
                        (list weblocks.response:*code* ;; this value can be changed somewhere in
