@@ -8,6 +8,7 @@
 
 (defsystem weblocks
   :name "weblocks"
+  :class :package-inferred-system
   :version (:read-file-form "version.lisp-expr")
   :maintainer "Alexander Artemenko, Olexiy Zamkoviy, Scott L. Burson"
   :author "Slava Akhmechet"
@@ -127,63 +128,34 @@
                               :depends-on ("application"))
                              ;; (:file "default-application")
                              )))
-  ;;  :in-order-to ;; ((test-op (load-op "weblocks-test"))
-  ;;  (doc-op (load-op "weblocks-scripts"))
-  ;;  (make-app-op (load-op "weblocks-scripts")))
-  )
+  :in-order-to ((test-op (test-op "weblocks/t"))))
 
-;;; test-op
-(defmethod perform ((o asdf:test-op) (c (eql (find-system :weblocks))))
-  "A method specializer to run the weblocks test suite through ASDF."
-  (funcall (intern (symbol-name :test-weblocks) (find-package :weblocks-test))))
 
-(defmethod operation-done-p ((o asdf:test-op) (c (eql (find-system :weblocks))))
-  nil)
+(defsystem "weblocks/t"
+  :class :package-inferred-system
+  :depends-on ("weblocks/t/dependencies"
+               "weblocks/t/hooks"
+               "weblocks/t/weblocks"
+               "weblocks/t/request"
+               "weblocks/t/response"
+               "weblocks/t/request-handler"
+               "weblocks/t/actions"
+               "weblocks/t/commands")
+  :perform (test-op (o c) (uiop:symbol-call :rove '#:run c)))
 
-;;;; test operation (same functionality as asdf:test-op, but defined for consistency)
-(defclass wop::test-op (operation)
-  ()
-  (:documentation "Allows to specialize built-in ASDF methods to run
-   the Weblocks test suite."))
 
-(defmethod perform ((o wop::test-op) (c (eql (find-system :weblocks))))
-  "A method specializer to run the weblocks test suite through ASDF."
-  (funcall (intern (symbol-name :test-weblocks) (find-package :weblocks-test))))
+(asdf:register-system-packages "lack" '(#:lack.request))
+(asdf:register-system-packages "lack-test" '(#:lack.test))
+(asdf:register-system-packages "lack-request" '(#:lack.request))
 
-(defmethod operation-done-p ((o wop::test-op) (c (eql (find-system :weblocks))))
-  nil)
-
-;;;; doc-op operation
-(defclass doc-op (operation)
-  ()
-  (:documentation "Allows to specialize built-in ASDF methods to run
-   the Weblocks documentation generation."))
-
-(defmethod perform ((o doc-op) (c component))
-  "Runs the documentation generating function."
-  nil)
-
-(defmethod perform ((o doc-op) (c (eql (find-system :weblocks))))
-  "Runs the documentation generating function."
-  (funcall (intern (symbol-name :document-weblocks) (find-package :weblocks-scripts))))
-
-(defmethod operation-done-p ((o doc-op) (c (eql (find-system :weblocks))))
-  nil)
-
-;;;; helper functions that hide away the unnecessary arguments to
-;;;; (asdf:operate)
-(defun test ()
-  "Runs the Weblocks test suite together with loading the necessary packages."
-  (asdf:operate 'test-op :weblocks))
-
-(defun doc ()
-  "Generates Weblocks documentation together with loading the necessary packages."
-  (asdf:operate 'doc-op :weblocks))
-
-(defun make-app (name &optional target)
-   "Creates a new Weblocks app named <name> into directory <target> 
-    based on the new-app-template."
-   (or (find-package :weblocks-scripts) (asdf:load-system :weblocks-scripts))
-   (uiop:symbol-call :weblocks-scripts :make-application name target))
-
+;; TODO: move all these packages to the inferred system
+(asdf:register-system-packages "weblocks" '(#:weblocks.dependencies
+                                            #:weblocks.session
+                                            #:weblocks.request
+                                            #:weblocks.app
+                                            #:weblocks.html
+                                            #:weblocks.hooks
+                                            #:weblocks.widgets.string-widget
+                                            #:weblocks.request-handler
+                                            #:weblocks.response))
 

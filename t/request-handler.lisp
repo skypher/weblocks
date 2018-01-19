@@ -1,50 +1,54 @@
-(defpackage #:weblocks.t.request-handler
+(defpackage #:weblocks/t/request-handler
   (:use #:cl
-        #:prove
-        #:hamcrest.prove
-        #:weblocks
-        #:weblocks.t.utils))
-(in-package weblocks.t.request-handler)
+        #:rove
+        #:hamcrest/rove
+;;        #:weblocks
+        #:weblocks/t/utils)
+  (:import-from #:weblocks.app
+                #:defapp
+                #:*current-app*)
+  (:import-from #:weblocks.widgets.string-widget
+                #:make-string-widget)
+  (:import-from #:weblocks.request-handler
+                #:handle-client-request)
+  (:import-from #:weblocks.response
+                #:catch-possible-abort
+                #:*code*
+                #:*headers*)
+  (:import-from #:weblocks.session))
+(in-package weblocks/t/request-handler)
 
 
-(plan 2)
-
-
-(weblocks.app:defapp app-with-init
+(defapp app-with-init
   :prefix "/"
   :autostart nil)
 
 
 (defmethod weblocks.session:init ((app app-with-init))
-  (weblocks.widgets.string-widget:make-string-widget
+  (make-string-widget
    "Hello world"))
 
 
-(subtest "process-first-request"
+(deftest process-first-request
   (with-session
     (with-request ("/foo/bar" :app app-with-init)
-      (let ((result (weblocks.request-handler:handle-client-request
-                     weblocks.app::*current-app*)))
+      (let ((result (handle-client-request *current-app*)))
         (ok (search "Hello world" result)
             "Result should have a greeting.")))))
 
 
-(subtest "process-request-with-missing-action"
+(deftest process-request-with-missing-action
   (with-session
     (with-request ("/foo/bar?action=store-data" :app app-with-init)
-      (let ((result (weblocks.response:catch-possible-abort
-                      (weblocks.request-handler:handle-client-request
-                       weblocks.app::*current-app*))))
-        (is result
-            ""
+      (let ((result (catch-possible-abort
+                      (handle-client-request *current-app*))))
+        (ok (equal result
+                   "")
             "Result should have an error message.")
-        (is weblocks.response:*code*
-            302
+        (ok (equal *code* 302)
             "And response code should be 302")
 
-        (subtest "And user should be redirected to the app's prefix uri."
-          (assert-that
-           weblocks.response:*headers*
-           (has-plist-entries :location "/")))))))
+        (testing "And user should be redirected to the app's prefix uri."
+          (assert-that *headers*
+                       (has-plist-entries :location "/")))))))
 
-(finalize)
