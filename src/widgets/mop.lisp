@@ -1,7 +1,15 @@
+(defpackage #:weblocks/widgets/mop
+  (:use #:cl)
+  (:import-from #:anaphora
+                #:awhen
+                #:it)
+  (:shadowing-import-from #:closer-mop
+                          #:standard-class
+                          #:validate-superclass)
+  
+  (:export #:widget-class))
+(in-package weblocks/widgets/mop)
 
-(in-package :weblocks)
-
-(export '(widget-class))
 
 (defclass widget-class (standard-class)
   ()

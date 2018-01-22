@@ -70,13 +70,13 @@ All tests:
 
 .. code:: common-lisp
 
-          (rove:run :weblocks/t)
+          (rove:run :weblocks-test)
 
 or you can run test for some package:
 
 .. code:: common-lisp
 
-          (rove:run :weblocks/t/dependencies)
+          (rove:run :weblocks-test/dependencies)
 
 Single test:
 

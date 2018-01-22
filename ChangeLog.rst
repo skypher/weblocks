@@ -44,8 +44,28 @@ Functionality, related to opening another window instead of redirection
 or deferring redirection until the end of action or rendering was
 removed.
 
+Request handler
+===============
+
+Functions ``remove-duplicate-dirty-widgets``,
+``update-location-hash-dependents`` and ``update-widget-tree`` were
+removed.
+
+Call to ``weblocks::update-dialog-on-request`` from
+``handle-client-request`` was commented.
+
+
+Error handler
+=============
+
+Generic method ``weblocks/error-handler:on-error`` now accepts two
+arguments - application object and condition.
+
+
 Application level
 =================
+
+All code from ``uri-parameters-slotmap.lisp`` was removed.
 
 All code, related to application class, was moved to the package
 ``weblocks.app``. Base aplication class was renamed to
@@ -63,6 +83,20 @@ generates non indented code.
 Slot ``init-user-session`` was completely removed and replace with a generic
 ``weblocks.session:init``.
 
+These dependency related slots and accessors were removed:
+
+* ``application-dependencies``
+* ``weblocks-webapp-application-dependencies``
+* ``bundle-dependency-types``
+* ``version-dependency-types``
+* ``gzip-dependency-types``
+
+And macro for defining a special readers for them was removed as well:
+``def-debug-p-slot-readers``.
+
+Also, these arguments to ``defapp`` was removed:
+``:ignore-default-dependencies``, ``:dependencies``
+  
 Function ``update-thread-status`` and method ``webapp-update-thread-status``
 were removed.
 
@@ -122,8 +156,10 @@ Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
 were moved to ``weblocks.app:define-action`` and
 ``weblocks.app:define-action/cc``.
 
-Function ``make-webapp-uri`` was replaced with ``weblocks.app:make-uri``
-and ``weblocks.current-app:make-uri``.
+Function ``make-webapp-uri`` was removed, use
+``weblocks/response:make-uri`` instedad.
+
+Accessor ``webapp-js-backend`` was renamed to get-js-backend
 
 These functions were moved into the separate package
 ``weblocks.current-app`` and renamed:
@@ -133,15 +169,99 @@ These functions were moved into the separate package
 Actions and commands
 ====================
 
-Function ``weblocks.actions:add-command`` was moved to ``weblocks.commands``.
+Function ``weblocks.actions:add-command`` was moved to
+``weblocks.commands``.
+
+Function ``weblocks:get-request-action`` was moved to ``weblocks/actions:get-request-action``
+
+Javascript
+==========
+
+Package ``weblocks.js`` was renamed to ``weblocks/js/base``.
+
+Functions ``escape-script-tags``, ``%js`` and macroses
+``with-javascript``, ``with-javascript-to-string`` were moved to the
+package ``weblocks/js/base``.
+
+Variables
+=========
+
+These variables were moved from ``weblocks`` package to
+``weblocks/variables``:
+
+* ``*current-page-title*``
+* ``*current-page-keywords*``
+* ``*current-page-headers*``
+* ``*rewrite-for-session-urls*``
+* ``*default-content-type*``
+* ``*ignore-missing-actions*``
+
+Symbols moved from :weblocks to other packages
+==============================================
+
+To :weblocks/widgets/dom
+------------------------
+
+* ``dom-object-mixin``
+* ``dom-id``
+
+To :weblocks/utils/uri
+----------------------
+
+* ``request-uri-path``
+* ``add-get-param-to-url``
+* ``remove-parameter-from-uri``
+
+To :weblocks/linguistic/grammar
+-------------------------------
+
+* ``pluralize``
+* ``singularize``
+* ``proper-number-form``
+* ``vowelp``
+* ``consonantp``
+* ``proper-indefinite-article``
+* ``articlize``
+* ``*current-locale*``
+* ``current-locale``
+* ``russian-proper-number-form``
+* ``noun-vocative-to-genitive``
+* ``*debug-words-forms*``
+* ``*debug-words-genders*``
+* ``determine-gender``
+
+To weblocks/utils/warn
+----------------------
+
+* ``style-warn``
+* ``webapp-style-warning`` renamed to ``style-warning``.
+* ``non-idempotent-rendering``
+* ``misunderstood-action``
+
+To weblocks/actions
+-------------------
+
+* ``function-or-action->action``
+* ``make-action``
+* ``generate-action-code``
+
 
 Removals
 ========
 
-To make Weblocks core smaller, many files were removed: views, widgets,
-html-parts, utilities.
+To make Weblocks core smaller, many files were removed: ``views``, ``widgets``,
+``html-parts``, ``utilities``.
 
-Systems weblocks-util, weblocks-testutils were removed.
+Systems ``weblocks-util``, ``weblocks-testutils`` were removed.
+
+Accessor ``dom-class`` and generic function ``dom-classes`` were removed
+and replaced with generic function ``weblocks/widget:get-css-classes``.
+
+Generic function ``weblocks:handle-error-condition`` was removed.
+
+Variable ``*dirty-widgets*`` was removed along with
+``render-dirty-widgets`` function.
+
 
 Dependencies
 ============

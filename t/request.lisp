@@ -1,16 +1,25 @@
-(defpackage #:weblocks/t/request
+(defpackage #:weblocks-test/request
   (:use #:cl
         #:rove
-        #:weblocks/t/utils))
-(in-package weblocks/t/request)
+        #:weblocks-test/utils)
+  (:import-from #:weblocks/request
+                #:last-request-path
+                #:refresh-request-p
+                #:get-uri)
+  (:import-from #:lack.test
+                #:generate-env)
+  (:import-from #:lack.request
+                #:make-request
+                #:request-uri))
+(in-package weblocks-test/request)
 
 
 (deftest refresh-request-p-1
   (with-session
     (with-request ("/foo/bar")
-      (setf (weblocks.session:get-value 'weblocks.request::last-request-path)
+      (setf (weblocks/session:get-value 'last-request-path)
             "/foo/bar")
-      (ok (weblocks.request:refresh-request-p)
+      (ok (refresh-request-p)
           "Refresh-request-p should return true, because current URI has same tokens as last-request-path."))))
 
 
@@ -21,13 +30,14 @@
     ;; with full URI: http://localhost:80/some-path?with=params
 
     (let* ((uri "https://example.com:8443/some-path?with=params")
-           (env (lack.test:generate-env uri :method :get))
-           (request (lack.request:make-request env)))
-      (ok (equal (weblocks.request:get-uri :request request)
+           (env (generate-env
+                 uri :method :get))
+           (request (make-request env)))
+      (ok (equal (get-uri :request request)
                  "https://example.com:8443/some-path?with=params")
           "Weblock's get-uri should return full URL with correct scheme and port.")
 
-      (ok (equal (lack.request:request-uri request)
+      (ok (equal (request-uri request)
                  "/some-path?with=params")
           "However Lack's request-uri returns only the path with parameters."))))
 

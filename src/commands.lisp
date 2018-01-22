@@ -1,8 +1,11 @@
-(defpackage #:weblocks.commands
+(defpackage #:weblocks/commands
   (:use #:cl)
-  (:export
-   #:add-command))
-(in-package weblocks.commands)
+  (:import-from #:weblocks/hooks
+                #:add-application-hook
+                #:call-next-hook)
+  (:export #:add-command
+           #:get-collected-commands))
+(in-package weblocks/commands)
 
 
 (defvar *commands* nil
@@ -37,7 +40,10 @@ After action processing these commands will be sent for execution on the client.
    *commands*))
 
 
-(weblocks.hooks:add-application-hook :handle-request
+(defun get-collected-commands ()
+  *commands*)
+
+(add-application-hook :handle-request
     reset-commands-list ()
   (let (*commands*)
-    (weblocks.hooks:call-next-hook)))
+    (call-next-hook)))

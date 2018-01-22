@@ -1,13 +1,16 @@
-(defpackage #:weblocks.session
+(defpackage #:weblocks/session
   (:use #:cl)
+  (:import-from #:alexandria
+                #:ensure-gethash)
   (:export
    #:delete-value
    #:get-value
    #:set-value
    #:gen-id
    #:in-session-p
-   #:init))
-(in-package weblocks.session)
+   #:init
+   #:get-session-id))
+(in-package weblocks/session)
 
 
 (defvar *session* nil
@@ -32,7 +35,7 @@ It was made as a macro to not evaluate 'default' on each call."
   ;; TODO: seems, previously keys were separated for different weblocks apps
   ;;       but I've simplified it for now
   
-  (alexandria:ensure-gethash key *session* default))
+  (ensure-gethash key *session* default))
 
 
 (defun (setf get-value) (value key)
@@ -65,3 +68,7 @@ used to create IDs for html elements, widgets, etc."
                    it should return a widget which become a root widget."))
 
 
+(defun get-session-id ()
+  "Returns current session id or signals an error if no current session."
+  ;; TODO: see if a id can be extracted from sesion
+  *session*)

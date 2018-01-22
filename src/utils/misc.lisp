@@ -1,40 +1,37 @@
-(in-package :weblocks)
+(defpackage #:weblocks/utils/misc
+  (:use #:cl)
+  (:import-from #:salza2
+                #:gzip-stream)
+  (:import-from #:ironclad
+                #:byte-array-to-hex-string
+                #:digest-sequence)
+  (:import-from #:babel
+                #:string-to-octets)
+  (:export #:gen-id
+           #:safe-apply
+           #:safe-funcall
+           #:request-parameter
+           #:request-parameters
+           #:public-file-relative-path
+           #:public-files-relative-paths
+           #:symbol-status
+           #:asdf-system-directory
+           #:hash-keys
+           #:append-custom-fields
+           #:function-designator-p
+           #:defrender 
+           #:find-own-symbol 
+           #:relative-path 
+           #:read-from-file 
+           #:write-to-file
+           #:slurp-file
+           #:with-file-write
+           #:merge-files-with-newline
+           #:gzip-file
+           #:md5
+           #:concatenate-keywords))
+(in-package :weblocks/utils/misc)
 
-
-(defmacro defvar-unbound (variable-name documentation)
-  "Like DEFVAR, but the variable will be unbound rather than getting
-an initial value.  This is useful for variables which should have no
-global value but might have a dynamically bound value."
-  ;; stolen from comp.lang.lisp article <k7727i3s.fsf@comcast.net> by
-  ;; "prunesquallor@comcast.net"
-  `(eval-when (:load-toplevel :compile-toplevel :execute)
-    (defvar ,variable-name)
-    (setf (documentation ',variable-name 'variable)
-            ,documentation)))
-
-;; (wexport '(gen-id
-;;            safe-apply
-;;            safe-funcall
-;;            request-parameter
-;;            request-parameters
-;;            public-file-relative-path
-;;            public-files-relative-paths
-;;            symbol-status
-;;            asdf-system-directory
-;;            hash-keys
-;;            append-custom-fields
-;;            function-designator-p
-;;            defrender 
-;;            find-own-symbol 
-;;            relative-path 
-;;            read-from-file 
-;;            write-to-file
-;;            slurp-file
-;;            with-file-write
-;;            merge-files-with-newline
-;;            gzip-file md5
-;;            concatenate-keywords)
-;;          '(t util))
 
 (defun safe-apply (fn &rest args)
   "Apply 'fn' if it isn't nil. Otherwise return nil."
@@ -228,7 +225,7 @@ answering its result."
                                :direction :output
                                :if-does-not-exist if-does-not-exist
                                :if-exists if-exists)
-        (salza2:gzip-stream istream ostream)))
+        (gzip-stream istream ostream)))
     (probe-file output)))
 
 (defmacro defrender (widget-type &body body)
@@ -239,13 +236,11 @@ answering its result."
          ,@body))))
 
 (defun md5 (string)
-  (ironclad:byte-array-to-hex-string 
-    (ironclad:digest-sequence 
-      :md5 (babel:string-to-octets string :encoding :utf-8))))
+  (byte-array-to-hex-string
+    (digest-sequence
+      :md5 (string-to-octets string :encoding :utf-8))))
 
 (defun concatenate-keywords (&rest symbols)
   (intern 
     (apply #'concatenate (list* 'string (mapcar #'string-upcase symbols)))
     "KEYWORD"))
-
-

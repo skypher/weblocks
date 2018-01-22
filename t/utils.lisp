@@ -1,4 +1,4 @@
-(defpackage #:weblocks/t/utils
+(defpackage #:weblocks-test/utils
   (:use #:cl)
   (:import-from #:alexandria
                 #:with-gensyms
@@ -11,18 +11,18 @@
                 #:all-matches)
   (:import-from #:rove
                 #:ok)
-  (:import-from #:weblocks.session
+  (:import-from #:weblocks/session
                 #:*session*)
-  (:import-from #:weblocks.app
+  (:import-from #:weblocks/app
                 #:*current-app*
                 #:defapp)
-  (:import-from #:weblocks.html
+  (:import-from #:weblocks/html
                 #:with-html-string)
-  (:import-from #:weblocks.hooks
+  (:import-from #:weblocks/hooks
                 #:prepare-hooks
                 #:add-session-hook)
   ;; Just to point to dependencies
-  (:import-from #:weblocks.request)
+  (:import-from #:weblocks/request)
   
   (:export
    #:with-request
@@ -30,7 +30,7 @@
    #:is-html
    #:catch-hooks
    #:assert-hooks-called))
-(in-package weblocks/t/utils)
+(in-package weblocks-test/utils)
 
 
 (defmacro with-session (&body body)
@@ -53,7 +53,7 @@
             ;; we need to setup a current webapp, because
             ;; uri tokenizer needs to know app's uri prefix
             (*current-app* (make-instance ',app)))
-       (weblocks.request:with-request ((make-request env))
+       (weblocks/request:with-request ((make-request env))
         ,@body))))
 
 

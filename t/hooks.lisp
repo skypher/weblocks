@@ -1,31 +1,38 @@
-(defpackage #:weblocks/t/hooks
+(defpackage #:weblocks-test/hooks
   (:use #:cl
         #:rove
-        #:weblocks/t/utils))
-(in-package weblocks/t/hooks)
+        #:weblocks-test/utils)
+  (:import-from #:weblocks/hooks
+                #:get-callbacks
+                #:*session-hooks*
+                #:add-session-hook
+                #:get-callbacks-names
+                #:with-hook
+                #:call-next-hook))
+(in-package weblocks-test/hooks)
 
 
 (deftest empty-call-back-list
   (testing "Callbacks list for unknown name is empty"
     (with-session
       (with-request ("/")
-        (ng (weblocks.hooks::get-callbacks
-             weblocks.hooks::*session-hooks*
+        (ng (get-callbacks
+             *session-hooks*
              :some-unknown-name)
             "If no callbacks were added for the name, then get-callbacks should return an empty list.")))))
 
 
-(deftest add-session-hook
+(deftest add-session-hook-test
   (with-session
     (with-request ("/")
-      (weblocks.hooks:add-session-hook :action foo ())
+      (add-session-hook :action foo ())
 
-      (let ((callbacks (weblocks.hooks::get-callbacks-names
-                        weblocks.hooks::*session-hooks*
+      (let ((callbacks (get-callbacks-names
+                        *session-hooks*
                         :action)))
         (ok (equal (first callbacks)
                    'foo))
-        "Function add-session-hook2 should put given value into the list of callbacks bound to the session."))))
+        "Function add-session-hook should put given value into the list of callbacks bound to the session."))))
 
 
 (deftest hooks-evaluation
@@ -34,12 +41,12 @@
       (with-request ("/")
         (let (call-result)
           
-          (weblocks.hooks:add-session-hook :action
+          (add-session-hook :action
               set-result ()
             (setf call-result
                   'callback-was-called))
           
-          (weblocks.hooks:with-hook (:action)
+          (with-hook (:action)
             ;; do nothing
             )
 
@@ -50,13 +57,13 @@
     (with-session
       (with-request ("/")
         (let (call-result)
-          (weblocks.hooks:add-session-hook
+          (add-session-hook
               :some-hook
               add-value (param)
             (push param call-result))
           
-          (weblocks.hooks:with-hook (:some-hook 'blah))
-          (weblocks.hooks:with-hook (:some-hook 'minor))
+          (with-hook (:some-hook 'blah))
+          (with-hook (:some-hook 'minor))
 
           (ok (equal call-result
                      '(minor blah)))))))
@@ -65,7 +72,7 @@
   (testing "Hook should return last form's value"
     (with-session
       (with-request ("/")
-        (let ((result (weblocks.hooks:with-hook (:action)
+        (let ((result (with-hook (:action)
                         'foo
                         'bar)))
 
@@ -79,21 +86,21 @@
     (with-request ("/")
       (let (result)
         
-        (weblocks.hooks:add-session-hook
+        (add-session-hook
             :some-hook
             inner-value ()
           (push :inner-before result)
-          (weblocks.hooks:call-next-hook)
+          (call-next-hook)
           (push :inner-after result))
         
-        (weblocks.hooks:add-session-hook
+        (add-session-hook
             :some-hook
             outer-value ()
           (push :outer-before result)
-          (weblocks.hooks:call-next-hook)
+          (call-next-hook)
           (push :outer-after result))
           
-        (weblocks.hooks:with-hook (:some-hook)
+        (with-hook (:some-hook)
           ;; Now we surrounded this code with hooks
           ;; and will insert another value to the list
           (push :real-value result))
@@ -107,17 +114,17 @@
     (with-session
       (with-request ("/")
         (let (result)
-          (weblocks.hooks:add-session-hook :my-hook foo ()
+          (add-session-hook :my-hook foo ()
             (push :foo result)
-            (weblocks.hooks:call-next-hook))
+            (call-next-hook))
 
           ;; Add a hook with same name, but now it will push :bar
           ;; into the list.
-          (weblocks.hooks:add-session-hook :my-hook foo ()
+          (add-session-hook :my-hook foo ()
             (push :bar result)
-            (weblocks.hooks:call-next-hook))
+            (call-next-hook))
 
-          (weblocks.hooks:with-hook (:my-hook)
+          (with-hook (:my-hook)
             t)
 
           (ok (equal result
@@ -130,13 +137,13 @@
     (with-session
       (with-request ("/")
         (let (result)
-          (weblocks.hooks:add-session-hook :my-hook foo ()
+          (add-session-hook :my-hook foo ()
             (push :foo result))
 
-          (weblocks.hooks:add-session-hook :my-hook bar ()
+          (add-session-hook :my-hook bar ()
             (push :bar result))
 
-          (weblocks.hooks:with-hook (:my-hook)
+          (with-hook (:my-hook)
             t)
 
           ;; Neither of two callbacks use call-next-hook,

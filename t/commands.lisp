@@ -1,15 +1,17 @@
-(defpackage #:weblocks/t/commands
+(defpackage #:weblocks-test/commands
   (:use #:cl
         #:hamcrest/rove
-        #:rove))
-(in-package weblocks/t/commands)
+        #:rove)
+  (:import-from #:weblocks/commands
+                #:create-command))
+(in-package weblocks-test/commands)
 
 
 (deftest test-create-command
   (testing "Function create-command should return a plist with a JSON-rpc method call"
-    (let ((result (weblocks.commands::create-command :update-widget
-                                                     :widget "some-string"
-                                                     :dom-id 42)))
+    (let ((result (create-command :update-widget
+                                  :widget "some-string"
+                                  :dom-id 42)))
       (testing "Now we'll check the structure of the response"
         (assert-that result
                      (has-plist-entries

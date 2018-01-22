@@ -1,5 +1,24 @@
-(defpackage #:weblocks.page
+(defpackage #:weblocks/page
   (:use #:cl)
+  (:import-from #:weblocks/variables
+                #:*default-content-type*)
+  (:import-from #:weblocks/html
+                #:*lang*
+                #:with-html
+                #:get-rendered-chunk)
+  (:import-from #:weblocks/dependencies
+                #:render-in-head
+                #:get-dependencies
+                #:register-dependencies
+                #:get-collected-dependencies)
+  (:import-from #:weblocks/app
+                #:app)
+  (:import-from #:alexandria
+                #:symbolicate)
+
+  ;; Just dependencies
+  (:import-from #:log)
+  
   (:export
    #:render
    #:render-body
@@ -10,7 +29,7 @@
    #:get-keywords
    #:get-language
    #:with-layout))
-(in-package weblocks.page)
+(in-package weblocks/page)
 
 
 (defvar *title* nil)
@@ -21,8 +40,8 @@
 
 (defmacro def-get-set (variable)
   "Generates a function get-<variable> and a corresponding setf part."
-  (let ((func-name (alexandria:symbolicate :get- variable))
-        (var-name (alexandria:symbolicate :* variable :*)))
+  (let ((func-name (symbolicate :get- variable))
+        (var-name (symbolicate :* variable :*)))
     `(progn
        (defun ,func-name ()
          ,var-name)
@@ -37,15 +56,15 @@
 (def-get-set language)
 
 
-(defmethod render-headers ((app weblocks.app:app))
+(defmethod render-headers ((app app))
   "A placeholder to add :meta entries, :expires headers and other 
    header content on a per-webapp basis.  For example, using a dynamic 
    hook on rendering you can bind special variables that are dereferenced 
    here to customize header rendering on a per-request basis.  By default
    this function renders the current content type."
-  (spinneret:with-html
+  (with-html
     (:meta :http-equiv "Content-type"
-           :content weblocks::*default-content-type*)
+           :content *default-content-type*)
     
     (when (get-description)
       (:meta :name "description"
@@ -66,32 +85,31 @@
     ))
 
 
-(defmethod render-body ((app weblocks.app:app) body-string)
+(defmethod render-body ((app app) body-string)
   "Default page-body rendering method"
   
-  (spinneret:with-html
+  (with-html
     (:raw body-string)))
 
 
-(defmethod render-dependencies ((app weblocks.app:app) dependencies)
+(defmethod render-dependencies ((app app) dependencies)
   (etypecase dependencies
-    (list (mapc #'weblocks.dependencies:render-in-head
+    (list (mapc #'render-in-head
                  dependencies))
-    (string (spinneret:with-html
+    (string (with-html
               (:raw dependencies)))))
 
 
-(defmethod render ((app weblocks.app:app)
+(defmethod render ((app app)
                    inner-html
-                   &key (dependencies (weblocks.dependencies:get-dependencies
-                                       app)))
+                   &key (dependencies (get-dependencies app)))
   "Default page rendering template and protocol."
   (log:debug "Rendering page for" app)
 
-  (weblocks.dependencies:register-dependencies dependencies)
+  (register-dependencies dependencies)
 
-  (let ((weblocks.html:*lang* (get-language)))
-    (weblocks.html:with-html
+  (let ((*lang* (get-language)))
+    (with-html
       (:doctype)
       (:html
        (:head
@@ -111,17 +129,17 @@
         )))))
 
 
-(defmethod render-page-with-widgets ((app weblocks.app:app))
+(defmethod render-page-with-widgets ((app app))
   "Renders a full HTML by collecting header elements, dependencies and inner
    HTML and inserting them into the `render' method."
   (log:debug "Special Rendering page for" app)
 
   ;; At the moment when this method is called, there is already
-  ;; rendered page's content in the weblocks.html::*stream*.
+  ;; rendered page's content in the weblocks/html::*stream*.
   ;; All we need to do now – is to render dependencies in the header
   ;; and paste content into the body.
-  (let* ((rendered-html (weblocks.html:get-rendered-chunk))
-         (all-dependencies (weblocks.dependencies:get-collected-dependencies)))
+  (let* ((rendered-html (get-rendered-chunk))
+         (all-dependencies (get-collected-dependencies)))
 
     (render app rendered-html :dependencies all-dependencies)))
 

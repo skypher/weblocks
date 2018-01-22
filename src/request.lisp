@@ -1,5 +1,29 @@
-(defpackage #:weblocks.request
+(defpackage #:weblocks/request
   (:use #:cl)
+  (:import-from #:metacopy
+                #:copy-thing)
+  (:import-from #:lack.request
+                #:request-uri-scheme
+                #:request-query-string
+                #:request-uri
+                #:request-path-info
+                #:request-server-name
+                #:request-server-port
+                #:request-method
+                #:request-parameters
+                #:request-headers)
+  (:import-from #:alexandria
+                #:assoc-value)
+  (:import-from #:weblocks/variables
+                #:*action-string*)
+  (:import-from #:weblocks/actions
+                #:get-request-action)
+  (:import-from #:weblocks/utils/uri
+                #:query-string->alist)
+  ;; Just to add dependency
+  (:import-from #:weblocks/session)
+  (:import-from #:quri)
+  
   (:export
    #:get-parameters
    #:get-parameter
@@ -15,7 +39,7 @@
    #:get-path
    #:with-request
    #:pure-request-p))
-(in-package weblocks.request)
+(in-package weblocks/request)
 
 
 (defvar *request* nil
@@ -26,9 +50,9 @@
   "For URL http://example.com/foo/bar?blah=minor returns it as is."
   (let ((host (get-host :request request))
         (port (get-port :request request))
-        (scheme (lack.request:request-uri-scheme request))
+        (scheme (request-uri-scheme request))
         (path (get-path :request request))
-        (query (lack.request:request-query-string request)))
+        (query (request-query-string request)))
     (quri:render-uri (quri:make-uri :scheme scheme
                                     :host host
                                     :port port
@@ -41,36 +65,36 @@
 /foo/bar path of the request's URL."
   (if with-params
       ;; request-uri returns path-info + GET params
-      (lack.request:request-uri request)
+      (request-uri request)
       ;; Otherwice, return only a path
-      (lack.request:request-path-info request)))
+      (request-path-info request)))
 
 (defun get-path (&key (request *request*) with-params)
   "For URL http://example.com/foo/bar?blah=minor returns
 /foo/bar path of the request's URL."
   (if with-params
       ;; request-uri returns path-info + GET params
-      (lack.request:request-uri request)
+      (request-uri request)
       ;; Otherwice, return only a path
-      (lack.request:request-path-info request)))
+      (request-path-info request)))
 
 
 (defun get-host (&key (request *request*))
-  (lack.request:request-server-name request))
+  (request-server-name request))
 
 
 (defun get-port (&key (request *request*))
-  (lack.request:request-server-port request))
+  (request-server-port request))
 
 
 (defun get-method (&key (request *request*))
   "Returns association list with GET or POST parameters for current request."
-  (lack.request:request-method request))
+  (request-method request))
 
 
 (defun get-parameters (&key (request *request*))
   "Returns association list with GET or POST parameters for current request."
-  (lack.request:request-parameters request))
+  (request-parameters request))
 
 
 (defun get-parameter (name &key (request *request*))
@@ -78,14 +102,14 @@
   (declare (type string name))
 
   (let ((params (get-parameters :request request)))
-    (alexandria:assoc-value params
-                            name
-                            :test #'equal)))
+    (assoc-value params
+                 name
+                 :test #'equal)))
 
 
 (defun get-header (name &key (request *request*))
   "Returns value of the HTTP header or nil. Name is case insensitive."
-  (let ((headers (lack.request:request-headers request))
+  (let ((headers (request-headers request))
         (lowercased-name (string-downcase name)))
     (gethash lowercased-name
              headers)))
@@ -98,12 +122,12 @@ without given header."
   (let ((lowercased-name (string-downcase name))
         ;; make shallow copy of the request
         (new-request (copy-structure request))
-        (new-headers (metacopy:copy-thing (lack.request:request-headers request))))
+        (new-headers (copy-thing (request-headers request))))
     
     (remhash lowercased-name
              new-headers)
     
-    (setf (lack.request:request-headers new-request)
+    (setf (request-headers new-request)
           new-headers)
 
     new-request))
@@ -123,7 +147,7 @@ in a dynamic hunchentoot environment."
 
 (defun get-action-name-from-request ()
   "Returns called action name if any action was called"
-  (get-parameter weblocks.variables:*action-string*)) 
+  (get-parameter *action-string*)) 
 
 
 (defun refresh-request-p ()
@@ -132,9 +156,9 @@ refresh function. Note that a request will not be considered a refresh
 if there is an action involved (even if the user hits refresh)."
   (let ((action-name (get-action-name-from-request)))
     (and
-     (null (weblocks::get-request-action action-name))
-     (equalp (weblocks.request:get-path)
-             (weblocks.session:get-value 'last-request-path)))))
+     (null (get-request-action action-name))
+     (equalp (get-path)
+             (weblocks/session:get-value 'last-request-path)))))
 
 
 (defun pure-request-p ()
@@ -153,7 +177,7 @@ etc."
 (defun parse-location-hash ()
   (let ((raw-hash (get-parameter "weblocks-internal-location-hash")))
     (when raw-hash
-      (weblocks::query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
+      (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
 
 
 ;; (defmacro with-path ((path) &body body)
@@ -174,7 +198,7 @@ etc."
   `(let ((*request* ,request))
      ,@body
      (unless (ajax-request-p)
-       (setf (weblocks.session:get-value 'last-request-path)
+       (setf (weblocks/session:get-value 'last-request-path)
              (get-path)))))
 
 

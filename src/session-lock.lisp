@@ -1,10 +1,13 @@
-(defpackage #:weblocks.session-lock
+(defpackage #:weblocks/session-lock
   (:use #:cl)
-  (:import-from #:weblocks.session
-                #:*session*)
-  (:export
-   #:get-lock))
-(in-package weblocks.session-lock)
+  (:import-from #:bordeaux-threads
+                #:with-lock-held
+                #:make-lock)
+  ;; Just dependencies
+  (:import-from #:weblocks/session)
+  
+  (:export #:get-lock))
+(in-package weblocks/session-lock)
 
 
 (defvar *session-locks* (make-hash-table :test #'eq
@@ -16,17 +19,14 @@
             Expect a tiny memory leak until fixed.")
 
 
-(defvar *session-lock-table-lock* (bordeaux-threads:make-lock
-                                    "*session-lock-table-lock*"))
+(defvar *session-lock-table-lock* (make-lock "*session-lock-table-lock*"))
 
 
 (defun get-lock ()
   (bordeaux-threads:with-lock-held (*session-lock-table-lock*)
-    (unless (gethash *session* *session-locks*)
-      (setf (gethash *session* *session-locks*) 
-            (bordeaux-threads:make-lock
-             (format nil "session lock for session ~S"
-                     *session*)))))
-  (gethash *session* *session-locks*))
+    (weblocks/session:get-value *session-locks*
+                                (make-lock
+                                 (format nil "session lock for session ~S"
+                                         (weblocks/session:get-session-id))))))
 
 

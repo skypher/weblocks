@@ -1,4 +1,24 @@
-(in-package weblocks)
+(defpackage #:weblocks/variables
+  (:use #:cl)
+  (:import-from #:serapeum
+                #:defvar-unbound)
+  (:export #:*current-page-title*
+           #:*current-page-keywords*
+           #:*current-page-headers*
+           #:*rewrite-for-session-urls*
+           #:*default-content-type*
+           #:*ignore-missing-actions*
+           #:*catch-errors-p*
+           #:*backtrace-on-session-init-error*
+           #:*before-ajax-complete-scripts*
+           #:*on-ajax-complete-scripts*
+           #:*action-string*
+           #:*approved-return-codes*
+           #:*style-warn-on-circular-dirtying*
+           #:*style-warn-on-late-propagation*))
+
+(in-package weblocks/variables)
+
 
 (defvar *current-page-title* nil
   "Hold a title of the currently rendered page.")
@@ -18,23 +38,6 @@
 (defvar *ignore-missing-actions* t)
 
 
-(defpackage #:weblocks.variables
-  (:use #:cl)
-  (:import-from #:weblocks
-                #:defvar-unbound)
-  (:export
-   #:*catch-errors-p*
-   #:*backtrace-on-session-init-error*
-   #:*before-ajax-complete-scripts*
-   #:*on-ajax-complete-scripts*
-   #:*action-string*
-   #:*approved-return-codes*
-   #:*style-warn-on-circular-dirtying*
-   #:*style-warn-on-late-propagation*))
-
-(in-package weblocks.variables)
-
-
 (defvar *catch-errors-p* t
   "If this variable is nil, then weblocks will start lisp's debugger on unhandled conditions.")
 
@@ -52,7 +55,7 @@
 
 (defvar *action-string* "action"
   "A string used to pass actions from a client to the server. See
-  'get-request-action'.")
+  'weblocks/request:get-request-action'.")
 
 
 (defvar *approved-return-codes* (list 200))

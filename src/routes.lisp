@@ -1,4 +1,4 @@
-(defpackage #:weblocks.routes
+(defpackage #:weblocks/routes
   (:use #:cl)
   (:import-from #:routes
                 #:route)
@@ -8,7 +8,7 @@
    #:reset-routes
    #:serve
    #:get-route))
-(in-package weblocks.routes)
+(in-package weblocks/routes)
 
 
 (defvar *routes* (make-instance 'routes:mapper)

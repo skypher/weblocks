@@ -32,32 +32,5 @@ case, the symbols will be imported first if need be."
   cycle. This is a special variable modified by the actions that
   change state of widgets.")
 
-(defun escape-script-tags (source &key (delimiter ps:*js-string-delimiter*))
-  "Escape script blocks inside scripts."
-  (ppcre:regex-replace-all
-    (ppcre:quote-meta-chars "</script>")
-    (ppcre:regex-replace-all (ppcre:quote-meta-chars "]]>")
-                             source
-                             (format nil "]]~A + ~:*~A>" delimiter))
-    (format nil "</scr~A + ~:*~Aipt>" delimiter)))
-
-(defun %js (source &rest args)
-  "Helper function for WITH-JAVASCRIPT macros."
-  `(:script :type "text/javascript"
-            (:raw #.(format nil "~%// <![CDATA[~%"))
-            (:raw (escape-script-tags (format nil ,source ,@args)))
-            (:raw #.(format nil "~%// ]]>~%"))
-            ))
-
-(defmacro with-javascript (source &rest args)
-  "Places 'source' between script and CDATA elements. Used to avoid
-having to worry about special characters in JavaScript code."
-  `(weblocks.html:with-html ,(apply #'%js source args)))
-
-(defmacro with-javascript-to-string (source &rest args)
-  "Places 'source' between script and CDATA elements. Used to avoid
-having to worry about special characters in JavaScript code."
-  `(weblocks.html:with-html-string ,(apply #'%js source args)))
-
 ;;; This turns off a regex optimization that eats A LOT of memory
 (setq cl-ppcre:*use-bmh-matchers* nil)

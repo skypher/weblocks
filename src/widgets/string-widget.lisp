@@ -1,14 +1,19 @@
-(defpackage #:weblocks.widgets.string-widget
+(defpackage #:weblocks/widgets/string-widget
   (:use #:cl)
+  (:import-from #:weblocks/widgets/base
+                #:defwidget
+                #:render)
+  (:import-from #:weblocks/html
+                #:with-html)
   (:export
    #:make-string-widget
    #:string-widget
    #:get-content
    #:escape-p))
-(in-package weblocks.widgets.string-widget)
+(in-package weblocks/widgets/string-widget)
 
 
-(weblocks.widget:defwidget string-widget ()
+(defwidget string-widget ()
   ((content :type string
             :accessor get-content
             :initarg :content)
@@ -19,12 +24,12 @@
              :documentation "Whether to escape the output
              for HTML.")))
 
-(defmethod weblocks.widget:render ((widget string-widget))
+(defmethod render ((widget string-widget))
   (let ((content (get-content widget)))
     (if (escape-p widget)
-        (weblocks.html:with-html
+        (with-html
           (:p content))
-        (weblocks.html:with-html
+        (with-html
           (:p (:raw content))))))
 
 

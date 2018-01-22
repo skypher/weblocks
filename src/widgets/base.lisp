@@ -1,20 +1,43 @@
-(defpackage #:weblocks.widget
+(defpackage #:weblocks/widgets/base
   (:use #:cl)
-  (:import-from #:spinneret
-                #:with-html)
-  (:export
-   #:defwidget
-   #:render
-   #:get-css-classes
-   #:get-html-tag
-   #:render-widget
-   #:mark-dirty
-   #:update
-   #:widget))
-(in-package weblocks.widget)
+  (:nicknames #:weblocks/widget)
+  (:import-from #:weblocks/html
+                #:with-html
+                #:with-html-string)
+  (:import-from #:weblocks/widgets/mop
+                #:widget-class)
+  (:import-from #:weblocks/dependencies
+                #:get-collected-dependencies
+                #:get-dependencies
+                #:push-dependencies
+                #:render-in-ajax-response)
+  (:import-from #:weblocks/commands
+                #:add-command)
+  (:import-from #:weblocks/request
+                #:ajax-request-p)
+  (:import-from #:weblocks/widgets/dom
+                #:dom-id
+                #:dom-object-mixin)
+  (:import-from #:alexandria
+                #:make-keyword)
+  (:import-from #:cl-strings
+                #:join)
+
+  ;; Just dependencies
+  (:import-from #:log)
+  
+  (:export #:defwidget
+           #:render
+           #:get-css-classes
+           #:get-html-tag
+           #:render-widget
+           #:mark-dirty
+           #:update
+           #:widget))
+(in-package weblocks/widgets/base)
 
 
-(defclass widget (weblocks::dom-object-mixin)
+(defclass widget (dom-object-mixin)
   ((propagate-dirty :accessor widget-propagate-dirty
                     :initform nil
                     :initarg :propagate-dirty
@@ -31,7 +54,7 @@
                  on a widget, this value is used to resume the
                  computation."))
   #+lispworks (:optimize-slot-access nil)
-  (:metaclass weblocks::widget-class)
+  (:metaclass widget-class)
   (:documentation "Base class for all widget objects."))
 
 
@@ -44,10 +67,7 @@ inherits from 'widget' if no direct superclasses are provided."
                        (or direct-superclasses
                            '(widget)))
        ,@body
-       (:metaclass weblocks::widget-class))
-     
-     ,@(weblocks::awhen (weblocks::maybe-generate-parameter-slot-map-fn name (car body))
-         (list weblocks::it))))
+       (:metaclass widget-class))))
 
 
 (defgeneric render (widget)
@@ -60,8 +80,8 @@ inherits from 'widget' if no direct superclasses are provided."
     (with-html
       (:p "Please, define:"
           (:pre (format nil
-                        "(defmethod weblocks.widget:render ((widget ~a))
-    (spinneret:with-html
+                        "(defmethod weblocks/widget:render ((widget ~a))
+    (weblocks/html:with-html
         (:p \"My ~a widget\")))"
                         class-name
                         class-name))))))
@@ -71,41 +91,25 @@ inherits from 'widget' if no direct superclasses are provided."
 (defun render-widget (widget)
   "This function is intended for internal usage only.
    It renders widget with surrounding HTML tag and attributes."
-  (log:debug "NEW Rendering widget" widget "with" (weblocks.dependencies:get-collected-dependencies))
+  (log:debug "Rendering widget" widget "with" (get-collected-dependencies))
   
-  (let ((widget-dependencies (weblocks.dependencies:get-dependencies widget)))
+  (let ((widget-dependencies (get-dependencies widget)))
     ;; Update new-style dependencies
-    (weblocks.dependencies:push-dependencies
-     widget-dependencies)
+    (push-dependencies widget-dependencies)
     
-    (when (weblocks.request:ajax-request-p)
+    (when (ajax-request-p)
       ;; Generate code to embed new dependencies into the page on the fly
-      (mapc #'weblocks.dependencies:render-in-ajax-response
+      (mapc #'render-in-ajax-response
             widget-dependencies)))
   
-  (weblocks.html:with-html
+  (with-html
     (:tag
      :name (get-html-tag widget)
      :class (get-css-classes-as-string widget)
-     :id (weblocks::dom-id widget)
+     :id (dom-id widget)
+     ;; TODO: try to remove progn
      (progn (render widget)
             nil))))
-
-
-;; TODO: remove this completely with old widget code
-(defmethod weblocks::render-widget ((obj widget) &rest args)
-  (declare (ignorable args))
-  (render-widget obj))
-
-;; TODO: remove this too
-(defmethod weblocks::walk-widget-tree (obj fn &optional depth)
-  (declare (ignorable obj fn depth)))
-
-;; TODO: may be remove or may be in the weblocks.widget
-(defmethod weblocks::child-of-p ((parent widget) (child t))
-  nil)
-(defmethod weblocks::child-of-p ((parent t) (child widget))
-  nil)
 
 
 (defgeneric get-html-tag (widget)
@@ -127,7 +131,7 @@ inherits from 'widget' if no direct superclasses are provided."
 
 (defmethod get-css-classes ((widget t))
   (list :widget
-        (alexandria:make-keyword
+        (make-keyword
          (class-name (class-of widget)))))
 
 
@@ -137,7 +141,7 @@ inherits from 'widget' if no direct superclasses are provided."
                             collect (etypecase cls
                                       (string cls)
                                       (keyword (string-downcase (symbol-name cls)))))))
-    (cl-strings:join stringified :separator " ")))
+    (join stringified :separator " ")))
 
 
 ;; (defgeneric mark-dirty (w &key propagate)
@@ -181,19 +185,19 @@ propagation code."))
   (cond
     ((and inserted-after inserted-before)
      (error "Arguments inserted-after and inserted-before can't be used together."))
-    (inserted-after (weblocks.commands:add-command
+    (inserted-after (add-command
                      :insert-widget
-                     :widget (weblocks.html:with-html-string
+                     :widget (with-html-string
                                (render-widget w))
-                     :after (weblocks:dom-id inserted-after)))
-    (inserted-before (weblocks.commands:add-command
+                     :after (dom-id inserted-after)))
+    (inserted-before (add-command
                       :insert-widget
-                      :widget (weblocks.html:with-html-string
+                      :widget (with-html-string
                                 (render-widget w))
-                      :before (weblocks:dom-id inserted-before)))
-    (t (weblocks.commands:add-command
+                      :before (dom-id inserted-before)))
+    (t (add-command
         :update-widget
-        :dom-id (weblocks:dom-id w)
-        :widget (weblocks.html:with-html-string
+        :dom-id (dom-id w)
+        :widget (with-html-string
                   (render-widget w))))))
 

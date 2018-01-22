@@ -1,4 +1,4 @@
-(defpackage #:weblocks.html
+(defpackage #:weblocks/html
   (:use #:cl)
   (:import-from #:spinneret
                 #:*html*)
@@ -7,7 +7,7 @@
    #:*lang*
    #:with-html-string
    #:get-rendered-chunk))
-(in-package weblocks.html)
+(in-package weblocks/html)
 
 
 (defvar *stream*

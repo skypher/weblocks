@@ -1,16 +1,16 @@
-(defpackage #:weblocks/t/dependencies
+(defpackage #:weblocks-test/dependencies
   (:use #:cl
         ;; #:cl-mock
         ;; #:weblocks.dependencies
         ;; #:prove
         #:rove
 ;;        #:hamcrest/rove
-        #:weblocks/t/utils)
+        #:weblocks-test/utils)
   (:import-from #:cl-mock
                 #:invocations
                 #:with-mocks
                 #:answer)
-  (:import-from #:weblocks.dependencies
+  (:import-from #:weblocks/dependencies
                 #:*cache-remote-dependencies-in*
                 #:make-dependency
                 #:with-collected-dependencies
@@ -24,7 +24,7 @@
                 #:get-route
                 #:serve
                 #:render-in-head))
-(in-package weblocks/t/dependencies)
+(in-package weblocks-test/dependencies)
 
 
 (deftest infer-type

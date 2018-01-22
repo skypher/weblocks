@@ -1,9 +1,21 @@
+(defpackage #:weblocks/linguistic/grammar
+  (:use #:cl)
+  (:export #:pluralize
+           #:singularize
+           #:proper-number-form
+           #:vowelp
+           #:consonantp
+           #:proper-indefinite-article
+           #:articlize
+           #:*current-locale*
+           #:current-locale
+           #:russian-proper-number-form
+           #:noun-vocative-to-genitive
+           #:*debug-words-forms*
+           #:*debug-words-genders*
+           #:determine-gender))
+(in-package weblocks/linguistic/grammar)
 
-(in-package :weblocks)
-
-(export '(pluralize singularize proper-number-form vowelp consonantp
-          proper-indefinite-article articlize *current-locale* current-locale 
-          russian-proper-number-form noun-vocative-to-genitive *debug-words-forms* *debug-words-genders* determine-gender))
 
 (defvar *current-locale* :en)
 (defun current-locale ()

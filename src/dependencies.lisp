@@ -1,350 +1,569 @@
-(in-package :weblocks)
+(defpackage #:weblocks/dependencies
+  (:use #:cl)
+  (:import-from #:serapeum
+                #:defvar-unbound)
+  (:import-from #:weblocks/utils/misc
+                #:md5)
+  (:import-from #:weblocks/html
+                #:with-html)
+  (:import-from #:weblocks/routes
+                #:add-route)
+  ;; Just a dependency
+  (:import-from #:dexador)
+  
+  (:export
+   #:dependency
+   #:local-dependency
+   #:get-content-type
+   #:get-path
+   #:make-local-js-dependency
+   #:serve
+   #:make-local-css-dependency
+   #:get-route
+   #:get-dependencies
+   #:render-in-head
+   #:remote-dependency
+   #:make-remote-js-dependency
+   #:make-remote-css-dependency
+   #:get-integrity
+   #:get-crossorigin
+   #:make-local-image-dependency
+   #:*cache-remote-dependencies-in*
+   #:get-url
+   #:infer-type-from
+   #:make-dependency
+   #:get-type
+   #:render-in-ajax-response
+   #:register-dependencies
+   #:with-collected-dependencies
+   #:push-dependency
+   #:get-collected-dependencies
+   #:push-dependencies))
+(in-package weblocks/dependencies)
 
-(export '(dependency url-dependency-mixin stylesheet-dependency script-dependency
-          javascript-code-dependency
-          dependency-url
-          dependencies-equalp dependencies-lessp
-          render-dependency-in-page-head render-dependency-in-page-body-top
-          render-dependency-in-page-body-bottom render-dependency-in-form-submit
-          render-dependency-in-ajax-response
-          render-form-submit-dependencies
-          make-local-dependency per-class-dependencies dependencies
-          compact-dependencies build-dependencies))
 
-;; we need to be able to gather various kinds of dependencies
-;; from renderable objects (widgets, views, presentations). Dependencies
-;; are local (to our webserver) or external (external URLs), stylesheet
-;; or javascript code, and some could be introduced during AJAX page
-;; updates. We need to be able to handle all of these, where handling
-;; means: gather, compare and remove duplicates, detect new
-;; dependencies, render (possibly generating code that calls back
-;; javascript callbacks after updates have been completed).
-;;
-;; It looks complex, because the problem domain is complex. There is no
-;; escape from that. Fortunately, all that complexity will be hidden
-;; behind the scenes. Most people will only need to define one method
-;; for their new widget and that method will simply return one dependency.
-;;
-;; --Jan Rychter <jan@rychter.com>
+(defvar-unbound *page-dependencies*
+  "A list which contains all page dependencies.
+
+Weblocks fills this list during page rendering.")
+
+
+(defvar *cache-remote-dependencies-in* nil
+  "If this variable is set to a pathname, then
+remote dependencies will be cached and served as local dependencies.
+
+This pathname should point to a directory where cached dependencies will
+be stored.")
+
 
 (defclass dependency ()
+  ((type :type keyword
+         :initarg :type
+         :initform (error ":type argument is required.")
+         :reader get-type)))
+
+
+(defgeneric get-route (dependency)
+  (:documentation "This method should return a routes:route object
+if dependency should ber served from local server.")
+  (:method (dependency)
+    "By default dependencies aren't served by Lisp."
+    (declare (ignore dependency))))
+
+
+(defclass remote-dependency (dependency)
+  ((remote-url :type string
+               :initarg :remote-url
+               :reader get-remote-url)
+   (integrity :type (or string null)
+              :initarg :integrity
+              :initform nil
+              :reader get-integrity
+              :documentation "A hash, used by modern browsers for subresource integrity checking.
+
+See more information at: https://www.w3.org/TR/SRI/")
+   (crossorigin :type (or string null)
+                :initarg :crossorigin
+                :initform "anonymous"
+                :reader get-crossorigin)))
+
+
+(defclass local-dependency (dependency)
+  ((route :initarg :route
+          :initform nil
+          :reader get-route)
+   (path :type (or pathname null)
+         :initarg :path
+         :initform nil
+         :reader get-path)
+   (binary :type bool
+           :initarg :binary
+           :initform nil
+           :reader is-binary)))
+
+
+(defclass cached-remote-dependency (remote-dependency local-dependency)
   ()
-  (:documentation "Models a dependency of a particular renderable
-  item (widget, view, presentation) on a resource defined elsewhere
-  within the page (CSS, external JavaScript, JavaScript code)."))
+  (:documentation "This is subclass of remote dependency which is
+downloaded and stored in the local cache and served by lisp image.
 
-(defclass url-dependency-mixin ()
-  ((url :accessor dependency-url :initarg :url
-        :type (or string pathname puri:uri)
-        :documentation "URL to the object, represented as a string. May
-        be a relative or an absolute URL. Using the reader for this slot
-        always returns an URI object (as defined by the PURI
-        library).")
-   (local-path :accessor local-path :initarg :local-path :initform nil
-               :documentation "If the dependency is a local file, this stores its path."))
-  (:documentation "Any dependency which can be represented by an external URL."))
-
-(defmethod dependency-url ((obj url-dependency-mixin))
-  "Reading dependency-url always returns an URI object"
-  (with-slots (url) obj
-    (etypecase url
-      ((or string pathname) (setf url (puri:uri url)))
-      (puri:uri url))))
-
-(defmethod print-object ((obj url-dependency-mixin) stream)
-  (print-unreadable-object (obj stream :type t :identity nil)
-    (format stream "~A" (dependency-url obj))))
-
-(defclass stylesheet-dependency (dependency url-dependency-mixin)
-  ((media :accessor stylesheet-media :initarg :media :initform nil))
-  (:documentation "A CSS stylesheet dependency"))
-
-(defclass script-dependency (dependency url-dependency-mixin)
-  ()
-  (:documentation "A JavaScript file dependency"))
-
-(defclass javascript-code-dependency (dependency)
- ((code :accessor javascript-code :initarg :code
-        :documentation "String containing the javascript code."))
-  (:documentation "JavaScript code that is to be placed within the page
-  being rendered or sent as part of an AJAX update."))
+You don't' need to create it manually, just set *cache-remote-dependencies-in*
+variable to a path where to store data before all (make-dependency...) will be made,
+and they will create cached-remote-dependency instead of remote-dependency
+objects automatically."))
 
 
-(defgeneric dependencies-equalp (d1 d2)
-  (:documentation "Determine whether two dependencies are equal. We need
-to be able to compare dependencies in order to 1) remove duplicates from
-dependencies we gathered from the widget tree and 2) be able to detect
-when new dependencies appeared in AJAX page updates.")
-  ;; by default dependencies aren't equal
-  (:method (d1 d2) nil)           
-  ;; we also know how to compare uris
-  (:method ((d1 url-dependency-mixin) (d2 url-dependency-mixin))
-    (puri:uri= (dependency-url d1) (dependency-url d2))))
+(defgeneric get-url (dependency)
+  (:documentation "Returns URL of the dependency.
 
-(defgeneric dependencies-lessp (d1 d2)
-  (:documentation "Used for ordering dependencies, determines which ones
-  will come first in the page header.")
-
-  ;; in the general case, it doesn't matter
-  (:method (d1 d2) nil)
-
-  ;; stylesheets come before scripts
-  (:method ((d1 stylesheet-dependency) (d2 script-dependency)) t)
-  (:method ((d1 script-dependency) (d2 stylesheet-dependency)) nil))
-
-(defun prune-dependencies (dependency-list)
-  "Remove duplicates from a list of dependencies."
-  (log:debug "Pruning dependencies")
-  (remove-duplicates dependency-list :test #'dependencies-equalp :from-end t))
-
-(defun sort-dependencies-by-type (dependency-list)
-  (stable-sort dependency-list #'dependencies-lessp))
-
-(defun bundle-dependencies (dependency-list &key bundle-folder
-                                                 (bundle-types (bundle-dependency-types* *current-webapp*)))
-  (log:debug "Bundling dependencies")
-  (when (find :stylesheet bundle-types)
-    (setf dependency-list (bundle-some-dependencies dependency-list 'stylesheet-dependency
-                                                    :bundle-folder bundle-folder)))
-  (when (find :script bundle-types)
-    (setf dependency-list (bundle-some-dependencies dependency-list 'script-dependency
-                                                    :bundle-folder bundle-folder)))
-  dependency-list)
+If dependency should be served by the server, second value is :local.
+Otherwise it is :external. Also, in first case dependency's URL
+should have only path part, like /local/css/bootstrap.css."))
 
 
-(defgeneric compact-dependencies (dependency-list)
-  (:documentation "Provides a hook for dependency processing. The
-  default implementation just removes duplicates and sorts
-  dependencies. By adding :before, :after or :around methods one could
-  do more interesting things, such as combining differences.")
-  (:method (dependency-list)
-    (log:debug "Compacting dependencies")
-    (timing "sort-deps"
-      (sort-dependencies-by-type
-        (timing "bundle-deps"
-          (bundle-dependencies
-            (timing "prune-deps"
-              (prune-dependencies dependency-list))))))))
-
-;; Dependency rendering protocol
-
-(defgeneric render-dependency-in-page-head (obj)
-  (:method (obj)))
-
-(defgeneric render-dependency-in-page-body-top (obj)
-  (:method (obj)))
-
-(defgeneric render-dependency-in-page-body-bottom (obj)
-  (:method (obj)))
-
-(defgeneric render-dependency-in-form-submit (obj)
-  (:method (obj)))
-
-(defgeneric render-dependency-in-ajax-response (obj)
-  (:method (obj)))
+(defmethod print-object ((object local-dependency) stream)
+  (print-unreadable-object (object stream :type t)
+    (when (get-path object)
+      (format stream "path: ~S" (get-path object)))))
 
 
-;; Rendering implementations
-
-(defmethod render-dependency-in-page-head ((obj stylesheet-dependency))
-  (log:debug "Rendering stylesheet dependency" obj)
-  (with-html
-    (:link :rel "stylesheet" :type "text/css"
-           :href (dependency-url obj)
-           :media (stylesheet-media obj))))
-
-(defmethod render-dependency-in-page-head ((obj script-dependency))
-  (log:debug "Rendering script dependency" obj)
-  (with-html
-    (:script :src (dependency-url obj) :type "text/javascript" "")))
-
-(defmethod render-dependency-in-page-head ((obj javascript-code-dependency))
-  (log:debug "Rendering javascript code dependency" obj)
-  (weblocks.response:send-script (javascript-code obj)))
-
-(defmethod render-dependency-in-page-body-top ((obj javascript-code-dependency))
-  (log:debug "Rendering js dependency at the body top" obj)
-  (weblocks.response:send-script (javascript-code obj)))
-
-(defmethod render-dependency-in-page-body-bottom ((obj javascript-code-dependency))
-  (log:debug "Rendering js dependency at the body bottom" obj)
-  (weblocks.response:send-script (javascript-code obj)))
-
-(defmethod render-dependency-in-form-submit ((obj javascript-code-dependency))
-  (log:debug "Rendering js dependency in form submit" obj)
-  (javascript-code obj))
-
-(defmethod render-dependency-in-ajax-response ((obj stylesheet-dependency))
-  (log:debug "Rendering css dependency in ajax response" obj)
-  (weblocks.response:send-script
-   (ps* `(include_css
-          ,(puri:render-uri (dependency-url obj) nil)))
-   :before-load))
-
-(defmethod render-dependency-in-ajax-response ((obj script-dependency))
-  (log:debug "Rendering js dependency in ajax response" obj)
-  (weblocks.response:send-script
-   (ps* `(include_dom
-          ,(puri:render-uri (dependency-url obj) nil)))
-   :before-load))
-
-;; since rendering dependencies for views is more complex than a simple mapc, there is a utility function
-(defun render-form-submit-dependencies (dependency-list)
-  (log:debug "Rendering from submit dependency list" dependency-list)
-  (let ((code-string (reduce (lambda (e v)
-                               (concatenate 'string e (render-dependency-in-form-submit v)))
-                             (remove nil dependency-list)
-                             :initial-value "")))
-    (if (equalp code-string "")
-        nil
-        code-string)))
-
-(defvar *gzip-dependency-lock* (bordeaux-threads:make-lock))
-
-(defun create-gziped-dependency-file (original-path)
-  (log:debug "Creating gziped dependency file from" original-path)
-  (bordeaux-threads:with-lock-held (*gzip-dependency-lock*)
-    (let ((new-path (format nil "~A.gz" original-path)))
-      (gzip-file original-path new-path))))
+(defmethod print-object ((object remote-dependency) stream)
+  (print-unreadable-object (object stream :type t)
+    (format stream "url: ~S" (get-remote-url object))))
 
 
-;; Dependency gathering
+(defun get-content-type (dependency)
+  "Returns a MIME content type for given dependency.
 
-;; REMOVED because there are new dependencies in dependencies2.lisp
-;; (defun make-local-dependency (type file-name &key do-not-probe media (webapp *current-webapp*) (import-p nil))
-;;   "Make a local (e.g. residing on the same web server) dependency of
-;; type :stylesheet or :script. Unless :do-not-probe is set, checks if
-;; file-name exists in the server's public files directory, and if it does,
-;; returns a dependency object."
+It is used when dependency is served locally."
   
-;;   (log:debug "Making local dependency of" type "from" file-name)
+  (ecase (get-type dependency)
+    (:js "application/javascript")
+    (:css "text/css")
+    (:png "image/png")
+    (:jpg "image/jpeg")
+    (:gif "image/gif")))
+
+
+(defgeneric render-in-head (dependency)
+  (:documentation "Renders a piece of html.")
+  (:method (dependency)
+    (with-html
+      (:comment (format nil "Dependency ~S" dependency)))))
+
+
+(defgeneric render-in-ajax-response (dependency)
+  (:documentation "Returns a JS code to dynamically include a CSS or JS dependency
+into a webpage on AJAX response.
+
+This makes possible to load new styles and code for widgets which can appear on a page
+as a response to some action.")
+  (:method (dependency)
+    (declare (ignorable dependency))
+    (log:warn "No method to handle AJAX" dependency)))
+
+
+(defmethod render-in-head ((dependency dependency))
+  (case (get-type dependency)
+
+    (:js
+     (with-html
+       (:script :src (get-url dependency)
+                :type "text/javascript" "")))
+
+    (:css
+     (with-html
+       (:link :rel "stylesheet" :type "text/css"
+              :href (get-url dependency)
+              :media "screen")))))
+
+
+(defmethod render-in-ajax-response ((dependency dependency))
+  (case (get-type dependency)
+    (:js
+     (let ((script (parenscript:ps* `(include_dom
+                                      ,(get-url dependency)))))
+       (log:debug "Rendering js dependency in ajax response" dependency)
+       (send-script script :before-load)))
+
+    (:css
+     (let ((script (parenscript:ps* `(include_css
+                                      ,(get-url dependency)))))
+       (log:debug "Rendering css dependency in ajax response" dependency)
+       (send-script script :before-load)))))
+
+
+(defmethod render-in-head ((dependency remote-dependency))
+  ;; For cached dependencies remote and local urls are different
+  ;; to make life easier, we'll render a comment with original
+  ;; dependency's URL.
+  (unless (string-equal (get-url dependency)
+                        (get-remote-url dependency))
+    (with-html
+      (:comment (get-remote-url dependency))))
+
+  (case (get-type dependency)
+    ;; Javascript
+    (:js
+     (with-html
+       (:script :src (get-url dependency)
+                :type "text/javascript"
+                :integrity (get-integrity dependency)
+                :crossorigin (get-crossorigin dependency))))
+    ;; CSS
+    (:css
+     (with-html
+       (:link :rel "stylesheet" :type "text/css"
+              :href (get-url dependency)
+              :media "screen"
+              :integrity (get-integrity dependency)
+              :crossorigin (get-crossorigin dependency))))))
+
+
+(defgeneric serve (dependency)
+  (:documentation "Returns two values - content and content-type.
+
+Example output::
+
+  (values \"body {background: light-green;}\"
+          \"text/css\")"))
+
+
+(defgeneric get-dependencies (object)
+  (:documentation "Returns a list of object's dependencies.
+
+Object could be an application or a widget.
+Weblocks will call this method for application and every widget on a page
+to gather necessary dependencies and to inject them into resulting HTML.")
+
+  (:method ((object t))
+    "By default, there are no dependencies for an object."
+    nil))
+
+
+(defmethod initialize-instance :after ((dependency local-dependency)
+                                       &rest initargs)
+  "Creating a route for the dependency if it is \"local\".
+
+This way it will be possible to serve requests for this dependency from
+a browser."
   
-;;   (let* ((relative-path (public-file-relative-path type file-name))
-;;          (physical-path (princ-to-string (merge-pathnames relative-path
-;;                                                           (compute-webapp-public-files-path webapp))))
-;;          (file-exists (probe-file physical-path)))
+  (declare (ignorable initargs))
+  (log:debug "Making route for" dependency)
+
+  ;; Each dependency should have an url.
+  (let ((url (get-url dependency)))
+    ;; And now we will bind a route to dependency and vice-versa.
+    (setf (slot-value dependency
+                      'route)
+          (make-route url
+                      dependency))))
+
+
+(defmethod initialize-instance :after ((dependency remote-dependency)
+                                       &rest initargs)
+  "Creating a route for the dependency if it is \"local\".
+
+This way it will be possible to serve requests for this dependency from
+a browser."
+  
+  (declare (ignorable initargs))
+
+  ;; Each dependency should have an url.
+  (multiple-value-bind (url type)
+      (get-url dependency)
+
+    ;; But we only interested in a local dependencies,
+    ;; not in those which will be served by CDN.
+    (when (eql type
+               :local)
+
+      ;; And now we will bind a route to dependency and vice-versa.
+      (setf (slot-value dependency
+                        'route)
+            (make-route url
+                                        dependency)))))
+
+
+(defgeneric infer-type-from (path-or-url)
+  (:documentation "Returns a keyword meaning content type of the dependency
+by infering it from URL or a path"))
+
+
+(defmethod infer-type-from ((path pathname))
+  (let* ((type (pathname-type path)))
     
-;;     (if (or do-not-probe file-exists)
-;;       (let ((virtual-path (concatenate 'string
-;;                                        (maybe-add-trailing-slash (compute-webapp-public-files-uri-prefix webapp))
-;;                                        relative-path)))
-;;         (unless do-not-probe
-;;           (when (find type (version-dependency-types* webapp))
-;;             (multiple-value-setq (physical-path virtual-path)
-;;               (update-versioned-dependency-path physical-path virtual-path)))
-;;           (when import-p
-;;             (update-import-css-content physical-path))    
-;;           (when (find type (gzip-dependency-types* webapp))
-;;             (create-gziped-dependency-file physical-path)))
-;;         (ecase type
-;;           (:stylesheet (make-instance 'stylesheet-dependency
-;;                                       :url virtual-path :media media
-;;                                       :local-path physical-path))
-;;           (:script (make-instance 'script-dependency :url virtual-path
-;;                                                      :local-path physical-path))))
-;;       (log:warn "Depdendency wasn't found locally"
-;;                 physical-path))))
+    (if (member type '("css" "js" "png" "jpg" "ico" "gif") :test #'string-equal)
+        (intern (string-upcase type)
+                :keyword)
+        (error "Unable to infer type from ~a" path))))
 
 
-(defun build-dependencies (dep-list &optional (app *current-webapp*))
-  "Utility function: convert a list of either dependency objects or an
-alist of dependencies into a list of dependency objects. Used mostly
-when statically specyfing application dependencies, where alists are
-more convenient."
-  (log:debug "Building dependencies for" app "from" dep-list)
+(defmethod infer-type-from ((url string))
+  (let* ((parsed (puri:parse-uri url))
+         (url-path (puri:uri-path parsed)))
+    (if url-path
+        (infer-type-from (pathname url-path))
+        (error "Unable to infer type from ~a" url))))
+
+
+
+(defun make-dependency (path-or-url &key system
+                                      type
+                                      integrity
+                                      crossorigin)
+  "Creates a JavaScript dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  (check-type path-or-url (or string pathname))
+
+  (log:debug "Creating dependency from" path-or-url)
+
+  ;; If a usual string was given, but it is does not look like
+  ;; a URL, we'll consider it a path to a file, to make developer's
+  ;; life fun and easy.
+  (when (and (stringp path-or-url)
+             (not (cl-ppcre:scan "^https?://"
+                                 path-or-url)))
+    (setf path-or-url
+          (pathname path-or-url)))
   
-  (flet ((filedep-p (type)
-           (member type '(:script :stylesheet) :test #'eq))
-         (deptype->classname (type)
-           (ecase type
-             (:stylesheet 'stylesheet-dependency)
-             (:script 'script-dependency))))
+  (let ((type (or type
+                  (infer-type-from path-or-url))))
+    (typecase path-or-url
+      (string (make-instance (if *cache-remote-dependencies-in*
+                                 'cached-remote-dependency
+                                 'remote-dependency)
+                             :type type
+                             :remote-url path-or-url
+                             :integrity integrity
+                             :crossorigin crossorigin))
+      (pathname (make-instance 'local-dependency
+                               :type type
+                               :path (if system
+                                         (asdf:system-relative-pathname system
+                                                                        path-or-url)
+                                         path-or-url))))))
+
+(defun make-local-js-dependency (path &key system)
+  "Creates a JavaScript dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  
+  (make-instance 'local-dependency
+                 :content-type "application/javascript"
+                 :path (if system
+                           (asdf:system-relative-pathname system
+                                                          path)
+                           path)))
+
+
+(defun make-local-css-dependency (path &key system)
+  "Creates a CSS dependency, served from the disk.
+
+If system's name was give, then path is calculated relative
+to this system's source root."
+  
+  (make-instance 'local-dependency
+                 :content-type "text/css"
+                 :path (if system
+                           (asdf:system-relative-pathname system
+                                                          path)
+                           path)))
+
+
+(defun make-local-image-dependency (path &key system)
+  "Creates an image dependency, served from the disk.
+
+It is not rendered into an HTML, but served from disk."
+  
+  (let* ((path (if system
+                  (asdf:system-relative-pathname system
+                                                 path)
+                  (pathname path)))
+         (ext (pathname-type path))
+         (content-type (format nil "image/~a"
+                               ext)))
     
-    (mapcar (lambda (dep)
-              (if (consp dep)
-                  (destructuring-bind (type arg) dep
-                    (cond ((not (filedep-p type))
-                           (make-instance 'javascript-code-dependency :code arg))
-                          ((puri:uri-host (puri:parse-uri arg))
-                           (make-instance (deptype->classname type) :url arg))
-                          (t (make-local-dependency type arg :webapp app))))
-                  dep))
-            dep-list)))
-
-(defun dependencies-by-symbol (symbol)
-  "A utility function used to help in gathering dependencies. Determines
-dependencies for a particular symbol, which could (but doesn't have to)
-represent a class."
-  (log:debug "Returning dependencies by" symbol)
-  (let* ((attributized-widget-class-name (attributize-name symbol))
-         (base-dependencies (loop for type in '(:stylesheet :script)
-                               collect (make-local-dependency type attributized-widget-class-name)))
-         (import-stylesheet-name (format nil "~A-import" attributized-widget-class-name))
-         (import-dependency (make-local-dependency :stylesheet import-stylesheet-name :import-p t)))
-    (if import-dependency
-        (push import-dependency base-dependencies)
-        base-dependencies)))
-
-(defgeneric per-class-dependencies (obj)
-  (:documentation "Return a list of dependencies for an object of a
-  particular class. For widgets, this method is defined by defwidget
-  automatically. If you don't use defwidget or if you want other
-  renderable types to have per-class-dependencies, you need to take care
-  to define this method for your class.
-
-  The default implementation for widgets uses the following protocol to
-  determine if a widget has dependencies. It looks under
-  *public-files-path*/scripts/[attributized-widget-class-name].js and
-  *public-files-path*/stylesheets/[attributized-widget-class-name].css. If
-  it finds the aforementioned files, it returns them as
-  dependencies. This way the developer can simply place relevant files
-  in the appropriate location and not worry about specializing this
-  function most of the time.")
-  (:method-combination append)
-  ;; no dependencies by default
-  (:method append (obj)
-    (log:debug "No per-class dependencies for" obj "by default")
-    ()))
+    (make-instance 'local-dependency
+                   :content-type content-type
+                   :path path
+                   :binary t)))
 
 
-(defgeneric dependencies (obj)
-  (:documentation "Return a list of dependencies for a particular
-  object.
+(defun make-remote-js-dependency (url &key integrity
+                                           (cross-origin "anonymous"))
+  "Creates a JavaScript dependency, served from CDN."
+  (make-instance 'remote-dependency
+                 :content-type "application/javascript"
+                 :url url
+                 :integrity integrity
+                 :cross-origin cross-origin))
 
-  Whenever a widget is rendered by weblocks, this function is called to
-  determine which stylesheets, javascript files and javascript code the
-  widget depends on. These dependencies are then processed and included
-  in various places (header, body, AJAX page update) of the containing
-  page.
 
-  The default implementation for widgets finds some dependencies
-  automatically based on the widget's class name, see
-  'per-class-dependencies for details.
+(defun make-remote-css-dependency (url &key integrity
+                                            (cross-origin "anonymous"))
+  "Creates a CSS dependency, served from CDN."
+  (make-instance 'remote-dependency
+                 :content-type "text/css"
+                 :url url
+                 :integrity integrity
+                 :cross-origin cross-origin))
 
-  This method uses the append method combination to also return
-  dependencies for the superclasses of 'obj', because it's intuitive to
-  assume that a widget will use the stylesheets of its superclasses.")
 
-  (:method-combination append)
+(defmethod serve ((dependency local-dependency))
+  "Serves local dependency from the disk."
+  (values (pathname (get-path dependency))
+          (get-content-type dependency)))
 
-  ;; To actually gather dependencies, we need to 1. gather everything
-  ;; from user-defined append methods and 2. traverse the class tree and
-  ;; gather all class-related dependencies. This :around method collects
-  ;; everything and removes empty dependencies.
-  (:method :around (obj)
-    (log:debug "Returning dependencies for" obj)
-    (let ((dependencies (nreverse
-                         (remove nil
-                                 (append (call-next-method)
-                                         (per-class-dependencies obj))))))
-      (log:debug "Dependencies for"
-                 obj
-                 dependencies)))
 
-  ;; No dependencies by default
-  (:method append (obj) ())
+(defmethod serve ((dependency cached-remote-dependency))
+  "Serves remote dependency from local cache."
+  (let ((local-path (pathname (get-path dependency))))
+    
+    (unless (cl-fad:file-exists-p local-path)
+      (let* ((url (get-remote-url dependency))
+             ;; игнорируем ошибки пока в самолёте
+             (input (handler-case
+                        (progn
+                          (log:debug "Caching" url)
+                          (dex:get url
+                                   :want-stream t
+                                   :force-binary t))
+                      (t ()
+                        (log:error "Unable to fetch" url)
+                        (values)))))
+        
+        (ensure-directories-exist local-path)
+        
+        (when input
+          (with-open-file (output local-path
+                                  :direction :output
+                                  :element-type '(unsigned-byte 8)
+                                  :if-exists :supersede
+                                  :if-does-not-exist :create)
+            (cl-fad:copy-stream input output)))))
+    
+    (values local-path
+            (get-content-type dependency))))
 
-  ;; For strings and symbols we try a filename lookup.
-  (:method append ((obj symbol)) (dependencies-by-symbol obj))
-  (:method append ((obj string)) (dependencies-by-symbol obj)))
 
+(defmethod get-url ((dependency local-dependency))
+  "Returns dependency's url and it's type.
+
+URL type is returned as second value and can be :local or :remote.
+For local-dependency it is :local."
+  
+  (let* ((path (get-path dependency))
+         (filename (pathname-name path))
+         (ext (pathname-type path))
+         (prefix (format nil "/static/~a/"
+                         ext))
+         (filename-with-prefix (concatenate 'string
+                                            prefix
+                                            filename
+                                            "."
+                                            ext)))
+    filename-with-prefix))
+
+
+(defmethod get-url ((dependency remote-dependency))
+  (get-remote-url dependency))
+
+
+(defmethod get-url ((dependency cached-remote-dependency))
+  (let* ((remote-url (get-remote-url dependency)))
+    (concatenate 'string "/remote-deps-cache/"
+                 (md5 remote-url))))
+
+
+(defmethod get-path ((dependency remote-dependency))
+  "Returns a path to cached file."
+  (check-type *cache-remote-dependencies-in* pathname)
+  (assert (cl-fad:directory-pathname-p
+           *cache-remote-dependencies-in*))
+
+  (let* ((url (get-remote-url dependency))
+         (hash (md5 url)))
+    (merge-pathnames hash *cache-remote-dependencies-in*)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Routes related part ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO: rename to register-routes or may be move this code to push-dependency?
+(defun register-dependencies (dependencies)
+  "Adds dependencies to the router to make HTTP server handle them."
+  (dolist (dependency dependencies)
+    (let ((route (get-route dependency)))
+      (when route
+        (add-route route)))))
+
+
+(defclass dependency-route (routes:route)
+  ((dependency :initform nil
+               :initarg :dependency
+               :reader get-dependency)))
+
+
+(defun make-route (uri dependency)
+  "Makes a route for dependency.
+
+Automatically adds a prefix depending on current webapp and widget."
+
+  (make-instance 'dependency-route
+                 :template (routes:parse-template uri)
+                 :dependency dependency))
+
+
+
+(defmethod weblocks/routes:serve ((route dependency-route) env)
+  (declare (ignorable env))
+  
+  (let ((dependency (get-dependency route)))
+    (multiple-value-bind (content content-type)
+        (serve dependency)
+              
+      (let ((content (typecase content
+                       (string (list content))
+                       (t content))))
+        (list 200
+              (list :content-type content-type)
+              content)))))
+
+
+(defmacro with-collected-dependencies (&body body)
+  "Use this macro to wrap code which may push new dependencies for
+the page or an action."
+  `(let (*page-dependencies*)
+     ,@body))
+
+
+(defun push-dependency (dependency)
+  "Pushes dependency into the currently collected list of dependencies.
+
+Makes deduplication by comparing dependencies' urls."
+  
+  (unless (boundp '*page-dependencies*)
+    (error "Please, use push-dependency in code, wrapped with with-collected-dependencies macro."))
+  (pushnew dependency *page-dependencies*
+           :key #'get-url
+           :test #'string-equal))
+
+
+(defun push-dependencies (list-of-dependencies)
+  "Same as `push-dependency' but for the list."
+  (mapc #'push-dependency
+        list-of-dependencies))
+
+
+(defun get-collected-dependencies ()
+  (unless (boundp '*page-dependencies*)
+    (error "Please, use push-dependency in code, wrapped with with-collected-dependencies macro."))
+
+  ;; Dependencies returned as reversed list because that way
+  ;; they will have same order as they were pushed.
+  (reverse *page-dependencies*))

@@ -1,6 +1,5 @@
-(defpackage #:weblocks.app-mop
-  (:use #:cl
-        )
+(defpackage #:weblocks/app-mop
+  (:use #:cl)
   (:shadowing-import-from #:closer-mop
                           #:standard-class
                           #:validate-superclass
@@ -18,7 +17,7 @@
    #:app-class
    #:get-registered-apps
    #:get-autostarting-apps))
-(in-package weblocks.app-mop)
+(in-package weblocks/app-mop)
 
 
 ;; (eval-when (:compile-toplevel :load-toplevel :execute))

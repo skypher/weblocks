@@ -1,9 +1,27 @@
-(defpackage #:weblocks.app
+(defpackage #:weblocks/app
   (:use #:cl
         #:f-underscore)
-  (:import-from #:weblocks.app-mop
+  (:import-from #:metatilities
+                #:form-symbol)
+  (:import-from #:weblocks/app-mop
                 #:get-autostarting-apps
-                #:get-registered-apps)
+                #:get-registered-apps
+                #:app-class
+                #:webapp-class-home-package)
+  (:import-from #:serapeum
+                #:defvar-unbound)
+  (:import-from #:weblocks/js/base
+                #:make-js-backend)
+  (:import-from #:weblocks/utils/string
+                #:attributize-name
+                #:remove-spurious-slashes
+                #:strip-trailing-slashes)
+  (:import-from #:weblocks/utils/list
+                #:remove-keyword-parameters)
+  ;; Just dependencies
+  ;; Here we need to load jquery js backend, because it is a default
+  (:import-from #:weblocks/js/jquery)
+  
   (:export
    #:defapp
    #:app
@@ -23,7 +41,7 @@
    #:define-action
    #:define-action/cc
    #:make-uri))
-(in-package weblocks.app)
+(in-package weblocks/app)
 ;; (in-package weblocks)
 
 ;; (export '(defwebapp
@@ -63,8 +81,7 @@
 ;;     "A list of applications that the system knows about"))
 
 
-(serapeum:defvar-unbound
-    *current-app*
+(defvar-unbound *current-app*
   "A currently active web application.")
 
 
@@ -83,11 +100,11 @@
                 :initform nil 
                 :documentation "The name of the application.  This slot will be used 
                    by 'application-page-title' to generate the default title for each page.")
-   (js-backend :accessor webapp-js-backend 
+   (js-backend :accessor get-js-backend 
                :initarg :js-backend
                :initform :jquery
                :documentation "Specify a javascript backend for
-               framework (default is :jquery-js)")
+               framework (default is :jquery)")
    (hostnames :type list
               :reader weblocks-webapp-hostnames
               :initarg :hostnames
@@ -107,49 +124,10 @@
            :initarg :prefix
            :documentation "The subtree of the URI space at this site that belongs to
            the webapp.")
-   ;; TODO: may be remove
-   (application-dependencies :type list
-                             :accessor weblocks-webapp-application-dependencies 
-                             :initarg :dependencies
-                             :initform nil
-                             :documentation "The public dependencies for all pages rendered by this 
-                                application.  The automatic dependencies system will handle all of 
-                                the context or request specific dependencies.")
-   (bundle-dependency-types :type list
-                            :accessor bundle-dependency-types
-                            :initarg :bundle-dependency-types
-                                        ;:initform '(:stylesheet :script)
-                            :initform nil ; current bundling code is flaky
-                            :documentation "This enables bundling of css, js files.
-       If you only want js files to get bundled, set this to '(script-dependency).
-       Set it to nil disables bundling. When debug is on, bundling is turned off.
-       ATTENTION: If your 'whatever.css' file contains import rules, please take them out,
-       put them in a separate file, and name it 'whatever-import.css'. This way all import
-       rules will get properly placed in the beginning of the bundled css file.
-       ATTENTION: Bundling depends on versioning to detect change in a bundle.
-       TIPS:You can also prevent files from being bundled, for example,
-       '((stylesheet-dependency filepath-1 filepath-2) script-dependency)
-       These two files however, will come after the bundled ones in HTML.")
-   (version-dependency-types :type list
-                             :accessor version-dependency-types
-                             :initarg :version-dependency-types
-                                        ;:initform '(:stylesheet :script)
-                             :initform nil ; versioning does not work well for multiple webapps
-                             :documentation "This enables versioning of css, js files. The purpose
-       of versioning is to serve modified static files that have been cached permanently, and gziping.
-       Anytime you modified the original (unversioned) css or js file, new versioned (maybe gziped)
-       file will get created. This way, you only need to work on the unversioned file and not keep
-       track of the versioned ones. When debug is t, versioning is turned off.")
-   (gzip-dependency-types :type list
-                          :accessor gzip-dependency-types
-                          :initarg :gzip-dependency-types
-                          :initform '(:stylesheet :script)
-                          :documentation "This enables gziping of css, js files.
-                                          When debug is on, gzip is turned off.")
    (session-key :type symbol :accessor weblocks-webapp-session-key :initarg :session-key)
    (debug :accessor weblocks-webapp-debug :initarg :debug :initform nil 
           :documentation "Responsible for debug mode, use WEBAPP-DEBUG function for getting slot value"))
-  (:metaclass weblocks.app-mop::app-class)
+  (:metaclass app-class)
   (:documentation 
    "A class that encapsulates a unique web application and all relevant rnesources.
 A webapp is a unique set of dependencies and information that can be enabled or
@@ -160,22 +138,6 @@ not see the prefix parameter in URLs that are provided to it.  You can, for
 instance, have different sites (e.g. mobile vs. desktop) with vastly different 
 layout and dependencies running on the same server."))
 
-
-;;; Make slot readers that will return nil if debug is on
-;;; Yet still retain the original values when debug is off
-(defmacro def-debug-p-slot-readers (&rest reader-symbols)
-  `(progn
-     ,@(loop for symbol in reader-symbols
-          collect `(defun ,(weblocks::form-symbol symbol '*) (object)
-                     "This reader will prompt debug parameters first."
-                     (unless (or *weblocks-global-debug*
-                                 (weblocks-webapp-debug object))
-                       (,symbol object))))))
-
-(def-debug-p-slot-readers
-    version-dependency-types
-    bundle-dependency-types
-    gzip-dependency-types)
 
 ;; Slash-normalizing accessors
 ;;
@@ -190,7 +152,7 @@ layout and dependencies running on the same server."))
   "Set the prefix of the webapp. Ensures normalization by removing trailing slash."
   (unless (string= prefix "/") ;; XXX multiple slashes?
     (setf (slot-value app 'prefix)
-          (weblocks::strip-trailing-slashes prefix))))
+          (strip-trailing-slashes prefix))))
 
 
 ;; abstraction macro
@@ -220,15 +182,6 @@ co-exist, so long as they have different prefixes
 
 :description - A description of the application for the title page
 
-:ignore-default-dependencies inhibits appending the default dependencies to
-the dependencies list.  By default 'defwebapp' adds the following resources:
-
-  Stylesheets: layout.css, main.css
-  Scripts (only for prototype js backend): prototype.js, weblocks.js, scriptaculous.js 
-
-:dependencies - is a list of dependencies to append to the default dependencies
-list of the application.
-
 :autostart - Whether this webapp is started automatically when start-weblocks is
 called (primarily for backward compatibility"
   `(progn
@@ -236,24 +189,23 @@ called (primarily for backward compatibility"
        ,slots
        (:autostart . ,autostart)
        (:default-initargs
-        . ,(weblocks::remove-keyword-parameters
+        . ,(remove-keyword-parameters
             initargs :subclasses :slots :autostart))
-       (:metaclass weblocks.app-mop:app-class))
+       (:metaclass app-class))
      (when (find-active-app ',name :signal-error nil)
        (restart-webapp ',name))))
 
 
 (defmethod initialize-instance :after
-    ((self app) &key ignore-default-dependencies &allow-other-keys)
-  "Add some defaults to my slots.  In particular, unless
-IGNORE-DEFAULT-DEPENDENCIES, prepend the default Weblocks dependencies
-to my `application-dependencies' slot."
+    ((self app) &rest initargs)
+  "Add some defaults to the slots."
+  (declare (ignorable initargs))
 
   ;; Make an instance of js backend class from
   ;; a keyword name
-  (setf (webapp-js-backend self)
-        (weblocks.js:make-js-backend
-         (webapp-js-backend self)))
+  (setf (get-js-backend self)
+        (make-js-backend
+         (get-js-backend self)))
   
   
   ;; TODO: refactor this mess
@@ -268,34 +220,14 @@ to my `application-dependencies' slot."
 
     (let ((class-name (class-name (class-of self))))
       (slot-default session-key class-name)
-      (slot-default name (weblocks::attributize-name class-name))
+      (slot-default name (attributize-name class-name))
       (slot-default prefix
-                    (concatenate 'string "/" (weblocks::attributize-name class-name))))
-    (unless ignore-default-dependencies
-      ;; Replaced with new king of dependencies
-      ;;
-      ;; (let ((*current-app* self))
-      ;;   (setf (weblocks-webapp-application-dependencies self)
-      ;;         (build-dependencies
-      ;;          (append
-      ;;           ;; Backend dependencies should go first, to
-      ;;           ;; load jquery or prototype before all other code
-      ;;           ;; will be loaded.
-      ;;           (get-js-backend-dependencies
-      ;;            self
-      ;;            (weblocks-webapp-js-backend self))
-      ;;           ;; After that, we load dependencies of a class
-      ;;           (weblocks-webapp-default-dependencies self)
-      ;;           ;; And finally, we add them to existing application
-      ;;           ;; dependencies.
-      ;;           (weblocks-webapp-application-dependencies self)))))
-      ))
-  
-)
+                    (concatenate 'string "/" (attributize-name class-name))))))
+
 
 (defun find-active-app (name &key (signal-error t))
   "Get a running web application"
-  (let ((app (find (if (symbolp name) (weblocks::attributize-name name) name)
+  (let ((app (find (if (symbolp name) (attributize-name name) name)
                    *active-apps*
                    :key #'weblocks-webapp-name :test #'equal)))
     (when (and (null app)
@@ -307,7 +239,7 @@ to my `application-dependencies' slot."
 (defun app-active-p (name)
   "Returns t if application of given class is already active."
   (let ((class (or (and (symbolp name) (find-class name nil))
-                   (find-class (intern (weblocks::attributize-name name) :keyword) nil))))
+                   (find-class (intern (attributize-name name) :keyword) nil))))
     (when class
       (loop for app in *active-apps*
             when (eq (class-of app)
@@ -345,7 +277,7 @@ to my `application-dependencies' slot."
 
 
 (defun start (class &rest initargs
-              &key (name (weblocks::attributize-name class)) &allow-other-keys)
+              &key (name (attributize-name class)) &allow-other-keys)
   "Starts the web application if it is not started, shows warning in other case.
    Returns app.
 
@@ -373,8 +305,8 @@ to my `application-dependencies' slot."
   "Ensure that all registered stores are open"
 
   ;; to not introduce circular dependency we have these intern calls
-  (unless (intern "*SERVER*" :weblocks.server)
-    (funcall (intern "START-WEBLOCKS" :weblocks.server)))
+  (unless (intern "*SERVER*" :weblocks/server)
+    (funcall (intern "START-WEBLOCKS" :weblocks/server)))
 
   ;; TODO: Separate stores into a separate system
   ;;       with dependency from weblocks and make a hook
@@ -384,13 +316,6 @@ to my `application-dependencies' slot."
   ;;       which will define it's own initialize-webapp :before method.
   ;; (open-stores)
   )
-
-
-(defmethod weblocks.dependencies:get-dependencies ((self app))
-  (log:debug "Returning new-style dependencies for base application class.")
-  
-  (weblocks.dependencies:get-dependencies
-   (webapp-js-backend self)))
 
 
 (defgeneric finalize-webapp (app)
@@ -403,7 +328,7 @@ to my `application-dependencies' slot."
   "Shutdown Weblocks when no more apps are running."
   (unless *active-apps*
     ;; TODO: break this tie
-    (funcall (intern "STOP-WEBLOCKS" :weblocks.server))))
+    (funcall (intern "STOP-WEBLOCKS" :weblocks/server))))
 
 (defun stop-webapp (name)
   "Stops the web application"
@@ -419,13 +344,6 @@ to my `application-dependencies' slot."
 (defun restart-webapp (name)
   (stop-webapp name)
   (start-webapp name))
-
-;;; building webapp uris
-(defun make-uri (app uri)
-  "Makes a URI for a weblocks application (by concatenating the app
-prefix and the provided uri)."
-  (weblocks::remove-spurious-slashes
-    (concatenate 'string "/" (get-prefix app) "/" uri)))
 
 
 ;;
@@ -506,7 +424,7 @@ prefix and the provided uri)."
 `defwebapp') in PACKAGE, by default the current package."
   (loop for app-class-name in (get-registered-apps)
         for class = (find-class app-class-name)
-        when (eql package (weblocks::webapp-class-home-package class))
+        when (eql package (webapp-class-home-package class))
           collect class))
 
 

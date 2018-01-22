@@ -1,6 +1,9 @@
-(defpackage #:weblocks.hooks
+(defpackage #:weblocks/hooks
   (:use #:cl
         #:f-underscore)
+  ;; Just dependencies
+  (:import-from #:weblocks/session)
+  
   (:export
    #:add-application-hook
    #:add-request-hook
@@ -9,7 +12,7 @@
    #:with-hook
    #:call-next-hook
    #:call-hook))
-(in-package weblocks.hooks)
+(in-package weblocks/hooks)
 
 
 (defclass hooks ()
@@ -25,15 +28,15 @@
 
 (defun reset-session-hooks ()
   (let ((hooks (make-instance 'hooks)))
-    (setf (weblocks.session:get-value 'hooks)
+    (setf (weblocks/session:get-value 'hooks)
           hooks)
     hooks))
 
 
 (defun get-or-create-session-hooks ()
   "A request hook object used in the session scope."
-  (if (weblocks.session:get-value 'hooks)
-      (weblocks.session:get-value 'hooks)
+  (if (weblocks/session:get-value 'hooks)
+      (weblocks/session:get-value 'hooks)
       (reset-session-hooks)))
 
 
