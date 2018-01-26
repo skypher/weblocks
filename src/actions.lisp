@@ -9,9 +9,7 @@
                 #:generate-random-id)
   ;; Just dependencies
   (:import-from #:weblocks/session)
-  (:import-from #:weblocks/app)
   (:import-from #:weblocks/request
-                #:get-request-action
                 #:get-path)
   (:import-from #:quri
                 #:url-encode)
@@ -19,7 +17,8 @@
   (:export
    #:on-missing-action
    #:eval-action
-   #:get-session-action))
+   #:get-session-action
+   #:get-request-action))
 (in-package weblocks/actions)
 
 
@@ -111,7 +110,7 @@ it does not, signals an error."
       
       ;; if it is an action code
       (multiple-value-bind (res presentp)
-          (weblocks/app:get-action function-or-action)
+          (weblocks/app-actions:get-action function-or-action)
         (declare (ignore res))
         (if presentp
             function-or-action
@@ -146,3 +145,20 @@ Ex:
           (weblocks/session:get-value 'code->action
                               (make-hash-table :test #'equal))))
     (gethash name code->action)))
+
+
+(defun get-request-action (action-name)
+  "Gets an action from the request. If the request contains
+*action-string* parameter, the action is looked up in the session and
+appropriate function is returned. If no action is in the parameter,
+returns nil. If the action isn't in the session (somehow invalid),
+raises an assertion."
+  (when action-name
+    (let* ((app-wide-action (weblocks/app-actions:get-action action-name))
+           (session-action (get-session-action action-name))
+           (request-action (or app-wide-action session-action)))
+      ;; TODO: rethink this form. May be throw a special condition instead of string
+      (unless *ignore-missing-actions*
+        (assert request-action (request-action)
+                (concatenate 'string "Cannot find action: " action-name)))
+      request-action)))

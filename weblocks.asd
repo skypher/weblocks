@@ -54,9 +54,9 @@
   :pathname "src"
   :depends-on 
   (
-   ;; "weblocks/app"
+   "weblocks/app"
    ;; "weblocks/app-dependencies"
-   ;; "weblocks/js/jquery"
+   "weblocks/js/jquery"
    ;; "weblocks/session"
    ;; "weblocks/hooks"
    ;; "weblocks/request"

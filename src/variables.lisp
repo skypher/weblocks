@@ -15,10 +15,13 @@
            #:*action-string*
            #:*approved-return-codes*
            #:*style-warn-on-circular-dirtying*
-           #:*style-warn-on-late-propagation*))
+           #:*style-warn-on-late-propagation*
+           #:*current-app*))
 
 (in-package weblocks/variables)
 
+(defvar-unbound *current-app*
+  "A currently active web application.")
 
 (defvar *current-page-title* nil
   "Hold a title of the currently rendered page.")

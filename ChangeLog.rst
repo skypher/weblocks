@@ -125,7 +125,7 @@ Slot ``default-store-name`` and its accessor
 ``webapp-default-store-name`` were removed.
 
 Variable ``*current-webapp*`` was moved to
-``weblocks.app::*current-app*``.
+``weblocks.variables::*current-app*``.
 
 Functions ``compute-webapp-public-files-uri-prefix``,
 ``compute-webapp-public-files-uri-prefix``,
@@ -146,15 +146,15 @@ Variable ``*uri-tokens*`` was removed and weblocks does not set
 Macro ``with-webapp`` was moved to ``weblocks.app:with-app``.
 
 Function ``webapp-permanent-action`` was moved to
-``weblocks.app:get-action``.
+``weblocks.app-actions:get-action``.
 
 Function ``add-webapp-permanent-action`` was moved to
-``weblocks.app:add-action`` and ``remove-webapp-permanent-action`` to
-``weblocks.app:remove-action``.
+``weblocks.app-actions:add-action`` and ``remove-webapp-permanent-action`` to
+``weblocks.app-actions:remove-action``.
 
 Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
-were moved to ``weblocks.app:define-action`` and
-``weblocks.app:define-action/cc``.
+were moved to ``weblocks.app-actions:define-action`` and
+``weblocks.app-actions:define-action/cc``.
 
 Function ``make-webapp-uri`` was removed, use
 ``weblocks/response:make-uri`` instedad.
@@ -172,7 +172,7 @@ Actions and commands
 Function ``weblocks.actions:add-command`` was moved to
 ``weblocks.commands``.
 
-Function ``weblocks:get-request-action`` was moved to ``weblocks/request:get-request-action``
+Function ``weblocks:get-request-action`` was moved to ``weblocks/actions:get-request-action``
 
 Javascript
 ==========

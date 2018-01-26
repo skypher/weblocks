@@ -1,6 +1,6 @@
 (defpackage #:weblocks/request
   (:use #:cl)
-  (:import-from #:weblocks/app)
+  (:import-from #:weblocks/app-actions)
   
   (:import-from #:metacopy
                 #:copy-thing)
@@ -22,11 +22,10 @@
                 #:*ignore-missing-actions*)
   (:import-from #:weblocks/utils/uri
                 #:query-string->alist)
+
   ;; Just to add dependency
   (:import-from #:weblocks/session)
   (:import-from #:quri)
-  (:import-from #:weblocks/actions
-                #:get-session-action)
   
   (:export
    #:get-parameters
@@ -151,7 +150,7 @@ refresh function. Note that a request will not be considered a refresh
 if there is an action involved (even if the user hits refresh)."
   (let ((action-name (get-action-name-from-request)))
     (and
-     (null (get-request-action action-name))
+     (null action-name)
      (equalp (get-path)
              (weblocks/session:get-value 'last-request-path)))))
 
@@ -202,18 +201,3 @@ etc."
        ,result)))
 
 
-(defun get-request-action (action-name)
-  "Gets an action from the request. If the request contains
-*action-string* parameter, the action is looked up in the session and
-appropriate function is returned. If no action is in the parameter,
-returns nil. If the action isn't in the session (somehow invalid),
-raises an assertion."
-  (when action-name
-    (let* ((app-wide-action (weblocks/app:get-action action-name))
-           (session-action (get-session-action action-name))
-           (request-action (or app-wide-action session-action)))
-      ;; TODO: rethink this form. May be throw a special condition instead of string
-      (unless *ignore-missing-actions*
-        (assert request-action (request-action)
-                (concatenate 'string "Cannot find action: " action-name)))
-      request-action)))
