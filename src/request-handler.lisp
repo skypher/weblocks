@@ -407,10 +407,11 @@ customize behavior."))
               content))))
 
     ;; Restart
-    (abort (c)
+    (abort ()
       :report "abort request processing and return 500"
       (log:error "Aborting request processing")
-      (on-error app c))))
+      (abort-processing "Request was aborted"
+                        :code 500))))
 
 
 
