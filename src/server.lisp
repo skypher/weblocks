@@ -1,6 +1,9 @@
 (defpackage #:weblocks/server
   (:use #:cl
         #:f-underscore)
+  ;; to load js dependencies after app was started
+  (:import-from #:weblocks/app-dependencies)
+  
   (:import-from #:weblocks/session
                 #:*session*)
   (:import-from #:weblocks/hooks
@@ -21,7 +24,8 @@
                 #:weblocks-webapp-name
                 #:get-autostarting-apps)
   (:import-from #:weblocks/request
-                #:ajax-request-p)
+                #:ajax-request-p
+                #:with-request)
   (:import-from #:weblocks/response
                 #:*code*
                 #:*content-type*
@@ -108,7 +112,7 @@ This function serves all started applications and their static files."
          ;; This "hack" is needed to allow widgets to change *random-state*
          ;; and don't interfere with other threads and requests
          (*random-state* *random-state*))
-    (weblocks.request:with-request ((make-request env))
+    (with-request ((make-request env))
       ;; Dynamic hook :handle-request makes possible to write
       ;; some sort of middlewares, which change *request* and *session*
       ;; variables.
@@ -119,10 +123,13 @@ This function serves all started applications and their static files."
                  (hostname (getf env :server-name))
                  (route (get-route path-info)))
 
+            (log:debug "Processing request to" path-info)
+
             ;; If dependency found, then return it's content along with content-type
             (when route
+              (log:debug "Route was found" route)
               (return-from handle-request
-                (weblocks.routes:serve route env)))
+                (weblocks/routes:serve route env)))
 
             (dolist (app (get-active-apps))
               (let ((app-prefix (get-prefix app)))
@@ -159,11 +166,12 @@ This function serves all started applications and their static files."
                              ;; processing and to return data immediately
                              (list content))))))))
                                   
-            (log:debug "Application dispatch failed for" path-info)
+            (log:error "Application dispatch failed for" path-info)
 
             (list 404
-                  (list :content-type "text/html")
-                  (list (format nil "File \"~A\" was not found"
+                  (append (list :content-type "text/html")
+                          *headers*)
+                  (list (format nil "File \"~A\" was not found.~%"
                                 path-info)))))))))
 
 
@@ -297,7 +305,7 @@ declared AUTOSTART."
                  :reader get-content-type)))
 
 
-(defmethod weblocks.routes:serve ((route static-route-from-file) env)
+(defmethod weblocks/routes:serve ((route static-route-from-file) env)
   "Returns a file's content"
   (declare (ignorable env))
   (list 200

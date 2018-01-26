@@ -7,6 +7,7 @@
                 #:function-or-action->action
                 #:eval-action
                 #:on-missing-action
+                #:make-action-url
                 #:make-action)
   (:import-from #:weblocks/request
                 #:get-action-name-from-request))
@@ -37,6 +38,7 @@
         (testing "This action just returns 123 when evaluated."
           (ok (eql (eval-action nil action-name nil)
                    123)))))))
+
 
 (deftest missing-action
     (testing "eval-action should call weblocks/actions:on-missing-action if action is not found"
@@ -72,3 +74,10 @@
     (ok (equal (function-or-action->action #'identity)
                "abc123")
         "This also should work if a function was given as an argument")))
+
+
+(deftest make-action-url-test
+  (with-session
+    (with-request ("/foo/bar" :method :get)
+      (make-action-url "test-action")))
+  "/foo/bar?action=test-action")

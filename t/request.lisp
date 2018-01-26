@@ -41,3 +41,13 @@
                  "/some-path?with=params")
           "However Lack's request-uri returns only the path with parameters."))))
 
+
+(deftest with-request-returns-value-of-last-body-expression
+  (with-session
+    (let* ((env (generate-env "/" :method :get))
+           (request (make-request env)))
+      (ok (equal (weblocks/request:with-request (request)
+                   100500
+                   42)
+                 42)
+          "Macro with-request should return 42 because it was the last expression in the body."))))

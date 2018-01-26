@@ -172,7 +172,7 @@ Actions and commands
 Function ``weblocks.actions:add-command`` was moved to
 ``weblocks.commands``.
 
-Function ``weblocks:get-request-action`` was moved to ``weblocks/actions:get-request-action``
+Function ``weblocks:get-request-action`` was moved to ``weblocks/request:get-request-action``
 
 Javascript
 ==========

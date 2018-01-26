@@ -3,37 +3,22 @@
   (:import-from #:weblocks/utils/misc
                 #:safe-apply)
   (:import-from #:weblocks/variables
+                #:*action-string*
                 #:*ignore-missing-actions*)
   (:import-from #:lack.util
                 #:generate-random-id)
   ;; Just dependencies
   (:import-from #:weblocks/session)
   (:import-from #:weblocks/app)
+  (:import-from #:weblocks/request
+                #:get-path)
+  (:import-from #:quri
+                #:url-encode)
   
   (:export
    #:on-missing-action
    #:eval-action))
 (in-package weblocks/actions)
-
-
-(defun get-request-action (action-name)
-  "Gets an action from the request. If the request contains
-*action-string* parameter, the action is looked up in the session and
-appropriate function is returned. If no action is in the parameter,
-returns nil. If the action isn't in the session (somehow invalid),
-raises an assertion."
-  (when action-name
-    (let* ((app-wide-action (weblocks/app:get-action action-name))
-           (code->action 
-             (weblocks/session:get-value 'code->action
-                                         (make-hash-table :test #'equal)))
-           (session-action (gethash action-name code->action))
-           (request-action (or app-wide-action session-action)))
-      ;; TODO: rethink this form. May be throw a special condition instead of string
-      (unless *ignore-missing-actions*
-        (assert request-action (request-action)
-                (concatenate 'string "Cannot find action: " action-name)))
-      request-action)))
 
 
 (defgeneric on-missing-action (app action-name)
@@ -136,3 +121,18 @@ it does not, signals an error."
               (if presentp
                   function-or-action
                   (error "The value '~A' is not an existing action." function-or-action)))))))
+
+
+(defun make-action-url (action-code &optional (include-question-mark-p t))
+  "Accepts action code and returns a URL that can be used to render
+the action.
+
+Ex:
+
+\(make-action-url \"test-action\") => \"?action=test-action\""
+  (concatenate 'string
+               (get-path) ;; we need this for w3m
+               (if include-question-mark-p "?" "")
+               *action-string*
+               "="
+               (url-encode (princ-to-string action-code))))

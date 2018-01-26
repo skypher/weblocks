@@ -5,7 +5,12 @@
                 #:it)
   (:shadowing-import-from #:closer-mop
                           #:standard-class
-                          #:validate-superclass)
+                          #:validate-superclass
+                          #:direct-slot-definition-class
+                          #:effective-slot-definition-class
+                          #:compute-effective-slot-definition
+                          #:standard-direct-slot-definition
+                          #:standard-effective-slot-definition)
   
   (:export #:widget-class))
 (in-package weblocks/widgets/mop)

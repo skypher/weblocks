@@ -1,5 +1,7 @@
 (defpackage #:weblocks/request
   (:use #:cl)
+  (:import-from #:weblocks/app)
+  
   (:import-from #:metacopy
                 #:copy-thing)
   (:import-from #:lack.request
@@ -13,11 +15,11 @@
                 #:request-parameters
                 #:request-headers)
   (:import-from #:alexandria
+                #:with-gensyms
                 #:assoc-value)
   (:import-from #:weblocks/variables
-                #:*action-string*)
-  (:import-from #:weblocks/actions
-                #:get-request-action)
+                #:*action-string*
+                #:*ignore-missing-actions*)
   (:import-from #:weblocks/utils/uri
                 #:query-string->alist)
   ;; Just to add dependency
@@ -59,15 +61,6 @@
                                     :path path
                                     :query query))))
 
-
-(defun get-path (&key (request *request*) with-params)
-  "For URL http://example.com/foo/bar?blah=minor returns
-/foo/bar path of the request's URL."
-  (if with-params
-      ;; request-uri returns path-info + GET params
-      (request-uri request)
-      ;; Otherwice, return only a path
-      (request-path-info request)))
 
 (defun get-path (&key (request *request*) with-params)
   "For URL http://example.com/foo/bar?blah=minor returns
@@ -195,11 +188,33 @@ etc."
   "This macro binds current request and stores request path in the session if requiest is not AJAX.
 
    Later, this value is used to determine if user refreshed the page."
-  `(let ((*request* ,request))
-     ,@body
-     (unless (ajax-request-p)
-       (setf (weblocks/session:get-value 'last-request-path)
-             (get-path)))))
+  (with-gensyms (result)
+    `(let* ((*request* ,request)
+            (,result (progn
+                      ,@body)))
+     
+       (unless (ajax-request-p)
+         (setf (weblocks/session:get-value 'last-request-path)
+               (get-path)))
+
+       ,result)))
 
 
-
+(defun get-request-action (action-name)
+  "Gets an action from the request. If the request contains
+*action-string* parameter, the action is looked up in the session and
+appropriate function is returned. If no action is in the parameter,
+returns nil. If the action isn't in the session (somehow invalid),
+raises an assertion."
+  (when action-name
+    (let* ((app-wide-action (weblocks/app:get-action action-name))
+           (code->action 
+             (weblocks/session:get-value 'code->action
+                                         (make-hash-table :test #'equal)))
+           (session-action (gethash action-name code->action))
+           (request-action (or app-wide-action session-action)))
+      ;; TODO: rethink this form. May be throw a special condition instead of string
+      (unless *ignore-missing-actions*
+        (assert request-action (request-action)
+                (concatenate 'string "Cannot find action: " action-name)))
+      request-action)))

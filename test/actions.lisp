@@ -63,10 +63,7 @@
 ;;   "abc123")
 
 ;;; testing make-action-url
-(deftest make-action-url-1
-    (with-request :get nil
-      (make-action-url "test-action"))
-  "/foo/bar?action=test-action")
+
 
 ;;; test eval-action
 (deftest eval-action-1

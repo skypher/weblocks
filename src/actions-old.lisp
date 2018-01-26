@@ -5,21 +5,6 @@
 
 
 
-(defun make-action-url (action-code &optional (include-question-mark-p t))
-  "Accepts action code and returns a URL that can be used to render
-the action.
-
-Ex:
-
-\(make-action-url \"test-action\") => \"?action=test-action\""
-  (concatenate 'string
-               (weblocks.request:get-path) ; we need this for w3m
-               (if include-question-mark-p "?" "")
-               weblocks.variables:*action-string* "="
-               (quri:url-encode (princ-to-string action-code))))
-
-
-
 ;; TODO add to documentation
 (defun make-js-action (action)
   "Returns a code which can be inserted into onclick attribute and will
