@@ -52,49 +52,47 @@
   :licence "LLGPL"
   :description "A Common Lisp web framework."
   :pathname "src"
-  :depends-on 
-  (
-   "weblocks/app"
-   ;; "weblocks/app-dependencies"
-   "weblocks/js/jquery"
-   ;; "weblocks/session"
-   ;; "weblocks/hooks"
-   ;; "weblocks/request"
-   
-   ;; :log4cl
-   ;; :clack
-   ;; :lack-request
-   ;; :routes
-   ;; :function-cache
-   ;; :local-time
-   ;; :local-time-duration
-   ;; :dexador ;; to retrive remote dependencies and put them into the cache
-   ;; :closer-mop
-   ;; :puri
-   ;; :cl-json
-   ;; :alexandria
-   ;; :serapeum ;; utilities, like alexandria
-   ;; :spinneret
-   ;; :parenscript
-   ;; :cl-fad
-   ;; :optima
-   ;; :cl-cont
-   ;; :metatilities
-   ;; :cl-ppcre
-   ;; :anaphora
-   ;; :f-underscore
-   ;; :bordeaux-threads
-   ;; :salza2
-   ;; :html-template
-   ;; :trivial-timeout
-   ;; :trivial-backtrace 
-   ;; :parse-number 
-   ;; :pretty-function 
-   ;; :babel
-   ;; :metacopy
-   ;; :split-sequence
-   ;; :cl-strings
-   ;;   "application"
+  :depends-on ("weblocks/app"
+               ;; "weblocks/app-dependencies"
+               "weblocks/js/jquery"
+               ;; "weblocks/session"
+               ;; "weblocks/hooks"
+               ;; "weblocks/request"
+               
+               ;; :log4cl
+               ;; :clack
+               ;; :lack-request
+               ;; :routes
+               ;; :function-cache
+               ;; :local-time
+               ;; :local-time-duration
+               ;; :dexador ;; to retrive remote dependencies and put them into the cache
+               ;; :closer-mop
+               ;; :puri
+               ;; :cl-json
+               ;; :alexandria
+               ;; :serapeum ;; utilities, like alexandria
+               ;; :spinneret
+               ;; :parenscript
+               ;; :cl-fad
+               ;; :optima
+               ;; :cl-cont
+               ;; :metatilities
+               ;; :cl-ppcre
+               ;; :anaphora
+               ;; :f-underscore
+               ;; :bordeaux-threads
+               ;; :salza2
+               ;; :html-template
+               ;; :trivial-timeout
+               ;; :trivial-backtrace 
+               ;; :parse-number 
+               ;; :pretty-function 
+               ;; :babel
+               ;; :metacopy
+               ;; :split-sequence
+               ;; :cl-strings
+               ;;   "application"
    )
 ;;  :serial t
 ;;  :components ;; ((:module src

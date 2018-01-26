@@ -16,10 +16,10 @@
                 #:strip-trailing-slashes)
   (:import-from #:weblocks/utils/list
                 #:remove-keyword-parameters)
-  ;; Just dependencies
-  ;; Here we need to load jquery js backend, because it is a default
   (:import-from #:weblocks/variables
                 #:*current-app*)
+  ;; Just dependencies
+  (:import-from #:log)
   
   (:export
    #:defapp

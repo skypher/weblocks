@@ -57,6 +57,7 @@ before_script:
             (princ *features*)
             (terpri)
             (uiop:quit 0)'
+  - ros install fukamachi/rove
   
 script:
-  - ./run-tests.ros
+  - rove weblocks-test.asd
