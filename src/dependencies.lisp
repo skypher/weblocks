@@ -8,6 +8,8 @@
                 #:with-html)
   (:import-from #:weblocks/routes
                 #:add-route)
+  (:import-from #:weblocks/response
+                #:send-script)
   ;; Just a dependency
   (:import-from #:dexador)
   
