@@ -25,6 +25,8 @@
   ;; Just to add dependency
   (:import-from #:weblocks/session)
   (:import-from #:quri)
+  (:import-from #:weblocks/actions
+                #:get-session-action)
   
   (:export
    #:get-parameters
@@ -208,10 +210,7 @@ returns nil. If the action isn't in the session (somehow invalid),
 raises an assertion."
   (when action-name
     (let* ((app-wide-action (weblocks/app:get-action action-name))
-           (code->action 
-             (weblocks/session:get-value 'code->action
-                                         (make-hash-table :test #'equal)))
-           (session-action (gethash action-name code->action))
+           (session-action (get-session-action action-name))
            (request-action (or app-wide-action session-action)))
       ;; TODO: rethink this form. May be throw a special condition instead of string
       (unless *ignore-missing-actions*

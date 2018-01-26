@@ -72,3 +72,4 @@ used to create IDs for html elements, widgets, etc."
   "Returns current session id or signals an error if no current session."
   ;; TODO: see if a id can be extracted from sesion
   *session*)
+

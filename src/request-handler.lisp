@@ -319,84 +319,92 @@ customize behavior."))
 
           ;; TODO: write a test
           (when (null (weblocks/widgets/root:get))
+            (log:debug "Initializing session")
             (handler-bind ((error (lambda (c) 
-                                    (warn "Error initializing user session: ~A" c)
                                     (when *backtrace-on-session-init-error*
-                                      (format t "~%~A~%" (print-backtrace c)))
+                                      (let ((traceback))
+                                        (log:error "Error during session initialization" traceback)))
                                     (signal c))))
               (setf (weblocks/widgets/root:get)
-                    (weblocks/session:init app)))
-            
-            ;; TODO: understand why there is coupling with Dialog here and
-            ;;       how to move it into the Dialog's code.
-            
-            ;; (weblocks/hooks:add-session-hook :action
-            ;;     update-dialog ()
-            ;;   (weblocks::update-dialog-on-request)))
+                    (weblocks/session:init app))))
+          
+          ;; TODO: understand why there is coupling with Dialog here and
+          ;;       how to move it into the Dialog's code.
+          
+          ;; (weblocks/hooks:add-session-hook :action
+          ;;     update-dialog ()
+          ;;   (weblocks::update-dialog-on-request)))
 
-            (with-collected-dependencies
-              (let ((content nil) ;; this variable will be set to HTML string after rendering
-                    ;; TODO: may be remove uri-tokens
-                    ;; (weblocks::*uri-tokens*
-                    ;;   (make-instance 'weblocks::uri-tokens
-                    ;;                  :tokens (weblocks::tokenize-uri (get-path))))
-                    ;; weblocks.variables:*before-ajax-complete-scripts*
-                    ;; weblocks.variables:*on-ajax-complete-scripts*
-                    ;; weblocks::*current-page-title*
-                    ;; weblocks::*current-page-description*
-                    ;; weblocks::*current-page-keywords*
-                    ;; weblocks::*current-page-headers*
-                    )
+          (with-collected-dependencies
+            (let ((content nil) ;; this variable will be set to HTML string after rendering
+                  ;; TODO: may be remove uri-tokens
+                  ;; (weblocks::*uri-tokens*
+                  ;;   (make-instance 'weblocks::uri-tokens
+                  ;;                  :tokens (weblocks::tokenize-uri (get-path))))
+                  ;; weblocks.variables:*before-ajax-complete-scripts*
+                  ;; weblocks.variables:*on-ajax-complete-scripts*
+                  ;; weblocks::*current-page-title*
+                  ;; weblocks::*current-page-description*
+                  ;; weblocks::*current-page-keywords*
+                  ;; weblocks::*current-page-headers*
+                  )
 
+              
+              (push-dependencies
+               (get-dependencies app))
+              
+              (let ((action-name (get-action-name-from-request))
+                    (action-arguments
+                      (alist->plist (get-parameters))))
+
+                (when action-name
+                  (log:debug "Processing action" action-name)
+                  
+                  (when (pure-request-p)
+                    (log:debug "Request is pure, processing will be aborted.")
+                    ;; TODO: add with-hook (:action)
+                    (abort-processing
+                     (eval-action
+                      app
+                      action-name
+                      action-arguments)))
+
+                  (timing "action processing (w/ hooks)"
+                    (with-hook (:action)
+                      (eval-action
+                       app
+                       action-name
+                       action-arguments)))))
+
+              ;; Remove "action" parameter for the GET parameters
+              ;; it it is not an AJAX request
+              (when (and (not (ajax-request-p))
+                         (get-parameter *action-string*))
                 
-                (push-dependencies
-                 (get-dependencies app))
-                
-                (let ((action-name (get-action-name-from-request))
-                      (action-arguments
-                        (alist->plist (get-parameters))))
+                (let ((url (remove-action-from-uri
+                            (get-path :with-params t))))
+                  (log:debug "Redirecting to an URL without action parameter" url)
+                  (redirect url)))
 
-                  (when action-name
-                    (when (pure-request-p)
-                      (abort-processing
-                       (eval-action
-                        app
-                        action-name
-                        action-arguments)))
+              (setf content
+                    (with-html-string
+                      (timing "rendering (w/ hooks)"
+                        (with-hook (:render)
+                          (if (ajax-request-p)
+                              (handle-ajax-request app)
+                              (handle-normal-request app))
 
-                    (timing "action processing (w/ hooks)"
-                      (with-hook (:action)
-                        (eval-action
-                         app
-                         action-name
-                         action-arguments)))))
+                          ;; Now we'll add routes for each page dependency.
+                          ;; This way, a dependency for widgets, created by action
+                          ;; can be served when browser will follow up with next request.
+                          (let ((dependencies (get-collected-dependencies)))
+                            (log:debug "Collected dependencies"
+                                       dependencies)
 
-                ;; Remove "action" parameter for the GET parameters
-                ;; it it is not an AJAX request
-                (when (and (not (ajax-request-p))
-                           (get-parameter *action-string*))
-                  (redirect (remove-action-from-uri
-                             (get-path :with-params t))))
+                            (register-dependencies
+                             dependencies))))))
 
-                (setf content
-                      (with-html-string
-                        (timing "rendering (w/ hooks)"
-                          (with-hook (:render)
-                            (if (ajax-request-p)
-                                (handle-ajax-request app)
-                                (handle-normal-request app))
-
-                            ;; Now we'll add routes for each page dependency.
-                            ;; This way, a dependency for widgets, created by action
-                            ;; can be served when browser will follow up with next request.
-                            (let ((dependencies (get-collected-dependencies)))
-                              (log:debug "Collected dependencies"
-                                         dependencies)
-
-                              (register-dependencies
-                               dependencies))))))
-
-                content)))))
+              content))))
 
     ;; Restart
     (abort (c)

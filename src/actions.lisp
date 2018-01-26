@@ -11,13 +11,15 @@
   (:import-from #:weblocks/session)
   (:import-from #:weblocks/app)
   (:import-from #:weblocks/request
+                #:get-request-action
                 #:get-path)
   (:import-from #:quri
                 #:url-encode)
   
   (:export
    #:on-missing-action
-   #:eval-action))
+   #:eval-action
+   #:get-session-action))
 (in-package weblocks/actions)
 
 
@@ -136,3 +138,11 @@ Ex:
                *action-string*
                "="
                (url-encode (princ-to-string action-code))))
+
+
+(defun get-session-action (name)
+  "Returns an action bound to the current session."
+  (let ((code->action 
+          (weblocks/session:get-value 'code->action
+                              (make-hash-table :test #'equal))))
+    (gethash name code->action)))
