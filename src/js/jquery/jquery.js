@@ -249,20 +249,22 @@ function processCommand(command) {
 }
 
 function onActionSuccess(json){
+  // TODO: add processing for redirect command
+  //       and remove all this commented code after that.
   // See if there are redirects
-  var redirect = json['redirect'];
-  if (redirect)
-  {
-    window.location.href = redirect;
-    return;
-  }
+  // var redirect = json['redirect'];
+  // if (redirect)
+  // {
+  //   window.location.href = redirect;
+  //   return;
+  // }
 
-  execJsonCalls(json['before-load']);
+  // execJsonCalls(json['before-load']);
 
-  // Update dirty widgets
-  var dirtyWidgets = json['widgets'];
+  // // Update dirty widgets
+  // var dirtyWidgets = json['widgets'];
 
-  updateElementForTree(widgetsJsonToTree(dirtyWidgets));
+  // updateElementForTree(widgetsJsonToTree(dirtyWidgets));
 
   var commands = json['commands'] || [];
   commands.forEach(processCommand);
@@ -358,6 +360,8 @@ function doActionAnswer(newAnswer){
   answerDeferred.resolve();
 }
 
+// TODO: remove sessionString argument from all action related code,
+//       because it was removed in Weblocks lisp code after moving to Clack
 function initiateActionWithArgsAndDeferredCallback(actionCode, sessionString, args){
   startProgress();
 
