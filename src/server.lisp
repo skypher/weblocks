@@ -136,35 +136,35 @@ This function serves all started applications and their static files."
 
                 (log:debug "Searching handler in" app app-prefix)
 
-                (cond
-                  ((and (app-serves-hostname-p app hostname)
-                        (starts-with app-prefix
-                                     path-info))
+                (when (and (app-serves-hostname-p app hostname)
+                           (starts-with path-info
+                                        app-prefix))
 
-                   ;; TODO это внутри использует hunchentoot
-                   ;;      но при запуске на Woo вызывает ошибку
-                   ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
-                   ;; (weblocks::no-cache)    ; disable caching for dynamic pages
+                  ;; TODO это внутри использует hunchentoot
+                  ;;      но при запуске на Woo вызывает ошибку
+                  ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
+                  ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
-                   (return-from handle-request
-                     ;; TODO: replace veariable binding to some macro from weblocks/response
-                     (let* ((*code* 200)
-                            (*content-type*
-                              (if (ajax-request-p)
-                                  "application/json"
-                                  "text/html"))
-                            (*headers* nil)
-                            ;; TODO: make a macro to catch aborting
-                            (content (catch-possible-abort
-                                       (handle-client-request app))))
+                  (log:debug "Staringdsadasd BOOO HIT" path-info)
+                  (return-from handle-request
+                    ;; TODO: replace veariable binding to some macro from weblocks/response
+                    (let* ((*code* 200)
+                           (*content-type*
+                             (if (ajax-request-p)
+                                 "application/json"
+                                 "text/html"))
+                           (*headers* nil)
+                           ;; TODO: make a macro to catch aborting
+                           (content (catch-possible-abort
+                                      (handle-client-request app))))
 
-                       (list *code* ;; this value can be changed somewhere in
-                             ;; handle-client-request
-                             (append (list :content-type *content-type*)
-                                     *headers*)
-                             ;; Here we use catch to allow to abort usual response
-                             ;; processing and to return data immediately
-                             (list content))))))))
+                      (list *code* ;; this value can be changed somewhere in
+                            ;; handle-client-request
+                            (append (list :content-type *content-type*)
+                                    *headers*)
+                            ;; Here we use catch to allow to abort usual response
+                            ;; processing and to return data immediately
+                            (list content)))))))
                                   
             (log:error "Application dispatch failed for" path-info)
 
