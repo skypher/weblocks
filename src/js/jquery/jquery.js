@@ -220,6 +220,11 @@ function updateElementForTree(tree){
 }
 
 window.commandHandlers = {
+    'updateWidget': function(params) {
+        var widget = jQuery(params.widget);
+        var target = jQuery('#' + params.domId);
+        target.replaceWith(widget);
+    },
     'insertWidget': function(params) {
         var widget = jQuery(params.widget);
         if (params.after) {
