@@ -71,7 +71,7 @@ before_script:
   # https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
   - ros install fukamachi/lack
   - ros install 40ants/dissect/fix-iteration-on-unknown-args
-  - ros install 40ants/cl-hamcrest/v0.3.2
+  - ros install 40ants/cl-hamcrest/v0.3.3
   - cl-info hamcrest rove dissect weblocks
   # - ros run -e '(progn (ql:quickload :hamcrest) (princ "ROVE:") (terpri) (princ (ql:where-is-system :hamcrest)) (terpri) (uiop:quit 0))'
   # - echo "GIT CONFIG"
