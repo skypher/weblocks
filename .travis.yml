@@ -72,6 +72,7 @@ before_script:
   - ros run -e '(progn (ql:quickload :rove) (princ "ROVE:") (terpri) (princ (ql:where-is-system :rove)) (terpri))'
   - echo "GIT CONFIG"
   - cat /home/travis/.roswell/local-projects/40ants/rove/.git/config
+  - cd /home/travis/.roswell/local-projects/40ants/rove/ && git status
   - echo "GIT DONE"
   
 script:
