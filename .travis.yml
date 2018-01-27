@@ -57,10 +57,17 @@ before_script:
             (terpri)
             (princ (lisp-implementation-version))
             (terpri)
+            (princ "ASDF: ")
+            (princ (asdf:asdf-version))
+            (terpri)
+            (princ "Features: ")
             (princ *features*)
             (terpri)
             (uiop:quit 0)'
   - ros install fukamachi/rove
+  # Because REQUEST-URI-SCHEME exists only after 23c372594b92f5ae564115989feb4e4f97ba1a9c commit, and not in the
+  # quicklisp yet
+  - ros install fukamachi/lack
   
 script:
   - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
