@@ -7,14 +7,16 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - CL_SOURCE_REGISTRY=$(pwd)//
   matrix:
+    # Supported implementations
+    - LISP=ccl
     - LISP=sbcl
+
+    # Unsupported implementations
     # unable to find libssl.so, I tried hard, but it doesn't see it
     - LISP=allegro
     # fails with mmap: Invalid argument
     #            ensure_space: Failed to validate 0 bytes at 0x58100000
     - LISP=cmucl
-    # fails on weblocks-test loading
-    - LISP=ccl
     # shows error there is no package with name "UIOP"
     - LISP=clisp
     # it shows success but actually fails with tracebacks
@@ -26,7 +28,6 @@ matrix:
   allow_failures:
     - env: LISP=allegro
     - env: LISP=cmucl
-    - env: LISP=ccl
     - env: LISP=clisp
     - env: LISP=abcl
     - env: LISP=ecl
