@@ -1,11 +1,3 @@
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
-(defpackage #:weblocks-asd
-  (:use :cl :asdf)
-  (:nicknames :wop)
-  (:export #:test #:test-op #:doc #:doc-op #:make-app))
-
-(in-package :weblocks-asd)
-
 ;; Временно сохранил зависимости
 ;; (ql:quickload '(
 ;;                 :log4cl
@@ -177,36 +169,9 @@
   :in-order-to ((test-op (test-op "weblocks-test"))))
 
 
-;; (defsystem "weblocks/t"
-;;   :class :package-inferred-system
-;;   :pathname "t"
-;;   ;;#P"/Users/art/common-lisp/weblocks/t/"
-;;   :depends-on ("weblocks/t/dependencies"
-;;                "weblocks/t/hooks"
-;;                "weblocks/t/weblocks"
-;;                "weblocks/t/request"
-;;                "weblocks/t/response"
-;;                "weblocks/t/request-handler"
-;;                "weblocks/t/actions"
-;;                "weblocks/t/commands")
-;;   :perform (test-op (o c) (uiop:symbol-call :rove '#:run c)))
+(register-system-packages "lack-request" '(#:lack.request))
+(register-system-packages "lack-util" '(#:lack.util))
+(register-system-packages "log4cl" '(#:log))
 
-
-(asdf:register-system-packages "lack-request" '(#:lack.request))
-(asdf:register-system-packages "lack-util" '(#:lack.util))
-(asdf:register-system-packages "log4cl" '(#:log))
-
-(asdf:register-system-packages "weblocks/widgets/base" '(#:weblocks/widget))
-(asdf:register-system-packages "weblocks/js/base" '(#:weblocks/js))
-
-;; TODO: move all these packages to the inferred system
-;; (asdf:register-system-packages "weblocks" '(#:weblocks.dependencies
-;;                                             #:weblocks.session
-;;                                             #:weblocks.request
-;;                                             #:weblocks.app
-;;                                             #:weblocks.html
-;;                                             #:weblocks.hooks
-;;                                             #:weblocks.widgets.string-widget
-;;                                             #:weblocks.request-handler
-;;                                             #:weblocks.response))
-
+(register-system-packages "weblocks/widgets/base" '(#:weblocks/widget))
+(register-system-packages "weblocks/js/base" '(#:weblocks/js))
