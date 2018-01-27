@@ -71,5 +71,5 @@ before_script:
   - ros install 40ants/cl-hamcrest
   
 script:
-  # - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
+  - ros run -e '(progn (ql:quickload :rove) (princ "ROVE:") (terpri) (princ (ql:where-is-system :rove)) (terpri))'
   - rove weblocks-test.asd
