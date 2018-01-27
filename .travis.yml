@@ -68,5 +68,5 @@ before_script:
   - ros install fukamachi/lack
   
 script:
-  - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
-  # - rove weblocks-test.asd
+  # - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
+  - rove weblocks-test.asd
