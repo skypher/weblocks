@@ -62,5 +62,5 @@ before_script:
   - ros install fukamachi/rove
   
 script:
-  - ros run -e '(progn (ql:quickload :app) (format t "APP: ~A~%" (ql:where-is-system :app))'
+  - ros run -e '(progn (ql:quickload :weblocks) (format t "APP: ~A~%" (ql:where-is-system :weblocks)))'
   # - rove weblocks-test.asd
