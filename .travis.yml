@@ -66,6 +66,7 @@ before_script:
             (uiop:quit 0)'
   - ros install fukamachi/rove
   - ros install fukamachi/lack
+  - ros install 40ants/cl-hamcrest
   
 script:
   # - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
