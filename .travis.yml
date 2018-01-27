@@ -51,6 +51,7 @@ before_script:
   - env | sort
   - cat /proc/meminfo
   - ros --version
+  - ros install asdf/3.3.1.1
   - ros config
   - ros -e '(princ (lisp-implementation-type))
             (terpri)
