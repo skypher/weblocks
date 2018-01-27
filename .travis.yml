@@ -5,7 +5,7 @@ env:
   global:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - CL_SOURCE_REGISTRY=$(pwd)//
+    - CL_SOURCE_REGISTRY="$(pwd)//"
   matrix:
     # Supported implementations
     - LISP=ccl
