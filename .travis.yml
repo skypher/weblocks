@@ -5,7 +5,7 @@ env:
   global:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-#    - CL_SOURCE_REGISTRY="$(pwd)//"
+    - CL_SOURCE_REGISTRY="$(pwd)//"
   matrix:
     # Supported implementations
     - LISP=ccl
@@ -67,7 +67,7 @@ before_script:
   - ros install fukamachi/rove
   # Because REQUEST-URI-SCHEME exists only after 23c372594b92f5ae564115989feb4e4f97ba1a9c commit, and not in the
   # quicklisp yet
-  - ros install fukamachi/lack
+  #- ros install fukamachi/lack
   
 script:
   - ros run -e '(progn (ql:quickload :weblocks) (princ "WEBLOCKS:") (terpri) (princ (ql:where-is-system :weblocks)) (terpri))'
