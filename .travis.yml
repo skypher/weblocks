@@ -69,10 +69,10 @@ before_script:
   # https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
   - ros install fukamachi/lack
   - ros install 40ants/cl-hamcrest
-  - ros run -e '(progn (ql:quickload :rove) (princ "ROVE:") (terpri) (princ (ql:where-is-system :rove)) (terpri))'
+  - ros run -e '(progn (ql:quickload :hamcrest) (princ "ROVE:") (terpri) (princ (ql:where-is-system :hamcrest)) (terpri))'
   - echo "GIT CONFIG"
-  - cat /home/travis/.roswell/local-projects/40ants/rove/.git/config
-  - cd /home/travis/.roswell/local-projects/40ants/rove/ && git status
+  - cat /home/travis/.roswell/local-projects/40ants/cl-hamcrest/.git/config
+  - cd /home/travis/.roswell/local-projects/40ants/cl-hamcrest/ && git status
   - echo "GIT DONE"
   
 script:
