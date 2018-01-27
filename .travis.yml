@@ -64,7 +64,9 @@ before_script:
             (princ *features*)
             (terpri)
             (uiop:quit 0)'
-  - ros install fukamachi/rove
+  - ros install 40ants/rove/generic-assert-description
+  # because request-uri-scheme support is not in the quicklisp yet
+  # https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
   - ros install fukamachi/lack
   - ros install 40ants/cl-hamcrest
   
