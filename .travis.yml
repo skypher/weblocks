@@ -5,6 +5,7 @@ env:
   global:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
+    - CL_SOURCE_REGISTRY=$(pwd)//
   matrix:
     - LISP=sbcl
     # unable to find libssl.so, I tried hard, but it doesn't see it
@@ -46,7 +47,7 @@ cache:
     - $HOME/.config/common-lisp
 
 before_script:
-  - env
+  - env | sort
   - cat /proc/meminfo
   - ros --version
   - ros config
