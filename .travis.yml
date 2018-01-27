@@ -69,7 +69,8 @@ before_script:
   # https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
   - ros install fukamachi/lack
   - ros install 40ants/cl-hamcrest
+  - ros run -e '(progn (ql:quickload :rove) (princ "ROVE:") (terpri) (princ (ql:where-is-system :rove)) (terpri))'
+  - cat /home/travis/.roswell/local-projects/40ants/rove/.git/config
   
 script:
-  - ros run -e '(progn (ql:quickload :rove) (princ "ROVE:") (terpri) (princ (ql:where-is-system :rove)) (terpri))'
   - rove weblocks-test.asd
