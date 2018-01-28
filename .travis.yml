@@ -1,5 +1,6 @@
 language: common-lisp
-sudo: false
+# Sudo is required to install Roswell and some Lisp implementations
+sudo: true
 
 env:
   global:
