@@ -16,7 +16,7 @@ RUN ros install ccl-bin/1.11 && ros use ccl-bin/1.11
 
 # Version fixed for more build stability
 # TODO: update it from time to time
-RUN ros install fukamachi/qlot/0833e612c18bdaf56b74c79b1c1c26613f84e70d
+RUN ros install svetlyak40wt/qlot/stable
 
 # Install fixed ASDF version, to have it same on all lisp implementations
 RUN ros install asdf/3.3.1.1
