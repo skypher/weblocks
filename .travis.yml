@@ -52,6 +52,9 @@ before_script:
   - cat /proc/meminfo
   - ros --version
   - ros install asdf/3.3.1.1
+  # Version fixed for more build stability
+  # TODO: update it from time to time
+  - ros install fukamachi/qlot/0833e612c18bdaf56b74c79b1c1c26613f84e70d
   - ros config
   
   - qlot install
