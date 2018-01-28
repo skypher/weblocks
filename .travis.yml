@@ -3,8 +3,7 @@ sudo: false
 
 env:
   global:
-    - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
-    - ROSWELL_INSTALL_DIR=$HOME/.roswell
+    - PATH=~/.roswell/bin:$PATH
     - CL_SOURCE_REGISTRY="$(pwd)//"
   matrix:
     # Supported implementations
