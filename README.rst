@@ -4,7 +4,7 @@
 
 .. insert-your badges like that:
 
-.. image:: https://travis-ci.org/40ants/weblocks.svg?branch=master
+.. image:: https://travis-ci.org/40ants/weblocks.svg?branch=reblocks
     :target: https://travis-ci.org/40ants/weblocks
 
 .. Everything starting from this commit will be inserted into the
