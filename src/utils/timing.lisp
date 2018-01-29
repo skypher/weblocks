@@ -1,10 +1,18 @@
+(defpackage #:weblocks/utils/timing
+  (:use #:cl)
+  (:import-from #:alexandria
+                #:with-gensyms)
+  
+  (:export #:*enable-timings*
+           #:*timing-report-fn*
+           #:timing))
+(in-package weblocks/utils/timing)
 
-(in-package :weblocks)
 
-;; (wexport '(*enable-timings*
-;;            *timing-report-fn*
-;;            timing)
-;;          '(t util))
+;; TODO: rebuild this functionality, making
+;;       global variables hidden.
+;;       Add a macro lile with-collected-timings
+;;       and use it in the request-handler.lisp
 
 (defvar *enable-timings* nil)
 
@@ -18,6 +26,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *timing-level* 0))
+
 (declaim (fixnum *timing-level*))
 
 (defmethod on-timing-start (level name))
@@ -46,7 +55,10 @@
                                    internal-time-units-per-second)))
                (declare ((integer 0) ,end/real ,end/cpu)
                         ((rational 0) ,spent/real ,spent/cpu))
+               ;; Strange place, actually we need on call here, not
+               ;; two to report-timing and on-timing-end
                (report-timing ,name ,spent/real ,spent/cpu)
                (on-timing-end *timing-level* ,name)
+               
                (decf *timing-level*))))
          (funcall thunk)))))

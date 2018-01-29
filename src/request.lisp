@@ -1,24 +1,159 @@
+(defpackage #:weblocks/request
+  (:use #:cl)
+  (:import-from #:weblocks/app-actions)
+  
+  (:import-from #:metacopy
+                #:copy-thing)
+  (:import-from #:lack.request
+                #:request-uri-scheme
+                #:request-query-string
+                #:request-uri
+                #:request-path-info
+                #:request-server-name
+                #:request-server-port
+                #:request-method
+                #:request-parameters
+                #:request-headers)
+  (:import-from #:alexandria
+                #:with-gensyms
+                #:assoc-value)
+  (:import-from #:weblocks/variables
+                #:*action-string*
+                #:*ignore-missing-actions*)
+  (:import-from #:weblocks/utils/uri
+                #:query-string->alist)
 
-(in-package :weblocks)
+  ;; Just to add dependency
+  (:import-from #:weblocks/session)
+  (:import-from #:quri)
+  
+  (:export
+   #:get-parameters
+   #:get-parameter
+   #:get-header
+   #:ajax-request-p
+   #:get-host
+   #:get-port
+   #:get-uri
+   #:get-method
+   #:refresh-request-p
+   #:remove-header
+   #:get-uri
+   #:get-path
+   #:with-request
+   #:pure-request-p))
+(in-package weblocks/request)
 
-(export '(*json-content-type* initial-request-p
-          ajax-request-p pure-request-p redirect post-action-redirect
-          post-render-redirect))
 
-(defparameter *json-content-type* "application/json; charset=utf-8"
-  "A content type sent to the client to identify json data.")
+(defvar *request* nil
+  "Holds current request from a browser.")
 
 
-(defun initial-request-p ()
-  "Returns true if the request is the first request for the session."
-  (equalp (weblocks.session:get-value 'last-request-uri) :none))
+(defun get-uri (&key (request *request*))
+  "For URL http://example.com/foo/bar?blah=minor returns it as is."
+  (let ((host (get-host :request request))
+        (port (get-port :request request))
+        (scheme (request-uri-scheme request))
+        (path (get-path :request request))
+        (query (request-query-string request)))
+    (quri:render-uri (quri:make-uri :scheme scheme
+                                    :host host
+                                    :port port
+                                    :path path
+                                    :query query))))
 
-(defun ajax-request-p ()
+
+(defun get-path (&key (request *request*) with-params)
+  "For URL http://example.com/foo/bar?blah=minor returns
+/foo/bar path of the request's URL."
+  (if with-params
+      ;; request-uri returns path-info + GET params
+      (request-uri request)
+      ;; Otherwice, return only a path
+      (request-path-info request)))
+
+
+(defun get-host (&key (request *request*))
+  (request-server-name request))
+
+
+(defun get-port (&key (request *request*))
+  (request-server-port request))
+
+
+(defun get-method (&key (request *request*))
+  "Returns association list with GET or POST parameters for current request."
+  (request-method request))
+
+
+(defun get-parameters (&key (request *request*))
+  "Returns association list with GET or POST parameters for current request."
+  (request-parameters request))
+
+
+(defun get-parameter (name &key (request *request*))
+  "Returns GET or POST parameter by name."
+  (declare (type string name))
+
+  (let ((params (get-parameters :request request)))
+    (assoc-value params
+                 name
+                 :test #'equal)))
+
+
+(defun get-header (name &key (request *request*))
+  "Returns value of the HTTP header or nil. Name is case insensitive."
+  (let ((headers (request-headers request))
+        (lowercased-name (string-downcase name)))
+    (gethash lowercased-name
+             headers)))
+
+
+(defun remove-header (name &key (request *request*))
+  "Removes a HTTP header by name, returns new instance of request
+without given header."
+  
+  (let ((lowercased-name (string-downcase name))
+        ;; make shallow copy of the request
+        (new-request (copy-structure request))
+        (new-headers (copy-thing (request-headers request))))
+    
+    (remhash lowercased-name
+             new-headers)
+    
+    (setf (request-headers new-request)
+          new-headers)
+
+    new-request))
+
+
+(defun ajax-request-p (&key (request *request*))
   "Detects if the current request was initiated via AJAX by looking
 for 'X-Requested-With' http header. This function expects to be called
 in a dynamic hunchentoot environment."
-  (and (header-in* "X-Requested-With")
-       (equal "XMLHttpRequest" (header-in* "X-Requested-With"))))
+  ;; Sometimes this function may be called not in the context of request,
+  ;; to update an instance of the widgets in asyncrounous code and to send
+  ;; it via websocket.
+  (and request
+       (equal (get-header "X-Requested-With" :request request)
+              "XMLHttpRequest")))
+
+
+(defun get-action-name-from-request ()
+  "Returns called action name if any action was called"
+  (get-parameter *action-string*)) 
+
+
+(defun refresh-request-p ()
+  "Determines if a request is a result of the user invoking a browser
+refresh function. Note that a request will not be considered a refresh
+if there is an action involved (even if the user hits refresh)."
+  (let ((action-name (get-action-name-from-request)))
+    (and
+     (null action-name)
+     (equalp (get-path)
+             (weblocks/session:get-value 'last-request-path)))))
+
 
 (defun pure-request-p ()
   "Detects if the current request is declared as 'pure', i.e. affects
@@ -30,104 +165,39 @@ satisfied, the actions have access to the session, the widgets, and
 all other parameters. However, none of the callbacks (see
 *on-pre-request*) are executed, no widgets are sent to the client,
 etc."
-  (string-equal (weblocks.request:get-parameter "pure") "true"))
-
-(defvar *redirect-request-p* nil)
-
-(defun redirect-request-p ()
-  (declare (special *redirect-request-p*))
-  (or *redirect-request-p* 
-      (weblocks.session:get-value 'redirect-p)))
-
-(defun clear-session-redirect-p ()
-  ;; First, set a flag if delayed redirect was requested.
-  (setf *redirect-request-p*
-        (weblocks.session:get-value 'redirect-p))
-  ;; Next, reset this flag in the session
-  (setf (weblocks.session:get-value 'redirect-p)
-        nil))
-
-(defun clear-redirect-var ()
-  (declare (special *redirect-request-p*))
-  (setf *redirect-request-p* nil))
-
-;; (weblocks.hooks:add-application-hook :pre-action 'clear-redirect-var )
-;; (weblocks.hooks:add-application-hook :post-action 'clear-session-redirect-p )
-(weblocks.hooks:add-application-hook :action
-    clear-redirects ()
-  (clear-redirect-var)
-  (weblocks.hooks:call-next-hook)
-  (clear-session-redirect-p))
-
-
-(defun set-redirect-true ()
-  (setf (weblocks.session:get-value 'redirect-p)
-        t))
-
-
-(defun redirect (uri &key (defer (and (boundp '*session*) (boundp '*request-hook*)
-                                      :post-render))
-                          new-window-p (window-title uri))
-  "Redirects the client to a new URI.
-
-There are several modes of redirecting:
-
-Immediate redirect (:DEFER NIL): interrupt request processing at once
-and send either a `redirect' HTTP response (for normal requests) or
-an appropriate JSON command (for AJAX requests).
-
-Deferred redirect (:DEFER (:POST-ACTION|:POST-RENDER); the default
-being :POST-RENDER): like immediate redirecting but the execution will be
-deferred until action processing (POST-ACTION) or rendering (POST-RENDER)
-is finished.
-
-Redirect to new window (NEW-WINDOW=T): opens URI in a new window. The current
-request continues to be processed in a normal fashion.
-WINDOW-TITLE is the title of the new window, defaulting to the target URI.
-DEFER is disregarded in this case.
-
-NEW-WINDOW functionality will only work when Javascript is enabled."
-  (assert (member defer '(nil :post-action :post-render)))
-  (flet ((do-redirect ()
-           (if (weblocks.request:ajax-request-p)
-               (weblocks.response:abort-processing
-                (format nil "{\"redirect\":\"~A\"}" uri)
-                :content-type *json-content-type*)
-               (weblocks.response:abort-processing
-                ""
-                :headers (list :location uri)
-                :code 302))))
-
-    (set-redirect-true)
-
-    (cond
-      (new-window-p
-       (weblocks.response:send-script
-        (ps:ps*
-         `((slot-value window 'open) ,uri ,window-title))))
-      ((eq defer :post-action)
-       (weblocks.hooks:add-request-hook :action
-           make-redirect-after-action
-           (call-next-hook)
-           (do-redirect)))
-      ((eq defer :post-render)
-       (weblocks.hooks:add-request-hook :post-render
-           make-redirect-after-render
-           (call-next-hook)
-           (do-redirect)))
-      (t (do-redirect)))))
-
-;;; legacy wrappers for redirect
-(defun post-action-redirect (uri)
-  "Legacy wrapper; use REDIRECT with :DEFER set to :POST-ACTION instead."
-  (redirect uri :defer :post-action))
-
-(defun post-render-redirect (uri)
-  "Legacy wrapper; use REDIRECT with :DEFER set to :POST-RENDER instead."
-  (redirect uri :defer :post-render))
+  (string-equal (get-parameter "pure") "true"))
 
 
 (defun parse-location-hash ()
-  (let ((raw-hash (weblocks.request:get-parameter "weblocks-internal-location-hash")))
+  (let ((raw-hash (get-parameter "weblocks-internal-location-hash")))
     (when raw-hash
       (query-string->alist (cl-ppcre:regex-replace "^#" raw-hash "")))))
+
+
+;; (defmacro with-path ((path) &body body)
+;;   "This macro stores given uri in the session if requiest is not AJAX.
+
+;;    Later, this value is used to determine if user refreshed the page."
+;;   `(progn
+;;      ,@body
+;;      (unless (ajax-request-p)
+;;        (setf (weblocks.session:get-value 'last-request-path)
+;;              ,path))))
+
+
+(defmacro with-request ((request) &body body)
+  "This macro binds current request and stores request path in the session if requiest is not AJAX.
+
+   Later, this value is used to determine if user refreshed the page."
+  (with-gensyms (result)
+    `(let* ((*request* ,request)
+            (,result (progn
+                      ,@body)))
+     
+       (unless (ajax-request-p)
+         (setf (weblocks/session:get-value 'last-request-path)
+               (get-path)))
+
+       ,result)))
+
+

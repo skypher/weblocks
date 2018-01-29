@@ -80,6 +80,8 @@
 
 (defvar *bundle-dependencies-lock* (bordeaux-threads:make-lock))
 
+;; TODO: may be remove because all functions
+;; related to public files were removed
 (defun build-bundle (file-list type &key media bundle-folder)
   (bordeaux-threads:with-lock-held (*bundle-dependencies-lock*)
     (let* ((app *current-webapp*)

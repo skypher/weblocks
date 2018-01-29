@@ -1,12 +1,16 @@
-(defpackage #:weblocks.session
+(defpackage #:weblocks/session
   (:use #:cl)
+  (:import-from #:alexandria
+                #:ensure-gethash)
   (:export
    #:delete-value
    #:get-value
    #:set-value
    #:gen-id
-   #:in-session-p))
-(in-package weblocks.session)
+   #:in-session-p
+   #:init
+   #:get-session-id))
+(in-package weblocks/session)
 
 
 (defvar *session* nil
@@ -31,7 +35,7 @@ It was made as a macro to not evaluate 'default' on each call."
   ;; TODO: seems, previously keys were separated for different weblocks apps
   ;;       but I've simplified it for now
   
-  (alexandria:ensure-gethash key *session* default))
+  (ensure-gethash key *session* default))
 
 
 (defun (setf get-value) (value key)
@@ -43,19 +47,29 @@ KEY is compared using EQUAL."
 
 
 ;; Previously delete-webapp-session-value
-(defun delete-value (key &optional (webapp weblocks::*current-webapp*))
-  "Clear the session value for the currently running webapp.
-KEY is compared using EQUAL."
-  (declare (ignorable webapp))
+(defun delete-value (key)
+  "Clear the session value for the currently running app.
 
+   KEY is compared using EQUAL."
   (remhash key *session*))
 
 
-(defun weblocks.session:gen-id (&optional (prefix "dom"))
+(defun gen-id (&optional (prefix "dom"))
   "Generates an ID unique accross the session. The generated ID can be
 used to create IDs for html elements, widgets, etc."
   (let ((new-widget-id (1+ (or (get-value 'last-unique-id) -1))))
     (setf (get-value 'last-unique-id)
           new-widget-id)
     (apply #'concatenate 'string (mapcar #'princ-to-string (list prefix new-widget-id)))))
+
+
+(defgeneric init (app)
+  (:documentation "This method should be defined for weblocks application.
+                   it should return a widget which become a root widget."))
+
+
+(defun get-session-id ()
+  "Returns current session id or signals an error if no current session."
+  ;; TODO: see if a id can be extracted from sesion
+  *session*)
 

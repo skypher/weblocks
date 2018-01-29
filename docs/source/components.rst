@@ -213,44 +213,6 @@ The source of Weblocks Twitter Bootstrap theme
 https://github.com/html/weblocks-twitter-bootstrap-application
 is mostly templates and their definitions. Look there for more examples.
 
-Template rendering
-------------------
-
-Template rendering is done via two functions - ``RENDER-WT`` and
-``RENDER-WT-TO-STRING``. First one renders template to
-``*weblocks-output-stream*``, other one returns a string with rendered
-template.
-
-Rendering function takes template name, template context parameters and
-other arguments which are passed to template function.
-
-.. code:: common-lisp
-
-   (render-wt 
-       :checkbox-wt 
-       (list :name name :id id :class class)
-       :name (attributize-name name)
-       :id id 
-       :class class
-       :value (if checkedp "t" "f")
-       :checkedp checkedp 
-       :onclick onclick
-       :disabledp disabledp)
-
-First, render function will get all templates associated to
-``:checkbox-wt``, then will get every template priority based on
-context, will choose effective template and call it with parameters
-
-.. code:: common-lisp
-
-   :name (attributize-name name)
-   :id id 
-   :class class
-   :value (if checkedp "t" "f")
-   :checkedp checkedp 
-   :onclick onclick
-   :disabledp disabledp
-
 
 .. rubric:: Footnotes
 

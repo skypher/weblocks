@@ -70,20 +70,25 @@ All tests:
 
 .. code:: common-lisp
 
-          (weblocks-test:test-weblocks)
+          (rove:run :weblocks-test)
 
-or
+or you can run test for some package:
 
 .. code:: common-lisp
 
-          (lift:run-tests :suite 'WEBLOCKS-SUITE)
+          (rove:run :weblocks-test/dependencies)
 
 Single test:
 
 .. code:: common-lisp
-          
-          (lift:run-test :name 'weblocks-test::dataform-i18n-1
-                         :suite :widgets/data-editor-suite)
+
+          (rove:run-test 'weblocks/t/dependencies::render-js-dependency)
+
+From command line:
+
+.. code:: bash
+
+          rove weblocks.asd
 
 
 Changes from master branch

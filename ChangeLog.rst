@@ -2,6 +2,275 @@
  ChangeLog
 ===========
 
+0.24.0 (2018-01-12)
+===================
+
+All rendering code was refactored.
+
+Macroses ``with-html`` and ``with-html-to-string`` replaced
+with ``weblocks.html:with-html`` and ``weblocks.html:with-html-string``.
+Stream ``*weblocks-output-stream*`` was moved to
+``weblocks.html::*stream*`` and is not external anymore. Please, don't
+use it directly.
+
+Widget refactorings
+===================
+
+Procedure ``update-widget-tree`` was removed and not widgets can't
+change html header's tags, description, title, etc. If you need this,
+change them in the ``render`` method.
+
+Macro ``root-widget`` was removed and replaced with function
+``weblocks.widgets.root:get``.
+
+Request level
+=============
+
+Functions ``post-action-redirect``, ``post-render-redirect`` and
+``initial-request-p`` were removed from ``weblocks`` package.
+
+Function ``pure-request-p`` was moved to ``weblocks.request`` package.
+
+Variable ``*json-content-type*`` was removed.
+
+Variable ``*latest-request*`` was moved to
+``weblocks.debug:*latest-request*``.
+
+Functions ``parse-location-hash``, ``ajax-request-p`` were moved to
+``weblocks.request`` package.
+
+Function ``redirect`` was moved to ``weblocks.response:redirect``.
+Functionality, related to opening another window instead of redirection
+or deferring redirection until the end of action or rendering was
+removed.
+
+Request handler
+===============
+
+Functions ``remove-duplicate-dirty-widgets``,
+``update-location-hash-dependents`` and ``update-widget-tree`` were
+removed.
+
+Call to ``weblocks::update-dialog-on-request`` from
+``handle-client-request`` was commented.
+
+
+Error handler
+=============
+
+Generic method ``weblocks/error-handler:on-error`` now accepts two
+arguments - application object and condition.
+
+
+Application level
+=================
+
+All code from ``uri-parameters-slotmap.lisp`` was removed.
+
+All code, related to application class, was moved to the package
+``weblocks.app``. Base aplication class was renamed to
+``weblocks.app:app``, and macro for definition of the new
+application was renamed to ``weblocks.app:defapp``.
+
+All code related to application's metaclass, was moved to
+the package ``weblocks.app-mop``. Metaclass was renamed to
+``weblocks.app-mop:app-class``.
+
+Application's slot ``html-indent-p`` and corresponding accessor
+``weblocks-webapp-html-indent-p`` were removed because now spinneret
+generates non indented code.
+
+Slot ``init-user-session`` was completely removed and replace with a generic
+``weblocks.session:init``.
+
+These dependency related slots and accessors were removed:
+
+* ``application-dependencies``
+* ``weblocks-webapp-application-dependencies``
+* ``bundle-dependency-types``
+* ``version-dependency-types``
+* ``gzip-dependency-types``
+
+And macro for defining a special readers for them was removed as well:
+``def-debug-p-slot-readers``.
+
+Also, these arguments to ``defapp`` was removed:
+``:ignore-default-dependencies``, ``:dependencies``
+  
+Function ``update-thread-status`` and method ``webapp-update-thread-status``
+were removed.
+
+Function ``get-webapps-for-class`` was renamed to ``app-active-p`` and
+now returns ``t`` if application of given class is already active.
+
+Function ``start-webapp`` was renamed to ``weblocks.app:start``.
+
+Function ``get-webapp`` was renamed to ``get-active-app`` and optional
+argument ``error-p`` was renamed to keyword argument ``signal-error``.
+
+Function ``find-app`` was removed.
+
+Function ``in-webapp`` was moved to ``weblocks.debug:in-app``.
+
+Variable ``*default-webapp*`` was removed.
+
+Variable ``*active-webapps*`` was renamed to
+``weblocks.app::*active-apps*`` and made internal. Use
+``weblocks.app:get-active-apps`` function.
+
+Reader ``weblocks-webapp-prefix`` was renamed to
+``weblocks.app:get-prefix``.
+
+Slot ``default-store-name`` and its accessor
+``webapp-default-store-name`` were removed.
+
+Variable ``*current-webapp*`` was moved to
+``weblocks.variables::*current-app*``.
+
+Functions ``compute-webapp-public-files-uri-prefix``,
+``compute-webapp-public-files-uri-prefix``,
+``compute-webapp-public-files-path``,
+``make-webapp-public-file-uri``,
+``weblocks-webapp-public-files-cache-time`` and variable
+``*default-public-files-path*`` were removed because
+now there is another way to serve static.
+
+Function ``webapp-serves-hostname`` was renamed to
+``weblocks.app:app-serves-hostname-p`` and now accepts app as the first
+argument and hostname as the second.
+
+
+Variable ``*uri-tokens*`` was removed and weblocks does not set
+'last-request-uri session value to all uri tokens anymore.
+
+Macro ``with-webapp`` was moved to ``weblocks.app:with-app``.
+
+Function ``webapp-permanent-action`` was moved to
+``weblocks.app-actions:get-action``.
+
+Function ``add-webapp-permanent-action`` was moved to
+``weblocks.app-actions:add-action`` and ``remove-webapp-permanent-action`` to
+``weblocks.app-actions:remove-action``.
+
+Macroses ``define-permanent-action`` and ``define-permanent-action/cc``
+were moved to ``weblocks.app-actions:define-action`` and
+``weblocks.app-actions:define-action/cc``.
+
+Function ``make-webapp-uri`` was removed, use
+``weblocks/response:make-uri`` instedad.
+
+Accessor ``webapp-js-backend`` was renamed to get-js-backend
+
+These functions were moved into the separate package
+``weblocks.current-app`` and renamed:
+
+* ``webapp-prefix`` -> ``get-prefix``;
+
+Actions and commands
+====================
+
+Function ``weblocks.actions:add-command`` was moved to
+``weblocks.commands``.
+
+Function ``weblocks:get-request-action`` was moved to
+``weblocks/actions:get-request-action``
+
+Keyword argment ``:action`` was removed from action calls.
+
+Javascript
+==========
+
+Package ``weblocks.js`` was renamed to ``weblocks/js/base``.
+
+Functions ``escape-script-tags``, ``%js`` and macroses
+``with-javascript``, ``with-javascript-to-string`` were moved to the
+package ``weblocks/js/base``.
+
+Variables
+=========
+
+These variables were moved from ``weblocks`` package to
+``weblocks/variables``:
+
+* ``*current-page-title*``
+* ``*current-page-keywords*``
+* ``*current-page-headers*``
+* ``*rewrite-for-session-urls*``
+* ``*default-content-type*``
+* ``*ignore-missing-actions*``
+
+Symbols moved from :weblocks to other packages
+==============================================
+
+To :weblocks/widgets/dom
+------------------------
+
+* ``dom-object-mixin``
+* ``dom-id``
+
+To :weblocks/utils/uri
+----------------------
+
+* ``request-uri-path``
+* ``add-get-param-to-url``
+* ``remove-parameter-from-uri``
+
+To :weblocks/linguistic/grammar
+-------------------------------
+
+* ``pluralize``
+* ``singularize``
+* ``proper-number-form``
+* ``vowelp``
+* ``consonantp``
+* ``proper-indefinite-article``
+* ``articlize``
+* ``*current-locale*``
+* ``current-locale``
+* ``russian-proper-number-form``
+* ``noun-vocative-to-genitive``
+* ``*debug-words-forms*``
+* ``*debug-words-genders*``
+* ``determine-gender``
+
+To weblocks/utils/warn
+----------------------
+
+* ``style-warn``
+* ``webapp-style-warning`` renamed to ``style-warning``.
+* ``non-idempotent-rendering``
+* ``misunderstood-action``
+
+To weblocks/actions
+-------------------
+
+* ``function-or-action->action``
+* ``make-action``
+* ``generate-action-code``
+
+
+Removals
+========
+
+To make Weblocks core smaller, many files were removed: ``views``, ``widgets``,
+``html-parts``, ``utilities``.
+
+Systems ``weblocks-util``, ``weblocks-testutils`` were removed.
+
+Accessor ``dom-class`` and generic function ``dom-classes`` were removed
+and replaced with generic function ``weblocks/widget:get-css-classes``.
+
+Generic function ``weblocks:handle-error-condition`` was removed.
+
+Variable ``*dirty-widgets*`` was removed along with
+``render-dirty-widgets`` function.
+
+
+Dependencies
+============
+
+Rendering of remote (non cached) dependencies was fixed.
+
 0.23.0 (2018-01-11)
 ===================
 

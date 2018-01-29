@@ -1,47 +1,80 @@
-(in-package :cl-user)
-(defpackage #:weblocks.t.utils
-  (:use #:cl
-        #:weblocks
-        #:hamcrest.prove)
+(defpackage #:weblocks-test/utils
+  (:use #:cl)
+  (:import-from #:alexandria
+                #:with-gensyms
+                #:symbolicate)
+  (:import-from #:lack.test
+                #:generate-env)
+  (:import-from #:lack.request
+                #:make-request)
+  (:import-from #:cl-ppcre
+                #:all-matches)
+  (:import-from #:rove
+                #:ok)
+  (:import-from #:weblocks/session
+                #:*session*)
+  (:import-from #:weblocks/app
+                #:*current-app*
+                #:defapp)
+  (:import-from #:weblocks/html
+                #:with-html-string)
+  (:import-from #:weblocks/hooks
+                #:prepare-hooks
+                #:add-session-hook)
+  ;; Just to point to dependencies
+  (:import-from #:weblocks/request)
+  
   (:export
    #:with-request
    #:with-session
    #:is-html
    #:catch-hooks
    #:assert-hooks-called))
-(in-package weblocks.t.utils)
+(in-package weblocks-test/utils)
 
 
 (defmacro with-session (&body body)
-  `(let ((weblocks.session::*session* (make-hash-table :test 'equal)))
+  `(let ((*session* (make-hash-table :test 'equal)))
      ,@body))
 
 
-(defwebapp test-app
+(defapp empty-app
   :prefix "/"
   :autostart nil)
 
 
-(defmacro with-request ((uri &key (method :get) data) &body body)
+(defmacro with-request ((uri &key
+                               data
+                               (method :get)
+                               headers  ; it should be an alist
+                               (app 'empty-app)) &body body)
   "Argument 'data' should be an alist with POST parameters if method is :POST."
-  `(weblocks.hooks:prepare-hooks
-     (let* ((env (lack.test:generate-env ,uri :method ,method :content ,data))
-            (weblocks.request::*request* (lack.request:make-request env))
-            ;; we need to setup a current webapp, because
-            ;; uri tokenizer needs to know app's uri prefix
-            (weblocks::*current-webapp* (make-instance 'test-app))
-            (weblocks::*uri-tokens*
-              (make-instance 'weblocks::uri-tokens
-                             :tokens (weblocks::tokenize-uri (weblocks.request:get-path)))))
-       ,@body)))
+
+  ;; Lack stores headers in a dict with lowercased keys,
+  ;; that is why to simulate it, we need to ensure that
+  ;; keys are lowercased.
+  (let ((lowercased-headers
+          (loop for (key . value) in headers
+                collect (cons (string-downcase key)
+                              value))))
+    `(prepare-hooks
+       (let* ((env (generate-env ,uri
+                                 :method ,method
+                                 :content ,data
+                                 :headers ',lowercased-headers))
+              ;; we need to setup a current webapp, because
+              ;; uri tokenizer needs to know app's uri prefix
+              (*current-app* (make-instance ',app)))
+         (weblocks/request:with-request ((make-request env))
+           ,@body)))))
 
 
 (defmacro is-html (form expected &optional message)
-  `(let ((result (with-output-to-string
-                     (weblocks:*weblocks-output-stream*)
+  `(let ((result (with-html-string
                    ,form)))
-     (prove:like result ,expected
-               ,message)))
+     (ok (all-matches ,expected result)
+         ;;(string= result ,expected)
+         ,message)))
 
 
 (defmacro catch-hooks ((&rest hook-names) &body body)
@@ -55,17 +88,17 @@ Call assert-hooks-contains inside the body, to check if proper hooks were called
    \(assert-hooks-called
       \(contains :fact-created a-contact a-twitter-name\)
       \(contains :fact-removed a-contact a-twitter-name\)\)\)"
-  (alexandria:with-gensyms (hook-calls)
+  (with-gensyms (hook-calls)
     (let ((hook-handlers
             (loop for hook-name in hook-names
-                  collect `(weblocks.hooks:add-session-hook
+                  collect `(add-session-hook
                                ,hook-name
-                               ,(alexandria:symbolicate 'handle- hook-name)
+                               ,(symbolicate 'handle- hook-name)
                                (&rest args)
                              (push (cons ,hook-name args)
                                    ,hook-calls))
                   )))
-      `(weblocks.hooks:prepare-hooks
+      `(prepare-hooks
          (let* ((,hook-calls nil)) 
            ,@hook-handlers
 

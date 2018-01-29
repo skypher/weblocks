@@ -1,11 +1,21 @@
-(in-package :weblocks)
+(defpackage #:weblocks/utils/i18n
+  (:use #:cl)
+  (:import-from #:weblocks/linguistic/grammar
+                #:default-translation-function)
+  
+  (:export #:*translation-function*
+           #:translate
+           #:default-translation-function))
+(in-package weblocks/utils/i18n)
 
-; i18n utils
 
-;; (wexport '(*translation-function* translate default-translation-function)
-;;          '(t util))
+;; TODO: rethink this module, unexport variable and make
+;;       it more pluggable, probably by making translate a
+;;       a generic function. Or may be to remove i18n at all?
+
 
 (defvar *translation-function* 'default-translation-function)
+
 
 (defun translate (string &rest scope)
   "Translates given string by calling *translation-function* 

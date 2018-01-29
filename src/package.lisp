@@ -6,7 +6,6 @@
   (:use #:cl
         #:c2mop
         #:metabang.utilities
-        #:cl-who
         #:json
         #:optima
         #:cont
@@ -20,7 +19,6 @@
   (:shadowing-import-from :c2mop #:defclass #:defgeneric #:defmethod
                           #:standard-generic-function #:ensure-generic-function
                           #:standard-class #:typep #:subtypep #:standard-method)
-  (:shadowing-import-from :cl-who #:str)
   (:shadowing-import-from :f-underscore #:f #:_)
   (:shadowing-import-from :optima #:match)
   (:shadowing-import-from :metabang.utilities #:with-array #:size #:bind)

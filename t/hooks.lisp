@@ -1,151 +1,156 @@
-(defpackage #:weblocks.t.hooks
+(defpackage #:weblocks-test/hooks
   (:use #:cl
-        #:prove
-        #:weblocks.t.utils))
-(in-package weblocks.t.hooks)
+        #:rove
+        #:weblocks-test/utils)
+  (:import-from #:weblocks/hooks
+                #:get-callbacks
+                #:*session-hooks*
+                #:add-session-hook
+                #:get-callbacks-names
+                #:with-hook
+                #:call-next-hook))
+(in-package weblocks-test/hooks)
 
 
-(plan 6)
+(deftest empty-call-back-list
+  (testing "Callbacks list for unknown name is empty"
+    (with-session
+      (with-request ("/")
+        (ng (get-callbacks
+             *session-hooks*
+             :some-unknown-name)
+            "If no callbacks were added for the name, then get-callbacks should return an empty list.")))))
 
 
-(subtest "Callbacks list for unknown name is empty"
+(deftest add-session-hook-test
   (with-session
     (with-request ("/")
-      (is (weblocks.hooks::get-callbacks
-           weblocks.hooks::*session-hooks*
-           :some-unknown-name)
-          nil
-          "If no callbacks were added for the name, then get-callbacks should return an empty list."))))
+      (add-session-hook :action foo ())
 
-
-(subtest "Add session hook"
-  (with-session
-    (with-request ("/")
-      (weblocks.hooks:add-session-hook :action foo ())
-
-      (let ((callbacks (weblocks.hooks::get-callbacks-names
-                        weblocks.hooks::*session-hooks*
+      (let ((callbacks (get-callbacks-names
+                        *session-hooks*
                         :action)))
-        (is (first callbacks)
-            'foo)
-        "Function add-session-hook2 should put given value into the list of callbacks bound to the session."))))
+        (ok (equal (first callbacks)
+                   'foo))
+        "Function add-session-hook should put given value into the list of callbacks bound to the session."))))
 
 
-(subtest "Hooks evaluation"
-  (subtest "Without params"
+(deftest hooks-evaluation
+  (testing "Without params"
     (with-session
       (with-request ("/")
         (let (call-result)
           
-          (weblocks.hooks:add-session-hook :action
+          (add-session-hook :action
               set-result ()
             (setf call-result
                   'callback-was-called))
           
-          (weblocks.hooks:with-hook (:action)
+          (with-hook (:action)
             ;; do nothing
             )
 
-          (is call-result
-              'callback-was-called)))))
+          (ok (equal call-result
+                     'callback-was-called))))))
 
-  (subtest "With params"
+  (testing "With params"
     (with-session
       (with-request ("/")
         (let (call-result)
-          (weblocks.hooks:add-session-hook
+          (add-session-hook
               :some-hook
               add-value (param)
             (push param call-result))
           
-          (weblocks.hooks:with-hook (:some-hook 'blah))
-          (weblocks.hooks:with-hook (:some-hook 'minor))
+          (with-hook (:some-hook 'blah))
+          (with-hook (:some-hook 'minor))
 
-          (is call-result
-              '(minor blah))))))
+          (ok (equal call-result
+                     '(minor blah)))))))
 
 
-  (subtest "Hook should return last form's value"
+  (testing "Hook should return last form's value"
     (with-session
       (with-request ("/")
-        (let ((result (weblocks.hooks:with-hook (:action)
+        (let ((result (with-hook (:action)
                         'foo
                         'bar)))
 
-          (is result
-              'bar))))))
+          (ok (equal result
+                     'bar)))))))
 
 
-(subtest "Nested evaluation"
+(deftest nested-evaluation
   ;; Here we check if hooks are propertly chained
   (with-session
     (with-request ("/")
       (let (result)
         
-        (weblocks.hooks:add-session-hook
+        (add-session-hook
             :some-hook
             inner-value ()
           (push :inner-before result)
-          (weblocks.hooks:call-next-hook)
+          (call-next-hook)
           (push :inner-after result))
         
-        (weblocks.hooks:add-session-hook
+        (add-session-hook
             :some-hook
             outer-value ()
           (push :outer-before result)
-          (weblocks.hooks:call-next-hook)
+          (call-next-hook)
           (push :outer-after result))
           
-        (weblocks.hooks:with-hook (:some-hook)
+        (with-hook (:some-hook)
           ;; Now we surrounded this code with hooks
           ;; and will insert another value to the list
           (push :real-value result))
 
-        (is result
-            '(:outer-after :inner-after :real-value :inner-before :outer-before))))))
+        (ok (equal result
+                   '(:outer-after :inner-after :real-value :inner-before :outer-before)))))))
 
 
-(subtest "If a callback with same name already exists, it is rewritten"
-  (with-session
-    (with-request ("/")
-      (let (result)
-        (weblocks.hooks:add-session-hook :my-hook foo ()
-          (push :foo result)
-          (weblocks.hooks:call-next-hook))
+(deftest rewritting-callback
+  (testing "If a callback with same name already exists, it is rewritten"
+    (with-session
+      (with-request ("/")
+        (let (result)
+          (add-session-hook :my-hook foo ()
+            (push :foo result)
+            (call-next-hook))
 
-        ;; Add a hook with same name, but now it will push :bar
-        ;; into the list.
-        (weblocks.hooks:add-session-hook :my-hook foo ()
-          (push :bar result)
-          (weblocks.hooks:call-next-hook))
+          ;; Add a hook with same name, but now it will push :bar
+          ;; into the list.
+          (add-session-hook :my-hook foo ()
+            (push :bar result)
+            (call-next-hook))
 
-        (weblocks.hooks:with-hook (:my-hook)
-                                  t)
+          (with-hook (:my-hook)
+            t)
 
-        (is result
-            '(:bar)
-            "If callback was overwritten, then we have only :bar in the list.")))))
+          (ok (equal result
+                     '(:bar))
+              "If callback was overwritten, then we have only :bar in the list."))))))
 
 
-(subtest "Call-next-hook will be called automatically if it wasn't used in a callback body."
-  (with-session
-    (with-request ("/")
-      (let (result)
-        (weblocks.hooks:add-session-hook :my-hook foo ()
-          (push :foo result))
+(deftest automatic-call-next-hook
+  (testing "Call-next-hook will be called automatically if it wasn't used in a callback body."
+    (with-session
+      (with-request ("/")
+        (let (result)
+          (add-session-hook :my-hook foo ()
+            (push :foo result))
 
-        (weblocks.hooks:add-session-hook :my-hook bar ()
-          (push :bar result))
+          (add-session-hook :my-hook bar ()
+            (push :bar result))
 
-        (weblocks.hooks:with-hook (:my-hook)
-                                  t)
+          (with-hook (:my-hook)
+            t)
 
-        ;; Neither of two callbacks use call-next-hook,
-        ;; but results should contain both :foo and :bar,
-        ;; because call-next-hook was called at the end of each callback
-        ;; implicitly
-        (is result
-            '(:foo :bar)
-            "Call-next-hook should be called implicitly and execute all available hooks.")))))
+          ;; Neither of two callbacks use call-next-hook,
+          ;; but results should contain both :foo and :bar,
+          ;; because call-next-hook was called at the end of each callback
+          ;; implicitly
+          (ok (equal result
+                     '(:foo :bar))
+              "Call-next-hook should be called implicitly and execute all available hooks."))))))
 
-(finalize)

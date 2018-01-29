@@ -1,5 +1,19 @@
-(defpackage #:weblocks.response
+(defpackage #:weblocks/response
   (:use #:cl)
+  (:import-from #:weblocks/request
+                #:get-uri
+                #:ajax-request-p
+                #:get-header)
+  (:import-from #:weblocks/js/base
+                #:with-javascript-to-string
+                #:with-javascript)
+  (:import-from #:weblocks/actions
+                #:on-missing-action)
+  (:import-from #:weblocks/app
+                #:get-prefix)
+  (:import-from #:weblocks/commands
+                #:add-command)
+  (:import-from #:quri)
   (:export
    #:*code*
    #:*content-type*
@@ -7,8 +21,10 @@
    #:add-header
    #:*headers*
    #:send-script
-   #:make-uri))
-(in-package weblocks.response)
+   #:make-uri
+   #:redirect
+   #:catch-possible-abort))
+(in-package weblocks/response)
 
 
 (defvar *code* nil
@@ -34,6 +50,13 @@ with any headers you need or use (add-header ...) to add one header.
 Additional header :content-type will be added to this list before
 returning response. To change content type, set *content-type*.")
 
+(defvar *abort-can-be-catched-p* nil
+  "This variable will be set to 't automatically
+   when you use `catch-possible-abort'.
+
+   If it is not 't, then call to `abort-processing' will
+   invoke the debugger, because it is abnormal situation.")
+
 
 (defun add-header (name value)
   "Use this function to add a HTTP header:
@@ -53,7 +76,7 @@ returning response. To change content type, set *content-type*.")
    like ./stories.
 
    Also, it can contain a query params like /login?code=100500"
-  (let* ((base (weblocks.request:get-uri))
+  (let* ((base (get-uri))
          (parsed-base (quri:uri base))
          (parsed-new-path (quri:uri new-path))
          (new-url (quri:merge-uris parsed-new-path
@@ -69,7 +92,6 @@ returning response. To change content type, set *content-type*.")
 HTTP code and headers are taken from *code* and *content-type*."
 
   (log:debug "Aborting request processing"
-             content
              code
              content-type
              headers)
@@ -83,7 +105,18 @@ HTTP code and headers are taken from *code* and *content-type*."
   (when headers-given
     (setf *headers* headers))
 
-  (throw 'abort-processing content))
+  (if *abort-can-be-catched-p*
+      (throw 'abort-processing content)
+      (error "Abort is not possible")))
+
+
+(defmacro catch-possible-abort (&body body)
+  "Catches throwed 'abort-processing and returns the value.
+
+   Used in the server code and in tests."
+  `(let ((*abort-can-be-catched-p* t))
+     (catch 'abort-processing
+       ,@body)))
 
 
 (defun send-script (script &optional (place :after-load))
@@ -94,20 +127,41 @@ HTTP code and headers are taken from *code* and *content-type*."
   it will be compiled through Parenscript first.
   
   FIXME: is using PUSH or PUSHLAST correct?"
+  (declare (ignorable place))
   (let ((script (etypecase script
                   (string script)
                   (list (ps:ps* script)))))
-    (if (weblocks.request:ajax-request-p)
-        (let ((code (if (equalp (weblocks.request:get-header "X-Weblocks-Client")
+    (if (ajax-request-p)
+        (let ((code (if (equalp (get-header "X-Weblocks-Client")
                                 "JQuery")
                         script
-                        (weblocks:with-javascript-to-string script))))
-          (weblocks.actions:add-command :execute-code
-                                        :code code)
+                        (with-javascript-to-string script))))
+          (add-command :execute-code
+                       :code code)
           ;; TODO remove before-ajax-complete-scripts and on-ajax-complete-scripts completely
           ;; (ecase place
           ;;   (:before-load (push code weblocks.variables:*before-ajax-complete-scripts*))
           ;;   (:after-load (push code weblocks.variables:*on-ajax-complete-scripts*)))
           )
-        (weblocks:with-javascript
+        (with-javascript
           script))))
+
+
+(defun redirect (uri)
+  "Redirects the client to a new URI."
+  (if (ajax-request-p)
+      (abort-processing
+       (format nil "{\"redirect\":\"~A\"}" uri)
+       :content-type "application/json")
+      (abort-processing
+       ""
+       :headers (list :location uri)
+       :code 302)))
+
+
+(defmethod on-missing-action (app action-name)
+  (declare (ignorable app action-name))
+  (redirect
+   (make-uri (get-prefix app))))
+
+

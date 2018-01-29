@@ -1,6 +1,9 @@
-(defpackage #:weblocks.hooks
+(defpackage #:weblocks/hooks
   (:use #:cl
         #:f-underscore)
+  ;; Just dependencies
+  (:import-from #:weblocks/session)
+  
   (:export
    #:add-application-hook
    #:add-request-hook
@@ -9,7 +12,7 @@
    #:with-hook
    #:call-next-hook
    #:call-hook))
-(in-package weblocks.hooks)
+(in-package weblocks/hooks)
 
 
 (defclass hooks ()
@@ -25,15 +28,15 @@
 
 (defun reset-session-hooks ()
   (let ((hooks (make-instance 'hooks)))
-    (setf (weblocks.session:get-value 'hooks)
+    (setf (weblocks/session:get-value 'hooks)
           hooks)
     hooks))
 
 
 (defun get-or-create-session-hooks ()
   "A request hook object used in the session scope."
-  (if (weblocks.session:get-value 'hooks)
-      (weblocks.session:get-value 'hooks)
+  (if (weblocks/session:get-value 'hooks)
+      (weblocks/session:get-value 'hooks)
       (reset-session-hooks)))
 
 
@@ -246,45 +249,4 @@ one of add-xxxx-hook and a (call-next-hook) inside of it."
         (apply current-hook
                next-hooks
                args)))))
-
-;; Hooks for using html parts, reset parts set before render and save it to session after render 
-;; Allow to modify html parts set when is in debug mode
-
-;; Раньше все pushnew были завёрнуты в этот eval-when,
-;; не знаю зачем
-;; (eval-when (:load-toplevel))
-;; кроме того, pushnew не работает и всё равно при повторном евале добавляет в словарь
-;; *application-request-hooks* дубликаты функций, а вот если 
-
-;; TODO: move this hook to place where html parts are processed
-(defun reset-html-parts ()
-  (when (or weblocks::*weblocks-global-debug*
-            (weblocks::webapp-debug))
-    
-    (log:debug "Resetting html parts cache")
-    (weblocks.utils.html-parts:reset)))
-
-
-(defun update-html-parts ()
-  (when (or weblocks::*weblocks-global-debug*
-            (weblocks::webapp-debug))
-    (weblocks::timing "html parts processing"
-      (progn 
-        (weblocks.utils.html-parts:update-html-parts-connections)
-        ;; Don't know why to do this,
-        ;; because this is only place where weblocks.session:get-value
-        ;; is called with this argument. Probably, these values
-        ;; are never restored from the session.
-        ;;
-        ;; (setf (weblocks.session:get-value 'parts-md5-hash)
-        ;;       weblocks-util:*parts-md5-hash*)
-        ;; (setf (weblocks.session:get-value 'parts-md5-context-hash)
-        ;;       weblocks-util:*parts-md5-context-hash*)
-        ))))
-
-(add-application-hook :render
-    process-html-parts ()
-  (reset-html-parts)
-;;  (call-next-hook)
-  (update-html-parts))
 

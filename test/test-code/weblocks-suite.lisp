@@ -17,8 +17,7 @@
   (:dynamic-variables (weblocks::*current-webapp*
                        (make-instance 'weblocks::weblocks-webapp :prefix ""
                                       :version-dependency-types '(:stylesheet :script)
-                                      :js-backend :jquery
-                                      :html-indent-p nil)))
+                                      :js-backend :jquery)))
   (:setup 
    (setf (weblocks::weblocks-webapp-init-user-session weblocks::*current-webapp*)
          (lambda (&rest args)

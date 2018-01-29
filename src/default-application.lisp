@@ -30,10 +30,10 @@
                       list)))
     (with-html
       (:h3 "Currently running webapps:")
-      (render-list (remove-classname 'weblocks-default *active-webapps*)
+      (render-list (remove-classname 'weblocks-default (weblocks.app:get-active-apps))
                    :render-fn (lambda (app)
                                 (with-html
-                                  (:a :href (make-webapp-uri "/" app)
+                                  (:a :href (weblocks.app:make-uri app "/")
                                       (esc (format nil "~A"
                                                    (class-name (class-of app))))))))
       (:h3 "Registered webapps:")
@@ -42,7 +42,7 @@
                                 (with-html
                                   (esc (format nil "~A" appname))
                                   " "
-                                  (if (find appname *active-webapps*
+                                  (if (find appname (weblocks.app:get-active-webapps)
                                             :key (compose #'class-name #'class-of))
                                     (render-link (f_% (stop-webapp appname)
                                                       (mark-dirty widget))

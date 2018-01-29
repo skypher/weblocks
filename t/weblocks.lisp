@@ -1,35 +1,21 @@
-(defpackage #:weblocks.t.weblocks
+(defpackage #:weblocks-test/weblocks
   (:use #:cl
-        #:prove
-        #:weblocks
-        #:weblocks.t.utils))
-(in-package weblocks.t.weblocks)
-
-(plan 3)
-
-(subtest "root-composite-1"
-  (with-session
-    (is-values (weblocks::root-composite)
-               (list nil nil)
-               "root-composite by default returns two nil values")))
+        #:rove
+        #:weblocks-test/utils)
+  (:import-from #:weblocks/html
+                #:with-html-string)
+  (:import-from #:weblocks/js
+                #:with-javascript
+                #:with-javascript-to-string))
+(in-package weblocks-test/weblocks)
 
 
-(subtest "root-composite-2"
-  (with-session
-    (setf (weblocks::root-composite) 'foobar)
-    (is-values (weblocks::root-composite)
-               (list 'foobar t)
-               "setf for root-composite should put any value to the session hash")))
-
-
-(subtest "with-javascript-1"
-    (is
-      (with-output-to-string (*weblocks-output-stream*)
-        (with-javascript
-          "foo~A" "bar"))
-      (with-javascript-to-string "foo~A" "bar")
+(deftest with-javascript-1
+  (ok
+   (equal (with-html-string
+            (with-javascript
+              "foo~A" "bar"))
+          (with-javascript-to-string "foo~A" "bar"))
       
-      "Macro with-javascript should write into *weblocks-output-stream*"))
+   "Macro with-javascript should write into weblocks.html:*stream*"))
 
-
-(finalize)

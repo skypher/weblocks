@@ -14,14 +14,16 @@ about the currently active dialog, if any. The place holds a structure
 of type 'dialog'."
   `(weblocks.session:get-value 'dialog-contents))
 
-(defun dialog-js-wt (&key image-src image-onclick &allow-other-keys)
-  (with-html-to-string
+(defun render-dialog-js (&key image-src image-onclick &allow-other-keys)
+  (weblocks.html:with-html
     (:img :src  image-src
      :onclick image-onclick
      :onmouseover "this.style.cursor = \"pointer\";"
      :style "cursor: expression(\"hand\");")))
 
-(deftemplate :dialog-js-wt 'dialog-js-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :dialog-js-wt 'dialog-js-wt)
 
 (defun make-dialog-js (title widget css-class &optional close escape-script-tags-p)
   "Returns a string with JS code that shows a modal pop-up dialog with
@@ -32,17 +34,12 @@ the widget inside."
                                 close
                                 (f_% (answer widget))))
                   (close-action (make-action close-fn)))
-             (render-wt-to-string 
-               :dialog-js-wt
-               nil
-               :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
-               :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
+             (render-dialog-js
+              :image-src (make-webapp-public-file-uri "images/dialog/close.gif")
+              :image-onclick (format nil "initiateAction(\"~A\", \"~A\");" close-action (session-name-string-pair)))))
          (widget-html (widget)
-           (let ((*weblocks-output-stream* (make-string-output-stream)))
-             (declare (special *weblocks-output-stream*))
-             (render-widget widget)
-             (get-output-stream-string *weblocks-output-stream*))))
-    ;(format t "widget-html: ~S~%" (widget-html widget))
+           (weblocks.html:with-html-string
+             (render-widget widget))))
     (let ((inner (intern (string-upcase (weblocks.session:gen-id "inner"))))
           (close-action (intern (string-upcase (weblocks.session:gen-id "close")))))
       `(progn
@@ -92,35 +89,39 @@ scales down to 'do-modal' instead."
       (do-modal title callee :css-class css-class)))
 
 (defun choices-get-wt (&key message content)
-  (with-html-to-string
-    (:p (str message))
+  (weblocks.html:with-html
+      (:p message)
     (str content)))
 
-(deftemplate :choices-get-wt 'choices-get-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :choices-get-wt 'choices-get-wt)
 
 (defun render-choices-get (msg choices k)
   "Renders the contents of a choice dialog with choices displayed as
    links."
-  (render-wt 
-    :choices-get-wt 
-    nil 
-    :message msg
-    :content (capture-weblocks-output 
-               (with-html 
-                 (mapc (lambda (choice)
-                         (render-link (lambda (&rest args)
-                                        (declare (ignore args))
-                                        (answer k (car choice)))
-                                      (cdr choice))
-                         (htm "&nbsp;"))
-                       choices)))))
+  (weblocks.html:with-html
+    (:p msg)
+    (mapc (lambda (choice)
+            (weblocks.html:with-html
+              ;; TODO: May be return such basic helper as render-link.
+              ;;       Right now it does not work because was removed
+              ;;       during refactoring.
+              (render-link (lambda (&rest args)
+                             (declare (ignore args))
+                             (answer k (car choice)))
+                           (cdr choice))
+              (:raw "&nbsp;")))
+          choices)))
 
 (defun choices-post-wt (&key message content &allow-other-keys)
   (with-html-to-string 
     (:p (str message)) 
     (str content)))
 
-(deftemplate :choices-post-wt 'choices-post-wt)
+;; TODO: think what to do with this, because templates were
+;; removed from the core framework
+;; (deftemplate :choices-post-wt 'choices-post-wt)
 
 (defun render-choices-post (msg choices k &rest args)
   "Renders the contents of a choice dialog with choices displayed as

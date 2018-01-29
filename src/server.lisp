@@ -1,269 +1,325 @@
-(in-package weblocks)
-
-(export '(*last-session*
-          start-weblocks
-          stop-weblocks
-          *weblocks-server*
-          server-type
-          server-version
-          session-name-string-pair 
-          create-regex-dispatcher 
-          create-prefix-dispatcher 
-          create-static-file-dispatcher-and-handler 
-          create-folder-dispatcher-and-handler 
-          active-sessions 
-          *force-files-to-serve*))
-
-(defmacro add-print-object-for-function (function (stream-var) &body body)
-  `(let ((function ,function))
-     (setf (pretty-function:get-function-printer function)
-           (lambda (,stream-var)
-             (print-unreadable-object (function ,stream-var :type t)
-               ,@body)))
-     function))
-
-(defun create-regex-dispatcher (regex handler &key (name "regex-dispatcher"))
-  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
-  ;; (add-print-object-for-function 
-  ;;   (hunchentoot:create-regex-dispatcher regex handler) 
-  ;;   (stream)
-  ;;   (princ 
-  ;;     (format nil 
-  ;;             "~A, regexp - \"~A\""
-  ;;             name
-  ;;             (ppcre:regex-replace-all "\"" regex "\\\"")) stream))
-  )
-
-(defun create-static-file-dispatcher-and-handler (uri path &optional content-type)
-  (log:debug "Creating static file dispatcher for" uri path content-type)
-  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
+(defpackage #:weblocks/server
+  (:use #:cl
+        #:f-underscore)
+  ;; to load js dependencies after app was started
+  (:import-from #:weblocks/app-dependencies)
   
-  ;; (add-print-object-for-function 
-  ;;   (hunchentoot:create-static-file-dispatcher-and-handler uri path content-type) 
-  ;;   (stream)
-  ;;   (princ (format nil "static-file-dispatcher, uri - ~A file - ~A, content-type - ~A" uri path content-type) stream))
-  )
-
-(defun create-folder-dispatcher-and-handler (uri-prefix base-path &optional content-type)
-  (log:debug "Creating folder dispatcher" uri-prefix base-path content-type)
-  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
+  (:import-from #:weblocks/session
+                #:*session*)
+  (:import-from #:weblocks/hooks
+                #:prepare-hooks
+                #:with-hook)
+  (:import-from #:weblocks/routes
+                #:route
+                #:get-route
+                #:add-route
+                #:reset-routes)
+  (:import-from #:weblocks/app
+                #:app-active-p
+                #:get-active-apps
+                #:get-prefix
+                #:app-serves-hostname-p
+                #:start-webapp
+                #:stop-webapp
+                #:weblocks-webapp-name
+                #:get-autostarting-apps)
+  (:import-from #:weblocks/request
+                #:ajax-request-p
+                #:with-request)
+  (:import-from #:weblocks/response
+                #:*code*
+                #:*content-type*
+                #:*headers*
+                #:catch-possible-abort)
+  (:import-from #:weblocks/request-handler
+                #:handle-client-request)
+    
+  (:import-from #:lack.request
+                #:make-request)
+  (:import-from #:lack
+                #:builder)
+  (:import-from #:clack
+                #:clackup)
+  (:import-from #:cl-strings
+                #:starts-with)
+  ;; Just dependencies
+  (:import-from #:weblocks/debug)
+  (:import-from #:log)
   
-  ;; (add-print-object-for-function 
-  ;;   (hunchentoot:create-folder-dispatcher-and-handler uri-prefix base-path content-type) 
-  ;;   (stream)
-  ;;   (princ (format nil "folder-dispatcher, uri - ~A path - ~A, content-type - ~A" uri-prefix base-path content-type) stream))
-  )
+  (:export #:start
+           #:stop
+           #:get-server-type
+           #:get-port
+           #:make-server
+           #:handle-request
+           #:*server*
+           #:stop-weblocks
+           #:start-weblocks
+           #:serve-static-file))
+(in-package weblocks/server)
 
-(defun create-prefix-dispatcher (prefix handler)
-  (error "Not implemented, use weblocks.routes or weblocks.dependencies instead")
-  ;; (add-print-object-for-function 
-  ;;   (hunchentoot:create-prefix-dispatcher prefix handler) 
-  ;;   (stream)
-  ;;   (princ 
-  ;;     (format nil 
-  ;;             "prefix-dispatcher, prefix - \"~A\"" 
-  ;;             (ppcre:regex-replace-all "\"" prefix "\\\"")) stream))
-  )
 
-(defvar *weblocks-server* nil
-  "If the server is started, bound to hunchentoot server
+(defvar *server* nil
+  "If the server is started, bound to a server
   object. Otherwise, nil.")
 
-(defparameter *maintain-last-session* nil
-  "Determines whether *last-session* variable will be maintained at
-  each request. Note, this variable is automatically set to a
-  hunchentoot lock in debug mode and nil in release mode by
-  'start-weblocks'.")
 
-(defvar *last-session* nil
-  "Bound to a session object associated with the last handled
-  request. Note, this variable is only updated in debug mode.")
-
-;;; Tell hunchentoot to output in utf-8 and to try utf-8 on input by
-;;; default (if no encoding information is provided by the client)
-(setf *hunchentoot-default-external-format*
-      (flexi-streams:make-external-format :utf-8))
+(defclass server ()
+  ((port :type integer
+         :initarg :port
+         :reader get-port)
+   (interface :type string
+              :initarg :interface
+              :reader get-interface)
+   (server-type :initarg :server-type
+                :reader get-server-type)
+   (handler :initform nil
+            :accessor get-handler)))
 
 
-;; Moved to weblocks.server
-;; (defun start-weblocks (&rest keys &key (debug t) (port 8080)
-;;                        &allow-other-keys)
-;;   "Starts weblocks framework hooked into Hunchentoot server.
-
-;; Set DEBUG to true in order for error messages and stack traces to be shown
-;; to the client (note: stack traces are temporarily not available due to changes
-;; in Hunchentoot 1.0.0).
-
-;; All other keywords will be passed as initargs to the acceptor;
-;; the initargs :PORT and :SESSION-COOKIE-NAME default to
-;; 8080 and `weblocks-GENSYM'.
-
-;; Also opens all stores declared via DEFSTORE and starts webapps
-;; declared AUTOSTART."
-;;   (unless (member :bordeaux-threads *features*)
-;;     (cerror "I know what I'm doing and will stubbornly continue."
-;;             "You're trying to start Weblocks without threading ~
-;;             support. Recompile your Lisp with threads enabled."))
-;;   (if debug
-;;     (enable-global-debugging)
-;;     (disable-global-debugging))
-;;   (when (null *weblocks-server*)
-;;     (values
-;;       (start (setf *weblocks-server*))
-;;       (mapcar (lambda (class)
-;;                 (unless (get-webapps-for-class class)
-;;                   (start-webapp class :debug debug)))
-;;               *autostarting-webapps*))))
-
-;; Moved to weblocks.server
-;; (defun stop-weblocks ()
-;;   "Stops weblocks. Closes all stores declared via 'defstore'."
-;;   (when (not (null *weblocks-server*))
-;;     (dolist (app *active-webapps*)
-;;       (stop-webapp (weblocks-webapp-name app)))
-;;     (setf *last-session* nil)
-;;     (reset-sessions)
-;;     (when *weblocks-server*
-;;       (stop *weblocks-server*))
-;;     (setf *weblocks-server* nil)))
+(defgeneric handle-request (server env)
+  (:documentation "Handles HTTP request, passed by Clack"))
 
 
-;;; of interest: http://www.mnot.net/blog/2007/05/15/expires_max-age
-(defun send-cache-rules (cache-time)
-  (when cache-time
-    (check-type cache-time integer)
-    (let* ((now (local-time:now))
-           (cache-until (local-time-duration:timestamp-duration+
-                         now
-                         (local-time-duration:duration :sec cache-time))))
-      (weblocks.response:add-header
-       :expired
-       (local-time:format-rfc1123-timestring
-        nil
-        cache-until))
-      (weblocks.response:add-header
-       :cache-control
-       (format nil "max-age=~D" (max 0 cache-time))))))
+(defgeneric start (server &key debug)
+  (:documentation "Starts a webserver, returns this server as result.
+If server is already started, then logs a warning and does nothing."))
 
 
-(defun send-gzip-rules (types script-name request virtual-folder physical-folder)
-  (let (content-type)
-    (when (and types
-               (search "gzip" (header-in :accept-encoding request))
-               (cl-fad:file-exists-p (format nil "~A~A.gz" physical-folder
-                                             (relative-path script-name virtual-folder)))
-               (or (and (find :script types)
-                        (cl-ppcre:scan "(?i)\\.js$" script-name)
-                        (setf content-type "text/javascript"))
-                   (and (find :stylesheet types)
-                        (cl-ppcre:scan "(?i)\\.css$" script-name)
-                        (setf content-type "text/css"))))
-      (setf (header-out "Content-Encoding") "gzip")
-      (setf (slot-value request 'script-name) (format nil "~A.gz" script-name))
-      content-type)))
-
-
-(defvar *force-files-to-serve* (list "/favicon.ico"))
-(setf (documentation '*force-files-to-serve* 'variable)
-      "A list of urls which should be recognized as files. 
-       This is useful for avoiding double requests to application. 
-       /favicon.ico here fixes Weblocks bug in Google Chrome browser")
-
-
-;; Removed when moving to Clack
-;; (defun weblocks-dispatcher (request)
-;;   "Weblocks' Hunchentoot dispatcher. The function serves all started applications
-;;   and their static files."
-;;   (log:debug "Serving" request)
-  
-;;   (dolist (app *active-webapps*)
-;;     (log:debug "Searching file in" app)
-    
-;;     (let* ((script-name (script-name request))
-;;            (hostname (host request))
-;;            (app-prefix (webapp-prefix app))
-;;            (app-pub-prefix (compute-webapp-public-files-uri-prefix app))
-;;            *default-content-type*)
-
-;;       (cond
-;;         ((or 
-;;           (find script-name *force-files-to-serve* :test #'string=)
-;;           (and (webapp-serves-hostname hostname app)
-;;                (list-starts-with (tokenize-uri script-name nil)
-;;                                  (tokenize-uri app-pub-prefix nil)
-;;                                  :test #'string=)))
-;;          (let* ((virtual-folder (maybe-add-trailing-slash app-pub-prefix))
-;;                 (physical-folder (compute-webapp-public-files-path app))
-;;                 (content-type (send-gzip-rules (gzip-dependency-types* app)
-;;                                                script-name request virtual-folder physical-folder)))
-;;            (send-cache-rules (weblocks-webapp-public-files-cache-time app))
-
-;;            ;; This is not optimal, because a new dispatcher created for each request
-;;            (return-from weblocks-dispatcher
-;;              (funcall (create-folder-dispatcher-and-handler virtual-folder physical-folder content-type)
-;;                       request))))
-;;         ((and (webapp-serves-hostname (hunchentoot:host) app)
-;;               (list-starts-with (tokenize-uri script-name nil)
-;;                                 (tokenize-uri app-prefix nil)
-;;                                 :test #'string=))
-;;          (no-cache)                     ; disable caching for dynamic pages
-;;          (return-from weblocks-dispatcher 
-;;            (f0 (handle-client-request app)))))))
-;;   (log:debug "Application dispatch failed for" (script-name request)))
-
-;; Redirect to default app if all other handlers fail
-;; *** removed from Hunchentoot; find another way to implement this.
-#|
-(setf hunchentoot:*default-handler*
-      (lambda ()
-        (if (null (tokenize-uri (script-name*) nil))
-            (progn
-              (unless (get-webapp 'weblocks-default nil)
-                (start-webapp 'weblocks-default))
-              (redirect "/weblocks-default"))
-            (setf (return-code*) +http-not-found+))))
-|#
-
-;; install weblocks-dispatcher
-;; (eval-when (:load-toplevel)
-;;   (let ((easy-handlers (find 'hunchentoot:dispatch-easy-handlers *dispatch-table*)))
-;;     (when easy-handlers 
-;;       (setf *dispatch-table* (remove easy-handlers *dispatch-table*)))
-;;     (push 'weblocks-dispatcher *dispatch-table*)
-;;     (when easy-handlers 
-;;       (push easy-handlers *dispatch-table*))))
-
-(defun session-name-string-pair ()
-  "Returns a session name and string suitable for URL rewriting. This
-pair is passed to JavaScript because web servers don't normally do URL
-rewriting in JavaScript code."
-
-  ""
-  ;; TODO: removed seems is used only in tests
-  ;; (if (and *rewrite-for-session-urls*
-  ;;          (null (cookie-in (session-cookie-name *weblocks-server*)))
-  ;;          (hunchentoot:session-cookie-value *session*))
-  ;;     (format nil "~A=~A"
-  ;;             (url-encode (session-cookie-name *weblocks-server*))
-  ;;             (string-upcase (url-encode (hunchentoot:session-cookie-value *session*))))
-  ;;     "")
+(defgeneric stop (server)
+  (:documentation "Stops a webserver if it if running. If it's not - does nothing.
+Returns a webserver's instance.")
   )
 
-#|
-Removed after moving to Clack
-(defun server-type ()
-  "Hunchentoot")
 
-(defun server-version ()
-  hunchentoot::*hunchentoot-version*)
+(defun make-server (&key
+                      (port 8080)
+                      (interface "localhost")
+                      (server-type :hunchentoot))
+  "Makes a webserver instance.
+Make instance, then start it with ``start`` method."
+  (make-instance 'server
+                 :port port
+                 :interface interface
+                 :server-type server-type))
 
-(defun reset-sessions ()
-  (let ((*acceptor* *weblocks-server*))
-    (hunchentoot:reset-sessions)))
-(export 'reset-sessions)
 
-(defun active-sessions ()
-  "Returns a list of currently active sessions."
-  (loop for s in (mapcar #'cdr (session-db *weblocks-server*))
-        collect s))
-|#
+(defmethod handle-request ((server server) env)
+  "Weblocks HTTP dispatcher.
+This function serves all started applications and their static files."
+
+  (let* ((*session* (getf env :lack.session))
+         ;; This "hack" is needed to allow widgets to change *random-state*
+         ;; and don't interfere with other threads and requests
+         (*random-state* *random-state*))
+    (with-request ((make-request env))
+      ;; Dynamic hook :handle-request makes possible to write
+      ;; some sort of middlewares, which change *request* and *session*
+      ;; variables.
+      (prepare-hooks
+        (with-hook (:handle-request)
+
+          (let* ((path-info (getf env :path-info))
+                 (hostname (getf env :server-name))
+                 (route (get-route path-info)))
+
+            (log:debug "Processing request to" path-info)
+
+            ;; If dependency found, then return it's content along with content-type
+            (when route
+              (log:debug "Route was found" route)
+              (return-from handle-request
+                (weblocks/routes:serve route env)))
+
+            (dolist (app (get-active-apps))
+              (let ((app-prefix (get-prefix app)))
+
+                (log:debug "Searching handler in" app app-prefix)
+
+                (when (and (app-serves-hostname-p app hostname)
+                           (starts-with path-info
+                                        app-prefix))
+
+                  ;; TODO это внутри использует hunchentoot
+                  ;;      но при запуске на Woo вызывает ошибку
+                  ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
+                  ;; (weblocks::no-cache)    ; disable caching for dynamic pages
+
+                  (log:debug "Staringdsadasd BOOO HIT" path-info)
+                  (return-from handle-request
+                    ;; TODO: replace veariable binding to some macro from weblocks/response
+                    (let* ((*code* 200)
+                           (*content-type*
+                             (if (ajax-request-p)
+                                 "application/json"
+                                 "text/html"))
+                           (*headers* nil)
+                           ;; TODO: make a macro to catch aborting
+                           (content (catch-possible-abort
+                                      (handle-client-request app))))
+
+                      (list *code* ;; this value can be changed somewhere in
+                            ;; handle-client-request
+                            (append (list :content-type *content-type*)
+                                    *headers*)
+                            ;; Here we use catch to allow to abort usual response
+                            ;; processing and to return data immediately
+                            (list content)))))))
+                                  
+            (log:error "Application dispatch failed for" path-info)
+
+            (list 404
+                  (append (list :content-type "text/html")
+                          *headers*)
+                  (list (format nil "File \"~A\" was not found.~%"
+                                path-info)))))))))
+
+
+(defmethod start ((server server) &key debug)
+  (if (get-handler server)
+      (log:warn "Webserver already started")
+      
+      ;; Otherwise, starting a server
+      (let* ((port (get-port server))
+             (interface (get-interface server))
+             (app (builder
+                   :session
+                   (lambda (env)
+                     (handle-request server env)
+                     ;; (handler-case ()
+                     ;;   (t (condition)
+                     ;;     (let* ((traceback (with-output-to-string (stream)
+                     ;;                         (trivial-backtrace:print-condition condition stream)))
+                     ;;            (condition (describe condition))
+                     ;;            (just-traceback (trivial-backtrace:backtrace-string)))
+                     ;;       (log:error "Unhandled exception" condition traceback just-traceback))
+                     ;;     '(500
+                     ;;       ("Content-Type" "text/html")
+                     ;;       ("Something went wrong!"))))
+                     ))))
+        (log:info "Starting webserver on" interface port debug)
+        
+        ;; Suppressing output to stdout, because Clack writes message
+        ;; about started server and we want to write into a log instead.
+        (with-output-to-string (*standard-output*)
+          (setf (get-handler server)
+                (clackup app
+                         :address interface
+                         :server (get-server-type server)
+                         :port port
+                         :debug debug)))))
+  server)
+
+
+(defmethod stop ((server server))
+  (if (get-handler server)
+      (progn (log:info "Stopping server" server)
+             (clack:stop (get-handler server))
+             (setf (get-handler server)
+                   nil))
+      (log:warn "Server wasn't started"))
+
+  server)
+
+
+(defmethod print-object ((server server) stream)
+  (format stream "#<SERVER port=~S ~A>"
+          (get-port server)
+          (if (get-handler server)
+              "running"
+              "stopped")))
+
+
+(defun start-weblocks (&key (debug t)
+                         (port 8080)
+                         (interface "localhost")
+                         (server-type :hunchentoot))
+  "Starts weblocks framework hooked into Clack server.
+
+Set DEBUG to true in order for error messages and stack traces to be shown
+to the client (note: stack traces are temporarily not available due to changes
+in Hunchentoot 1.0.0).
+
+All other keywords will be passed as initargs to the acceptor;
+the initargs :PORT and :SESSION-COOKIE-NAME default to
+8080 and `weblocks-GENSYM'.
+
+Also opens all stores declared via DEFSTORE and starts webapps
+declared AUTOSTART."
+
+  (log:info "Starting weblocks" port server-type debug)
+
+  (reset-routes)
+  
+  (unless (member :bordeaux-threads *features*)
+    (cerror "I know what I'm doing and will stubbornly continue."
+            "You're trying to start Weblocks without threading ~
+            support. Recompile your Lisp with threads enabled."))
+  (if debug
+      (weblocks/debug:on)
+      (weblocks/debug:off))
+  
+  (when (null *server*)
+    (values
+     (start (setf *server*
+                  (make-server :port port
+                               :interface interface
+                               :server-type server-type))
+            :debug debug)
+     
+     (log:info "Starting webapps flagged as ``autostarted``")
+     (mapcar (lambda (class)
+               (unless (app-active-p class)
+                 (start-webapp class :debug debug)))
+             (get-autostarting-apps)))))
+
+
+(defun stop-weblocks ()
+  "Stops weblocks."
+
+  ;; TODO: Investigate if it closes all stores declared via 'defstore'.
+  
+  (when (not (null *server*))
+    (with-hook
+        (:stop-weblocks)
+        
+        (dolist (app (get-active-apps))
+          (stop-webapp (weblocks-webapp-name app)))
+
+        ;; Was commented because *last-session* is unknown
+        ;; (setf weblocks.session::*last-session* nil)
+
+        ;; TODO: Replace with CLACK's sessions
+        ;; (weblocks::reset-sessions)
+        (when *server*
+          (stop *server*))
+        (setf *server* nil))))
+
+
+;;;; Static files
+
+(defclass static-route-from-file (route)
+  ((path :initarg :path
+         :reader get-path)
+   (content-type :initarg :content-type
+                 :reader get-content-type)))
+
+
+(defmethod weblocks/routes:serve ((route static-route-from-file) env)
+  "Returns a file's content"
+  (declare (ignorable env))
+  (list 200
+        (list :content-type (get-content-type route))
+        (get-path route)))
+
+
+(defgeneric serve-static-file (uri object &key content-type)
+  (:documentation "Adds a route to serve given object by static URI."))
+
+
+(defmethod serve-static-file (uri (path pathname) &key (content-type "text/plain"))
+  (let* ((route (make-instance 'static-route-from-file
+                               :template (routes:parse-template uri)
+                               :path path
+                               :content-type content-type)))
+    (add-route route)))

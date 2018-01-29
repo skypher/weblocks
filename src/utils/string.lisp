@@ -1,14 +1,16 @@
+(defpackage #:weblocks/utils/string
+  (:use #:cl)
+  (:import-from #:cl-fad
+                #:pathname-as-directory)
+  (:export #:humanize-name
+           #:attributize-name
+           #:string-whitespace-p
+           #:string-remove-left
+           #:string-remove-right
+           #:string-invert-case
+           #:remove-spurious-slashes))
+(in-package weblocks/utils/string)
 
-(in-package :weblocks)
-
-;; (wexport '(humanize-name
-;;            attributize-name
-;;            string-whitespace-p
-;;            string-remove-left
-;;            string-remove-right
-;;            string-invert-case
-;;            remove-spurious-slashes)
-;;          '(t util))
 
 (defgeneric humanize-name (name)
   (:documentation "Convert objects to a human-readable string suitable
@@ -110,7 +112,7 @@ Returns the number of stripped slashes as second value."
 (defun maybe-add-trailing-slash (s)
   "Supply a trailing slash if needed."
   (typecase s
-    (pathname (fad:pathname-as-directory s))
+    (pathname (pathname-as-directory s))
     (otherwise
        (if (equal (subseq s (1- (length s))) "/")
            s

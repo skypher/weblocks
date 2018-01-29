@@ -1,47 +1,37 @@
+(defpackage #:weblocks/error-handler
+  (:use #:cl)
+  (:import-from #:trivial-backtrace
+                #:print-backtrace)
+  (:import-from #:weblocks/response
+                #:abort-processing)
+  ;; Just dependencies
+  (:import-from #:log)
+  
+  (:export #:on-error))
+(in-package weblocks/error-handler)
 
-(in-package :weblocks)
 
-(export '(handle-http-error handle-error-condition))
+(defgeneric on-error (app condition)
+  (:documentation "This method is called when some unhandled error was raised by application.
+                   It should call weblocks/response:abort-processing like this:
 
-(defun error-page-html-wt (&key title heading description content &allow-other-keys)
-  (with-html-to-string
-    (:html
-     (:head
-      (:title (str title))
-      (:link :rel "stylesheet" :type "text/css" :href "/weblocks-common/pub/stylesheets/error-page.css"))
-     (:body                             ; TODO date
-      (:h1 (esc heading))
-      (when description
-        (htm (:h2 "Description")
-             (:p (:tt (esc description)))))
-      (str content)
-      (when (or description content)
-        (htm (:hr)))
-      (:table :class "footer"
-              :width "100%"
-              (:tr :valign "center"
-                   (:td :width "10"
-                    (:img :src "http://40ants.com/img/made-with-lisp.svg"
-                          :width "60"))
-                   (:td 
-                    "This is the " (:a :href "http://weblocks-framework.info/" "Weblocks Application Framework")
-                    " running on " (esc (format nil "~A:~A"
-                                                (weblocks.request:get-host)
-                                                (weblocks.request:get-port))))))))))
+                       \(weblocks/response:abort-processing
+                           \"Unhandled condition\"
+                           :code 500
+                           :content-type \"text/plain\"\)
 
-(deftemplate :error-page-html-wt 'error-page-html-wt)
+"))
 
-(defmacro with-error-page-html ((title heading &optional description) &body body)
-  `(render-wt 
-     :error-page-html-wt 
-     nil 
-     :title ,title
-     :heading ,heading
-     :description ,description
-     :content (capture-weblocks-output 
-                (with-html ,@body))))
 
-(defmethod handle-http-error ((app weblocks-webapp) code &optional condition)
-  (with-error-page-html ((escape-string (format nil "~A ~A" code (reason-phrase code)))
-                         (escape-string (format nil "~A ~A" code (reason-phrase code))))))
-
+(defmethod on-error (app condition)
+  "Default implementation returns a plain text page and 500 status code."
+  (declare (ignorable app))
+  
+  (when condition
+    (let ((traceback (print-backtrace
+                      condition :output nil)))
+      (log:error "Returning 500 error to user" traceback)))
+  
+  (abort-processing "Unhandled condition"
+                    :code 500
+                    :content-type "text/plain"))

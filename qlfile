@@ -1,0 +1,12 @@
+ql :all :latest
+
+github defmain 40ants/defmain
+github cl-info 40ants/cl-info
+github rove 40ants/rove :ref generic-assert-description
+
+# because request-uri-scheme support is not in the quicklisp yet
+# https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
+github lack fukamachi/lack
+
+github dissect 40ants/dissect :ref fix-iteration-on-unknown-args
+github hamcrest 40ants/cl-hamcrest :ref v0.3.3

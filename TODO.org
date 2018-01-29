@@ -22,7 +22,7 @@ Instead of
    (eval-dynamic-hooks hooks))
 
 (add-application-hook :pre-render
-                      'reset-html-parts)
+                      my-hook)
 #+END_SRC
 ** TODO Process (declare ...) forms in add-xxxx-hook macrose
 Need to place these forms in the top of flet from
