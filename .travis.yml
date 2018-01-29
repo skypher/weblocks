@@ -13,16 +13,16 @@ env:
 
     # Unsupported implementations
     # unable to find libssl.so, I tried hard, but it doesn't see it
-    - LISP=allegro
+    #- LISP=allegro
     # fails with mmap: Invalid argument
     #            ensure_space: Failed to validate 0 bytes at 0x58100000
-    - LISP=cmucl
+    #- LISP=cmucl
     # shows error there is no package with name "UIOP"
-    - LISP=clisp
+    #- LISP=clisp
     # it shows success but actually fails with tracebacks
-    - LISP=abcl
+    #- LISP=abcl
     # compile error on loading yaclml-20150709-git
-    - LISP=ecl
+    #- LISP=ecl
 
 matrix:
   allow_failures:
