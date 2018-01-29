@@ -10,7 +10,9 @@
                 #:make-action-url
                 #:make-action)
   (:import-from #:weblocks/request
-                #:get-action-name-from-request))
+                #:get-action-name-from-request)
+  (:import-from #:weblocks/request-handler
+                #:handle-action-if-needed))
 (in-package weblocks-test/actions)
 
 
@@ -38,6 +40,25 @@
         (testing "This action just returns 123 when evaluated."
           (ok (eql (eval-action nil action-name nil)
                    123)))))))
+
+
+(deftest eval-action-with-arguments
+  (with-session
+    (let* (action-result
+           (action-name (make-action (lambda (&rest args)
+                                       (setf action-result
+                                             args)))))
+      (with-request ((format nil "/?name=Bob&cancel=Cancel&~A=~A"
+                             weblocks/variables:*action-string*
+                             action-name)
+                     :method :get
+                     :headers (("X-Requested-With" . "XMLHttpRequest")))
+        ;; App is nil here
+        (handle-action-if-needed nil))
+
+      (assert-that action-result
+                   (contains :name "Bob"
+                             :cancel "Cancel")))))
 
 
 (deftest missing-action

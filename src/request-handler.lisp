@@ -72,6 +72,8 @@
   (:import-from #:log)
   (:import-from #:weblocks/widgets/root)
   (:import-from #:weblocks/session)
+  (:import-from #:alexandria
+                #:make-keyword)
 
   (:export
    #:handle-client-request
@@ -297,6 +299,45 @@ customize behavior."))
   (remove-parameter-from-uri uri *action-string*))
 
 
+(defun handle-action-if-needed (app)
+  (let ((action-name (get-action-name-from-request))
+        (action-arguments
+          (alist->plist (get-parameters))))
+
+    (when action-name
+      (log:debug "Processing action" action-name)
+
+      ;; Remove :action key from action arguments
+      (remf action-arguments (make-keyword (string-upcase *action-string*)))
+      
+      (when (pure-request-p)
+        (log:debug "Request is pure, processing will be aborted.")
+        ;; TODO: add with-hook (:action)
+        (abort-processing
+         (eval-action
+          app
+          action-name
+          action-arguments)))
+
+      (timing "action processing (w/ hooks)"
+        (with-hook (:action)
+          (eval-action
+           app
+           action-name
+           action-arguments)))))
+
+
+  ;; Remove "action" parameter for the GET parameters
+  ;; it it is not an AJAX request
+  (when (and (not (ajax-request-p))
+             (get-parameter *action-string*))
+    
+    (let ((url (remove-action-from-uri
+                (get-path :with-params t))))
+      (log:debug "Redirecting to an URL without action parameter" url)
+      (redirect url))))
+
+
 (defmethod handle-client-request ((app app))
   (restart-case
       (progn
@@ -353,38 +394,7 @@ customize behavior."))
               (push-dependencies
                (get-dependencies app))
               
-              (let ((action-name (get-action-name-from-request))
-                    (action-arguments
-                      (alist->plist (get-parameters))))
-
-                (when action-name
-                  (log:debug "Processing action" action-name)
-                  
-                  (when (pure-request-p)
-                    (log:debug "Request is pure, processing will be aborted.")
-                    ;; TODO: add with-hook (:action)
-                    (abort-processing
-                     (eval-action
-                      app
-                      action-name
-                      action-arguments)))
-
-                  (timing "action processing (w/ hooks)"
-                    (with-hook (:action)
-                      (eval-action
-                       app
-                       action-name
-                       action-arguments)))))
-
-              ;; Remove "action" parameter for the GET parameters
-              ;; it it is not an AJAX request
-              (when (and (not (ajax-request-p))
-                         (get-parameter *action-string*))
-                
-                (let ((url (remove-action-from-uri
-                            (get-path :with-params t))))
-                  (log:debug "Redirecting to an URL without action parameter" url)
-                  (redirect url)))
+              (handle-action-if-needed app)
 
               (setf content
                     (with-html-string

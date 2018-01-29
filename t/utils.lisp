@@ -46,15 +46,27 @@
 (defmacro with-request ((uri &key
                                data
                                (method :get)
+                               headers  ; it should be an alist
                                (app 'empty-app)) &body body)
   "Argument 'data' should be an alist with POST parameters if method is :POST."
-  `(prepare-hooks
-     (let* ((env (generate-env ,uri :method ,method :content ,data))
-            ;; we need to setup a current webapp, because
-            ;; uri tokenizer needs to know app's uri prefix
-            (*current-app* (make-instance ',app)))
-       (weblocks/request:with-request ((make-request env))
-        ,@body))))
+
+  ;; Lack stores headers in a dict with lowercased keys,
+  ;; that is why to simulate it, we need to ensure that
+  ;; keys are lowercased.
+  (let ((lowercased-headers
+          (loop for (key . value) in headers
+                collect (cons (string-downcase key)
+                              value))))
+    `(prepare-hooks
+       (let* ((env (generate-env ,uri
+                                 :method ,method
+                                 :content ,data
+                                 :headers ',lowercased-headers))
+              ;; we need to setup a current webapp, because
+              ;; uri tokenizer needs to know app's uri prefix
+              (*current-app* (make-instance ',app)))
+         (weblocks/request:with-request ((make-request env))
+           ,@body)))))
 
 
 (defmacro is-html (form expected &optional message)
