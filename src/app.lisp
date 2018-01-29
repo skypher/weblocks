@@ -333,7 +333,7 @@ called (primarily for backward compatibility"
 
 (defun restart-webapp (name)
   (stop-webapp name)
-  (start-webapp name))
+  (start name))
 
 
 ;;; Convenience accessors
