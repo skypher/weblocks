@@ -20,7 +20,8 @@
                 #:*current-app*)
   ;; Just dependencies
   (:import-from #:log)
-  
+
+  (:shadow #:restart)
   (:export
    #:defapp
    #:app
@@ -28,6 +29,8 @@
    #:get-registered-apps
    #:app-active-p
    #:start
+   #:stop
+   #:restart
    #:find-active-app
    #:get-active-apps
    #:get-prefix
@@ -320,7 +323,7 @@ called (primarily for backward compatibility"
     ;; TODO: break this tie
     (funcall (intern "STOP-WEBLOCKS" :weblocks/server))))
 
-(defun stop-webapp (name)
+(defun stop (name)
   "Stops the web application"
   (log:debug "Stopping webapp" name)
   
@@ -331,8 +334,8 @@ called (primarily for backward compatibility"
       (finalize-webapp app))))
 
 
-(defun restart-webapp (name)
-  (stop-webapp name)
+(defun restart (name)
+  (stop name)
   (start name))
 
 

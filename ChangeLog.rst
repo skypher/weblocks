@@ -2,7 +2,20 @@
  ChangeLog
 ===========
 
-0.24.0 (2018-01-12)
+0.25.0 (2018-01-30)
+===================
+
+Package ``weblocks/app`` now exports functions ``stop`` and ``restart``.
+Previously they were internal and were called like ``stop-webapp`` and
+``restart-webapp``.
+
+Package ``weblocks/server`` does not export ``start-weblocks`` and
+``stop-weblocks`` functions. They were replaced with just ``start`` and
+``stop``. Also, it's internal generics ``start`` and ``stop`` were
+renamed and transformed to ``start-server`` and ``stop-server`` functions.
+
+
+0.24.0 (2018-01-29)
 ===================
 
 All rendering code was refactored.

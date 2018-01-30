@@ -19,8 +19,6 @@
                 #:get-active-apps
                 #:get-prefix
                 #:app-serves-hostname-p
-                #:start-webapp
-                #:stop-webapp
                 #:weblocks-webapp-name
                 #:get-autostarting-apps)
   (:import-from #:weblocks/request
@@ -46,15 +44,12 @@
   (:import-from #:weblocks/debug)
   (:import-from #:log)
   
-  (:export #:start
+  (:export ;; #:get-server-type
+           ;; #:get-port
+           ;; #:make-server
+           ;; #:handle-request
            #:stop
-           #:get-server-type
-           #:get-port
-           #:make-server
-           #:handle-request
-           #:*server*
-           #:stop-weblocks
-           #:start-weblocks
+           #:start
            #:serve-static-file))
 (in-package weblocks/server)
 
@@ -79,17 +74,6 @@
 
 (defgeneric handle-request (server env)
   (:documentation "Handles HTTP request, passed by Clack"))
-
-
-(defgeneric start (server &key debug)
-  (:documentation "Starts a webserver, returns this server as result.
-If server is already started, then logs a warning and does nothing."))
-
-
-(defgeneric stop (server)
-  (:documentation "Stops a webserver if it if running. If it's not - does nothing.
-Returns a webserver's instance.")
-  )
 
 
 (defun make-server (&key
@@ -175,7 +159,11 @@ This function serves all started applications and their static files."
                                 path-info)))))))))
 
 
-(defmethod start ((server server) &key debug)
+(defun start-server (server &key debug)
+  "Starts a Clack webserver, returns this server as result.
+
+If server is already started, then logs a warning and does nothing."
+  
   (if (get-handler server)
       (log:warn "Webserver already started")
       
@@ -211,7 +199,10 @@ This function serves all started applications and their static files."
   server)
 
 
-(defmethod stop ((server server))
+(defun stop-server (server)
+  "Stops a Clack server, but does not deactivates active applications,
+   use `stop' function for that."
+  
   (if (get-handler server)
       (progn (log:info "Stopping server" server)
              (clack:stop (get-handler server))
@@ -230,10 +221,10 @@ This function serves all started applications and their static files."
               "stopped")))
 
 
-(defun start-weblocks (&key (debug t)
-                         (port 8080)
-                         (interface "localhost")
-                         (server-type :hunchentoot))
+(defun start (&key (debug t)
+                (port 8080)
+                (interface "localhost")
+                (server-type :hunchentoot))
   "Starts weblocks framework hooked into Clack server.
 
 Set DEBUG to true in order for error messages and stack traces to be shown
@@ -260,40 +251,35 @@ declared AUTOSTART."
       (weblocks/debug:off))
   
   (when (null *server*)
+    (setf *server*
+          (make-server :port port
+                       :interface interface
+                       :server-type server-type))
     (values
-     (start (setf *server*
-                  (make-server :port port
-                               :interface interface
-                               :server-type server-type))
-            :debug debug)
+
+
+     (start-server *server*
+                   :debug debug)
      
-     (log:info "Starting webapps flagged as ``autostarted``")
      (mapcar (lambda (class)
                (unless (app-active-p class)
-                 (start-webapp class :debug debug)))
+                 (weblocks/app:start class :debug debug)))
              (get-autostarting-apps)))))
 
 
-(defun stop-weblocks ()
-  "Stops weblocks."
+(defun stop ()
+  "Stops weblocks, by deactivating all active applications and stopping Clack server"
 
-  ;; TODO: Investigate if it closes all stores declared via 'defstore'.
-  
   (when (not (null *server*))
     (with-hook
         (:stop-weblocks)
-        
-        (dolist (app (get-active-apps))
-          (stop-webapp (weblocks-webapp-name app)))
+      
+      (dolist (app (get-active-apps))
+        (weblocks/app:stop (weblocks-webapp-name app)))
 
-        ;; Was commented because *last-session* is unknown
-        ;; (setf weblocks.session::*last-session* nil)
-
-        ;; TODO: Replace with CLACK's sessions
-        ;; (weblocks::reset-sessions)
-        (when *server*
-          (stop *server*))
-        (setf *server* nil))))
+      (when *server*
+        (stop-server *server*))
+      (setf *server* nil))))
 
 
 ;;;; Static files
