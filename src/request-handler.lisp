@@ -18,7 +18,7 @@
                 #:get-lock)
   (:import-from #:weblocks/widget
                 #:dom-id
-                #:render-widget)
+                #:render)
   (:import-from #:weblocks/html
                 #:with-html-string
                 #:*stream*)
@@ -70,6 +70,9 @@
                 #:redirect)
   ;; Just dependencies
   (:import-from #:log)
+  ;; This package defines an :around method for weblocks/widgets:render
+  ;; which adds a wrapper around widget body
+  (:import-from #:weblocks/widgets/render-methods)
   (:import-from #:weblocks/widgets/root)
   (:import-from #:weblocks/session)
   (:import-from #:alexandria
@@ -124,10 +127,11 @@ customize behavior."))
 (defmethod handle-client-request :around ((app app))
   "This wrapper sets current application and suppresses error output from Hunchentoot."
   (handler-bind ((error (lambda (c)
+                          ;; TODO: rename *catch-errors-p* into *invoke-debugger-on-error* #low-hanging-fruit
                           (if *catch-errors-p*
-                            (return-from handle-client-request
-                                         (on-error app c))
-                            (invoke-debugger c)))))
+                              (return-from handle-client-request
+                                (on-error app c))
+                              (invoke-debugger c)))))
     (let ((*print-pretty* t)
           ; Hunchentoot already displays warnings into log file, we just suppress output
           (*error-output* (make-string-output-stream)))
@@ -284,7 +288,7 @@ customize behavior."))
     ;;       (page-not-found-handler app))))
 
     (timing "widget tree rendering"
-      (render-widget (weblocks/widgets/root:get))))
+      (render (weblocks/widgets/root:get))))
 
   ;; render page will wrap the HTML already rendered to
   ;; weblocks.html::*stream* with necessary boilerplate HTML

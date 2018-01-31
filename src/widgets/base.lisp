@@ -6,11 +6,6 @@
                 #:with-html-string)
   (:import-from #:weblocks/widgets/mop
                 #:widget-class)
-  (:import-from #:weblocks/dependencies
-                #:get-collected-dependencies
-                #:get-dependencies
-                #:push-dependencies
-                #:render-in-ajax-response)
   (:import-from #:weblocks/commands
                 #:add-command)
   (:import-from #:weblocks/request
@@ -74,44 +69,6 @@ inherits from 'widget' if no direct superclasses are provided."
   (:documentation "Define this method to render widget's content."))
 
 
-(defmethod render (widget)
-  "By default, widget rendered with a text, suggesting to define a rendering method."
-  (let ((class-name (class-name (class-of widget))))
-    (with-html
-      (:p "Please, define:"
-          (:pre (format nil
-                        "(defmethod weblocks/widget:render ((widget ~a))
-    (weblocks/html:with-html
-        (:p \"My ~a widget\")))"
-                        class-name
-                        class-name))))))
-
-
-;; TODO: REPLACE THIS with render :around
-(defun render-widget (widget)
-  "This function is intended for internal usage only.
-   It renders widget with surrounding HTML tag and attributes."
-  (log:debug "Rendering widget" widget "with" (get-collected-dependencies))
-  
-  (let ((widget-dependencies (get-dependencies widget)))
-    ;; Update new-style dependencies
-    (push-dependencies widget-dependencies)
-    
-    (when (ajax-request-p)
-      ;; Generate code to embed new dependencies into the page on the fly
-      (mapc #'render-in-ajax-response
-            widget-dependencies)))
-  
-  (with-html
-    (:tag
-     :name (get-html-tag widget)
-     :class (get-css-classes-as-string widget)
-     :id (dom-id widget)
-     ;; TODO: try to remove progn
-     (progn (render widget)
-            nil))))
-
-
 (defgeneric get-html-tag (widget)
   (:documentation "This method should return a keyword, like :div or :article.
                    By default, it returns :div"))
@@ -158,34 +115,6 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; of calling MARK-DIRTY on the list of dependents \(propagate-dirty\)."))
 
 
-
-(defgeneric create-widget-from (object)
-  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
-                   The most obvious cases are transformation of strings and functions into the widget, but
-                   these methods are already supplied by Weblocks."))
-
-
-(defmethod create-widget-from ((object widget))
-  "If input is already a widget, then it is returned as is."
-  object)
-(defgeneric create-widget-from (object)
-  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
-                   The most obvious cases are transformation of strings and functions into the widget, but
-                   these methods are already supplied by Weblocks."))
-
-
-(defmethod create-widget-from ((object widget))
-  "If input is already a widget, then it is returned as is."
-  object)
-(defgeneric create-widget-from (object)
-  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
-                   The most obvious cases are transformation of strings and functions into the widget, but
-                   these methods are already supplied by Weblocks."))
-
-
-(defmethod create-widget-from ((object widget))
-  "If input is already a widget, then it is returned as is."
-  object)
 ;; (defmethod mark-dirty ((w widget) &key (propagate t))
 ;;   (unless (weblocks:widget-dirty-p w)
 ;;     (pushnew w weblocks::*dirty-widgets*)
@@ -193,9 +122,6 @@ inherits from 'widget' if no direct superclasses are provided."
 ;;     ;; may get called at initialization time before those slots are bound
 ;;     (values t (when (and propagate (slot-boundp w 'propagate-dirty))
 ;;                 (mapc #'mark-dirty
-(defmethod create-widget-from ((object widget))
-  "If input is already a widget, then it is returned as is."
-  object)
 ;;                       (remove nil (widget-propagate-dirty w)))))))
 
 
@@ -219,12 +145,12 @@ propagation code."))
     (inserted-after (add-command
                      :insert-widget
                      :widget (with-html-string
-                               (render-widget w))
+                               (render w))
                      :after (dom-id inserted-after)))
     (inserted-before (add-command
                       :insert-widget
                       :widget (with-html-string
-                                (render-widget w))
+                                (render w))
                       :before (dom-id inserted-before)))
     (t (add-command
         :update-widget

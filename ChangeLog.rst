@@ -10,8 +10,15 @@ Good news, everyone!
 
 Quickstart tutorial was fixed!
 
-Other changes
-=============
+Widget related changes
+======================
+
+Function ``render-widget`` was replaced with ``weblocks/widget:render
+:around`` method. Method implementation were moved to
+``weblocks/widgets/render-methods``.
+
+Funcall-widget's package was refactored to conform package inferred
+requirements.
 
 Actions processing
 ==================
@@ -54,6 +61,8 @@ Removals
 * ``session-name-string-pair`` this function was removed in previous
   releases, but didn't find it's way to the changelog, still used in
   some older tests not ported to the Rove.
+
+* Macro ``defrender`` was removed.
 
 
 0.24.0 (2018-01-29)

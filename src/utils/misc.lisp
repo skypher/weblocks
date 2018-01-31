@@ -228,13 +228,6 @@ answering its result."
         (gzip-stream istream ostream)))
     (probe-file output)))
 
-(defmacro defrender (widget-type &body body)
-  `(defmethod render-widget-body ((widget ,widget-type) &rest args)
-     (declare (ignore args))
-     (catch 'abort-widget-rendering
-       (block nil
-         ,@body))))
-
 (defun md5 (string)
   (byte-array-to-hex-string
     (digest-sequence
