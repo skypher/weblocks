@@ -7,6 +7,8 @@
 
 Old tests for widgets, removed from core framework were removed.
 
+Tests for widget's MOP methods were ported to Rove.
+
 0.25.0 (2018-01-31)
 ===================
 
