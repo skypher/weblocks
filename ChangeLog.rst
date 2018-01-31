@@ -34,6 +34,19 @@ functions.
 Session initialization changes
 ==============================
 
+File ``default-application.lisp`` was removed, because now every
+application has default session initialization method.
+
+File ``default-init.lisp`` was refactored. Now it provides default
+method for ``weblocks/session:init`` generic and ``:around`` method for
+same generic, which allows end user just to return a string or a
+function from his ``init`` method.
+
+Now user can return any string or function from his method
+``weblocks/session:init`` and it will be passed to a new generic
+``weblocks/widget:create-widget-from`` to create a root widget. You can
+also define ``create-widget-from`` for you custom types.
+
 
 Removals
 ========

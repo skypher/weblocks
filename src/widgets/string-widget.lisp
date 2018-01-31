@@ -1,6 +1,7 @@
 (defpackage #:weblocks/widgets/string-widget
   (:use #:cl)
-  (:import-from #:weblocks/widgets/base
+  (:import-from #:weblocks/widget
+                #:create-widget-from
                 #:defwidget
                 #:render)
   (:import-from #:weblocks/html
@@ -39,3 +40,7 @@
                  :content string
                  :escape-p escape-p))
 
+
+
+(defmethod create-widget-from ((object string))
+  (make-string-widget object))

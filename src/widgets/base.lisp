@@ -30,10 +30,10 @@
            #:render
            #:get-css-classes
            #:get-html-tag
-           #:render-widget
            #:mark-dirty
            #:update
-           #:widget))
+           #:widget
+           #:create-widget-from))
 (in-package weblocks/widgets/base)
 
 
@@ -158,6 +158,34 @@ inherits from 'widget' if no direct superclasses are provided."
 ;; of calling MARK-DIRTY on the list of dependents \(propagate-dirty\)."))
 
 
+
+(defgeneric create-widget-from (object)
+  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
+                   The most obvious cases are transformation of strings and functions into the widget, but
+                   these methods are already supplied by Weblocks."))
+
+
+(defmethod create-widget-from ((object widget))
+  "If input is already a widget, then it is returned as is."
+  object)
+(defgeneric create-widget-from (object)
+  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
+                   The most obvious cases are transformation of strings and functions into the widget, but
+                   these methods are already supplied by Weblocks."))
+
+
+(defmethod create-widget-from ((object widget))
+  "If input is already a widget, then it is returned as is."
+  object)
+(defgeneric create-widget-from (object)
+  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
+                   The most obvious cases are transformation of strings and functions into the widget, but
+                   these methods are already supplied by Weblocks."))
+
+
+(defmethod create-widget-from ((object widget))
+  "If input is already a widget, then it is returned as is."
+  object)
 ;; (defmethod mark-dirty ((w widget) &key (propagate t))
 ;;   (unless (weblocks:widget-dirty-p w)
 ;;     (pushnew w weblocks::*dirty-widgets*)
@@ -165,6 +193,9 @@ inherits from 'widget' if no direct superclasses are provided."
 ;;     ;; may get called at initialization time before those slots are bound
 ;;     (values t (when (and propagate (slot-boundp w 'propagate-dirty))
 ;;                 (mapc #'mark-dirty
+(defmethod create-widget-from ((object widget))
+  "If input is already a widget, then it is returned as is."
+  object)
 ;;                       (remove nil (widget-propagate-dirty w)))))))
 
 
@@ -199,5 +230,15 @@ propagation code."))
         :update-widget
         :dom-id (dom-id w)
         :widget (with-html-string
-                  (render-widget w))))))
+                  (render w))))))
 
+
+(defgeneric create-widget-from (object)
+  (:documentation "Methods of this generic should return an instance of subclass of weblocks/widget:widget
+                   The most obvious cases are transformation of strings and functions into the widget, but
+                   these methods are already supplied by Weblocks."))
+
+
+(defmethod create-widget-from ((object widget))
+  "If input is already a widget, then it is returned as is."
+  object)

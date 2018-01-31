@@ -34,3 +34,6 @@
   (check-type func (or symbol function))
   (make-instance 'funcall-widget :function func))
 
+
+(defmethod create-widget-from ((object function))
+  (make-funcall-widget object))
