@@ -1,0 +1,22 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp (ql:quickload '(trivial-backtrace) :silent t)
+  )
+
+(defpackage :ros.script.check-quickstart.3726319575
+  (:use :cl))
+(in-package :ros.script.check-quickstart.3726319575)
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+
+  (handler-case (load "docs/source/quickstart.lisp")
+    (error (c)
+      (trivial-backtrace:print-backtrace c)
+      (uiop:quit 1))))
+;;; vim: set ft=lisp lisp:

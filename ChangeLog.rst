@@ -54,6 +54,11 @@ Now user can return any string or function from his method
 ``weblocks/widget:create-widget-from`` to create a root widget. You can
 also define ``create-widget-from`` for you custom types.
 
+Debug
+=====
+
+Function ``weblocks/debug:on`` now turns on mode when Weblocks does not
+intercept unhandled conditions, but calls an interactive debugger.
 
 Removals
 ========

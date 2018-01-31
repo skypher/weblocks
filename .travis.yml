@@ -65,3 +65,5 @@ before_script:
   
 script:
   - qlot exec rove weblocks-test.asd
+  - qlot exec ./check-quickstart.ros
+
