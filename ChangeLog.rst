@@ -6,12 +6,12 @@
 ===================
 
 Good news, everyone!
-====================
+--------------------
 
 Quickstart tutorial was fixed!
 
 Widget related changes
-======================
+----------------------
 
 Function ``render-widget`` was replaced with ``weblocks/widget:render
 :around`` method. Method implementation were moved to
@@ -21,12 +21,12 @@ Funcall-widget's package was refactored to conform package inferred
 requirements.
 
 Actions processing
-==================
+------------------
 
 Function ``make-js-action`` was moved to ``weblocks/actions`` package.
 
 Application and server restarting
-=================================
+---------------------------------
 
 Package ``weblocks/app`` now exports functions ``stop`` and ``restart``.
 Previously they were internal and were called like ``stop-webapp`` and
@@ -39,7 +39,7 @@ renamed and transformed to ``start-server`` and ``stop-server``
 functions.
 
 Session initialization changes
-==============================
+------------------------
 
 File ``default-application.lisp`` was removed, because now every
 application has default session initialization method.
@@ -55,13 +55,13 @@ Now user can return any string or function from his method
 also define ``create-widget-from`` for you custom types.
 
 Debug
-=====
+-----
 
 Function ``weblocks/debug:on`` now turns on mode when Weblocks does not
 intercept unhandled conditions, but calls an interactive debugger.
 
 Removals
-========
+--------
 
 * ``session-name-string-pair`` this function was removed in previous
   releases, but didn't find it's way to the changelog, still used in
@@ -82,7 +82,7 @@ Stream ``*weblocks-output-stream*`` was moved to
 use it directly.
 
 Widget refactorings
-===================
+-------------------
 
 Procedure ``update-widget-tree`` was removed and not widgets can't
 change html header's tags, description, title, etc. If you need this,
@@ -92,7 +92,7 @@ Macro ``root-widget`` was removed and replaced with function
 ``weblocks.widgets.root:get``.
 
 Request level
-=============
+-------------
 
 Functions ``post-action-redirect``, ``post-render-redirect`` and
 ``initial-request-p`` were removed from ``weblocks`` package.
@@ -113,7 +113,7 @@ or deferring redirection until the end of action or rendering was
 removed.
 
 Request handler
-===============
+---------------
 
 Functions ``remove-duplicate-dirty-widgets``,
 ``update-location-hash-dependents`` and ``update-widget-tree`` were
@@ -124,14 +124,14 @@ Call to ``weblocks::update-dialog-on-request`` from
 
 
 Error handler
-=============
+-------------
 
 Generic method ``weblocks/error-handler:on-error`` now accepts two
 arguments - application object and condition.
 
 
 Application level
-=================
+-----------------
 
 All code from ``uri-parameters-slotmap.lisp`` was removed.
 
@@ -235,7 +235,7 @@ These functions were moved into the separate package
 * ``webapp-prefix`` -> ``get-prefix``;
 
 Actions and commands
-====================
+--------------------
 
 Function ``weblocks.actions:add-command`` was moved to
 ``weblocks.commands``.
@@ -246,7 +246,7 @@ Function ``weblocks:get-request-action`` was moved to
 Keyword argment ``:action`` was removed from action calls.
 
 Javascript
-==========
+----------
 
 Package ``weblocks.js`` was renamed to ``weblocks/js/base``.
 
@@ -255,7 +255,7 @@ Functions ``escape-script-tags``, ``%js`` and macroses
 package ``weblocks/js/base``.
 
 Variables
-=========
+---------
 
 These variables were moved from ``weblocks`` package to
 ``weblocks/variables``:
@@ -268,23 +268,23 @@ These variables were moved from ``weblocks`` package to
 * ``*ignore-missing-actions*``
 
 Symbols moved from :weblocks to other packages
-==============================================
+----------------------------------------------
 
 To :weblocks/widgets/dom
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ``dom-object-mixin``
 * ``dom-id``
 
 To :weblocks/utils/uri
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 * ``request-uri-path``
 * ``add-get-param-to-url``
 * ``remove-parameter-from-uri``
 
 To :weblocks/linguistic/grammar
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ``pluralize``
 * ``singularize``
@@ -302,7 +302,7 @@ To :weblocks/linguistic/grammar
 * ``determine-gender``
 
 To weblocks/utils/warn
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 * ``style-warn``
 * ``webapp-style-warning`` renamed to ``style-warning``.
@@ -310,7 +310,7 @@ To weblocks/utils/warn
 * ``misunderstood-action``
 
 To weblocks/actions
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 * ``function-or-action->action``
 * ``make-action``
@@ -318,7 +318,7 @@ To weblocks/actions
 
 
 Removals
-========
+--------
 
 To make Weblocks core smaller, many files were removed: ``views``, ``widgets``,
 ``html-parts``, ``utilities``.
@@ -335,7 +335,7 @@ Variable ``*dirty-widgets*`` was removed along with
 
 
 Dependencies
-============
+------------
 
 Rendering of remote (non cached) dependencies was fixed.
 
