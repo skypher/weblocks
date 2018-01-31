@@ -5,6 +5,22 @@
 0.25.0 (2018-01-30)
 ===================
 
+Good news, everyone!
+====================
+
+Quickstart tutorial was fixed!
+
+Other changes
+=============
+
+Actions processing
+==================
+
+Function ``make-js-action`` was moved to ``weblocks/actions`` package.
+
+Application and server restarting
+=================================
+
 Package ``weblocks/app`` now exports functions ``stop`` and ``restart``.
 Previously they were internal and were called like ``stop-webapp`` and
 ``restart-webapp``.
@@ -12,7 +28,19 @@ Previously they were internal and were called like ``stop-webapp`` and
 Package ``weblocks/server`` does not export ``start-weblocks`` and
 ``stop-weblocks`` functions. They were replaced with just ``start`` and
 ``stop``. Also, it's internal generics ``start`` and ``stop`` were
-renamed and transformed to ``start-server`` and ``stop-server`` functions.
+renamed and transformed to ``start-server`` and ``stop-server``
+functions.
+
+Session initialization changes
+==============================
+
+
+Removals
+========
+
+* ``session-name-string-pair`` this function was removed in previous
+  releases, but didn't find it's way to the changelog, still used in
+  some older tests not ported to the Rove.
 
 
 0.24.0 (2018-01-29)
