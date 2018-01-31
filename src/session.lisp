@@ -67,7 +67,6 @@ used to create IDs for html elements, widgets, etc."
   (:documentation "This method should be defined for weblocks application.
                    it should return a widget which become a root widget."))
 
-
 (defun get-session-id ()
   "Returns current session id or signals an error if no current session."
   ;; TODO: see if a id can be extracted from sesion

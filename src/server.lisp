@@ -149,7 +149,8 @@ This function serves all started applications and their static files."
                             ;; Here we use catch to allow to abort usual response
                             ;; processing and to return data immediately
                             (list content)))))))
-                                  
+
+            
             (log:error "Application dispatch failed for" path-info)
 
             (list 404

@@ -186,7 +186,7 @@ called (primarily for backward compatibility"
             initargs :subclasses :slots :autostart))
        (:metaclass app-class))
      (when (find-active-app ',name :signal-error nil)
-       (restart-webapp ',name))))
+       (restart ',name))))
 
 
 (defmethod initialize-instance :after
@@ -320,8 +320,8 @@ called (primarily for backward compatibility"
 (defmethod finalize-webapp :after ((app app))
   "Shutdown Weblocks when no more apps are running."
   (unless *active-apps*
-    ;; TODO: break this tie
-    (funcall (intern "STOP-WEBLOCKS" :weblocks/server))))
+    ;; TODO: break this tie #medium
+    (uiop:symbol-call :weblocks/server :stop)))
 
 (defun stop (name)
   "Stops the web application"
