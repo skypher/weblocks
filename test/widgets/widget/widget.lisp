@@ -1,37 +1,7 @@
 
 (in-package :weblocks-test)
 
-(deftestsuite widgets/widget/widget-suite (weblocks-suite print-upcase-suite)
-  ())
-
 ;;; test defwidget
-(deftest defwidget-1
-    (macroexpand-1
-     '(defwidget foo (bar)
-       ((slot1 :initarg :slot1) (slot2 :initform nil))))
-  (progn
-    (defclass foo (bar)
-      ((slot1 :initarg :slot1)
-      (slot2 :initform nil))
-      (:metaclass widget-class))
-    (defmethod per-class-dependencies append ((weblocks::obj foo))
-       (declare (ignore weblocks::obj))
-       (weblocks::dependencies-by-symbol (quote foo))))
-  t)
-
-(deftest defwidget-2
-    (macroexpand-1
-     '(defwidget foo ()
-       ((slot1 :initarg :slot1) (slot2 :initform nil))))
-  (progn
-    (defclass foo (widget)
-      ((slot1 :initarg :slot1)
-       (slot2 :initform nil))
-      (:metaclass widget-class))
-    (defmethod per-class-dependencies append ((weblocks::obj foo))
-      (declare (ignore weblocks::obj))
-      (weblocks::dependencies-by-symbol (quote foo))))
-  t)
 
 
 ;;; test widget-dependencies

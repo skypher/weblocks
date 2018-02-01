@@ -1,22 +1,27 @@
-(defpackage #:weblocks.widgets.funcall
+(defpackage #:weblocks/widgets/funcall-widget
   (:use #:cl)
+  (:import-from #:weblocks/widget
+                #:create-widget-from
+                #:widget-continuation
+                #:render
+                #:defwidget)
   (:export
    #:make-funcall-widget))
-(in-package weblocks.widgets.funcall)
+(in-package weblocks/widgets/funcall-widget)
 
 
-(weblocks.widget:defwidget funcall-widget ()
+(defwidget funcall-widget ()
   ((function :type (or symbol function)
              :accessor get-function
              :initarg :function)))
 
 
-(defmethod weblocks.widget:render ((widget funcall-widget))
+(defmethod render ((widget funcall-widget))
   (let (args)
     ;; TODO: refactor widget class and move continuations into
     ;;       a separate class.
-    (when (weblocks.widget::widget-continuation widget)
-      (setf args (cons (weblocks.widget::widget-continuation widget) args)))
+    (when (widget-continuation widget)
+      (setf args (cons (widget-continuation widget) args)))
     
     (let ((func (get-function widget)))
       (etypecase func
@@ -34,3 +39,6 @@
   (check-type func (or symbol function))
   (make-instance 'funcall-widget :function func))
 
+
+(defmethod create-widget-from ((object function))
+  (make-funcall-widget object))

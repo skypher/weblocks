@@ -1,7 +1,7 @@
 ("quicklisp" .
  (:class qlot.source.ql:source-ql-all
   :initargs (:project-name "quicklisp" :%version :latest)
-  :version "2017-12-27"))
+  :version "2018-01-31"))
 ("defmain" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "defmain" :repos "40ants/defmain" :ref nil :branch nil :tag nil)
@@ -44,3 +44,10 @@
   :repos "40ants/cl-hamcrest"
   :url "https://github.com/40ants/cl-hamcrest/archive/v0.3.3.tar.gz"
   :ref "v0.3.3"))
+("weblocks-ui" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "weblocks-ui" :repos "40ants/weblocks-ui" :ref "v0.6.0" :branch nil :tag nil)
+  :version "github-v0.6.0"
+  :repos "40ants/weblocks-ui"
+  :url "https://github.com/40ants/weblocks-ui/archive/v0.6.0.tar.gz"
+  :ref "v0.6.0"))

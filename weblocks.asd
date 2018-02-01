@@ -46,7 +46,12 @@
   :pathname "src"
   :depends-on ("weblocks/app"
                ;; "weblocks/app-dependencies"
+               "weblocks/server"
+               "weblocks/debug"
                "weblocks/js/jquery"
+               "weblocks/default-init"
+               "weblocks/widgets/string-widget"
+               "weblocks/widgets/funcall-widget"
                ;; "weblocks/session"
                ;; "weblocks/hooks"
                ;; "weblocks/request"
@@ -85,7 +90,7 @@
                ;; :split-sequence
                ;; :cl-strings
                ;;   "application"
-   )
+               )
 ;;  :serial t
 ;;  :components ;; ((:module src
               ;;   :components (
@@ -164,8 +169,7 @@
               ;;                (:file "server2")
               ;;                (:file "current-app"
               ;;                 :depends-on ("application"))
-              ;;                ;; (:file "default-application")
-              ;;                )))
+  ;;                )))
   :in-order-to ((test-op (test-op "weblocks-test"))))
 
 

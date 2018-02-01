@@ -18,7 +18,8 @@
    #:on-missing-action
    #:eval-action
    #:get-session-action
-   #:get-request-action))
+   #:get-request-action
+   #:make-js-action))
 (in-package weblocks/actions)
 
 
@@ -137,6 +138,19 @@ Ex:
                *action-string*
                "="
                (url-encode (princ-to-string action-code))))
+
+
+;; TODO add to documentation #easy
+(defun make-js-action (action)
+  "Returns a code which can be inserted into onclick attribute and will
+execute given Lisp function on click.
+
+It accepts any function as input and produces a string with JavaScript code.
+"
+  
+  (let* ((action-code (function-or-action->action action)))
+    (format nil "initiateAction(\"~A\"); return false;"
+            action-code)))
 
 
 (defun get-session-action (name)
