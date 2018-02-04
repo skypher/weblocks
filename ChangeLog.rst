@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.25.2 (2018-02-04)
+===================
+
+System ``weblocks/hooks`` now depends on ``log4cl`` and
+``metatilities``, because previously sometimes it was impossible to load ``weblocks``.
+
 0.25.1 (2018-02-04)
 ===================
 

@@ -3,6 +3,8 @@
         #:f-underscore)
   ;; Just dependencies
   (:import-from #:weblocks/session)
+  (:import-from #:log)
+  (:import-from #:metatilities)
   
   (:export
    #:add-application-hook
