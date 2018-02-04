@@ -2,8 +2,8 @@
  ChangeLog
 ===========
 
-0.25.1 (???)
-============
+0.25.1 (2018-02-04)
+===================
 
 Old tests for widgets, removed from core framework were removed.
 
