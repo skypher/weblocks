@@ -52,6 +52,7 @@
                "weblocks/default-init"
                "weblocks/widgets/string-widget"
                "weblocks/widgets/funcall-widget"
+               "weblocks/utils/clos"
                ;; "weblocks/session"
                ;; "weblocks/hooks"
                ;; "weblocks/request"

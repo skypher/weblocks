@@ -1,4 +1,4 @@
-(defpackage #:weblocks.utils.clos
+(defpackage #:weblocks/utils/clos
   (:use #:cl)
   (:export #:slot-value-by-path 
            #:find-slot-dsd
@@ -6,7 +6,7 @@
            #:object-class-name
            #:slot-equal))
 
-(in-package weblocks.utils.clos)
+(in-package weblocks/utils/clos)
 
 ;;; CLOS and MOP utils.
 

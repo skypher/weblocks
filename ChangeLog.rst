@@ -9,6 +9,8 @@ Old tests for widgets, removed from core framework were removed.
 
 Tests for widget's MOP methods were ported to Rove.
 
+Package ``weblocks/utils/close`` now loaded with main ``:weblocks`` system.
+
 0.25.0 (2018-01-31)
 ===================
 
