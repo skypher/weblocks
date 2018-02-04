@@ -14,6 +14,8 @@ system.
 
 Few old widget tests were removed.
 
+Added function ``weblocks/session:reset`` which resets current session.
+
 0.25.0 (2018-01-31)
 ===================
 

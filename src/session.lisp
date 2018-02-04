@@ -9,7 +9,8 @@
    #:gen-id
    #:in-session-p
    #:init
-   #:get-session-id))
+   #:get-session-id
+   #:reset))
 (in-package weblocks/session)
 
 

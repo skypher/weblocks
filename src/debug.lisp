@@ -14,6 +14,8 @@
   (:import-from #:weblocks/variables
                 #:*catch-errors-p*
                 #:*ignore-missing-actions*)
+  (:import-from #:weblocks/session-reset
+                #:reset-session)
   (:export #:*latest-session*
            #:*latest-request*
            #:reset-latest-session
@@ -119,9 +121,7 @@ To clear, use function \(reset-last-session\).")
   (unless *on*
     (error "Debugging wasn't turned on and I know nothing about latest session."))
   
-  (when *latest-session*
-    (with-hook (:reset-session *latest-session*)
-      (clrhash *latest-session*))))
+  (reset-session *latest-session*))
 
 
 (defun in-app (&optional name)
