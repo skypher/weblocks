@@ -1,60 +1,6 @@
 
 (in-package :weblocks-test)
 
-;;; test defwidget
-
-
-;;; test widget-dependencies
-(addtest widget-dependencies-1
-  (ensure-same (values-list (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-                                    (dependencies (make-instance 'navigation))))
-               (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-                                    '(("menu" "css")
-                                      ("navigation" "css"))))
-               :test (lambda (x y) (cl-ppcre:scan y x))))
-
-(addtest widget-dependencies-2
-         (ensure-same
-           (values-list (remove-import-urls (mapcar (lambda (x) (puri:uri-path (dependency-url x)))
-                                                    (dependencies (make-instance 'gridedit
-                                                                                 :data-class 'employee)))))
-           ;; note, pagination and dataform are there because for gridedit and
-           ;; datagrid widget-dependencies is specialized
-           (values-list (mapcar (lambda (x) (apply #'make-versioned-regex x))
-                                '(("dataseq" "css")
-                                  ("datagrid" "css")
-                                  ("pagination" "css")
-                                  ("table" "css")
-                                  ("datagrid" "backend-js"))))
-           :test (lambda (x y) (cl-ppcre:scan y x))))
-
-(deftest widget-dependencies-3
-    (with-request :get nil
-      (dependencies 'test))
-  nil)
-
-;;; test render-widget-body
-(deftest-html render-widget-body-1
-    (render-widget-body (lambda (&rest args)
-                          (with-html (:p "blah"))))
-  (:p "blah"))
-
-(deftest-html render-widget-body-2
-    (render-widget-body "test")
-  (:p "test"))
-
-(deftest-html render-widget-body-3
-    (render-widget-body "test" :id "foo" :class "bar")
-  (:p :id "foo" :class "bar" "test"))
-
-;; helper function
-(defun dummy-symbol-function (&rest args)
-  (with-html (:p "test")))
-
-(deftest-html render-widget-body-4
-    (render-widget-body 'dummy-symbol-function)
-  (:p "test"))
-
 ;;; test dom-classes
 (deftest dom-classes-1
     (dom-classes #'identity)
