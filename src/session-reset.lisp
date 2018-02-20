@@ -2,15 +2,14 @@
   (:use #:cl)
   (:import-from #:weblocks/session
                 #:*session*)
-  (:import-from #:weblocks/hooks
-                #:with-hook))
+  (:import-from #:weblocks/hooks))
 (in-package weblocks/session-reset)
 
 
 (defun reset-session (session)
   "Internal function for session reset."
   (when session
-    (with-hook (:reset-session session)
+    (weblocks/hooks:with-reset-session-hook (session)
       (clrhash session))))
 
 

@@ -1,7 +1,7 @@
 (defpackage #:weblocks/commands
   (:use #:cl)
   (:import-from #:weblocks/hooks
-                #:add-application-hook
+                #:on-application-hook-handle-request
                 #:call-next-hook)
   (:export #:add-command
            #:get-collected-commands))
@@ -43,7 +43,8 @@ After action processing these commands will be sent for execution on the client.
 (defun get-collected-commands ()
   *commands*)
 
-(add-application-hook :handle-request
-    reset-commands-list ()
+
+(on-application-hook-handle-request
+  reset-commands-list ()
   (let (*commands*)
     (call-next-hook)))

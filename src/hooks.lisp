@@ -5,15 +5,14 @@
   (:import-from #:weblocks/session)
   (:import-from #:log)
   (:import-from #:metatilities)
+  (:import-from #:alexandria
+                #:symbolicate
+                #:ensure-symbol
+                #:with-gensyms)
   
   (:export
-   #:add-application-hook
-   #:add-request-hook
-   #:add-session-hook
-   #:prepare-hooks
-   #:with-hook
    #:call-next-hook
-   #:call-hook))
+   #:defhook))
 (in-package weblocks/hooks)
 
 
@@ -230,12 +229,6 @@ list bound to a current request."
        ,result)))
 
 
-(defmacro call-hook (name &rest args)
-  "A little helper to use when you want to call a hook
-   and don't have a code to wrap."
-  `(with-hook (,name ,@args)))
-
-
 (defun eval-next-hooks (next-hooks &rest args)
   "Helper function that makes it easier to write dynamic hooks.
 
@@ -252,3 +245,65 @@ one of add-xxxx-hook and a (call-next-hook) inside of it."
                next-hooks
                args)))))
 
+
+
+(defmacro defhook (name &optional docstring)
+  "Registers a hook"
+  (declare (ignorable docstring))
+  
+  (with-gensyms ()
+    (let ((session-macro-name (ensure-symbol (symbolicate "ON-SESSION-HOOK-" name)
+                                             :weblocks/hooks))
+          (request-macro-name (ensure-symbol (symbolicate "ON-REQUEST-HOOK-" name)
+                                             :weblocks/hooks))
+          (application-macro-name (ensure-symbol (symbolicate "ON-APPLICATION-HOOK-" name)
+                                     :weblocks/hooks))
+          (with-macro-name (ensure-symbol (symbolicate "WITH-" name "-HOOK")
+                                          :weblocks/hooks))
+          (call-macro-name (ensure-symbol (symbolicate "CALL-" name "-HOOK")
+                                          :weblocks/hooks)))
+      ;; Here we need eval-when, because otherwice, exported functions
+      ;; will not be available at load time
+      `(eval-when (:compile-toplevel :load-toplevel :execute)
+         (defmacro ,session-macro-name (&body body)
+           `(add-session-hook ',',name
+                ,@body))
+         (defmacro ,request-macro-name (&body body)
+           `(add-request-hook ',',name
+                ,@body))
+         (defmacro ,application-macro-name (&body body)
+           `(add-application-hook ',',name
+                ,@body))
+         
+         (defmacro ,with-macro-name ((&rest args) &body body)
+           `(with-hook (',',name ,@args)
+              ,@body))
+         
+         (defmacro ,call-macro-name (&rest args)
+           `(with-hook (',',name ,@args)))
+         
+         (export (list ',session-macro-name
+                       ',request-macro-name
+                       ',application-macro-name
+                       ',with-macro-name
+                       ',call-macro-name)
+                 :weblocks/hooks)))))
+
+
+;; Weblocks core hooks
+
+(defhook handle-request
+  "Called around code reponsible for request processing even
+   before any application was choosen.")
+
+(defhook stop-weblocks
+  "Called around code which stops all application and a webserver.")
+
+(defhook action
+  "Called when action is processed")
+
+(defhook render
+  "Called when around whole page or ajax request processing.")
+
+(defhook reset-session
+  "Called when session is resetted for some reason.")

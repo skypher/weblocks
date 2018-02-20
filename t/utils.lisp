@@ -2,6 +2,7 @@
   (:use #:cl)
   (:import-from #:alexandria
                 #:with-gensyms
+                #:ensure-symbol
                 #:symbolicate)
   (:import-from #:lack.test
                 #:generate-env)
@@ -19,10 +20,12 @@
   (:import-from #:weblocks/html
                 #:with-html-string)
   (:import-from #:weblocks/hooks
-                #:prepare-hooks
-                #:add-session-hook)
+                #:prepare-hooks)
   ;; Just to point to dependencies
   (:import-from #:weblocks/request)
+  (:import-from #:hamcrest/rove
+                #:assert-that
+                #:contains)
   
   (:export
    #:with-request
@@ -91,9 +94,9 @@ Call assert-hooks-contains inside the body, to check if proper hooks were called
   (with-gensyms (hook-calls)
     (let ((hook-handlers
             (loop for hook-name in hook-names
-                  collect `(add-session-hook
-                               ,hook-name
-                               ,(symbolicate 'handle- hook-name)
+                  collect `(,(ensure-symbol (symbolicate 'on-session-hook- hook-name)
+                                            :weblocks/hooks)
+                            ,(symbolicate 'handle- hook-name)
                                (&rest args)
                              (push (cons ,hook-name args)
                                    ,hook-calls))

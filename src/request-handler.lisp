@@ -38,8 +38,6 @@
                 #:eval-action)
   (:import-from #:weblocks/commands
                 #:get-collected-commands)
-  (:import-from #:weblocks/hooks
-                #:with-hook)
   (:import-from #:weblocks/error-handler
                 #:on-error)
   (:import-from #:weblocks/variables
@@ -69,6 +67,7 @@
                 #:abort-processing
                 #:redirect)
   ;; Just dependencies
+  (:import-from #:weblocks/hooks)
   (:import-from #:log)
   ;; This package defines an :around method for weblocks/widgets:render
   ;; which adds a wrapper around widget body
@@ -92,7 +91,6 @@
   This prevents threads from hogging the CPU indefinitely.
 
   You can set this to NIL to disable timeouts (not recommended).")
-
 
 (defgeneric handle-client-request (app)
   (:documentation
@@ -316,7 +314,7 @@ customize behavior."))
       
       (when (pure-request-p)
         (log:debug "Request is pure, processing will be aborted.")
-        ;; TODO: add with-hook (:action)
+        ;; TODO: add with-action-hook ()
         (abort-processing
          (eval-action
           app
@@ -324,7 +322,7 @@ customize behavior."))
           action-arguments)))
 
       (timing "action processing (w/ hooks)"
-        (with-hook (:action)
+        (weblocks/hooks:with-action-hook ()
           (eval-action
            app
            action-name
@@ -376,7 +374,7 @@ customize behavior."))
           ;; TODO: understand why there is coupling with Dialog here and
           ;;       how to move it into the Dialog's code.
           
-          ;; (weblocks/hooks:add-session-hook :action
+          ;; (weblocks/hooks:on-session-hook-action
           ;;     update-dialog ()
           ;;   (weblocks::update-dialog-on-request)))
 
@@ -403,7 +401,7 @@ customize behavior."))
               (setf content
                     (with-html-string
                       (timing "rendering (w/ hooks)"
-                        (with-hook (:render)
+                        (weblocks/hooks:with-render-hook ()
                           (if (ajax-request-p)
                               (handle-ajax-request app)
                               (handle-normal-request app))

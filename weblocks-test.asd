@@ -14,5 +14,5 @@
   :perform (test-op (o c) (symbol-call :rove '#:run c)))
 
 
-(register-system-packages "lack" '(#:lack.request))
 (register-system-packages "lack-test" '(#:lack.test))
+(register-system-packages "lack-request" '(#:lack.request))

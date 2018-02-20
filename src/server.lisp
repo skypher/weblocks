@@ -7,8 +7,7 @@
   (:import-from #:weblocks/session
                 #:*session*)
   (:import-from #:weblocks/hooks
-                #:prepare-hooks
-                #:with-hook)
+                #:prepare-hooks)
   (:import-from #:weblocks/routes
                 #:route
                 #:get-route
@@ -101,7 +100,7 @@ This function serves all started applications and their static files."
       ;; some sort of middlewares, which change *request* and *session*
       ;; variables.
       (prepare-hooks
-        (with-hook (:handle-request)
+        (weblocks/hooks:with-handle-request-hook ()
 
           (let* ((path-info (getf env :path-info))
                  (hostname (getf env :server-name))
@@ -272,9 +271,7 @@ declared AUTOSTART."
   "Stops weblocks, by deactivating all active applications and stopping Clack server"
 
   (when (not (null *server*))
-    (with-hook
-        (:stop-weblocks)
-      
+    (weblocks/hooks:with-stop-weblocks-hook ()
       (dolist (app (get-active-apps))
         (weblocks/app:stop (weblocks-webapp-name app)))
 

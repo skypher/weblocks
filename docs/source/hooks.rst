@@ -5,6 +5,8 @@
 Hook is a named callbacks list. Depending on name, callbacks are
 called in different places though request processing pipeline.
 
+TODO: actialize documentation. Example is in the changelog. defhook
+
 Callback can be bound to ``application``, ``session`` or
 ``request``. They are added via these functions
 ``weblocks.hooks:add-application-hook``,

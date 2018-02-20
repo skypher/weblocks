@@ -2,6 +2,55 @@
  ChangeLog
 ===========
 
+0.26.0 (2018-02-20)
+===================
+
+Symbols ``add-application-hook``, ``add-request-hook``,
+``add-session-hook``, ``prepare-hooks`` and ``call-hook``
+aren't exported from ``weblocks/hooks`` anymore. Use new macro
+``defhook`` instead.
+
+Here is how it works:
+
+You use ``defhook`` as the toplevel form of your file if you want to define
+a new hook. This macro will create few other macroses in
+``weblocks/hooks`` package and will export them. For example:
+
+.. code:: common-lisp
+
+   (defhook database-opened
+      "This hook is called when your application opens a database.")
+
+This code will add these macroses into the ``weblocks/hooks`` package:
+``on-session-hook-database-opened``,
+``on-request-hook-database-opened``,
+``on-application-hook-database-opened``,
+``with-database-opened-hook`` and
+``call-database-opened-hook``.
+
+You need to wrap code, which opens a database, with
+``with-database-opened-hook``:
+
+.. code:: common-lisp
+
+   (weblocks/hooks:with-database-opened-hook ()
+      (do-some-staff-to-open-database))
+
+And in any other piece of code, you can define callbacks, using one of
+other three macroses:
+
+.. code:: common-lisp
+
+   (weblocks/hooks:on-session-hook-database-opened
+       log-database-opening ()
+
+     (weblocks/hooks:call-next-hook)
+     (log:info "Database was opened"))
+
+Usage of ``defhook`` macro gives more transparency to all defined hooks,
+because all of them now visible as external symbols in
+``weblocks/hooks`` package.
+
 0.25.2 (2018-02-04)
 ===================
 
