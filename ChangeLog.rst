@@ -2,6 +2,14 @@
  ChangeLog
 ===========
 
+0.27.0 (unreleased)
+===================
+
+Reloading of the defapp definition now does not tries to restart an
+application. Previously, restart caused the problem – when there is only
+one application, whole Weblocks server was shut down. So, I've removed
+this implicit action.
+
 0.26.0 (2018-02-20)
 ===================
 

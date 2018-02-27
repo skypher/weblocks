@@ -128,7 +128,6 @@ This function serves all started applications and their static files."
                   ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
                   ;; (weblocks::no-cache)    ; disable caching for dynamic pages
 
-                  (log:debug "Staringdsadasd BOOO HIT" path-info)
                   (return-from handle-request
                     ;; TODO: replace veariable binding to some macro from weblocks/response
                     (let* ((*code* 200)
@@ -202,7 +201,7 @@ If server is already started, then logs a warning and does nothing."
 (defun stop-server (server)
   "Stops a Clack server, but does not deactivates active applications,
    use `stop' function for that."
-  
+
   (if (get-handler server)
       (progn (log:info "Stopping server" server)
              (clack:stop (get-handler server))

@@ -184,9 +184,7 @@ called (primarily for backward compatibility"
        (:default-initargs
         . ,(remove-keyword-parameters
             initargs :subclasses :slots :autostart))
-       (:metaclass app-class))
-     (when (find-active-app ',name :signal-error nil)
-       (restart ',name))))
+       (:metaclass app-class))))
 
 
 (defmethod initialize-instance :after
