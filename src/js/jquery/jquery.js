@@ -317,17 +317,25 @@ function getActionUrl(actionCode, sessionString, isPure) {
 }
 
 function initiateActionWithArgs(actionCode, sessionString, args, method, url) {
-  startProgress();
+    startProgress();
 
-  if (!method) method = 'get';
-    if (!url) url = getActionUrl(actionCode, sessionString);
-    log('Fireing action with code', actionCode);
-  jQuery.ajax(url, {
-    type: method,
-    success: onActionSuccess,
-    error: onActionFailure,
-    data: args
-  });
+    if (!method) {
+        method = 'get';
+    }
+    if (!url) {
+        url = getActionUrl(actionCode, sessionString);
+    }
+    
+    log('Fireing action', actionCode);
+    jQuery.ajax(
+        url,
+        {
+            type: method,
+            success: onActionSuccess,
+            error: onActionFailure,
+            data: args
+        }
+    );
 }
 
 function initiateActionWithArgsAndCallback(actionCode, sessionString, args){
@@ -341,9 +349,11 @@ function initiateActionWithArgsAndCallback(actionCode, sessionString, args){
     delete args['url'];
     args.action = actionCode;
 
+    log('Fireing action', actionCode);
     options = {
         type: method,
-        success: function(first, second, third) { 
+        success: function(first, second, third) {
+            log('Action was successful', actionCode);
             onActionSuccess(first, second, third);
             complete && complete();
         },
