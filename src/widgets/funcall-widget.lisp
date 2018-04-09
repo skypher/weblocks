@@ -1,6 +1,6 @@
 (defpackage #:weblocks/widgets/funcall-widget
   (:use #:cl)
-  (:import-from #:weblocks/widget
+  (:import-from #:weblocks/widget/base
                 #:create-widget-from
                 #:widget-continuation
                 #:render

@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.27.1 (2018-04-09)
+===================
+
+Now ``string-widget`` and ``funcall-widget`` depends on
+``weblocks/widgets/base`` instead of ``weblocks/widget.
+
 0.27.0 (2018-03-11)
 ===================
 
