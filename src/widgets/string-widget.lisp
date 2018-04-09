@@ -1,6 +1,6 @@
 (defpackage #:weblocks/widgets/string-widget
   (:use #:cl)
-  (:import-from #:weblocks/widget/base
+  (:import-from #:weblocks/widgets/base
                 #:create-widget-from
                 #:defwidget
                 #:render)

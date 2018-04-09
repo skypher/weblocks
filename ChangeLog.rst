@@ -2,6 +2,11 @@
  ChangeLog
 ===========
 
+0.27.2 (2018-04-09)
+===================
+
+Fixed a typo in  ``string-widget`` and ``funcall-widget`` package definitions.
+
 0.27.1 (2018-04-09)
 ===================
 
