@@ -28,3 +28,10 @@ Instead of
 Need to place these forms in the top of flet from
 ** TODO Make a package per file in all codebase
 ** TODO Remove all special widgets with html rendering code into separate weblocks-ui library
+** Use Websocket for actions and all communications between client and server
+This way it will be possible also to push data from server to the
+client. This can be initiated by a timer or by some event or action from
+the developer. For example, server can push new css/js dependencies for
+all widgets shown on the page or for single widget, when developer hits
+C-c C-c in the Emacs.
+
