@@ -11,7 +11,7 @@
   (:import-from #:weblocks/request
                 #:*request*)
   (:import-from #:weblocks/variables
-                #:*catch-errors-p*
+                #:*invoke-debugger-on-error*
                 #:*ignore-missing-actions*)
   (:import-from #:weblocks/session-reset
                 #:reset-session)
@@ -53,7 +53,7 @@ To clear, use function \(reset-last-session\).")
              (track-latest-session t)
              (debug-actions t)
              (track-latest-request t)
-             (invoke-debugger-on-errors t))
+             (invoke-debugger-on-error t))
   ;; TODO: think about pluggable switchers to not hardcode them into this function
   (setf *on* t)
   
@@ -81,10 +81,10 @@ To clear, use function \(reset-last-session\).")
           (getf *config* :debug-actions)
           t))
 
-  (when invoke-debugger-on-errors
-    (setf *catch-errors-p*
-          nil
-          (getf *config* :invoke-debugger-on-errors)
+  (when invoke-debugger-on-error
+    (setf *invoke-debugger-on-error*
+          t
+          (getf *config* :invoke-debugger-on-error)
           t))
 
 
@@ -104,9 +104,9 @@ To clear, use function \(reset-last-session\).")
     (setf *ignore-missing-actions*
           t))
   
-  (when (getf *config* :invoke-debugger-on-errors)
-    (setf *catch-errors-p*
-          t))
+  (when (getf *config* :invoke-debugger-on-error)
+    (setf *invoke-debugger-on-error*
+          nil))
   
   (setf *config* nil)
   (values))

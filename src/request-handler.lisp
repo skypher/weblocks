@@ -47,7 +47,7 @@
                 ;; #:*style-warn-on-late-propagation*
                 ;; #:*before-ajax-complete-scripts*
                 ;; #:*on-ajax-complete-scripts*
-                #:*catch-errors-p*)
+                #:*invoke-debugger-on-error*)
   (:import-from #:weblocks/utils/timing
                 #:*timing-level*
                 #:*timing-report-fn*
@@ -125,11 +125,10 @@ customize behavior."))
 (defmethod handle-client-request :around ((app app))
   "This wrapper sets current application and suppresses error output from Hunchentoot."
   (handler-bind ((error (lambda (c)
-                          ;; TODO: rename *catch-errors-p* into *invoke-debugger-on-error* #low-hanging-fruit
-                          (if *catch-errors-p*
+                          (if *invoke-debugger-on-error*
+                              (invoke-debugger c)
                               (return-from handle-client-request
-                                (on-error app c))
-                              (invoke-debugger c)))))
+                                (on-error app c))))))
     (let ((*print-pretty* t)
           ; Hunchentoot already displays warnings into log file, we just suppress output
           (*error-output* (make-string-output-stream)))
@@ -422,8 +421,7 @@ customize behavior."))
     (abort ()
       :report "abort request processing and return 500"
       (log:error "Aborting request processing")
-      (abort-processing "Request was aborted"
-                        :code 500))))
+      (on-error app nil))))
 
 
 

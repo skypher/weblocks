@@ -2,6 +2,24 @@
  ChangeLog
 ===========
 
+0.28.0 (2018-04-23)
+===================
+
+Error handling was fixed. Previously it aborted Woo's worker thread and
+break the server.
+
+Variable ``weblocks/variables::*catch-errors-p*`` was renamed to
+``weblocks/variables::*invoke-debugger-on-error*`` and it's value was
+inverted. If this variable is True, then debugger will be
+invoked. Otherwise - Weblocks will return 500 error page.
+
+Argument ``:invoke-debugger-on-errors`` of ``weblocks/debug:on``
+function was renamed to ``:invoke-debugger-on-error``.
+
+Method ``weblocks/error-handler:on-error`` now is called when you abort
+request processing from the debugger. It is called with current app as
+the first argument and the ``nil`` instead of condition.
+
 0.27.2 (2018-04-09)
 ===================
 

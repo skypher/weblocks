@@ -8,7 +8,7 @@
            #:*rewrite-for-session-urls*
            #:*default-content-type*
            #:*ignore-missing-actions*
-           #:*catch-errors-p*
+           #:*invoke-debugger-on-error*
            #:*backtrace-on-session-init-error*
            #:*before-ajax-complete-scripts*
            #:*on-ajax-complete-scripts*
@@ -41,8 +41,8 @@
 (defvar *ignore-missing-actions* t)
 
 
-(defvar *catch-errors-p* t
-  "If this variable is nil, then weblocks will start lisp's debugger on unhandled conditions.")
+(defvar *invoke-debugger-on-error* nil
+  "If this variable is t, then weblocks will start lisp's debugger on unhandled conditions.")
 
 (defvar *backtrace-on-session-init-error* t)
 

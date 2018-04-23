@@ -94,38 +94,7 @@ From command line:
 Changes from master branch
 ==========================
 
-Added
------
-
-* make-js-action function
-* make-root-widget generic
-
-Removed
--------
-
-* with-extra-tags macro
-* render-extra-tags generic
-* add-get-param-to-url and remove-parameter-from-uri functions
-
-Renamed
--------
-
-* get-request-action-name was renamed to get-action-name-from-request
-* page-not-found-handler generic was moved to weblocks.request-handler
-* variable weblocks:*catch-errors-p* moved to
-  weblocks.variables:*catch-errors-p*
-* slot-value-by-path, find-slot-dsd, find-slot-esd, object-class-name
-  and slot-equal were moved from weblocks-util to weblocks.utils.clos.
-
-Replacements
-------------
-
-* Function webapp-session-hash was replaced with just
-  weblocks.session::*session*
-* Function webapp-session-key replaced with weblocks.session:get-value
-* Macro hook-by-scope now is a function.
-* Macro request-hook now is a function, use add-request-hook instead of
-  (push 'some-func (request-hook :session :post-action))
+There were very many refactorings. Check ``ChangeLog.rst`` file.
   
 
 Testsuite refactoring
