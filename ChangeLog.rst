@@ -5,6 +5,9 @@
 0.29.0 (2018-05-05)
 ===================
 
+Backward incompatibilities
+--------------------------
+
 Class ``weblocks/dependencies:dependency`` now requires that ``type``
 attribute shoulde be of type ``(member :css :js :png :jpg :gif)``
 
@@ -13,6 +16,13 @@ Also, functions ``make-local-js-dependency``,
 ``make-remote-js-dependency`` and ``make-remote-css-dependency`` were
 removed from package ``weblocks/dependencies``. Use ``make-dependency``
 function, it will figure out which dependency type to create itself.
+
+Improvements
+------------
+
+A new function ``weblocks/debug:get-session-value`` was added. It can be
+used to get values from the last session seen by weblocks.
+
 
 0.28.0 (2018-04-23)
 ===================

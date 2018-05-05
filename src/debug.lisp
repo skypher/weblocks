@@ -21,7 +21,8 @@
            #:on
            #:off
            #:status
-           #:in-app))
+           #:in-app
+           #:get-session-value))
 (in-package weblocks/debug)
 
 
@@ -130,3 +131,10 @@ not supplied. Returns the selected webapp. Convenience function for the REPL."
         (find-active-app
          (or name
              (first (get-registered-apps))))))
+
+
+(defun get-session-value (key)
+  "Returns a value from the latest session."
+  (unless *latest-session*
+    (error "Please, turn on debug mode with (weblocks/debug:on) call and refresh the page."))
+  (gethash key *latest-session*))
