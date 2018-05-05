@@ -2,6 +2,18 @@
  ChangeLog
 ===========
 
+0.29.0 (2018-05-05)
+===================
+
+Class ``weblocks/dependencies:dependency`` now requires that ``type``
+attribute shoulde be of type ``(member :css :js :png :jpg :gif)``
+
+Also, functions ``make-local-js-dependency``,
+``make-local-css-dependency``, ``make-local-image-dependency``,
+``make-remote-js-dependency`` and ``make-remote-css-dependency`` were
+removed from package ``weblocks/dependencies``. Use ``make-dependency``
+function, it will figure out which dependency type to create itself.
+
 0.28.0 (2018-04-23)
 ===================
 

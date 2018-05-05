@@ -12,24 +12,21 @@
                 #:send-script)
   ;; Just a dependency
   (:import-from #:dexador)
+  (:import-from #:alexandria
+                #:make-keyword)
   
   (:export
    #:dependency
    #:local-dependency
    #:get-content-type
    #:get-path
-   #:make-local-js-dependency
    #:serve
-   #:make-local-css-dependency
    #:get-route
    #:get-dependencies
    #:render-in-head
    #:remote-dependency
-   #:make-remote-js-dependency
-   #:make-remote-css-dependency
    #:get-integrity
    #:get-crossorigin
-   #:make-local-image-dependency
    #:*cache-remote-dependencies-in*
    #:get-url
    #:infer-type-from
@@ -59,7 +56,7 @@ be stored.")
 
 
 (defclass dependency ()
-  ((type :type keyword
+  ((type :type (member :css :js :png :jpg :gif)
          :initarg :type
          :initform (error ":type argument is required.")
          :reader get-type)))
@@ -347,72 +344,6 @@ to this system's source root."
                                          (asdf:system-relative-pathname system
                                                                         path-or-url)
                                          path-or-url))))))
-
-(defun make-local-js-dependency (path &key system)
-  "Creates a JavaScript dependency, served from the disk.
-
-If system's name was give, then path is calculated relative
-to this system's source root."
-  
-  (make-instance 'local-dependency
-                 :content-type "application/javascript"
-                 :path (if system
-                           (asdf:system-relative-pathname system
-                                                          path)
-                           path)))
-
-
-(defun make-local-css-dependency (path &key system)
-  "Creates a CSS dependency, served from the disk.
-
-If system's name was give, then path is calculated relative
-to this system's source root."
-  
-  (make-instance 'local-dependency
-                 :content-type "text/css"
-                 :path (if system
-                           (asdf:system-relative-pathname system
-                                                          path)
-                           path)))
-
-
-(defun make-local-image-dependency (path &key system)
-  "Creates an image dependency, served from the disk.
-
-It is not rendered into an HTML, but served from disk."
-  
-  (let* ((path (if system
-                  (asdf:system-relative-pathname system
-                                                 path)
-                  (pathname path)))
-         (ext (pathname-type path))
-         (content-type (format nil "image/~a"
-                               ext)))
-    
-    (make-instance 'local-dependency
-                   :content-type content-type
-                   :path path
-                   :binary t)))
-
-
-(defun make-remote-js-dependency (url &key integrity
-                                           (cross-origin "anonymous"))
-  "Creates a JavaScript dependency, served from CDN."
-  (make-instance 'remote-dependency
-                 :content-type "application/javascript"
-                 :url url
-                 :integrity integrity
-                 :cross-origin cross-origin))
-
-
-(defun make-remote-css-dependency (url &key integrity
-                                            (cross-origin "anonymous"))
-  "Creates a CSS dependency, served from CDN."
-  (make-instance 'remote-dependency
-                 :content-type "text/css"
-                 :url url
-                 :integrity integrity
-                 :cross-origin cross-origin))
 
 
 (defmethod serve ((dependency local-dependency))
