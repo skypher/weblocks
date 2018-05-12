@@ -234,9 +234,9 @@ This code has the following significant changes:
 
      (toggle-task (task)
         (setf (task-done task)
-        (if (task-done task)
-          nil
-          t))
+              (if (task-done task)
+                  nil
+                  t))
         (redraw))
 
 * And finally, we've modified our task rendering function by adding a
