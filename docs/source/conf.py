@@ -45,7 +45,7 @@ cl_systems = [
         'name': 'weblocks',
         'path': join(dirname(realpath(__file__)), '../../'),
         'packages': [
-            'weblocks',
+#            'weblocks',
         ]
     },
 ]
@@ -65,7 +65,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'weblocks'
+project = u'weblocks/reblocks'
 copyright = u'2017, group of lisp hackers'
 
 # The version info for the project you're documenting, acts as replacement for

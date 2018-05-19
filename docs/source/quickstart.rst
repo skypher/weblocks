@@ -2,6 +2,11 @@
  Quickstart
 ============
 
+.. warning:: This version of Weblocks is not in the Quicklisp yet. To
+             install it you need to clone the repository somewhere where
+             ASDF will find it, for example, to ``~/common-lisp/`` directory.
+
+
 Load weblocks and create a package for a sandbox:
 
 .. code-block:: common-lisp-repl
