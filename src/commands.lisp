@@ -41,7 +41,10 @@ After action processing these commands will be sent for execution on the client.
 
 
 (defun get-collected-commands ()
-  *commands*)
+  "Returns all commands created during AJAX request processing in order as they where added."
+  ;; Because we are pushing command into the list,
+  ;; we need to reverse it now.
+  (reverse *commands*))
 
 
 (on-application-hook-handle-request

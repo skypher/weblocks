@@ -2,6 +2,11 @@
  ChangeLog
 ===========
 
+0.30.0 (2018-05-19)
+===================
+
+* Fixed the order of commands for frontend. Now they are returned in the chronological order.
+
 0.29.0 (2018-05-05)
 ===================
 
