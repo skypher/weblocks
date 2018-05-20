@@ -2,6 +2,19 @@
  ChangeLog
 ===========
 
+0.30.1 (2018-05-20)
+===================
+
+* Error was fixed when you are trying to start a server which is already
+  running. Now you have a "restart" to stop the old version of the
+  server before starting the new one.
+
+  However, it does not work with ``Woo`` server, because C library libev
+  crashes with error::
+
+    Assertion failed: (("libev: a signal must not be attached to two different loops", !signals [w->signum - 1].loop || signals [w->signum - 1].loop == loop)), function ev_signal_start, file ev.c, line 4082
+  
+
 0.30.0 (2018-05-19)
 ===================
 
