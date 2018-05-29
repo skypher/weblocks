@@ -6,10 +6,18 @@
 
 .. image:: https://travis-ci.org/40ants/weblocks.svg?branch=reblocks
     :target: https://travis-ci.org/40ants/weblocks
+    
+.. image:: https://badges.gitter.im/40ants/weblocks.svg
+    :target: https://gitter.im/40ants/weblocks
 
 .. Everything starting from this commit will be inserted into the
    index page of the HTML documentation.
 .. include-from
+
+Contribution
+============
+
+Join our `Gitter Chat Room`_ to participate in the project or ask your questions about Weblocks.
 
 This branch contains following branches
 =======================================
@@ -111,3 +119,5 @@ License
 =======
 
 Licensed under the LLGPL License.
+
+.. _`Gitter Chat Room`: https://gitter.im/40ants/weblocks
