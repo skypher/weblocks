@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+0.31.0 (2018-05-29)
+===================
+
+* We don't enforce ``*print-pretty*`` inside of
+  ``weblocks/html:with-html`` macro. This hack was required because
+  the bug in the spinneret, which was fixed at 2018-01-04:
+
+  https://github.com/ruricolist/spinneret/commit/06b280612aff07cf376f593746d080230f2c7462
+
 0.30.1 (2018-05-20)
 ===================
 

@@ -26,11 +26,7 @@
 
 
 (defmacro with-html (&body body)
-  ;; Here we need to set *print-pretty* to nil, to prevent
-  ;; spinneret from reformatting body-string, because this breaks
-  ;; formatting of :pre elements if they are used
-  `(let ((*print-pretty* nil)
-         (spinneret:*html-lang* *lang*)
+  `(let ((spinneret:*html-lang* *lang*)
          (spinneret:*html* *stream*))
      (spinneret:with-html
        ,@body)))
