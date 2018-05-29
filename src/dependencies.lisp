@@ -313,7 +313,7 @@ by infering it from URL or a path"))
                                       crossorigin)
   "Creates a JavaScript dependency, served from the disk.
 
-If system's name was give, then path is calculated relative
+If the system's name is given, then the path is calculated relatively
 to this system's source root."
   (check-type path-or-url (or string pathname))
 

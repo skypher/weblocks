@@ -130,10 +130,10 @@ inherits from 'widget' if no direct superclasses are provided."
 
 Usually this required as a result of an action execution.
 
-In old weblocks there was a mark-dirty method. This one replaces it.
-To make everything easier, new protocol excludes \"propagation\". If you
-need to update other widgets, please define \"update\" method for you widget.
-You can use :before or :after modifier, to keep current behavior and to add
+In the old weblocks there was a mark-dirty method. This one replaces it.
+To make everything easier, the new protocol excludes \"propagation\". If you
+need to update other widgets, please define an \"update\" method for your widget.
+You can use :before or :after modifiers, to keep the current behavior and to add
 propagation code."))
 
 
