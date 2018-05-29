@@ -93,6 +93,7 @@ a link to it. Only use guessable action codes for GET actions."
   action-code)
 
 
+;; TODO: make this public and may be to rename it to just make-action
 (defun function-or-action->action (function-or-action)
   "Accepts a function or an existing action. If the value is a
 function, calls 'make-action' and returns its result. Otherwise,
