@@ -9,7 +9,7 @@ env:
   matrix:
     # Supported implementations
     - LISP=ccl
-    - LISP=sbcl
+#    - LISP=sbcl
 
     # Unsupported implementations
     # unable to find libssl.so, I tried hard, but it doesn't see it
@@ -38,6 +38,7 @@ addons:
       - libtidy-dev
       - libc6-i386
       - openjdk-7-jre
+      - python-pip
       
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
@@ -62,8 +63,10 @@ before_script:
   - qlot exec ros install cl-info
   - qlot exec ros run -e '(progn (ql:quickload :weblocks-test) (uiop:quit 0))'
   - qlot exec cl-info hamcrest rove dissect weblocks
+    
   
 script:
   - qlot exec rove weblocks-test.asd
   - qlot exec ./check-quickstart.ros
+  - ./build-docs-on-ci.sh
 

@@ -1,21 +1,21 @@
 ("quicklisp" .
  (:class qlot.source.ql:source-ql-all
   :initargs (:project-name "quicklisp" :%version :latest)
-  :version "2018-01-31"))
+  :version "2018-04-30"))
 ("defmain" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "defmain" :repos "40ants/defmain" :ref nil :branch nil :tag nil)
-  :version "github-7f8a88a22b0f8f01758e7694ce2522369e750a3a"
+  :version "github-7d6a0a532d774a30b25599862d424273c5e98a0f"
   :repos "40ants/defmain"
-  :url "https://github.com/40ants/defmain/archive/7f8a88a22b0f8f01758e7694ce2522369e750a3a.tar.gz"
-  :ref "7f8a88a22b0f8f01758e7694ce2522369e750a3a"))
+  :url "https://github.com/40ants/defmain/archive/7d6a0a532d774a30b25599862d424273c5e98a0f.tar.gz"
+  :ref "7d6a0a532d774a30b25599862d424273c5e98a0f"))
 ("cl-info" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-info" :repos "40ants/cl-info" :ref nil :branch nil :tag nil)
-  :version "github-6fb171800a16080d52be41f10155f96fd48a3b61"
+  :version "github-c942f5bdfb7a5ca879602c480892b391000f42e7"
   :repos "40ants/cl-info"
-  :url "https://github.com/40ants/cl-info/archive/6fb171800a16080d52be41f10155f96fd48a3b61.tar.gz"
-  :ref "6fb171800a16080d52be41f10155f96fd48a3b61"))
+  :url "https://github.com/40ants/cl-info/archive/c942f5bdfb7a5ca879602c480892b391000f42e7.tar.gz"
+  :ref "c942f5bdfb7a5ca879602c480892b391000f42e7"))
 ("rove" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "rove" :repos "40ants/rove" :ref "generic-assert-description" :branch nil :tag nil)
@@ -26,10 +26,10 @@
 ("lack" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "lack" :repos "fukamachi/lack" :ref nil :branch nil :tag nil)
-  :version "github-23c372594b92f5ae564115989feb4e4f97ba1a9c"
+  :version "github-2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096"
   :repos "fukamachi/lack"
-  :url "https://github.com/fukamachi/lack/archive/23c372594b92f5ae564115989feb4e4f97ba1a9c.tar.gz"
-  :ref "23c372594b92f5ae564115989feb4e4f97ba1a9c"))
+  :url "https://github.com/fukamachi/lack/archive/2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096.tar.gz"
+  :ref "2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096"))
 ("dissect" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "dissect" :repos "40ants/dissect" :ref "fix-iteration-on-unknown-args" :branch nil :tag nil)
@@ -39,11 +39,11 @@
   :ref "fix-iteration-on-unknown-args"))
 ("hamcrest" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "hamcrest" :repos "40ants/cl-hamcrest" :ref "v0.3.3" :branch nil :tag nil)
-  :version "github-v0.3.3"
+  :initargs (:project-name "hamcrest" :repos "40ants/cl-hamcrest" :ref "v0.4.2" :branch nil :tag nil)
+  :version "github-v0.4.2"
   :repos "40ants/cl-hamcrest"
-  :url "https://github.com/40ants/cl-hamcrest/archive/v0.3.3.tar.gz"
-  :ref "v0.3.3"))
+  :url "https://github.com/40ants/cl-hamcrest/archive/v0.4.2.tar.gz"
+  :ref "v0.4.2"))
 ("weblocks-ui" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "weblocks-ui" :repos "40ants/weblocks-ui" :ref "v0.6.0" :branch nil :tag nil)
