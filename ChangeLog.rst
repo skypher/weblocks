@@ -2,6 +2,11 @@
  ChangeLog
 ===========
 
+0.31.1 (2018-06-16)
+===================
+
+* Fixed error about missing 'bool type under SBCL.
+
 0.31.0 (2018-05-29)
 ===================
 
