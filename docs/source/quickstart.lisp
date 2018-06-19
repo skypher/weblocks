@@ -23,7 +23,6 @@
 
 (defvar *port* (find-port:find-port))
 
-(weblocks/app:start 'tasks)
 (weblocks/server:start :port *port*)
 
 ;; Part 2: defining tasks
@@ -32,17 +31,11 @@
 (defwidget task ()
     ((title
       :initarg :title
-      :reader title)
+      :accessor title)
      (done
       :initarg :done
       :initform nil
       :accessor done)))
-
-(defmethod print-object ((task task) stream)
-  (print-unreadable-object (task stream :type t)
-    (format stream "~a, done ? ~a" (title task) (done task))))
-
-(defvar *task-1* (make-instance 'task :title "Make my first Weblocks app"))
 
 (defmethod render ((task task))
   (with-html
@@ -68,36 +61,38 @@
      (loop for task in (tasks widget) do
           (:li (render task))))))
 
-(defvar *root* nil
-  "Our root widget.")
+(defun make-task-list (&rest rest)
+  "Create some tasks from titles."
+  (loop for title in rest collect
+       (make-task :title title)))
 
 (defmethod weblocks/session:init ((app tasks))
   (declare (ignorable app))
-  (let ((tasks (list (make-task :title "Make my first Weblocks app")
-                     (make-task :title "Deploy it somewhere")
-                     (make-task :title "Have a profit"))))
-    (setf *root* (make-instance 'task-list :tasks tasks))))
+  (let ((tasks (make-task-list "Make my first Weblocks app"
+                               "Deploy it somewhere"
+                               "Have a profit")))
+    (make-instance 'task-list :tasks tasks)))
 
 (weblocks/debug:reset-latest-session)
 
 
 ;; Part 3: add-task
 
-(defun add-task (&rest rest &key title &allow-other-keys)
-  (push (make-task :title title) (tasks *root*))
-  (update *root*))
-
 (defmethod render ((widget task-list))
-  (with-html
-    (:h1 "Tasks")
-    (loop for task in (tasks widget) do
-         (render task))
-    (with-html-form (:POST #'add-task)
-      (:input :type "text"
-              :name "title"
-              :placeholder "Task's title")
-      (:input :type "submit"
-              :value "Add"))))
+  (flet ((add-task (&key title &allow-other-keys)
+           (push (make-task :title title)
+                 (tasks (weblocks/widgets/root:get)))
+           (update (weblocks/widgets/root:get))))
+    (with-html
+      (:h1 "Tasks")
+      (loop for task in (tasks widget) do
+           (render task))
+      (with-html-form (:POST #'add-task)
+        (:input :type "text"
+                :name "title"
+                :placeholder "Task's title")
+        (:input :type "submit"
+                :value "Add")))))
 
 (weblocks/debug:reset-latest-session)
 

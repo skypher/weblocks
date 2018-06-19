@@ -35,7 +35,6 @@ Now, create an application:
    TODO> (defapp tasks)
    TODO> (weblocks/debug:on)
    TODO> (defvar *port* (find-port:find-port))
-   TODO> (weblocks/app:start 'tasks)
    TODO> (weblocks/server:start :port *port*)
     <INFO> [19:41:00] weblocks/server server.lisp (start) -
      Starting weblocks WEBLOCKS/SERVER::PORT: 40000
@@ -77,7 +76,7 @@ The Task widget
    TODO> (defwidget task ()
            ((title
              :initarg :title
-             :reader title)
+             :accessor title)
             (done
              :initarg :done
              :initform nil
@@ -99,7 +98,7 @@ We can create a task with ``make-instance``:
 Above, ``:title`` is the initarg, and since we didn't give a ``:done``
 argument, it will be instanciated to its ``:initform``, which is ``nil``.
 
-We can read the object's slots with its readers and accessors:
+We defined accessors for both slots, so we can read and set them easily:
 
 .. code-block:: common-lisp-repl
 
@@ -107,9 +106,8 @@ We can read the object's slots with its readers and accessors:
    "Make my first Weblocks app"
    TODO> (done *TASK-1*)
    NIL
-
-We can change the done attribute with ``setf``, thanks to the accessor: ``(setf (done *task-1*) t)``. The title however only defines a reader, so we would have to resort to
-``slot-value object 'slot-name``. That's a design choice.
+   TODO> (setf (done *TASK-1*) t)
+   T
 
 We define a constructor for our task:
 
@@ -120,18 +118,8 @@ We define a constructor for our task:
 
 It isn't mandatory, but it is good practice to do so.
 
-And as a last convenience, we'll write a pretty printer for our tasks:
 
-.. code-block:: common-lisp-repl
-
-    TODO> (defmethod print-object ((task task) stream)
-            (print-unreadable-object (task stream :type t)
-              (format stream "~a, done ? ~a" (title task) (done task))))
-    TODO> *task-1*
-    #<TASK Make my first Weblocks app, done ? NIL>
-
-
-Better. If you are not familiar with the Common Lisp Object System (CLOS), you
+If you are not familiar with the Common Lisp Object System (CLOS), you
 can have a look at `Practical Common Lisp<http://www.gigamonkeys.com/book/object-reorientation-classes.html>`_
 and the `Common Lisp Cookbook<https://lispcookbook.github.io/cl-cookbook/clos.html>`_.
 
@@ -188,18 +176,21 @@ But we still don't get anything in the browser.
 
 .. code-block:: common-lisp-repl
 
-    TODO> (defvar *root* nil "Our root widget.")
+    TODO> (defun make-task-list (&rest rest)
+                 "Create some tasks from titles."
+                 (loop for title in rest collect
+                       (make-task :title title)))
 
     TODO> (defmethod weblocks/session:init ((app tasks))
-            (declare (ignorable app))
-            (let ((tasks (list (make-task :title "Make my first Weblocks app")
-                               (make-task :title "Deploy it somewhere")
-                               (make-task :title "Have a profit"))))
-              (setf *root* (make-instance 'task-list :tasks tasks))))
+             (declare (ignorable app))
+             (let ((tasks (make-task-list "Make my first Weblocks app"
+                                          "Deploy it somewhere"
+                                          "Have a profit")))
+               (make-instance 'task-list :tasks tasks)))
 
 
 This defines a list of tasks (for simplicity, they are defined as a
-list in memory) and saves a reference of our root widget.
+list in memory) and returns what will be our session's root widget..
 
 Restart the application:
 
@@ -235,22 +226,22 @@ Write a new ``add-task`` function and modify the ``render`` method of a task-lis
 
 .. code-block:: common-lisp-repl
 
-   TODO> (defun add-task (&rest rest &key title &allow-other-keys)
-            (declare (ignorable rest))
-            (push (make-task :title title) (tasks *root*))
-            (update *root*))
 
-   TODO> (defmethod render ((widget task-list))
-           (with-html
-                 (:h1 "Tasks")
-                 (loop for task in (tasks widget) do
-                      (render task)))
-                 (with-html-form (:POST #'add-task)
-                       (:input :type "text"
-                        :name "title"
-                        :placeholder "Task's title")
-                       (:input :type "submit"
-                        :value "Add")))
+    TODO> (defmethod render ((widget task-list))
+              (flet ((add-task (&key title &allow-other-keys)
+                       (push (make-task :title title)
+                             (tasks (weblocks/widgets/root:get)))
+                       (update (weblocks/widgets/root:get))))
+                (with-html
+                  (:h1 "Tasks")
+                  (loop for task in (tasks widget) do
+                       (render task))
+                  (with-html-form (:POST #'add-task)
+                    (:input :type "text"
+                            :name "title"
+                            :placeholder "Task's title")
+                    (:input :type "submit"
+                            :value "Add")))))
 
     TODO> (weblocks/debug:reset-latest-session)
 
@@ -264,6 +255,8 @@ This second point is really important because it allows Weblocks to render
 necessary parts of the page on the server and to inject it into the HTML DOM
 in the browser. Here it rerenders the root widget, but we can as well ``update``
 a specific task widget, as we'll do soon.
+
+We also took care of defining ``add-task`` inline, as a closure, for it to be thread safe.
 
 Another block in our new version of ``render`` of a `task-list` is the form:
 
