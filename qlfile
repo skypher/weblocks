@@ -9,7 +9,7 @@ github rove 40ants/rove :ref generic-assert-description
 github lack fukamachi/lack
 
 github dissect 40ants/dissect :ref fix-iteration-on-unknown-args
-github hamcrest 40ants/cl-hamcrest :ref v0.3.3
+github hamcrest 40ants/cl-hamcrest :ref v0.4.2
 
 # This system is needed for testing quickstart.lisp loading
 github weblocks-ui 40ants/weblocks-ui :ref v0.6.0

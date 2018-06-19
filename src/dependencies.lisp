@@ -95,7 +95,7 @@ See more information at: https://www.w3.org/TR/SRI/")
          :initarg :path
          :initform nil
          :reader get-path)
-   (binary :type bool
+   (binary :type (or null t)
            :initarg :binary
            :initform nil
            :reader is-binary)))
