@@ -120,8 +120,8 @@ It isn't mandatory, but it is good practice to do so.
 
 
 If you are not familiar with the Common Lisp Object System (CLOS), you
-can have a look at `Practical Common Lisp<http://www.gigamonkeys.com/book/object-reorientation-classes.html>`_
-and the `Common Lisp Cookbook<https://lispcookbook.github.io/cl-cookbook/clos.html>`_.
+can have a look at `Practical Common Lisp <http://www.gigamonkeys.com/book/object-reorientation-classes.html>`_
+and the `Common Lisp Cookbook <https://lispcookbook.github.io/cl-cookbook/clos.html>`_.
 
 Now let's carry on with our application.
 
@@ -158,7 +158,7 @@ and we tell Weblocks how to display them by *specializing* the
 
 
 The ``with-html`` macro uses
-`Spinneret<https://github.com/ruricolist/spinneret/>`_ under the hood,
+`Spinneret <https://github.com/ruricolist/spinneret/>`_ under the hood,
 but you can use anything that outputs html.
 
 We can check how the generated html looks like by calling ``render`` in the REPL:
@@ -332,7 +332,7 @@ As a homework:
 1. Play with lambdas and add a "Delete" button next after
    each task.
 2. Add the ability to sort tasks by name or by completion flag.
-3. Save tasks in a database (the `Cookbook<https://lispcookbook.github.io/cl-cookbook/databases.html>`_ might help).
+3. Save tasks in a database (the `Cookbook <https://lispcookbook.github.io/cl-cookbook/databases.html>`_ might help).
 4. Read the rest of the documentation and make a real application, using the full
    power of Common Lisp.
 
