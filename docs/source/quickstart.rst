@@ -231,22 +231,19 @@ task-list to call ``add-task`` in response to ``POST`` method:
             (push (make-task title)
                   (tasks task-list))
             (update task-list))
-
-    TODO> (defmethod render ((widget task-list))
-              (flet ((add-task (&key title &allow-other-keys)
-                       (push (make-task title)
-                             (tasks (weblocks/widgets/root:get)))
-                       (update (weblocks/widgets/root:get))))
-                (with-html
-                  (:h1 "Tasks")
-                  (loop for task in (tasks widget) do
-                       (render task))
-                  (with-html-form (:POST #'add-task)
-                    (:input :type "text"
-                            :name "title"
-                            :placeholder "Task's title")
-                    (:input :type "submit"
-                            :value "Add")))))
+            
+    TODO> (defmethod render ((task-list task-list))
+            (with-html
+              (:h1 "Tasks")
+              (loop for task in (tasks task-list) do
+                (render task))
+              (with-html-form (:POST (lambda (&key title &allow-other-keys)
+                                             (add-task task-list title)))
+                (:input :type "text"
+                        :name "title"
+                        :placeholder "Task's title")
+                (:input :type "submit"
+                        :value "Add"))))
 
     TODO> (weblocks/debug:reset-latest-session)
 
