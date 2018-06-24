@@ -113,7 +113,7 @@ We define a constructor for our task:
 
 .. code-block:: common-lisp-repl
 
-    TODO> (defun make-task (&key title done)
+    TODO> (defun make-task (title &key done)
             (make-instance 'task :title title :done done))
 
 It isn't mandatory, but it is good practice to do so.
@@ -178,8 +178,8 @@ But we still don't get anything in the browser.
 
     TODO> (defun make-task-list (&rest rest)
                  "Create some tasks from titles."
-                 (loop for title in rest collect
-                       (make-task :title title)))
+                 (loop for title in rest
+                       collect (make-task title)))
 
     TODO> (defmethod weblocks/session:init ((app tasks))
              (declare (ignorable app))
@@ -222,14 +222,19 @@ Import a new module, ``weblocks-ui`` to help in creating forms and other UI elem
    TODO> (ql:quickload "weblocks-ui")
    TODO> (use-package :weblocks-ui/form)
 
-Write a new ``add-task`` function and modify the ``render`` method of a task-list:
+Write a new ``add-task`` method and modify the ``render`` method of a
+task-list to call ``add-task`` in response to ``POST`` method:
 
 .. code-block:: common-lisp-repl
 
+    TODO> (defmethod add-task ((task-list task-list) title)
+            (push (make-task title)
+                  (tasks task-list))
+            (update task-list))
 
     TODO> (defmethod render ((widget task-list))
               (flet ((add-task (&key title &allow-other-keys)
-                       (push (make-task :title title)
+                       (push (make-task title)
                              (tasks (weblocks/widgets/root:get)))
                        (update (weblocks/widgets/root:get))))
                 (with-html
@@ -246,17 +251,19 @@ Write a new ``add-task`` function and modify the ``render`` method of a task-lis
     TODO> (weblocks/debug:reset-latest-session)
 
 
-The function ``add-task`` does only two simple things:
+The method ``add-task`` does only two simple things:
 
 - it adds a task into a list;
-- it tells Weblocks that our root widget should be redrawn.
+- it tells Weblocks that our task list should be redrawn.
 
 This second point is really important because it allows Weblocks to render
 necessary parts of the page on the server and to inject it into the HTML DOM
-in the browser. Here it rerenders the root widget, but we can as well ``update``
+in the browser. Here it rerenders the task-list widget, but we can as well ``update``
 a specific task widget, as we'll do soon.
 
-We also took care of defining ``add-task`` inline, as a closure, for it to be thread safe.
+We are calling ``add-task`` from a lambda function to catch a
+``task-list`` in a closure and make it availabe when weblocks will
+process AJAX request with ``POST`` parameters later.
 
 Another block in our new version of ``render`` of a `task-list` is the form:
 
@@ -270,8 +277,7 @@ Another block in our new version of ``render`` of a `task-list` is the form:
        :value "Add"))
 
 It defines a text field, a submit button and an action to perform on
-form submit. The ``add-task`` function will receive the text input as
-argument.
+form submit.
 
 .. note:: This is really amazing!
 
@@ -303,9 +309,8 @@ Toggle tasks
               (:p (:input :type "checkbox"
                 :checked (done task)
                 :onclick (make-js-action
-                          (lambda (&rest rest)
-                            (declare (ignore rest))
-                          (toggle task))))
+                          (lambda (&key &allow-other-keys)
+                            (toggle task))))
                   (:span (if (done task)
                        (with-html
                              ;; strike

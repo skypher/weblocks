@@ -45,7 +45,7 @@
                (title task)))))
 
 
-(defun make-task (&key title done)
+(defun make-task (title &key done)
   "Create a task."
   (make-instance 'task :title title :done done))
 
@@ -63,8 +63,8 @@
 
 (defun make-task-list (&rest rest)
   "Create some tasks from titles."
-  (loop for title in rest collect
-       (make-task :title title)))
+  (loop for title in rest
+        collect (make-task title)))
 
 (defmethod weblocks/session:init ((app tasks))
   (declare (ignorable app))
@@ -78,21 +78,24 @@
 
 ;; Part 3: add-task
 
-(defmethod render ((widget task-list))
-  (flet ((add-task (&key title &allow-other-keys)
-           (push (make-task :title title)
-                 (tasks (weblocks/widgets/root:get)))
-           (update (weblocks/widgets/root:get))))
-    (with-html
-      (:h1 "Tasks")
-      (loop for task in (tasks widget) do
-           (render task))
-      (with-html-form (:POST #'add-task)
-        (:input :type "text"
-                :name "title"
-                :placeholder "Task's title")
-        (:input :type "submit"
-                :value "Add")))))
+(defmethod add-task ((task-list task-list) title)
+  (push (make-task title)
+        (tasks task-list))
+  (update task-list))
+
+
+(defmethod render ((task-list task-list))
+  (with-html
+    (:h1 "Tasks")
+    (loop for task in (tasks task-list) do
+      (render task))
+    (with-html-form (:POST (lambda (&key title &allow-other-keys)
+                                   (add-task task-list title)))
+      (:input :type "text"
+              :name "title"
+              :placeholder "Task's title")
+      (:input :type "submit"
+              :value "Add"))))
 
 (weblocks/debug:reset-latest-session)
 
@@ -106,13 +109,13 @@
             t))
   (update task))
 
+
 (defmethod render ((task task))
   (with-html
     (:p (:input :type "checkbox"
                 :checked (done task)
                 :onclick (make-js-action
-                          (lambda (&rest rest)
-                            (declare (ignore rest))
+                          (lambda (&key &allow-other-keys)
                             (toggle task))))
         (:span (if (done task)
                    (with-html
