@@ -137,10 +137,9 @@ behaviour could be overriden by keyword argument ``:raise t``."
   (log:config :debug)
   (log:info "Building documentation")
 
-  (handler-bind ((t (lambda (condition)
-                      (uiop:print-condition-backtrace condition :stream *error-output*)
-                      (uiop:quit 1))))
+  (handler-bind ((error (lambda (condition)
+                          (uiop:print-condition-backtrace condition :stream *error-output*)
+                          (uiop:quit 1))))
     (build-docs)
-    (push-gh-pages)
-    (uiop:quit 0)))
+    (push-gh-pages)))
 
