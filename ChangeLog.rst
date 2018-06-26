@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.32.0 (2018-06-26)
+===================
+
+* Now weblocks system explicitly requires ASDF >= 3.1, because it uses
+  ``package-inferred-system`` class.
+
 0.31.1 (2018-06-16)
 ===================
 
