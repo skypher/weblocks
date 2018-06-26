@@ -9,7 +9,7 @@ env:
   matrix:
     # Supported implementations
     - LISP=ccl
-#    - LISP=sbcl
+    - LISP=sbcl
 
     # Unsupported implementations
     # unable to find libssl.so, I tried hard, but it doesn't see it
@@ -31,6 +31,7 @@ matrix:
     - env: LISP=clisp
     - env: LISP=abcl
     - env: LISP=ecl
+    - env: LISP=sbcl
 
 addons:
   apt:
