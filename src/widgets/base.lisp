@@ -168,3 +168,4 @@ propagation code."))
 (defmethod create-widget-from ((object widget))
   "If input is already a widget, then it is returned as is."
   object)
+

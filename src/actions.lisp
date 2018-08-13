@@ -1,5 +1,6 @@
 (defpackage #:weblocks/actions
   (:use #:cl)
+  (:import-from #:log4cl)
   (:import-from #:weblocks/utils/misc
                 #:safe-apply)
   (:import-from #:weblocks/variables
