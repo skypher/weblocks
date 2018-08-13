@@ -2,6 +2,23 @@
  ChangeLog
 ===========
 
+0.32.1 (2018-08-13)
+===================
+
+* Previosly, there was an error if you are using ASDF's package inferred
+  system class and don't have explicit dependency on the ``weblocks``
+  page.
+
+  The error was raised during code loading::
+
+    ;;; > Error: There is no applicable method for the generic function:
+    >          #<STANDARD-GENERIC-FUNCTION WEBLOCKS/JS/BASE:MAKE-JS-BACKEND #x3020027E292F>
+    >        when called with arguments:
+    >          (:JQUERY)
+
+  Now it is fixed and package ``weblocks/js/jquery`` is a dependency of
+  ``weblocks/server`` and always loads.
+
 0.32.0 (2018-06-26)
 ===================
 

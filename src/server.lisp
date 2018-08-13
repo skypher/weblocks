@@ -3,7 +3,10 @@
         #:f-underscore)
   ;; to load js dependencies after app was started
   (:import-from #:weblocks/app-dependencies)
-  
+  ;; We need this import because this module defines important method
+  ;; make-js-backend
+  (:import-from #:weblocks/js/jquery)
+ 
   (:import-from #:weblocks/session
                 #:*session*)
   (:import-from #:weblocks/hooks
