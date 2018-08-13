@@ -2,6 +2,11 @@
  Request Hooks
 ===============
 
+TODO: Rewrite this part of documentation, enumerate hooks, available out
+of the box (could be searched by ``defhook`` keyword), add an example of
+a custom hook.
+
+
 Hook is a named callbacks list. Depending on name, callbacks are
 called in different places though request processing pipeline.
 
@@ -39,10 +44,6 @@ Here are hook names, defined by Weblocks:
   session. Has one parameter – session hash. Right now it is
   called only from ``weblocks.sessions:reset-latest-session``.
 
-
-TODO: Add example of a custom hook.
-
-TODO: Add description how dynamic hooks are working.
 
 .. cl:in-package:: weblocks
                    

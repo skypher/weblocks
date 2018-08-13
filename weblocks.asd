@@ -50,7 +50,6 @@
   :depends-on ("weblocks/app"
                "weblocks/server"
                "weblocks/debug"
-               "weblocks/js/jquery"
                "weblocks/default-init"
                "weblocks/widgets/string-widget"
                "weblocks/widgets/funcall-widget"

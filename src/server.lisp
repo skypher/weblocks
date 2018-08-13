@@ -240,39 +240,40 @@ the initargs :PORT and :SESSION-COOKIE-NAME default to
 Also opens all stores declared via DEFSTORE and starts webapps
 declared AUTOSTART."
 
-  (when *server*
-    (restart-case
-        (error "Server already running on port ~A"
-               (get-port *server*))
-      (continue ()
-        :report "Stop the old server and start a new one."
-        (stop))))
+  (weblocks/hooks:with-start-weblocks-hook ()
+    (when *server*
+      (restart-case
+          (error "Server already running on port ~A"
+                 (get-port *server*))
+        (continue ()
+          :report "Stop the old server and start a new one."
+          (stop))))
 
 
 
-  (log:info "Starting weblocks" port server-type debug)
+    (log:info "Starting weblocks" port server-type debug)
 
-  (reset-routes)
+    (reset-routes)
   
-  (unless (member :bordeaux-threads *features*)
-    (cerror "I know what I'm doing and will stubbornly continue."
-            "You're trying to start Weblocks without threading ~
+    (unless (member :bordeaux-threads *features*)
+      (cerror "I know what I'm doing and will stubbornly continue."
+              "You're trying to start Weblocks without threading ~
             support. Recompile your Lisp with threads enabled."))
-  (if debug
-      (weblocks/debug:on)
-      (weblocks/debug:off))
+    (if debug
+        (weblocks/debug:on)
+        (weblocks/debug:off))
 
-  (setf *server*
-        (make-server :port port
-                     :interface interface
-                     :server-type server-type))
-  (values
-   (start-server *server*
-                 :debug debug)
-   (mapcar (lambda (class)
-             (unless (app-active-p class)
-               (weblocks/app:start class :debug debug)))
-           (get-autostarting-apps))))
+    (setf *server*
+          (make-server :port port
+                       :interface interface
+                       :server-type server-type))
+    (values
+     (start-server *server*
+                   :debug debug)
+     (mapcar (lambda (class)
+               (unless (app-active-p class)
+                 (weblocks/app:start class :debug debug)))
+             (get-autostarting-apps)))))
 
 
 (defun stop ()

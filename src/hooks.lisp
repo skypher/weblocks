@@ -296,8 +296,11 @@ one of add-xxxx-hook and a (call-next-hook) inside of it."
   "Called around code reponsible for request processing even
    before any application was choosen.")
 
+(defhook start-weblocks
+  "Called around code which starts all applications and a webserver.")
+
 (defhook stop-weblocks
-  "Called around code which stops all application and a webserver.")
+  "Called around code which stops all applications and a webserver.")
 
 (defhook action
   "Called when action is processed")

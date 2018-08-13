@@ -5,6 +5,16 @@
 0.32.1 (2018-08-13)
 ===================
 
+Changes
+-------
+
+* A new hook was added - ``start-weblocks``. It is called around the
+  code in ``(weblocks/server:start)`` and can be used to setup some
+  additional routes, for example.
+
+Fixes
+-----
+
 * Previosly, there was an error if you are using ASDF's package inferred
   system class and don't have explicit dependency on the ``weblocks``
   page.
