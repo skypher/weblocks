@@ -1,4 +1,7 @@
 * Roadmap
+** TODO Create defroute macro to simplify adding of additional routes
+Also, all functions like weblocks/request:get-parameters should work
+within defined route.
 ** DONE Make hooks system easier to use
 - State "DONE"       from "TODO"       [2017-09-11 Mon 09:59]
 Get rid of distinction between :pre :post and :dynamic hooks
