@@ -36,8 +36,7 @@
    #:get-prefix
    #:app-serves-hostname-p
    #:get-current
-   #:with-app
-   #:make-uri))
+   #:with-app))
 (in-package weblocks/app)
 ;; (in-package weblocks)
 

@@ -34,7 +34,6 @@
    #:ajax-request-p
    #:get-host
    #:get-port
-   #:get-uri
    #:get-method
    #:refresh-request-p
    #:remove-header

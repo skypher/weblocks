@@ -5,6 +5,14 @@
 0.33.0 (2018-11-22)
 ===================
 
+Changes
+-------
+
+* Removed external symbol ``weblocks/app:make-uri`` because it wasn't
+  fbound to any function after some refactoring.
+
+  Use ``weblocks/response:make-uri`` instead.
+
 Fixes
 -----
 
