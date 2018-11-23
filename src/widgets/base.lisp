@@ -1,6 +1,5 @@
 (defpackage #:weblocks/widgets/base
   (:use #:cl)
-  (:nicknames #:weblocks/widget)
   (:import-from #:weblocks/html
                 #:with-html
                 #:with-html-string)

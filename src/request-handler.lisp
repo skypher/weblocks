@@ -17,8 +17,9 @@
   (:import-from #:weblocks/session-lock
                 #:get-lock)
   (:import-from #:weblocks/widget
-                #:dom-id
                 #:render)
+  (:import-from #:weblocks/widgets/dom
+                #:dom-id)
   (:import-from #:weblocks/html
                 #:with-html-string
                 #:*stream*)

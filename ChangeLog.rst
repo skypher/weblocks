@@ -2,6 +2,18 @@
  ChangeLog
 ===========
 
+0.33.0 (2018-11-22)
+===================
+
+Fixes
+-----
+
+* A separate file ``widget.lisp`` was added to define a
+  ``weblocks/widget`` package. This solves issues when
+  ASDF package inferred loading is unable to find ``weblocks/widget``
+  system. Seems it plays badly when ``weblocks/widget`` is nickname for
+  ``weblocks/widgets/base``.
+
 0.32.1 (2018-08-13)
 ===================
 
