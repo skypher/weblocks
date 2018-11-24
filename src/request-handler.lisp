@@ -77,6 +77,8 @@
   (:import-from #:weblocks/session)
   (:import-from #:alexandria
                 #:make-keyword)
+  (:import-from #:log4cl-json
+                #:with-log-unhandled)
 
   (:export
    #:handle-client-request
@@ -134,8 +136,8 @@ customize behavior."))
           ; Hunchentoot already displays warnings into log file, we just suppress output
           (*error-output* (make-string-output-stream)))
       (with-app app
-        ;;(log4cl-json:with-log-unhandled ())
-        (call-next-method)))))
+        (with-log-unhandled ()
+          (call-next-method))))))
 
 
 (defmethod handle-client-request :around (app)

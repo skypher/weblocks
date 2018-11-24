@@ -5,6 +5,16 @@
 0.33.1 (2018-11-24)
 ===================
 
+Improvements
+------------
+
+* Now unhandled exceptions are logged with tracebacks if you are using
+  ``log4cl-json`` library. To turn it on, just do:
+
+  .. code:: common-lisp
+            
+     (log4cl-json:setup)
+
 Fixes
 -----
 
