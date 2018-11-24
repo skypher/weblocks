@@ -1,6 +1,5 @@
 (defpackage #:weblocks/js/base
   (:use #:cl)
-  (:nicknames #:weblocks/js)
   (:import-from #:weblocks/html
                 #:with-html
                 #:with-html-string)

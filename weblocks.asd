@@ -60,5 +60,3 @@
 (register-system-packages "lack-request" '(#:lack.request))
 (register-system-packages "lack-util" '(#:lack.util))
 (register-system-packages "log4cl" '(#:log))
-
-(register-system-packages "weblocks/js/base" '(#:weblocks/js))
