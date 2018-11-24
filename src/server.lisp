@@ -90,6 +90,18 @@ Make instance, then start it with ``start`` method."
                  :server-type server-type))
 
 
+(defun search-app-for-request-handling (path-info hostname)
+  (dolist (app (get-active-apps))
+    (let ((app-prefix (get-prefix app)))
+      (log:debug "Searching handler in" app app-prefix)
+      
+      (when (and (app-serves-hostname-p app hostname)
+                 (starts-with path-info
+                              app-prefix))
+        (return-from search-app-for-request-handling
+          app)))))
+
+
 (defmethod handle-request ((server server) env)
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
@@ -107,58 +119,43 @@ This function serves all started applications and their static files."
 
           (let* ((path-info (getf env :path-info))
                  (hostname (getf env :server-name))
-                 (route (get-route path-info)))
+                 (route (get-route path-info))
+                 (app (search-app-for-request-handling path-info hostname)))
 
             (log:debug "Processing request to" path-info)
 
             ;; If dependency found, then return it's content along with content-type
-            (when route
-              (log:debug "Route was found" route)
-              (return-from handle-request
-                (weblocks/routes:serve route env)))
+            (cond
+              (route
+               (log:debug "Route was found" route)
+               (weblocks/routes:serve route env))
+              (app
+               (log:debug "App was found" route)
+               (let* ((*code* 200)
+                      (*content-type*
+                        (if (ajax-request-p)
+                            "application/json"
+                            "text/html"))
+                      (*headers* nil)
+                      ;; TODO: make a macro to catch aborting
+                      (content (catch-possible-abort
+                                 (handle-client-request app))))
 
-            (dolist (app (get-active-apps))
-              (let ((app-prefix (get-prefix app)))
+                 (list *code* ;; this value can be changed somewhere in
+                       ;; handle-client-request
+                       (append (list :content-type *content-type*)
+                               *headers*)
+                       ;; Here we use catch to allow to abort usual response
+                       ;; processing and to return data immediately
+                       (list content))))
+              (t
+               (log:error "Application dispatch failed for" path-info)
 
-                (log:debug "Searching handler in" app app-prefix)
-
-                (when (and (app-serves-hostname-p app hostname)
-                           (starts-with path-info
-                                        app-prefix))
-
-                  ;; TODO это внутри использует hunchentoot
-                  ;;      но при запуске на Woo вызывает ошибку
-                  ;;      The variable HUNCHENTOOT:*REPLY* is unbound.
-                  ;; (weblocks::no-cache)    ; disable caching for dynamic pages
-
-                  (return-from handle-request
-                    ;; TODO: replace veariable binding to some macro from weblocks/response
-                    (let* ((*code* 200)
-                           (*content-type*
-                             (if (ajax-request-p)
-                                 "application/json"
-                                 "text/html"))
-                           (*headers* nil)
-                           ;; TODO: make a macro to catch aborting
-                           (content (catch-possible-abort
-                                      (handle-client-request app))))
-
-                      (list *code* ;; this value can be changed somewhere in
-                            ;; handle-client-request
-                            (append (list :content-type *content-type*)
-                                    *headers*)
-                            ;; Here we use catch to allow to abort usual response
-                            ;; processing and to return data immediately
-                            (list content)))))))
-
-            
-            (log:error "Application dispatch failed for" path-info)
-
-            (list 404
-                  (append (list :content-type "text/html")
-                          *headers*)
-                  (list (format nil "File \"~A\" was not found.~%"
-                                path-info)))))))))
+               (list 404
+                     (append (list :content-type "text/html")
+                             *headers*)
+                     (list (format nil "File \"~A\" was not found.~%"
+                                   path-info)))))))))))
 
 
 (defun start-server (server &key debug)

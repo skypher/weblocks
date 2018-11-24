@@ -20,6 +20,31 @@ Fixes
 
 * Function ``response:redirect`` and it's JS counterpart was fixed
   and now work as expected.
+* Request processing was streamlined and now
+  ``weblocks/server:handle-request`` does not contain non-local
+  exits. This fixes usage of the ``handle-request`` hook, because
+  previously, if you wrap some code around ``(call-next-hook)``, then
+  part following ``call-next-hook`` was ignored.
+
+  For example:
+
+  .. code:: common-lisp
+         
+
+     (weblocks/hooks:on-application-hook-handle-request
+       connect-to-database ()
+       
+       (let ((success nil))
+         (unwind-protect (progn (setup-transaction)
+                                (weblocks/hooks:call-next-hook)
+                                (setf success t))
+           (if success
+               (commit)
+               (rollback)))))
+
+  Before this fix, ``rollback`` always called, because execution never
+  hitted ``(setf success t)``. Now this is fixed.
+
 
 0.33.0 (2018-11-22)
 ===================
