@@ -237,6 +237,9 @@ window.commandHandlers = {
             }
         }
     },
+    'redirect': function(params) {
+        window.location.href = params.to;
+    },
     'executeCode': function(params) {
         jQuery(params.code).appendTo('body');
     }

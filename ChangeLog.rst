@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+0.33.1 (2018-11-24)
+===================
+
+Fixes
+-----
+
+* Function ``response:redirect`` and it's JS counterpart was fixed
+  and now work as expected.
+
 0.33.0 (2018-11-22)
 ===================
 

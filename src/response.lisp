@@ -150,9 +150,8 @@ HTTP code and headers are taken from *code* and *content-type*."
 (defun redirect (uri)
   "Redirects the client to a new URI."
   (if (ajax-request-p)
-      (abort-processing
-       (format nil "{\"redirect\":\"~A\"}" uri)
-       :content-type "application/json")
+      (add-command :redirect
+                   :to uri)
       (abort-processing
        ""
        :headers (list :location uri)
