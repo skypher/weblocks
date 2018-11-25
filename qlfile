@@ -13,3 +13,6 @@ github hamcrest 40ants/cl-hamcrest :ref v0.4.2
 
 # This system is needed for testing quickstart.lisp loading
 github weblocks-ui 40ants/weblocks-ui :ref v0.6.0
+
+# This depedency not in ultralisp or quicklisp yet
+github log4cl-json 40ants/log4cl-json :ref v0.2.1
