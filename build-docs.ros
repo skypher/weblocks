@@ -127,6 +127,7 @@ behaviour could be overriden by keyword argument ``:raise t``."
   (cond
    ((git-repository-was-changed-p)
     (git "commit -m 'Update docs'")
+    
     (git "push --force origin master:gh-pages"))
    ;; or
    (t (log:info "Everything is up to date."))))
