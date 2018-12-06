@@ -3,6 +3,10 @@
         #:f-underscore)
   ;; to load js dependencies after app was started
   (:import-from #:weblocks/app-dependencies)
+  ;; we need to depend on this package, because
+  ;; lack:builder will try to find `LACK.MIDDLEWARE.SESSION`
+  ;; package
+  (:import-from #:lack-middleware-session)
   ;; We need this import because this module defines important method
   ;; make-js-backend
   (:import-from #:weblocks/js/jquery)

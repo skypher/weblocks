@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+0.33.2 (2018-12-06)
+===================
+
+Fixes
+-----
+
+* Added dependency on ``lack-middleware-session`` system
+  because wee use it to store sessions.
+
 0.33.1 (2018-11-24)
 ===================
 
