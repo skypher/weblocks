@@ -31,7 +31,6 @@ matrix:
     - env: LISP=clisp
     - env: LISP=abcl
     - env: LISP=ecl
-    - env: LISP=sbcl
 
 addons:
   apt:
