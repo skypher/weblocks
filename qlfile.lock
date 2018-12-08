@@ -1,49 +1,35 @@
 ("quicklisp" .
  (:class qlot.source.ql:source-ql-all
-  :initargs (:project-name "quicklisp" :%version :latest)
-  :version "2018-04-30"))
+  :initargs (:distribution "http://beta.quicklisp.org/dist/quicklisp.txt" :%version :latest)
+  :version "2018-10-18"))
 ("defmain" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "defmain" :repos "40ants/defmain" :ref nil :branch nil :tag nil)
-  :version "github-7d6a0a532d774a30b25599862d424273c5e98a0f"
+  :version "github-a19d38334a391699bfd428f0cb3db43b7beb7495"
   :repos "40ants/defmain"
-  :url "https://github.com/40ants/defmain/archive/7d6a0a532d774a30b25599862d424273c5e98a0f.tar.gz"
-  :ref "7d6a0a532d774a30b25599862d424273c5e98a0f"))
+  :url "https://github.com/40ants/defmain/archive/a19d38334a391699bfd428f0cb3db43b7beb7495.tar.gz"
+  :ref "a19d38334a391699bfd428f0cb3db43b7beb7495"))
 ("cl-info" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-info" :repos "40ants/cl-info" :ref nil :branch nil :tag nil)
-  :version "github-c942f5bdfb7a5ca879602c480892b391000f42e7"
+  :version "github-2a879c21b4a62a33d89a750f2f0a5a99d5b6e25d"
   :repos "40ants/cl-info"
-  :url "https://github.com/40ants/cl-info/archive/c942f5bdfb7a5ca879602c480892b391000f42e7.tar.gz"
-  :ref "c942f5bdfb7a5ca879602c480892b391000f42e7"))
-("rove" .
- (:class qlot.source.github:source-github
-  :initargs (:project-name "rove" :repos "40ants/rove" :ref "generic-assert-description" :branch nil :tag nil)
-  :version "github-generic-assert-description"
-  :repos "40ants/rove"
-  :url "https://github.com/40ants/rove/archive/generic-assert-description.tar.gz"
-  :ref "generic-assert-description"))
+  :url "https://github.com/40ants/cl-info/archive/2a879c21b4a62a33d89a750f2f0a5a99d5b6e25d.tar.gz"
+  :ref "2a879c21b4a62a33d89a750f2f0a5a99d5b6e25d"))
 ("lack" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "lack" :repos "fukamachi/lack" :ref nil :branch nil :tag nil)
-  :version "github-2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096"
+  :version "github-abff8efeb0c3a848e6bb0022f2b8b7fa3a1bc88b"
   :repos "fukamachi/lack"
-  :url "https://github.com/fukamachi/lack/archive/2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096.tar.gz"
-  :ref "2c1c0df583f4b7cc9aba1d97cf9d1131a0fa0096"))
-("dissect" .
- (:class qlot.source.github:source-github
-  :initargs (:project-name "dissect" :repos "40ants/dissect" :ref "fix-iteration-on-unknown-args" :branch nil :tag nil)
-  :version "github-fix-iteration-on-unknown-args"
-  :repos "40ants/dissect"
-  :url "https://github.com/40ants/dissect/archive/fix-iteration-on-unknown-args.tar.gz"
-  :ref "fix-iteration-on-unknown-args"))
+  :url "https://github.com/fukamachi/lack/archive/abff8efeb0c3a848e6bb0022f2b8b7fa3a1bc88b.tar.gz"
+  :ref "abff8efeb0c3a848e6bb0022f2b8b7fa3a1bc88b"))
 ("hamcrest" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "hamcrest" :repos "40ants/cl-hamcrest" :ref "v0.4.2" :branch nil :tag nil)
-  :version "github-v0.4.2"
+  :initargs (:project-name "hamcrest" :repos "40ants/cl-hamcrest" :ref "v0.4.3" :branch nil :tag nil)
+  :version "github-v0.4.3"
   :repos "40ants/cl-hamcrest"
-  :url "https://github.com/40ants/cl-hamcrest/archive/v0.4.2.tar.gz"
-  :ref "v0.4.2"))
+  :url "https://github.com/40ants/cl-hamcrest/archive/v0.4.3.tar.gz"
+  :ref "v0.4.3"))
 ("weblocks-ui" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "weblocks-ui" :repos "40ants/weblocks-ui" :ref "v0.6.0" :branch nil :tag nil)
@@ -53,8 +39,8 @@
   :ref "v0.6.0"))
 ("log4cl-json" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "log4cl-json" :repos "40ants/log4cl-json" :ref "v0.2.1" :branch nil :tag nil)
-  :version "github-v0.2.1"
+  :initargs (:project-name "log4cl-json" :repos "40ants/log4cl-json" :ref "v0.2.2" :branch nil :tag nil)
+  :version "github-v0.2.2"
   :repos "40ants/log4cl-json"
-  :url "https://github.com/40ants/log4cl-json/archive/v0.2.1.tar.gz"
-  :ref "v0.2.1"))
+  :url "https://github.com/40ants/log4cl-json/archive/v0.2.2.tar.gz"
+  :ref "v0.2.2"))

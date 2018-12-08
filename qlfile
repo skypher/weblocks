@@ -2,17 +2,15 @@ ql :all :latest
 
 github defmain 40ants/defmain
 github cl-info 40ants/cl-info
-github rove 40ants/rove :ref generic-assert-description
 
 # Because request-uri-scheme support is not in the quicklisp yet
 # https://github.com/fukamachi/lack/commit/23c372594b92f5ae564115989feb4e4f97ba1a9c
 github lack fukamachi/lack
 
-github dissect 40ants/dissect :ref fix-iteration-on-unknown-args
-github hamcrest 40ants/cl-hamcrest :ref v0.4.2
+github hamcrest 40ants/cl-hamcrest :ref v0.4.3
 
 # This system is needed for testing quickstart.lisp loading
 github weblocks-ui 40ants/weblocks-ui :ref v0.6.0
 
 # This depedency not in ultralisp or quicklisp yet
-github log4cl-json 40ants/log4cl-json :ref v0.2.1
+github log4cl-json 40ants/log4cl-json :ref v0.2.2
