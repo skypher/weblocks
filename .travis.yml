@@ -64,7 +64,7 @@ before_script:
   # Using latest dissect because current Quicklisp fails on SBCL >= 1.4.10
   # https://github.com/fukamachi/qlot/commit/367f87c89b08afca0ff13a8c3b58d0c9fd6cb567
   - ros install Shinmera/dissect
-  - ros install rove
+  - ros install fukamachi/rove
   - ros install 40ants/cl-info
   
   - qlot install
