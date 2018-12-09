@@ -27,7 +27,9 @@
 
 (defmacro with-html (&body body)
   `(let ((spinneret:*html-lang* *lang*)
-         (spinneret:*html* *stream*))
+         (spinneret:*html* *stream*)
+         ;; We want to an HTML which is nice to read, by default
+         (*print-pretty* t))
      (spinneret:with-html
        ,@body)))
 

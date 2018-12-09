@@ -11,6 +11,7 @@ Fixes
 * Fixed issue introduced in ``0.33.2`` release - system
   ``lack-middleware-session`` was loaded successfully, but SBCL was
   unable to find ``lack-middleware-session`` package.
+* Now HTML is pretty-printed by default on all implementations.
 
 0.33.2 (2018-12-06)
 ===================
