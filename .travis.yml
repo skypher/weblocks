@@ -24,6 +24,10 @@ env:
     # compile error on loading yaclml-20150709-git
     #- LISP=ecl
 
+os:
+  - osx
+  - linux
+
 matrix:
   allow_failures:
     - env: LISP=allegro
@@ -31,7 +35,6 @@ matrix:
     - env: LISP=clisp
     - env: LISP=abcl
     - env: LISP=ecl
-    - env: LISP=sbcl
 
 addons:
   apt:
@@ -51,17 +54,20 @@ cache:
 
 before_script:
   - env | sort
-  - cat /proc/meminfo
   - ros --version
   - ros install asdf/3.3.1.1
   # Version fixed for more build stability
   # TODO: update it from time to time
-  - ros install svetlyak40wt/qlot/stable
+  - ros install 40ants/qlot/freeze/f390a18c023267c5b40d5d407fdffa1b2ab7d3b8
   - ros config
   
+  # Using latest dissect because current Quicklisp fails on SBCL >= 1.4.10
+  # https://github.com/fukamachi/qlot/commit/367f87c89b08afca0ff13a8c3b58d0c9fd6cb567
+  - ros install Shinmera/dissect
+  - ros install fukamachi/rove
+  - ros install 40ants/cl-info
+  
   - qlot install
-  - qlot exec ros install rove
-  - qlot exec ros install cl-info
   - qlot exec ros run -e '(progn (ql:quickload :weblocks-test) (uiop:quit 0))'
   - qlot exec cl-info hamcrest rove dissect weblocks
     

@@ -142,29 +142,37 @@
         (cl-fad:delete-directory-and-files *cache-remote-dependencies-in*)))))
 
 
-(deftest reder-css-dependency
+(deftest render-css-dependency
   (let ((dependency (make-dependency "some.css")))
     (is-html (render-in-head dependency)
-             "<link rel=stylesheet type=text/css href=/static/css/some.css media=screen>"
+             "<link rel=stylesheet type=text/css
+      href=/static/css/some.css media=screen>"
              "Local CSS dependency should be rendered as a link tag."))
 
   (let* ((*cache-remote-dependencies-in* nil)
          (dependency (make-dependency "https://example.com/some.css")))
     (is-html (render-in-head dependency)
-             "<link rel=stylesheet type=text/css href=https://example.com/some.css media=screen>"
+             "<link rel=stylesheet type=text/css
+      href=https://example.com/some.css
+      media=screen>"
              "Remote CSS dependency should be rendered with remote url if caching is turned off."))
 
   (let* ((*cache-remote-dependencies-in* "/tmp/cache/")
          (dependency (make-dependency "https://example.com/some.css")))
     (is-html (render-in-head dependency)
-             "<!-- https://example.com/some.css --><link rel=stylesheet type=text/css href=/remote-deps-cache.* media=screen>"
+             "<!-- https://example.com/some.css -->
+<link rel=stylesheet type=text/css
+      href=/remote-deps-cache.*
+      media=screen>"
              "Remote CSS dependency should be rendered with local if caching is turned on.")))
 
 
 (deftest render-js-dependency
   (let ((dependency (make-dependency "some.js")))
     (is-html (render-in-head dependency)
-             "<script src=/static/js/some.js type=text/javascript></script>"
+             "<script src=/static/js/some.js
+        type=text/javascript>
+</script>"
              "JS dependency should be rendered as a script tag.")))
 
 
