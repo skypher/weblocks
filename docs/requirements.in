@@ -1,5 +1,5 @@
 # to build documentation
-sphinx
+sphinx>=1.8
 pygments-cl-repl
 sphinx-bootstrap-theme
 releases
