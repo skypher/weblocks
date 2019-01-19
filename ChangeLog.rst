@@ -2,8 +2,22 @@
  ChangeLog
 ===========
 
-Unreleased
-==========
+0.34.0
+======
+
+New
+---
+
+* Function ``weblocks/request:get-scheme`` was added and it is uses
+  ``X-Forwarded-Proto`` header, if it is available.
+
+Changes
+-------
+
+* Function ``weblocks/request:get-port`` now will use ``X-Forwarded-Port``
+  header if it is available.
+* Function ``weblocks/request:get-host`` now will use ``X-Forwarded-Host``
+  header if it is available.
 
 Fixes
 -----
@@ -12,6 +26,8 @@ Fixes
   ``lack-middleware-session`` was loaded successfully, but SBCL was
   unable to find ``lack-middleware-session`` package.
 * Now HTML is pretty-printed by default on all implementations.
+* Function ``weblocks/request:get-uri`` was fixed to work correctly when
+  server is behind a reverse proxy which provides ``X-Forwarded-*`` headers.
 
 0.33.2 (2018-12-06)
 ===================

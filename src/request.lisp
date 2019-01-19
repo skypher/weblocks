@@ -31,6 +31,7 @@
    #:get-parameters
    #:get-parameter
    #:get-header
+   #:get-scheme
    #:ajax-request-p
    #:get-host
    #:get-port
@@ -52,14 +53,20 @@
   "For URL http://example.com/foo/bar?blah=minor returns it as is."
   (let ((host (get-host :request request))
         (port (get-port :request request))
-        (scheme (request-uri-scheme request))
+        (scheme (get-scheme :request request))
         (path (get-path :request request))
         (query (request-query-string request)))
+
     (quri:render-uri (quri:make-uri :scheme scheme
                                     :host host
                                     :port port
                                     :path path
                                     :query query))))
+
+
+(defun get-scheme (&key (request *request*))
+  (or (get-header "x-forwarded-proto" :request request)
+      (request-uri-scheme request)))
 
 
 (defun get-path (&key (request *request*) with-params)
@@ -73,11 +80,21 @@
 
 
 (defun get-host (&key (request *request*))
-  (request-server-name request))
+  (or (get-header "x-forwarded-host" :request request)
+      (request-server-name request)))
 
 
 (defun get-port (&key (request *request*))
-  (request-server-port request))
+  "Returns a webserver's port.
+
+   It may be not a port a lisp server listens on but
+   a port a reverse proxy listens on."
+  (let ((forwarded-port (get-header "x-forwarded-port" :request request)))
+    ;; Lack parses this value itself and should provide integer
+    (check-type forwarded-port (or null integer))
+    
+    (or forwarded-port
+        (request-server-port request))))
 
 
 (defun get-method (&key (request *request*))
