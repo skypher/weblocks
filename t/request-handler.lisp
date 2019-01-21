@@ -10,11 +10,12 @@
   (:import-from #:weblocks/widgets/string-widget
                 #:make-string-widget)
   (:import-from #:weblocks/request-handler
-                #:handle-client-request)
+                #:handle-request)
   (:import-from #:weblocks/response
                 #:catch-possible-abort
-                #:*code*
-                #:*headers*)
+                #:get-code
+                #:get-content
+                #:get-custom-headers)
   
   ;; Just dependencies
   (:import-from #:weblocks/session))
@@ -22,7 +23,7 @@
 
 
 (defapp app-with-init
-  :prefix "/my-app"
+  :prefix "/test/my-app"
   :autostart nil)
 
 
@@ -34,23 +35,24 @@
 (deftest process-first-request
   (with-session
     (with-request ("/foo/bar" :app app-with-init)
-      (let ((result (handle-client-request *current-app*)))
-        (ok (search "Hello world" result)
+      (let* ((response (handle-request *current-app*))
+             (content (get-content response)))
+        (ok (search "Hello world" content)
             "Result should have a greeting.")))))
 
 
 (deftest process-request-with-missing-action
   (with-session
     (with-request ("/foo/bar?action=store-data" :app app-with-init)
-      (let ((result (catch-possible-abort
-                      (handle-client-request *current-app*))))
-        (ok (equal result
+      (let ((response (handle-request *current-app*)))
+        (ok (equal (get-content response)
                    "")
             "Result should have an error message.")
-        (ok (equal *code* 302)
+        (ok (equal (get-code response)
+                   302)
             "And response code should be 302")
 
         (testing "And user should be redirected to the app's prefix uri."
-          (assert-that *headers*
-                       (has-plist-entries :location "http://localhost/my-app")))))))
+          (assert-that (get-custom-headers response)
+                       (has-plist-entries :location "http://localhost/test/my-app")))))))
 

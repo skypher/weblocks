@@ -1,7 +1,7 @@
 (defpackage #:weblocks/debug
   (:use #:cl)
   (:import-from #:weblocks/hooks
-                #:on-application-hook-handle-request)
+                #:on-application-hook-handle-http-request)
   (:import-from #:weblocks/app
                 #:*current-app*
                 #:find-active-app
@@ -60,7 +60,7 @@ To clear, use function \(reset-last-session\).")
   
   (when track-latest-session
     ;; This piece will store latest session in a variable
-    (on-application-hook-handle-request
+    (on-application-hook-handle-http-request
         track-latest-session ()
       
       (setf *latest-session*

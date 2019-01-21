@@ -1,7 +1,7 @@
 (defpackage #:weblocks/commands
   (:use #:cl)
   (:import-from #:weblocks/hooks
-                #:on-application-hook-handle-request
+                #:on-application-hook-handle-http-request
                 #:call-next-hook)
   (:export #:add-command
            #:get-collected-commands))
@@ -47,7 +47,7 @@ After action processing these commands will be sent for execution on the client.
   (reverse *commands*))
 
 
-(on-application-hook-handle-request
+(on-application-hook-handle-http-request
   reset-commands-list ()
   (let (*commands*)
     (call-next-hook)))

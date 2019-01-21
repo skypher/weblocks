@@ -292,8 +292,8 @@ one of add-xxxx-hook and a (call-next-hook) inside of it."
 
 ;; Weblocks core hooks
 
-(defhook handle-request
-  "Called around code reponsible for request processing even
+(defhook handle-http-request
+  "Called around code reponsible for an HTTP request processing even
    before any application was choosen.")
 
 (defhook start-weblocks

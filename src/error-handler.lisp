@@ -3,9 +3,9 @@
   (:import-from #:trivial-backtrace
                 #:print-backtrace)
   (:import-from #:weblocks/response
-                #:abort-processing)
+                #:immediate-response)
   ;; Just dependencies
-  (:import-from #:log)
+  (:import-from #:log4cl)
   
   (:export #:on-error))
 (in-package weblocks/error-handler)
@@ -13,12 +13,11 @@
 
 (defgeneric on-error (app condition)
   (:documentation "This method is called when some unhandled error was raised by application.
-                   It should call weblocks/response:abort-processing like this:
+                   It should call weblocks/response:immediate-response like this:
 
-                       \(weblocks/response:abort-processing
+                       \(weblocks/response:immediate-response
                            \"Unhandled condition\"
-                           :code 500
-                           :content-type \"text/plain\"\)
+                           :code 500)
 
 "))
 
@@ -32,6 +31,5 @@
                       condition :output nil)))
       (log:error "Returning 500 error to user" traceback)))
   
-  (abort-processing "Unhandled condition"
-                    :code 500
-                    :content-type "text/plain"))
+  (immediate-response "Unhandled condition"
+                      :code 500))
