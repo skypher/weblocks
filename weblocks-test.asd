@@ -10,7 +10,8 @@
                "weblocks-test/request-handler"
                "weblocks-test/actions"
                "weblocks-test/commands"
-               "weblocks-test/default-init")
+               "weblocks-test/default-init"
+               "weblocks-test/widgets/render-methods")
   :perform (test-op (o c) (symbol-call :rove '#:run c)))
 
 
