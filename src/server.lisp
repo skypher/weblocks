@@ -30,7 +30,9 @@
   (:import-from #:weblocks/request
                 #:with-request)
   (:import-from #:weblocks/response
-                #:get-code)
+                #:get-code
+                #:get-headers
+                #:get-content)
   (:import-from #:weblocks/request-handler
                 #:handle-request)
     
