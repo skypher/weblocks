@@ -14,48 +14,88 @@
   (:import-from #:weblocks/commands
                 #:add-command)
   (:import-from #:quri)
-  (:export
-   #:*code*
-   #:*content-type*
-   #:abort-processing
-   #:add-header
-   #:*headers*
-   #:send-script
-   #:make-uri
-   #:redirect
-   #:catch-possible-abort))
+  (:export #:immediate-response
+           #:make-response
+           #:add-header
+           #:send-script
+           #:make-uri
+           #:redirect
+           #:catch-possible-abort
+           #:get-response
+           #:get-content
+           #:get-code
+           #:get-headers
+           #:get-custom-headers
+           #:get-content-type))
 (in-package weblocks/response)
 
 
-(defvar *code* nil
-  "HTTP status code to return in response to request.
+(defvar *custom-headers* nil
+  "Additional HTTP headers to return in response to request.
 
-This variable is bound to 200 for each request. Set it to another
-code if required to return something else.")
-
-
-(defvar *content-type* nil
-  "HTTP content type to return in response to request.
-
-This variable is bound to text/html for each usual request and to application/json
-for AJAX requests. Set it to another content type if you need to return something else.")
+   Use (add-header ...) to add one header.")
 
 
-(defvar *headers* nil
-  "HTTP headers to return in response to request.
+(defun get-default-content-type-for-response ()
+  (if (ajax-request-p)
+      "application/json"
+      "text/html"))
 
-This variable is bound to nil for each request. Set it to plist
-with any headers you need or use (add-header ...) to add one header.
+(defclass response ()
+  ((content :type string
+            :initarg :content
+            :initform ""
+            :reader get-content
+            :documentation "A string with a content of the response.")
+   (code :type integer
+         :initarg :code
+         :initform 200
+         :reader get-code
+         :documentation "HTTP status code to return in response to request.
 
-Additional header :content-type will be added to this list before
-returning response. To change content type, set *content-type*.")
+                         By default, this slot will be set to 200.")
+   (custom-headers :type (or null list)
+                   :initarg :custom-headers
+                   :initform nil
+                   :reader get-custom-headers
+                   :documentation "Custom HTTP headers of request.
 
-(defvar *abort-can-be-catched-p* nil
-  "This variable will be set to 't automatically
-   when you use `catch-possible-abort'.
+                         By default, this slot will be set to 200.")
+   (content-type :type string
+                 :initarg :content-type
+                 :initform (get-default-content-type-for-response)
+                 :reader get-content-type
+                 :documentation "HTTP content type to return in response to request.
 
-   If it is not 't, then call to `abort-processing' will
-   invoke the debugger, because it is abnormal situation.")
+                                 By default, have text/html value for usual requests
+                                 and application/json for AJAX requests.")))
+
+
+(defun get-headers (response)
+  (check-type response response)
+  (append (list :content-type (get-content-type response))
+          (get-custom-headers response)))
+
+
+(define-condition immediate-response ()
+  ((response :type response
+             :initarg :response
+             :reader get-response)))
+
+
+(define-condition redirect (immediate-response)
+  ())
+
+
+(defun make-response (content &key
+                                (code 200)
+                                (content-type (get-default-content-type-for-response))
+                                (headers *custom-headers*))
+  (make-instance 'response
+                 :content content
+                 :code code
+                 :content-type content-type
+                 :custom-headers headers))
 
 
 (defun add-header (name value)
@@ -65,8 +105,8 @@ returning response. To change content type, set *content-type*.")
 
   (declare (type symbol name)
            (type string value))
-  (push value *headers*)
-  (push name *headers*))
+  (push value *custom-headers*)
+  (push name *custom-headers*))
 
 
 (defun make-uri (new-path)
@@ -84,9 +124,11 @@ returning response. To change content type, set *content-type*.")
     (quri:render-uri new-url)))
 
 
-(defun abort-processing (content &key (content-type nil content-type-given)
-                                      (code nil code-given)
-                                      (headers nil headers-given))
+(defun immediate-response (content &key
+                                     (content-type (get-default-content-type-for-response))
+                                     (code 200)
+                                     (headers *custom-headers*)
+                                     (condition-class 'immediate-response))
   "Aborts request processing and return given value as response.
 
 HTTP code and headers are taken from *code* and *content-type*."
@@ -96,27 +138,12 @@ HTTP code and headers are taken from *code* and *content-type*."
              content-type
              headers)
 
-  (when content-type-given
-    (setf *content-type* content-type))
-
-  (when code-given
-    (setf *code* code))
-
-  (when headers-given
-    (setf *headers* headers))
-
-  (if *abort-can-be-catched-p*
-      (throw 'abort-processing content)
-      (error "Abort is not possible")))
-
-
-(defmacro catch-possible-abort (&body body)
-  "Catches throwed 'abort-processing and returns the value.
-
-   Used in the server code and in tests."
-  `(let ((*abort-can-be-catched-p* t))
-     (catch 'abort-processing
-       ,@body)))
+  (signal condition-class
+          :response (make-response 
+                     content
+                     :code code
+                     :content-type content-type
+                     :headers headers)))
 
 
 (defun send-script (script &optional (place :after-load))
@@ -152,10 +179,10 @@ HTTP code and headers are taken from *code* and *content-type*."
   (if (ajax-request-p)
       (add-command :redirect
                    :to uri)
-      (abort-processing
-       ""
-       :headers (list :location uri)
-       :code 302)))
+      (immediate-response ""
+                          :condition-class 'redirect
+                          :headers (list :location uri)
+                          :code 302)))
 
 
 (defmethod on-missing-action (app action-name)

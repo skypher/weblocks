@@ -2,6 +2,47 @@
  ChangeLog
 ===========
 
+0.35.0
+======
+
+Request handling pipeline was refactored.
+
+The idea of this refactoring, is to separate roles of the functions
+which process requests. Now ``weblocks/server:handle-http-request``
+prepares data received from the ``Clack`` and calls
+``weblocks/request-handler:handle-request`` to do the real job.
+
+In it's turn, ``weblocks/request-handler:handle-request`` should return
+an object of type ``weblocks/response:response`` containing a content,
+HTTP status code and headers of the response. Any error signal, thrown
+from the ``handle-resquest`` is considered by ``handle-http-request`` as
+an "unhandled error" and returned with 500 HTTP status code.
+
+Here is a list of changes:
+
+* Macro ``weblocks/hooks:on-application-hook-handle-request`` was
+  renamed to ``weblocks/hooks:on-application-hook-handle-http-request``.
+* Generic-function ``weblocks/request-handler:handle-client-request``
+  was renamed to ``weblocks/request-handler:handle-request`` and now
+  this function should return either ``string`` or an object of type
+  ``response``. Previously, it also made a non-local exit by throwing a
+  tag, if request was aborted (for example to return a redirect
+  response). But now it should only unwind a stack in case if some
+  unhandled errow was thrown. Any condition of type
+  ``weblocks/response:immediate-response`` will be catched inside a
+  ``:around weblocks/request-handler:handle-request`` method and
+  returned as usual ``response`` object.
+* Function ``weblocks/response:abort-processing`` was renamed to
+  ``weblocks/response:immediate-return``, symbols ``*code*``,
+  ``*headers*`` and ``*content-type`` are not exported anymore. Instead
+  of these global variables, use newly exported functions
+  ``get-content``, ``get-code``, ``get-headers``, ``get-custom-headers``
+  and ``get-content-type`` to extract information from the ``response`` object.
+  * Package ``weblocks/response`` does not export symbols ``*code*`` and
+  ``*content-type*`` anymore, but exports a function ``make-response``
+  which can be used by a ``weblocks/request-handler:handle-reqiest`` to
+  return response.
+
 0.34.0
 ======
 

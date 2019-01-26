@@ -28,15 +28,13 @@
                 #:weblocks-webapp-name
                 #:get-autostarting-apps)
   (:import-from #:weblocks/request
-                #:ajax-request-p
                 #:with-request)
   (:import-from #:weblocks/response
-                #:*code*
-                #:*content-type*
-                #:*headers*
-                #:catch-possible-abort)
+                #:get-code
+                #:get-headers
+                #:get-content)
   (:import-from #:weblocks/request-handler
-                #:handle-client-request)
+                #:handle-request)
     
   (:import-from #:lack.request
                 #:make-request)
@@ -53,7 +51,7 @@
   (:export ;; #:get-server-type
            ;; #:get-port
            ;; #:make-server
-           ;; #:handle-request
+           ;; #:handle-http-request
            #:stop
            #:start
            #:serve-static-file))
@@ -78,7 +76,7 @@
             :accessor get-handler)))
 
 
-(defgeneric handle-request (server env)
+(defgeneric handle-http-request (server env)
   (:documentation "Handles HTTP request, passed by Clack"))
 
 
@@ -106,7 +104,7 @@ Make instance, then start it with ``start`` method."
           app)))))
 
 
-(defmethod handle-request ((server server) env)
+(defmethod handle-http-request ((server server) env)
   "Weblocks HTTP dispatcher.
 This function serves all started applications and their static files."
 
@@ -115,11 +113,11 @@ This function serves all started applications and their static files."
          ;; and don't interfere with other threads and requests
          (*random-state* *random-state*))
     (with-request ((make-request env))
-      ;; Dynamic hook :handle-request makes possible to write
+      ;; Dynamic hook :handle-http-request makes possible to write
       ;; some sort of middlewares, which change *request* and *session*
       ;; variables.
       (prepare-hooks
-        (weblocks/hooks:with-handle-request-hook ()
+        (weblocks/hooks:with-handle-http-request-hook ()
 
           (let* ((path-info (getf env :path-info))
                  (hostname (getf env :server-name))
@@ -135,29 +133,17 @@ This function serves all started applications and their static files."
                (weblocks/routes:serve route env))
               (app
                (log:debug "App was found" route)
-               (let* ((*code* 200)
-                      (*content-type*
-                        (if (ajax-request-p)
-                            "application/json"
-                            "text/html"))
-                      (*headers* nil)
-                      ;; TODO: make a macro to catch aborting
-                      (content (catch-possible-abort
-                                 (handle-client-request app))))
-
-                 (list *code* ;; this value can be changed somewhere in
-                       ;; handle-client-request
-                       (append (list :content-type *content-type*)
-                               *headers*)
+               (let* ((response (handle-request app)))
+                 (list (get-code response)
+                       (get-headers response)
                        ;; Here we use catch to allow to abort usual response
                        ;; processing and to return data immediately
-                       (list content))))
+                       (list (get-content response)))))
               (t
                (log:error "Application dispatch failed for" path-info)
 
                (list 404
-                     (append (list :content-type "text/html")
-                             *headers*)
+                     (list :content-type "text/html")
                      (list (format nil "File \"~A\" was not found.~%"
                                    path-info)))))))))))
 
@@ -176,7 +162,7 @@ If server is already started, then logs a warning and does nothing."
              (app (builder
                    :session
                    (lambda (env)
-                     (handle-request server env)
+                     (handle-http-request server env)
                      ;; (handler-case ()
                      ;;   (t (condition)
                      ;;     (let* ((traceback (with-output-to-string (stream)

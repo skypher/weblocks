@@ -11,6 +11,8 @@
                "weblocks-test/actions"
                "weblocks-test/commands"
                "weblocks-test/default-init"
+               "weblocks-test/widgets/mop"
+               "weblocks-test/widgets/macroexpansion"
                "weblocks-test/widgets/render-methods")
   :perform (test-op (o c) (symbol-call :rove '#:run c)))
 

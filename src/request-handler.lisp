@@ -63,9 +63,10 @@
                 #:timeout-error
                 #:with-timeout)
   (:import-from #:weblocks/response
-                #:*code*
-                #:*content-type*
-                #:abort-processing
+                #:get-response
+                #:response
+                #:immediate-response
+                #:make-response
                 #:redirect)
   ;; Just dependencies
   (:import-from #:weblocks/hooks)
@@ -81,8 +82,7 @@
                 #:with-log-unhandled)
 
   (:export
-   #:handle-client-request
-   #:abort-request-handler
+   #:handle-request
    #:page-not-found-handler
    *request-timeout*
    #:handle-ajax-request))
@@ -95,7 +95,8 @@
 
   You can set this to NIL to disable timeouts (not recommended).")
 
-(defgeneric handle-client-request (app)
+
+(defgeneric handle-request (app)
   (:documentation
    "This method handles each request as it comes in from the
 server. It is a hunchentoot handler and has access to all hunchentoot
@@ -106,7 +107,7 @@ dirty widgets are rendered into a JSON data structure. It also invokes
 user supplied 'weblocks/session:init' method on the first request that has no
 session setup.
 
-'handle-client-request' immediately returns '+http-not-found+' if it
+'handle-request' immediately returns '+http-not-found+' if it
 sees a mime type on the script name (it doesn't handle what could be
 files because these mess with callback functions and break some
 widgets that depend on them).
@@ -125,22 +126,31 @@ Override this method (along with :before and :after specifiers) to
 customize behavior."))
 
 
-(defmethod handle-client-request :around ((app app))
+(defmethod handle-request :around ((app app))
   "This wrapper sets current application and suppresses error output from Hunchentoot."
   (handler-bind ((error (lambda (c)
                           (if *invoke-debugger-on-error*
                               (invoke-debugger c)
-                              (return-from handle-client-request
+                              (return-from handle-request
                                 (on-error app c))))))
     (let ((*print-pretty* t)
           ; Hunchentoot already displays warnings into log file, we just suppress output
           (*error-output* (make-string-output-stream)))
       (with-app app
         (with-log-unhandled ()
-          (call-next-method))))))
+          (handler-case
+              (let ((response (call-next-method)))
+                (typecase response
+                  (response response)
+                  (string (make-response response))
+                  (t (error "Responses of type ~A are not supported"
+                            (type-of response)))))
+            (immediate-response (c)
+              (get-response c))))))))
 
 
-(defmethod handle-client-request :around (app)
+;; TODO: make-this method an optional application mixin
+(defmethod handle-request :around (app)
   "This wrapper sets a timeout on the request and reports response timings."
 
   (log:debug "Handling client request for" app)
@@ -166,7 +176,7 @@ customize behavior."))
                                           (list real cpu
                                                 *timing-level*)
                                           timings))))
-                 (result (timing "handle-client-request"
+                 (result (timing "handle-request"
                            (call-next-method))))
             (dolist (timing timings)
               (dotimes (i (cadddr timing))
@@ -184,17 +194,15 @@ customize behavior."))
   (:method ((app t))
     (declare (ignore app))
     
-    (setf *code* 404
-          *content-type* "plain/text")
-
-    (abort-processing "Not found")))
+    (immediate-response "Not found"
+                        :code 404)))
 
 
 ;; Removed because we use `update' method now and it adds a command
 ;; (defun render-dirty-widgets ()
 ;;   "Renders widgets that have been marked as dirty into a JSON
 ;; association list. This function is normally called by
-;; 'handle-client-request' to service AJAX requests."
+;; 'handle-request' to service AJAX requests."
 
 ;;   (log:debug "Rendering dirty widgets")
 
@@ -317,7 +325,7 @@ customize behavior."))
       (when (pure-request-p)
         (log:debug "Request is pure, processing will be aborted.")
         ;; TODO: add with-action-hook ()
-        (abort-processing
+        (immediate-response
          (eval-action
           app
           action-name
@@ -342,7 +350,7 @@ customize behavior."))
       (redirect url))))
 
 
-(defmethod handle-client-request ((app app))
+(defmethod handle-request ((app app))
   (restart-case
       (progn
         ;; save it for splitting this up
@@ -425,11 +433,3 @@ customize behavior."))
       :report "abort request processing and return 500"
       (log:error "Aborting request processing")
       (on-error app nil))))
-
-
-
-;; (defun abort-request-handler (response)
-;;   "Aborts execution of the current request and returns a response as is."
-
-;;   ;; TODO: signal a condition and handle it somewhere.
-;;   nil)
