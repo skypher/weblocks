@@ -2,6 +2,15 @@
  ChangeLog
 ===========
 
+0.35.1 (2019-02-02)
+===================
+
+* Previosly, when you called ``(weblocks/debug:off)``, subsequent
+  call to ``(weblocks/debug:status)`` returned ``T``, but should return
+  ``NIL``.
+
+  This was fixed now.
+
 0.35.0
 ======
 
