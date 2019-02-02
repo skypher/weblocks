@@ -93,7 +93,7 @@ To clear, use function \(reset-last-session\).")
 
 
 (defun off ()
-  (setf *on* t)
+  (setf *on* nil)
 
   (when (getf *config* :track-latest-session)
     ;; TODO: implement hook removal
