@@ -90,7 +90,7 @@ Single test:
 
 .. code:: common-lisp
 
-          (rove:run-test 'weblocks/t/dependencies::render-js-dependency)
+          (rove:run-test 'weblocks-test/dependencies::render-js-dependency)
 
 From command line:
 
