@@ -53,7 +53,8 @@
                "weblocks/default-init"
                "weblocks/widgets/string-widget"
                "weblocks/widgets/funcall-widget"
-               "weblocks/utils/clos")
+               "weblocks/utils/clos"
+               "weblocks/utils/i18n")
   :in-order-to ((test-op (test-op "weblocks-test"))))
 
 

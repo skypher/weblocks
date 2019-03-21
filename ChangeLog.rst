@@ -2,6 +2,12 @@
  ChangeLog
 ===========
 
+0.35.2 (2019-03-21)
+===================
+
+* Subsystem ``weblocks/utils/i18n`` was added to asd file, because
+  otherwise system ``weblocks-ui`` can't be installed from the Ultralisp.
+
 0.35.1 (2019-02-02)
 ===================
 
