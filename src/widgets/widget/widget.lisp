@@ -571,9 +571,10 @@ Slots will be copied shallowly except for CHILDREN."
             (copy (make-instance (type-of root))))
         (dolist (slotname slotnames)
           (if (slot-boundp root slotname)
-            (case slotname
-              (children (mapc #'copy-widget-tree slotname))
-              (t (setf (slot-value copy slotname) (slot-value root slotname))))
+              (setf (slot-value copy slotname)
+                    (if (eql slotname 'children)
+                        (mapcar #'copy-widget-tree (slot-value root slotname))
+                        (slot-value root slotname)))
             (slot-makunbound root slotname)))
         copy))))
 
